@@ -492,7 +492,7 @@
                         </Setter>
 
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.AnimateText, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="True">
+                            <DataTrigger Binding="{Binding DataContext.AnimateText, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" Value="True">
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
                                         <DataTemplate DataType="{x:Type vm:ContentViewModel}">
@@ -515,7 +515,7 @@
                                 </Setter>
                             </DataTrigger>
 
-                            <DataTrigger Binding="{Binding DataContext.PartialText, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="True">
+                            <DataTrigger Binding="{Binding DataContext.PartialText, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" Value="True">
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
                                         <DataTemplate DataType="{x:Type vm:ContentViewModel}">
@@ -557,14 +557,14 @@
                                     Name="image"
                                     Stretch="Uniform"
                                     Source="{Binding Value, Converter={StaticResource UriConverter}}"
-                                    lb:ImageController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                    lb:ImageController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" />
                             </DataTemplate>
 
                             <DataTemplate x:Key="{x:Static vm:ContentType.Video}">
                                 <MediaElement
                                     Source="{Binding Value}"
                                     Stretch="Uniform"
-                                    lb:MediaController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                    lb:MediaController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" />
                             </DataTemplate>
 
                             <DataTemplate x:Key="{x:Static vm:ContentType.Html}">

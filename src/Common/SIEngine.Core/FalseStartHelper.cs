@@ -13,8 +13,8 @@ public static class FalseStartHelper
     /// </summary>
     /// <param name="script">Question script.</param>
     /// <param name="parameters">Question parameters.</param>
-    /// <param name="falseStartMode"></param>
-    /// <returns></returns>
+    /// <param name="falseStartMode">False start mode.</param>
+    /// <returns>Index of first step that should allow button press.</returns>
     public static int? GetAskAnswerStartIndex(
         Script script,
         StepParameters? parameters,

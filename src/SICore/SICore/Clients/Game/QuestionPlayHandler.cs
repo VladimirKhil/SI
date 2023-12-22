@@ -83,15 +83,30 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         GameData.IsPlayingMedia = false;
     }
 
-    public void OnButtonPressStart()
+    public bool OnButtonPressStart()
     {
         if (GameLogic == null || GameData == null)
         {
-            return;
+            return false;
+        }
+
+        // TODO: merge somehow with GameLogic.AskToPress() and OnAskAnswer() for buttons
+        if (GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.LayoutShown)
+        {
+            GameLogic.OnAnswerOptions(false, GameData.QuestionPlayState.AnswerOptions);
+            GameData.QuestionPlayState.LayoutShown = true;
+        }
+
+        if (GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.AnswerOptionsShown)
+        {
+            GameLogic.ShowAnswerOptions(null);
+            GameData.QuestionPlayState.AnswerOptionsShown = true;
+            return true;
         }
 
         GameData.AnswerMode = StepParameterValues.AskAnswerMode_Button;
-        GameLogic.OnButtonPressStart(); // TODO: merge somehow with GameLogic.AskToPress()
+        GameLogic.OnButtonPressStart();
+        return false;
     }
 
     public void OnContentStart(IEnumerable<ContentItem> contentItems)

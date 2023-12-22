@@ -28,10 +28,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         
     }
 
-    public void OnButtonPressStart()
-    {
-        throw new NotImplementedException();
-    }
+    public bool OnButtonPressStart() => false;
 
     public void OnContentStart(IEnumerable<ContentItem> contentItems)
     {

@@ -4712,7 +4712,7 @@ public sealed class GameLogic : Logic<GameData>
         _gameActions.SendMessage(messageBuilder.ToString());
     }
 
-    internal void ShowAnswerOptions(Action continuation)
+    internal void ShowAnswerOptions(Action? continuation)
     {
         if (ClientData.QuestionPlayState.AnswerOptions == null)
         {

@@ -1772,5 +1772,6 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     {
         TInfo.AnswerOptions.Options = optionsTypes.Select(i => new ItemViewModel()).ToArray();
         TInfo.LayoutMode = LayoutMode.AnswerOptions;
+        TInfo.TStage = TableStage.Question;
     }
 }

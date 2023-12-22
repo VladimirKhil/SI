@@ -29,7 +29,7 @@ public interface IQuestionEnginePlayHandler
     /// <summary>
     /// Allows to press the button.
     /// </summary>
-    void OnButtonPressStart();
+    bool OnButtonPressStart();
 
     /// <summary>
     /// Sets question answerer(s).

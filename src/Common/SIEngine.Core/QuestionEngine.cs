@@ -224,7 +224,11 @@ public sealed class QuestionEngine
                 case StepTypes.ShowContent:
                     if (_stepIndex == _askAnswerStartIndex)
                     {
-                        _playHandler.OnButtonPressStart();
+                        if (_playHandler.OnButtonPressStart())
+                        {
+                            return true;
+                        }
+
                         _askAnswerStartIndex = null;
                     }
 
