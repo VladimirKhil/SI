@@ -11,6 +11,11 @@ public static class Constants
     public const string GameHost = "<GAMEHOST>";
 
     /// <summary>
+    /// Game host uri placeholder.
+    /// </summary>
+    public const string GameHostUri = "http://" + GameHost;
+
+    /// <summary>
     /// Server host name placeholder in server host Uri.
     /// </summary>
     public const string ServerHost = "<SERVERHOST>";

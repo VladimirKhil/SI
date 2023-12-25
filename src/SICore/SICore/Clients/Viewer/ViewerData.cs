@@ -12,7 +12,30 @@ namespace SICore;
 /// </summary>
 public sealed class ViewerData : Data
 {
-    public string ServerAddress { get; set; }
+    private string? _serverAddress = null;
+
+    public string? ServerAddress
+    {
+        get => _serverAddress;
+        set
+        {
+            if (_serverAddress != value)
+            {
+                _serverAddress = value;
+                OnPropertyChanged();
+
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    if (Uri.TryCreate(value, UriKind.Absolute, out var hostUri))
+                    {
+                        ServerHostUri = "http://" + hostUri.Host;
+                    }
+                }
+            }
+        }
+    }
+
+    public string ServerHostUri { get; private set; } = "";
 
     public string ServerPublicUrl { get; set; }
 

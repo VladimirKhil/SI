@@ -616,6 +616,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         TInfo.PartialText = true;
         TInfo.Text = text.ToString();
         TInfo.TStage = TableStage.Question;
+        TInfo.QuestionContentType = QuestionContentType.Text;
     }
 
     public void OnContent(string[] mparams)
@@ -638,6 +639,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 var contentType = mparams[i + 1];
                 var contentValue = mparams[i + 2];
 
+                contentValue = PreprocessUri(contentType, contentValue);
+
                 content.Add(new ContentInfo(contentType, contentValue));
 
                 i += 2;
@@ -647,6 +650,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 var label = mparams[i + 1];
                 var contentType = mparams[i + 2];
                 var contentValue = mparams[i + 3];
+
+                contentValue = PreprocessUri(contentType, contentValue);
 
                 var option = TInfo.AnswerOptions.Options[layoutId - 1];
 
@@ -695,6 +700,21 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             default:
                 break;
         }
+    }
+
+    private string PreprocessUri(string contentType, string contentValue)
+    {
+        if (contentType == ContentTypes.Text)
+        {
+            return contentValue;
+        }
+
+        if (contentValue.StartsWith(Constants.GameHostUri))
+        {
+            return string.Concat(ClientData.ServerHostUri, contentValue.AsSpan(Constants.GameHostUri.Length));
+        }
+
+        return contentValue;
     }
 
     public void OnContentAppend(string[] mparams)

@@ -13,5 +13,5 @@ public interface IFileShare : IAsyncDisposable
     /// <param name="resourceKind">File resource kind.</param>
     /// <param name="relativePath">Relative path to the file.</param>
     /// <returns>Absolute Uri to access the file.</returns>
-    Uri CreateResourceUri(ResourceKind resourceKind, Uri relativePath);
+    string CreateResourceUri(ResourceKind resourceKind, Uri relativePath);
 }

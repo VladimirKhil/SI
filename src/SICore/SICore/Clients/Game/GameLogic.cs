@@ -526,22 +526,22 @@ public sealed class GameLogic : Logic<GameData>
             CheckFileLength(contentType, fileLength.Value);
         }
 
-        Uri uri;
+        string globalUri;
         string? localUri;
 
         if (fullUri.Scheme == "file")
         {
             localUri = fullUri.AbsolutePath;
             var fileName = Path.GetFileName(localUri);
-            uri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
+            globalUri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
         }
         else
         {
-            uri = fullUri;
+            globalUri = fullUri.ToString();
             localUri = null;
         }
 
-        return (true, uri.ToString(), localUri);
+        return (true, globalUri, localUri);
     }
 
     private bool ShareMedia(ContentItem contentItem, bool isBackground = false)
@@ -561,7 +561,12 @@ public sealed class GameLogic : Logic<GameData>
                 return false;
             }
 
-            _gameActions.SendMessageWithArgs(Messages.Content, contentItem.Placement, 0, contentItem.Type, globalUri);
+            _gameActions.SendMessageWithArgs(
+                Messages.Content,
+                contentItem.Placement,
+                0,
+                contentItem.Type,
+                globalUri);
 
             // TODO: remove after complete switching to Content message
             // {
@@ -586,7 +591,7 @@ public sealed class GameLogic : Logic<GameData>
                 }
                 else
                 {
-                    msg2.Append(Message.ArgsSeparatorChar).Append(globalUri.Replace("http://localhost", $"http://{Constants.GameHost}"));
+                    msg2.Append(Message.ArgsSeparatorChar).Append(globalUri);
                 }
 
                 _gameActions.SendMessage(msg2.ToString(), person);

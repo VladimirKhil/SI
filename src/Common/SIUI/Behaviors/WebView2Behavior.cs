@@ -28,7 +28,18 @@ internal static class WebView2Behavior
 
         UpdateWebView2Environment(webView2);
 
+        webView2.NavigationStarting += WebView2_NavigationStarting;
         webView2.Unloaded += WebView2_Unloaded;
+    }
+
+    private static void WebView2_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
+    {
+        if (e.Uri.StartsWith("file:///") || e.Uri.StartsWith("https://www.youtube.com/"))
+        {
+            return;
+        }
+
+        e.Cancel = true;
     }
 
     private static void WebView2_Unloaded(object sender, RoutedEventArgs e)
@@ -40,6 +51,7 @@ internal static class WebView2Behavior
             return;
         }
 
+        webView2.NavigationStarting -= WebView2_NavigationStarting;
         webView2.Unloaded -= WebView2_Unloaded;
 
         var coreWebView = webView2.CoreWebView2;

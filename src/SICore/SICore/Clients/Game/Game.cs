@@ -1129,7 +1129,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 }
             }
 
-            var uri = _fileShare.CreateResourceUri(Clients.ResourceKind.Avatar, new Uri(file, UriKind.Relative));
+            var uri = _fileShare.CreateResourceUri(ResourceKind.Avatar, new Uri(file, UriKind.Relative));
 
             person.Picture = $"URI: {uri}";
         }
@@ -3536,10 +3536,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                     _avatarHelper.AddFile(avatarUri, complexName);
                 }
 
-                path = _fileShare.CreateResourceUri(ResourceKind.Avatar, new Uri(complexName, UriKind.Relative)).ToString();
+                path = _fileShare.CreateResourceUri(ResourceKind.Avatar, new Uri(complexName, UriKind.Relative));
             }
 
-            return local ? path : path.Replace("http://localhost", "http://" + Constants.GameHost);
+            return path;
         }
         else
         {

@@ -742,6 +742,8 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             host.MyData.AutoReady = true;
         }
 
+        host.MyData.ServerAddress = "http://localhost";
+
         MoveToGame(node, host, documentPath, fileShare);
     }
 

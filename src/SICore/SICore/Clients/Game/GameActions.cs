@@ -259,8 +259,7 @@ public sealed class GameActions
                                             ResourceKind.Package,
                                             new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
 
-                                        var externalUri = resourceUri.ToString().Replace("http://localhost", "http://" + Constants.GameHost);
-                                        contentUris.Add(externalUri);
+                                        contentUris.Add(resourceUri);
                                     }
                                 }
 

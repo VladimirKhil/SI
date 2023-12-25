@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.FileProviders;
+using SICore;
 using SICore.Clients;
 using SICore.Contracts;
 using SIPackages;
@@ -84,12 +85,12 @@ public sealed class WebManager : IFileShare
         _webApplication.RunAsync($"http://+:{port}");
     }
 
-    public Uri CreateResourceUri(ResourceKind resourceKind, Uri relativePath) =>
+    public string CreateResourceUri(ResourceKind resourceKind, Uri relativePath) =>
         new(resourceKind switch
         {
-            ResourceKind.DefaultAvatar => $"http://localhost:{_port}/defaultAvatars/{relativePath}",
-            ResourceKind.Avatar => $"http://localhost:{_port}/avatars/{relativePath}",
-            _ => $"http://localhost:{_port}/package/{relativePath}"
+            ResourceKind.DefaultAvatar => $"{Constants.GameHostUri}:{_port}/defaultAvatars/{relativePath}",
+            ResourceKind.Avatar => $"{Constants.GameHostUri}:{_port}/avatars/{relativePath}",
+            _ => $"{Constants.GameHostUri}:{_port}/package/{relativePath}"
         });
 
     public ValueTask DisposeAsync() => _webApplication.DisposeAsync();
