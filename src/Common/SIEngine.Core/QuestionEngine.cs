@@ -229,6 +229,7 @@ public sealed class QuestionEngine
                             return true;
                         }
 
+                        _isAskingAnswer = true;
                         _askAnswerStartIndex = null;
                     }
 
@@ -452,6 +453,12 @@ public sealed class QuestionEngine
         {
             _stepIndex = nextStepIndex + 1;
             _contentIndex = 0;
+
+            if (_isAskingAnswer)
+            {
+                _playHandler.OnAskAnswerStop();
+                _isAskingAnswer = false;
+            }
         }
     }
 }

@@ -2673,6 +2673,7 @@ public sealed class GameLogic : Logic<GameData>
             if (themeComments.Length > 0)
             {
                 _gameActions.ShowmanReplic(themeComments);
+                _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines());
                 ScheduleExecution(Tasks.QuestionType, 10, arg + 1);
                 return;
             }
@@ -4515,14 +4516,16 @@ public sealed class GameLogic : Logic<GameData>
     internal void OnComplexAnswer()
     {
         var last = _data.QuestionHistory.LastOrDefault();
+        var answer = _data.Question?.Right.FirstOrDefault();
 
         if (last == null || !last.IsRight) // There has been no right answer
         {
-            var answer = _data.Question.Right.FirstOrDefault();
             var printedAnswer = answer != null ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
 
             _gameActions.ShowmanReplic(printedAnswer);
         }
+
+        _gameActions.SendMessageWithArgs(Messages.RightAnswerStart, ContentTypes.Text, answer ?? "");
     }
 
     internal void OnRightAnswerOption(string rightOptionLabel)

@@ -1,4 +1,5 @@
 ﻿using SIUI.ViewModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -27,19 +28,43 @@ internal static class ContentCollectionBehavior
             return;
         }
 
-        grid.RowDefinitions.Clear();
+        void TableInfoViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null || e.PropertyName != nameof(TableInfoViewModel.Content))
+            {
+                return;
+            }
+
+            var tableInfoViewModel = (TableInfoViewModel)sender;
+
+            CalculateRowDefinitions(grid, tableInfoViewModel);
+        }
+
+        if (e.OldValue is TableInfoViewModel table)
+        {
+            table.PropertyChanged -= TableInfoViewModel_PropertyChanged;
+        }
 
         if (e.NewValue is not TableInfoViewModel tableInfoViewModel)
         {
             return;
         }
+        
+        tableInfoViewModel.PropertyChanged += TableInfoViewModel_PropertyChanged;
 
+        CalculateRowDefinitions(grid, tableInfoViewModel);
+    }
+
+    private static void CalculateRowDefinitions(Grid grid, TableInfoViewModel tableInfoViewModel)
+    {
         var content = tableInfoViewModel.Content;
 
         if (content == null)
         {
             return;
         }
+
+        grid.RowDefinitions.Clear();
 
         foreach (var contentItem in content)
         {

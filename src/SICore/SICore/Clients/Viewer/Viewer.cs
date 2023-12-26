@@ -733,6 +733,7 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
                 case Messages.Question:
                     if (mparams.Length > 1)
                     {
+                        _logic.ClearQuestionState();
                         _logic.SetText(mparams[1], TableStage.QuestionPrice);
                         OnThemeOrQuestion();
                         _logic.SetCaption($"{ClientData.ThemeName}, {mparams[1]}");
@@ -799,6 +800,13 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
                     }
                     break;
 
+                case Messages.ThemeComments:
+                    if (mparams.Length > 1)
+                    {
+                        _logic.OnThemeComments(mparams[1]);
+                    }
+                    break;
+
                 case Messages.QType:
                     OnQuestionType(mparams);
                     break;
@@ -852,6 +860,13 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
 
                 case Messages.RightAnswer:
                     _logic.OnRightAnswer(mparams[2]);
+                    break;
+
+                case Messages.RightAnswerStart:
+                    if (mparams.Length > 2)
+                    {
+                        _logic.OnRightAnswerStart(mparams[2]);
+                    }
                     break;
 
                 case Messages.Resume:
@@ -1164,6 +1179,7 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
             player.MediaLoaded = false;
         }
 
+        _logic.ClearQuestionState();
         _logic.Choice();
     }
 

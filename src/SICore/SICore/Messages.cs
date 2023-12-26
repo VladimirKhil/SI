@@ -372,6 +372,11 @@ public static class Messages
     public const string RightAnswer = "RIGHTANSWER";
 
     /// <summary>
+    /// Notifies about complex answer start.
+    /// </summary>
+    public const string RightAnswerStart = "RIGHT_ANSWER_START";
+
+    /// <summary>
     /// Тип вопроса
     /// </summary>
     public const string QType = "QTYPE";
@@ -483,6 +488,11 @@ public static class Messages
     /// Тема
     /// </summary>
     public const string Theme = "THEME";
+
+    /// <summary>
+    /// Theme comments.
+    /// </summary>
+    public const string ThemeComments = "THEME_COMMENTS";
 
     /// <summary>
     /// Изменения таймера

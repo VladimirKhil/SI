@@ -66,6 +66,12 @@ public interface IViewerLogic : ILogic
     /// <param name="answer">Right answer or label.</param>
     void OnRightAnswer(string answer);
 
+    /// <summary>
+    /// Handles right complex answer start.
+    /// </summary>
+    /// <param name="answer">Simple answer text.</param>
+    void OnRightAnswerStart(string answer) { }
+
     void Resume();
 
     /// <summary>
@@ -193,4 +199,8 @@ public interface IViewerLogic : ILogic
     /// </summary>
     /// <param name="full">Should game table selection be cleared too.</param>
     void ClearSelections(bool full = false) { }
+
+    void ClearQuestionState() { }
+
+    void OnThemeComments(string comments) { }
 }

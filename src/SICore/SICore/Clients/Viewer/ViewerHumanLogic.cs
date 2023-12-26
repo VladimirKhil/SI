@@ -2,11 +2,13 @@
 using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
 using SIData;
+using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Utils;
 using R = SICore.Properties.Resources;
@@ -14,11 +16,16 @@ using R = SICore.Properties.Resources;
 namespace SICore;
 
 /// <summary>
-/// Логика зрителя-человека
+/// Defines a human viewer logic.
 /// </summary>
 public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 {
     private record struct ContentInfo(string Type, string Uri);
+
+    /// <summary>
+    /// Maximum length of text that could be automatically added to game table.
+    /// </summary>
+    private const int MaxAdditionalTableTextLength = 150;
 
     private static readonly TimeSpan HintLifetime = TimeSpan.FromSeconds(6);
 
@@ -40,6 +47,9 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     public IPlayerLogic PlayerLogic { get; }
 
     public IShowmanLogic ShowmanLogic { get; }
+
+    private string? _prependTableText;
+    private string? _appendTableText;
 
     public ViewerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer)
         : base(data)
@@ -549,6 +559,12 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
+    public void ClearQuestionState()
+    {
+        _prependTableText = null;
+        _appendTableText = null;
+    }
+
     virtual public async void Choice()
     {
         TInfo.Text = "";
@@ -847,6 +863,22 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             groups.Add(currentGroup);
         }
 
+        if (groups.Count == 1 && groups[0].Content.Count == 1 && groups[0].Content[0].Type != ContentType.Text)
+        {
+            if (_prependTableText != null)
+            {
+                var group = new ContentGroup();
+                group.Content.Add(new ContentViewModel(ContentType.Text, _prependTableText, 0.0));
+                groups.Insert(0, group);
+            }
+            else if (_appendTableText != null)
+            {
+                var group = new ContentGroup();
+                group.Content.Add(new ContentViewModel(ContentType.Text, _appendTableText, 0.0));
+                groups.Add(group);
+            }
+        }
+
         TInfo.Content = groups;
         TInfo.QuestionContentType = QuestionContentType.Collection;
     }
@@ -858,7 +890,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         if (TInfo.TStage != TableStage.Question)
         {
             TInfo.TStage = TableStage.Question;
-            TInfo.QuestionContentType = QuestionContentType.Clef;
+            TInfo.QuestionContentType = QuestionContentType.Void;
         }
 
         if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
@@ -882,7 +914,21 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
         if (TInfo.QuestionContentType == QuestionContentType.Void)
         {
-            TInfo.QuestionContentType = QuestionContentType.Clef;
+            var additionalText = _appendTableText ?? _prependTableText;
+
+            if (additionalText != null)
+            {
+                var groups = new List<ContentGroup>();
+                var group = new ContentGroup();
+                group.Content.Add(new ContentViewModel(ContentType.Text, additionalText, 0.0));
+                groups.Add(group);
+                TInfo.Content = groups;
+                TInfo.QuestionContentType = QuestionContentType.Collection;
+            }
+            else
+            {
+                TInfo.QuestionContentType = QuestionContentType.Clef;
+            }
         }
     }
 
@@ -1177,7 +1223,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             }
             catch (NullReferenceException exc)
             {
-                // Strange error is periodically happened in WPF bindings
+                // Strange error happened periodically in WPF bindings
                 _data.Host.SendError(exc);
             }
         }
@@ -1210,6 +1256,23 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 }
             }
         }
+    }
+
+    public void OnRightAnswerStart(string answer)
+    {
+        TInfo.AnimateText = false;
+        TInfo.PartialText = false;
+        TInfo.Content = Array.Empty<ContentGroup>();
+        TInfo.QuestionContentType = QuestionContentType.Void;
+        TInfo.Sound = false;
+
+        _prependTableText = null;
+        _appendTableText = answer.LeaveFirst(MaxAdditionalTableTextLength);
+    }
+
+    public void OnThemeComments(string comments)
+    {
+        _prependTableText = comments.UnescapeNewLines().LeaveFirst(MaxAdditionalTableTextLength);
     }
 
     public void Try() => TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
