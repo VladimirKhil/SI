@@ -624,7 +624,7 @@
                             </DataTemplate>
 
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Collection}">
-                                <ItemsControl ItemsSource="{Binding Content}" AlternationCount="100000">
+                                <ItemsControl ItemsSource="{Binding Content}" AlternationCount="100000" Margin="0,0,0,10">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <Grid lb:ContentCollectionBehavior.IsAttached="{Binding}" />
@@ -643,7 +643,7 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <ContentControl
-                                                            Margin="10"
+                                                            Margin="10,10,10,0"
                                                             Content="{Binding}"
                                                             ContentTemplate="{Binding Type, Converter={StaticResource QuestionContentSelector2}}" />
                                                     </DataTemplate>

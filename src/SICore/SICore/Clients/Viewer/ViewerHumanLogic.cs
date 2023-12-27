@@ -557,6 +557,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 TInfo.TStage = TableStage.Final;
             }
         }
+
+        ClearQuestionState();
     }
 
     public void ClearQuestionState()
@@ -826,7 +828,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 case ContentTypes.Video:
                 case ContentTypes.Image:
                 case ContentTypes.Html:
-                    currentGroup ??= new ContentGroup { Weight = 3.0 };
+                    currentGroup ??= new ContentGroup { Weight = 4.0 };
 
                     var uri = contentValue;
 
