@@ -2193,7 +2193,9 @@ public sealed class Game : Actor<GameData, GameLogic>
                     _logic.Engine.MoveToAnswer();
                 }
 
-                _logic.ExecuteImmediate();
+                _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All);
+                _logic.ClearContinuation();
+                _logic.ScheduleExecution(Tasks.MoveNext, 1, force: true);
             }
         }
     }

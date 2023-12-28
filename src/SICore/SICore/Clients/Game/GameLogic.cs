@@ -67,6 +67,8 @@ public sealed class GameLogic : Logic<GameData>
     /// </summary>
     private Action? _continuation;
 
+    internal void ClearContinuation() => _continuation = null;
+
     /// <summary>
     /// Minimum price in round.
     /// </summary>
