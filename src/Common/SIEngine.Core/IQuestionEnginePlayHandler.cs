@@ -88,7 +88,7 @@ public interface IQuestionEnginePlayHandler
     bool OnRightAnswerOption(string rightOptionLabel);
 
     /// <summary>
-    /// Handles the ending of asking for an answer.
+    /// Handles answer start.
     /// </summary>
-    void OnAskAnswerStop();
+    void OnAnswerStart();
 }

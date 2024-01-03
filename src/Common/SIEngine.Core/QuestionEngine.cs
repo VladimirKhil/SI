@@ -16,8 +16,9 @@ public sealed class QuestionEngine
 
     private bool _started = false;
 
-    private int? _askAnswerStartIndex = null;
+    private int? _enableButtonsStepIndex = null;
     private bool _isAskingAnswer = false;
+    private bool _areButtonsEnabled = false;
 
     private bool _isAnswerTypeSelect = false;
 
@@ -59,14 +60,14 @@ public sealed class QuestionEngine
 
         if (!_started)
         {
-            _askAnswerStartIndex = FalseStartHelper.GetAskAnswerStartIndex(_script, _question.Parameters, _options.FalseStarts);
+            _enableButtonsStepIndex = FalseStartHelper.GetAskAnswerStartIndex(_script, _question.Parameters, _options.FalseStarts);
             _playHandler.OnQuestionStart(ScriptHasAskAnswerButtonsStep(_script));
             _started = true;
         }
 
         if (_isAskingAnswer)
         {
-            _playHandler.OnAskAnswerStop();
+            _playHandler.OnAnswerStart();
             _isAskingAnswer = false;
         }
 
@@ -222,15 +223,15 @@ public sealed class QuestionEngine
                 // Preambula part end
 
                 case StepTypes.ShowContent:
-                    if (_stepIndex == _askAnswerStartIndex)
+                    if (_stepIndex == _enableButtonsStepIndex)
                     {
                         if (_playHandler.OnButtonPressStart())
                         {
                             return true;
                         }
 
-                        _isAskingAnswer = true;
-                        _askAnswerStartIndex = null;
+                        _areButtonsEnabled = true;
+                        _enableButtonsStepIndex = null;
                     }
 
                     if (!step.Parameters.TryGetValue(StepParameterNames.Content, out var content))
@@ -454,9 +455,10 @@ public sealed class QuestionEngine
             _stepIndex = nextStepIndex + 1;
             _contentIndex = 0;
 
-            if (_isAskingAnswer)
+            if (_areButtonsEnabled || _isAskingAnswer)
             {
-                _playHandler.OnAskAnswerStop();
+                _playHandler.OnAnswerStart();
+                _areButtonsEnabled = false;
                 _isAskingAnswer = false;
             }
         }

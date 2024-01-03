@@ -249,7 +249,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         
     }
 
-    public void OnAskAnswerStop()
+    public void OnAnswerStart()
     {
         
     }

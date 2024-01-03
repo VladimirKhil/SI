@@ -23,7 +23,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         
     }
 
-    public void OnAskAnswerStop()
+    public void OnAnswerStart()
     {
         
     }

@@ -69,7 +69,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         }
     }
 
-    public void OnAskAnswerStop()
+    public void OnAnswerStart()
     {
         if (GameLogic == null || GameData == null)
         {
