@@ -36,6 +36,11 @@ public sealed class NumberSetEditorNewViewModel : ModelViewBase
                 var oldValue = _model.Minimum;
                 _model.Minimum = value;
                 OnPropertyChanged(oldValue);
+
+                if (_mode == NumberSetMode.FixedValue)
+                {
+                    Maximum = value;
+                }
             }
         }
     }
