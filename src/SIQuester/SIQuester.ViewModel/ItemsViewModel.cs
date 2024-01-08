@@ -134,9 +134,10 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
         {
             using var change = document.OperationsManager.BeginComplexChange();
 
+            var currentItem = this[index];
             (this[index - 1], this[index]) = (this[index], this[index - 1]);
-            CurrentItem = this[_currentPosition];
-            UpdateCommands();
+            CurrentPosition--;
+            CurrentItem = currentItem;
 
             change.Commit();
         }
@@ -161,9 +162,10 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
         {
             using var change = document.OperationsManager.BeginComplexChange();
 
+            var currentItem = this[index];
             (this[index + 1], this[index]) = (this[index], this[index + 1]);
-            CurrentItem = this[_currentPosition];
-            UpdateCommands();
+            CurrentPosition++;
+            CurrentItem = currentItem;
 
             change.Commit();
         }

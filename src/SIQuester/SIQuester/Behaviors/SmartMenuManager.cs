@@ -134,7 +134,7 @@ public static class SmartMenuManager
 
         doc.ActiveItem = context;
 
-        ActionMenuViewModel.Instance.PlacementTarget = control;
+        ActionMenuViewModel.Instance.PlacementTarget = e.OriginalSource as UIElement ?? control;
         ActionMenuViewModel.Instance.IsOpen = true;
     }
 

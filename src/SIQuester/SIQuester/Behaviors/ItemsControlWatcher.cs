@@ -54,7 +54,7 @@ public sealed class ItemsControlWatcher
                 return;
             }
         }
-
+        
         if (parentList.Contains(childItem))
         {
             parentList.SetCurrentItem(childItem);

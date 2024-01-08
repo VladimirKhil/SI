@@ -230,10 +230,17 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             return;
         }
 
+        var ownerPackage = OwnerTheme.OwnerRound?.OwnerPackage;
+
+        if (ownerPackage == null)
+        {
+            return;
+        }
+
         var quest = Model.Clone();
         var newQuestionViewModel = new QuestionViewModel(quest);
         OwnerTheme.Questions.Add(newQuestionViewModel);
-        OwnerTheme.OwnerRound.OwnerPackage.Document.Navigate.Execute(newQuestionViewModel);
+        ownerPackage.Document.Navigate.Execute(newQuestionViewModel);
     }
 
     private void RemoveQuestion_Executed(object? arg) => OwnerTheme?.Questions.Remove(this);

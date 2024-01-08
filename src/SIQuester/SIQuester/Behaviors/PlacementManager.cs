@@ -28,7 +28,7 @@ public static class PlacementManager
         var newPlacement = (UIElement)e.NewValue;
         var margin = newPlacement.TranslatePoint(new Point(0, 0), grid);
 
-        var newX = Math.Min(margin.X + (margin.Y == 0 ? 400 : 100), grid.ActualWidth - 300);
+        var newX = Math.Min(margin.X + (margin.Y == 0 ? 400 : 100), grid.ActualWidth - 600);
         var newY = Math.Max(0, margin.Y - 90);
 
         var sb = new Storyboard();

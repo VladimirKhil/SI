@@ -1026,12 +1026,14 @@
                                                     </DataTemplate>
                                                 </Setter.Value>
                                             </Setter>
-                                            
+
                                             <Setter Property="Margin" Value="2" />
-                                            
-                                            <Setter
-                                                Property="Visibility"
-                                                Value="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource VisibilityConverter}}" />
+
+                                            <Style.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value="0.5" />
+                                                </Trigger>
+                                            </Style.Triggers>
                                         </Style>
 
                                         <Style
@@ -2933,15 +2935,15 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Border Style="{StaticResource mediaBorder}" ToolTip="{Binding Model.Value}">
-                                <Image
-                                    MinWidth="20"
-                                    MinHeight="20"
-                                    MaxWidth="300"
-                                    MaxHeight="300"
-                                    Stretch="Uniform"
-                                    Source="{Binding MediaSource.Uri, Converter={StaticResource ImageConverter}}" />
-                            </Border>
+                            <Image
+                                Margin="2"
+                                ToolTip="{Binding Model.Value}"
+                                MinWidth="20"
+                                MinHeight="20"
+                                MaxWidth="200"
+                                MaxHeight="200"
+                                Stretch="Uniform"
+                                Source="{Binding MediaSource.Uri, Converter={StaticResource ImageConverter}}" />
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -2976,8 +2978,8 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Border Style="{StaticResource mediaBorder}" ToolTip="{Binding Model.Text}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
+                            <Border Style="{StaticResource mediaBorder}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4" ToolTip="{Binding Model.Text}">
                                     <ToggleButton Style="{StaticResource playButton}" Name="play" />
                                     <Slider Style="{StaticResource playSlider}" Name="progress" />
                                     
@@ -3025,21 +3027,19 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Border Style="{StaticResource mediaBorder}" ToolTip="{Binding Model.Value}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
-                                    <ToggleButton Style="{StaticResource playButton}" Name="play" />
-                                    <Slider Style="{StaticResource playSlider}" Name="progress" />
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4" ToolTip="{Binding Model.Value}">
+                                <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                                <Slider Style="{StaticResource playSlider}" Name="progress" />
 
-                                    <MediaElement
-                                        Name="mediaElement1"
-                                        lb:MediaController.Source="{Binding}"
-                                        LoadedBehavior="Manual"
-                                        UnloadedBehavior="Manual"
-                                        ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
-                                        lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
-                                        lb:MediaController.Progress="{Binding ElementName=progress}" />
-                                </StackPanel>
-                            </Border>
+                                <MediaElement
+                                    Name="mediaElement1"
+                                    lb:MediaController.Source="{Binding}"
+                                    LoadedBehavior="Manual"
+                                    UnloadedBehavior="Manual"
+                                    ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                                    lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                                    lb:MediaController.Progress="{Binding ElementName=progress}" />
+                            </StackPanel>
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -3134,32 +3134,30 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Border Style="{StaticResource mediaBorder}" ToolTip="{Binding Model.Value}">
-                                <Grid Margin="4">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
+                            <Grid Margin="4" ToolTip="{Binding Model.Value}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
 
-                                    <Rectangle Fill="Lavender" />
+                                <Rectangle Fill="Lavender" />
 
-                                    <MediaElement
-                                        Name="mediaElement1"
-                                        lb:MediaController.Source="{Binding}"
-                                        LoadedBehavior="Manual"
-                                        UnloadedBehavior="Manual"
-                                        Width="400"
-                                        Height="200"
-                                        ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
-                                        lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
-                                        lb:MediaController.Progress="{Binding ElementName=progress}" />
+                                <MediaElement
+                                    Name="mediaElement1"
+                                    lb:MediaController.Source="{Binding}"
+                                    LoadedBehavior="Manual"
+                                    UnloadedBehavior="Manual"
+                                    Width="400"
+                                    Height="200"
+                                    ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                                    lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                                    lb:MediaController.Progress="{Binding ElementName=progress}" />
 
-                                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
-                                        <ToggleButton Style="{StaticResource playButton}" Name="play" />
-                                        <Slider Style="{StaticResource playSlider}" Name="progress" />
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
+                                <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
+                                    <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                                    <Slider Style="{StaticResource playSlider}" Name="progress" />
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -3248,7 +3246,7 @@
                             TextWrapping="Wrap"
                             AcceptsReturn="True"
                             Height="Auto"
-                            MinWidth="50"
+                            MinWidth="250"
                             Text="{Binding Model.Value, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource CommonTextBox}"
                             TabIndex="2"
@@ -3341,12 +3339,35 @@
 
                 <siqcv:TemplateConverter.Templates>
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Content}" DataType="vm:StepParameterViewModel">
-                        <ItemsControl
+                        <ListBox
                             DataContext="{Binding ContentValue}"
                             ItemsSource="{Binding}"
                             siq:SmartMenuManager.SecondMenu="True"
-                            vm1:ItemsControlWatcher.IsWatching="True">
-                            <ItemsControl.ItemTemplate>
+                            vm1:ItemsControlWatcher.IsWatching="True"
+                            SelectedItem="{Binding CurrentItem}"
+                            Background="Transparent"
+                            BorderThickness="0">
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <ItemsPresenter />
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Background" Value="#F3F3F3" />
+                                    <Setter Property="Margin" Value="1" />
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+
+                            <ListBox.ItemTemplate>
                                 <DataTemplate DataType="vm:ContentItemViewModel">
                                     <DockPanel>
                                         <ContentControl Style="{StaticResource ContentItemWaitForFinishStyle}" KeyboardNavigation.IsTabStop="False" />
@@ -3358,8 +3379,8 @@
                                             ContentTemplate="{Binding Model.Type, Converter={StaticResource ContentItemSelector}}" />
                                     </DockPanel>
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="vm:StepParameterViewModel">
@@ -3722,7 +3743,6 @@
                 
                 <HierarchicalDataTemplate.Triggers>
                     <Trigger SourceName="scenario" Property="IsMouseOver" Value="True">
-                        <Setter TargetName="scenario" Property="Control.Background" Value="{StaticResource ActiveBrush}" />
                         <Setter TargetName="right" Property="Control.Background" Value="{StaticResource SecondHighlightColor}" />
                     </Trigger>
                     

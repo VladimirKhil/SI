@@ -214,7 +214,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
     private void UpdateContentItemCommands()
     {
         var contentItem = CurrentItem;
-        var atomType = contentItem.Model.Type;
+        var atomType = contentItem?.Model.Type;
 
         var isMedia = atomType == AtomTypes.Image
             || atomType == AtomTypes.Audio
@@ -486,7 +486,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                     index = Count - 1;
                 }
 
-                if (string.IsNullOrWhiteSpace(this[index].Model.Value) && this[index].Model.Type != AtomTypes.Marker)
+                if (string.IsNullOrWhiteSpace(this[index].Model.Value))
                 {
                     RemoveAt(index--);
                 }
@@ -496,21 +496,21 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                 index = -1;
             }
 
-            var contentItem = new ContentItemViewModel(new ContentItem 
+            for (var i = initialItemCount; i < collection.Files.Count; i++)
             {
-                Type = mediaType,
-                Value = "",
-                Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
-            });
+                var contentItem = new ContentItemViewModel(new ContentItem
+                {
+                    Type = mediaType,
+                    Value = "",
+                    Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+                });
 
-            Insert(index + 1, contentItem);
+                Insert(index + 1, contentItem);
 
-            var last = collection.Files.LastOrDefault();
+                var file = collection.Files[i];
 
-            if (last != null)
-            {
                 contentItem.Model.IsRef = true;
-                contentItem.Model.Value = last.Model.Name;
+                contentItem.Model.Value = file.Model.Name;
 
                 if (AppSettings.Default.SetRightAnswerFromFileName)
                 {
@@ -521,7 +521,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                         question.Right.RemoveAt(question.Right.Count - 1);
                     }
 
-                    question.Right.Add(Path.GetFileNameWithoutExtension(last.Model.Name));
+                    question.Right.Add(Path.GetFileNameWithoutExtension(file.Model.Name));
                 }
             }
 

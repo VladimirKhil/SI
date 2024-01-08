@@ -283,12 +283,12 @@ public sealed class QDocument : WorkspaceViewModel
             return;
         }
 
-        var atomType = contentItem.Type;
+        var contentType = contentItem.Type;
         var link = contentItem.Value;
 
-        if (!HasLinksTo(link)) // Called after items removal so works properly
+        if (contentType != ContentTypes.Text && !HasLinksTo(link)) // Called after items removal so works properly
         {
-            var collection = GetCollectionByMediaType(atomType);
+            var collection = GetCollectionByMediaType(contentType);
             RemoveFileByName(collection, link);
         }
     }
@@ -2600,6 +2600,8 @@ public sealed class QDocument : WorkspaceViewModel
             parent = parent.Owner;
         }
 
+        ActiveItem = null;
+
         if (expanded)
         {
             await Task.Delay(400);
@@ -2607,7 +2609,6 @@ public sealed class QDocument : WorkspaceViewModel
 
         infoOwner.IsSelected = true;
         ActiveNode = infoOwner;
-        ActiveItem = null;
     }
 
     internal ValueTask SaveInternalAsync() =>
