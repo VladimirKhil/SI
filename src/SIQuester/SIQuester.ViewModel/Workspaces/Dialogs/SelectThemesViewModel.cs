@@ -176,8 +176,13 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
     {
         var link = contentItem.Value;
 
-        var collection = oldDocument.Document.GetCollection(contentItem.Type);
-        var newCollection = newDocument.GetCollectionByMediaType(contentItem.Type);
+        var collection = oldDocument.Document.TryGetCollection(contentItem.Type);
+        var newCollection = newDocument.TryGetCollectionByMediaType(contentItem.Type);
+
+        if (collection == null || newCollection == null)
+        {
+            return;
+        }
 
         if (newCollection.Files.Any(f => f.Model.Name == link))
         {
@@ -206,8 +211,13 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
     {
         var link = atom.Text.ExtractLink();
 
-        var collection = oldDocument.Document.GetCollection(atom.Type);
-        var newCollection = newDocument.GetCollectionByMediaType(atom.Type);
+        var collection = oldDocument.Document.TryGetCollection(atom.Type);
+        var newCollection = newDocument.TryGetCollectionByMediaType(atom.Type);
+
+        if (collection == null || newCollection == null)
+        {
+            return;
+        }
 
         if (newCollection.Files.Any(f => f.Model.Name == link))
         {
