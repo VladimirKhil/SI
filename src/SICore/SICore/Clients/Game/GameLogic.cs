@@ -479,7 +479,8 @@ public sealed class GameLogic : Logic<GameData>
     internal void OnContentReplicText(string text, bool waitForFinish, TimeSpan duration)
     {
         _data.IsPartial = false;
-        _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Replic, 0, ContentTypes.Text, text.EscapeNewLines());
+        // There is no need to send content for now, as we can send replic directly
+        //_gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Replic, 0, ContentTypes.Text, text.EscapeNewLines());
         _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Oral, text);
         _gameActions.ShowmanReplic(text);
 

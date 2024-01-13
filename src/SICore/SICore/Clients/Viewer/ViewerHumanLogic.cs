@@ -641,6 +641,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     {
         if (mparams.Length < 5)
         {
+            OnSpecialReplic("Invalid content message");
             return;
         }
 
@@ -688,6 +689,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
         if (content.Count == 0)
         {
+            OnSpecialReplic("No content found");
             return;
         }
 
@@ -845,6 +847,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
                     if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
                     {
+                        OnSpecialReplic($"Unparsable uri: {uri}");
                         return;
                     }
 

@@ -288,10 +288,12 @@
             Background="{StaticResource WindowBackground}"
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}">
-            <ItemsPresenter
-                KeyboardNavigation.DirectionalNavigation="Cycle"
-                Margin="0"
-                HorizontalAlignment="Center" />
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsPresenter
+                    KeyboardNavigation.DirectionalNavigation="Cycle"
+                    Margin="0"
+                    HorizontalAlignment="Center" />
+            </ScrollViewer>
         </Border>
     </ControlTemplate>
 
