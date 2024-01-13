@@ -177,17 +177,17 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                     }
                 }
 
-                foreach (var quest in theme.Questions)
+                foreach (var question in theme.Questions)
                 {
-                    var questionText = quest.GetText();
+                    var questionText = question.GetText();
 
-                    var emptyQuestion = quest.Price > Question.InvalidPrice
-                        && quest.TypeName != QuestionTypes.SecretNoQuestion
+                    var emptyQuestion = question.Price > Question.InvalidPrice
+                        && question.TypeName != QuestionTypes.SecretNoQuestion
                         && (questionText == "" || questionText == Resources.Question)
-                        && !quest.HasMediaContent();
+                        && !question.HasMediaContent();
 
-                    var noAnswer = quest.Right.Count == 1 && quest.Right[0] == Resources.RightAnswer;
-                    var emptySources = quest.Info.Sources.Count == 0 && _checkEmptySources;
+                    var noAnswer = question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]);
+                    var emptySources = question.Info.Sources.Count == 0 && _checkEmptySources;
 
                     var bracketsData = new StringBuilder();
 
@@ -201,35 +201,35 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                             switch (i)
                             {
                                 case 0:
-                                    text = quest.GetText();
+                                    text = question.GetText();
                                     comment = Resources.QText;
                                     break;
 
                                 case 1:
-                                    if (quest.Right.Count == 0)
+                                    if (question.Right.Count == 0)
                                         continue;
 
-                                    text = quest.Right[0];
+                                    text = question.Right[0];
                                     comment = Resources.QAnswer;
                                     break;
 
                                 case 2:
-                                    if (quest.Info.Sources.Count == 0)
+                                    if (question.Info.Sources.Count == 0)
                                         continue;
 
-                                    text = quest.Info.Sources[0];
+                                    text = question.Info.Sources[0];
                                     comment = Resources.Source;
                                     break;
 
                                 case 3:
-                                    text = quest.Info.Comments.Text;
+                                    text = question.Info.Comments.Text;
                                     comment = Resources.Comment;
                                     break;
                             }
 
                             if (!Utils.ValidateTextBrackets(text))
                             {
-                                bracketsData.Append(quest.Price);
+                                bracketsData.Append(question.Price);
                                 bracketsData.Append(": ");
                                 bracketsData.Append(Resources.WrongBrackets);
                                 bracketsData.AppendFormat(" ({0})", comment);
@@ -252,17 +252,17 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
                     if (emptyQuestion)
                     {
-                        themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoQuestion));
+                        themeData.AppendLine(string.Format("{0}: {1}", question.Price, Resources.NoQuestion));
                     }
 
                     if (noAnswer)
                     {
-                        themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoAnswer));
+                        themeData.AppendLine(string.Format("{0}: {1}", question.Price, Resources.NoAnswer));
                     }
 
                     if (emptySources)
                     {
-                        themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoSource));
+                        themeData.AppendLine(string.Format("{0}: {1}", question.Price, Resources.NoSource));
                     }
 
                     if (hasBracketsIssues)
@@ -270,11 +270,11 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                         themeData.Append(bracketsData);
                     }
 
-                    foreach (var content in quest.GetContent())
+                    foreach (var content in question.GetContent())
                     {
                         if (content.Type == ContentTypes.Audio && content.Placement != ContentPlacements.Background)
                         {
-                            themeData.AppendLine($"{quest.Price}: {string.Format(Resources.AudioIsNotOnBackground, content.Value)}");
+                            themeData.AppendLine($"{question.Price}: {string.Format(Resources.AudioIsNotOnBackground, content.Value)}");
                         }
                     }
                 }
