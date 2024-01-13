@@ -148,20 +148,20 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     private void TInfo_MediaLoad() => _viewerActions.SendMessage(Messages.MediaLoaded);
 
-    private void TInfo_MediaLoadError(Exception exc)
+    private void TInfo_MediaLoadError(MediaLoadException exc)
     {
         string error;
 
-        if (exc is NotSupportedException)
+        if (exc.InnerException is NotSupportedException)
         {
-            error = $"{_localizer[nameof(R.MediaFileNotSupported)]}: {exc.Message}";
+            error = $"{_localizer[nameof(R.MediaFileNotSupported)]}: {exc.InnerException.Message}";
         }
         else
         {
-            error = exc.ToString();
+            error = (exc.InnerException ?? exc).ToString();
         }
 
-        _data.OnAddString(null, $"{_localizer[nameof(R.MediaLoadError)]} {TInfo.MediaSource?.Uri}: {error}{Environment.NewLine}", LogMode.Log);
+        _data.OnAddString(null, $"{_localizer[nameof(R.MediaLoadError)]} {exc.MediaUri}: {error}{Environment.NewLine}", LogMode.Log);
     }
 
     private void TInfo_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -858,6 +858,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                         : (contentType == ContentTypes.Video ? ContentType.Video : ContentType.Html);
 
                     currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
+                    OnSpecialReplic($"Media uri: \"{uri}\"");
                     break;
             }
         }

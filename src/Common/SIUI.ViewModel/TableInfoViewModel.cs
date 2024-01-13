@@ -514,7 +514,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public event Action? MediaResume;
 
     public event Action? MediaLoad;
-    public event Action<Exception>? MediaLoadError;
+    public event Action<MediaLoadException>? MediaLoadError;
 
     public void OnMediaStart() => MediaStart?.Invoke();
 
@@ -532,5 +532,5 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
 
     public void OnMediaLoad() => MediaLoad?.Invoke();
 
-    public void OnMediaLoadError(Exception exc) => MediaLoadError?.Invoke(exc);
+    public void OnMediaLoadError(MediaLoadException exc) => MediaLoadError?.Invoke(exc);
 }

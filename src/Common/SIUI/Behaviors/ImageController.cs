@@ -33,7 +33,7 @@ public static class ImageController
 
         image.ImageFailed += (sender, e2) =>
         {
-            tableInfo.OnMediaLoadError(e2.ErrorException);
+            tableInfo.OnMediaLoadError(new MediaLoadException(((Image?)sender)?.Source.ToString() ?? "", e2.ErrorException));
         };
     }
 }

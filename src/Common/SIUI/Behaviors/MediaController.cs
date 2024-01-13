@@ -65,7 +65,7 @@ public static class MediaController
             }
             catch (Exception exc)
             {
-                tableInfo.OnMediaLoadError(exc);
+                tableInfo.OnMediaLoadError(new MediaLoadException(mediaElement.Source.ToString(), exc));
             }
         }
 
@@ -75,7 +75,7 @@ public static class MediaController
 
         mediaElement.MediaFailed += (sender, e2) =>
         {
-            tableInfo.OnMediaLoadError(e2.ErrorException);
+            tableInfo.OnMediaLoadError(new MediaLoadException(((MediaElement?)sender)?.Source.ToString() ?? "", e2.ErrorException));
         };
 
         System.Timers.Timer? timer = null;
