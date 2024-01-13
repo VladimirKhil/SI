@@ -899,7 +899,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         foreach (var parameter in requiredParametes)
         {
-            question.Parameters.Insert(0, new StepParameterRecord(parameter.Item1, new StepParameterViewModel(question, parameter.Item2)));
+            question.Parameters.InsertSorted(new StepParameterRecord(parameter.Item1, new StepParameterViewModel(question, parameter.Item2)));
         }
     }
 

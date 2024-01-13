@@ -32,7 +32,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
 
         foreach (var parameter in parameters)
         {
-            Add(new StepParameterRecord(
+            InsertSorted(new StepParameterRecord(
                 parameter.Key,
                 new StepParameterViewModel(question, parameter.Value, isTopLevel)));
         }
@@ -43,6 +43,47 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
         UpdateCommands();
 
         CollectionChanged += StepParametersViewModel_CollectionChanged;
+    }
+
+    internal void InsertSorted(StepParameterRecord stepParameterRecord)
+    {
+        var parameterWeight = GetParameterWeight(stepParameterRecord);
+
+        for (var i = 0; i < Count; i++)
+        {
+            if (parameterWeight < GetParameterWeight(this[i]))
+            {
+                Insert(i, stepParameterRecord);
+                return;
+            }
+        }
+
+        Add(stepParameterRecord);
+    }
+
+    private static int GetParameterWeight(StepParameterRecord parameter)
+    {
+        if (parameter.Value.Model.Type == StepParameterTypes.Simple)
+        {
+            return -40;
+        }
+
+        if (parameter.Value.Model.Type == StepParameterTypes.NumberSet)
+        {
+            return -30;
+        }
+
+        if (parameter.Key == QuestionParameterNames.Question)
+        {
+            return -20;
+        }
+
+        if (parameter.Value.Model.Type == StepParameterTypes.Content)
+        {
+            return -10;
+        }
+
+        return 0;
     }
 
     private void UpdateCommands()
@@ -65,12 +106,12 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
             Type = StepParameterTypes.Content,
             ContentValue = new List<ContentItem>
             {
-                new ContentItem { Type = AtomTypes.Text, Value = "" },
+                new() { Type = ContentTypes.Text, Value = "" },
             }
         };
 
         var stepParameterViewModel = new StepParameterViewModel(question, stepParameter, false);
-        Add(new StepParameterRecord(label, stepParameterViewModel));
+        InsertSorted(new StepParameterRecord(label, stepParameterViewModel));
         UpdateCommands();
     }
 
@@ -146,7 +187,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
             throw new InvalidOperationException($"Key {key} alredy exist");
         }
 
-        Add(new StepParameterRecord(key, parameter));
+        InsertSorted(new StepParameterRecord(key, parameter));
     }
 
     internal void RemoveAnswer() => RemoveParameter(QuestionParameterNames.Answer);

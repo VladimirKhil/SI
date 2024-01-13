@@ -25,7 +25,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public QuestionTypeViewModel Type { get; private set; }
 
-    public event Action<QuestionViewModel, string> TypeNameChanged;
+    public event Action<QuestionViewModel, string>? TypeNameChanged;
 
     public string TypeName
     {

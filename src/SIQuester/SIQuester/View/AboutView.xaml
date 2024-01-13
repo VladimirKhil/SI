@@ -30,7 +30,7 @@
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" FontWeight="Bold">SIQuester</TextBlock>
                 
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="1">
-                    <Run Text="2005 - 2023" />
+                    <Run Text="2005 - 2024" />
                     <Run Text="{x:Static lp:Resources.Years}" />
                 </TextBlock>
 
