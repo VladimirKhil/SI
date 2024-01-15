@@ -2,13 +2,11 @@
 using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
 using SIData;
-using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Diagnostics;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml;
 using Utils;
 using R = SICore.Properties.Resources;
@@ -869,7 +867,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             groups.Add(currentGroup);
         }
 
-        if (groups.Count == 1 && groups[0].Content.Count == 1 && groups[0].Content[0].Type != ContentType.Text)
+        if (Data.Host.AttachContentToTable && groups.Count == 1 && groups[0].Content.Count == 1 && groups[0].Content[0].Type != ContentType.Text)
         {
             if (_prependTableText != null)
             {
@@ -922,7 +920,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         {
             var additionalText = _appendTableText ?? _prependTableText;
 
-            if (additionalText != null)
+            if (Data.Host.AttachContentToTable && additionalText != null)
             {
                 var groups = new List<ContentGroup>();
                 var group = new ContentGroup();

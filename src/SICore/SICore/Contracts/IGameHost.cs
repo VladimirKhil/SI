@@ -26,6 +26,8 @@ public interface IGameHost : IPlatformManager
 
     string LogsFolder { get; }
 
+    bool AttachContentToTable { get; }
+
     bool TranslateGameToChat { get; }
 
     string GameButtonKey { get; }

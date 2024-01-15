@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     mc:Ignorable="d" 
     d:DesignHeight="875.942"
     d:DesignWidth="529.153"
@@ -11,7 +12,8 @@
     Title="{x:Static lp:Resources.Other}"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:local="clr-namespace:SIGame"
-    FontSize="20">
+    FontSize="20"
+    d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Page.Resources>
         <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
             <Setter Property="Margin" Value="0,30,0,0" />
@@ -70,7 +72,15 @@
             Padding="18,6"
             Content="{x:Static lp:Resources.Move}"
             Command="{Binding MoveLogs}" />
-        
+
+        <CheckBox IsChecked="{Binding Model.BindNextButton}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.BindNextButton}" />
+        </CheckBox>
+
+        <CheckBox IsChecked="{Binding Model.AttachContentToTable}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.AttachContentToTable}" />
+        </CheckBox>
+
         <CheckBox IsChecked="{Binding Model.TranslateGameToChat}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.TranslateToChat}" />
         </CheckBox>

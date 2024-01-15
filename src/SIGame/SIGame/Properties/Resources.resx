@@ -1143,4 +1143,10 @@
   <data name="ButtonPressMode_RandomWithinInterval" xml:space="preserve">
     <value>Random from early pressers</value>
   </data>
+  <data name="AttachContentToTable" xml:space="preserve">
+    <value>Add theme comments and right answers to game table</value>
+  </data>
+  <data name="BindNextButton" xml:space="preserve">
+    <value>Activate "Next" button by Right keyboard button</value>
+  </data>
 </root>

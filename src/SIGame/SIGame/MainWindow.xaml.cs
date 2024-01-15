@@ -83,7 +83,9 @@ public partial class MainWindow : Window
             return false;
         }
 
-        if (game.Move.CanBeExecuted)
+        var appSettings = UserSettings.Default.GameSettings.AppSettings;
+
+        if (appSettings.BindNextButton && game.Move.CanBeExecuted)
         {
             game.Move.Execute(1);
             return true;

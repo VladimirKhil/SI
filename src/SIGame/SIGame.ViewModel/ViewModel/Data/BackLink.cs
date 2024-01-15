@@ -40,6 +40,8 @@ public sealed class BackLink : GameHostBase
 
     public override bool MakeLogs => _userSettings.GameSettings.AppSettings.MakeLogs;
 
+    public override bool AttachContentToTable => _userSettings.GameSettings.AppSettings.AttachContentToTable;
+
     public override bool TranslateGameToChat => _userSettings.GameSettings.AppSettings.TranslateGameToChat;
 
     public override string LogsFolder => _userSettings.GameSettings.AppSettings.LogsFolder;

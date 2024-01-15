@@ -340,6 +340,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Add theme comments and right answers to game table.
+        /// </summary>
+        public static string AttachContentToTable {
+            get {
+                return ResourceManager.GetString("AttachContentToTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Authors.
         /// </summary>
         public static string Authors {
@@ -390,6 +399,15 @@ namespace SIGame.Properties {
         public static string BaseCostForRandomPackage {
             get {
                 return ResourceManager.GetString("BaseCostForRandomPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Activate &quot;Next&quot; button by Right keyboard button.
+        /// </summary>
+        public static string BindNextButton {
+            get {
+                return ResourceManager.GetString("BindNextButton", resourceCulture);
             }
         }
         

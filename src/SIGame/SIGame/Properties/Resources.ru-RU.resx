@@ -1146,4 +1146,10 @@
   <data name="ButtonPressMode_RandomWithinInterval" xml:space="preserve">
     <value>Рандом из ранних нажавших</value>
   </data>
+  <data name="AttachContentToTable" xml:space="preserve">
+    <value>Добавлять комментарии темы и правильный ответ на табло</value>
+  </data>
+  <data name="BindNextButton" xml:space="preserve">
+    <value>Активировать кнопку "Далее" по стрелке вправо</value>
+  </data>
 </root>

@@ -22,6 +22,8 @@ public abstract class GameHostBase : IGameHost
 
     public abstract string LogsFolder { get; }
 
+    public abstract bool AttachContentToTable { get; }
+
     public abstract bool TranslateGameToChat { get; }
 
     public abstract string GameButtonKey { get; }

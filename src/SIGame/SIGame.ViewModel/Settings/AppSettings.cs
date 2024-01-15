@@ -95,6 +95,34 @@ public sealed class AppSettings : AppSettingsCore
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _bindNextButton = false;
+
+    /// <summary>
+    /// Should the next button be bound to keyboard.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(false)]
+    public bool BindNextButton
+    {
+        get => _bindNextButton;
+        set { _bindNextButton = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _attachContentToTable = true;
+
+    /// <summary>
+    /// Could the game attach content to game table.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(true)]
+    public bool AttachContentToTable
+    {
+        get => _attachContentToTable;
+        set { _attachContentToTable = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private bool _areAnswersShown = true;
 
     /// <summary>
@@ -149,6 +177,8 @@ public sealed class AppSettings : AppSettingsCore
         MakeLogs = origin.MakeLogs;
         TranslateGameToChat = origin._translateGameToChat;
         ShowBorderOnFalseStart = origin.ShowBorderOnFalseStart;
+        BindNextButton = origin.BindNextButton;
+        AttachContentToTable = origin.AttachContentToTable;
     }
 
     internal void Set(AppSettings settings)
@@ -159,6 +189,8 @@ public sealed class AppSettings : AppSettingsCore
         ThemeSettings = settings.ThemeSettings;
         TranslateGameToChat = settings._translateGameToChat;
         ShowBorderOnFalseStart = settings.ShowBorderOnFalseStart;
+        BindNextButton = settings.BindNextButton;
+        AttachContentToTable = settings.AttachContentToTable;
         // logsFolder is not changed
     }
 
