@@ -245,6 +245,11 @@
             <ThicknessAnimation Storyboard.TargetName="gameBorder" Storyboard.TargetProperty="Margin" To="0" Duration="0:0:0.2" />
             <ThicknessAnimation Storyboard.TargetName="gameBorder" Storyboard.TargetProperty="Margin" BeginTime="0:0:0.4" Duration="0:0:0.2" />
         </Storyboard>
+
+        <Storyboard x:Key="nextSB">
+            <ColorAnimation Storyboard.TargetName="forward" Storyboard.TargetProperty="Background.Color" To="AntiqueWhite" Duration="0:0:0.2" />
+            <ColorAnimation Storyboard.TargetName="forward" Storyboard.TargetProperty="Background.Color" BeginTime="0:0:0.4" Duration="0:0:0.2" />
+        </Storyboard>
     </UserControl.Resources>
     
     <Grid>        
@@ -342,6 +347,7 @@
             </ToggleButton>
 
             <Button
+                Name="forward"
                 Grid.Column="2"
                 Cursor="Hand"
                 Width="70"

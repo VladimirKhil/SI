@@ -13,6 +13,7 @@ namespace SIGame;
 public partial class StudiaCommandPanel : UserControl
 {
     private readonly Storyboard _sb;
+    private readonly Storyboard _nextSB;
 
     public StudiaCommandPanel()
     {
@@ -20,6 +21,7 @@ public partial class StudiaCommandPanel : UserControl
 
         _sb = (Storyboard)Resources["gameSB"];
         _sb.Completed += Sb_Completed;
+        _nextSB = (Storyboard)Resources["nextSB"];
 
         DataContextChanged += Studia_DataContextChanged;
     }
@@ -38,6 +40,15 @@ public partial class StudiaCommandPanel : UserControl
         }
     }
 
+    private void RaiseNextClick()
+    {
+        if (forward.IsEnabled)
+        {
+            forward.Visibility = Visibility.Visible;
+            BeginStoryboard(_nextSB);
+        }
+    }
+
     private void Studia_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (DataContext is not GameViewModel game)
@@ -48,6 +59,7 @@ public partial class StudiaCommandPanel : UserControl
         if (game.Host.MyLogic is IViewerLogic logic)
         {
             ((ViewerData)logic.Data).PlayerDataExtensions.PressButton += RaiseButtonClick;
+            ((ViewerData)logic.Data).PlayerDataExtensions.PressNextButton += RaiseNextClick;
         }
     }
 

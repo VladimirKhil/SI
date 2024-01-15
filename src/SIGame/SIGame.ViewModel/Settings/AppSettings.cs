@@ -95,13 +95,13 @@ public sealed class AppSettings : AppSettingsCore
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private bool _bindNextButton = false;
+    private bool _bindNextButton = true;
 
     /// <summary>
     /// Should the next button be bound to keyboard.
     /// </summary>
     [XmlAttribute]
-    [DefaultValue(false)]
+    [DefaultValue(true)]
     public bool BindNextButton
     {
         get => _bindNextButton;

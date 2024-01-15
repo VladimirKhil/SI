@@ -123,10 +123,13 @@ public sealed class PlayerData : INotifyPropertyChanged
     public DateTimeOffset? TryStartTime { get; set; }
 
     public event Action? PressButton;
+    public event Action? PressNextButton;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void OnPressButton() => PressButton?.Invoke();
+
+    public void OnPressNextButton() => PressNextButton?.Invoke();
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

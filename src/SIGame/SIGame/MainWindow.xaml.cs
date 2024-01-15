@@ -1,4 +1,5 @@
-﻿using SIGame.ViewModel;
+﻿using SICore;
+using SIGame.ViewModel;
 using SIWindows.WinAPI;
 using System;
 using System.ComponentModel;
@@ -87,6 +88,7 @@ public partial class MainWindow : Window
 
         if (appSettings.BindNextButton && game.Move.CanBeExecuted)
         {
+            game.Data.PlayerDataExtensions.OnPressNextButton();
             game.Move.Execute(1);
             return true;
         }
