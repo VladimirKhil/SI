@@ -331,15 +331,6 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на -й раунд.
-        /// </summary>
-        public static string EndingRound {
-            get {
-                return ResourceManager.GetString("EndingRound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на В следующей теме обнаружена ошибка нумерации. Ожидается, что текст всех вопросов в каждой теме начинается с номера, последовательно возрастающего от вопроса к вопросу.
         ///УБЕДИТЕСЬ, что в тексте нет номеров в начале строки помимо стоимостей вопросов. При необходимости удалите, перенесите или пропустите их.
         /// </summary>
@@ -1201,6 +1192,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Round {
             get {
                 return ResourceManager.GetString("Round", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0}-й раунд.
+        /// </summary>
+        public static string RoundNameTemplate {
+            get {
+                return ResourceManager.GetString("RoundNameTemplate", resourceCulture);
             }
         }
         

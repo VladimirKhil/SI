@@ -3077,7 +3077,7 @@ public sealed class QDocument : WorkspaceViewModel
 
             for (var i = 0; i < 3; i++)
             {
-                var round = new Round { Name = (Package.Rounds.Count + 1).ToString() + Resources.EndingRound, Type = RoundTypes.Standart };
+                var round = new Round { Name = string.Format(Resources.RoundNameTemplate, Package.Rounds.Count + 1), Type = RoundTypes.Standart };
                 var roundViewModel = new RoundViewModel(round) { IsExpanded = true };
                 Package.Rounds.Add(roundViewModel);
 

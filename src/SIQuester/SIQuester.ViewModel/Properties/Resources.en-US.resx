@@ -207,9 +207,6 @@
   <data name="End" xml:space="preserve">
     <value>Stop</value>
   </data>
-  <data name="EndingRound" xml:space="preserve">
-    <value>#NAME?</value>
-  </data>
   <data name="EnumerationError" xml:space="preserve">
     <value>An error in numbering was found in the next topic. It is expected that the text of all questions in each topic starts with a number, sequentially increasing from question to question</value>
   </data>
@@ -497,6 +494,9 @@
   </data>
   <data name="Round" xml:space="preserve">
     <value>Round</value>
+  </data>
+  <data name="RoundNameTemplate" xml:space="preserve">
+    <value>Round {0}</value>
   </data>
   <data name="RtfFiles" xml:space="preserve">
     <value>RTF Documents</value>

@@ -444,33 +444,40 @@
             <Setter Property="Padding" Value="4" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="Width" Value="40" />
-            <Setter Property="Height" Value="24" />
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Margin" Value="4" />
             <Setter Property="Visibility" Value="Visible" />
 
             <Style.Triggers>
-                <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
-                    <Setter Property="Margin" Value="1,0,2,0" />
-                </DataTrigger>
-
                 <DataTrigger Binding="{Binding Edit, Source={x:Static m:AppSettings.Default}}" Value="{x:Static m:EditMode.None}">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="QuestionToolButton" TargetType="Button" BasedOn="{StaticResource ToolButton}">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Margin" Value="4" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
+                    <Setter Property="Margin" Value="1,0,2,0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <DataTemplate x:Key="ThemeView">
             <StackPanel Name="panel" Margin="0,6,6,0" Background="#FFA1C2DE" Width="240">
-                <TextBlock
-                    Name="name"
-                    Text="{Binding Model.Name}"
-                    ToolTip="{Binding Model.Name}"
-                    FontSize="14"
-                    HorizontalAlignment="Center"
-                    Margin="6,6,6,0"
-                    TextTrimming="CharacterEllipsis" />
+                <Border Name="border">
+                    <TextBlock
+                        Name="name"
+                        Text="{Binding Model.Name}"
+                        ToolTip="{Binding Model.Name}"
+                        FontSize="14"
+                        HorizontalAlignment="Center"
+                        Margin="6,6,6,0"
+                        TextTrimming="CharacterEllipsis" />
+                </Border>
                 
                 <ItemsControl
                     Name="questions"
@@ -488,7 +495,7 @@
                 <Button
                     Command="{Binding AddQuestion}"
                     ToolTip="{Binding AddHeader}"
-                    Style="{StaticResource ToolButton}">
+                    Style="{StaticResource QuestionToolButton}">
                     <Path
                         Stretch="Uniform"
                         Fill="Green"
@@ -508,6 +515,10 @@
                     <Setter TargetName="questions" Property="ItemsControl.ItemsPanel" Value="{StaticResource Horizontal}" />
                     <Setter TargetName="questions" Property="Margin" Value="0" />
                 </DataTrigger>
+
+                <Trigger SourceName="border" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="border" Property="Background" Value="#FF6985FF" />
+                </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
 
@@ -570,7 +581,30 @@
 
         <DataTemplate x:Key="ExpandedRoundView">
             <StackPanel>
-                <TextBlock Name="header" Text="{Binding Model.Name}" FontSize="16" FontWeight="Bold" Margin="0,6,0,0" Style="{StaticResource RoundHeaderStyle}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        Name="header"
+                        Text="{Binding Model.Name}"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Margin="0,6,0,0"
+                        Style="{StaticResource RoundHeaderStyle}" />
+
+                    <Button
+                        Command="{Binding AddTheme}"
+                        ToolTip="{Binding AddHeader}"
+                        Style="{StaticResource ToolButton}"
+                        VerticalAlignment="Stretch"
+                        Width="30"
+                        Height="30"
+                        Margin="5,3,0,0">
+                        <Path
+                            Stretch="Uniform"
+                            Fill="Green"
+                            Margin="1"
+                            Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                    </Button>
+                </StackPanel>
                 
                 <ItemsControl Name="themes" ItemsSource="{Binding Themes}">
                     <ItemsControl.ItemsPanel>
@@ -685,7 +719,18 @@
             <ls:DictionaryTemplateSelector.Templates>
                 <DataTemplate x:Key="{x:Type vm:PackageViewModel}" />
                 <DataTemplate x:Key="{x:Type vm:RoundViewModel}" />
-                <DataTemplate x:Key="{x:Type vm:ThemeViewModel}" />
+
+                <DataTemplate x:Key="{x:Type vm:ThemeViewModel}">
+                    <Button
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Padding="3"
+                        Margin="2,0,0,0"
+                        Command="{Binding Remove}"
+                        ToolTip="{x:Static lp:Resources.Delete}">
+                        <Image Source="{StaticResource RemoveImage}" Width="15" Height="15" Margin="2" />
+                    </Button>
+                </DataTemplate>
+
                 <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
                     <StackPanel Margin="8">
                         <TextBlock x:Name="typeHeader" Text="{x:Static lp:Resources.Type}" />
@@ -763,6 +808,53 @@
                 </DataTemplate>
             </ls:DictionaryTemplateSelector.Templates>
         </ls:DictionaryTemplateSelector>
+        
+        <ls:DictionaryTemplateSelector x:Key="EditSelector">
+            <ls:DictionaryTemplateSelector.Templates>
+                <DataTemplate x:Key="{x:Type vm:PackageViewModel}" />
+                <DataTemplate x:Key="{x:Type vm:RoundViewModel}" />
+                
+                <DataTemplate x:Key="{x:Type vm:ThemeViewModel}">
+                    <TextBox
+                        BorderThickness="0"
+                        Visibility="Collapsed"
+                        MaxLines="1"
+                        MinWidth="100"
+                        Height="29"
+                        Padding="4,0,0,0"
+                        FontSize="14"
+                        VerticalAlignment="top"
+                        HorizontalAlignment="Left"
+                        VerticalContentAlignment="Center"
+                        Text="{Binding Model.Name,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                        HorizontalContentAlignment="Left" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
+                    <l:NumericTextBox
+                        x:Name="editor"
+                        BorderThickness="0"
+                        Visibility="Collapsed"
+                        Foreground="{Binding Type.Model.Name, Converter={StaticResource QTypeToColorConverter}}"
+                        Width="40"
+                        Height="23"
+                        MaxLines="1"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left"
+                        VerticalContentAlignment="Center"
+                        Text="{Binding Model.Price,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                        HorizontalContentAlignment="Center" />
+
+                    <DataTemplate.Triggers>
+                        <DataTrigger
+                            Binding="{Binding Model.Price,Converter={StaticResource Equals2}, ConverterParameter={x:Static p:Question.InvalidPrice}}"
+                            Value="True">
+                            <Setter TargetName="editor" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ls:DictionaryTemplateSelector.Templates>
+        </ls:DictionaryTemplateSelector>
     </UserControl.Resources>
     
     <Grid>
@@ -781,7 +873,24 @@
             Drop="Main_Drop">
             <Grid Name="grid">
                 <StackPanel DataContext="{Binding Package}" Margin="10">
-                    <TextBlock Text="{Binding Model.Name}" FontSize="24" FontWeight="Bold" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Model.Name}" FontSize="24" FontWeight="Bold" />
+
+                        <Button
+                            Command="{Binding AddRound}"
+                            ToolTip="{Binding AddHeader}"
+                            Style="{StaticResource ToolButton}"
+                            VerticalAlignment="Stretch"
+                            Width="30"
+                            Height="30"
+                            Margin="5,3,0,0">
+                            <Path
+                                Stretch="Uniform"
+                                Fill="Green"
+                                Margin="1"
+                                Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                        </Button>
+                    </StackPanel>
 
                     <ItemsControl ItemsSource="{Binding Rounds}">
                         <ItemsControl.Style>
@@ -872,11 +981,10 @@
                 <ContentControl Content="{Binding ActiveNode}" ContentTemplateSelector="{StaticResource SimpleCardSelector}" />
             </Border>
         </Popup>
-        
+
         <ContentControl
             x:Name="_directEditHost"
             Content="{Binding}">
-
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
                     <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
@@ -885,27 +993,12 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding Edit, Source={x:Static m:AppSettings.Default}}" Value="{x:Static m:EditMode.FloatPanel}" />
-
-                                <Condition
-                                    Binding="{Binding ActiveNode.Model.Price,Converter={StaticResource Equals2}, ConverterParameter={x:Static p:Question.InvalidPrice}}"
-                                    Value="False" />
                             </MultiDataTrigger.Conditions>
 
                             <Setter Property="ContentTemplate">
                                 <Setter.Value>
                                     <DataTemplate>
-                                        <l:NumericTextBox
-                                            BorderThickness="0"
-                                            Visibility="Collapsed"
-                                            Foreground="{Binding ActiveNode.Type.Model.Name, Converter={StaticResource QTypeToColorConverter}}"
-                                            Width="40"
-                                            Height="23"
-                                            MaxLines="1"
-                                            VerticalAlignment="Top"
-                                            HorizontalAlignment="Left"
-                                            VerticalContentAlignment="Center"
-                                            Text="{Binding ActiveNode.Model.Price,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                            HorizontalContentAlignment="Center" />
+                                        <ContentControl Content="{Binding ActiveNode}"  ContentTemplateSelector="{StaticResource EditSelector}" />
                                     </DataTemplate>
                                 </Setter.Value>
                             </Setter>

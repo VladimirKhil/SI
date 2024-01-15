@@ -11,6 +11,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -72,54 +73,107 @@ public partial class FlatDocView : UserControl
         }
     }
 
-    private void OnHostClick(Border host)
+    private void OnHostClick(FrameworkElement host)
     {
-        if (host.DataContext is not QuestionViewModel question)
-        {
-            if (host.DataContext is not ContentItemsViewModel contentItems)
-            {
-                return;
-            }
+        IItemViewModel itemViewModel;
+        bool showEditor;
 
-            question = contentItems.Owner;
+        switch (host.DataContext)
+        {
+            case QuestionViewModel question:
+                itemViewModel = question;
+                showEditor = question.Model.Price != Question.InvalidPrice;
+                break;
+
+            case ContentItemsViewModel contentItems:
+                itemViewModel = contentItems.Owner;
+                showEditor = contentItems.Owner.Model.Price != Question.InvalidPrice;
+                break;
+
+            case ThemeViewModel theme:
+                itemViewModel = theme;
+                showEditor = true;
+                break;
+
+            default:
+                return;
         }
 
         var doc = (QDocument)DataContext;
-        doc.Navigate.Execute(question);
+        doc.Navigate.Execute(itemViewModel);
 
         popup.PlacementTarget = host;
 
-        if (AppSettings.Default.Edit == EditMode.FloatPanel)
+        if (AppSettings.Default.Edit != EditMode.FloatPanel)
         {
-            popup.IsOpen = false;
-            popup.IsOpen = true;
-
-            if (question.Model.Price == Question.InvalidPrice)
-            {
-                return;
-            }
-
-            var presenter = VisualTreeHelper.GetChild(_directEditHost, 0);
-            var childrenCount = VisualTreeHelper.GetChildrenCount(presenter);
-
-            if (childrenCount == 0)
-            {
-                return;
-            }
-
-            var directEdit = (NumericTextBox)VisualTreeHelper.GetChild(presenter, 0);
-
-            var margin = host.TranslatePoint(new Point(0, 0), this);
-            directEdit.Visibility = Visibility.Visible;
-            directEdit.Margin = new Thickness(margin.X, margin.Y, 0, 0);
-
-            Dispatcher.BeginInvoke(() =>
-            {
-                directEdit.Focus();
-                directEdit.SelectAll();
-                Keyboard.Focus(directEdit);
-            });
+            return;
         }
+
+        popup.IsOpen = false;
+        popup.IsOpen = true;
+
+        var presenter = VisualTreeHelper.GetChild(_directEditHost, 0);
+        var childrenCount = VisualTreeHelper.GetChildrenCount(presenter);
+
+        if (childrenCount == 0)
+        {
+            return;
+        }
+
+        var childPresenter = VisualTreeHelper.GetChild(VisualTreeHelper.GetChild(presenter, 0), 0);
+        var childrenCount2 = VisualTreeHelper.GetChildrenCount(childPresenter);
+
+        if (showEditor && childrenCount2 == 0)
+        {
+            Dispatcher.BeginInvoke(CheckAndActivateEditor, host, childPresenter);
+            return;
+        }
+
+        if (!showEditor)
+        {
+            var directEdit = (TextBoxBase)VisualTreeHelper.GetChild(childPresenter, 0);
+            directEdit.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        ActivateEditor(host, childPresenter);
+    }
+
+    private async void CheckAndActivateEditor(FrameworkElement host, DependencyObject childPresenter)
+    {
+        await Task.Delay(600);
+
+        try
+        {
+            var childrenCount2 = VisualTreeHelper.GetChildrenCount(childPresenter);
+
+            if (childrenCount2 == 0)
+            {
+                return;
+            }
+
+            ActivateEditor(host, childPresenter);
+        }
+        catch
+        {
+            // No op
+        }
+    }
+
+    private void ActivateEditor(FrameworkElement host, DependencyObject childPresenter)
+    {
+        var directEdit = (TextBoxBase)VisualTreeHelper.GetChild(childPresenter, 0);
+
+        var margin = host.TranslatePoint(new Point(0, 0), this);
+        directEdit.Visibility = Visibility.Visible;
+        directEdit.Margin = new Thickness(margin.X, margin.Y, 0, 0);
+
+        Dispatcher.BeginInvoke(() =>
+        {
+            directEdit.Focus();
+            directEdit.SelectAll();
+            Keyboard.Focus(directEdit);
+        });
     }
 
     private void DocumentView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -180,7 +234,7 @@ public partial class FlatDocView : UserControl
 
         var active = (QDocument)DataContext;
         var item = ((IItemViewModel)host.DataContext).GetModel();
-        InfoOwnerData itemData = null;
+        InfoOwnerData itemData;
 
         try
         {

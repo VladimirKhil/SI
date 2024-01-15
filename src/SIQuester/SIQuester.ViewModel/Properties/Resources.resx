@@ -165,8 +165,8 @@
   <data name="End" xml:space="preserve">
     <value>Стоп</value>
   </data>
-  <data name="EndingRound" xml:space="preserve">
-    <value>-й раунд</value>
+  <data name="RoundNameTemplate" xml:space="preserve">
+    <value>{0}-й раунд</value>
   </data>
   <data name="EnumerationError" xml:space="preserve">
     <value>В следующей теме обнаружена ошибка нумерации. Ожидается, что текст всех вопросов в каждой теме начинается с номера, последовательно возрастающего от вопроса к вопросу.

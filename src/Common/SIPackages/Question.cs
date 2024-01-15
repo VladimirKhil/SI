@@ -203,8 +203,12 @@ public sealed class Question : InfoOwner, IEquatable<Question>
 
                         case "params":
                             Parameters = new();
-                            Parameters.ReadXml(reader, limits);
-                            read = false;
+
+                            if (!reader.IsEmptyElement)
+                            {
+                                Parameters.ReadXml(reader, limits);
+                                read = false;
+                            }
                             break;
 
                         case "atom":
