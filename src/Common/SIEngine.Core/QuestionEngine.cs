@@ -4,7 +4,7 @@ using SIPackages.Core;
 namespace SIEngine.Core;
 
 /// <summary>
-/// Performs SI question playing (new engine version).
+/// Performs SI question playing.
 /// </summary>
 public sealed class QuestionEngine
 {
@@ -283,10 +283,9 @@ public sealed class QuestionEngine
                                     {
                                         ContentValue = new List<ContentItem>
                                         {
-                                            new ContentItem
-                                            {
+                                            new() {
                                                 Placement = ContentPlacements.Screen,
-                                                Type = AtomTypes.Text,
+                                                Type = ContentTypes.Text,
                                                 Value = rightAnswer
                                             }
                                         }

@@ -144,9 +144,11 @@ public sealed class GameLogic : Logic<GameData>
         _data.PackageDoc = Engine.Document;
 
         _data.GameResultInfo.Name = _data.GameName;
+        _data.GameResultInfo.Language = _data.Settings.AppSettings.Culture;
         _data.GameResultInfo.PackageName = Engine.PackageName;
         _data.GameResultInfo.PackageHash = ""; // Will not use hash for now
         _data.GameResultInfo.PackageAuthors = Engine.Document.Package.Info.Authors.ToArray();
+        _data.GameResultInfo.PackageAuthorsContacts = Engine.Document.Package.ContactUri;
 
         if (_data.Settings.IsAutomatic)
         {
@@ -902,7 +904,11 @@ public sealed class GameLogic : Logic<GameData>
         await ClientData.TaskLock.TryLockAsync(
             () =>
             {
-                SendReport();
+                if (_data.Stage != GameStage.Before)
+                {
+                    SendReport();
+                }
+
                 Engine.Dispose();
 
                 return base.DisposeAsync(disposing);
