@@ -143,11 +143,42 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     private static string GetSafeFileName(Uri uri)
     {
-        var fullUri = uri.ToString();
-        var extension = Path.GetExtension(fullUri);
-        var hashedFileName = Hash.ComputeHash(Encoding.UTF8.GetBytes(fullUri));
-        var escapedFileName = Convert.ToBase64String(hashedFileName).Replace('/', '_').Replace('+', '-').Replace("=", "");
+        var extension = Path.GetExtension(uri.LocalPath);
+        var hashedFileName = Hash.ComputeHash(Encoding.UTF8.GetBytes(uri.AbsoluteUri));
+
+        var base64String = Convert.ToBase64String(hashedFileName);
+        var escapedFileName = ReplaceInvalidFileNameCharactersInBase64(base64String);
+
         return string.IsNullOrEmpty(extension) ? escapedFileName : Path.ChangeExtension(escapedFileName, extension);
+    }
+
+    private static string ReplaceInvalidFileNameCharactersInBase64(string base64String)
+    {
+        var resultBuilder = new StringBuilder(base64String.Length);
+
+        foreach (var c in base64String)
+        {
+            switch (c)
+            {
+                case '/':
+                    resultBuilder.Append('_');
+                    break;
+
+                case '+':
+                    resultBuilder.Append('-');
+                    break;
+
+                case '=':
+                    // Skip '=' characters
+                    break;
+
+                default:
+                    resultBuilder.Append(c);
+                    break;
+            }
+        }
+
+        return resultBuilder.ToString();
     }
 
     public void Dispose()
