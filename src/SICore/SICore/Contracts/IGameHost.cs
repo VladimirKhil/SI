@@ -82,5 +82,11 @@ public interface IGameHost : IPlatformManager
     /// </summary>
     string? GetAd(string localization, out int adId);
 
+    /// <summary>
+    /// Logs a message.
+    /// </summary>
+    /// <param name="message">Message to log.</param>
+    void Log(string message);
+
     void LogWarning(string message);
 }

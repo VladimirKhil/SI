@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Notions;
 using SICore;
 using SICore.Models;
@@ -10,7 +11,6 @@ using SIGame.ViewModel.Settings;
 using SIStatisticsService.Contract;
 using SIStatisticsService.Contract.Models;
 using SIUI.ViewModel;
-using System.Diagnostics;
 
 namespace SIGame.ViewModel;
 
@@ -25,13 +25,19 @@ public sealed class BackLink : GameHostBase
     private readonly AppState _appState;
 
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<BackLink> _logger;
 
-    internal BackLink(AppSettingsViewModel settings, UserSettings userSettings, AppState appState, IServiceProvider serviceProvider)
+    internal BackLink(
+        AppSettingsViewModel settings,
+        UserSettings userSettings,
+        AppState appState,
+        IServiceProvider serviceProvider)
     {
         _settings = settings;
         _userSettings = userSettings;
         _appState = appState;
         _serviceProvider = serviceProvider;
+        _logger = serviceProvider.GetRequiredService<ILogger<BackLink>>();
     }
 
     public override void OnFlash(bool flash = true) => PlatformSpecific.PlatformManager.Instance.Activate();
@@ -54,7 +60,9 @@ public sealed class BackLink : GameHostBase
 
     public override void OnError(Exception exc) => PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Error, true);
 
-    public override void LogWarning(string message) => Trace.TraceWarning(message);
+    public override void Log(string message) => _logger.LogInformation("Game info: {message}", message);
+
+    public override void LogWarning(string message) => _logger.LogWarning("Game warning: {warning}", message);
 
     public override void SendError(Exception exc, bool isWarning = false) => PlatformSpecific.PlatformManager.Instance.SendErrorReport(exc);
 

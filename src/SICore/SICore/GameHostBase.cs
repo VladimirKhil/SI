@@ -70,6 +70,8 @@ public abstract class GameHostBase : IGameHost
 
     public abstract void OnGameFinished(string packageId);
 
+    public abstract void Log(string message);
+
     public abstract void LogWarning(string message);
 
     public abstract bool AreAnswersShown { get; set; }

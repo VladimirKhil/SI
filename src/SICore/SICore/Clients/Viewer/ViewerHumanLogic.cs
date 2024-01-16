@@ -25,6 +25,21 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     /// </summary>
     private const int MaxAdditionalTableTextLength = 150;
 
+    /// <summary>
+    /// Minimum weight for the small content.
+    /// </summary>
+    private const double SmallContentWeight = 1.0;
+
+    /// <summary>
+    /// Maximum weight for the large content.
+    /// </summary>
+    private const double LargeContentWeight = 5.0;
+
+    /// <summary>
+    /// Length of text having weight of 1.
+    /// </summary>
+    private const int TextLengthWithBasicWeight = 80;
+
     private static readonly TimeSpan HintLifetime = TimeSpan.FromSeconds(6);
 
     private bool _disposed = false;
@@ -819,16 +834,16 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                         currentGroup = null;
                     }
 
-                    var text = contentValue.UnescapeNewLines();
-                    var group = new ContentGroup();
-                    group.Content.Add(new ContentViewModel(ContentType.Text, text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…"), groups.Count == 0 ? TInfo.TextSpeed : 0.0));
+                    var text = contentValue.UnescapeNewLines().Shorten(_data.Host.MaximumTableTextLength, "…");
+                    var group = new ContentGroup { Weight = Math.Max(SmallContentWeight, Math.Min(LargeContentWeight, (double)text.Length / TextLengthWithBasicWeight)) };
+                    group.Content.Add(new ContentViewModel(ContentType.Text, text, groups.Count == 0 ? TInfo.TextSpeed : 0.0));
                     groups.Add(group);
                     break;
 
                 case ContentTypes.Video:
                 case ContentTypes.Image:
                 case ContentTypes.Html:
-                    currentGroup ??= new ContentGroup { Weight = 4.0 };
+                    currentGroup ??= new ContentGroup { Weight = LargeContentWeight };
 
                     var uri = contentValue;
 
@@ -850,13 +865,13 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                     }
 
                     uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
+                    Data.Host.Log($"Media uri conversion: {mediaUri} => {uri}");
 
                     var tableContentType = contentType == ContentTypes.Image
                         ? ContentType.Image
                         : (contentType == ContentTypes.Video ? ContentType.Video : ContentType.Html);
 
                     currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
-                    OnSpecialReplic($"Media uri: \"{uri}\"");
                     break;
             }
         }
