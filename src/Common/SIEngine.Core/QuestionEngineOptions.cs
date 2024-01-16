@@ -13,7 +13,7 @@ public sealed class QuestionEngineOptions
     public FalseStartMode FalseStarts { get; set; } = FalseStartMode.Enabled;
 
     /// <summary>
-    /// Show simple right answers.
+    /// Show simple right answers flag. Complex right answers are always shown.
     /// </summary>
     public bool ShowSimpleRightAnswers { get; set; }
 

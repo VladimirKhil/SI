@@ -181,6 +181,9 @@ public sealed class GameServerClient : IGameServerClient
     public Task<string> GetNewsAsync(CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync<string>("GetNews", cancellationToken);
 
+    public Task<ChatMessage[]> GetLatestChatMessagesAsync(CancellationToken cancellationToken = default) =>
+        _connection.InvokeAsync<ChatMessage[]>("GetLatestChatMessages", cancellationToken);
+
     public Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync<string[]>("GetUsers", cancellationToken);
 

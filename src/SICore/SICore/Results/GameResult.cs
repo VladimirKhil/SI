@@ -11,9 +11,14 @@ public sealed class GameResult
     public string Name { get; set; } = "";
 
     /// <summary>
+    /// Game language.
+    /// </summary>
+    public string? Language { get; set; }
+
+    /// <summary>
     /// Game start time.
     /// </summary>
-    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
 
     /// <summary>
     /// Game duration.
@@ -34,6 +39,11 @@ public sealed class GameResult
     /// Game package authors.
     /// </summary>
     public string[] PackageAuthors { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Game package authors contacts.
+    /// </summary>
+    public string? PackageAuthorsContacts { get; set; }
 
     /// <summary>
     /// Players results.

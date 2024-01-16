@@ -118,7 +118,7 @@ public static class FalseStartHelper
         {
             var contentItem = content.ContentValue[k];
 
-            if (contentItem.Type != AtomTypes.Text)
+            if (contentItem.Type != ContentTypes.Text)
             {
                 return true;
             }
