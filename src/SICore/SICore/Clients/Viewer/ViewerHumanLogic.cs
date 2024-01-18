@@ -747,6 +747,11 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             return string.Concat(ClientData.ServerHostUri, contentValue.AsSpan(Constants.GameHostUri.Length));
         }
 
+        if (contentValue.StartsWith(Constants.ServerHost))
+        {
+            return string.Concat(ClientData.ServerPublicUrl ?? ClientData.ServerAddress, contentValue.AsSpan(Constants.ServerHost.Length));
+        }
+
         return contentValue;
     }
 
@@ -858,7 +863,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                         return;
                     }
 
-                    if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
+                    if (!Uri.TryCreate(uri, UriKind.Absolute, out var mediaUri))
                     {
                         OnSpecialReplic($"Unparsable uri: {uri}");
                         return;
