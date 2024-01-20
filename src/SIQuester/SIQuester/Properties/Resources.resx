@@ -703,6 +703,9 @@
   <data name="OK" xml:space="preserve">
     <value>OK</value>
   </data>
+  <data name="OOMCopyError" xml:space="preserve">
+    <value>Ошибка копирования данных: слишком большой объём</value>
+  </data>
   <data name="Open" xml:space="preserve">
     <value>Открыть… (Ctrl+O)</value>
   </data>
@@ -729,6 +732,9 @@
   </data>
   <data name="OrientationVertical" xml:space="preserve">
     <value>в столбец</value>
+  </data>
+  <data name="Package" xml:space="preserve">
+    <value>Пакет</value>
   </data>
   <data name="PackageAuthor" xml:space="preserve">
     <value>Автор пакета</value>
@@ -846,6 +852,9 @@
   </data>
   <data name="Restriction" xml:space="preserve">
     <value>Ограничение</value>
+  </data>
+  <data name="Round" xml:space="preserve">
+    <value>Раунд</value>
   </data>
   <data name="RoundCount" xml:space="preserve">
     <value>Число раундов</value>

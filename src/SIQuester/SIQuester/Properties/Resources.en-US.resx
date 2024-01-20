@@ -699,6 +699,9 @@
   <data name="OK" xml:space="preserve">
     <value>OK</value>
   </data>
+  <data name="OOMCopyError" xml:space="preserve">
+    <value>Data copy error: too big size</value>
+  </data>
   <data name="Open" xml:space="preserve">
     <value>Open… (Ctrl+O)</value>
   </data>
@@ -725,6 +728,9 @@
   </data>
   <data name="OrientationVertical" xml:space="preserve">
     <value>columns</value>
+  </data>
+  <data name="Package" xml:space="preserve">
+    <value>Package</value>
   </data>
   <data name="PackageAuthor" xml:space="preserve">
     <value>Package author</value>
@@ -842,6 +848,9 @@
   </data>
   <data name="Restriction" xml:space="preserve">
     <value>Restriction</value>
+  </data>
+  <data name="Round" xml:space="preserve">
+    <value>Round</value>
   </data>
   <data name="RoundCount" xml:space="preserve">
     <value>Round count</value>

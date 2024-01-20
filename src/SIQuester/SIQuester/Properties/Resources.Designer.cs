@@ -1817,6 +1817,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка копирования данных: слишком большой объём.
+        /// </summary>
+        public static string OOMCopyError {
+            get {
+                return ResourceManager.GetString("OOMCopyError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Открыть… (Ctrl+O).
         /// </summary>
         public static string Open {
@@ -1894,6 +1903,15 @@ namespace SIQuester.Properties {
         public static string OrientationVertical {
             get {
                 return ResourceManager.GetString("OrientationVertical", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пакет.
+        /// </summary>
+        public static string Package {
+            get {
+                return ResourceManager.GetString("Package", resourceCulture);
             }
         }
         
@@ -2245,6 +2263,15 @@ namespace SIQuester.Properties {
         public static string Restriction {
             get {
                 return ResourceManager.GetString("Restriction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Раунд.
+        /// </summary>
+        public static string Round {
+            get {
+                return ResourceManager.GetString("Round", resourceCulture);
             }
         }
         

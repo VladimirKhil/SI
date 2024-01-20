@@ -26,7 +26,7 @@ public partial class FlatDocView : UserControl
 {
     private bool _isDragging = false;
     private Point _startPoint;
-    private Tuple<ThemeViewModel, int> _insertionPosition;
+    private Tuple<ThemeViewModel, int>? _insertionPosition;
 
     private readonly object _dragLock = new();
 
@@ -55,6 +55,13 @@ public partial class FlatDocView : UserControl
     private void Main_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (e.OriginalSource is TextBox textBox && textBox.IsFocused)
+        {
+            return;
+        }
+
+        var button = VisualHelper.TryFindAncestor<Button>((DependencyObject)e.OriginalSource);
+
+        if (button != null)
         {
             return;
         }
@@ -183,7 +190,7 @@ public partial class FlatDocView : UserControl
 
     private void MainWindow_PreviewMouseMove(object sender, MouseEventArgs e)
     {
-        FrameworkElement host;
+        FrameworkElement? host;
 
         if (AppSettings.Default.FlatScale != FlatScale.Theme)
         {
@@ -263,7 +270,7 @@ public partial class FlatDocView : UserControl
         }
         catch (OutOfMemoryException)
         {
-            MessageBox.Show("Ошибка копирования данных: слишком большой объём", App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            MessageBox.Show(Properties.Resources.OOMCopyError, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
         }
         catch (InvalidOperationException)
         {

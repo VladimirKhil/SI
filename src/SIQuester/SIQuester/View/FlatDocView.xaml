@@ -569,6 +569,21 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
+
+                <Button
+                    Command="{Binding AddTheme}"
+                    ToolTip="{Binding AddHeader}"
+                    Style="{StaticResource ToolButton}"
+                    VerticalAlignment="Stretch"
+                    Width="30"
+                    Height="30"
+                    Margin="5,3,0,0">
+                    <Path
+                        Stretch="Uniform"
+                        Fill="Green"
+                        Margin="1"
+                        Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                </Button>
             </StackPanel>
 
             <DataTemplate.Triggers>
@@ -642,41 +657,119 @@
         
         <ls:DictionaryTemplateSelector x:Key="CardSelector">
             <ls:DictionaryTemplateSelector.Templates>
-                <DataTemplate x:Key="{x:Type vm:PackageViewModel}" />
-                <DataTemplate x:Key="{x:Type vm:RoundViewModel}" />
-                <DataTemplate x:Key="{x:Type vm:ThemeViewModel}" />
+                <DataTemplate x:Key="{x:Type vm:PackageViewModel}">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="{x:Static lp:Resources.Package}" FontSize="18" />
+                        <TextBlock Text="{x:Static lp:Resources.Name}" Margin="0,5,0,0" />
+
+                        <TextBox
+                             x:Name="price"
+                             Text="{Binding Model.Name, Mode=TwoWay}"
+                             Margin="0,1,0,0"
+                             Padding="0,1" />
+                    </StackPanel>
+                </DataTemplate>
+                
+                <DataTemplate x:Key="{x:Type vm:RoundViewModel}">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="{x:Static lp:Resources.Round}" FontSize="18" />
+                        <TextBlock Text="{x:Static lp:Resources.Name}" Margin="0,5,0,0" />
+
+                        <TextBox
+                             x:Name="price"
+                             Text="{Binding Model.Name, Mode=TwoWay}"
+                             Margin="0,1,0,0"
+                             Padding="0,1" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Type vm:ThemeViewModel}">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="{x:Static lp:Resources.Theme}" FontSize="18" />
+                        <TextBlock Text="{x:Static lp:Resources.Name}" Margin="0,5,0,0" />
+
+                        <TextBox
+                             x:Name="price"
+                             Text="{Binding Model.Name, Mode=TwoWay}"
+                             Margin="0,1,0,0"
+                             Padding="0,1" />
+                    </StackPanel>
+                </DataTemplate>
 
                 <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
-                    <StackPanel Margin="10">
-                        <TextBlock Text="{x:Static lp:Resources.Question}" FontSize="18" />
-                        <TextBlock Text="{x:Static lp:Resources.Price}" Margin="0,5,0,0" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="{x:Static lp:Resources.Question}" FontSize="18" />
+                            <TextBlock Text="{x:Static lp:Resources.Price}" Margin="0,5,0,0" />
 
-                        <l:NumericTextBox
-                            x:Name="price"
-                            Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}"
-                            Margin="0,1,0,0"
-                            Padding="0,1" />
+                            <l:NumericTextBox
+                                x:Name="price"
+                                Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}"
+                                Margin="0,1,0,0"
+                                Padding="0,1" />
 
-                        <TextBlock x:Name="typeHeader" Text="{x:Static lp:Resources.Type}" Margin="0,5,0,0" />
+                            <TextBlock x:Name="typeHeader" Text="{x:Static lp:Resources.Type}" Margin="0,5,0,0" />
 
-                        <ComboBox
-                            x:Name="type"
-                            Margin="0,1,0,0"
-                            IsSynchronizedWithCurrentItem="False"
-                            ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}"
-                            SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}" />
+                            <ComboBox
+                                x:Name="type"
+                                Margin="0,1,0,0"
+                                IsSynchronizedWithCurrentItem="False"
+                                ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}"
+                                SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}" />
 
-                        <ItemsControl x:Name="typeParams" ItemsSource="{Binding Type.Params}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Model.Name, Converter={StaticResource QuestionTypeParamConverter}}" Margin="0,5,0,0" />
-                                        <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource TypeParamSelector}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+                            <ItemsControl x:Name="typeParams" ItemsSource="{Binding Type.Params}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Model.Name, Converter={StaticResource QuestionTypeParamConverter}}" Margin="0,5,0,0" />
+                                            <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource TypeParamSelector}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <ItemsControl x:Name="params" ItemsSource="{Binding Parameters}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <ContentControl
+                                                x:Name="name"
+                                                Content="{Binding Key, Converter={StaticResource QuestionParameterNamesConverter}}"
+                                                ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource ParameterNameSelector}}"
+                                                Margin="0,5,0,0" />
+
+                                            <ContentControl
+                                                x:Name="value"
+                                                Content="{Binding Value}"
+                                                ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource ParameterSelector}}" />
+                                        </StackPanel>
+
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.Question}">
+                                                <Setter TargetName="name" Property="Content" Value="" />
+                                                <Setter TargetName="name" Property="MinWidth" Value="0" />
+                                                <Setter TargetName="name" Property="Margin" Value="3,2,0,2" />
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.Answer}">
+                                                <Setter TargetName="name" Property="DockPanel.Dock" Value="Top" />
+                                                <Setter TargetName="name" Property="MinWidth" Value="0" />
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.SelectionMode}">
+                                                <Setter TargetName="value" Property="ContentTemplate" Value="{StaticResource SelectionModeTemplate}" />
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerType}">
+                                                <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                                <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
 
                     <DataTemplate.Triggers>
                         <DataTrigger Binding="{Binding Model.Price}" Value="{x:Static p:Question.InvalidPrice}">
@@ -699,6 +792,10 @@
 
                             <!-- TODO: add new menu for upgraded question type params -->
                             <Setter TargetName="typeParams" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+
+                        <DataTrigger Binding="{Binding IsUpgraded}" Value="False">
+                            <Setter TargetName="params" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
 
                         <MultiDataTrigger>
@@ -942,7 +1039,7 @@
         </ScrollViewer>
         
         <Border
-            Width="200"
+            Width="300"
             Grid.Column="1"
             Background="#FFF1F1F1"
             Visibility="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}">
