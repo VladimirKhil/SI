@@ -1,7 +1,9 @@
 ﻿using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Workspaces.Dialogs.Play;
+using System.Text.Json;
 using Utils.Commands;
 
 namespace SIQuester.ViewModel.Workspaces.Dialogs;
@@ -9,112 +11,24 @@ namespace SIQuester.ViewModel.Workspaces.Dialogs;
 /// <summary>
 /// Defines a view model for question player.
 /// </summary>
-public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEnginePlayHandler
+public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEnginePlayHandler, IWebInterop
 {
+    private readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
     private readonly QuestionEngine _questionEngine;
     private readonly QDocument _qDocument;
 
     private bool _isFinished;
+    private AnswerOptionViewModel[]? _options;
 
     public override string Header => Properties.Resources.QuestionPlay;
 
-    private ContentInfo[] _content = Array.Empty<ContentInfo>();
+    public Uri Source { get; } = new($"file:///{AppDomain.CurrentDomain.BaseDirectory}wwwroot/index.html");
 
-    /// <summary>
-    /// Current question content.
-    /// </summary>
-    public ContentInfo[] Content
-    {
-        get => _content;
-        set
-        {
-            if (_content != value)
-            {
-                _content = value;
-
-                try
-                {
-                    OnPropertyChanged();
-                }
-                catch (NotImplementedException exc) when (exc.Message.Contains("The Source property cannot be set to null"))
-                {
-                    // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
-                }
-            }
-        }
-    }
-
-    private string? _sound;
-
-    /// <summary>
-    /// Current background sound.
-    /// </summary>
-    public string? Sound
-    {
-        get => _sound;
-        set
-        {
-            if (_sound != value)
-            {
-                _sound = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private string? _oral;
-
-    /// <summary>
-    /// Current oral text.
-    /// </summary>
-    public string? Oral
-    {
-        get => _oral;
-        set
-        {
-            if (_oral != value)
-            {
-                _oral = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private AnswerOptionViewModel[] _answerOptions = Array.Empty<AnswerOptionViewModel>();
-
-    /// <summary>
-    /// Answer options.
-    /// </summary>
-    public AnswerOptionViewModel[] AnswerOptions
-    {
-        get => _answerOptions;
-        set 
-        {
-            if (_answerOptions != value)
-            {
-                _answerOptions = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private bool _isAnswer;
-
-    /// <summary>
-    /// Is the playing in the answer stage.
-    /// </summary>
-    public bool IsAnswer
-    {
-        get => _isAnswer;
-        set
-        {
-            if (_isAnswer != value)
-            {
-                _isAnswer = value;
-                OnPropertyChanged();
-            }
-        }
-    }
+    public event Action<string>? SendJsonMessage;
 
     /// <summary>
     /// Plays the next question fragment.
@@ -157,13 +71,14 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         {
             _isFinished = true;
             Play.CanBeExecuted = false;
-            Sound = null;
-            Content = Array.Empty<ContentInfo>();
-            AnswerOptions = Array.Empty<AnswerOptionViewModel>();
             return;
         }
 
-        IsAnswer = false;
+        OnMessage(new
+        {
+            Type = "endPressButtonByTimeout"
+        });
+
         _isFinished = !_questionEngine.PlayNext();
     }
 
@@ -176,7 +91,12 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             switch (contentItem.Placement)
             {
                 case ContentPlacements.Replic:
-                    Oral = contentItem.Value;
+                    OnMessage(new
+                    {
+                        Type = "replic",
+                        PersonCode = "s",
+                        Text = contentItem.Value
+                    });
                     break;
 
                 case ContentPlacements.Screen:
@@ -204,7 +124,14 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
                     break;
 
                 case ContentPlacements.Background:
-                    Sound = contentItem.IsRef ? _qDocument.Audio.Wrap(contentItem.Value).Uri : contentItem.Value;
+                    var sound = contentItem.IsRef ? _qDocument.Audio.Wrap(contentItem.Value).Uri : contentItem.Value;
+
+                    OnMessage(new
+                    {
+                        Type = "content",
+                        Placement = "background",
+                        Content = new object[] { new { Type = "audio", Value = sound } }
+                    });
                     break;
 
                 default:
@@ -214,15 +141,19 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
         if (screenContent.Count > 0)
         {
-            Content = screenContent.ToArray();
+            OnMessage(new
+            {
+                Type = "content",
+                Placement = "screen",
+                Content = screenContent.Select(sc => new { Type = sc.Type.ToString().ToLowerInvariant(), sc.Value }).ToArray()
+            });
         }
     }
 
-    public void OnAskAnswer(string mode)
+    public void OnAskAnswer(string mode) => OnMessage(new
     {
-        IsAnswer = true;
-        Sound = null;
-    }
+        Type = "beginPressButton"
+    });
 
     public bool OnButtonPressStart() => false;
 
@@ -277,21 +208,55 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             }
         }
 
-        AnswerOptions = options.ToArray();
+        OnMessage(new
+        {
+            Type = "answerOptionsLayout",
+            QuestionHasScreenContent = true,
+            TypeNames = options.Select(o => o.Content.Type.ToString().ToLowerInvariant()).ToArray()
+        });
+
+        for (int i = 0; i < options.Count; i++)
+        {
+            OnMessage(new
+            {
+                Type = "answerOption",
+                Index = i,
+                options[i].Label,
+                ContentType = options[i].Content.Type.ToString().ToLowerInvariant(),
+                ContentValue = options[i].Content.Value,
+            });
+        }
+
+        _options = options.ToArray();
+
         return false;
     }
 
     public bool OnRightAnswerOption(string rightOptionLabel)
     {
-        foreach (var option in AnswerOptions)
+        if (_options == null)
         {
-            if (option.Label == rightOptionLabel)
+            return false;
+        }
+
+        for (var i = 0; i < _options.Length; i++)
+        {
+            if (_options[i].Label == rightOptionLabel)
             {
-                option.IsSelected = true;
+                OnMessage(new
+                {
+                    Type = "contentState",
+                    Placement = "screen",
+                    LayoutId = i + 1,
+                    ItemState = 2 // right
+                });
+
                 break;
             }
         }
 
         return true;
     }
+
+    private void OnMessage(object message) => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions));
 }

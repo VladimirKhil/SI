@@ -53,6 +53,7 @@
 			<ComponentGroupRef Id="ManufacturerProgramMenu" />
 			<ComponentGroupRef Id="ApplicationProgramMenu" />
 			<ComponentGroupRef Id="Licenses" />
+			<ComponentGroupRef Id="wwwroot" />
 		</Feature>
 	</Product>
 
@@ -62,6 +63,7 @@
 				<Directory Id="ManufacturerFolder" Name="$(var.ManufacturerEn)">
 					<Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
 						<Directory Id="LicensesFolder" Name="Licenses" />
+						<Directory Id="WWWRootFolder" Name="wwwroot" />
 					</Directory>
 				</Directory>
 			</Directory>
@@ -174,6 +176,41 @@
 				  KeyPath="yes" />
 
 				<RemoveFolder Id="LicensesFolder" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="wwwroot" Directory="WWWRootFolder">
+			<Component Guid="{1e004fe0-3407-4abd-bfeb-d9d9b8094c17}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\Clefs.ttf" />
+			</Component>
+			<Component Guid="{564f0b39-4189-4e20-a61d-47334c10cd82}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\index.html" />
+			</Component>
+			<Component Guid="{9981e64f-4579-4076-ae13-393af8e6da7d}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\main.js" />
+			</Component>
+			<Component Guid="{c17c0222-cbed-4df1-b2a8-015fc6a9f5bb}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\script.js" />
+			</Component>
+			<Component Guid="{67efe4f6-377d-4ea8-8e54-527ac0f7571d}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\style.css" />
+			</Component>
+			<Component Guid="{ee41f1be-f740-419e-978d-44c6dcdf4e15}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\vendor.js" />
+			</Component>
+			<Component Id="WWWRootReg" Guid="{099327ca-de3f-4991-808e-f1bd8b7ad0ea}">
+				<RegistryValue
+				  Id="WWWRootFolderReg"
+				  Root="HKMU"
+				  Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
+				  Name="wwwroot"
+				  Type="integer"
+				  Value="1"
+				  KeyPath="yes" />
+
+				<RemoveFolder Id="WWWRootFolder" On="uninstall" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>

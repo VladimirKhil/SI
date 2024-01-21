@@ -1,5 +1,6 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
+using SIQuester.ViewModel.Contracts;
 using System.Diagnostics;
 using System.Windows;
 
@@ -28,6 +29,8 @@ internal static class WebView2Behavior
 
         UpdateWebView2Environment(webView2);
 
+        var coreWebView = webView2.CoreWebView2;
+
         webView2.Unloaded += WebView2_Unloaded;
     }
 
@@ -48,6 +51,11 @@ internal static class WebView2Behavior
         {
             // Prevent WebView for producing sound after unload
             coreWebView.IsMuted = true;
+
+            if (webView2.DataContext is IWebInterop webInterop)
+            {
+                webInterop.SendJsonMessage -= coreWebView.PostWebMessageAsJson;
+            }
         }
     }
 
@@ -60,6 +68,11 @@ internal static class WebView2Behavior
             var environment = await CoreWebView2Environment.CreateAsync(null, null, options);
 
             await webView2.EnsureCoreWebView2Async(environment);
+
+            if (webView2.DataContext is IWebInterop webInterop)
+            {
+                webInterop.SendJsonMessage += webView2.CoreWebView2.PostWebMessageAsJson;
+            }
         }
         catch (Exception exc)
         {
