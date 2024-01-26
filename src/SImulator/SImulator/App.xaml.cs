@@ -251,7 +251,8 @@ public partial class App : Application
         else if (e.Exception is System.Windows.Markup.XamlParseException
             || e.Exception is NotImplementedException
             || e.Exception is TypeInitializationException
-            || e.Exception is COMException comException && (uint)comException.ErrorCode == 0x88980406)
+            || e.Exception is COMException comException && (uint)comException.ErrorCode == 0x88980406
+            || e.Exception.Message.Contains("UpdateTaskbarProgressState()"))
         {
             MessageBox.Show(
                 string.Format(SImulator.Properties.Resources.RuntimeBrokenError, e.Exception),

@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using System.Windows.Xps.Packaging;
 using System.Windows.Xps.Serialization;
+using Utils;
 
 namespace SIQuester.Implementation;
 
@@ -276,7 +277,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         var tempMediaDirectory = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName);
         Directory.CreateDirectory(tempMediaDirectory);
 
-        fileName = Path.Combine(tempMediaDirectory, new Random().Next() + media.Uri);
+        fileName = Path.Combine(tempMediaDirectory, new Random().Next() + FilePathHelper.GetSafeFileName(media.Uri));
 
         if (fileName.Length >= MAX_PATH)
         {

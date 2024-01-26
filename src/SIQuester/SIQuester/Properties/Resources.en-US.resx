@@ -489,6 +489,12 @@
   <data name="Encoding" xml:space="preserve">
     <value>Encoding</value>
   </data>
+  <data name="ErrorFixed" xml:space="preserve">
+    <value>This error is fixed in the new version of the program. Please update.</value>
+  </data>
+  <data name="ErrorNotReproduced" xml:space="preserve">
+    <value>This error is not reproducible. If you can surely reproduce it, please contact the author.</value>
+  </data>
   <data name="ExpandAll" xml:space="preserve">
     <value>Collapse all</value>
   </data>
@@ -842,6 +848,9 @@
   </data>
   <data name="RemoveUnusedMedia" xml:space="preserve">
     <value>Remove multimedia from the package when the last link to it is deleted</value>
+  </data>
+  <data name="ReportDelayed" xml:space="preserve">
+    <value>Cannot connect to server while sending error report. The report will be sent later</value>
   </data>
   <data name="Reserve" xml:space="preserve">
     <value>Reserve</value>

@@ -42,7 +42,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// <summary>
     /// Game log writer.
     /// </summary>
-    private readonly ILogger _logger;
+    private readonly IGameLogger _gameLogger;
 
     private readonly Timer _roundTimer;
     private readonly Timer _questionTimer;
@@ -478,12 +478,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         IExtendedListener presentationListener,
         IPresentationController presentationController,
         IList<SimplePlayerInfo> players,
-        ILogger logger)
+        IGameLogger gameLogger)
     {
         Settings = settings;
         _engine = (EngineBase)engine;
         _presentationListener = presentationListener;
-        _logger = logger;
+        _gameLogger = gameLogger;
         PresentationController = presentationController;
 
         LocalInfo = new TableInfoViewModel();
@@ -1025,40 +1025,48 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void AddRight_Executed(object? arg)
     {
-        if (arg is not PlayerInfo player)
+        try
         {
-            if (_selectedPlayer == null)
+            if (arg is not PlayerInfo player)
+            {
+                if (_selectedPlayer == null)
+                {
+                    return;
+                }
+
+                player = _selectedPlayer;
+            }
+
+            player.Right++;
+            player.Sum += Price;
+
+            Chooser = player;
+
+            _gameLogger.Write("{0} +{1}", player.Name, Price);
+
+            if (_activeQuestion == null)
             {
                 return;
             }
 
-            player = _selectedPlayer;
+            SetSound(Settings.Model.Sounds.AnswerRight);
+
+            _answeringHistory.Push(Tuple.Create(player, Price, true));
+
+            if (Settings.Model.EndQuestionOnRightAnswer)
+            {
+                _engine.MoveToAnswer();
+                Next_Executed();
+            }
+            else
+            {
+                ReturnToQuestion();
+            }
+
         }
-
-        player.Right++;
-        player.Sum += Price;
-
-        Chooser = player;
-
-        _logger.Write("{0} +{1}", player.Name, Price);
-
-        if (_activeQuestion == null)
+        catch (Exception exc)
         {
-            return;
-        }
-
-        SetSound(Settings.Model.Sounds.AnswerRight);
-
-        _answeringHistory.Push(Tuple.Create(player, Price, true));
-
-        if (Settings.Model.EndQuestionOnRightAnswer)
-        {
-            _engine.MoveToAnswer();
-            Next_Executed();
-        }
-        else
-        {
-            ReturnToQuestion();
+            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
         }
     }
 
@@ -1091,7 +1099,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             PresentationController.SetAnswerState(_selectedAnswerIndex, ItemState.Wrong);
         }
 
-        _logger.Write("{0} -{1}", player.Name, substract);
+        _gameLogger.Write("{0} -{1}", player.Name, substract);
 
         _answeringHistory.Push(Tuple.Create(player, Price, false));
 
@@ -1114,8 +1122,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
 
-        _logger.Write("Game started {0}", DateTime.Now);
-        _logger.Write("Package: {0}", _engine.PackageName);
+        _gameLogger.Write("Game started {0}", DateTime.Now);
+        _gameLogger.Write("Package: {0}", _engine.PackageName);
 
         _selectedPlayers.Clear();
         PresentationController.ClearPlayersState();
@@ -1337,7 +1345,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         SetSound(Settings.Model.Sounds.RoundBegin);
         LocalInfo.TStage = TableStage.Round;
 
-        _logger.Write("\r\n{0} {1}", Resources.Round, round.Name);
+        _gameLogger.Write("\r\n{0} {1}", Resources.Round, round.Name);
 
         if (round.Type == RoundTypes.Standart)
         {
@@ -1352,7 +1360,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         LocalInfo.RoundInfo.Clear();
 
-        _logger.Write($"{Resources.RoundThemes}:");
+        _gameLogger.Write($"{Resources.RoundThemes}:");
 
         int maxQuestion = roundThemes.Max(theme => theme.Questions.Count);
         foreach (var theme in roundThemes)
@@ -1360,7 +1368,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             var themeInfo = new ThemeInfoViewModel { Name = theme.Name };
             LocalInfo.RoundInfo.Add(themeInfo);
 
-            _logger.Write(theme.Name);
+            _gameLogger.Write(theme.Name);
 
             for (int i = 0; i < maxQuestion; i++)
             {
@@ -1468,7 +1476,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private void Engine_RoundTimeout()
     {
         SetSound(Settings.Model.Sounds.RoundTimeout);
-        _logger?.Write(Resources.RoundTimeout);
+        _gameLogger.Write(Resources.RoundTimeout);
     }
 
     private void Engine_EndQuestion(int themeIndex, int questionIndex)
@@ -1677,10 +1685,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 }
                 catch (IOException exc)
                 {
-                    _logger.Write($"Engine dispose error: {exc}");
+                    _gameLogger.Write($"Engine dispose error: {exc}");
                 }
 
-                _logger.Dispose();
+                _gameLogger.Dispose();
 
                 PresentationController.SetSound();
 
@@ -1726,7 +1734,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             sb.AppendFormat("{0}:{1}", player.Name, player.Sum);
         }
 
-        _logger?.Write(sb.ToString());
+        _gameLogger.Write(sb.ToString());
     }
 
     private void Engine_NextRound(bool showSign)
@@ -1783,40 +1791,47 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
     {
-        _answeringHistory.Push(null);
-
-        ActiveTheme = theme;
-        ActiveQuestion = question;
-
-        CurrentTheme = theme.Name;
-        Price = question.Price;
-
-        LogScore();
-        _logger?.Write("\r\n{0}, {1}", theme.Name, question.Price);
-
-        var (played, highlightTheme) = PlayQuestionType();
-
-        if (!played)
+        try
         {
-            SetSound(Settings.Model.Sounds.QuestionSelected);
-            PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
+            _answeringHistory.Push(null);
 
-            try
+            ActiveTheme = theme;
+            ActiveQuestion = question;
+
+            CurrentTheme = theme.Name;
+            Price = question.Price;
+
+            LogScore();
+            _gameLogger.Write("\r\n{0}, {1}", theme.Name, question.Price);
+
+            var (played, highlightTheme) = PlayQuestionType();
+
+            if (!played)
             {
-                await Task.Delay(700);
-                _engine.MoveNext();
+                SetSound(Settings.Model.Sounds.QuestionSelected);
+                PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
+
+                try
+                {
+                    await Task.Delay(700);
+                    _engine.MoveNext();
+                }
+                catch (Exception exc)
+                {
+                    Trace.TraceError("QuestionSelected error: " + exc.Message);
+                }
             }
-            catch (Exception exc)
+            else
             {
-                Trace.TraceError("QuestionSelected error: " + exc.Message);
+                PresentationController.PlayComplexSelection(themeIndex, questionIndex, highlightTheme);
             }
+
+            _gameLogger.Write(question.GetText());
         }
-        else
+        catch (Exception exc)
         {
-            PresentationController.PlayComplexSelection(themeIndex, questionIndex, highlightTheme);
+            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameEndingError, exc.Message));
         }
-
-        _logger.Write(question.GetText());
     }
 
     private void PrintQuestionType(string originalTypeName, string? aliasName)
@@ -1824,7 +1839,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         var actualName = string.IsNullOrWhiteSpace(aliasName) ? originalTypeName : aliasName;
 
         PresentationController.SetText(actualName);
-        _logger.Write(actualName);
+        _gameLogger.Write(actualName);
     }
 
     private void OnError(string error) => Error?.Invoke(error);

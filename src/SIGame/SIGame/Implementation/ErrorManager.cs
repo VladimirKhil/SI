@@ -65,6 +65,7 @@ internal sealed class ErrorManager : IErrorManager
         var exc = e;
 
         var result = new StringBuilder();
+
         while (exc != null)
         {
             if (result.Length > 0)
@@ -161,9 +162,7 @@ internal sealed class ErrorManager : IErrorManager
 
             errorReport.SendNoReport = new CustomCommand(arg =>
             {
-                if (mainWindow != null)
-                    mainWindow.Close();
-
+                mainWindow?.Close();
                 Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
             });
 

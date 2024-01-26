@@ -343,7 +343,7 @@ internal sealed class DesktopManager : PlatformManager
         }
     }
 
-    public override ILogger CreateLogger(string? folder)
+    public override IGameLogger CreateLogger(string? folder)
     {
         if (folder == null)
         {

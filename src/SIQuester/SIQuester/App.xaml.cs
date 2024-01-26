@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using NLog.Web;
-using SIPackages;
 using SIQuester.Helpers;
 using SIQuester.Model;
 using SIQuester.Services.Host;
@@ -18,13 +17,10 @@ using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
 using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
-using SIStorage.Service.Contract.Requests;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -122,23 +118,6 @@ public partial class App : Application
         var appServiceClientOptions = _host.Services.GetRequiredService<IOptions<AppServiceClientOptions>>().Value;
         _useAppService = appServiceClientOptions.ServiceUri != null;
 
-        if (e.Args.Length > 0)
-        {
-            if (e.Args[0] == "backup")
-            {
-                // Бэкап хранилища вопросов
-                var folder = e.Args[1];
-                Backup(folder);
-                return;
-            }
-            else if (e.Args[0] == "upgrade" && e.Args.Length > 1)
-            {
-                UpgradePackage(e.Args[1]);
-                Current.Shutdown();
-                return;
-            }
-        }
-
 #if !DEBUG
         if (AppSettings.Default.SearchForUpdates)
         {
@@ -150,14 +129,6 @@ public partial class App : Application
 
         _logger = _host.Services.GetRequiredService<ILogger<App>>();
         _logger.LogInformation("Application started. Version: {version}", Assembly.GetExecutingAssembly().GetName().Version);
-    }
-
-    private static void UpgradePackage(string packagePath)
-    {
-        using var fs = File.Open(packagePath, FileMode.Open);
-        using var doc = SIDocument.Load(fs, false);
-        doc.Upgrade();
-        doc.Save();
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -222,58 +193,6 @@ public partial class App : Application
         services.AddSingleton<IClipboardService, ClipboardService>();
 
         services.AddSIQuester();
-    }
-
-    /// <summary>
-    /// Backups SIStorage to folder. This method is called from the console.
-    /// </summary>
-    /// <param name="folder">Folder to backup.</param>
-    private async void Backup(string folder)
-    {
-        int code = 0;
-
-        try
-        {
-            var directoryInfo = new DirectoryInfo(folder);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
-
-            var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
-
-            var packages = await siStorageClient.Packages.GetPackagesAsync(
-                new PackageFilters(),
-                new PackageSelectionParameters { Count = 1000 });
-
-            using var client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
-
-            foreach (var package in packages.Packages)
-            {
-                if (package.DirectContentUri == null)
-                {
-                    continue;
-                }
-
-                var link = package.DirectContentUri.AbsolutePath;
-                var fileName = Path.GetFileName(link);
-
-                var targetFile = Path.Combine(folder, fileName);
-                using var stream = await client.GetStreamAsync(package.DirectContentUri);
-                using var fileStream = File.Create(targetFile);
-                await stream.CopyToAsync(fileStream);
-            }
-        }
-        catch (Exception exc)
-        {
-            Console.Write($"Backup error: {exc}");
-            code = 1;
-        }
-        finally
-        {
-            Environment.Exit(code);
-        }
     }
 
 #if !DEBUG
@@ -409,10 +328,10 @@ public partial class App : Application
         else if (e.Exception is InvalidOperationException
             && e.Exception.Message.Contains(SIQuester.Properties.Resources.ApplicationIsClosing))
         {
-            // Это нормально, ничего не сделаешь
+            // It is ok; nothing can be done
         }
         else if (e.Exception is BadImageFormatException
-            || e.Exception is ArgumentException && e.Exception.Message.Contains("Rect..ctor")
+            || e.Exception is ArgumentException && (e.Exception.Message.Contains("Rect..ctor") || e.Exception.Message.Contains("Width and Height"))
             || e.Exception is NullReferenceException && e.Exception.Message.Contains("UpdateTaskbarThumbButtons"))
         {
             MessageBox.Show(
@@ -445,17 +364,12 @@ public partial class App : Application
         }
         else if (e.Exception.ToString().Contains("MahApps.Metro"))
         {
-            // Ничего не сделаешь
-        }
-        else if (e.Exception.ToString().Contains("StoryFragments part failed to load"))
-        {
-            // https://learn.microsoft.com/en-us/answers/questions/1129597/wpf-apps-crash-on-windows-1011-after-windows-updat.html
-            e.Handled = true;
-            return;
+            // Can do nothing with it
         }
         else if (e.Exception is InvalidOperationException invalidOperationException
             && (invalidOperationException.Message.Contains(SIQuester.Properties.Resources.BindingDetachedError)
-            || invalidOperationException.Message.Contains("Cannot perform this operation when binding is detached")))
+            || invalidOperationException.Message.Contains("Cannot perform this operation when binding is detached")
+            || invalidOperationException.Message.Contains("Dispatcher processing")))
         {
             MessageBox.Show(invalidOperationException.Message, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
         }
@@ -536,19 +450,18 @@ public partial class App : Application
             switch (result)
             {
                 case ErrorStatus.Fixed:
-                    MessageBox.Show("Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.", ProductName);
+                    MessageBox.Show(SIQuester.Properties.Resources.ErrorFixed, ProductName);
                     break;
 
                 case ErrorStatus.CannotReproduce:
-                    MessageBox.Show(
-                        "Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.",
-                        ProductName);
+                    MessageBox.Show(SIQuester.Properties.Resources.ErrorNotReproduced, ProductName);
                     break;
             }
         }
         catch
         {
-            MessageBox.Show("Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.", ProductName);
+            MessageBox.Show(SIQuester.Properties.Resources.ReportDelayed, ProductName);
+            
             if (AppSettings.Default.DelayedErrors.Count < 10)
             {
                 AppSettings.Default.DelayedErrors.Add(XamlServices.Save(errorInfo));

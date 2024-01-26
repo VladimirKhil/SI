@@ -1177,6 +1177,24 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста..
+        /// </summary>
+        public static string ErrorFixed {
+            get {
+                return ResourceManager.GetString("ErrorFixed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста..
+        /// </summary>
+        public static string ErrorNotReproduced {
+            get {
+                return ResourceManager.GetString("ErrorNotReproduced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Свернуть всё.
         /// </summary>
         public static string ExpandAll {
@@ -2245,6 +2263,15 @@ namespace SIQuester.Properties {
         public static string RemoveUnusedMedia {
             get {
                 return ResourceManager.GetString("RemoveUnusedMedia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее..
+        /// </summary>
+        public static string ReportDelayed {
+            get {
+                return ResourceManager.GetString("ReportDelayed", resourceCulture);
             }
         }
         

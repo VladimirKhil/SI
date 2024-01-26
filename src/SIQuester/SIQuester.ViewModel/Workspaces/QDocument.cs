@@ -31,7 +31,7 @@ using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
-// TODO: this class is too heavy. It requires a refactoring
+// TODO: this class is too heavy. It requires refactoring
 
 /// <summary>
 /// Represents a document opened inside the editor.
@@ -3458,13 +3458,20 @@ public sealed class QDocument : WorkspaceViewModel
 
         Package.IsExpanded = expand;
 
+        var allThemes = new List<ThemeViewModel>();
+
         foreach (var round in Package.Rounds)
         {
             round.IsExpanded = expand;
+            allThemes.AddRange(round.Themes);
+        }
 
-            foreach (var theme in round.Themes)
+        foreach (var theme in allThemes)
+        {
+            theme.IsExpanded = expand;
+
+            if (expand)
             {
-                theme.IsExpanded = expand;
                 await Task.Delay(100);
             }
         }

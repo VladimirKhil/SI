@@ -62,24 +62,31 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public void Play_Executed(object? arg)
     {
-        if (_isFinished)
+        try
         {
-            return;
+            if (_isFinished)
+            {
+                return;
+            }
+
+            if (!_questionEngine.CanNext)
+            {
+                _isFinished = true;
+                Play.CanBeExecuted = false;
+                return;
+            }
+
+            OnMessage(new
+            {
+                Type = "endPressButtonByTimeout"
+            });
+
+            _isFinished = !_questionEngine.PlayNext();
         }
-
-        if (!_questionEngine.CanNext)
+        catch (Exception exc)
         {
-            _isFinished = true;
-            Play.CanBeExecuted = false;
-            return;
+            OnError(exc);
         }
-
-        OnMessage(new
-        {
-            Type = "endPressButtonByTimeout"
-        });
-
-        _isFinished = !_questionEngine.PlayNext();
     }
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)

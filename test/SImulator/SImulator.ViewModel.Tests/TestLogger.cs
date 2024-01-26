@@ -2,7 +2,7 @@
 
 namespace SImulator.ViewModel.Tests;
 
-internal sealed class TestLogger : ILogger
+internal sealed class TestLogger : IGameLogger
 {
     public void Dispose()
     {

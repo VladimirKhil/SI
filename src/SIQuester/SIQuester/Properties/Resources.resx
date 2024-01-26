@@ -489,6 +489,12 @@
   <data name="Encoding" xml:space="preserve">
     <value>Кодировка</value>
   </data>
+  <data name="ErrorFixed" xml:space="preserve">
+    <value>Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.</value>
+  </data>
+  <data name="ErrorNotReproduced" xml:space="preserve">
+    <value>Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.</value>
+  </data>
   <data name="ExpandAll" xml:space="preserve">
     <value>Свернуть всё</value>
   </data>
@@ -846,6 +852,9 @@
   </data>
   <data name="RemoveUnusedMedia" xml:space="preserve">
     <value>Удалять мультимедиа из пакета при удалении последней ссылки на него</value>
+  </data>
+  <data name="ReportDelayed" xml:space="preserve">
+    <value>Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.</value>
   </data>
   <data name="Reserve" xml:space="preserve">
     <value>Резерв</value>

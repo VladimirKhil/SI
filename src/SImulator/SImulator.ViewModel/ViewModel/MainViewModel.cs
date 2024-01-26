@@ -375,7 +375,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         };
     }
 
-    private ILogger CreateLogger()
+    private IGameLogger CreateLogger()
     {
         if (Settings.SaveLogs)
         {

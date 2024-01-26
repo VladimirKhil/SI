@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SImulator.Implementation;
 
-internal sealed class Logger : ILogger
+internal sealed class Logger : IGameLogger
 {
     private StreamWriter _writer;
 

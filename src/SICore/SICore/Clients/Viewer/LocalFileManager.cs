@@ -1,16 +1,14 @@
 ﻿using SICore.Properties;
 using System.Diagnostics;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Channels;
+using Utils;
 
 namespace SICore.Clients.Viewer;
 
 /// <inheritdoc cref="ILocalFileManager" />
 internal sealed class LocalFileManager : ILocalFileManager
 {
-    private static readonly MD5 Hash = MD5.Create();
 
     private readonly HttpClient _client = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
@@ -60,7 +58,7 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     private async Task ProcesFileAsync(FileTask fileTask, CancellationToken cancellationToken)
     {
-        var fileName = GetSafeFileName(fileTask.Uri);
+        var fileName = FilePathHelper.GetSafeFileName(fileTask.Uri);
         var localFile = Path.Combine(_rootFolder, fileName);
 
         if (File.Exists(localFile))
@@ -122,7 +120,7 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     public string? TryGetFile(Uri uri)
     {
-        var fileName = GetSafeFileName(uri);
+        var fileName = FilePathHelper.GetSafeFileName(uri);
         var localFile = Path.Combine(_rootFolder, fileName);
 
         if (!File.Exists(localFile))
@@ -139,46 +137,6 @@ internal sealed class LocalFileManager : ILocalFileManager
         }
 
         return localFile;
-    }
-
-    private static string GetSafeFileName(Uri uri)
-    {
-        var extension = Path.GetExtension(uri.LocalPath);
-        var hashedFileName = Hash.ComputeHash(Encoding.UTF8.GetBytes(uri.AbsoluteUri));
-
-        var base64String = Convert.ToBase64String(hashedFileName);
-        var escapedFileName = ReplaceInvalidFileNameCharactersInBase64(base64String);
-
-        return string.IsNullOrEmpty(extension) ? escapedFileName : Path.ChangeExtension(escapedFileName, extension);
-    }
-
-    private static string ReplaceInvalidFileNameCharactersInBase64(string base64String)
-    {
-        var resultBuilder = new StringBuilder(base64String.Length);
-
-        foreach (var c in base64String)
-        {
-            switch (c)
-            {
-                case '/':
-                    resultBuilder.Append('_');
-                    break;
-
-                case '+':
-                    resultBuilder.Append('-');
-                    break;
-
-                case '=':
-                    // Skip '=' characters
-                    break;
-
-                default:
-                    resultBuilder.Append(c);
-                    break;
-            }
-        }
-
-        return resultBuilder.ToString();
     }
 
     public void Dispose()

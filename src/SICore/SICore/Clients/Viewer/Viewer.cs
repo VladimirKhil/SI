@@ -2398,7 +2398,7 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
                 }
                 catch (Exception exc)
                 {
-                    ClientData.Host.SendError(exc, false);
+                    _logic.OnReplic(ReplicCodes.Special.ToString(), exc.Message);
                     return;
                 }
 

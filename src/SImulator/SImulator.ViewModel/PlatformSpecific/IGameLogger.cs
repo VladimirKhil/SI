@@ -1,6 +1,6 @@
 ﻿namespace SImulator.ViewModel.PlatformSpecific;
 
-public interface ILogger : IDisposable
+public interface IGameLogger : IDisposable
 {
     void Write(string message, params object?[] args);
 }

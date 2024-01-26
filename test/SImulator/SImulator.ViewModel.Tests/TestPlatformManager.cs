@@ -56,7 +56,7 @@ internal sealed class TestPlatformManager : PlatformManager
         throw new NotImplementedException();
     }
 
-    public override ILogger CreateLogger(string folder) => new TestLogger();
+    public override IGameLogger CreateLogger(string folder) => new TestLogger();
 
     public override Task CreateMainViewAsync(object dataContext, int screenNumber) => Task.CompletedTask;
 

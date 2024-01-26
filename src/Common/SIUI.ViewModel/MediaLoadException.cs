@@ -8,9 +8,9 @@ public sealed class MediaLoadException : Exception
     /// <summary>
     /// Media uri.
     /// </summary>
-    public string MediaUri { get; }
+    public string? MediaUri { get; }
 
-    public MediaLoadException(string mediaUri, Exception innerException) : base("Media load error", innerException)
+    public MediaLoadException(string? mediaUri, Exception innerException) : base("Media load error", innerException)
     {
         MediaUri = mediaUri;
     }

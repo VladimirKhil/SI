@@ -16,9 +16,9 @@ public static class ImageController
     public static readonly DependencyProperty LoadHandlerProperty =
         DependencyProperty.RegisterAttached("LoadHandler", typeof(TableInfoViewModel), typeof(ImageController), new PropertyMetadata(null, OnLoadHandlerChanged));
 
-    public static void OnLoadHandlerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public static void OnLoadHandlerChanged(DependencyObject? d, DependencyPropertyChangedEventArgs e)
     {
-        var image = (Image)d;
+        var image = (Image?)d;
         var tableInfo = (TableInfoViewModel?)e.NewValue;
 
         if (tableInfo == null || image == null)
@@ -33,7 +33,7 @@ public static class ImageController
 
         image.ImageFailed += (sender, e2) =>
         {
-            tableInfo.OnMediaLoadError(new MediaLoadException(((Image?)sender)?.Source.ToString() ?? "", e2.ErrorException));
+            tableInfo.OnMediaLoadError(new MediaLoadException(((Image?)sender)?.Source?.ToString() ?? "", e2.ErrorException));
         };
     }
 }

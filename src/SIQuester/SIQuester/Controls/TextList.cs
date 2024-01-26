@@ -379,6 +379,12 @@ public sealed class TextList : TextBox
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
+        if (_infos.Count == 0)
+        {
+            base.OnPreviewKeyDown(e);
+            return;
+        }
+
         var offset = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int index);
 
         if (ItemsSource.Count == 0

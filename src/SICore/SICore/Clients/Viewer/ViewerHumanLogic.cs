@@ -1424,6 +1424,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
                     TInfo.TStage = TableStage.Special;
                     _data.Sound = Sounds.QuestionSecret;
+                    _prependTableText = null;
                     break;
                 }
 

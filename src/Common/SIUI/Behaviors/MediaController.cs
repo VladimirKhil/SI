@@ -38,9 +38,9 @@ public static class MediaController
     public static readonly DependencyProperty LoadHandlerProperty =
         DependencyProperty.RegisterAttached("LoadHandler", typeof(TableInfoViewModel), typeof(MediaController), new PropertyMetadata(null, OnLoadHandlerChanged));
 
-    public static void OnLoadHandlerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public static void OnLoadHandlerChanged(DependencyObject? d, DependencyPropertyChangedEventArgs e)
     {
-        var mediaElement = (MediaElement)d;
+        var mediaElement = (MediaElement?)d;
         var tableInfo = (TableInfoViewModel?)e.NewValue;
 
         if (mediaElement == null || tableInfo == null)
@@ -65,7 +65,7 @@ public static class MediaController
             }
             catch (Exception exc)
             {
-                tableInfo.OnMediaLoadError(new MediaLoadException(mediaElement.Source.ToString(), exc));
+                tableInfo.OnMediaLoadError(new MediaLoadException(mediaElement.Source?.ToString(), exc));
             }
         }
 
@@ -75,7 +75,7 @@ public static class MediaController
 
         mediaElement.MediaFailed += (sender, e2) =>
         {
-            tableInfo.OnMediaLoadError(new MediaLoadException(((MediaElement?)sender)?.Source.ToString() ?? "", e2.ErrorException));
+            tableInfo.OnMediaLoadError(new MediaLoadException(((MediaElement?)sender)?.Source?.ToString() ?? "", e2.ErrorException));
         };
 
         System.Timers.Timer? timer = null;
