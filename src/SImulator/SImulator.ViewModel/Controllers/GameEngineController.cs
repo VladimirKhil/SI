@@ -14,9 +14,19 @@ namespace SImulator.ViewModel.Controllers;
 internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEnginePlayHandler
 {
     /// <summary>
-    /// Relative image and video weight on screen.
+    /// Minimum weight for the small content.
     /// </summary>
-    private const double ImageVideoWeight = 3.0;
+    private const double SmallContentWeight = 1.0;
+
+    /// <summary>
+    /// Relative media content group weight on screen.
+    /// </summary>
+    private const double MediaContentGroupWeight = 5.0;
+
+    /// <summary>
+    /// Length of text having weight of 1.
+    /// </summary>
+    private const int TextLengthWithBasicWeight = 80;
 
     public GameViewModel? GameViewModel { get; set; }
 
@@ -36,11 +46,11 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         {
             switch (content.Type)
             {
-                case AtomTypes.Text:
+                case ContentTypes.Text:
                     options.Add(new ItemViewModel { Label = label, Content = new ContentViewModel(ContentType.Text, content.Value) });
                     break;
 
-                case AtomTypes.Image:
+                case ContentTypes.Image:
                     var imageUri = TryGetMediaUri(content);
 
                     if (imageUri != null)
@@ -48,12 +58,12 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                         options.Add(new ItemViewModel
                         {
                             Label = label, 
-                            Content = new ContentViewModel(ContentType.Image, imageUri, ImageVideoWeight)
+                            Content = new ContentViewModel(ContentType.Image, imageUri, MediaContentGroupWeight)
                         });
                     }
                     else
                     {
-                        options.Add(new ItemViewModel { Label = label, Content = new ContentViewModel(ContentType.Void, "", ImageVideoWeight) });
+                        options.Add(new ItemViewModel { Label = label, Content = new ContentViewModel(ContentType.Void, "", MediaContentGroupWeight) });
                     }
                     break;
 
@@ -161,13 +171,18 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                                 : $"{GameViewModel.CurrentTheme}\n{GameViewModel.Price}";
 
                             PresentationController.SetText(displayedText); // For simple answer
-                            var group = new ContentGroup();
+                            
+                            var groupWeight = Math.Max(
+                                SmallContentWeight,
+                                Math.Min(MediaContentGroupWeight, (double)displayedText.Length / TextLengthWithBasicWeight));
+
+                            var group = new ContentGroup { Weight = groupWeight };
                             group.Content.Add(new ContentViewModel(ContentType.Text, displayedText));
                             screenContent.Add(group);
                             break;
 
                         case ContentTypes.Image:
-                            currentGroup ??= new ContentGroup { Weight = ImageVideoWeight };
+                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
                             var imageUri = TryGetMediaUri(contentItem);
 
                             if (imageUri != null)
@@ -181,7 +196,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             break;
 
                         case ContentTypes.Video:
-                            currentGroup ??= new ContentGroup { Weight = ImageVideoWeight };
+                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
                             var videoUri = TryGetMediaUri(contentItem);
 
                             if (videoUri != null)
@@ -197,7 +212,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             break;
 
                         case ContentTypes.Html:
-                            currentGroup ??= new ContentGroup { Weight = ImageVideoWeight };
+                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
                             var htmlUri = TryGetMediaUri(contentItem);
 
                             if (htmlUri != null)

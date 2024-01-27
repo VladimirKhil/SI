@@ -7,6 +7,7 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using SImulator.Implementation;
 using SImulator.ViewModel;
+using SImulator.ViewModel.Model;
 using SIStorage.Service.Client;
 using SIStorage.Service.Contract.Models;
 using SIStorageService.ViewModel;
@@ -95,6 +96,16 @@ public partial class App : Application
         base.OnStartup(e);
 
         UI.Initialize();
+
+        if (Settings.Language != null)
+        {
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(Settings.Language);
+        }
+        else
+        {
+            var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+            Settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
+        }
 
         var main = new MainViewModel(Settings);
 

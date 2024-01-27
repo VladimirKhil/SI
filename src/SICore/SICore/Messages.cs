@@ -444,6 +444,11 @@ public static class Messages
     public const string Stage = "STAGE";
 
     /// <summary>
+    /// Lightweight version of stage info (does not require to be announced).
+    /// </summary>
+    public const string StageInfo = "STAGE_INFO";
+
+    /// <summary>
     /// Ставка
     /// </summary>
     public const string Stake = "STAKE";

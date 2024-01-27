@@ -48,6 +48,8 @@
             <my:GameModeToBooleanConverter x:Key="IsStart" Mode="{x:Static vmc:GameMode.Start}" />
             <my:GameModeToBooleanConverter x:Key="IsModerator" Mode="{x:Static vmc:GameMode.Moderator}" />
 
+            <my:LanguageConverter x:Key="LanguageConverter" />
+
             <my:PlayersConverter x:Key="PlayersConverter" />
             
             <my:EqualityConverter x:Key="Equality" />
@@ -1416,46 +1418,43 @@
                 </UniformGrid>
                 
                 <UniformGrid Columns="2" Margin="0,4,4,0" DataContext="{Binding SettingsViewModel.Model}">
-                    <CheckBox Margin="0,0,5,0" IsChecked="{Binding EndQuestionOnRightAnswer}">Завершать вопрос при правильном ответе</CheckBox>
-                    
+                    <CheckBox Margin="0,0,5,0" IsChecked="{Binding EndQuestionOnRightAnswer}" Content="{x:Static lp:Resources.EndQuestionOnRightAnswer}" />
+
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Margin="5,0,0,0" IsChecked="{Binding DropStatsOnBack}">Откатывать статистику при шаге назад</CheckBox>
+                        <CheckBox Margin="5,0,0,0" IsChecked="{Binding DropStatsOnBack}" Content="{x:Static lp:Resources.DropStatsOnBack}" />
                         
                         <Button Style="{StaticResource HelpButton}">
                             <lb:TipBehavior.Tip>
-                                <TextBlock>Возвращать суммы игроков и число их верных и неверных ответов</TextBlock>
+                                <TextBlock Text="{x:Static lp:Resources.DropStatsOnBackHint}" />
                             </lb:TipBehavior.Tip>
                         </Button>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding FalseStart}" Margin="0,5">Игра с фальстартами</CheckBox>
-                        
+                        <CheckBox IsChecked="{Binding FalseStart}" Margin="0,5" Content="{x:Static lp:Resources.FalseStartGame}" />
+
                         <Button Style="{StaticResource HelpButton}">
                             <lb:TipBehavior.Tip>
-                                <TextBlock TextWrapping="Wrap">
-                                    <Run>При игре с фальстартами:</Run><LineBreak/>
-                                    <Run>- на экране отображается текст вопросов;</Run><LineBreak/>
-                                    <Run>- при использовании кнопок для старта таймера вопроса требуется дополнительное нажатие на кнопку &quot;Дальше&quot;, на экране при этом загорается цветная рамка.</Run>
-                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.FalseStartGameHint}" />
                             </lb:TipBehavior.Tip>
                         </Button>
                     </StackPanel>
-                    
-                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding AutomaticGame}">Автоматическое ведение игры (без ведущего)</CheckBox>
-                    
+
+                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding AutomaticGame}" Content="{x:Static lp:Resources.AutomaticGame}" />
+
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding FalseStart}">
-                        <CheckBox IsChecked="{Binding FalseStartMultimedia}" Margin="0,5">Мультимедиа с фальстартами</CheckBox>
+                        <CheckBox IsChecked="{Binding FalseStartMultimedia}" Margin="0,5" Content="{x:Static lp:Resources.FalseStartMultimedia}" />
+                        
                         <Button Style="{StaticResource HelpButton}">
                             <lb:TipBehavior.Tip>
-                                <TextBlock TextWrapping="Wrap">Запрещает нажимать на кнопку в процессе проигрывания мультимедиа-файла</TextBlock>
+                                <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.FalseStartMultimediaHint}" />
                             </lb:TipBehavior.Tip>
                         </Button>
                     </StackPanel>
-                    
-                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding SubstractOnWrong}">Снимать очки за неверный ответ</CheckBox>
-                    <CheckBox IsChecked="{Binding PlaySpecials}">Играть спецвопросы</CheckBox>
-                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding ShowLostButtonPlayers}">Показывать игроков, проигравших кнопку</CheckBox>
+
+                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
+                    <CheckBox IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
+                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
                 </UniformGrid>
                 
                 <Expander
@@ -1955,31 +1954,48 @@
                             Height="64"
                             Margin="0,3,3,0"
                             HorizontalAlignment="Right"
-                            VerticalAlignment="Top" />
-                        
+                            VerticalAlignment="Top" />                        
                         <StackPanel>
-                            <TextBlock Style="{StaticResource Title}">СИмулятор</TextBlock>
-                            <TextBlock Style="{StaticResource Header}">Версия</TextBlock>
+                            <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.AppName}" />
+                            <!--<TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
+
+                            <ComboBox
+                                Margin="0,4,0,0"
+                                ItemsSource="{Binding Languages}"
+                                SelectedItem="{Binding Settings.Language}"
+                                HorizontalAlignment="Left"
+                                Width="200">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type sys:String}">
+                                        <TextBlock Text="{Binding Converter={StaticResource LanguageConverter}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>-->
+
+                            <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Version}" />
                             <TextBlock Margin="1,1,5,1" Text="{Binding Version, ElementName=root}"/>
-                            <TextBlock Style="{StaticResource Header}">Автор</TextBlock>
+                            <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Author}" />
                             
                             <TextBlock Margin="1,1,5,1">
-                                Владимир Хиль (<Hyperlink NavigateUri="https://vladimirkhil.com" Command="{Binding NavigateToSite}">Сайт</Hyperlink>)
+                                <Run Text="{x:Static lp:Resources.AuthorName}" />
+                                (<Hyperlink NavigateUri="https://vladimirkhil.com" Command="{Binding NavigateToSite}">
+                                    <Run Text="{x:Static lp:Resources.Website}" />
+                                </Hyperlink>)
                             </TextBlock>
 
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.License}" />
                         </StackPanel>
                     </DockPanel>
-                    
-                    <TextBlock><Hyperlink Command="{Binding OpenLicensesFolder}"><LineBreak />Лицензии используемых компонентов</Hyperlink></TextBlock>
-                    
-                    <TextBlock Margin="1,1,5,1" TextWrapping="Wrap">
-                        <LineBreak />Все исключительные авторские права на Программный продукт и документацию к нему в печатном и/или электронном виде принадлежат Автору.
-                        <LineBreak /><LineBreak />Программа распространяется бесплатно.
-                        <LineBreak /><LineBreak />Пользователь имеет право свободно использовать и распространять данную Программу, размещать её на сайтах и производить другие не запрещённые законодательством его страны действия с ней в течение сколь угодно длительного времени при условии сохранения авторских прав.
-                        <LineBreak /><LineBreak />Программа поставляется «как есть». Автор не даёт никаких гарантий, что работа Программы будет соответствовать ожиданиям Пользователя. Автор не обязан исправлять Программу при возникновении данного несоответствия. Автор не несёт ответственности за ущерб, причинённый использованием данной Программы.
-                        <LineBreak /><LineBreak />Устанавливая и используя Программу, вы автоматически принимаете данное Соглашение. Вы можете передать права на использование Программы третьему лицу при условии его согласия с данным Соглашением. Если вы не согласны с каким-либо условием данного Соглашения, вы не имеете права использовать данную Программу.
+
+                    <TextBlock>
+                        <Hyperlink Command="{Binding OpenLicensesFolder}">
+                            <LineBreak />
+                            <Run Text="{x:Static lp:Resources.ComponentsLicenses}" />
+                            <LineBreak />
+                        </Hyperlink>
                     </TextBlock>
+
+                    <TextBlock Margin="1,1,5,1" TextWrapping="Wrap" Text="{x:Static lp:Resources.LicenseText}" />
                 </StackPanel>
             </ScrollViewer>
         </TabItem>

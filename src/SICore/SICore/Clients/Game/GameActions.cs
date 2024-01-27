@@ -145,7 +145,7 @@ public sealed class GameActions
     /// <summary>
     /// Выдача информации о состоянии игры
     /// </summary>
-    public void InformStage(string person = NetworkConstants.Everybody, string name = null, int index = -1)
+    public void InformStage(string person = NetworkConstants.Everybody, string? name = null, int index = -1)
     {
         if (index > -1)
         {
@@ -156,6 +156,9 @@ public sealed class GameActions
             SendMessage(string.Join(Message.ArgsSeparator, Messages.Stage, _gameData.Stage.ToString(), name ?? ""), person);
         }
     }
+
+    public void InformStageInfo(string person, int stageIndex) =>
+        SendMessageToWithArgs(person, Messages.StageInfo, _gameData.Stage.ToString(), _gameData.Round?.Name ?? "", stageIndex);
 
     internal void InformRoundThemes(string person = NetworkConstants.Everybody, bool play = true)
     {

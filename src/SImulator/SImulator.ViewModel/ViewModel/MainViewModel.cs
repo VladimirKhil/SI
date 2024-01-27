@@ -32,6 +32,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     #endregion
 
+    public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
+
     private bool _lockPlayerButtonSync = false;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();

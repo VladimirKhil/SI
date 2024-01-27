@@ -654,17 +654,53 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _attachContentToTable = true;
+
+    /// <summary>
+    /// Automatically add content to game table.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool AttachContentToTable
+    {
+        get => _attachContentToTable;
+        set
+        {
+            if (_attachContentToTable != value)
+            {
+                _attachContentToTable = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string? _language = null;
+
+    /// <summary>
+    /// Application language.
+    /// </summary>
+    public string? Language
+    {
+        get => _language;
+        set
+        {
+            if (_language != value)
+            {
+                _language = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public SoundsSettings Sounds { get; set; } = new SoundsSettings();
 
     public SpecialsAliases SpecialsAliases { get; set; } = new SpecialsAliases();
 
     #endregion
 
-    public void Save(Stream stream, XmlSerializer serializer = null)
+    public void Save(Stream stream, XmlSerializer? serializer = null)
     {
         _playerKeysPublic = new List<int>(_playerKeys2.Cast<int>());
-        if (serializer == null)
-            serializer = new XmlSerializer(typeof(AppSettings));
+        serializer ??= new XmlSerializer(typeof(AppSettings));
 
         serializer.Serialize(stream, this);
     }
@@ -672,12 +708,11 @@ public sealed class AppSettings : INotifyPropertyChanged
     /// <summary>
     /// Загрузить пользовательские настройки
     /// </summary>
-    public static AppSettings Load(Stream stream, XmlSerializer serializer = null)
+    public static AppSettings Load(Stream stream, XmlSerializer? serializer = null)
     {
-        if (serializer == null)
-            serializer = new XmlSerializer(typeof(AppSettings));
+        serializer ??= new XmlSerializer(typeof(AppSettings));
 
-        var settings = (AppSettings)serializer.Deserialize(stream);
+        var settings = (AppSettings?)serializer.Deserialize(stream) ?? new AppSettings();
         settings._playerKeys2 = new KeyCollection2(settings._playerKeysPublic.Cast<GameKey>());
 
         return settings;

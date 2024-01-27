@@ -1217,7 +1217,19 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }
 
-        _gameActions.InformStage(message.Sender);
+        var roundIndex = -1;
+
+        for (int i = 0; i < ClientData.Rounds.Length; i++)
+        {
+            if (ClientData.Rounds[i].Index == _logic.Engine.RoundIndex)
+            {
+                roundIndex = i;
+                break;
+            }
+        }
+
+        _gameActions.InformStage(message.Sender); // deprecated
+        _gameActions.InformStageInfo(message.Sender, roundIndex);
         _gameActions.InformSums(message.Sender);
 
         if (ClientData.Stage != GameStage.Before)

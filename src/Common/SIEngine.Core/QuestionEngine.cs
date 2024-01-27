@@ -283,7 +283,8 @@ public sealed class QuestionEngine
                                     {
                                         ContentValue = new List<ContentItem>
                                         {
-                                            new() {
+                                            new()
+                                            {
                                                 Placement = ContentPlacements.Screen,
                                                 Type = ContentTypes.Text,
                                                 Value = rightAnswer

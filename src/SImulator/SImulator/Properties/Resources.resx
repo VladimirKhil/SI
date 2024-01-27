@@ -141,8 +141,23 @@
   <data name="AnswerOptions" xml:space="preserve">
     <value>Варианты ответа</value>
   </data>
+  <data name="AppLanguage" xml:space="preserve">
+    <value>Язык приложения (требуется перезапуск)</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>СИмулятор</value>
+  </data>
   <data name="Audio" xml:space="preserve">
     <value>Аудио</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+  <data name="AuthorName" xml:space="preserve">
+    <value>Владимир Хиль</value>
+  </data>
+  <data name="AutomaticGame" xml:space="preserve">
+    <value>Автоматическое ведение игры (без ведущего)</value>
   </data>
   <data name="Back" xml:space="preserve">
     <value>Назад</value>
@@ -177,11 +192,37 @@
   <data name="CommonAppError" xml:space="preserve">
     <value>Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику.</value>
   </data>
+  <data name="ComponentsLicenses" xml:space="preserve">
+    <value>Лицензии используемых компонентов</value>
+  </data>
   <data name="Design" xml:space="preserve">
     <value>Внешний вид</value>
   </data>
   <data name="DiskFullError" xml:space="preserve">
     <value>Закончилось место на диске!</value>
+  </data>
+  <data name="DropStatsOnBack" xml:space="preserve">
+    <value>Откатывать статистику при шаге назад</value>
+  </data>
+  <data name="DropStatsOnBackHint" xml:space="preserve">
+    <value>Возвращать суммы игроков и число их верных и неверных ответов</value>
+  </data>
+  <data name="EndQuestionOnRightAnswer" xml:space="preserve">
+    <value>Завершать вопрос при правильном ответе</value>
+  </data>
+  <data name="FalseStartGame" xml:space="preserve">
+    <value>Игра с фальстартами</value>
+  </data>
+  <data name="FalseStartGameHint" xml:space="preserve">
+    <value>При игре с фальстартами:
+- на экране отображается текст вопросов;
+- при использовании кнопок для старта таймера вопроса требуется дополнительное нажатие на кнопку "Дальше", на экране при этом загорается цветная рамка</value>
+  </data>
+  <data name="FalseStartMultimedia" xml:space="preserve">
+    <value>Мультимедиа с фальстартами</value>
+  </data>
+  <data name="FalseStartMultimediaHint" xml:space="preserve">
+    <value>Запрещает нажимать на кнопку в процессе проигрывания мультимедиа-файла</value>
   </data>
   <data name="FileDeletionError" xml:space="preserve">
     <value>Ошибка удаления файла: {0}</value>
@@ -249,6 +290,17 @@
   <data name="License" xml:space="preserve">
     <value>Лицензия</value>
   </data>
+  <data name="LicenseText" xml:space="preserve">
+    <value>Все исключительные авторские права на Программный продукт и документацию к нему в печатном и/или электронном виде принадлежат Автору.
+
+Программа распространяется бесплатно.
+
+Пользователь имеет право свободно использовать и распространять данную Программу, размещать её на сайтах и производить другие не запрещённые законодательством его страны действия с ней в течение сколь угодно длительного времени при условии сохранения авторских прав.
+
+Программа поставляется «как есть». Автор не даёт никаких гарантий, что работа Программы будет соответствовать ожиданиям Пользователя. Автор не обязан исправлять Программу при возникновении данного несоответствия. Автор не несёт ответственности за ущерб, причинённый использованием данной Программы.
+
+Устанавливая и используя Программу, вы автоматически принимаете данное Соглашение. Вы можете передать права на использование Программы третьему лицу при условии его согласия с данным Соглашением. Если вы не согласны с каким-либо условием данного Соглашения, вы не имеете права использовать данную Программу.</value>
+  </data>
   <data name="LogsFolderNotFound" xml:space="preserve">
     <value>Папка для записи логов "{0}" не найдена</value>
   </data>
@@ -294,6 +346,9 @@
   <data name="PlaySounds" xml:space="preserve">
     <value>Играть звуки</value>
   </data>
+  <data name="PlaySpecials" xml:space="preserve">
+    <value>Играть спецвопросы</value>
+  </data>
   <data name="PresentationExitHint" xml:space="preserve">
     <value>Для выхода нажмите Escape, правую кнопку мыши или немного надавите пальцем</value>
   </data>
@@ -320,6 +375,9 @@
   </data>
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
+  </data>
+  <data name="QuestionLibrary" xml:space="preserve">
+    <value>Библиотека вопросов</value>
   </data>
   <data name="QuestionLineSpacing" xml:space="preserve">
     <value>Межстрочный интервал в вопросе</value>
@@ -384,6 +442,9 @@
   <data name="Show" xml:space="preserve">
     <value>Показать</value>
   </data>
+  <data name="ShowLostButtonPlayers" xml:space="preserve">
+    <value>Показывать игроков, проигравших кнопку</value>
+  </data>
   <data name="ShowPlayersList" xml:space="preserve">
     <value>Показывать список игроков</value>
   </data>
@@ -426,6 +487,9 @@
   <data name="StopGame" xml:space="preserve">
     <value>Завершить игру</value>
   </data>
+  <data name="SubstractOnWrong" xml:space="preserve">
+    <value>Снимать очки за неверный ответ</value>
+  </data>
   <data name="SubtractSum" xml:space="preserve">
     <value>Вычесть сумму</value>
   </data>
@@ -453,8 +517,14 @@
   <data name="UnknownType" xml:space="preserve">
     <value>Неизвестный тип</value>
   </data>
+  <data name="Version" xml:space="preserve">
+    <value>Версия</value>
+  </data>
   <data name="Video" xml:space="preserve">
     <value>Видео</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Сайт</value>
   </data>
   <data name="Window" xml:space="preserve">
     <value>Окно</value>
