@@ -64,13 +64,13 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     private string? _prependTableText;
     private string? _appendTableText;
 
-    public ViewerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer)
+    public ViewerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer, SettingsViewModel settings)
         : base(data)
     {
         _viewerActions = viewerActions;
         _localizer = localizer;
 
-        TInfo = new TableInfoViewModel(_data.TInfo, _data.Host.GetSettings()) { AnimateText = true, Enabled = true };
+        TInfo = new TableInfoViewModel(_data.TInfo, settings) { AnimateText = true, Enabled = true };
 
         TInfo.PropertyChanged += TInfo_PropertyChanged;
         TInfo.MediaLoad += TInfo_MediaLoad;
@@ -1324,7 +1324,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         _data.Players[number].State = PlayerState.Press;
     }
 
-    virtual public void ShowTablo() => TInfo.TStage = TableStage.RoundTable;
+    virtual public void ShowTablo() => TInfo.TStage = SIUI.ViewModel.TableStage.RoundTable;
 
     /// <summary>
     /// Игрок получил или потерял деньги
@@ -1604,10 +1604,10 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     public void OnTextSpeed(double speed) => TInfo.TextSpeed = speed;
 
-    public void SetText(string text, TableStage stage = TableStage.Round)
+    public void SetText(string text, Models.TableStage stage)
     {
         TInfo.Text = text;
-        TInfo.TStage = stage;
+        TInfo.TStage = stage == Models.TableStage.Theme ? TableStage.Theme : stage == Models.TableStage.Round ? TableStage.Round : TableStage.QuestionPrice;
         _data.EnableMediaLoadButton = false;
     }
 

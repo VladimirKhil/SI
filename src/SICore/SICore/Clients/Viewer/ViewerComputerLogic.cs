@@ -1,7 +1,6 @@
 ﻿using SICore.Models;
 using SIData;
 using SIPackages;
-using SIUI.ViewModel;
 
 namespace SICore;
 
@@ -278,6 +277,4 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     {
         
     }
-
-    public TableInfoViewModel TInfo => null;
 }

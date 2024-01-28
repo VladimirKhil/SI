@@ -1,6 +1,5 @@
 ﻿using SICore.Contracts;
 using SICore.Models;
-using SIUI.ViewModel;
 using System.Text.RegularExpressions;
 
 namespace SICore.PlatformSpecific;
@@ -45,8 +44,6 @@ public abstract class GameHostBase : IGameHost
     public abstract void OnPictureError(string remoteUri);
 
     public abstract void SaveBestPlayers(IEnumerable<PlayerAccount> players);
-
-    public abstract SettingsViewModel GetSettings();
 
     public Stream CreateLog(string userName, out string logUri)
     {

@@ -12,7 +12,6 @@ using SIPackages;
 using SIPackages.Core;
 using SIPackages.Providers;
 using SIUI.Model;
-using SIUI.ViewModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using R = SICore.Properties.Resources;

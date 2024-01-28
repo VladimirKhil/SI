@@ -31,7 +31,6 @@
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIPackages.Providers\SIPackages.Providers.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.Model\SIUI.Model.csproj" />
-    <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
     <ProjectReference Include="..\..\SICore\SIData\SIData.csproj" />
     <ProjectReference Include="..\SICore.Connections\SICore.Connections.csproj" />
     <ProjectReference Include="..\SICore.Network\SICore.Network.csproj" />

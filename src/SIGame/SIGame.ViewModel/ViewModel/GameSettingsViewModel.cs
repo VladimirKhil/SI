@@ -14,8 +14,8 @@ using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Web;
 using SIPackages;
-using SIPackages.Helpers;
 using SIStorageService.ViewModel;
+using SIUI.ViewModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -376,11 +376,13 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     }
 
     private readonly long? _maxPackageSize;
+    private readonly SettingsViewModel _settingsViewModel;
 
     public GameSettingsViewModel(
         GameSettings gameSettings,
         CommonSettings commonSettings,
         UserSettings userSettings,
+        SettingsViewModel settingsViewModel,
         StorageViewModel siStorage,
         bool isNetworkGame = false,
         long? maxPackageSize = null)
@@ -388,6 +390,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     {
         NetworkGame = isNetworkGame;
         _commonSettings = commonSettings;
+        _settingsViewModel = settingsViewModel;
 
         UpdateComputerPlayers();
         UpdateComputerShowmans();
@@ -633,7 +636,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                     return;
                 }
 
-                MoveToGame(info.Value.Item1, info.Value.Item2, null, null);
+                MoveToGame(info.Value.Item1, info.Value.Item2, (ViewerHumanLogic)info.Value.Item2.MyLogic, null, null);
             }
             else
             {
@@ -732,9 +735,9 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             _computerShowmans.ToArray(),
             documentPath,
             avatarHelper)
-            .Run();
+            .Run((data, actions, localizer) => new ViewerHumanLogic(data, actions, localizer, _settingsViewModel));
 
-        host.MyData.IsNetworkGame = NetworkGame;
+        host!.MyData.IsNetworkGame = NetworkGame;
 
         if (!NetworkGame)
         {
@@ -744,10 +747,10 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         host.MyData.ServerAddress = "http://localhost";
 
-        MoveToGame(node, host, documentPath, fileShare);
+        MoveToGame(node, host, (ViewerHumanLogic)host.MyLogic, documentPath, fileShare);
     }
 
-    private void MoveToGame(Node server, IViewerClient host, string tempDocFolder, IFileShare? fileShare)
+    private void MoveToGame(Node server, IViewerClient host, ViewerHumanLogic logic, string tempDocFolder, IFileShare? fileShare)
     {
         if (host == null)
         {
@@ -757,7 +760,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _model.ShowmanType = Showman.AccountType;
         _model.PlayersTypes = Players.Select(p => p.AccountType).ToArray();
 
-        OnStartGame(server, host, NetworkGame, false, tempDocFolder, fileShare, NetworkPort);
+        OnStartGame(server, host, logic, NetworkGame, false, tempDocFolder, fileShare, NetworkPort);
     }
 
     private void Server_Error(Exception exc, bool isWarning) =>

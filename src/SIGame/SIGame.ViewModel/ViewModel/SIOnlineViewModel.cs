@@ -12,6 +12,7 @@ using SIGame.ViewModel.Implementation;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Properties;
+using SIUI.ViewModel;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Security.Cryptography;
@@ -345,9 +346,10 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         IGameServerClient gameServerClient,
         CommonSettings commonSettings,
         UserSettings userSettings,
+        SettingsViewModel settingsViewModel,
         SIContentClientOptions siContentClientOptions,
         ILogger<SIOnlineViewModel> logger)
-        : base(connectionData, commonSettings, userSettings)
+        : base(connectionData, commonSettings, userSettings, settingsViewModel)
     {
         _gameServerClient = gameServerClient;
 

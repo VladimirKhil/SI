@@ -3315,7 +3315,11 @@ public sealed class Game : Actor<GameData, GameLogic>
         ClientData.Players[index] = newAccount;
 
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        _ = new Player(playerClient, account, false, LO, new ViewerData(ClientData.Host));
+        var data = new ViewerData(ClientData.Host);
+        var actions = new ViewerActions(playerClient, LO);
+        var logic = new ViewerComputerLogic(data, actions, account);
+        _ = new Player(playerClient, account, false, logic, actions, LO, data);
+
         Inform(newAccount.Name);
 
         return newAccount;
@@ -3340,7 +3344,10 @@ public sealed class Game : Actor<GameData, GameLogic>
         ClientData.ShowMan = newAccount;
 
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        var showman = new Showman(showmanClient, account, false, LO, new ViewerData(ClientData.Host));
+        var data = new ViewerData(ClientData.Host);
+        var actions = new ViewerActions(showmanClient, LO);
+        var logic = new ViewerComputerLogic(data, actions, account);
+        var showman = new Showman(showmanClient, account, false, logic, actions, LO, data);
 
         Inform(newAccount.Name);
 

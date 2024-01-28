@@ -86,9 +86,9 @@ public abstract class Data : ITimeProvider, INotifyPropertyChanged
         set { if (_thinkingTime != value) { _thinkingTime = value; OnPropertyChanged(); } }
     }
 
-    internal int CurPriceRight { get; set; }
-    
-    internal int CurPriceWrong { get; set; }
+    public int CurPriceRight { get; set; }
+
+    public int CurPriceWrong { get; set; }
 
     /// <summary>
     /// Информация о системных ошибках в игре, которые неплохо бы отправлять автору, но которые не приводят к краху системы

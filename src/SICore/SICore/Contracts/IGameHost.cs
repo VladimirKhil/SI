@@ -1,6 +1,5 @@
 ﻿using SICore.Models;
 using SICore.PlatformSpecific;
-using SIUI.ViewModel;
 
 namespace SICore.Contracts;
 
@@ -72,8 +71,6 @@ public interface IGameHost : IPlatformManager
     void OnPictureError(string remoteUri);
 
     void SaveBestPlayers(IEnumerable<PlayerAccount> players);
-
-    SettingsViewModel GetSettings();
 
     void OnGameFinished(string packageId);
 

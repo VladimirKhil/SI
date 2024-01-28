@@ -24,10 +24,12 @@ public sealed class Player : Viewer
     /// <param name="client">Player game network client.</param>
     /// <param name="personData">Player account data.</param>
     /// <param name="isHost">Is the player a game host.</param>
+    /// <param name="logic">Player logic.</param>
+    /// <param name="viewerActions">Player actions.</param>
     /// <param name="localizer">Resource localizer.</param>
     /// <param name="data">Player game data.</param>
-    public Player(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
-        : base(client, personData, isHost, localizer, data)
+    public Player(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
+        : base(client, personData, isHost, logic, viewerActions, localizer, data)
     {
         ClientData.PlayerDataExtensions.PressGameButton = new CustomCommand(arg =>
         {

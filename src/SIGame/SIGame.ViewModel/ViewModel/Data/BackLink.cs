@@ -10,7 +10,6 @@ using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Settings;
 using SIStatisticsService.Contract;
 using SIStatisticsService.Contract.Models;
-using SIUI.ViewModel;
 
 namespace SIGame.ViewModel;
 
@@ -20,7 +19,6 @@ public sealed class BackLink : GameHostBase
 
     internal static BackLink Default { get; set; }
 
-    private readonly AppSettingsViewModel _settings;
     private readonly UserSettings _userSettings;
     private readonly AppState _appState;
 
@@ -28,12 +26,10 @@ public sealed class BackLink : GameHostBase
     private readonly ILogger<BackLink> _logger;
 
     internal BackLink(
-        AppSettingsViewModel settings,
         UserSettings userSettings,
         AppState appState,
         IServiceProvider serviceProvider)
     {
-        _settings = settings;
         _userSettings = userSettings;
         _appState = appState;
         _serviceProvider = serviceProvider;
@@ -128,8 +124,6 @@ public sealed class BackLink : GameHostBase
             }
         }
     }
-
-    public override SettingsViewModel GetSettings() => _settings.ThemeSettings.SIUISettings;
 
     public override void OnGameFinished(string packageId)
     {

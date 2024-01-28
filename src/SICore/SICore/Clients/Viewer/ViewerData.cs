@@ -234,7 +234,7 @@ public sealed class ViewerData : Data
 
     public string AtomType { get; set; } = "";
 
-    internal int Winner { get; set; }
+    public int Winner { get; set; }
 
     internal int LastStakerIndex { get; set; } = -1;
 
@@ -284,7 +284,7 @@ public sealed class ViewerData : Data
         set { _iReady = value; OnPropertyChanged(); }
     }
 
-    internal string Sound { set => Host.PlaySound(value); }
+    public string Sound { set => Host.PlaySound(value); }
 
     internal bool FalseStart { get; set; } = true;
 
@@ -443,7 +443,7 @@ public sealed class ViewerData : Data
     /// <summary>
     /// Main game persons (showman and players).
     /// </summary>
-    internal PersonAccount[] MainPersons
+    public PersonAccount[] MainPersons
     {
         get => _mainPersons;
         private set
@@ -555,7 +555,7 @@ public sealed class ViewerData : Data
     /// Adds mesage to the game chat.
     /// </summary>
     /// <param name="message">Message to add.</param>
-    internal void AddToChat(Message message)
+    public void AddToChat(Message message)
     {
         var index = _chatTable.IndexOf(message.Sender);
         

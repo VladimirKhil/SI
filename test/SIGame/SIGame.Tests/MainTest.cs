@@ -122,7 +122,7 @@ public class MainTest
 
         var game = (GameViewModel?)mainViewModel.ActiveView;
 
-        var tInfo = ((ViewerHumanLogic)game.Host.MyLogic).TInfo;
+        var tInfo = game!.TInfo;
         tInfo.PropertyChanged += TInfo_PropertyChanged;
 
         await Task.Delay(5000);

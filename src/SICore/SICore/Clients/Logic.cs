@@ -48,7 +48,7 @@ public abstract class Logic<D> : ILogic
 
     protected IEnumerable<Tuple<int, int, int>> OldTasks => _oldTasks;
 
-    internal Logic(D data)
+    public Logic(D data)
     {
         _data = data ?? throw new ArgumentNullException(nameof(data));
         _taskTimer = new Timer(TaskTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);

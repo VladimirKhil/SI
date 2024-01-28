@@ -24,12 +24,13 @@ namespace SIGame.ViewModel;
 public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 {
     private readonly Node _node;
+    private readonly ViewerHumanLogic _logic;
 
     public IViewerClient Host { get; private set; }
 
     public ViewerData Data => Host.MyData;
 
-    public TableInfoViewModel TInfo => Host.MyLogic.TInfo;
+    public TableInfoViewModel TInfo => _logic.TInfo;
 
     /// <summary>
     /// Ends the game and returns to main menu/lobby.
@@ -143,11 +144,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public GameViewModel(
         Node node,
         IViewerClient host,
+        ViewerHumanLogic logic,
         UserSettings userSettings,
         IFileShare? fileShare,
         ILogger<GameViewModel> logger)
     {
         _node = node;
+        _logic = logic;
         _fileShare = fileShare;
         _logger = logger;
 
@@ -245,7 +248,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     }
 
     private void GameViewModel_TimeChanged(IAnimatableTimer timer) =>
-        Host.MyLogic.TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
+        TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
 
     private void Host_Timer(int timerIndex, string timerCommand, string arg)
     {

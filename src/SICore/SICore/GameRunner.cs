@@ -65,7 +65,7 @@ public sealed class GameRunner
         _createHost = createHost;
     }
 
-    public (IViewerClient?, Game) Run()
+    public (IViewerClient?, Game) Run(Func<ViewerData, ViewerActions, Localizer, IViewerLogic> hostLogicFactory)
     {
         _document.Upgrade();
 
@@ -88,7 +88,10 @@ public sealed class GameRunner
             if (!_settings.Showman.IsHuman || isHost)
             {
                 var showmanClient = new Client(_settings.Showman.Name);
-                var showman = new Showman(showmanClient, _settings.Showman, isHost, localizer, new ViewerData(_gameHost));
+                var data = new ViewerData(_gameHost);
+                var actions = new ViewerActions(showmanClient, localizer);
+                var logic = isHost ? hostLogicFactory(data, actions, localizer) : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Showman);
+                var showman = new Showman(showmanClient, _settings.Showman, isHost, logic, actions, localizer, data);
                 showmanClient.ConnectTo(_node);
 
                 if (isHost)
@@ -109,7 +112,10 @@ public sealed class GameRunner
                 if (!human || isHost)
                 {
                     var playerClient = new Client(_settings.Players[i].Name);
-                    var player = new Player(playerClient, _settings.Players[i], isHost, localizer, new ViewerData(_gameHost));
+                    var data = new ViewerData(_gameHost);
+                    var actions = new ViewerActions(playerClient, localizer);
+                    var logic = isHost ? hostLogicFactory(data, actions, localizer) : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Players[i]);
+                    var player = new Player(playerClient, _settings.Players[i], isHost, logic, actions, localizer, data);
                     playerClient.ConnectTo(_node);
 
                     if (isHost)
@@ -131,7 +137,10 @@ public sealed class GameRunner
                     gameData.Viewers.Add(new ViewerAccount(_settings.Viewers[i]));
                     
                     var viewerClient = new Client(_settings.Viewers[i].Name);
-                    var viewer = new SimpleViewer(viewerClient, _settings.Viewers[i], isHost, localizer, new ViewerData(_gameHost));
+                    var data = new ViewerData(_gameHost);
+                    var actions = new ViewerActions(viewerClient, localizer);
+                    var logic = hostLogicFactory(data, actions, localizer);
+                    var viewer = new Viewer(viewerClient, _settings.Viewers[i], isHost, logic, actions, localizer, data);
                     viewerClient.ConnectTo(_node);
                     host = viewer;
 

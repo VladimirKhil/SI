@@ -1,5 +1,6 @@
 ﻿using SICore;
 using SIGame.ViewModel.Properties;
+using SIUI.ViewModel;
 using System.Text.RegularExpressions;
 
 namespace SIGame.ViewModel;
@@ -79,8 +80,8 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    public SINetworkViewModel(ConnectionData connectionData, CommonSettings commonSettings, UserSettings userSettings)
-        : base(connectionData, commonSettings, userSettings)
+    public SINetworkViewModel(ConnectionData connectionData, CommonSettings commonSettings, UserSettings userSettings, SettingsViewModel settingsViewModel)
+        : base(connectionData, commonSettings, userSettings, settingsViewModel)
     {
 
     }

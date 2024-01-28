@@ -1,6 +1,6 @@
 ﻿using SICore.Clients.Viewer;
+using SICore.Models;
 using SIData;
-using SIUI.ViewModel;
 
 namespace SICore;
 
@@ -12,8 +12,6 @@ public interface IViewerLogic : ILogic
     IPlayerLogic PlayerLogic { get; }
 
     IShowmanLogic ShowmanLogic { get; }
-
-    TableInfoViewModel TInfo { get; }
 
     bool CanSwitchType { get; }
 

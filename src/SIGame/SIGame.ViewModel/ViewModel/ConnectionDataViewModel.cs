@@ -11,6 +11,7 @@ using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIStorageService.ViewModel;
+using SIUI.ViewModel;
 using System.Diagnostics;
 using System.Windows.Input;
 
@@ -120,6 +121,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     private readonly CommonSettings _commonSettings;
     protected readonly UserSettings _userSettings;
+    private readonly SettingsViewModel _settingsViewModel;
 
     protected GameSettingsViewModel GameSettings { get; private set; }
 
@@ -129,11 +131,12 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         _userSettings = userSettings;
     }
 
-    protected ConnectionDataViewModel(ConnectionData connectionData, CommonSettings commonSettings, UserSettings userSettings)
+    protected ConnectionDataViewModel(ConnectionData connectionData, CommonSettings commonSettings, UserSettings userSettings, SettingsViewModel settingsViewModel)
         : base(connectionData)
     {
         _commonSettings = commonSettings;
         _userSettings = userSettings;
+        _settingsViewModel = settingsViewModel;
     }
 
     protected override void Initialize()
@@ -151,7 +154,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         var siStorage = PlatformManager.Instance.ServiceProvider.GetRequiredService<StorageViewModel>();
         siStorage.DefaultLanguage = Thread.CurrentThread.CurrentUICulture.Name;
 
-        GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage, true, MaxPackageSize)
+        GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, _settingsViewModel, siStorage, true, MaxPackageSize)
         {
             Human = Human,
             ChangeSettings = ChangeSettings
@@ -178,12 +181,13 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     protected override void OnStartGame(
         Node node,
         IViewerClient host,
+        ViewerHumanLogic logic,
         bool networkGame,
         bool isOnline,
         string tempDocFolder,
         IFileShare? fileShare,
         int networkGamePort) =>
-        base.OnStartGame(node, host, networkGame, IsOnline, tempDocFolder, fileShare, networkGamePort);
+        base.OnStartGame(node, host, logic, networkGame, IsOnline, tempDocFolder, fileShare, networkGamePort);
 
     protected virtual void Prepare(GameSettingsViewModel gameSettings)
     {
@@ -317,12 +321,14 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         };
 
         var localizer = new Localizer(Thread.CurrentThread.CurrentUICulture.Name);
+        var actions = new ViewerActions(_client, localizer);
+        var logic = new ViewerHumanLogic(data, actions, localizer, _settingsViewModel);
 
         _host = role switch
         {
-            GameRole.Showman => new Showman(_client, humanPlayer, isHost, localizer, data),
-            GameRole.Player => new Player(_client, humanPlayer, isHost, localizer, data),
-            _ => new SimpleViewer(_client, humanPlayer, isHost, localizer, data),
+            GameRole.Showman => new Showman(_client, humanPlayer, isHost, logic, actions, localizer, data),
+            GameRole.Player => new Player(_client, humanPlayer, isHost, logic, actions, localizer, data),
+            _ => new Viewer(_client, humanPlayer, isHost, logic, actions, localizer, data),
         };
 
         _host.Avatar = _avatarLoadingTask != null ? (await _avatarLoadingTask).AvatarUrl : null;
@@ -338,7 +344,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         if (!isHost && Ready != null)
         {
-            Ready(_node, _host, IsOnline); // Здесь происходит переход к игре
+            Ready(_node, _host, logic, IsOnline); // Здесь происходит переход к игре
         }
 
         if (_connector != null)
@@ -366,7 +372,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     protected virtual Task ClearConnectionAsync() => Task.CompletedTask;
 
-    public event Action<Node, IViewerClient, bool> Ready;
+    public event Action<Node, IViewerClient, ViewerHumanLogic, bool> Ready;
 
     #endregion
 

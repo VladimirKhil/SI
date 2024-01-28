@@ -9,7 +9,6 @@ using SICore.Special;
 using SIData;
 using SIPackages.Core;
 using SIUI.Model;
-using SIUI.ViewModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -20,7 +19,7 @@ namespace SICore;
 /// <summary>
 /// Implements a game viewer.
 /// </summary>
-public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPropertyChanged
+public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPropertyChanged
 {
     private bool _ignoreAtoms = false;
 
@@ -207,9 +206,9 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
     }
 
     /// <summary>
-    /// Упрощённый клиент (используется в качестве предка)
+    /// Initializes a new instance of <see cref="Viewer" /> class.
     /// </summary>
-    protected Viewer(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
+    public Viewer(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
         : base(client, localizer, data)
     {
         if (personData == null)
@@ -217,18 +216,13 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
             throw new ArgumentNullException(nameof(personData));
         }
 
-        _viewerActions = new ViewerActions(client, localizer);
-        _logic = CreateLogic(personData);
+        _viewerActions = viewerActions;
+        _logic = logic;
 
         Initialize(isHost);
 
         ClientData.Picture = personData.Picture;
     }
-
-    protected IViewerLogic CreateLogic(Account personData) =>
-        personData.IsHuman ?
-            new ViewerHumanLogic(ClientData, _viewerActions, LO) :
-            new ViewerComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
 
     public void Move(object arg) => _viewerActions.SendMessageWithArgs(Messages.Move, arg);
 
@@ -1997,9 +1991,9 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
 
         IViewerClient viewer = role switch
         {
-            GameRole.Viewer => new SimpleViewer(_client, newAccount, IsHost, LO, ClientData),
-            GameRole.Player => new Player(_client, newAccount, IsHost, LO, ClientData),
-            _ => new Showman(_client, newAccount, IsHost, LO, ClientData),
+            GameRole.Viewer => new Viewer(_client, newAccount, IsHost, _logic, _viewerActions, LO, ClientData),
+            GameRole.Player => new Player(_client, newAccount, IsHost, _logic, _viewerActions, LO, ClientData),
+            _ => new Showman(_client, newAccount, IsHost, _logic, _viewerActions, LO, ClientData),
         };
 
         if (oldAccount is PersonAccount current)

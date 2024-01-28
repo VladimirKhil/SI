@@ -51,7 +51,7 @@ public sealed class PlayerAccount : PersonAccount
     /// <summary>
     /// Может ли жать на кнопку
     /// </summary>
-    internal bool Pass
+    public bool Pass
     {
         get => _pass;
         set { if (_pass != value) { _pass = value; OnPropertyChanged(); } }

@@ -123,7 +123,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         MainMenu = new MainMenuViewModel(userSettings) { IsVisible = false };
 
-        BackLink.Default = new BackLink(Settings, userSettings, appState, serviceProvider);
+        BackLink.Default = new BackLink(userSettings, appState, serviceProvider);
 
         Cancel = new CustomCommand(Cancel_Executed);
 
@@ -206,6 +206,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     private void StartGame(
         Node node,
         IViewerClient host,
+        ViewerHumanLogic logic,
         bool isNetworkGame,
         bool isOnline,
         string? tempDocFolder,
@@ -220,6 +221,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         var game = new GameViewModel(
             node,
             host,
+            logic,
             _userSettings,
             fileShare,
             _serviceProvider.GetRequiredService<ILogger<GameViewModel>>())
@@ -242,7 +244,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         host.MyLogic.PrintGreeting();
     }
 
-    private void JoinGame(Node server, IViewerClient host, bool isOnline) => StartGame(server, host, false, isOnline, null, null);
+    private void JoinGame(
+        Node server,
+        IViewerClient host,
+        ViewerHumanLogic logic,
+        bool isOnline) => StartGame(server, host, logic, false, isOnline, null, null);
 
     private async void EndGame_Executed()
     {
@@ -266,7 +272,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         var siStorage = _serviceProvider.GetRequiredService<StorageViewModel>();
         siStorage.DefaultLanguage = Thread.CurrentThread.CurrentUICulture.Name;
 
-        var gameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage)
+        var gameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, Settings.ThemeSettings.SIUISettings, siStorage)
         {
             Human = Human.HumanPlayer,
             ChangeSettings = ShowSlideMenu
@@ -305,6 +311,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 client,
                 _commonSettings,
                 _userSettings,
+                Settings.ThemeSettings.SIUISettings,
                 _serviceProvider.GetRequiredService<IOptions<SIContentClientOptions>>().Value,
                 _serviceProvider.GetRequiredService<ILogger<SIOnlineViewModel>>())
             {
@@ -330,7 +337,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         var networkConnection = new SINetworkViewModel(
             _userSettings.ConnectionData,
             _commonSettings,
-            _userSettings)
+            _userSettings,
+            Settings.ThemeSettings.SIUISettings)
         {
             Human = Human.HumanPlayer, 
             ChangeSettings = ShowSlideMenu,

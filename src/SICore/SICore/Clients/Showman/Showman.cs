@@ -13,8 +13,8 @@ public sealed class Showman : Viewer
 {
     private readonly object _readyLock = new();
 
-    public Showman(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
-        : base(client, personData, isHost, localizer, data)
+    public Showman(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
+        : base(client, personData, isHost, logic, viewerActions, localizer, data)
     {
         ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg =>
         {
