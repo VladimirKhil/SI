@@ -18,9 +18,11 @@ namespace SImulator.ViewModel.Controllers;
 /// <inheritdoc cref="IPresentationController" />
 public sealed class PresentationController : IPresentationController, INotifyPropertyChanged
 {
+    public Uri Source { get; } = new($"file:///{AppDomain.CurrentDomain.BaseDirectory}webtable/index.html");
+
     private int _previousCode = -1;
 
-    private IAnimatableTimer _animatableTimer = PlatformManager.Instance.CreateAnimatableTimer();
+    private readonly IAnimatableTimer _animatableTimer = PlatformManager.Instance.CreateAnimatableTimer();
 
     private IPresentationListener? _listener;
 
@@ -52,7 +54,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     private bool _stageCallbackBlock = false;
 
-    public int ScreenIndex { get; set; }
+    public IDisplayDescriptor Screen { get; }
 
     public event Action<Exception>? Error;
 
@@ -68,8 +70,10 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         set { if (_showPlayers != value) { _showPlayers = value; OnPropertyChanged(); } }
     }
 
-    public PresentationController()
+    public PresentationController(IDisplayDescriptor screen)
     {
+        Screen = screen;
+
         TInfo = new TableInfoViewModel
         {
             Enabled = true,
@@ -165,7 +169,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public async void Start()
     {
-        await PlatformManager.Instance.CreateMainViewAsync(this, ScreenIndex);
+        await PlatformManager.Instance.CreateMainViewAsync(this, Screen);
         TInfo.TStage = TableStage.Sign;
     }
 

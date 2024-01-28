@@ -1266,6 +1266,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Окно (новая версия).
+        /// </summary>
+        public static string WebView {
+            get {
+                return ResourceManager.GetString("WebView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Окно.
         /// </summary>
         public static string Window {

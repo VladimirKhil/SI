@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using SImulator.Implementation.ButtonManagers;
 using SImulator.Properties;
 using SImulator.ViewModel;
+using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -66,19 +67,14 @@ internal sealed class DesktopManager : PlatformManager
         }
     }
 
-    public override Task CreateMainViewAsync(object dataContext, int screenNumber)
+    public override Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen)
     {
-        var fullScreen = screenNumber < Screen.AllScreens.Length;
+        _window = screen.IsWebView ? new WebWindow() : new MainWindow(screen.IsFullScreen);
+        _window.DataContext = dataContext;
 
-        _window = new MainWindow(fullScreen)
+        if (screen.IsFullScreen && screen is ScreenDisplayDescriptor screenInfo)
         {
-            DataContext = dataContext
-        };
-
-        if (fullScreen)
-        {
-            screenNumber = Math.Min(screenNumber, Screen.AllScreens.Length - 1);
-            var area = Screen.AllScreens[screenNumber].WorkingArea;
+            var area = screenInfo.Screen.WorkingArea;
             _window.Left = area.Left;
             _window.Top = area.Top;
             _window.Width = area.Width;
@@ -87,7 +83,7 @@ internal sealed class DesktopManager : PlatformManager
 
         _window.Show();
 
-        if (fullScreen)
+        if (screen.IsFullScreen)
         {
             _window.WindowState = WindowState.Maximized;
         }
@@ -100,6 +96,7 @@ internal sealed class DesktopManager : PlatformManager
         if (_window != null)
         {
             MainWindow.CanClose = true;
+
             try
             {
                 _window.Close();
@@ -114,9 +111,9 @@ internal sealed class DesktopManager : PlatformManager
         return Task.CompletedTask;
     }
 
-    public override IScreen[] GetScreens() =>
-        Screen.AllScreens.Select(screen => new ScreenInfo(screen))
-            .Concat(new ScreenInfo[] { new ScreenInfo(null) })
+    public override IDisplayDescriptor[] GetScreens() =>
+        Screen.AllScreens.Select(screen => new ScreenDisplayDescriptor(screen))
+            .Concat(new IDisplayDescriptor[] { WindowDisplayDescriptor.Instance /*, WebView.Instance */ })
             .ToArray();
 
     public override string[] GetLocalComputers()
@@ -330,7 +327,11 @@ internal sealed class DesktopManager : PlatformManager
 
         _mediaTimeline.Source = new Uri(source, UriKind.RelativeOrAbsolute);
         _mediaClock = _mediaTimeline.CreateClock();
-        _player.Clock = _mediaClock;
+
+        if (_player != null)
+        {
+            _player.Clock = _mediaClock;
+        }
 
         _mediaClock.Controller.Begin();
     }
@@ -343,7 +344,7 @@ internal sealed class DesktopManager : PlatformManager
         }
     }
 
-    public override IGameLogger CreateLogger(string? folder)
+    public override IGameLogger CreateGameLogger(string? folder)
     {
         if (folder == null)
         {

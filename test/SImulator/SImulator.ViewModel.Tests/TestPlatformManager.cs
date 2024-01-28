@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SImulator.ViewModel.ButtonManagers;
+using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -56,9 +57,9 @@ internal sealed class TestPlatformManager : PlatformManager
         throw new NotImplementedException();
     }
 
-    public override IGameLogger CreateLogger(string folder) => new TestLogger();
+    public override IGameLogger CreateGameLogger(string folder) => new TestLogger();
 
-    public override Task CreateMainViewAsync(object dataContext, int screenNumber) => Task.CompletedTask;
+    public override Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen) => Task.CompletedTask;
 
     public override void CreatePlayersView(object dataContext)
     {
@@ -80,7 +81,7 @@ internal sealed class TestPlatformManager : PlatformManager
         throw new NotImplementedException();
     }
 
-    public override IScreen[] GetScreens() => new IScreen[] { new TestScreen() };
+    public override IDisplayDescriptor[] GetScreens() => new IDisplayDescriptor[] { new TestScreen() };
 
     public override void InitSettings(AppSettings defaultSettings)
     {

@@ -526,6 +526,9 @@
   <data name="Website" xml:space="preserve">
     <value>Сайт</value>
   </data>
+  <data name="WebView" xml:space="preserve">
+    <value>Окно (новая версия)</value>
+  </data>
   <data name="Window" xml:space="preserve">
     <value>Окно</value>
   </data>

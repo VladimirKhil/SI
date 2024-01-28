@@ -1,5 +1,6 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.ButtonManagers;
+using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Listeners;
@@ -121,24 +122,18 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public AppSettingsViewModel SettingsViewModel { get; }
 
-    private string[] _comPorts;
+    private readonly Lazy<string[]> _comPorts;
 
-    public string[] ComPorts
+    private string[] LoadComPorts()
     {
-        get
+        var ports = PlatformManager.Instance.GetComPorts();
+
+        if (Settings.ComPort == null || _comPorts != null && ports.Length > 0)
         {
-            if (_comPorts == null)
-            {
-                _comPorts = PlatformManager.Instance.GetComPorts();
-
-                if (Settings.ComPort == null || _comPorts != null && _comPorts.Length > 0)
-                {
-                    Settings.ComPort = _comPorts[0];
-                }
-            }
-
-            return _comPorts;
+            Settings.ComPort = ports[0];
         }
+
+        return ports;
     }
 
     private GameViewModel? _game;
@@ -182,9 +177,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public bool CanSelectScreens => (_mode == GameMode.Start) && Screens.Length > 1;
 
-    public IScreen[] Screens { get; private set; }
+    public IDisplayDescriptor[] Screens { get; private set; }
 
-    public string Host => "[Ваш IP-адрес]";
+    public string Host => Resources.IpAddressHint;
 
     /// <summary>
     /// Список игроков, отображаемых на табло в особом режиме игры
@@ -231,7 +226,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         Players = new ObservableCollection<SimplePlayerInfo>();
 
         Screens = PlatformManager.Instance.GetScreens();
-        
+        _comPorts = new Lazy<string[]>(LoadComPorts);
+
         var screensLength = Screens.Length;
 
 #if DEBUG
@@ -386,24 +382,24 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             if (string.IsNullOrWhiteSpace(logsFolder))
             {
                 PlatformManager.Instance.ShowMessage(Resources.LogsFolderNotSetWarning);
-                return PlatformManager.Instance.CreateLogger(null);
+                return PlatformManager.Instance.CreateGameLogger(null);
             }
             else
             {
                 try
                 {
-                    return PlatformManager.Instance.CreateLogger(logsFolder);
+                    return PlatformManager.Instance.CreateGameLogger(logsFolder);
                 }
                 catch (Exception exc)
                 {
                     PlatformManager.Instance.ShowMessage(string.Format(Resources.LoggerCreationWarning, exc.Message), false);
-                    return PlatformManager.Instance.CreateLogger(null);
+                    return PlatformManager.Instance.CreateGameLogger(null);
                 }
             }
         }
         else
         {
-            return PlatformManager.Instance.CreateLogger(null);
+            return PlatformManager.Instance.CreateGameLogger(null);
         }
     }
 
@@ -414,6 +410,15 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         try
         {
+            var screenIndex = SettingsViewModel.Model.ScreenNumber;
+
+            if (screenIndex < 0 || screenIndex >= Screens.Length)
+            {
+                return;
+            }
+
+            var screen = Screens[screenIndex];
+
             _start.CanBeExecuted = false;
             IsStarting = true;
 
@@ -441,10 +446,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             var presentationListener = new PresentationListener(engine);
 
-            var presentationController = new PresentationController
+            var presentationController = new PresentationController(screen)
             {
-                Listener = presentationListener,
-                ScreenIndex = SettingsViewModel.Model.ScreenNumber
+                Listener = presentationListener
             };
 
             presentationController.UpdateSettings(SettingsViewModel.SIUISettings.Model);

@@ -1,10 +1,10 @@
-﻿using SImulator.ViewModel.PlatformSpecific;
+﻿using SImulator.ViewModel.Contracts;
 
 namespace SImulator.ViewModel.Tests;
 
-internal sealed class TestScreen : IScreen
+internal sealed class TestScreen : IDisplayDescriptor
 {
     public string Name => throw new NotImplementedException();
 
-    public bool IsRemote => false;
+    public bool IsFullScreen => throw new NotImplementedException();
 }

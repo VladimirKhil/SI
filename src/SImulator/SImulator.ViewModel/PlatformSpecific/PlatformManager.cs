@@ -1,4 +1,5 @@
-﻿using SImulator.ViewModel.Core;
+﻿using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using Utils.Timers;
 
@@ -22,11 +23,11 @@ public abstract class PlatformManager
 
     public abstract void ClosePlayersView();
 
-    public abstract Task CreateMainViewAsync(object dataContext, int screenNumber);
+    public abstract Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen);
 
     public abstract Task CloseMainViewAsync();
 
-    public abstract IScreen[] GetScreens();
+    public abstract IDisplayDescriptor[] GetScreens();
 
     public abstract string[] GetLocalComputers();
 
@@ -52,7 +53,7 @@ public abstract class PlatformManager
 
     public abstract void PlaySound(string name, Action onFinish);
 
-    public abstract IGameLogger CreateLogger(string? folder);
+    public abstract IGameLogger CreateGameLogger(string? folder);
 
     public abstract void ClearMedia();
 

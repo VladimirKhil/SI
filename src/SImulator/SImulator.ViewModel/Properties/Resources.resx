@@ -138,6 +138,9 @@
   <data name="GameStartError" xml:space="preserve">
     <value>Ошибка старта игры: {0}</value>
   </data>
+  <data name="IpAddressHint" xml:space="preserve">
+    <value>[Ваш IP-адрес]</value>
+  </data>
   <data name="LoggerCreationWarning" xml:space="preserve">
     <value>Ошибка создания файла лога: {0}. Лог записываться не будет</value>
   </data>

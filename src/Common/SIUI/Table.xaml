@@ -721,26 +721,13 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition
                                             Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedTopRowHeightConverter}}" />
-                                        
+
                                         <RowDefinition Height="*" />
-                                        
+
                                         <RowDefinition
                                             Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedBottomRowHeightConverter}}" />
                                     </Grid.RowDefinitions>
-                                    
-                                    <Border
-                                        Grid.Row="1"
-                                        Background="{Binding Settings.Model.AnswererColorString}"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Stretch">
-                                        <ContentControl>
-                                            <TextBlock
-                                                Style="{StaticResource CenteredText}"
-                                                lb:FillManager.Fill="True"
-                                                Text="{Binding ActivePlayer}" />
-                                        </ContentControl>
-                                    </Border>
-                                    
+
                                     <ItemsControl ItemsSource="{Binding LostButtonPlayers}" Grid.Row="2">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>

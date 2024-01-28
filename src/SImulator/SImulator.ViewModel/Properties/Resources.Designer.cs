@@ -124,6 +124,15 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на [Ваш IP-адрес].
+        /// </summary>
+        internal static string IpAddressHint {
+            get {
+                return ResourceManager.GetString("IpAddressHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка создания файла лога: {0}. Лог записываться не будет.
         /// </summary>
         internal static string LoggerCreationWarning {

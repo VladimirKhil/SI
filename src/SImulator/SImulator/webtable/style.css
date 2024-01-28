@@ -1,0 +1,26 @@
+@font-face {
+    font-family: 'Clefs';
+    src: url('./Clefs.eot');
+    src: url('./Clefs.eot?#iefix') format('embedded-opentype'), url('./Clefs.woff') format('woff'), url('./Clefs.ttf') format('truetype'), url('./Clefs.svg#Clefs') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html, body, #reactHost {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.playersAndTable {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#table {
+	flex: 2.5 !important;
+}

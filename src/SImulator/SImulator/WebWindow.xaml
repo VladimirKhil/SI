@@ -1,0 +1,20 @@
+﻿<Window
+    x:Class="SImulator.WebWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:lp="clr-namespace:SImulator.Properties"
+    xmlns:lb="clr-namespace:SImulator.Behaviors"
+    xmlns:lvmc="clr-namespace:SImulator.ViewModel.Controllers;assembly=SImulator.ViewModel"
+    xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+    d:DataContext="{d:DesignInstance lvmc:PresentationController}"
+    mc:Ignorable="d"
+    Title="{x:Static lp:Resources.PresentationTitle}"
+    Height="450"
+    Width="800">
+    <wv2:WebView2
+        x:Name="webView"
+        Source="{Binding Path=Source}"
+        lb:WebView2Behavior.IsAttached="True" />
+</Window>
