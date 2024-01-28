@@ -142,10 +142,6 @@ public enum Tasks
     /// </summary>
     WaitDelete,
     /// <summary>
-    /// Ожидание решения ведущего о том, кто будет следующим удалять тему в финале
-    /// </summary>
-    WaitNextToDelete,
-    /// <summary>
     /// Объявление темы финального раунда
     /// </summary>
     AnnounceFinalTheme,

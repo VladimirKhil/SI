@@ -2130,7 +2130,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         {
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
-                if (ClientData.Players[i].Flag && ClientData.Players[i].Name == message.Sender)
+                if (ClientData.Players[i].ApellationFlag && ClientData.Players[i].Name == message.Sender)
                 {
                     if (args[1] == "+")
                     {
@@ -2141,7 +2141,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         ClientData.AppellationNegativeVoteCount++;
                     }
 
-                    ClientData.Players[i].Flag = false;
+                    ClientData.Players[i].ApellationFlag = false;
                     ClientData.AppellationAwaitedVoteCount--;
                     _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
                     break;
@@ -2651,10 +2651,17 @@ public sealed class Game : Actor<GameData, GameLogic>
         else if (ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting && ClientData.ThemeDeleters != null)
         {
             var indicies = ClientData.ThemeDeleters.Current.PossibleIndicies;
+            var hasAnyFlag = false;
 
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
                 ClientData.Players[i].Flag = indicies.Contains(i);
+                hasAnyFlag = true;
+            }
+
+            if (!hasAnyFlag)
+            {
+                PlanExecution(Tasks.AskToDelete, 10);
             }
         }
     }

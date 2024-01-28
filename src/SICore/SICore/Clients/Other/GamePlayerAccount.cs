@@ -71,9 +71,14 @@ public sealed class GamePlayerAccount : GamePersonAccount
     internal int FinalStake { get; set; }
 
     /// <summary>
-    /// Вспомогательная переменная
+    /// Marks that player is selectable for the current decision.
     /// </summary>
     internal bool Flag { get; set; }
+
+    /// <summary>
+    /// Marks that player is participating in apellation.
+    /// </summary>
+    internal bool ApellationFlag { get; set; }
 
     // TODO: Will be moved to Stake strategy implementation
     /// <summary>

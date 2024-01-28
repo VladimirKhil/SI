@@ -412,6 +412,8 @@ public sealed class GameLogic : Logic<GameData>
 
     private void InitQuestionState(Question question)
     {
+        _data.AppellationOpened = false;
+        _data.AllowAppellation = false;
         _data.IsAnswer = false;
         _data.QuestionHistory.Clear();
         _data.PendingAnswererIndicies.Clear();
@@ -1012,8 +1014,6 @@ public sealed class GameLogic : Logic<GameData>
             return false;
         }
 
-        _data.AppellationOpened = false;
-        _data.AllowAppellation = false;
         StopWaiting();
         Engine.SelectQuestion(_data.ThemeIndex, _data.QuestionIndex);
         return true;
@@ -1730,8 +1730,7 @@ public sealed class GameLogic : Logic<GameData>
                         break;
 
                     case Tasks.WaitNext:
-                    case Tasks.WaitNextToDelete:
-                        WaitNext(task);
+                        WaitNext(arg == 0);
                         break;
 
                     case Tasks.WaitStake:
@@ -2208,12 +2207,12 @@ public sealed class GameLogic : Logic<GameData>
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10));
     }
 
-    private void WaitNext(Tasks task)
+    private void WaitNext(bool isSelectingStaker)
     {
         _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
-        var playerIndex = task == Tasks.WaitNext ? _data.Order[_data.OrderIndex] : _data.ThemeDeleters?.Current.PlayerIndex;
+        var playerIndex = isSelectingStaker ? _data.Order[_data.OrderIndex] : _data.ThemeDeleters?.Current.PlayerIndex;
 
         if (playerIndex == -1) // The showman has not made a decision
         {
@@ -2223,13 +2222,13 @@ public sealed class GameLogic : Logic<GameData>
             {
                 throw new Exception(
                     "Wait next error (candidates.Length == 0): " +
-                    (task == Tasks.WaitNext ? "" : _data.ThemeDeleters?.GetRemoveLog()));
+                    (isSelectingStaker ? "" : _data.ThemeDeleters?.GetRemoveLog()));
             }
 
             var index = Random.Shared.Next(candidates.Length);
             var newPlayerIndex = _data.Players.IndexOf(candidates[index]);
 
-            if (task == Tasks.WaitNext)
+            if (isSelectingStaker)
             {
                 _data.Order[_data.OrderIndex] = newPlayerIndex;
                 CheckOrder(_data.OrderIndex);
@@ -3484,7 +3483,7 @@ public sealed class GameLogic : Logic<GameData>
         _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-        ScheduleExecution(Tasks.WaitNextToDelete, waitTime);
+        ScheduleExecution(Tasks.WaitNext, waitTime, 1);
         WaitFor(DecisionType.NextPersonFinalThemeDeleting, waitTime, -1);
     }
 
@@ -3901,19 +3900,19 @@ public sealed class GameLogic : Logic<GameData>
         {
             if (i == _data.AppelaerIndex)
             {
-                _data.Players[i].Flag = false;
+                _data.Players[i].ApellationFlag = false;
                 _data.AppellationPositiveVoteCount++;
             }
             else if (!_data.IsAppelationForRightAnswer && i == _data.AppellationCallerIndex)
             {
-                _data.Players[i].Flag = false;
+                _data.Players[i].ApellationFlag = false;
                 _data.AppellationNegativeVoteCount++;
                 _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
             }
             else
             {
                 _data.AppellationAwaitedVoteCount++;
-                _data.Players[i].Flag = true;
+                _data.Players[i].ApellationFlag = true;
                 _gameActions.SendMessage(validationMessage, _data.Players[i].Name);
                 _gameActions.SendMessage(validation2Message, _data.Players[i].Name);
             }

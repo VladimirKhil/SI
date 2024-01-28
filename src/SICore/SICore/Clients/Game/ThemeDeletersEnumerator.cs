@@ -164,7 +164,7 @@ public sealed class ThemeDeletersEnumerator
 
     public void RemoveAt(int index)
     {
-        var removeLog = new StringBuilder(ToString()).Append(' ').Append(index);
+        var removeLog = new StringBuilder(ToString()).Append(" DROP:").Append(index);
 
         _removeLog.Add("Before: " + removeLog.ToString());
 
