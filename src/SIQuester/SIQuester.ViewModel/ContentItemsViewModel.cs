@@ -62,8 +62,8 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
         CollectionChanged += ContentItemsViewModel_CollectionChanged;
 
-        AddText = new SimpleCommand(AddText_Executed);
-        AddVoice = new SimpleCommand(AddVoice_Executed);
+        AddText = new SimpleCommand(AddScreenText_Executed);
+        AddVoice = new SimpleCommand(AddReplicText_Executed);
 
         ChangePlacement = new SimpleCommand(ChangePlacement_Executed);
 
@@ -79,9 +79,9 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         IsTopLevel = isTopLevel;
     }
 
-    internal void AddText_Executed(object? arg) => QDocument.ActivatedObject = Add(AtomTypes.Text, "", ContentPlacements.Screen);
+    internal void AddScreenText_Executed(object? arg) => QDocument.ActivatedObject = Add(ContentTypes.Text, "", ContentPlacements.Screen);
 
-    private void AddVoice_Executed(object? arg)
+    private void AddReplicText_Executed(object? arg)
     {
         var index = CurrentPosition;
 
@@ -90,7 +90,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
             RemoveAt(index);
         }
 
-        QDocument.ActivatedObject = Add(AtomTypes.Text, "", ContentPlacements.Replic);
+        QDocument.ActivatedObject = Add(ContentTypes.Text, "", ContentPlacements.Replic);
     }
 
     private void ChangePlacement_Executed(object? arg)
@@ -101,7 +101,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         {
             var contentItem = this[index];
 
-            if (contentItem.Type != AtomTypes.Text)
+            if (contentItem.Type != ContentTypes.Text)
             {
                 return;
             }
@@ -214,13 +214,13 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
     private void UpdateContentItemCommands()
     {
         var contentItem = CurrentItem;
-        var atomType = contentItem?.Model.Type;
+        var contentType = contentItem?.Model.Type;
 
-        var isMedia = atomType == AtomTypes.Image
-            || atomType == AtomTypes.Audio
-            || atomType == AtomTypes.AudioNew
-            || atomType == AtomTypes.Video
-            || atomType == AtomTypes.Html;
+        var isMedia = contentType == ContentTypes.Image
+            || contentType == AtomTypes.Audio
+            || contentType == ContentTypes.Audio
+            || contentType == ContentTypes.Video
+            || contentType == ContentTypes.Html;
 
         SetTime.CanBeExecuted = contentItem != null && contentItem.Model.Duration == TimeSpan.Zero;
 
@@ -259,13 +259,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
     {
         try
         {
-            var document = Owner.OwnerTheme.OwnerRound?.OwnerPackage?.Document;
-
-            if (document == null)
-            {
-                throw new InvalidOperationException("document is undefined");
-            }
-
+            var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
             var media = document.Document.GetLink(CurrentItem.Model);
 
             if (media.GetStream != null && media.Uri != null)
@@ -291,7 +285,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
     {
         try
         {
-            var document = (Owner.OwnerTheme.OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("document is undefined");
+            var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
             var collection = document.TryGetCollectionByMediaType(CurrentItem.Model.Type);
 
             if (collection == null)
@@ -318,18 +312,18 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     public bool SelectAtomObjectCore(object? arg)
     {
-        var data = (Tuple<object, object>)arg;
+        var data = (Tuple<object, object>?)arg;
         var media = data.Item1;
-        var mediaType = data.Item2.ToString() ?? "";
+        var contentType = data.Item2.ToString() ?? "";
 
-        if (mediaType == AtomTypes.Audio)
+        if (contentType == AtomTypes.Audio)
         {
-            mediaType = ContentTypes.Audio;
+            contentType = ContentTypes.Audio;
         }
 
         if (media is MediaItemViewModel file)
         {
-            SelectAtomObject_Do(mediaType, file);
+            LinkExistingContentFile(contentType, file);
             return false;
         }
 
@@ -340,15 +334,15 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
         if (text == Resources.File) // TODO: do not rely business logic on resource strings
         {
-            return AddAtomObject(mediaType);
+            return AddContentFile(contentType);
         }
         else
         {
-            return LinkAtomObject(mediaType);
+            return LinkContentUri(contentType);
         }
     }
 
-    private bool LinkAtomObject(string mediaType)
+    private bool LinkContentUri(string contentType)
     {
         var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
         var index = CurrentPosition;
@@ -374,15 +368,16 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                 RemoveAt(index--);
             }
 
-            var atom = new ContentItemViewModel(new ContentItem
+            var contentItemViewModel = new ContentItemViewModel(new ContentItem
             {
-                Type = mediaType,
+                Type = contentType,
                 Value = uri,
-                Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+                Placement = contentType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen,
+                Duration = document.GetDurationByContentType(contentType),
             });
 
-            QDocument.ActivatedObject = atom;
-            Insert(index + 1, atom);
+            QDocument.ActivatedObject = contentItemViewModel;
+            Insert(index + 1, contentItemViewModel);
             document.ActiveItem = null;
 
             change.Commit();
@@ -395,8 +390,9 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         }
     }
 
-    private void SelectAtomObject_Do(string mediaType, MediaItemViewModel file)
+    private void LinkExistingContentFile(string contentType, MediaItemViewModel file)
     {
+        var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
         var index = CurrentPosition;
 
         if (index == -1)
@@ -406,37 +402,38 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
         try
         {
-            using var change = OwnerDocument.OperationsManager.BeginComplexChange();
+            using var change = document.OperationsManager.BeginComplexChange();
 
             if (string.IsNullOrWhiteSpace(this[index].Model.Value))
             {
                 RemoveAt(index--);
             }
 
-            var atom = new ContentItemViewModel(new ContentItem
+            var contentItemViewModel = new ContentItemViewModel(new ContentItem
             { 
-                Type = mediaType,
+                Type = contentType,
                 Value = "",
-                Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+                Placement = contentType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen,
+                Duration = document.GetDurationByContentType(contentType),
             });
 
-            Insert(index + 1, atom);
+            Insert(index + 1, contentItemViewModel);
 
-            atom.Model.IsRef = true;
-            atom.Model.Value = file.Model.Name;
-            OwnerDocument.ActiveItem = null;
+            contentItemViewModel.Model.IsRef = true;
+            contentItemViewModel.Model.Value = file.Model.Name;
+            document.ActiveItem = null;
 
             change.Commit();
         }
         catch (Exception exc)
         {
-            OwnerDocument.OnError(exc);
+            document.OnError(exc);
         }
     }
 
-    private bool AddAtomObject(string mediaType)
+    private bool AddContentFile(string contentType)
     {
-        QDocument document;
+        QDocument? document;
 
         try
         {
@@ -453,7 +450,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
             return false;
         }
 
-        var collection = document.GetCollectionByMediaType(mediaType);
+        var collection = document.GetCollectionByMediaType(contentType);
         var initialItemCount = collection.Files.Count;
 
         try
@@ -498,19 +495,20 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
             for (var i = initialItemCount; i < collection.Files.Count; i++)
             {
-                var contentItem = new ContentItemViewModel(new ContentItem
+                var contentItemViewModel = new ContentItemViewModel(new ContentItem
                 {
-                    Type = mediaType,
+                    Type = contentType,
                     Value = "",
-                    Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+                    Placement = contentType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen,
+                    Duration = document.GetDurationByContentType(contentType),
                 });
 
-                Insert(index + 1, contentItem);
+                Insert(index + 1, contentItemViewModel);
 
                 var file = collection.Files[i];
 
-                contentItem.Model.IsRef = true;
-                contentItem.Model.Value = file.Model.Name;
+                contentItemViewModel.Model.IsRef = true;
+                contentItemViewModel.Model.Value = file.Model.Name;
 
                 if (AppSettings.Default.SetRightAnswerFromFileName)
                 {

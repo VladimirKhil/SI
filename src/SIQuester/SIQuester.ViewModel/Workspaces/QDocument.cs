@@ -89,6 +89,8 @@ public sealed class QDocument : WorkspaceViewModel
 
     public MediaStorageViewModel Html { get; private set; }
 
+    public AppSettings Settings => AppSettings.Default;
+
     public MediaStorageViewModel? TryGetCollectionByMediaType(string mediaType) => mediaType switch
     {
         AtomTypes.Image => Images,
@@ -487,6 +489,11 @@ public sealed class QDocument : WorkspaceViewModel
         {
             if (_activeItem != value)
             {
+                if (_activeItem is ContentItemsViewModel contentItems)
+                {
+                    contentItems.CurrentItem = null;
+                }
+
                 _activeItem = value;
                 OnPropertyChanged();
             }
@@ -3898,5 +3905,15 @@ public sealed class QDocument : WorkspaceViewModel
         {
             RemoveFileByName(Html, item);
         }
+    }
+
+    internal TimeSpan GetDurationByContentType(string contentType)
+    {
+        if (contentType == ContentTypes.Image && Settings.UseImageDuration)
+        {
+            return TimeSpan.FromSeconds(Settings.ImageDurationSeconds);
+        }
+
+        return TimeSpan.Zero;
     }
 }

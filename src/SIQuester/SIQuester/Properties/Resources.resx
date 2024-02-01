@@ -907,6 +907,9 @@
   <data name="SecondName" xml:space="preserve">
     <value>Отчество</value>
   </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>с</value>
+  </data>
   <data name="SecretCanBeGivenToSelf" xml:space="preserve">
     <value>Вопрос можно оставить себе</value>
   </data>
@@ -1116,6 +1119,9 @@
   </data>
   <data name="UpdatePricesOnDragAndDropHint" xml:space="preserve">
     <value>Вопросы будут перемещаться, а распределение стоимостей останется прежним</value>
+  </data>
+  <data name="UseImageDuration" xml:space="preserve">
+    <value>Задавать длительность показа изображений по умолчанию</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>Версия</value>

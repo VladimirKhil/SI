@@ -40,9 +40,9 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
         }
     }
 
-    private T _currentItem;
+    private T? _currentItem;
 
-    public T CurrentItem
+    public T? CurrentItem
     {
         get => _currentItem;
         set
@@ -51,7 +51,7 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
             {
                 var oldValue = _currentItem;
                 _currentItem = value;
-                CurrentPosition = IndexOf(_currentItem);
+                CurrentPosition = _currentItem == null ? -1 : IndexOf(_currentItem);
                 OnCurrentItemChanged(oldValue, value);
 
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentItem)));
@@ -59,7 +59,7 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
         }
     }
 
-    protected virtual void OnCurrentItemChanged(T oldValue, T newValue) { }
+    protected virtual void OnCurrentItemChanged(T? oldValue, T? newValue) { }
 
     public void SetCurrentItem(object item)
     {

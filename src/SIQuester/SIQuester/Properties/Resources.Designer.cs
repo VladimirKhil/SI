@@ -2429,6 +2429,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на с.
+        /// </summary>
+        public static string Seconds {
+            get {
+                return ResourceManager.GetString("Seconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Вопрос можно оставить себе.
         /// </summary>
         public static string SecretCanBeGivenToSelf {
@@ -3055,6 +3064,15 @@ namespace SIQuester.Properties {
         public static string UpdatePricesOnDragAndDropHint {
             get {
                 return ResourceManager.GetString("UpdatePricesOnDragAndDropHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Задавать длительность показа изображений по умолчанию.
+        /// </summary>
+        public static string UseImageDuration {
+            get {
+                return ResourceManager.GetString("UseImageDuration", resourceCulture);
             }
         }
         

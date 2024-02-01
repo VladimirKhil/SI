@@ -65,8 +65,23 @@
             <CheckBox Content="{x:Static lp:Resources.CheckFileSize}" IsChecked="{Binding Model.CheckFileSize}" />
             <CheckBox Content="{x:Static lp:Resources.SetRightAnswerFromFileName}" IsChecked="{Binding Model.SetRightAnswerFromFileName}" />
 
+            <StackPanel Orientation="Horizontal" Margin="0,2,0,0" VerticalAlignment="Stretch">
+                <CheckBox Content="{x:Static lp:Resources.UseImageDuration}" IsChecked="{Binding Model.UseImageDuration}" />
+                
+                <l:NumericTextBox
+                    Margin="8,5,7,0"
+                    Padding="0,1"
+                    Width="50"
+                    Text="{Binding Model.ImageDurationSeconds, Mode=TwoWay}"
+                    IsEnabled="{Binding Model.UseImageDuration}"
+                    Minimum="1"
+                    Maximum="120" />
+                
+                <TextBlock Margin="0,4,0,0" VerticalAlignment="Center" Text="{x:Static lp:Resources.Seconds}" />
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
-                <TextBlock VerticalAlignment="Center"><Run Text="{x:Static lp:Resources.SelectOptionCount}" /></TextBlock>
+                <TextBlock VerticalAlignment="Center" Text="{x:Static lp:Resources.SelectOptionCount}"/>
                 <l:NumericTextBox Margin="15,0" Padding="0,1" Width="50" Text="{Binding Model.SelectOptionCount, Mode=TwoWay}" Minimum="2" />
             </StackPanel>
 

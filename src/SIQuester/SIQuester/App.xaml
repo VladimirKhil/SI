@@ -405,8 +405,8 @@
                 </ls:QuestionTypeParamTemplateSelector.BagCatSelfTemplate>
             </ls:QuestionTypeParamTemplateSelector>
 
-            <SolidColorBrush x:Key="ItemOverBrush" Color="#FFDEDEFF" />
-            <SolidColorBrush x:Key="ItemSelectedBrush" Color="#FFA9A9FF" />
+            <SolidColorBrush x:Key="ItemOverBrush" Color="#FFE9E9FF" />
+            <SolidColorBrush x:Key="ItemSelectedBrush" Color="#FFD5D5FF" />
 
             <Style x:Key="QTreeViewItem" TargetType="{x:Type TreeViewItem}" >
                 <Setter Property="AllowDrop" Value="True" />
@@ -3361,6 +3361,26 @@
 
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="border"
+                                                    Margin="{TemplateBinding Margin}"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}">
+                                                    <ContentPresenter />
+                                                </Border>
+                                                
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="{StaticResource SecondHighlightColor}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    
                                     <Setter Property="BorderThickness" Value="0" />
                                     <Setter Property="Background" Value="#F3F3F3" />
                                     <Setter Property="Margin" Value="1" />
@@ -3440,6 +3460,7 @@
                                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
                                             <Setter TargetName="delete" Property="Visibility" Value="Visible" />
                                         </Trigger>
+                                        
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter TargetName="delete" Property="Visibility" Value="Visible" />
                                         </Trigger>

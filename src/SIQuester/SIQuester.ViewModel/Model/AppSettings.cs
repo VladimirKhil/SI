@@ -48,6 +48,8 @@ public sealed class AppSettings : INotifyPropertyChanged
     private const string DefaultFontFamily = "Calibri";
 
     private const int DefaultSelectOptionCount = 4;
+    private const bool DefaultUseImageDuration = false;
+    private const int DefaultImageDurationSeconds = 5;
 
     /// <summary>
     /// Auto-save interval.
@@ -493,6 +495,43 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _useImageDuration = DefaultUseImageDuration;
+
+    /// <summary>
+    /// Use custom image duration.
+    /// </summary>
+    [DefaultValue(DefaultUseImageDuration)]
+    public bool UseImageDuration
+    {
+        get => _useImageDuration;
+        set
+        {
+            if (_useImageDuration != value)
+            {
+                _useImageDuration = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private int _imageDurationSeconds = DefaultImageDurationSeconds;
+
+    /// <summary>
+    /// Image duration in seconds.
+    /// </summary>
+    [DefaultValue(DefaultImageDurationSeconds)]
+    public int ImageDurationSeconds
+    {
+        get => _imageDurationSeconds;
+        set
+        {
+            if (_imageDurationSeconds != value && value > 0 && value <= 120)
+            {
+                _imageDurationSeconds = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     /// <summary>
     /// Maximum recommended image size.
@@ -585,5 +624,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         SelectOptionCount = DefaultSelectOptionCount;
         CheckFileSize = defaultSettings.CheckFileSize;
         SetRightAnswerFromFileName = defaultSettings.SetRightAnswerFromFileName;
+        UseImageDuration = defaultSettings.UseImageDuration;
+        ImageDurationSeconds = defaultSettings.ImageDurationSeconds;
     }
 }

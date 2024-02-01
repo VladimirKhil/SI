@@ -903,6 +903,9 @@
   <data name="SecondName" xml:space="preserve">
     <value>Second name</value>
   </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>s</value>
+  </data>
   <data name="SecretCanBeGivenToSelf" xml:space="preserve">
     <value>Question can be given to yourself</value>
   </data>
@@ -1112,6 +1115,9 @@
   </data>
   <data name="UpdatePricesOnDragAndDropHint" xml:space="preserve">
     <value>Questions will be moved, but the cost distribution will remain the same</value>
+  </data>
+  <data name="UseImageDuration" xml:space="preserve">
+    <value>Set default image duration</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>Version</value>
