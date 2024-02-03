@@ -2154,8 +2154,10 @@
                                 Command="{Binding AddTags}"
                                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                 Background="#FFEEEEEE"
+                                Foreground="Red"
+                                FontSize="20"
                                 HorizontalAlignment="Left"
-                                Padding="2" />
+                                Padding="8,2" />
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>

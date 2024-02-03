@@ -2,6 +2,7 @@
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Helpers;
+using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -188,8 +189,26 @@ public sealed class PackageViewModel : ItemViewModel<Package>
 
     private void AddTags_Executed(object? arg)
     {
+        var tags = PlatformManager.Instance.AskTags(Document.StorageContext.Tags);
+
+        if (tags == null)
+        {
+            return;
+        }
+
         QDocument.ActivatedObject = Tags;
-        Tags.Add("");
+
+        if (tags.Length > 0)
+        {
+            foreach (var tag in tags)
+            {
+                Tags.Add(tag);
+            }
+        }
+        else
+        {
+            Tags.Add("");
+        }
     }
 
     private void SelectLogo_Executed(object? arg)

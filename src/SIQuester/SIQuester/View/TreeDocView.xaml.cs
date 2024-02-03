@@ -585,6 +585,11 @@ public partial class TreeDocView : UserControl
             return false;
         }
 
+        if (question1.TypeName != question2.TypeName)
+        {
+            return false;
+        }
+
         if (question1.Type.Name != question2.Type.Name)
         {
             return false;

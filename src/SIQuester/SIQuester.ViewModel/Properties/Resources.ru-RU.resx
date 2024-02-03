@@ -1,0 +1,696 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="Accept" xml:space="preserve">
+    <value>Зачёт</value>
+  </data>
+  <data name="Answer" xml:space="preserve">
+    <value>Ответ</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+  <data name="AuthorSiteUrl" xml:space="preserve">
+    <value>https://vk.com/si_game</value>
+  </data>
+  <data name="BaseAuthors" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+  <data name="BaseSources" xml:space="preserve">
+    <value>Источник</value>
+  </data>
+  <data name="Championship" xml:space="preserve">
+    <value>Чемпионат</value>
+  </data>
+  <data name="ChangeGroupIsActivated" xml:space="preserve">
+    <value>changeGroup уже активирована!</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Комментарий</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Комментарии</value>
+  </data>
+  <data name="DocumentLoading" xml:space="preserve">
+    <value>Загрузка документа</value>
+  </data>
+  <data name="DoYouWantToSave" xml:space="preserve">
+    <value>Пакет {0} был изменён. Вы хотите сохранить его?</value>
+  </data>
+  <data name="Empty" xml:space="preserve">
+    <value>Без имени</value>
+  </data>
+  <data name="EmptyValue" xml:space="preserve">
+    <value>Пусто</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Стоп</value>
+  </data>
+  <data name="RoundNameTemplate" xml:space="preserve">
+    <value>{0}-й раунд</value>
+  </data>
+  <data name="EnumerationError" xml:space="preserve">
+    <value>В следующей теме обнаружена ошибка нумерации. Ожидается, что текст всех вопросов в каждой теме начинается с номера, последовательно возрастающего от вопроса к вопросу.
+УБЕДИТЕСЬ, что в тексте нет номеров в начале строки помимо стоимостей вопросов. При необходимости удалите, перенесите или пропустите их</value>
+  </data>
+  <data name="ExportToSns" xml:space="preserve">
+    <value>Экспорт в формат СНС</value>
+  </data>
+  <data name="FewQuestions" xml:space="preserve">
+    <value>Недостаточное число вопросов</value>
+  </data>
+  <data name="FileIsReadOnly" xml:space="preserve">
+    <value>Файл доступен только для чтения!</value>
+  </data>
+  <data name="Final" xml:space="preserve">
+    <value>ФИНАЛ</value>
+  </data>
+  <data name="FinalName" xml:space="preserve">
+    <value>ФИНАЛ</value>
+  </data>
+  <data name="FragmentNotFound" xml:space="preserve">
+    <value>Следующий фрагмент шаблона не обнаружен: {0}</value>
+  </data>
+  <data name="Futher" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="GameNumber" xml:space="preserve">
+    <value>ИГРА {0}</value>
+  </data>
+  <data name="HasUpdates" xml:space="preserve">
+    <value>Обнаружены обновления программы от {0}. Загрузить их сейчас?</value>
+  </data>
+  <data name="InColumn" xml:space="preserve">
+    <value>В столбец</value>
+  </data>
+  <data name="InstallError" xml:space="preserve">
+    <value>Произошла ошибка</value>
+  </data>
+  <data name="Left" xml:space="preserve">
+    <value>ОСТАТОК</value>
+  </data>
+  <data name="LocalProgramName" xml:space="preserve">
+    <value>SIQuester</value>
+  </data>
+  <data name="LostFile" xml:space="preserve">
+    <value>Сохранить необработанную часть файла в: </value>
+  </data>
+  <data name="NameOfPackage" xml:space="preserve">
+    <value>Имя:</value>
+  </data>
+  <data name="NewLine" xml:space="preserve">
+    <value>Перевод строки</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="NoAnswer" xml:space="preserve">
+    <value>Отсутствует правильный ответ</value>
+  </data>
+  <data name="NoAuthorName" xml:space="preserve">
+    <value>Не введено имя автора!</value>
+  </data>
+  <data name="NoAuthors" xml:space="preserve">
+    <value>Отсутствуют авторы</value>
+  </data>
+  <data name="NoPackageName" xml:space="preserve">
+    <value>Не введено имя пакета!</value>
+  </data>
+  <data name="NoQuestion" xml:space="preserve">
+    <value>Отсутствует текст вопроса</value>
+  </data>
+  <data name="NoQuestionsFound" xml:space="preserve">
+    <value>Во входном файле не обнаружены вопросы! Учтите, что вопросы должны иметь стоимость, кратную 10, и каждый вопрос должен начинаться с новой строки.</value>
+  </data>
+  <data name="NoSource" xml:space="preserve">
+    <value>Отсутствует источник</value>
+  </data>
+  <data name="NotAQuestionNumber" xml:space="preserve">
+    <value>Это число не является стоимостью вопроса</value>
+  </data>
+  <data name="Notice" xml:space="preserve">
+    <value>Просьба ВНИМАТЕЛЬНО ознакомиться с предложенным форматом. Учтите, что ошибки при прочтении файла могут возникать даже из-за отсутствия символа перевода строки или пробела</value>
+  </data>
+  <data name="NumOfQuests" xml:space="preserve">
+    <value>Число вопросов</value>
+  </data>
+  <data name="NumOfRounds" xml:space="preserve">
+    <value>Число раундов</value>
+  </data>
+  <data name="NumOfThemes" xml:space="preserve">
+    <value>Число тем</value>
+  </data>
+  <data name="ObjectNotFound" xml:space="preserve">
+    <value>Следующий объект не обнаружен: {0}</value>
+  </data>
+  <data name="PhraseTemplates" xml:space="preserve">
+    <value>Входной текст не соответствует нижеприведённому шаблону. Пожалуйста, поправьте шаблон, после чего анализ входного файла продолжится. Кроме того, вы всего-навсего можете поправить входной текст. Проблема:</value>
+  </data>
+  <data name="ProgramName" xml:space="preserve">
+    <value>SIQuester</value>
+  </data>
+  <data name="QAnswer" xml:space="preserve">
+    <value>Ответ на вопрос</value>
+  </data>
+  <data name="QText" xml:space="preserve">
+    <value>Текст вопроса</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>Вопрос</value>
+  </data>
+  <data name="Rest" xml:space="preserve">
+    <value>ОСТАТОК</value>
+  </data>
+  <data name="RightAnswer" xml:space="preserve">
+    <value>Правильный ответ</value>
+  </data>
+  <data name="Round" xml:space="preserve">
+    <value>Раунд</value>
+  </data>
+  <data name="SaveFile" xml:space="preserve">
+    <value>Оригинальный файл был изменён. Сохранить его?</value>
+  </data>
+  <data name="Simple" xml:space="preserve">
+    <value>Обычный</value>
+  </data>
+  <data name="SkipPart" xml:space="preserve">
+    <value>Нераспознанный кусок текста будет добавлен в комментарии к теме</value>
+  </data>
+  <data name="SkipTitle" xml:space="preserve">
+    <value>Нераспознанный кусок текста будет добавлен в комментарии к пакету</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Источник</value>
+  </data>
+  <data name="SourceFail" xml:space="preserve">
+    <value>В оригинальном тексте чтение закончилось там, где заканчивается подсветка текста.</value>
+  </data>
+  <data name="Space" xml:space="preserve">
+    <value>Пробел</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Старт</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Входной файл считан полностью! Весь заголовок файла помещён в комментарии к пакету. Просьба самостоятельно рассортировать его содержимое. Всего импортировано тем:</value>
+  </data>
+  <data name="TeleSI" xml:space="preserve">
+    <value>Телевизионный аналог SIGame</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="ThemesCollection" xml:space="preserve">
+    <value>Коллекция тем</value>
+  </data>
+  <data name="ToBase" xml:space="preserve">
+    <value>Экспорт в Базу Вопросов</value>
+  </data>
+  <data name="ToIRC" xml:space="preserve">
+    <value>Экспорт в IRC</value>
+  </data>
+  <data name="ToIRCtext" xml:space="preserve">
+    <value>Этот файл создан для игр в свояк в IRC-чате. Убедительная просьба ничего в нём руками не править, ибо это может привести к неприятным последствиям во время игры. 
+Для работы скрипта вам необходимы файлы sportsi.ini (сам скрипт), ssi-load.cmd (загрузка скрипта) и ssi-restore.cmd (выгрузка скрипта). Они должны быть помещены в папку вашего IRC-клиента. Для начала игры загрузите скрипт командой
+/play -c ssi-load.cmd
+Далее всю помощь вы можете получить по нажатию клавиши F2.
+По завершению игры вы можете выгрузить скрипт командой
+/play -c ssi-restore.cmd
+
+Обозначения в файле:
+p - пакет
+r - раунд
+t - тема
+q - вопрос
+(далее номер)
+name - имя
+price - цена у вопроса
+type - тип (у раунда и вопроса)
+auth - авторы
+sour - источники
+comm - комментарии
+text - текст вопроса
+right - правильные ответы
+wrong - неправильные ответы
+cost - цена Кота
+theme - тема Кота</value>
+  </data>
+  <data name="TotalImport" xml:space="preserve">
+    <value>Всего импортировано тем:</value>
+  </data>
+  <data name="Tour" xml:space="preserve">
+    <value>Тур</value>
+  </data>
+  <data name="Transform" xml:space="preserve">
+    <value>Трансформация</value>
+  </data>
+  <data name="Undefined" xml:space="preserve">
+    <value>Не распознано:</value>
+  </data>
+  <data name="UndoError" xml:space="preserve">
+    <value>Ошибка отмены операции. Обратитесь к разработчику.</value>
+  </data>
+  <data name="UnreadTemplate" xml:space="preserve">
+    <value>Не подошедший шаблон</value>
+  </data>
+  <data name="Unrecognized" xml:space="preserve">
+    <value>Имеется нераспознанный текст</value>
+  </data>
+  <data name="WrongBrackets" xml:space="preserve">
+    <value>Некорректная расстановка скобок</value>
+  </data>
+  <data name="YourThemes" xml:space="preserve">
+    <value>Ваши темы:</value>
+  </data>
+  <data name="DBStorage" xml:space="preserve">
+    <value>База вопросов</value>
+  </data>
+  <data name="DBStorageComment" xml:space="preserve">
+    <value>Пакет хранится в Базе {0} под именем {1}</value>
+  </data>
+  <data name="Editors" xml:space="preserve">
+    <value>Редакторы</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>(файл…)</value>
+  </data>
+  <data name="NoRiskQuestion" xml:space="preserve">
+    <value>Вопрос без риска</value>
+  </data>
+  <data name="OtherTypeQuestion" xml:space="preserve">
+    <value>Другой</value>
+  </data>
+  <data name="SecretQuestion" xml:space="preserve">
+    <value>Вопрос с секретом</value>
+  </data>
+  <data name="SimpleQuestion" xml:space="preserve">
+    <value>Простой</value>
+  </data>
+  <data name="SIStorage" xml:space="preserve">
+    <value>Библиотека вопросов SIGame</value>
+  </data>
+  <data name="StakeQuestion" xml:space="preserve">
+    <value>Вопрос со ставкой</value>
+  </data>
+  <data name="SuperSecretQuestion" xml:space="preserve">
+    <value>Супервопрос с секретом</value>
+  </data>
+  <data name="ErrorInsertingBindedQuestion" xml:space="preserve">
+    <value>Попытка вставить привязанный вопрос!</value>
+  </data>
+  <data name="ExportMedia" xml:space="preserve">
+    <value>Экспорт медиа</value>
+  </data>
+  <data name="ExportMediaError" xml:space="preserve">
+    <value>Ошибка экспорта медиа</value>
+  </data>
+  <data name="InputMediaUri" xml:space="preserve">
+    <value>Введите адрес мультимедиа-объекта</value>
+  </data>
+  <data name="RestoreConfirmation" xml:space="preserve">
+    <value>Обнаружены файлы, которые не были корректно сохранены при последней работе с программой. Восстановить их?</value>
+  </data>
+  <data name="DocumentSavingError" xml:space="preserve">
+    <value>Ошибка сохранения документа</value>
+  </data>
+  <data name="SIQuestions" xml:space="preserve">
+    <value>Вопросы СИ</value>
+  </data>
+  <data name="FileSizeLimitExceed" xml:space="preserve">
+    <value>Размер файла превышает допустимое значение для игры через Игровой сервер ({0} байт)!</value>
+  </data>
+  <data name="HowToUseApp" xml:space="preserve">
+    <value>Как использовать программу</value>
+  </data>
+  <data name="AddQuestion" xml:space="preserve">
+    <value>Добавить вопрос</value>
+  </data>
+  <data name="AddRound" xml:space="preserve">
+    <value>Добавить раунд</value>
+  </data>
+  <data name="AddTheme" xml:space="preserve">
+    <value>Добавить тему</value>
+  </data>
+  <data name="MediaFileTooLarge" xml:space="preserve">
+    <value>Файл {0} превышает рекомендуемый размер в {1} КБ</value>
+  </data>
+  <data name="QuestionPlay" xml:space="preserve">
+    <value>Проигрывание вопроса</value>
+  </data>
+  <data name="UnsupportedFragment" xml:space="preserve">
+    <value>Неподдерживаемый фрагмент: {0}</value>
+  </data>
+  <data name="FileSearch" xml:space="preserve">
+    <value>Поиск файлов</value>
+  </data>
+  <data name="MediaFileExtensionIsNotRecommened" xml:space="preserve">
+    <value>Расширение мультимедиа файла не относится к рекомендуемым ({0})!</value>
+  </data>
+  <data name="MediaFileSizeExceedsRecommenedValue" xml:space="preserve">
+    <value>Размер мультимедиа файла превышает рекомендуемое значение ({0} МБ)!</value>
+  </data>
+  <data name="YamlFiles" xml:space="preserve">
+    <value>YAML файлы</value>
+  </data>
+  <data name="TxtFilesFilter" xml:space="preserve">
+    <value>Файлы вопросов (*.txt) | *.txt</value>
+  </data>
+  <data name="XmlFilesFilter" xml:space="preserve">
+    <value>Файлы вопросов (*.xml) | *.xml</value>
+  </data>
+  <data name="YamlFilesFilter" xml:space="preserve">
+    <value>YAML файлы (*.yaml) | *.yaml</value>
+  </data>
+  <data name="TextImport" xml:space="preserve">
+    <value>Импорт текста</value>
+  </data>
+  <data name="Untitled" xml:space="preserve">
+    <value>Безымянный</value>
+  </data>
+  <data name="SplittingError" xml:space="preserve">
+    <value>Ошибка при поиске вопросов</value>
+  </data>
+  <data name="Statistic" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+  <data name="Images" xml:space="preserve">
+    <value>Изображения</value>
+  </data>
+  <data name="ExportAndPrint" xml:space="preserve">
+    <value>экспорт и печать</value>
+  </data>
+  <data name="GamePackageTooLarge" xml:space="preserve">
+    <value>Размер файла превышает 100 Мб!</value>
+  </data>
+  <data name="NewPackage" xml:space="preserve">
+    <value>Новый пакет</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="PackageServerFull" xml:space="preserve">
+    <value>в настоящий момент на сервере нет места для принятия новых пакетов</value>
+  </data>
+  <data name="SendPackageErrorHeader" xml:space="preserve">
+    <value>Не удалось отправить пакет</value>
+  </data>
+  <data name="SendPackageSuccess" xml:space="preserve">
+    <value>Пакет успешно отправлен!</value>
+  </data>
+  <data name="SendToGame" xml:space="preserve">
+    <value>Отправка пакета в компьютерную игру</value>
+  </data>
+  <data name="SIGameQuestions" xml:space="preserve">
+    <value>Вопросы SIGame</value>
+  </data>
+  <data name="ThemesSelection" xml:space="preserve">
+    <value>выбор тем</value>
+  </data>
+  <data name="And" xml:space="preserve">
+    <value>и</value>
+  </data>
+  <data name="ConversionError" xml:space="preserve">
+    <value>Ошибка конвертации</value>
+  </data>
+  <data name="SecretNoQuestion" xml:space="preserve">
+    <value>Вопрос с секретом без вопроса</value>
+  </data>
+  <data name="SecretPublicPrice" xml:space="preserve">
+    <value>Вопрос с секретом и объявленной стоимостью</value>
+  </data>
+  <data name="StakeAllQuestion" xml:space="preserve">
+    <value>Вопрос со ставками для всех</value>
+  </data>
+  <data name="FileOpenError" xml:space="preserve">
+    <value>Ошибка открытия файла</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="OpenAutosaveFolder" xml:space="preserve">
+    <value>Открыть папку автосохранений</value>
+  </data>
+  <data name="OpenLogsFolder" xml:space="preserve">
+    <value>Открыть папку с логами</value>
+  </data>
+  <data name="PackageCorruptedHint" xml:space="preserve">
+    <value>Файл с вопросами повреждён! Попробуйте извлечь данные из него при помощи архиватора (открыв его как архив)</value>
+  </data>
+  <data name="PackageCorruptedHintAutoSave" xml:space="preserve">
+    <value>или получить данные из автосохранения</value>
+  </data>
+  <data name="PackageCorruptedHintLogs" xml:space="preserve">
+    <value>Если не получится, отправьте автору программы логи, чтобы можно было избежать проблемы в будущем</value>
+  </data>
+  <data name="FileInMultipleCategories" xml:space="preserve">
+    <value>Файл {0} содержится в пакете в разных категориях!</value>
+  </data>
+  <data name="FileIsDuplicated" xml:space="preserve">
+    <value>Файл {0} содержится в пакете дважды!</value>
+  </data>
+  <data name="MissingLogoFile" xml:space="preserve">
+    <value>Логотип пакета: отсутствует файл {0}!</value>
+  </data>
+  <data name="ExternalLinksAreForbidden" xml:space="preserve">
+    <value>Внешние ссылки не допускаются</value>
+  </data>
+  <data name="MissingFile" xml:space="preserve">
+    <value>отсутствует файл</value>
+  </data>
+  <data name="UnusedFile" xml:space="preserve">
+    <value>Файл {0} не используется. Удалите его</value>
+  </data>
+  <data name="ConfirmFilesRemoval" xml:space="preserve">
+    <value>Вы действительно хотите удалить все неиспользуемые в пакете медиафайлы</value>
+  </data>
+  <data name="DocxFiles" xml:space="preserve">
+    <value>Документы DOCX</value>
+  </data>
+  <data name="Export" xml:space="preserve">
+    <value>Экспорт</value>
+  </data>
+  <data name="HtmlFiles" xml:space="preserve">
+    <value>Файлы HTML</value>
+  </data>
+  <data name="RtfFiles" xml:space="preserve">
+    <value>Документы RTF</value>
+  </data>
+  <data name="TextFiles" xml:space="preserve">
+    <value>Текстовые файлы</value>
+  </data>
+  <data name="XpsFiles" xml:space="preserve">
+    <value>Документы XPS</value>
+  </data>
+  <data name="Authors" xml:space="preserve">
+    <value>Авторы</value>
+  </data>
+  <data name="Sources" xml:space="preserve">
+    <value>Источники</value>
+  </data>
+  <data name="PackageClassicDescription" xml:space="preserve">
+    <value>Такой же пакет, как и в Телевизионном аналоге SIGame</value>
+  </data>
+  <data name="PackageClassicName" xml:space="preserve">
+    <value>Стандартный пакет для SIGame</value>
+  </data>
+  <data name="PackageEmptyDescription" xml:space="preserve">
+    <value>Пакет, изначально ничего не содержащий</value>
+  </data>
+  <data name="PackageEmptyName" xml:space="preserve">
+    <value>Пустой пакет</value>
+  </data>
+  <data name="PackageSpecialDescription" xml:space="preserve">
+    <value>Пакет, содержащий какое-то иное число раундов, тем или вопросов, чем в стандартной SIGame</value>
+  </data>
+  <data name="PackageSpecialName" xml:space="preserve">
+    <value>Нестандартный пакет</value>
+  </data>
+  <data name="PackageThemesCollectionDescription" xml:space="preserve">
+    <value>Просто набор тем</value>
+  </data>
+  <data name="PackageThemesCollectionName" xml:space="preserve">
+    <value>Коллекция тем</value>
+  </data>
+  <data name="TemplateName" xml:space="preserve">
+    <value>Имя шаблона</value>
+  </data>
+  <data name="TemplateWithThisNameAlreadyExists" xml:space="preserve">
+    <value>Шаблон с таким именем уже существует!</value>
+  </data>
+  <data name="RemoveTemplateConfirm" xml:space="preserve">
+    <value>Вы действительно хотите удалить шаблон "{0}"?</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>(ссылка…)</value>
+  </data>
+  <data name="ExportToHtml" xml:space="preserve">
+    <value>экспорт в HTML</value>
+  </data>
+  <data name="ExportToHtmlHeader" xml:space="preserve">
+    <value>Вопросы "SIGame"</value>
+  </data>
+  <data name="ExportTableHeader" xml:space="preserve">
+    <value>Экспорт в формат таблицы</value>
+  </data>
+  <data name="MircAudio" xml:space="preserve">
+    <value>звук</value>
+  </data>
+  <data name="MircImage" xml:space="preserve">
+    <value>изображение</value>
+  </data>
+  <data name="MircVideo" xml:space="preserve">
+    <value>видео</value>
+  </data>
+  <data name="Restriction" xml:space="preserve">
+    <value>Ограничение</value>
+  </data>
+  <data name="Number" xml:space="preserve">
+    <value>Номер</value>
+  </data>
+  <data name="Separator" xml:space="preserve">
+    <value>Разделитель</value>
+  </data>
+  <data name="Trash" xml:space="preserve">
+    <value>Мусор</value>
+  </data>
+  <data name="OfThemes" xml:space="preserve">
+    <value>тем</value>
+  </data>
+  <data name="Info" xml:space="preserve">
+    <value>Инфо</value>
+  </data>
+  <data name="Played" xml:space="preserve">
+    <value>Играно</value>
+  </data>
+  <data name="AudioIsNotOnBackground" xml:space="preserve">
+    <value>Аудио файл {0} не указан как фоновый</value>
+  </data>
+  <data name="PackageInNewFormat" xml:space="preserve">
+    <value>Пакет создан в новом формате и не может быть присоединён к данному</value>
+  </data>
+  <data name="ObjectInNewFormat" xml:space="preserve">
+    <value>Объект создан в новом формате и не может быть присоединён к данному пакету</value>
+  </data>
+  <data name="CommonTag" xml:space="preserve">
+    <value>Общие знания (солянка)</value>
+  </data>
+</root>

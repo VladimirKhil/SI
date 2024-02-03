@@ -64,6 +64,7 @@
             <CheckBox Content="{x:Static lp:Resources.RemoveUnusedMedia}" IsChecked="{Binding Model.RemoveLinks}" />
             <CheckBox Content="{x:Static lp:Resources.CheckFileSize}" IsChecked="{Binding Model.CheckFileSize}" />
             <CheckBox Content="{x:Static lp:Resources.SetRightAnswerFromFileName}" IsChecked="{Binding Model.SetRightAnswerFromFileName}" />
+            <CheckBox Content="{x:Static lp:Resources.AskToSetTagsOnSave}" IsChecked="{Binding Model.AskToSetTagsOnSave}" />
 
             <StackPanel Orientation="Horizontal" Margin="0,2,0,0" VerticalAlignment="Stretch">
                 <CheckBox Content="{x:Static lp:Resources.UseImageDuration}" IsChecked="{Binding Model.UseImageDuration}" />

@@ -5,6 +5,7 @@ using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.Properties;
+using SIQuester.View;
 using SIQuester.ViewModel;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -35,6 +36,15 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
     private const int MAX_PATH = 260;
 
     public override string[] FontFamilies => Fonts.SystemFontFamilies.Select(ff => ff.Source).OrderBy(f => f).ToArray();
+
+    private static readonly Dictionary<string, string> QuestionTypeMap = new()
+    {
+        { QuestionTypes.NoRisk, ViewModel.Properties.Resources.NoRiskQuestion.ToUpper() },
+        { QuestionTypes.Stake, ViewModel.Properties.Resources.StakeQuestion.ToUpper() },
+        { QuestionTypes.Secret, ViewModel.Properties.Resources.SecretQuestion.ToUpper() },
+        { QuestionTypes.SecretPublicPrice, ViewModel.Properties.Resources.SecretQuestion.ToUpper() },
+        { QuestionTypes.SecretNoQuestion, Resources.SecretNoQuestion.ToUpper() }
+    };
 
     public override Tuple<int, int, int>? GetCurrentItemSelectionArea() =>
         ActionMenuViewModel.Instance.PlacementTarget is TextList box ? box.GetSelectionInfo() : null;
@@ -145,7 +155,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         Action<int>? fileTypeChanged,
         params Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogControl[] richUI)
     {
-        if (richUI.Length > 0 && AppSettings.IsVistaOrLater)
+        if (richUI.Length > 0)
         {
             // Show dialog with rich UI
             var dialog = new CommonSaveFileDialog
@@ -327,6 +337,13 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         var viewModel = new LinkViewModel { Title = title, IsMultiline = multiline };
         var view = new InputLinkView { DataContext = viewModel, Owner = Application.Current.MainWindow };
         return view.ShowDialog() == true ? viewModel.Uri : null;
+    }
+
+    public override string[]? AskTags(string[] possibleTags)
+    {
+        var viewModel = new SelectTagsViewModel(possibleTags);
+        var view = new SelectTagsView { DataContext = viewModel, Owner = Application.Current.MainWindow };
+        return view.ShowDialog() == true ? viewModel.SelectedTags : null;
     }
 
     /// <summary>
@@ -846,67 +863,36 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                     paragraph.Inlines.Add(string.Format(round.Type == RoundTypes.Standart ? "{0}, {1}" : "{0}", theme.Name, quest.Price));
                     paragraph.Inlines.Add(new LineBreak());
 
-                    if (quest.Type.Name != QuestionTypes.Simple)
+                    var questionType = quest.TypeName;
+
+                    if (questionType != QuestionTypes.Default)
                     {
-                        if (quest.Type.Name == QuestionTypes.Sponsored)
+                        if (!QuestionTypeMap.TryGetValue(questionType, out var mappedType))
                         {
-                            paragraph.Inlines.Add(ViewModel.Properties.Resources.NoRiskQuestion.ToUpper());
+                            mappedType = questionType;
                         }
-                        else if (quest.Type.Name == QuestionTypes.Auction)
+
+                        paragraph.Inlines.Add(mappedType);
+
+                        if (quest.Parameters != null)
                         {
-                            paragraph.Inlines.Add(ViewModel.Properties.Resources.StakeQuestion.ToUpper());
-                        }
-                        else if (quest.Type.Name == QuestionTypes.Cat)
-                        {
-                            paragraph.Inlines.Add(ViewModel.Properties.Resources.SecretQuestion.ToUpper());
-                            paragraph.Inlines.Add(new LineBreak());
-
-                            paragraph.Inlines.Add(string.Format(
-                                "{0}, {1}",
-                                quest.Type[QuestionTypeParams.Cat_Theme],
-                                quest.Type[QuestionTypeParams.Cat_Cost]));
-                        }
-                        else if (quest.Type.Name == QuestionTypes.BagCat)
-                        {
-                            paragraph.Inlines.Add(ViewModel.Properties.Resources.SecretQuestion.ToUpper());
-                            var knows = quest.Type[QuestionTypeParams.BagCat_Knows];
-                            var cost = quest.Type[QuestionTypeParams.Cat_Cost];
-
-                            if (cost == "0")
+                            foreach (var param in quest.Parameters)
                             {
-                                cost = Resources.NumberSetModeMinimumOrMaximumInRound;
-                            }
+                                if (param.Key == QuestionParameterNames.Question || param.Key == QuestionParameterNames.Answer)
+                                {
+                                    continue;
+                                }
 
-                            if (knows == QuestionTypeParams.BagCat_Knows_Value_Never)
-                            {
                                 paragraph.Inlines.Add(new LineBreak());
-                                paragraph.Inlines.Add(string.Format("{0}: {1}", Resources.SecretNoQuestion, cost));
-                                continue;
-                            }
 
-                            paragraph.Inlines.Add(new LineBreak());
-                            paragraph.Inlines.Add(string.Format("{0}, {1}", quest.Type[QuestionTypeParams.Cat_Theme], cost));
-
-                            if (knows == QuestionTypeParams.BagCat_Knows_Value_Before)
-                            {
-                                paragraph.Inlines.Add(new LineBreak());
-                                paragraph.Inlines.Add(Resources.SecretPublicPrice);
-                            }
-
-                            if (quest.Type[QuestionTypeParams.BagCat_Self] == QuestionTypeParams.BagCat_Self_Value_True)
-                            {
-                                paragraph.Inlines.Add(new LineBreak());
-                                paragraph.Inlines.Add(Resources.SecretCanBeGivenToSelf);
-                            }
-                        }
-                        else // Unsupported type
-                        {
-                            paragraph.Inlines.Add(quest.Type.Name);
-
-                            foreach (var param in quest.Type.Params)
-                            {
-                                paragraph.Inlines.Add(new LineBreak());
-                                paragraph.Inlines.Add(string.Format(STR_Definition, param.Name, param.Value));
+                                if (param.Key == QuestionParameterNames.Price)
+                                {
+                                    printPrice(paragraph, param);
+                                }
+                                else if (param.Value.Type == StepParameterTypes.Simple)
+                                {
+                                    paragraph.Inlines.Add(string.Format(STR_Definition, param.Key, param.Value.SimpleValue));
+                                }
                             }
                         }
 
@@ -936,15 +922,36 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         paginator.PageSize = new Size(1056.0, 816.0); // A4
         manager.SaveAsXaml(paginator);
         manager.Commit();
+
+        static void printPrice(Paragraph paragraph, KeyValuePair<string, StepParameter> param)
+        {
+            var price = param.Value.NumberSetValue;
+
+            if (price != null)
+            {
+                string priceValue;
+
+                if (price.Maximum == 0)
+                {
+                    priceValue = Resources.NumberSetModeMinimumOrMaximumInRound;
+                }
+                else
+                {
+                    priceValue = price.ToString();
+                }
+
+                paragraph.Inlines.Add(string.Format(STR_Definition, Resources.Price, priceValue));
+            }
+        }
     }
 
     public override void ShowHelp()
     {
-        var helpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Help.pdf");
+        var helpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Resources.HelpFile);
 
         try
         {
-            Utils.Browser.Open(helpPath);
+            Browser.Open(helpPath);
         }
         catch (Exception exc)
         {

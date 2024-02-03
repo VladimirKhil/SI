@@ -2126,6 +2126,11 @@ public sealed class QDocument : WorkspaceViewModel
     {
         try
         {
+            if (AppSettings.Default.AskToSetTagsOnSave && Package.Tags.Count == 0)
+            {
+                Package.AddTags.Execute(null);
+            }
+
             if (_path.Length > 0)
             {
                 await SaveInternalAsync();
@@ -3298,6 +3303,23 @@ public sealed class QDocument : WorkspaceViewModel
                     for (int i = 0; i < quest.Wrong.Count; i++)
                     {
                         quest.Wrong[i] = quest.Wrong[i].Wikify().ClearPoints().GrowFirstLetter();
+                    }
+
+                    if (quest.Parameters != null)
+                    {
+                        foreach (var parameter in quest.Parameters)
+                        {
+                            if (parameter.Value.ContentValue != null)
+                            {
+                                foreach (var contentItem in parameter.Value.ContentValue)
+                                {
+                                    if (contentItem.Type == ContentTypes.Text)
+                                    {
+                                        contentItem.Model.Value = contentItem.Model.Value.Wikify().ClearPoints().GrowFirstLetter();
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     foreach (var atom in quest.Scenario)

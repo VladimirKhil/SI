@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 namespace SIQuester.Model;
@@ -56,12 +57,13 @@ public sealed class AppSettings : INotifyPropertyChanged
     /// </summary>
     public static readonly TimeSpan AutoSaveInterval = TimeSpan.FromSeconds(20);
 
-    /// <summary>
-    /// Is current Windows version a Windows Vista or a later version.
-    /// </summary>
-    public static readonly bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
-
     public static AppSettings Default { get; set; }
+
+    /// <summary>
+    /// Has the setting been changed.
+    /// </summary>
+    [JsonIgnore]
+    public bool HasChanges { get; set; }
 
     private bool _searchForUpdates = true;
 
@@ -245,7 +247,9 @@ public sealed class AppSettings : INotifyPropertyChanged
         {
             if (_costSetters != value)
             {
+                _costSetters.CollectionChanged -= CostSetters_CollectionChanged;
                 _costSetters = value;
+                _costSetters.CollectionChanged += CostSetters_CollectionChanged;
                 OnPropertyChanged();
             }
         }
@@ -458,6 +462,25 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _askToSetTagsOnSave = true;
+
+    /// <summary>
+    /// Ask to set tags on save if they are missing.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool AskToSetTagsOnSave
+    {
+        get => _askToSetTagsOnSave;
+        set
+        {
+            if (_askToSetTagsOnSave != value)
+            {
+                _askToSetTagsOnSave = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private string? _language = null;
 
     /// <summary>
@@ -568,9 +591,16 @@ public sealed class AppSettings : INotifyPropertyChanged
         return Create();
     }
 
+    public AppSettings()
+    {
+        _costSetters.CollectionChanged += CostSetters_CollectionChanged;
+    }
+
+    private void CostSetters_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => HasChanges = true;
+
     public static AppSettings Create()
     {
-        var newSettings = new AppSettings();
+        var newSettings = new AppSettings { HasChanges = true };
         newSettings.Initialize();
         return newSettings;
     }
@@ -590,8 +620,11 @@ public sealed class AppSettings : INotifyPropertyChanged
         serializer.Serialize(stream, this);
     }
 
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        HasChanges = true;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -624,6 +657,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         SelectOptionCount = DefaultSelectOptionCount;
         CheckFileSize = defaultSettings.CheckFileSize;
         SetRightAnswerFromFileName = defaultSettings.SetRightAnswerFromFileName;
+        AskToSetTagsOnSave = defaultSettings.AskToSetTagsOnSave;
         UseImageDuration = defaultSettings.UseImageDuration;
         ImageDurationSeconds = defaultSettings.ImageDurationSeconds;
     }

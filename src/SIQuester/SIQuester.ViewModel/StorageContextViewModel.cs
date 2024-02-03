@@ -1,6 +1,7 @@
-﻿using SIStorage.Service.Contract;
+﻿using Microsoft.Extensions.Logging;
+using SIQuester.Model;
+using SIStorage.Service.Contract;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace SIQuester.ViewModel;
@@ -8,6 +9,8 @@ namespace SIQuester.ViewModel;
 public sealed class StorageContextViewModel : INotifyPropertyChanged
 {
     private readonly ISIStorageServiceClient _siStorageServiceClient;
+    private readonly AppSettings _appSettings;
+    private readonly ILogger<StorageContextViewModel> _logger;
 
     private string[] _publishers = Array.Empty<string>();
 
@@ -47,25 +50,36 @@ public sealed class StorageContextViewModel : INotifyPropertyChanged
 
     public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
 
-    public StorageContextViewModel(ISIStorageServiceClient siStorageService) => _siStorageServiceClient = siStorageService;
+    public StorageContextViewModel(
+        ISIStorageServiceClient siStorageService,
+        AppSettings appSettings,
+        ILogger<StorageContextViewModel> logger)
+    {
+        _siStorageServiceClient = siStorageService;
+        _appSettings = appSettings;
+        _logger = logger;
+    }
 
-    public async void Load()
+    public async void Load(CancellationToken cancellationToken = default)
     {
         try
         {
-            Publishers = (await _siStorageServiceClient.Facets.GetPublishersAsync())
+            var languages = await _siStorageServiceClient.Facets.GetLanguagesAsync(cancellationToken);
+            var languageId = languages.FirstOrDefault(l => l.Code == _appSettings.Language)?.Id;
+
+            Publishers = (await _siStorageServiceClient.Facets.GetPublishersAsync(languageId, cancellationToken))
                 .Select(publisher => publisher.Name)
                 .OrderBy(n => n)
                 .ToArray();
 
-            Tags = (await _siStorageServiceClient.Facets.GetTagsAsync())
+            Tags = (await _siStorageServiceClient.Facets.GetTagsAsync(languageId, cancellationToken))
                 .Select(tag => tag.Name)
                 .OrderBy(n => n)
                 .ToArray();
         }
         catch (Exception exc)
         {
-            Trace.TraceWarning(exc.ToString());
+            _logger.LogError(exc, "Storage context load error: {error}", exc.Message);
         }
     }
 

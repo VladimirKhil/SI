@@ -4,7 +4,7 @@
     <AssemblyTitle>SIQuester.ViewModel</AssemblyTitle>
     <Product>SIQuester.ViewModel</Product>
     <Description>SIQuester business logic</Description>
-    <Copyright>Copyright © Khil-soft 2014 - 2023</Copyright>
+    <Copyright>Copyright © Khil-soft 2014 - 2024</Copyright>
     <Version>$(SIQuesterVersion)</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -36,13 +36,6 @@
 	<PackageReference Include="YamlDotNet" Version="13.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine.Core\SIEngine.Core.csproj" />
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
@@ -52,6 +45,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">

@@ -54,6 +54,9 @@
 			<ComponentGroupRef Id="ApplicationProgramMenu" />
 			<ComponentGroupRef Id="Licenses" />
 			<ComponentGroupRef Id="wwwroot" />
+			<ComponentGroupRef Id="native" />
+			<ComponentGroupRef Id="runtimes" />
+			<ComponentGroupRef Id="platform" />
 		</Feature>
 	</Product>
 
@@ -64,6 +67,11 @@
 					<Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
 						<Directory Id="LicensesFolder" Name="Licenses" />
 						<Directory Id="WWWRootFolder" Name="wwwroot" />
+						<Directory Id="RuntimesFolder" Name="runtimes">
+						  <Directory Id="PlatformFolder" Name="win-$(var.Platform)">
+							<Directory Id="NativeFolder" Name="native" />
+						  </Directory>
+						</Directory>
 					</Directory>
 				</Directory>
 			</Directory>
@@ -106,6 +114,9 @@
 			<Component Guid="{BE062A3B-5687-4676-9F5B-710AFB837C5F}">
 				<File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
 			</Component>
+		  <Component Guid="{35c2036e-b32a-4d84-b53a-39027e7eb66b}">
+			<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
+		  </Component>
 			<Component Guid="{9DDD698F-CC42-450B-A706-73F395AF1F74}">
 				<File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
 			</Component>
@@ -116,7 +127,10 @@
 				<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
 			</Component>
 			<Component Guid="52e158c9-4d0b-48e9-ba43-3c81c3799910">
-				<File KeyPath="yes" Source="$(var.PublishFolder)Help.pdf" />
+				<File KeyPath="yes" Source="$(var.PublishFolder)Help.ru-RU.pdf" />
+			</Component>
+			<Component Guid="3b169511-36e4-4d4a-b0d3-128175610b1f">
+				<File KeyPath="yes" Source="$(var.PublishFolder)Help.en-US.pdf" />
 			</Component>
 			<Component Guid="46306d8e-094a-4559-a541-df3cbf95b19a">
 				<File KeyPath="yes" Source="$(var.PublishFolder)ygpackagekey3.0.xslt" />
@@ -161,6 +175,9 @@
 			</Component>
 			<Component Guid="{D24545DB-5745-4EFF-B17D-87EBFCAC2849}">
 				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\YamlDotNet.LICENSE.txt" />
+			</Component>
+			<Component Guid="{b108abbc-642a-4b49-9f33-e11b3e071fd3}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Polly.LICENSE.txt" />
 			</Component>
 			<Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
 				<File KeyPath="yes" Source="$(var.SolutionDir)LICENSE" />
@@ -211,6 +228,36 @@
 				  KeyPath="yes" />
 
 				<RemoveFolder Id="WWWRootFolder" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="runtimes" Directory="RuntimesFolder">
+			<Component Guid="{ead36f5b-feec-4a79-a93b-a0b5dbe28015}">
+				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="runtimes" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="RuntimesFolder" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="platform" Directory="PlatformFolder">
+			<Component Guid="{9960fb88-6ad2-434e-902a-6c2765dfba21}">
+				<RemoveFolder Id="PlatformFolder" On="uninstall" />
+				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="platform" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="native" Directory="NativeFolder">
+			<Component Guid="{fcc45238-44fe-4310-a8d3-ce1c94185eb5}">
+				<File KeyPath="yes" Id="runtimeLoader" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
+			</Component>
+			<Component Id="NativeReg" Guid="{25579643-4b1e-4de4-9135-40d79f16d7e6}">
+				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="native" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="NativeFolder" On="uninstall" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>

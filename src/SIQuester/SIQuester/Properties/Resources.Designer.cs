@@ -61,7 +61,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на О программе….
+        ///   Ищет локализованную строку, похожую на About the program….
         /// </summary>
         public static string About {
             get {
@@ -70,7 +70,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Зачёт.
+        ///   Ищет локализованную строку, похожую на Credit.
         /// </summary>
         public static string Accept {
             get {
@@ -79,7 +79,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Действия.
+        ///   Ищет локализованную строку, похожую на Actions.
         /// </summary>
         public static string Actions {
             get {
@@ -88,7 +88,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить.
+        ///   Ищет локализованную строку, похожую на Add.
         /// </summary>
         public static string Add {
             get {
@@ -97,7 +97,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить ответ.
+        ///   Ищет локализованную строку, похожую на Add answer.
         /// </summary>
         public static string AddAnswer {
             get {
@@ -106,7 +106,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить аудио.
+        ///   Ищет локализованную строку, похожую на Add audio.
         /// </summary>
         public static string AddAudio {
             get {
@@ -115,7 +115,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить сложный ответ.
+        ///   Ищет локализованную строку, похожую на Add complex answer.
         /// </summary>
         public static string AddComplexAnswer {
             get {
@@ -124,7 +124,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить пустой вопрос.
+        ///   Ищет локализованную строку, похожую на Add empty question.
         /// </summary>
         public static string AddEmptyQuestion {
             get {
@@ -133,7 +133,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить HTML.
+        ///   Ищет локализованную строку, похожую на Add HTML.
         /// </summary>
         public static string AddHtml {
             get {
@@ -142,7 +142,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить изображение.
+        ///   Ищет локализованную строку, похожую на Add image.
         /// </summary>
         public static string AddImage {
             get {
@@ -151,7 +151,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить вариант ответа.
+        ///   Ищет локализованную строку, похожую на Add answer option.
         /// </summary>
         public static string AddOption {
             get {
@@ -160,7 +160,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить устный текст.
+        ///   Ищет локализованную строку, похожую на Add oral text.
         /// </summary>
         public static string AddOral {
             get {
@@ -169,7 +169,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить параметр.
+        ///   Ищет локализованную строку, похожую на Add parameter.
         /// </summary>
         public static string AddParameter {
             get {
@@ -178,7 +178,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить вопрос (Insert).
+        ///   Ищет локализованную строку, похожую на Add question (Insert).
         /// </summary>
         public static string AddQuestion {
             get {
@@ -187,7 +187,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить раунд (Insert).
+        ///   Ищет локализованную строку, похожую на Add round (Insert).
         /// </summary>
         public static string AddRound {
             get {
@@ -196,7 +196,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить текст.
+        ///   Ищет локализованную строку, похожую на Add text.
         /// </summary>
         public static string AddText {
             get {
@@ -205,7 +205,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить тему (Insert).
+        ///   Ищет локализованную строку, похожую на Add topic (Insert).
         /// </summary>
         public static string AddTheme {
             get {
@@ -214,7 +214,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить видео.
+        ///   Ищет локализованную строку, похожую на Add video.
         /// </summary>
         public static string AddVideo {
             get {
@@ -223,7 +223,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дополнительно.
+        ///   Ищет локализованную строку, похожую на Advanced.
         /// </summary>
         public static string Advanced {
             get {
@@ -232,7 +232,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выровнять ответы по правому краю окна в древовидном отображении.
+        ///   Ищет локализованную строку, похожую на Align answers to the right edge of the window in the tree view.
         /// </summary>
         public static string AlignAnswersRight {
             get {
@@ -241,7 +241,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Цена пишется в той же строке, что и вопрос.
+        ///   Ищет локализованную строку, похожую на The price is written in the same line as the question.
         /// </summary>
         public static string AlignPriceWithQuestionText {
             get {
@@ -250,7 +250,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Все файлы.
+        ///   Ищет локализованную строку, похожую на All files.
         /// </summary>
         public static string AllFiles {
             get {
@@ -259,7 +259,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ответ.
+        ///   Ищет локализованную строку, похожую на Answer.
         /// </summary>
         public static string Answer {
             get {
@@ -268,7 +268,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ответ:.
+        ///   Ищет локализованную строку, похожую на Answer:.
         /// </summary>
         public static string AnswerHeader {
             get {
@@ -277,7 +277,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подсказка про метасиволы в ответах.
+        ///   Ищет локализованную строку, похожую на Hint about metacharacters in answers.
         /// </summary>
         public static string AnswerMetaHint {
             get {
@@ -286,7 +286,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Варианты ответа.
+        ///   Ищет локализованную строку, похожую на Answer options.
         /// </summary>
         public static string AnswerOptions {
             get {
@@ -295,7 +295,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ответы пишутся.
+        ///   Ищет локализованную строку, похожую на Answers layout.
         /// </summary>
         public static string AnswersLayout {
             get {
@@ -304,7 +304,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип ответа.
+        ///   Ищет локализованную строку, похожую на Answer type.
         /// </summary>
         public static string AnswerType {
             get {
@@ -313,7 +313,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Владимир Хиль.
+        ///   Ищет локализованную строку, похожую на Vladimir Khil.
         /// </summary>
         public static string AppAuthor {
             get {
@@ -322,7 +322,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Язык приложения (требуется перезапуск).
+        ///   Ищет локализованную строку, похожую на App language (restart required).
         /// </summary>
         public static string AppLanguage {
             get {
@@ -331,7 +331,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Идет завершение работы объекта Application.
+        ///   Ищет локализованную строку, похожую на Closing the Application object.
         /// </summary>
         public static string ApplicationIsClosing {
             get {
@@ -340,7 +340,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка запуска программы.
+        ///   Ищет локализованную строку, похожую на Program start error.
         /// </summary>
         public static string AppRunError {
             get {
@@ -349,7 +349,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Редактор вопросов SIGame.
+        ///   Ищет локализованную строку, похожую на SIGame question editor.
         /// </summary>
         public static string AppTitle {
             get {
@@ -358,7 +358,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Программа будет закрыта. При повторном возникновении этой ошибки обратитесь к разработчику.
+        ///   Ищет локализованную строку, похожую на The program will be closed. If this error occurs again, contact the developer.
         /// </summary>
         public static string AppWillBeClosed {
             get {
@@ -367,7 +367,16 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Присоединить пакет….
+        ///   Ищет локализованную строку, похожую на Ask to set tags on save (if they are missing).
+        /// </summary>
+        public static string AskToSetTagsOnSave {
+            get {
+                return ResourceManager.GetString("AskToSetTagsOnSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Attach package….
         /// </summary>
         public static string AttachPackage {
             get {
@@ -376,7 +385,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Присоединение другого файла вопросов.
+        ///   Ищет локализованную строку, похожую на Attaching another question file.
         /// </summary>
         public static string AttachPackageHint {
             get {
@@ -385,7 +394,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Аудио.
+        ///   Ищет локализованную строку, похожую на Audio.
         /// </summary>
         public static string Audio {
             get {
@@ -394,7 +403,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автор.
+        ///   Ищет локализованную строку, похожую на Author.
         /// </summary>
         public static string Author {
             get {
@@ -403,7 +412,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Авторы.
+        ///   Ищет локализованную строку, похожую на Authors.
         /// </summary>
         public static string Authors {
             get {
@@ -412,7 +421,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отсутствие авторов.
+        ///   Ищет локализованную строку, похожую на No authors.
         /// </summary>
         public static string AuthorsAbsence {
             get {
@@ -421,7 +430,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Авторы:.
+        ///   Ищет локализованную строку, похожую на Authors:.
         /// </summary>
         public static string AuthorsHeader {
             get {
@@ -430,7 +439,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Авторы пишутся.
+        ///   Ищет локализованную строку, похожую на Authors layout.
         /// </summary>
         public static string AuthorsLayout {
             get {
@@ -439,7 +448,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автоопределение.
+        ///   Ищет локализованную строку, похожую на Auto-detect.
         /// </summary>
         public static string AutoDetect {
             get {
@@ -448,7 +457,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автоматический подбор шаблона при импорте текста.
+        ///   Ищет локализованную строку, похожую на Automatic template selection when importing text.
         /// </summary>
         public static string AutoDetectTemplateWhenImportingText {
             get {
@@ -457,7 +466,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Определить шаблоны входного файла автоматически.
+        ///   Ищет локализованную строку, похожую на Define input file templates automatically.
         /// </summary>
         public static string AutomaticallyDetectTemplates {
             get {
@@ -466,7 +475,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автосохранение (требуется перезапуск приложения).
+        ///   Ищет локализованную строку, похожую на Auto-save (application restart required).
         /// </summary>
         public static string AutoSave {
             get {
@@ -475,7 +484,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автоматическое задание стоимостей вопросов.
+        ///   Ищет локализованную строку, похожую на Automatic setting of question costs.
         /// </summary>
         public static string AutoSetQuestionPrices {
             get {
@@ -484,7 +493,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тема и стоимость известны.
+        ///   Ищет локализованную строку, похожую на Theme and prices are announced.
         /// </summary>
         public static string BagCat_Knows {
             get {
@@ -493,7 +502,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на После отдачи.
+        ///   Ищет локализованную строку, похожую на After giving.
         /// </summary>
         public static string BagCat_Knows_Value_After {
             get {
@@ -502,7 +511,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на До отдачи.
+        ///   Ищет локализованную строку, похожую на Before giving.
         /// </summary>
         public static string BagCat_Knows_Value_Before {
             get {
@@ -511,7 +520,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Никогда.
+        ///   Ищет локализованную строку, похожую на Never.
         /// </summary>
         public static string BagCat_Knows_Value_Never {
             get {
@@ -520,7 +529,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отдать себе.
+        ///   Ищет локализованную строку, похожую на Can give to yourself.
         /// </summary>
         public static string BagCat_Self {
             get {
@@ -529,7 +538,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нельзя.
+        ///   Ищет локализованную строку, похожую на Disallow.
         /// </summary>
         public static string BagCat_Self_Value_False {
             get {
@@ -538,7 +547,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Можно.
+        ///   Ищет локализованную строку, похожую на Allow.
         /// </summary>
         public static string BagCat_Self_Value_True {
             get {
@@ -547,7 +556,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автор.
+        ///   Ищет локализованную строку, похожую на Author.
         /// </summary>
         public static string BaseAuthors {
             get {
@@ -556,7 +565,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Базовая стоимость вопроса.
+        ///   Ищет локализованную строку, похожую на Base question price.
         /// </summary>
         public static string BaseQuestionPrice {
             get {
@@ -565,7 +574,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Источник.
+        ///   Ищет локализованную строку, похожую на Source.
         /// </summary>
         public static string BaseSources {
             get {
@@ -574,7 +583,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Базовое значение.
+        ///   Ищет локализованную строку, похожую на Base value.
         /// </summary>
         public static string BaseValue {
             get {
@@ -583,7 +592,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Основные настройки.
+        ///   Ищет локализованную строку, похожую на Basic settings.
         /// </summary>
         public static string BasicSettings {
             get {
@@ -592,7 +601,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Невозможно выполнить эту операцию, когда привязка отсоединена.
+        ///   Ищет локализованную строку, похожую на It is impossible to perform this operation when the binding is disconnected.
         /// </summary>
         public static string BindingDetachedError {
             get {
@@ -601,7 +610,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Содержимое внутри скобок вынести в комментарий.
+        ///   Ищет локализованную строку, похожую на Move brackets content to comment.
         /// </summary>
         public static string BracketsContentToComment {
             get {
@@ -610,7 +619,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на По умолчанию.
+        ///   Ищет локализованную строку, похожую на Reset to default.
         /// </summary>
         public static string ByDefault {
             get {
@@ -619,7 +628,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на байт.
+        ///   Ищет локализованную строку, похожую на byte.
         /// </summary>
         public static string Bytes {
             get {
@@ -628,7 +637,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отмена.
+        ///   Ищет локализованную строку, похожую на Cancel.
         /// </summary>
         public static string Cancel {
             get {
@@ -637,7 +646,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отменить поиск.
+        ///   Ищет локализованную строку, похожую на Cancel search.
         /// </summary>
         public static string CancelSearch {
             get {
@@ -646,7 +655,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Чемпионат.
+        ///   Ищет локализованную строку, похожую на Championship.
         /// </summary>
         public static string Championship {
             get {
@@ -655,7 +664,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поменять язык.
+        ///   Ищет локализованную строку, похожую на Change language.
         /// </summary>
         public static string ChangeLanguage {
             get {
@@ -664,7 +673,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Проверять, что файл вопросов подходит для игры через Игровой сервер.
+        ///   Ищет локализованную строку, похожую на Check that the question file is suitable for playing through the Game server.
         /// </summary>
         public static string CheckFileSize {
             get {
@@ -673,7 +682,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Город.
+        ///   Ищет локализованную строку, похожую на City.
         /// </summary>
         public static string City {
             get {
@@ -682,7 +691,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить тип.
+        ///   Ищет локализованную строку, похожую на Remove type.
         /// </summary>
         public static string ClearType {
             get {
@@ -691,7 +700,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Клонировать вопрос.
+        ///   Ищет локализованную строку, похожую на Clone question.
         /// </summary>
         public static string CloneQuestion {
             get {
@@ -700,7 +709,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Клонировать раунд.
+        ///   Ищет локализованную строку, похожую на Clone round.
         /// </summary>
         public static string CloneRound {
             get {
@@ -709,7 +718,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Клонировать тему.
+        ///   Ищет локализованную строку, похожую на Clone topic.
         /// </summary>
         public static string CloneTheme {
             get {
@@ -718,7 +727,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Закрыть.
+        ///   Ищет локализованную строку, похожую на Close.
         /// </summary>
         public static string Close {
             get {
@@ -727,7 +736,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Развернуть всё.
+        ///   Ищет локализованную строку, похожую на Expand all.
         /// </summary>
         public static string CollapseAll {
             get {
@@ -736,7 +745,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Свернуть всё медиа.
+        ///   Ищет локализованную строку, похожую на Collapse all media.
         /// </summary>
         public static string CollapseAllMedia {
             get {
@@ -745,7 +754,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Свернуть медиа.
+        ///   Ищет локализованную строку, похожую на Collapse media.
         /// </summary>
         public static string CollapseMedia {
             get {
@@ -754,7 +763,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Комментарий.
+        ///   Ищет локализованную строку, похожую на Comment.
         /// </summary>
         public static string Comment {
             get {
@@ -763,7 +772,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Комментарии.
+        ///   Ищет локализованную строку, похожую на Comments.
         /// </summary>
         public static string Comments {
             get {
@@ -772,7 +781,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Комментарии:.
+        ///   Ищет локализованную строку, похожую на Comments:.
         /// </summary>
         public static string CommentsHeader {
             get {
@@ -781,7 +790,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обычный.
+        ///   Ищет локализованную строку, похожую на Normal.
         /// </summary>
         public static string Common {
             get {
@@ -790,7 +799,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка выполнения программы.
+        ///   Ищет локализованную строку, похожую на Program execution error.
         /// </summary>
         public static string CommonAppError {
             get {
@@ -799,7 +808,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сжать.
+        ///   Ищет локализованную строку, похожую на Compress.
         /// </summary>
         public static string Compress {
             get {
@@ -808,7 +817,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Написать замечания автору….
+        ///   Ищет локализованную строку, похожую на Write remarks to the author….
         /// </summary>
         public static string ContactAuthor {
             get {
@@ -817,7 +826,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сообщить автору о багах или что-нибудь предложить.
+        ///   Ищет локализованную строку, похожую на Report bugs to the author or make suggestions.
         /// </summary>
         public static string ContactAuthorToolTip {
             get {
@@ -826,7 +835,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Адрес для связи.
+        ///   Ищет локализованную строку, похожую на Contact address.
         /// </summary>
         public static string ContactUri {
             get {
@@ -835,7 +844,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Оформить для Теле- и Комп-SIGame.
+        ///   Ищет локализованную строку, похожую на Format for TV and Comp-SIGame.
         /// </summary>
         public static string ConvertToCompSI {
             get {
@@ -844,7 +853,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Разбить по раундам и назначить телевизионные стоимости.
+        ///   Ищет локализованную строку, похожую на Split into rounds and assign television costs.
         /// </summary>
         public static string ConvertToCompSIHint {
             get {
@@ -853,7 +862,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поправить для Теле- и Комп-SIGame.
+        ///   Ищет локализованную строку, похожую на Correct for TV and Comp-SIGame.
         /// </summary>
         public static string ConvertToCompSISimple {
             get {
@@ -862,7 +871,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменить названия тем, убрать точки в конце вопросов.
+        ///   Ищет локализованную строку, похожую на Change topic names, remove dots at the end of questions.
         /// </summary>
         public static string ConvertToCompSISimpleHint {
             get {
@@ -871,7 +880,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Оформить для &quot;Миллионера&quot;.
+        ///   Ищет локализованную строку, похожую на Format for &quot;Millionaire&quot;.
         /// </summary>
         public static string ConvertToMillionaire {
             get {
@@ -880,7 +889,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Разбить на группы по 15 вопросов.
+        ///   Ищет локализованную строку, похожую на Split into groups of 15 questions.
         /// </summary>
         public static string ConvertToMillionaireHint {
             get {
@@ -889,7 +898,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Оформить для Спорт-SIGame.
+        ///   Ищет локализованную строку, похожую на Format for Sport-SIGame.
         /// </summary>
         public static string ConvertToSportSI {
             get {
@@ -898,7 +907,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Назначить стоимости 10, 20, 30 и т.д..
+        ///   Ищет локализованную строку, похожую на Assign costs of 10, 20, 30, etc..
         /// </summary>
         public static string ConvertToSportSIHint {
             get {
@@ -907,7 +916,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Копировать.
+        ///   Ищет локализованную строку, похожую на Copy.
         /// </summary>
         public static string Copy {
             get {
@@ -916,7 +925,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Копировать шаблон.
+        ///   Ищет локализованную строку, похожую на Copy template.
         /// </summary>
         public static string CopyTemplate {
             get {
@@ -925,7 +934,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Страна.
+        ///   Ищет локализованную строку, похожую на Country.
         /// </summary>
         public static string Country {
             get {
@@ -934,7 +943,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Создать.
+        ///   Ищет локализованную строку, похожую на Create.
         /// </summary>
         public static string Create {
             get {
@@ -943,7 +952,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Создавать 5 вопросов вместе с темой.
+        ///   Ищет локализованную строку, похожую на Create 5 questions along with theme.
         /// </summary>
         public static string Create5QuestionsWithTheme {
             get {
@@ -952,7 +961,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дата создания.
+        ///   Ищет локализованную строку, похожую на Creation date.
         /// </summary>
         public static string CreationDate {
             get {
@@ -961,7 +970,16 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Точечная выборка.
+        ///   Ищет локализованную строку, похожую на You can add you own tags later in editor window.
+        /// </summary>
+        public static string CustomTagsHint {
+            get {
+                return ResourceManager.GetString("CustomTagsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Custom themes.
         /// </summary>
         public static string CustomThemes {
             get {
@@ -970,7 +988,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вырезать.
+        ///   Ищет локализованную строку, похожую на Cut.
         /// </summary>
         public static string Cut {
             get {
@@ -979,7 +997,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вырезать шаблон.
+        ///   Ищет локализованную строку, похожую на Cut template.
         /// </summary>
         public static string CutTemplate {
             get {
@@ -988,7 +1006,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка копирования данных.
+        ///   Ищет локализованную строку, похожую на Data copy error.
         /// </summary>
         public static string DataCopyError {
             get {
@@ -997,7 +1015,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить.
+        ///   Ищет локализованную строку, похожую на Delete.
         /// </summary>
         public static string Delete {
             get {
@@ -1006,7 +1024,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сложность.
+        ///   Ищет локализованную строку, похожую на Difficulty.
         /// </summary>
         public static string Difficulty {
             get {
@@ -1015,7 +1033,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Заголовок документа.
+        ///   Ищет локализованную строку, похожую на Document title.
         /// </summary>
         public static string DocumentCaption {
             get {
@@ -1024,7 +1042,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Шрифт документа.
+        ///   Ищет локализованную строку, похожую на Document font.
         /// </summary>
         public static string DocumentFont {
             get {
@@ -1033,7 +1051,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поблагодарить автора….
+        ///   Ищет локализованную строку, похожую на Thank the author….
         /// </summary>
         public static string Donate {
             get {
@@ -1042,7 +1060,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на A и B =&gt; A и B + B и A.
+        ///   Ищет локализованную строку, похожую на A and B =&gt; A and B + B and A.
         /// </summary>
         public static string DuplicateAnd {
             get {
@@ -1051,7 +1069,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Длительность.
+        ///   Ищет локализованную строку, похожую на Duration.
         /// </summary>
         public static string Duration {
             get {
@@ -1060,7 +1078,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Редактировать.
+        ///   Ищет локализованную строку, похожую на Edit.
         /// </summary>
         public static string Edit {
             get {
@@ -1069,7 +1087,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Способ редактирования.
+        ///   Ищет локализованную строку, похожую на Edit mode.
         /// </summary>
         public static string EditMode {
             get {
@@ -1078,7 +1096,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фиксированная панель.
+        ///   Ищет локализованную строку, похожую на Fixed panel.
         /// </summary>
         public static string EditMode_FixedPanel {
             get {
@@ -1087,7 +1105,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Плавающая панель.
+        ///   Ищет локализованную строку, похожую на Floating panel.
         /// </summary>
         public static string EditMode_FloatPanel {
             get {
@@ -1096,7 +1114,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Только чтение.
+        ///   Ищет локализованную строку, похожую на Read only.
         /// </summary>
         public static string EditMode_ReadOnly {
             get {
@@ -1105,7 +1123,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фиксированная панель.
+        ///   Ищет локализованную строку, похожую на Fixed panel.
         /// </summary>
         public static string EditModeFixedPanel {
             get {
@@ -1114,7 +1132,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Плавающая панель.
+        ///   Ищет локализованную строку, похожую на Floating panel.
         /// </summary>
         public static string EditModeFloatPanel {
             get {
@@ -1123,7 +1141,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Только чтение.
+        ///   Ищет локализованную строку, похожую на Read only.
         /// </summary>
         public static string EditModeNone {
             get {
@@ -1132,7 +1150,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Редактировать текст.
+        ///   Ищет локализованную строку, похожую на Edit text.
         /// </summary>
         public static string EditText {
             get {
@@ -1141,7 +1159,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Без имени.
+        ///   Ищет локализованную строку, похожую на Untitled.
         /// </summary>
         public static string Empty {
             get {
@@ -1150,7 +1168,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нужна ли пустая строка после темы.
+        ///   Ищет локализованную строку, похожую на Is an empty line needed after the theme name.
         /// </summary>
         public static string EmptyLineBeforeThemeName {
             get {
@@ -1159,7 +1177,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (пустой).
+        ///   Ищет локализованную строку, похожую на (empty).
         /// </summary>
         public static string EmptyQuestion {
             get {
@@ -1168,7 +1186,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Кодировка.
+        ///   Ищет локализованную строку, похожую на Encoding.
         /// </summary>
         public static string Encoding {
             get {
@@ -1177,7 +1195,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста..
+        ///   Ищет локализованную строку, похожую на This error is fixed in the new version of the program. Please update..
         /// </summary>
         public static string ErrorFixed {
             get {
@@ -1186,7 +1204,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста..
+        ///   Ищет локализованную строку, похожую на This error is not reproducible. If you can surely reproduce it, please contact the author..
         /// </summary>
         public static string ErrorNotReproduced {
             get {
@@ -1195,7 +1213,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Свернуть всё.
+        ///   Ищет локализованную строку, похожую на Collapse all.
         /// </summary>
         public static string ExpandAll {
             get {
@@ -1204,7 +1222,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Развернуть всё медиа.
+        ///   Ищет локализованную строку, похожую на Expand all media.
         /// </summary>
         public static string ExpandAllMedia {
             get {
@@ -1213,7 +1231,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Развернуть медиа.
+        ///   Ищет локализованную строку, похожую на Expand media.
         /// </summary>
         public static string ExpandMedia {
             get {
@@ -1222,7 +1240,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Экспорт.
+        ///   Ищет локализованную строку, похожую на Export.
         /// </summary>
         public static string Export {
             get {
@@ -1231,7 +1249,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Экспорт и печать.
+        ///   Ищет локализованную строку, похожую на Export and print.
         /// </summary>
         public static string ExportAndPrint {
             get {
@@ -1240,7 +1258,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на База вопросов.
+        ///   Ищет локализованную строку, похожую на Questions database.
         /// </summary>
         public static string ExportFormatsDb {
             get {
@@ -1249,7 +1267,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Динабанк.
+        ///   Ищет локализованную строку, похожую на Dinabank.
         /// </summary>
         public static string ExportFormatsDinabank {
             get {
@@ -1258,7 +1276,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на СНС.
+        ///   Ищет локализованную строку, похожую на SNS.
         /// </summary>
         public static string ExportFormatsSns {
             get {
@@ -1267,7 +1285,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Телевизионный аналог SIGame.
+        ///   Ищет локализованную строку, похожую на SIGame TV version.
         /// </summary>
         public static string ExportFormatsTvSI {
             get {
@@ -1276,7 +1294,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выгрузить медиа….
+        ///   Ищет локализованную строку, похожую на Unload media….
         /// </summary>
         public static string ExportMediaCommand {
             get {
@@ -1285,7 +1303,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Файл {0} существует, заменить?.
+        ///   Ищет локализованную строку, похожую на File {0} exists, replace it?.
         /// </summary>
         public static string FileExistReplace {
             get {
@@ -1294,7 +1312,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Импорт файла.
+        ///   Ищет локализованную строку, похожую на Import file.
         /// </summary>
         public static string FileImport {
             get {
@@ -1303,7 +1321,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на слишком большой объём.
+        ///   Ищет локализованную строку, похожую на too large data.
         /// </summary>
         public static string FileTooLarge {
             get {
@@ -1312,7 +1330,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Задать стоимости.
+        ///   Ищет локализованную строку, похожую на Set costs.
         /// </summary>
         public static string FillPrices {
             get {
@@ -1321,7 +1339,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фильтр.
+        ///   Ищет локализованную строку, похожую на Filter.
         /// </summary>
         public static string Filter {
             get {
@@ -1330,7 +1348,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Финал.
+        ///   Ищет локализованную строку, похожую на Final.
         /// </summary>
         public static string Final {
             get {
@@ -1339,7 +1357,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Финальный раунд.
+        ///   Ищет локализованную строку, похожую на Final round.
         /// </summary>
         public static string FinalRound {
             get {
@@ -1348,7 +1366,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Число тем в финале.
+        ///   Ищет локализованную строку, похожую на Final theme count.
         /// </summary>
         public static string FinalThemeCount {
             get {
@@ -1357,7 +1375,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Расположение элементов в режиме плиток.
+        ///   Ищет локализованную строку, похожую на Placement of elements in tile mode.
         /// </summary>
         public static string FlatLayoutModeHeader {
             get {
@@ -1366,7 +1384,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Список.
+        ///   Ищет локализованную строку, похожую на List.
         /// </summary>
         public static string FlatLayoutModeList {
             get {
@@ -1375,7 +1393,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Таблица.
+        ///   Ищет локализованную строку, похожую на Table.
         /// </summary>
         public static string FlatLayoutModeTable {
             get {
@@ -1384,7 +1402,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настраиваемый HTML.
+        ///   Ищет локализованную строку, похожую на Customizable HTML.
         /// </summary>
         public static string FormattedHtml {
             get {
@@ -1393,7 +1411,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возможность настройки специфического представления пакета.
+        ///   Ищет локализованную строку, похожую на Ability to configure a specific package view.
         /// </summary>
         public static string FormattedHtmlHint {
             get {
@@ -1402,7 +1420,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на от.
+        ///   Ищет локализованную строку, похожую на from.
         /// </summary>
         public static string From {
             get {
@@ -1411,7 +1429,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обнаружено обновление программы до версии {0}. Будет произведена дополнительная установка. Установить обновление сейчас?.
+        ///   Ищет локализованную строку, похожую на Program update to version {0} detected. Additional installation will be performed. Install the update now?.
         /// </summary>
         public static string FullUpdates {
             get {
@@ -1420,7 +1438,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Перейти.
+        ///   Ищет локализованную строку, похожую на Go to.
         /// </summary>
         public static string Goto {
             get {
@@ -1429,7 +1447,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Помощь.
+        ///   Ищет локализованную строку, похожую на Help.
         /// </summary>
         public static string Help {
             get {
@@ -1438,7 +1456,16 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Как использовать программу….
+        ///   Ищет локализованную строку, похожую на Help.en-US.pdf.
+        /// </summary>
+        public static string HelpFile {
+            get {
+                return ResourceManager.GetString("HelpFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на How to use the program….
         /// </summary>
         public static string HowToUse {
             get {
@@ -1447,7 +1474,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настройте параметры выходного документа и нажмите кнопку &quot;Экспорт&quot;.
+        ///   Ищет локализованную строку, похожую на Set the parameters of the output document and press the &quot;Export&quot; button.
         /// </summary>
         public static string HtmlExportHint {
             get {
@@ -1466,7 +1493,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изображения.
+        ///   Ищет локализованную строку, похожую на Images.
         /// </summary>
         public static string Images {
             get {
@@ -1475,7 +1502,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Импорт.
+        ///   Ищет локализованную строку, похожую на Import.
         /// </summary>
         public static string Import {
             get {
@@ -1484,7 +1511,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на База вопросов….
+        ///   Ищет локализованную строку, похожую на Question database….
         /// </summary>
         public static string ImportDB {
             get {
@@ -1493,7 +1520,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Библиотека вопросов….
+        ///   Ищет локализованную строку, похожую на Question library….
         /// </summary>
         public static string ImportSIStorage {
             get {
@@ -1502,7 +1529,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Текст….
+        ///   Ищет локализованную строку, похожую на Text….
         /// </summary>
         public static string ImportText {
             get {
@@ -1511,7 +1538,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Преобразование текстового файла в SIQ формат.
+        ///   Ищет локализованную строку, похожую на Convert text file to SIQ format.
         /// </summary>
         public static string ImportTextTip {
             get {
@@ -1520,7 +1547,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на XML-файл….
+        ///   Ищет локализованную строку, похожую на XML file….
         /// </summary>
         public static string ImportXml {
             get {
@@ -1529,7 +1556,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Приращение.
+        ///   Ищет локализованную строку, похожую на Increment.
         /// </summary>
         public static string Increase {
             get {
@@ -1538,7 +1565,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Устанавливать обновления.
+        ///   Ищет локализованную строку, похожую на Install updates.
         /// </summary>
         public static string InstallUpdates {
             get {
@@ -1547,7 +1574,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Программа будет автоматически проверять наличие обновлений на сайте разработчика и устанавливать их.
+        ///   Ищет локализованную строку, похожую на The program will automatically check for updates on the developer&apos;s website and install them.
         /// </summary>
         public static string InstallUpdatesHint {
             get {
@@ -1556,7 +1583,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Параметр задан неверно.
+        ///   Ищет локализованную строку, похожую на Parameter is set incorrectly.
         /// </summary>
         public static string InvalidParameter {
             get {
@@ -1565,7 +1592,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Объединить со следующим (играть одновременно).
+        ///   Ищет локализованную строку, похожую на Merge with the next one (play simultaneously).
         /// </summary>
         public static string JoinWithNext {
             get {
@@ -1574,7 +1601,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Язык.
+        ///   Ищет локализованную строку, похожую на Language.
         /// </summary>
         public static string Language {
             get {
@@ -1583,7 +1610,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Последнее слово в новый ответ.
+        ///   Ищет локализованную строку, похожую на Last word to new answer.
         /// </summary>
         public static string LastWordToNewAnswer {
             get {
@@ -1592,7 +1619,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Лицензии.
+        ///   Ищет локализованную строку, похожую на Licenses.
         /// </summary>
         public static string Licences {
             get {
@@ -1601,7 +1628,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Список.
+        ///   Ищет локализованную строку, похожую на List.
         /// </summary>
         public static string List {
             get {
@@ -1610,7 +1637,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сделать пустым.
+        ///   Ищет локализованную строку, похожую на Make empty.
         /// </summary>
         public static string MakeEmpty {
             get {
@@ -1619,7 +1646,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сделать непустым.
+        ///   Ищет локализованную строку, похожую на Make non-empty.
         /// </summary>
         public static string MakeNonEmpty {
             get {
@@ -1628,7 +1655,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Скрипт mIRC.
+        ///   Ищет локализованную строку, похожую на mIRC Script.
         /// </summary>
         public static string MircScript {
             get {
@@ -1637,7 +1664,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Проведение игры в IRC.
+        ///   Ищет локализованную строку, похожую на Conducting a game in IRC.
         /// </summary>
         public static string MircScriptHint {
             get {
@@ -1646,7 +1673,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Переместить ниже.
+        ///   Ищет локализованную строку, похожую на Move down.
         /// </summary>
         public static string MoveDown {
             get {
@@ -1655,7 +1682,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Переместить левее.
+        ///   Ищет локализованную строку, похожую на Move left.
         /// </summary>
         public static string MoveLeft {
             get {
@@ -1664,7 +1691,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Переместить правее.
+        ///   Ищет локализованную строку, похожую на Move right.
         /// </summary>
         public static string MoveRight {
             get {
@@ -1673,7 +1700,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Переместить выше.
+        ///   Ищет локализованную строку, похожую на Move up.
         /// </summary>
         public static string MoveUp {
             get {
@@ -1682,7 +1709,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Имя.
+        ///   Ищет локализованную строку, похожую на Name.
         /// </summary>
         public static string Name {
             get {
@@ -1691,7 +1718,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Перейти к файлу.
+        ///   Ищет локализованную строку, похожую на Navigate to file.
         /// </summary>
         public static string NavigateToFile {
             get {
@@ -1700,7 +1727,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Перейти к использованию.
+        ///   Ищет локализованную строку, похожую на Navigate to usage.
         /// </summary>
         public static string NavigateToUsage {
             get {
@@ -1709,7 +1736,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дальше.
+        ///   Ищет локализованную строку, похожую на Next.
         /// </summary>
         public static string Next {
             get {
@@ -1718,7 +1745,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Следующий фрагмент.
+        ///   Ищет локализованную строку, похожую на Next fragment.
         /// </summary>
         public static string NextFragment {
             get {
@@ -1727,7 +1754,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Следующий результат.
+        ///   Ищет локализованную строку, похожую на Next result.
         /// </summary>
         public static string NextSearchResult {
             get {
@@ -1736,7 +1763,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нет.
+        ///   Ищет локализованную строку, похожую на No.
         /// </summary>
         public static string No {
             get {
@@ -1745,7 +1772,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Параметры нестандартного пакета.
+        ///   Ищет локализованную строку, похожую на Custom package settings.
         /// </summary>
         public static string NonStandardPackageParameters {
             get {
@@ -1754,7 +1781,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Недостаточно памяти для выполнения программы!.
+        ///   Ищет локализованную строку, похожую на Not enough memory to run the program!.
         /// </summary>
         public static string NotEnoughMemoryToStartApp {
             get {
@@ -1763,7 +1790,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фиксированное значение.
+        ///   Ищет локализованную строку, похожую на Fixed value.
         /// </summary>
         public static string NumberSetModeFixedValue {
             get {
@@ -1772,7 +1799,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Минимум или максимум в раунде.
+        ///   Ищет локализованную строку, похожую на Minimum or maximum in round.
         /// </summary>
         public static string NumberSetModeMinimumOrMaximumInRound {
             get {
@@ -1781,7 +1808,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбор.
+        ///   Ищет локализованную строку, похожую на Select.
         /// </summary>
         public static string NumberSetModeRange {
             get {
@@ -1790,7 +1817,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбор с шагом.
+        ///   Ищет локализованную строку, похожую на Select with step.
         /// </summary>
         public static string NumberSetModeRangeWithStep {
             get {
@@ -1799,7 +1826,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нумеровать темы.
+        ///   Ищет локализованную строку, похожую на Number the themes.
         /// </summary>
         public static string NumberThemes {
             get {
@@ -1808,7 +1835,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Объект.
+        ///   Ищет локализованную строку, похожую на Object.
         /// </summary>
         public static string Object {
             get {
@@ -1817,7 +1844,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Официальный сайт.
+        ///   Ищет локализованную строку, похожую на Official website.
         /// </summary>
         public static string OfficialSite {
             get {
@@ -1835,7 +1862,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка копирования данных: слишком большой объём.
+        ///   Ищет локализованную строку, похожую на Data copy error: too big size.
         /// </summary>
         public static string OOMCopyError {
             get {
@@ -1844,7 +1871,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Открыть… (Ctrl+O).
+        ///   Ищет локализованную строку, похожую на Open… (Ctrl+O).
         /// </summary>
         public static string Open {
             get {
@@ -1853,7 +1880,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Несоответствие числа открывающих и закрывающих скобок.
+        ///   Ищет локализованную строку, похожую на Mismatch of the number of opening and closing brackets.
         /// </summary>
         public static string OpenCloseBracketsIncosistency {
             get {
@@ -1862,7 +1889,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Открыть файл после сохранения.
+        ///   Ищет локализованную строку, похожую на Open file after saving.
         /// </summary>
         public static string OpenFileAfterSaving {
             get {
@@ -1871,7 +1898,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Открыть пакет.
+        ///   Ищет локализованную строку, похожую на Open package.
         /// </summary>
         public static string OpenPackage {
             get {
@@ -1880,7 +1907,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Открыть недавние.
+        ///   Ищет локализованную строку, похожую на Open recent.
         /// </summary>
         public static string OpenRecent {
             get {
@@ -1889,7 +1916,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Необязательный фрагмент.
+        ///   Ищет локализованную строку, похожую на Optional fragment.
         /// </summary>
         public static string OptionalFragment {
             get {
@@ -1898,7 +1925,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на или.
+        ///   Ищет локализованную строку, похожую на or.
         /// </summary>
         public static string Or {
             get {
@@ -1907,7 +1934,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на в строку.
+        ///   Ищет локализованную строку, похожую на rows.
         /// </summary>
         public static string OrientationHorizontal {
             get {
@@ -1916,7 +1943,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на в столбец.
+        ///   Ищет локализованную строку, похожую на columns.
         /// </summary>
         public static string OrientationVertical {
             get {
@@ -1925,7 +1952,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пакет.
+        ///   Ищет локализованную строку, похожую на Package.
         /// </summary>
         public static string Package {
             get {
@@ -1934,7 +1961,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автор пакета.
+        ///   Ищет локализованную строку, похожую на Package author.
         /// </summary>
         public static string PackageAuthor {
             get {
@@ -1943,7 +1970,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Логотип пакета.
+        ///   Ищет локализованную строку, похожую на Package logo.
         /// </summary>
         public static string PackageLogo {
             get {
@@ -1952,7 +1979,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Имя пакета.
+        ///   Ищет локализованную строку, похожую на Package name.
         /// </summary>
         public static string PackageName {
             get {
@@ -1961,7 +1988,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Размер шрифта в имени пакета.
+        ///   Ищет локализованную строку, похожую на Package name font size.
         /// </summary>
         public static string PackageNameFontSize {
             get {
@@ -1970,7 +1997,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Шаблон пакета.
+        ///   Ищет локализованную строку, похожую на Package template.
         /// </summary>
         public static string PackageType {
             get {
@@ -1979,7 +2006,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вставить.
+        ///   Ищет локализованную строку, похожую на Insert.
         /// </summary>
         public static string Paste {
             get {
@@ -1988,7 +2015,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вставить шаблон.
+        ///   Ищет локализованную строку, похожую на Paste template.
         /// </summary>
         public static string PasteTemplate {
             get {
@@ -1997,7 +2024,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Запустить вопрос.
+        ///   Ищет локализованную строку, похожую на Start question.
         /// </summary>
         public static string PlayQuestion {
             get {
@@ -2006,7 +2033,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Предыдущий фрагмент.
+        ///   Ищет локализованную строку, похожую на Previous fragment.
         /// </summary>
         public static string PreviousFragment {
             get {
@@ -2015,7 +2042,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Предыдущий результат.
+        ///   Ищет локализованную строку, похожую на Previous result.
         /// </summary>
         public static string PreviousSearchResult {
             get {
@@ -2024,7 +2051,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Стоимость.
+        ///   Ищет локализованную строку, похожую на Cost.
         /// </summary>
         public static string Price {
             get {
@@ -2033,7 +2060,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Печать....
+        ///   Ищет локализованную строку, похожую на Print....
         /// </summary>
         public static string Print {
             get {
@@ -2042,7 +2069,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на HTML для печати.
+        ///   Ищет локализованную строку, похожую на HTML for printing.
         /// </summary>
         public static string PrintedHtml {
             get {
@@ -2051,7 +2078,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Издатель.
+        ///   Ищет локализованную строку, похожую на Publisher.
         /// </summary>
         public static string Publisher {
             get {
@@ -2060,7 +2087,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Издательство.
+        ///   Ищет локализованную строку, похожую на Publisher.
         /// </summary>
         public static string PublisherCompany {
             get {
@@ -2069,7 +2096,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (все).
+        ///   Ищет локализованную строку, похожую на (all).
         /// </summary>
         public static string PublishersAll {
             get {
@@ -2078,7 +2105,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (не задано).
+        ///   Ищет локализованную строку, похожую на (not set).
         /// </summary>
         public static string PublishersNotSet {
             get {
@@ -2087,7 +2114,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос.
+        ///   Ищет локализованную строку, похожую на Question.
         /// </summary>
         public static string Question {
             get {
@@ -2096,7 +2123,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Импорт вопросов.
+        ///   Ищет локализованную строку, похожую на Import questions.
         /// </summary>
         public static string QuestionParsing {
             get {
@@ -2105,7 +2132,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Разделение текста на вопросы.
+        ///   Ищет локализованную строку, похожую на Splitting text into questions.
         /// </summary>
         public static string QuestionSplitting {
             get {
@@ -2114,7 +2141,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Размер шрифта в вопросе.
+        ///   Ищет локализованную строку, похожую на Question text font size.
         /// </summary>
         public static string QuestionTextFontSize {
             get {
@@ -2123,7 +2150,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип вопроса.
+        ///   Ищет локализованную строку, похожую на Question type.
         /// </summary>
         public static string QuestionType {
             get {
@@ -2132,7 +2159,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Интервал.
+        ///   Ищет локализованную строку, похожую на Range.
         /// </summary>
         public static string Range {
             get {
@@ -2141,7 +2168,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Последние файлы.
+        ///   Ищет локализованную строку, похожую на Recent files.
         /// </summary>
         public static string RecentFiles {
             get {
@@ -2150,7 +2177,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Повторить.
+        ///   Ищет локализованную строку, похожую на Repeat.
         /// </summary>
         public static string Redo {
             get {
@@ -2159,7 +2186,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обновить.
+        ///   Ищет локализованную строку, похожую на Refresh.
         /// </summary>
         public static string Refresh {
             get {
@@ -2168,7 +2195,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить ответ.
+        ///   Ищет локализованную строку, похожую на Remove answer.
         /// </summary>
         public static string RemoveAnswer {
             get {
@@ -2177,7 +2204,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить сложный ответ.
+        ///   Ищет локализованную строку, похожую на Remove complex answer.
         /// </summary>
         public static string RemoveComplexAnswer {
             get {
@@ -2186,7 +2213,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить ссылку.
+        ///   Ищет локализованную строку, похожую на Remove link.
         /// </summary>
         public static string RemoveLink {
             get {
@@ -2195,7 +2222,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить логотип.
+        ///   Ищет локализованную строку, похожую на Remove logo.
         /// </summary>
         public static string RemoveLogo {
             get {
@@ -2204,7 +2231,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить параметр.
+        ///   Ищет локализованную строку, похожую на Remove parameter.
         /// </summary>
         public static string RemoveParameter {
             get {
@@ -2213,7 +2240,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить вопрос.
+        ///   Ищет локализованную строку, похожую на Remove question.
         /// </summary>
         public static string RemoveQuestion {
             get {
@@ -2222,7 +2249,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить раунд.
+        ///   Ищет локализованную строку, похожую на Remove round.
         /// </summary>
         public static string RemoveRound {
             get {
@@ -2231,7 +2258,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить шаблон.
+        ///   Ищет локализованную строку, похожую на Delete template.
         /// </summary>
         public static string RemoveTemplate {
             get {
@@ -2240,7 +2267,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить тему.
+        ///   Ищет локализованную строку, похожую на Remove topic.
         /// </summary>
         public static string RemoveTheme {
             get {
@@ -2249,7 +2276,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить неиспользуемые файлы.
+        ///   Ищет локализованную строку, похожую на Remove unused files.
         /// </summary>
         public static string RemoveUnusedFiles {
             get {
@@ -2258,7 +2285,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалять мультимедиа из пакета при удалении последней ссылки на него.
+        ///   Ищет локализованную строку, похожую на Remove multimedia from the package when the last link to it is deleted.
         /// </summary>
         public static string RemoveUnusedMedia {
             get {
@@ -2267,7 +2294,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее..
+        ///   Ищет локализованную строку, похожую на Cannot connect to server while sending error report. The report will be sent later.
         /// </summary>
         public static string ReportDelayed {
             get {
@@ -2276,7 +2303,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Резерв.
+        ///   Ищет локализованную строку, похожую на Reserve.
         /// </summary>
         public static string Reserve {
             get {
@@ -2285,7 +2312,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ограничение.
+        ///   Ищет локализованную строку, похожую на Restriction.
         /// </summary>
         public static string Restriction {
             get {
@@ -2294,7 +2321,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Раунд.
+        ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         public static string Round {
             get {
@@ -2303,7 +2330,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Число раундов.
+        ///   Ищет локализованную строку, похожую на Round count.
         /// </summary>
         public static string RoundCount {
             get {
@@ -2312,7 +2339,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Размер шрифта в названии раунда.
+        ///   Ищет локализованную строку, похожую на Round name font size.
         /// </summary>
         public static string RoundNameFontSize {
             get {
@@ -2321,7 +2348,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Число тем в раунде.
+        ///   Ищет локализованную строку, похожую на Theme per round count.
         /// </summary>
         public static string RoundThemeCount {
             get {
@@ -2330,7 +2357,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранить.
+        ///   Ищет локализованную строку, похожую на Save.
         /// </summary>
         public static string Save {
             get {
@@ -2339,7 +2366,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранить всё (Shift+Ctrl+S).
+        ///   Ищет локализованную строку, похожую на Save all (Shift+Ctrl+S).
         /// </summary>
         public static string SaveAll {
             get {
@@ -2348,7 +2375,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранение и экспорт.
+        ///   Ищет локализованную строку, похожую на Save and export.
         /// </summary>
         public static string SaveAndExport {
             get {
@@ -2357,7 +2384,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранить как….
+        ///   Ищет локализованную строку, похожую на Save as….
         /// </summary>
         public static string SaveAs {
             get {
@@ -2366,7 +2393,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранить как шаблон….
+        ///   Ищет локализованную строку, похожую на Save as template….
         /// </summary>
         public static string SaveAsTemplate {
             get {
@@ -2375,7 +2402,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Масштаб.
+        ///   Ищет локализованную строку, похожую на Scale.
         /// </summary>
         public static string Scale {
             get {
@@ -2384,7 +2411,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поиск.
+        ///   Ищет локализованную строку, похожую на Search.
         /// </summary>
         public static string Search {
             get {
@@ -2393,7 +2420,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Папка для поиска....
+        ///   Ищет локализованную строку, похожую на Folder to search....
         /// </summary>
         public static string SearchFolder {
             get {
@@ -2402,7 +2429,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Результаты поиска.
+        ///   Ищет локализованную строку, похожую на Search results.
         /// </summary>
         public static string SearchResults {
             get {
@@ -2411,7 +2438,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Искать текст.
+        ///   Ищет локализованную строку, похожую на Search text.
         /// </summary>
         public static string SearchText {
             get {
@@ -2420,7 +2447,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отчество.
+        ///   Ищет локализованную строку, похожую на Second name.
         /// </summary>
         public static string SecondName {
             get {
@@ -2429,7 +2456,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на с.
+        ///   Ищет локализованную строку, похожую на s.
         /// </summary>
         public static string Seconds {
             get {
@@ -2438,7 +2465,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос можно оставить себе.
+        ///   Ищет локализованную строку, похожую на Question can be given to yourself.
         /// </summary>
         public static string SecretCanBeGivenToSelf {
             get {
@@ -2447,7 +2474,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сумма начисляется без вопроса.
+        ///   Ищет локализованную строку, похожую на Price is accrued without question.
         /// </summary>
         public static string SecretNoQuestion {
             get {
@@ -2456,7 +2483,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тема и стоимость оглашаются до передачи.
+        ///   Ищет локализованную строку, похожую на Theme and cost are announced before question is given.
         /// </summary>
         public static string SecretPublicPrice {
             get {
@@ -2465,7 +2492,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбрать.
+        ///   Ищет локализованную строку, похожую на Select.
         /// </summary>
         public static string Select {
             get {
@@ -2474,7 +2501,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выделенное -&gt; Новый ответ.
+        ///   Ищет локализованную строку, похожую на Selected -&gt; New answer.
         /// </summary>
         public static string SelectedToNewAnswer {
             get {
@@ -2483,7 +2510,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выделенное -&gt; Новый комментарий.
+        ///   Ищет локализованную строку, похожую на Selected -&gt; New comment.
         /// </summary>
         public static string SelectedToNewComment {
             get {
@@ -2492,7 +2519,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выделенное -&gt; Новый источник.
+        ///   Ищет локализованную строку, похожую на Selected -&gt; New source.
         /// </summary>
         public static string SelectedToNewSource {
             get {
@@ -2501,7 +2528,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбрать файл….
+        ///   Ищет локализованную строку, похожую на Select file….
         /// </summary>
         public static string SelectFile {
             get {
@@ -2510,7 +2537,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Режим передачи.
+        ///   Ищет локализованную строку, похожую на Transfer mode.
         /// </summary>
         public static string SelectionMode {
             get {
@@ -2519,7 +2546,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Число вариантов ответа по умолчанию.
+        ///   Ищет локализованную строку, похожую на Default option count.
         /// </summary>
         public static string SelectOptionCount {
             get {
@@ -2528,7 +2555,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите папку для поиска.
+        ///   Ищет локализованную строку, похожую на Select a folder to search.
         /// </summary>
         public static string SelectSearchFolder {
             get {
@@ -2537,7 +2564,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбрать темы….
+        ///   Ищет локализованную строку, похожую на Select themes….
         /// </summary>
         public static string SelectThemes {
             get {
@@ -2546,7 +2573,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранить часть тем данного пакета в отдельный пакет.
+        ///   Ищет локализованную строку, похожую на Save part of the topics of this package into a separate package.
         /// </summary>
         public static string SelectThemesHint {
             get {
@@ -2555,7 +2582,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Серьёзный сбой в приложении. Отправить отчёт автору? (по возможности, свяжитесь с автором лично, так как в программе остались только крайне редкие ошибки).
+        ///   Ищет локализованную строку, похожую на Serious application failure. Send a report to the author? (if possible, contact the author personally, as there are only extremely rare errors left in the program).
         /// </summary>
         public static string SendErrorHeader {
             get {
@@ -2564,7 +2591,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отправить в компьютерную игру.
+        ///   Ищет локализованную строку, похожую на Send to computer game.
         /// </summary>
         public static string SendToPCGame {
             get {
@@ -2573,7 +2600,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Кому угодно.
+        ///   Ищет локализованную строку, похожую на To anyone.
         /// </summary>
         public static string SetAnswererSelect_Any {
             get {
@@ -2582,7 +2609,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Всем кроме себя.
+        ///   Ищет локализованную строку, похожую на To everyone except oneself.
         /// </summary>
         public static string SetAnswererSelect_ExceptCurrent {
             get {
@@ -2591,7 +2618,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбор из вариантов.
+        ///   Ищет локализованную строку, похожую на Select from options.
         /// </summary>
         public static string SetAnswerTypeType_Select {
             get {
@@ -2600,7 +2627,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Текст.
+        ///   Ищет локализованную строку, похожую на Text.
         /// </summary>
         public static string SetAnswerTypeType_Text {
             get {
@@ -2609,7 +2636,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Задать логотип.
+        ///   Ищет локализованную строку, похожую на Set logo.
         /// </summary>
         public static string SetLogo {
             get {
@@ -2618,7 +2645,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Задавать правильный ответ по имени файла, добавляемого в вопрос.
+        ///   Ищет локализованную строку, похожую на Set right answer by name of file which is added to question.
         /// </summary>
         public static string SetRightAnswerFromFileName {
             get {
@@ -2627,7 +2654,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Задать теги.
+        ///   Ищет локализованную строку, похожую на Set tags.
         /// </summary>
         public static string SetTags {
             get {
@@ -2636,7 +2663,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Указать временной интервал.
+        ///   Ищет локализованную строку, похожую на Specify time interval.
         /// </summary>
         public static string SetTime {
             get {
@@ -2645,7 +2672,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настройки.
+        ///   Ищет локализованную строку, похожую на Settings.
         /// </summary>
         public static string Settings {
             get {
@@ -2654,7 +2681,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка сохранения настроек.
+        ///   Ищет локализованную строку, похожую на Error saving settings.
         /// </summary>
         public static string SettingsSavingError {
             get {
@@ -2663,7 +2690,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показывать всплывающие подсказки в плиточном отображении.
+        ///   Ищет локализованную строку, похожую на Show tooltips in tile view.
         /// </summary>
         public static string ShowToolTipsInFlatView {
             get {
@@ -2672,7 +2699,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Перемешать вопросы и стоимости.
+        ///   Ищет локализованную строку, похожую на Shuffle questions and costs.
         /// </summary>
         public static string ShuffleQuestions {
             get {
@@ -2681,7 +2708,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Боковая панель.
+        ///   Ищет локализованную строку, похожую на Side panel.
         /// </summary>
         public static string SidePanel {
             get {
@@ -2690,7 +2717,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопросы СИ.
+        ///   Ищет локализованную строку, похожую на SI questions.
         /// </summary>
         public static string SIQuestions {
             get {
@@ -2699,7 +2726,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Размер.
+        ///   Ищет локализованную строку, похожую на Size.
         /// </summary>
         public static string Size {
             get {
@@ -2708,7 +2735,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пропустить фрагмент.
+        ///   Ищет локализованную строку, похожую на Skip fragment.
         /// </summary>
         public static string SkipFragment {
             get {
@@ -2717,7 +2744,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Использовать шаблоны проекта СНС.
+        ///   Ищет локализованную строку, похожую на Use SNS project templates.
         /// </summary>
         public static string SnsTemplatesHint {
             get {
@@ -2726,7 +2753,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отсортировать вопросы по стоимости.
+        ///   Ищет локализованную строку, похожую на Sort questions by cost.
         /// </summary>
         public static string SortQuestionsByPrice {
             get {
@@ -2735,7 +2762,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Источник.
+        ///   Ищет локализованную строку, похожую на Source.
         /// </summary>
         public static string Source {
             get {
@@ -2744,7 +2771,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Исходный файл.
+        ///   Ищет локализованную строку, похожую на Source file.
         /// </summary>
         public static string SourceFile {
             get {
@@ -2753,7 +2780,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Исходный фрагмент.
+        ///   Ищет локализованную строку, похожую на Source fragment.
         /// </summary>
         public static string SourceFragment {
             get {
@@ -2762,7 +2789,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Источники.
+        ///   Ищет локализованную строку, похожую на Sources.
         /// </summary>
         public static string Sources {
             get {
@@ -2771,7 +2798,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отсутствие источников.
+        ///   Ищет локализованную строку, похожую на No sources.
         /// </summary>
         public static string SourcesAbsense {
             get {
@@ -2780,7 +2807,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Источники:.
+        ///   Ищет локализованную строку, похожую на Sources:.
         /// </summary>
         public static string SourcesHeader {
             get {
@@ -2789,7 +2816,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Авторы пишутся.
+        ///   Ищет локализованную строку, похожую на Sources layout.
         /// </summary>
         public static string SourcesLayout {
             get {
@@ -2798,7 +2825,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Проверка правописания (Windows 8.1 и выше).
+        ///   Ищет локализованную строку, похожую на Spell check (Windows 8.1 and above).
         /// </summary>
         public static string SpellChecking {
             get {
@@ -2807,7 +2834,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ответ следует сразу после вопроса.
+        ///   Ищет локализованную строку, похожую на The answer immediately follows the question.
         /// </summary>
         public static string StandardLogicDescription {
             get {
@@ -2816,7 +2843,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ожидать, что за каждым вопросом немедленно идёт ответ, а не считывать сначала группу вопросов, а затем группу ответов.
+        ///   Ищет локализованную строку, похожую на Expect that each question is immediately followed by an answer, rather than first reading a group of questions and then a group of answers.
         /// </summary>
         public static string StandardLogicHint {
             get {
@@ -2825,7 +2852,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Стандартное значение.
+        ///   Ищет локализованную строку, похожую на Standard value.
         /// </summary>
         public static string StandardValue {
             get {
@@ -2834,7 +2861,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Старт.
+        ///   Ищет локализованную строку, похожую на Start.
         /// </summary>
         public static string Start {
             get {
@@ -2843,7 +2870,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начать импорт.
+        ///   Ищет локализованную строку, похожую на Start import.
         /// </summary>
         public static string StartImport {
             get {
@@ -2852,7 +2879,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Искать в подпапках.
+        ///   Ищет локализованную строку, похожую на Search in subfolders.
         /// </summary>
         public static string SubfolderSearch {
             get {
@@ -2861,7 +2888,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фамилия.
+        ///   Ищет локализованную строку, похожую на Surname.
         /// </summary>
         public static string Surname {
             get {
@@ -2870,7 +2897,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Таблица.
+        ///   Ищет локализованную строку, похожую на Table.
         /// </summary>
         public static string Table {
             get {
@@ -2879,7 +2906,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Табличный формат.
+        ///   Ищет локализованную строку, похожую на Table format.
         /// </summary>
         public static string TableFormat {
             get {
@@ -2888,7 +2915,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Теги.
+        ///   Ищет локализованную строку, похожую на Tags.
         /// </summary>
         public static string Tags {
             get {
@@ -2897,7 +2924,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Шаблон.
+        ///   Ищет локализованную строку, похожую на Template.
         /// </summary>
         public static string Template {
             get {
@@ -2906,7 +2933,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Текст перед темой.
+        ///   Ищет локализованную строку, похожую на Text before theme name.
         /// </summary>
         public static string TextBeforeThemeName {
             get {
@@ -2915,7 +2942,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Текст для импорта (скопируйте в поле ниже или откройте файл).
+        ///   Ищет локализованную строку, похожую на Text for import (copy into the field below or open a file).
         /// </summary>
         public static string TextToImport {
             get {
@@ -2924,7 +2951,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тема.
+        ///   Ищет локализованную строку, похожую на Theme.
         /// </summary>
         public static string Theme {
             get {
@@ -2933,7 +2960,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Размер шрифта в названии темы.
+        ///   Ищет локализованную строку, похожую на Theme name font size.
         /// </summary>
         public static string ThemeNameFontSize {
             get {
@@ -2942,7 +2969,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Число вопросов в теме.
+        ///   Ищет локализованную строку, похожую на Question per theme count.
         /// </summary>
         public static string ThemeQuestionCount {
             get {
@@ -2951,7 +2978,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Название.
+        ///   Ищет локализованную строку, похожую на Title.
         /// </summary>
         public static string Title {
             get {
@@ -2960,7 +2987,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на до.
+        ///   Ищет локализованную строку, похожую на to.
         /// </summary>
         public static string To {
             get {
@@ -2969,7 +2996,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поменять тип (на устный или обратно).
+        ///   Ищет локализованную строку, похожую на Change type (to oral or back).
         /// </summary>
         public static string ToggleToOralAndBack {
             get {
@@ -2978,7 +3005,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поиск файлов.
+        ///   Ищет локализованную строку, похожую на File search.
         /// </summary>
         public static string ToolTipFileSearch {
             get {
@@ -2987,7 +3014,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новый… (Ctrl+N).
+        ///   Ищет локализованную строку, похожую на New… (Ctrl+N).
         /// </summary>
         public static string ToolTipNew {
             get {
@@ -2996,7 +3023,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Всего тем:.
+        ///   Ищет локализованную строку, похожую на Theme count:.
         /// </summary>
         public static string TotalThemes {
             get {
@@ -3005,7 +3032,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тур.
+        ///   Ищет локализованную строку, похожую на Tour.
         /// </summary>
         public static string Tour {
             get {
@@ -3014,7 +3041,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип.
+        ///   Ищет локализованную строку, похожую на Type.
         /// </summary>
         public static string Type {
             get {
@@ -3023,7 +3050,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отменить.
+        ///   Ищет локализованную строку, похожую на Cancel.
         /// </summary>
         public static string Undo {
             get {
@@ -3032,7 +3059,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отсоединить от следующего.
+        ///   Ищет локализованную строку, похожую на Disconnect from the next one.
         /// </summary>
         public static string UnlinkFromNext {
             get {
@@ -3041,7 +3068,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на При поиске обновления возникла следующая ошибка: {0}.
+        ///   Ищет локализованную строку, похожую на The following error occurred while searching for an update: {0}.
         /// </summary>
         public static string UpdateException {
             get {
@@ -3050,7 +3077,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменять стоимости вопросов при перетаскивании.
+        ///   Ищет локализованную строку, похожую на Change question costs when dragging.
         /// </summary>
         public static string UpdatePricesOnDragAndDrop {
             get {
@@ -3059,7 +3086,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопросы будут перемещаться, а распределение стоимостей останется прежним.
+        ///   Ищет локализованную строку, похожую на Questions will be moved, but the cost distribution will remain the same.
         /// </summary>
         public static string UpdatePricesOnDragAndDropHint {
             get {
@@ -3068,7 +3095,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Задавать длительность показа изображений по умолчанию.
+        ///   Ищет локализованную строку, похожую на Set default image duration.
         /// </summary>
         public static string UseImageDuration {
             get {
@@ -3077,7 +3104,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Версия.
+        ///   Ищет локализованную строку, похожую на Version.
         /// </summary>
         public static string Version {
             get {
@@ -3086,7 +3113,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Видео.
+        ///   Ищет локализованную строку, похожую на Video.
         /// </summary>
         public static string Video {
             get {
@@ -3095,7 +3122,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Представление.
+        ///   Ищет локализованную строку, похожую на View.
         /// </summary>
         public static string View {
             get {
@@ -3104,7 +3131,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Плитки.
+        ///   Ищет локализованную строку, похожую на Tiles.
         /// </summary>
         public static string ViewModeFlat {
             get {
@@ -3113,7 +3140,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дерево.
+        ///   Ищет локализованную строку, похожую на Tree.
         /// </summary>
         public static string ViewModeTree {
             get {
@@ -3122,7 +3149,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Викифицировать.
+        ///   Ищет локализованную строку, похожую на Wikify.
         /// </summary>
         public static string Wikify {
             get {
@@ -3131,7 +3158,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вставить типографские кавычки, многоточие и тире.
+        ///   Ищет локализованную строку, похожую на Insert typographic quotes, ellipsis, and dash.
         /// </summary>
         public static string WikifyHint {
             get {
@@ -3140,7 +3167,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка старта приложения, связанная с Windows Automation. Попробуйте установить обновления для своей операционной системы, для .NET Framework 4 или установить библиотеку API Windows Automation (ссылка находится на странице приложения)..
+        ///   Ищет локализованную строку, похожую на Application startup error related to Windows Automation. Try installing updates for your operating system, for .NET Framework 4, or install the Windows Automation API library (the link is on the application page)..
         /// </summary>
         public static string WindowsAutomationError {
             get {
@@ -3149,7 +3176,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на с шагом.
+        ///   Ищет локализованную строку, похожую на with a step.
         /// </summary>
         public static string WithStep {
             get {
@@ -3158,7 +3185,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неправильные ответы.
+        ///   Ищет локализованную строку, похожую на Incorrect answers.
         /// </summary>
         public static string WrongAnswers {
             get {
@@ -3167,7 +3194,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой.
+        ///   Ищет локализованную строку, похожую на Incorrect multimedia address. The program terminated abnormally with an error.
         /// </summary>
         public static string WrongMultimediaAddress {
             get {
@@ -3176,7 +3203,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Год.
+        ///   Ищет локализованную строку, похожую на Year.
         /// </summary>
         public static string Year {
             get {
@@ -3185,7 +3212,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на гг..
+        ///   Ищет локализованную строку, похожую на yrs..
         /// </summary>
         public static string Years {
             get {
@@ -3194,7 +3221,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ваши темы:.
+        ///   Ищет локализованную строку, похожую на Your topics:.
         /// </summary>
         public static string YourThemes {
             get {

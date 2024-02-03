@@ -58,6 +58,11 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         _qDocument = document;
 
         Play = new SimpleCommand(Play_Executed);
+
+        if (!File.Exists(Source.AbsolutePath))
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowErrorMessage($"File not found: {Source.AbsolutePath}");
+        }
     }
 
     public void Play_Executed(object? arg)

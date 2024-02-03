@@ -43,7 +43,7 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
                     Type = StepParameterTypes.Content,
                     ContentValue = new List<ContentItem>
                     {
-                        new ContentItem { Type = AtomTypes.Text, Value = "" },
+                        new() { Type = ContentTypes.Text, Value = "" },
                     }
                 }
             };

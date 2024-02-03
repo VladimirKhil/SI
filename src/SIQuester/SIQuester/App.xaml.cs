@@ -20,16 +20,17 @@ using SIStorage.Service.Contract;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO.IsolatedStorage;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xaml;
+
 #if !DEBUG
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Net;
+using System.Net.Http;
 #endif
 
 namespace SIQuester;
@@ -40,29 +41,12 @@ namespace SIQuester;
 public partial class App : Application
 {
     private IHost? _host;
+    private AppSettings _settings = SettingsHelper.LoadUserSettings() ?? AppSettings.Create();
     private bool _useAppService;
-
-    public const string SettingsFolderName = "Settings";
-
-    private static readonly string SettingsFolder = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        AppSettings.ManufacturerName,
-        AppSettings.ProductName,
-        SettingsFolderName);
-
-    /// <summary>
-    /// User settings file name.
-    /// </summary>
-    internal const string UserSettingsFileName = "usersettings.json";
-
-    /// <summary>
-    /// Имя конфигурационного файла пользовательских настроек
-    /// </summary>
-    private const string ConfigFileName = "user.config";
 
     private readonly Implementation.DesktopManager _manager = new();
 
-    public static bool IsWindows8_1OrLater = Environment.OSVersion.Version > new Version(6, 2);
+    private static bool IsWindows8_1OrLater = Environment.OSVersion.Version > new Version(6, 2);
 
     /// <summary>
     /// Имя приложения
@@ -85,11 +69,11 @@ public partial class App : Application
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
-        AppSettings.Default = LoadUserSettings() ?? LoadSettings();
+        AppSettings.Default = _settings;
 
         if (!IsWindows8_1OrLater)
         {
-            AppSettings.Default.SpellChecking = false;
+            _settings.SpellChecking = false;
         }
 
         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
@@ -119,7 +103,7 @@ public partial class App : Application
         _useAppService = appServiceClientOptions.ServiceUri != null;
 
 #if !DEBUG
-        if (AppSettings.Default.SearchForUpdates)
+        if (_settings.SearchForUpdates)
         {
             SearchForUpdatesAsync();
         }
@@ -137,14 +121,14 @@ public partial class App : Application
 
         try
         {
-            if (AppSettings.Default.Language != null)
+            if (_settings.Language != null)
             {
-                Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(AppSettings.Default.Language);
+                Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(_settings.Language);
             }
             else
             {
                 var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
-                AppSettings.Default.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
+                _settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
             }
 
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
@@ -162,7 +146,7 @@ public partial class App : Application
             MainWindow = new MainWindow { DataContext = _mainViewModel };
             MainWindow.Show();
 
-            if (AppSettings.Default.AutoSave)
+            if (_settings.AutoSave)
             {
                 _autoSaveTimer = new DispatcherTimer(AppSettings.AutoSaveInterval, DispatcherPriority.Background, AutoSave, Dispatcher);
             }
@@ -187,7 +171,7 @@ public partial class App : Application
         services.AddSIStorageServiceClient(ctx.Configuration);
         services.AddChgkServiceClient(ctx.Configuration);
 
-        services.AddSingleton(AppSettings.Default);
+        services.AddSingleton(_settings);
         services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
 
         services.AddSingleton<IClipboardService, ClipboardService>();
@@ -198,7 +182,7 @@ public partial class App : Application
 #if !DEBUG
     private async void SendDelayedReports()
     {
-        if (!_useAppService)
+        if (!_useAppService || _host == null)
         {
             return;
         }
@@ -207,13 +191,13 @@ public partial class App : Application
 
         try
         {
-            while (AppSettings.Default.DelayedErrors.Count > 0)
+            while (_settings.DelayedErrors.Count > 0)
             {
-                var error = AppSettings.Default.DelayedErrors[0];
+                var error = _settings.DelayedErrors[0];
                 var errorInfo = (Model.ErrorInfo)XamlServices.Load(error);
 
                 await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
-                AppSettings.Default.DelayedErrors.RemoveAt(0);
+                _settings.DelayedErrors.RemoveAt(0);
             }
         }
         catch
@@ -224,6 +208,7 @@ public partial class App : Application
     private async void SearchForUpdatesAsync()
     {
         var close = await SearchForUpdatesNewAsync();
+
         if (close)
         {
             Shutdown();
@@ -231,12 +216,12 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Произвести поиск и установку обновлений
+    /// Searches for app updates and installs them.
     /// </summary>
-    /// <returns>Нужно ли завершить приложение для выполнения обновления</returns>
+    /// <returns>Should the app be closed for update installation.</returns>
     private async Task<bool> SearchForUpdatesNewAsync(CancellationToken cancellationToken = default)
     {
-        if (!_useAppService)
+        if (!_useAppService || _host == null)
         {
             return false;
         }
@@ -248,9 +233,9 @@ public partial class App : Application
             var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
             var product = await appService.GetProductAsync("SIQuester", cancellationToken);
 
-            if (product.Version > currentVersion)
+            if (product != null && product.Version > currentVersion)
             {
-                _logger.LogInformation(
+                _logger?.LogInformation(
                     "Update detected. Current version: {currentVersion}. Product version: {productVersion}. Product uri: {productUri}",
                     currentVersion,
                     product.Version,
@@ -273,7 +258,7 @@ public partial class App : Application
                 }
                 catch (Win32Exception)
                 {
-                    Thread.Sleep(10000); // Иногда проверяется антивирусом и не сразу запускается
+                    Thread.Sleep(10000); // Sometimes setup file is checked by antivirus and could not be run immediately
                     Process.Start(localFile);
                 }
 
@@ -436,7 +421,7 @@ public partial class App : Application
 
     private async Task SendMessageAsync(Model.ErrorInfo errorInfo)
     {
-        if (!_useAppService)
+        if (!_useAppService || _host == null)
         {
             return;
         }
@@ -488,9 +473,9 @@ public partial class App : Application
         {
             _logger?.LogInformation("OnExit");
 
-            if (AppSettings.Default != null)
+            if (_settings != null && _settings.HasChanges)
             {
-                SaveUserSettings(AppSettings.Default);
+                SettingsHelper.SaveUserSettings(_settings);
             }
 
             _manager.Dispose();
@@ -505,94 +490,5 @@ public partial class App : Application
         }
 
         base.OnExit(e);
-    }
-
-    /// <summary>
-    /// Загрузить пользовательские настройки
-    /// </summary>
-    public static AppSettings LoadSettings()
-    {
-        try
-        {
-            using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-
-            if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
-            {
-                try
-                {
-                    using var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return AppSettings.Load(stream);
-                }
-                catch { }
-                finally
-                {
-                    Monitor.Exit(ConfigFileName);
-                }
-            }
-        }
-        catch { }
-
-        return new AppSettings();
-    }
-
-    /// <summary>
-    /// Loads user settings.
-    /// </summary>
-    public static AppSettings? LoadUserSettings()
-    {
-        try
-        {
-            var settingsFile = Path.Combine(SettingsFolder, UserSettingsFileName);
-
-            if (File.Exists(settingsFile) && Monitor.TryEnter(UserSettingsFileName, 2000))
-            {
-                try
-                {
-                    using var stream = File.Open(settingsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return JsonSerializer.Deserialize<AppSettings>(stream);
-                }
-                catch { }
-                finally
-                {
-                    Monitor.Exit(UserSettingsFileName);
-                }
-            }
-        }
-        catch { }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Saves user settings.
-    /// </summary>
-    internal static void SaveUserSettings(AppSettings settings)
-    {
-        try
-        {
-            Directory.CreateDirectory(SettingsFolder);
-            var settingsFile = Path.Combine(SettingsFolder, UserSettingsFileName);
-
-            if (Monitor.TryEnter(UserSettingsFileName, 2000))
-            {
-                try
-                {
-                    using var stream = File.Create(settingsFile);
-                    JsonSerializer.Serialize(stream, settings);
-                }
-                finally
-                {
-                    Monitor.Exit(UserSettingsFileName);
-                }
-            }
-        }
-        catch (Exception exc)
-        {
-            MessageBox.Show(
-                $"{SIQuester.Properties.Resources.SettingsSavingError}: {exc.Message}",
-                AppSettings.ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Exclamation);
-        }
     }
 }

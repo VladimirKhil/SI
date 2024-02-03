@@ -6,7 +6,7 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
 	<Company>Khil-soft</Company>
-	<Copyright>Copyright © Khil-soft 2022 - 2023</Copyright>
+	<Copyright>Copyright © Khil-soft 2022 - 2024</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugType>none</DebugType>

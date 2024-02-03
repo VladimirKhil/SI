@@ -50,6 +50,8 @@ public abstract class PlatformManager
 
     public abstract string? AskText(string title, bool multiline = false);
 
+    public abstract string[]? AskTags(string[] possibleTags);
+
     public abstract IFlowDocumentWrapper BuildDocument(SIDocument doc, ExportFormats format);
 
     public abstract void ExportTable(SIDocument doc, string filename);
