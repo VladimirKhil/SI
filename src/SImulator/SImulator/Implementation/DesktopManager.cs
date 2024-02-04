@@ -188,6 +188,7 @@ internal sealed class DesktopManager : PlatformManager
         {
             var storage = ServiceProvider.GetRequiredService<StorageViewModel>();
             storage.DefaultRestriction = ((App)Application.Current).Settings.Restriction;
+            storage.DefaultLanguage = "ru-RU";
 
             storage.PropertyChanged += (s, e) =>
             {
