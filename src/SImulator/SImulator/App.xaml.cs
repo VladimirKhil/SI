@@ -7,7 +7,6 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using SImulator.Implementation;
 using SImulator.ViewModel;
-using SImulator.ViewModel.Model;
 using SIStorage.Service.Client;
 using SIStorage.Service.Contract.Models;
 using SIStorageService.ViewModel;
@@ -286,7 +285,7 @@ public partial class App : Application
         else if (_useAppService
             && _host != null
             && MessageBox.Show(
-                string.Format("Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Отправить информацию разработчику? (просьба также связаться с разработчиком лично, так как ряд ошибок нельзя воспроизвести)", e.Exception.Message),
+                string.Format(SImulator.Properties.Resources.ErrorSendConfirm, e.Exception.Message),
                 MainViewModel.ProductName,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -303,7 +302,7 @@ public partial class App : Application
                 {
                     case ErrorStatus.Fixed:
                         MessageBox.Show(
-                            "Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.",
+                            SImulator.Properties.Resources.ErrorFixed,
                             MainViewModel.ProductName,
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
@@ -311,7 +310,7 @@ public partial class App : Application
 
                     case ErrorStatus.CannotReproduce:
                         MessageBox.Show(
-                            "Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.",
+                            SImulator.Properties.Resources.ErrorCannotReproduce,
                             MainViewModel.ProductName,
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
@@ -321,7 +320,7 @@ public partial class App : Application
             catch (Exception)
             {
                 MessageBox.Show(
-                    "Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.",
+                    SImulator.Properties.Resources.ErrorConnectionError,
                     MainViewModel.ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

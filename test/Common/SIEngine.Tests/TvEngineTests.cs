@@ -28,7 +28,7 @@ internal sealed class TvEngineTests
             new SIEnginePlayHandlerMock(),
             new QuestionEnginePlayHandlerMock());
 
-        Assert.AreEqual(GameStage.Begin, engine.Stage);
+        Assert.That(engine.Stage, Is.EqualTo(GameStage.Begin));
 
         AssertMove(engine, GameStage.GameThemes);
         AssertMove(engine, GameStage.Round);
@@ -37,7 +37,7 @@ internal sealed class TvEngineTests
 
         engine.SelectQuestion(0, 0);
 
-        Assert.AreEqual(GameStage.Question, engine.Stage);
+        Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
 
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
@@ -46,7 +46,7 @@ internal sealed class TvEngineTests
 
         engine.SelectQuestion(0, 1);
 
-        Assert.AreEqual(GameStage.Question, engine.Stage);
+        Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
 
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
@@ -55,7 +55,7 @@ internal sealed class TvEngineTests
 
         engine.SelectQuestion(0, 2);
 
-        Assert.AreEqual(GameStage.Question, engine.Stage);
+        Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
 
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
@@ -102,6 +102,6 @@ internal sealed class TvEngineTests
     {
         engine.MoveNext();
 
-        Assert.AreEqual(stage, engine.Stage);
+        Assert.That(engine.Stage, Is.EqualTo(stage));
     }
 }

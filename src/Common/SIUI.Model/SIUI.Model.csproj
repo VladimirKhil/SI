@@ -7,7 +7,7 @@
 	<Company>Khil-soft</Company>
 	<Description>Game table model</Description>
 	<Version>7.6.0</Version>
-    <Copyright>Copyright © Khil-soft 2010 - 2023</Copyright>
+    <Copyright>Copyright © Khil-soft 2010 - 2024</Copyright>
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

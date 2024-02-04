@@ -61,16 +61,12 @@
             <my:MappedConverter x:Key="QuestionTypeConverter">
                 <my:MappedConverter.Map>
                     <my:StringDictionary>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Simple}">Простой</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Auction}">Вопрос со ставкой</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Stake}">Вопрос со ставкой</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Cat}">Вопрос с секретом</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.BagCat}">Вопрос с секретом</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Secret}">Вопрос с секретом</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.SecretPublicPrice}">Вопрос с секретом (тема и стоимость известны до передачи вопроса)</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.SecretNoQuestion}">Вопрос с секретом (деньги без вопроса)</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Sponsored}">Вопрос без риска</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.NoRisk}">Вопрос без риска</sys:String>
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.Simple}" Member="lp:Resources.QuestionTypeSimple" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.Stake}" Member="lp:Resources.QuestionTypeStake" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.Secret}" Member="lp:Resources.QuestionTypeSecret" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.SecretPublicPrice}" Member="lp:Resources.QuestionTypeSecretPublicPrice" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.SecretNoQuestion}" Member="lp:Resources.QuestionTypeSecretNoQuestion" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.NoRisk}" Member="lp:Resources.QuestionTypeNoRisk" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
             </my:MappedConverter>
@@ -78,40 +74,24 @@
             <my:MappedConverter x:Key="QuestionTypeParamNameConverter">
                 <my:MappedConverter.Map>
                     <my:StringDictionary>
-                        <sys:String x:Key="{x:Static pc:QuestionTypeParams.Cat_Cost}">Стоимость</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows}">Когда известны тема и стоимость</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self}">Можно ли отдать себе</sys:String>
-
-                        <sys:String x:Key="{x:Static pc:QuestionParameterNames.Theme}">Тема</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionParameterNames.Price}">Стоимость</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionParameterNames.SelectionMode}">Можно отдать</sys:String>
+                        <x:Static x:Key="{x:Static pc:QuestionParameterNames.Theme}" Member="lp:Resources.Theme" />
+                        <x:Static x:Key="{x:Static pc:QuestionParameterNames.Price}" Member="lp:Resources.Price" />
+                        <x:Static x:Key="{x:Static pc:QuestionParameterNames.SelectionMode}" Member="lp:Resources.SelectionMode" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
             </my:MappedConverter>
 
             <my:QuestionParameterValueConverter x:Key="QuestionParameterValueConverter" />
 
-            <my:MappedConverter x:Key="QuestionTypeParamValueConverter">
-                <my:MappedConverter.Map>
-                    <my:StringDictionary>
-                        <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self_Value_True}">Да</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self_Value_False}">Нет</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_Before}">До отдачи</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_After}">После отдачи</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_Never}">Никогда</sys:String>
-                    </my:StringDictionary>
-                </my:MappedConverter.Map>
-            </my:MappedConverter>
-
             <my:MappedConverter x:Key="PlayerButtonTypesConverter">
                 <my:MappedConverter.Map>
                     <my:StringDictionary>
-                        <sys:String x:Key="None">Не использовать</sys:String>
-                        <sys:String x:Key="External">Внешние</sys:String>
-                        <sys:String x:Key="Keyboard">Клавиатура</sys:String>
-                        <sys:String x:Key="Joystick">Джойстик</sys:String>
-                        <sys:String x:Key="Com">COM-порт</sys:String>
-                        <sys:String x:Key="Web">Веб-доступ</sys:String>
+                        <x:Static x:Key="None" Member="lp:Resources.ButtonTypesNone" />
+                        <x:Static x:Key="External" Member="lp:Resources.ButtonTypesExternal" />
+                        <x:Static x:Key="Keyboard" Member="lp:Resources.ButtonTypesKeyboard" />
+                        <x:Static x:Key="Joystick" Member="lp:Resources.ButtonTypesJoystick" />
+                        <x:Static x:Key="Com" Member="lp:Resources.ButtonTypesCom" />
+                        <x:Static x:Key="Web" Member="lp:Resources.ButtonTypesWeb" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
             </my:MappedConverter>
@@ -214,8 +194,8 @@
                     <Trigger Property="Command" Value="{x:Null}">
                         <Setter Property="IsEnabled" Value="False" />
                     </Trigger>
-                    
-                    <DataTrigger Binding="{Binding Name}" Value="Приостановить">
+
+                    <DataTrigger Binding="{Binding Name}" Value="{x:Static lp:Resources.Pause}">
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
                                 <DataTemplate>
@@ -317,7 +297,11 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock x:Name="text" Grid.Column="1" TextWrapping="Wrap">
-                                        <Run Text="{Binding Placement, Converter={StaticResource PlacementConverter}}" Foreground="Gray" /><Run Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}" Foreground="Gray" /><Run Text="{Binding Value}" />
+                                        <Run
+                                            Text="{Binding Placement, Converter={StaticResource PlacementConverter}}"
+                                            Foreground="Gray" /><Run
+                                            Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}"
+                                            Foreground="Gray" /><Run Text="{Binding Value}" />
                                     </TextBlock>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -893,7 +877,7 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="SImulator">
             <TaskbarItemInfo.ThumbButtonInfos>
-                <ThumbButtonInfo Description="Назад" Command="{Binding Game.Back}">
+                <ThumbButtonInfo Description="{x:Static lp:Resources.Back}" Command="{Binding Game.Back}">
                     <ThumbButtonInfo.ImageSource>
                         <DrawingImage>
                             <DrawingImage.Drawing>
@@ -906,7 +890,7 @@
                     </ThumbButtonInfo.ImageSource>
                 </ThumbButtonInfo>
 
-                <ThumbButtonInfo Description="Дальше" Command="{Binding Game.Next}">
+                <ThumbButtonInfo Description="{x:Static lp:Resources.Next}" Command="{Binding Game.Next}">
                     <ThumbButtonInfo.ImageSource>
                         <DrawingImage>
                             <DrawingImage.Drawing>
@@ -919,7 +903,7 @@
                     </ThumbButtonInfo.ImageSource>
                 </ThumbButtonInfo>
 
-                <ThumbButtonInfo Description="Завершить" Command="{Binding Game.Stop}">
+                <ThumbButtonInfo Description="{x:Static lp:Resources.Stop}" Command="{Binding Game.Stop}">
                     <ThumbButtonInfo.ImageSource>
                         <DrawingImage>
                             <DrawingImage.Drawing>
@@ -1458,29 +1442,29 @@
                 </UniformGrid>
                 
                 <Expander
-                    Header="Псевдонимы спецвопросов"
+                    Header="{x:Static lp:Resources.SpecialQuestionsAliases}"
                     IsExpanded="False"
                     DataContext="{Binding SettingsViewModel.Model}"
                     IsEnabled="{Binding PlaySpecials}">
                     <Grid Margin="3" Background="LightGray">
                         <UniformGrid Columns="2" Margin="3">
-                            <TextBlock FontWeight="Bold">Название</TextBlock>
-                            <TextBlock FontWeight="Bold">Псевдоним</TextBlock>
-                            <TextBlock>Вопрос со ставкой</TextBlock>
+                            <TextBlock FontWeight="Bold" Text="{x:Static lp:Resources.Name}" />
+                            <TextBlock FontWeight="Bold" Text="{x:Static lp:Resources.Alias}" />
+                            <TextBlock Text="{x:Static lp:Resources.QuestionTypeStake}" />
 
                             <TextBox
                                 HorizontalAlignment="Stretch"
                                 Width="Auto"
                                 Text="{Binding SpecialsAliases.StakeQuestionAlias, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <TextBlock>Вопрос с секретом</TextBlock>
+                            <TextBlock Text="{x:Static lp:Resources.QuestionTypeSecret}" />
 
                             <TextBox
                                 HorizontalAlignment="Stretch"
                                 Width="Auto"
                                 Text="{Binding SpecialsAliases.SecretQuestionAlias, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <TextBlock>Вопрос без риска</TextBlock>
+                            <TextBlock Text="{x:Static lp:Resources.QuestionTypeNoRisk}" />
 
                             <TextBox
                                 HorizontalAlignment="Stretch"
@@ -1515,7 +1499,7 @@
                     Command="{Binding SettingsViewModel.Reset}"
                     CommandParameter="2"
                     IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
-                    Content="По умолчанию"
+                    Content="{x:Static lp:Resources.ByDefault}"
                     Height="25"
                     Width="120"
                     Margin="0,15,4,5"
@@ -1565,8 +1549,8 @@
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    
-                    <TextBlock Style="{StaticResource Header}">Номер COM-порта</TextBlock>
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ComPortNumber}" />
                     <ComboBox Margin="0,5" ItemsSource="{Binding ComPorts}" SelectedItem="{Binding Settings.ComPort}" />
                 </StackPanel>
                 
@@ -1592,7 +1576,11 @@
                     
                     <TextBlock FontStyle="Italic" TextWrapping="Wrap" Margin="0,0,0,6">Соответствуют позициям игроков в списке</TextBlock>
                     
-                    <ItemsControl HorizontalAlignment="Left" Margin="0,5" ItemsSource="{Binding Settings.PlayerKeys2}" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}">
+                    <ItemsControl
+                        HorizontalAlignment="Left"
+                        Margin="0,5"
+                        ItemsSource="{Binding Settings.PlayerKeys2}"
+                        IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Width="140" Margin="1">
@@ -1602,7 +1590,7 @@
                                         Width="25"
                                         Height="25"
                                         Padding="3"
-                                        ToolTip="Удалить"
+                                        ToolTip="{x:Static lp:Resources.Delete}"
                                         DockPanel.Dock="Right"
                                         Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ItemsControl,AncestorLevel=1}, Path=DataContext.DeletePlayerKey}"
                                         CommandParameter="{Binding}">

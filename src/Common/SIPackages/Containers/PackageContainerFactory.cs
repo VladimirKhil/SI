@@ -1,4 +1,6 @@
-﻿namespace SIPackages.Containers;
+﻿using ZipUtils;
+
+namespace SIPackages.Containers;
 
 /// <summary>
 /// Provides methods for creating package containers.
@@ -24,7 +26,7 @@ public static class PackageContainerFactory
     /// </summary>
     /// <param name="folder">Container folder.</param>
     /// <param name="fileNameMap">File name map.</param>
-    public static ISIPackageContainer GetPackageContainer(string folder, IReadOnlyDictionary<string, string> fileNameMap) =>
+    public static ISIPackageContainer GetPackageContainer(string folder, IReadOnlyDictionary<string, ExtractedFileInfo> fileNameMap) =>
         FolderSIPackageContainer.Open(folder, fileNameMap);
 
     /// <summary>

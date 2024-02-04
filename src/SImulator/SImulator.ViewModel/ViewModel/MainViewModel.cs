@@ -136,6 +136,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         return ports;
     }
 
+    public string[] ComPorts => _comPorts.Value;
+
     private GameViewModel? _game;
 
     public GameViewModel? Game

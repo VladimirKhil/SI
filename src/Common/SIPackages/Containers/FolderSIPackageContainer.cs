@@ -1,4 +1,5 @@
 ﻿using SIPackages.Core;
+using ZipUtils;
 
 namespace SIPackages.Containers;
 
@@ -8,12 +9,12 @@ namespace SIPackages.Containers;
 internal sealed class FolderSIPackageContainer : ISIPackageContainer
 {
     private readonly string _folder;
-    private readonly IReadOnlyDictionary<string, string> _fileNameMap;
+    private readonly IReadOnlyDictionary<string, ExtractedFileInfo> _fileNameMap;
     private readonly bool _deleteOnClose;
 
     public FolderSIPackageContainer(
         string folder,
-        IReadOnlyDictionary<string, string> fileNameMap,
+        IReadOnlyDictionary<string, ExtractedFileInfo> fileNameMap,
         bool deleteOnClose = true)
     {
         _folder = folder;
@@ -23,10 +24,10 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
 
     public ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
-    internal static ISIPackageContainer Open(string folder, IReadOnlyDictionary<string, string> fileNameMap) =>
+    internal static ISIPackageContainer Open(string folder, IReadOnlyDictionary<string, ExtractedFileInfo> fileNameMap) =>
         new FolderSIPackageContainer(folder, fileNameMap);
 
-    internal static ISIPackageContainer Create(string folder) => new FolderSIPackageContainer(folder, new Dictionary<string, string>(), false);
+    internal static ISIPackageContainer Create(string folder) => new FolderSIPackageContainer(folder, new Dictionary<string, ExtractedFileInfo>(), false);
 
     public void CreateStream(string name, string contentType)
     {
@@ -128,9 +129,9 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
     {
         if (!_fileNameMap.TryGetValue(name, out var mappedName))
         {
-            mappedName = name;
+            return name;
         }
 
-        return mappedName;
+        return mappedName.Name;
     }
 }

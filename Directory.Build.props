@@ -4,7 +4,7 @@
 		<Company>Khil-soft</Company>
 		<SIGameVersion>7.11.3</SIGameVersion>
 		<SIQuesterVersion>6.0.0</SIQuesterVersion>
-		<SImulatorVersion>2.14.0</SImulatorVersion>
+		<SImulatorVersion>2.15.0</SImulatorVersion>
 	</PropertyGroup>
 	
   <PropertyGroup>

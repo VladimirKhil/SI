@@ -25,9 +25,9 @@ public sealed class CommonTests
         await main.Start.ExecuteAsync(null);
 
         var game = main.Game;
-        Assert.NotNull(game);
+        Assert.That(game, Is.Not.Null);
 
-        game.Next.Execute(null);
+        game!.Next.Execute(null);
         game.Next.Execute(null);
         game.Next.Execute(null);
         game.Next.Execute(null);
@@ -37,7 +37,8 @@ public sealed class CommonTests
 
         game.Next.Execute(null);
 
-        Assert.AreEqual("В этой передаче гроссмейстеры «Своей игры» сражались с приглашёнными знаменитостями",
-            ((PresentationController)game.PresentationController).TInfo.Text);
+        Assert.That(
+            ((PresentationController)game.PresentationController).TInfo.Text,
+            Is.EqualTo("В этой передаче гроссмейстеры «Своей игры» сражались с приглашёнными знаменитостями"));
     }
 }

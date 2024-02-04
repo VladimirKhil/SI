@@ -129,6 +129,9 @@
   <data name="AddSumForActivePlayer" xml:space="preserve">
     <value>Добавить активному игроку</value>
   </data>
+  <data name="Alias" xml:space="preserve">
+    <value>Псевдоним</value>
+  </data>
   <data name="All" xml:space="preserve">
     <value>(все)</value>
   </data>
@@ -174,6 +177,24 @@
   <data name="Buttons" xml:space="preserve">
     <value>Кнопки</value>
   </data>
+  <data name="ButtonTypesCom" xml:space="preserve">
+    <value>COM-порт</value>
+  </data>
+  <data name="ButtonTypesExternal" xml:space="preserve">
+    <value>Внешние</value>
+  </data>
+  <data name="ButtonTypesJoystick" xml:space="preserve">
+    <value>Джойстик</value>
+  </data>
+  <data name="ButtonTypesKeyboard" xml:space="preserve">
+    <value>Клавиатура</value>
+  </data>
+  <data name="ButtonTypesNone" xml:space="preserve">
+    <value>Не использовать</value>
+  </data>
+  <data name="ButtonTypesWeb" xml:space="preserve">
+    <value>Веб-доступ</value>
+  </data>
   <data name="ByDefault" xml:space="preserve">
     <value>По умолчанию</value>
   </data>
@@ -195,6 +216,12 @@
   <data name="ComponentsLicenses" xml:space="preserve">
     <value>Лицензии используемых компонентов</value>
   </data>
+  <data name="ComPortNumber" xml:space="preserve">
+    <value>Номер COM-порта</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
   <data name="Design" xml:space="preserve">
     <value>Внешний вид</value>
   </data>
@@ -209,6 +236,20 @@
   </data>
   <data name="EndQuestionOnRightAnswer" xml:space="preserve">
     <value>Завершать вопрос при правильном ответе</value>
+  </data>
+  <data name="ErrorCannotReproduce" xml:space="preserve">
+    <value>Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста</value>
+  </data>
+  <data name="ErrorConnectionError" xml:space="preserve">
+    <value>Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее</value>
+  </data>
+  <data name="ErrorFixed" xml:space="preserve">
+    <value>Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста</value>
+  </data>
+  <data name="ErrorSendConfirm" xml:space="preserve">
+    <value>Произошла ошибка в приложении: {0}
+
+Приложение будет закрыто. Отправить информацию разработчику?</value>
   </data>
   <data name="FalseStartGame" xml:space="preserve">
     <value>Игра с фальстартами</value>
@@ -310,6 +351,9 @@
   <data name="MakeStake" xml:space="preserve">
     <value>Сделать ставку</value>
   </data>
+  <data name="Name" xml:space="preserve">
+    <value>Название</value>
+  </data>
   <data name="NavigateToSiteError" xml:space="preserve">
     <value>Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}</value>
   </data>
@@ -330,6 +374,9 @@
   </data>
   <data name="Pass" xml:space="preserve">
     <value>Пас</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Приостановить</value>
   </data>
   <data name="PlacementBackground" xml:space="preserve">
     <value>Фон</value>
@@ -364,6 +411,9 @@
   <data name="PreviousRound" xml:space="preserve">
     <value>Предыдущий раунд</value>
   </data>
+  <data name="Price" xml:space="preserve">
+    <value>Стоимость</value>
+  </data>
   <data name="PriceFromToStep" xml:space="preserve">
     <value>От {0} до {1} с шагом {2}</value>
   </data>
@@ -384,6 +434,24 @@
   </data>
   <data name="QuestionTime" xml:space="preserve">
     <value>Время вопроса (c)</value>
+  </data>
+  <data name="QuestionTypeNoRisk" xml:space="preserve">
+    <value>Вопрос без риска</value>
+  </data>
+  <data name="QuestionTypeSecret" xml:space="preserve">
+    <value>Вопрос с секретом</value>
+  </data>
+  <data name="QuestionTypeSecretNoQuestion" xml:space="preserve">
+    <value>Вопрос с секретом (деньги без вопроса)</value>
+  </data>
+  <data name="QuestionTypeSecretPublicPrice" xml:space="preserve">
+    <value>Вопрос с секретом (тема и стоимость известны до передачи вопроса)</value>
+  </data>
+  <data name="QuestionTypeSimple" xml:space="preserve">
+    <value>Простой</value>
+  </data>
+  <data name="QuestionTypeStake" xml:space="preserve">
+    <value>Вопрос со ставкой</value>
   </data>
   <data name="RecentFiles" xml:space="preserve">
     <value>Последние файлы</value>
@@ -426,6 +494,9 @@
   </data>
   <data name="SelectHeader" xml:space="preserve">
     <value>Выбрать…</value>
+  </data>
+  <data name="SelectionMode" xml:space="preserve">
+    <value>Можно отдать</value>
   </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>Библиотека вопросов…</value>
@@ -472,6 +543,9 @@
   <data name="Source" xml:space="preserve">
     <value>Источник</value>
   </data>
+  <data name="SpecialQuestionsAliases" xml:space="preserve">
+    <value>Псевдонимы спецвопросов</value>
+  </data>
   <data name="SpecialThinkingTime" xml:space="preserve">
     <value>Время на размышление над спецвопросом (с)</value>
   </data>
@@ -483,6 +557,9 @@
   </data>
   <data name="StartGame" xml:space="preserve">
     <value>Начать игру</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Завершить</value>
   </data>
   <data name="StopGame" xml:space="preserve">
     <value>Завершить игру</value>
@@ -504,6 +581,9 @@
   </data>
   <data name="TextColor" xml:space="preserve">
     <value>Цвет текста</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Тема</value>
   </data>
   <data name="ThemeComments" xml:space="preserve">
     <value>Комментарии темы</value>

@@ -97,6 +97,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Псевдоним.
+        /// </summary>
+        public static string Alias {
+            get {
+                return ResourceManager.GetString("Alias", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на (все).
         /// </summary>
         public static string All {
@@ -232,6 +241,60 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на COM-порт.
+        /// </summary>
+        public static string ButtonTypesCom {
+            get {
+                return ResourceManager.GetString("ButtonTypesCom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Внешние.
+        /// </summary>
+        public static string ButtonTypesExternal {
+            get {
+                return ResourceManager.GetString("ButtonTypesExternal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Джойстик.
+        /// </summary>
+        public static string ButtonTypesJoystick {
+            get {
+                return ResourceManager.GetString("ButtonTypesJoystick", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Клавиатура.
+        /// </summary>
+        public static string ButtonTypesKeyboard {
+            get {
+                return ResourceManager.GetString("ButtonTypesKeyboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не использовать.
+        /// </summary>
+        public static string ButtonTypesNone {
+            get {
+                return ResourceManager.GetString("ButtonTypesNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Веб-доступ.
+        /// </summary>
+        public static string ButtonTypesWeb {
+            get {
+                return ResourceManager.GetString("ButtonTypesWeb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на По умолчанию.
         /// </summary>
         public static string ByDefault {
@@ -295,6 +358,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Номер COM-порта.
+        /// </summary>
+        public static string ComPortNumber {
+            get {
+                return ResourceManager.GetString("ComPortNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Удалить.
+        /// </summary>
+        public static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Внешний вид.
         /// </summary>
         public static string Design {
@@ -336,6 +417,44 @@ namespace SImulator.Properties {
         public static string EndQuestionOnRightAnswer {
             get {
                 return ResourceManager.GetString("EndQuestionOnRightAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.
+        /// </summary>
+        public static string ErrorCannotReproduce {
+            get {
+                return ResourceManager.GetString("ErrorCannotReproduce", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.
+        /// </summary>
+        public static string ErrorConnectionError {
+            get {
+                return ResourceManager.GetString("ErrorConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.
+        /// </summary>
+        public static string ErrorFixed {
+            get {
+                return ResourceManager.GetString("ErrorFixed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Произошла ошибка в приложении: {0}
+        ///
+        ///Приложение будет закрыто. Отправить информацию разработчику?.
+        /// </summary>
+        public static string ErrorSendConfirm {
+            get {
+                return ResourceManager.GetString("ErrorSendConfirm", resourceCulture);
             }
         }
         
@@ -618,6 +737,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Название.
+        /// </summary>
+        public static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}.
         /// </summary>
         public static string NavigateToSiteError {
@@ -677,6 +805,15 @@ namespace SImulator.Properties {
         public static string Pass {
             get {
                 return ResourceManager.GetString("Pass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Приостановить.
+        /// </summary>
+        public static string Pause {
+            get {
+                return ResourceManager.GetString("Pause", resourceCulture);
             }
         }
         
@@ -780,6 +917,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Стоимость.
+        /// </summary>
+        public static string Price {
+            get {
+                return ResourceManager.GetString("Price", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на От {0} до {1} с шагом {2}.
         /// </summary>
         public static string PriceFromToStep {
@@ -839,6 +985,60 @@ namespace SImulator.Properties {
         public static string QuestionTime {
             get {
                 return ResourceManager.GetString("QuestionTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос без риска.
+        /// </summary>
+        public static string QuestionTypeNoRisk {
+            get {
+                return ResourceManager.GetString("QuestionTypeNoRisk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос с секретом.
+        /// </summary>
+        public static string QuestionTypeSecret {
+            get {
+                return ResourceManager.GetString("QuestionTypeSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос с секретом (деньги без вопроса).
+        /// </summary>
+        public static string QuestionTypeSecretNoQuestion {
+            get {
+                return ResourceManager.GetString("QuestionTypeSecretNoQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос с секретом (тема и стоимость известны до передачи вопроса).
+        /// </summary>
+        public static string QuestionTypeSecretPublicPrice {
+            get {
+                return ResourceManager.GetString("QuestionTypeSecretPublicPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Простой.
+        /// </summary>
+        public static string QuestionTypeSimple {
+            get {
+                return ResourceManager.GetString("QuestionTypeSimple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос со ставкой.
+        /// </summary>
+        public static string QuestionTypeStake {
+            get {
+                return ResourceManager.GetString("QuestionTypeStake", resourceCulture);
             }
         }
         
@@ -965,6 +1165,15 @@ namespace SImulator.Properties {
         public static string SelectHeader {
             get {
                 return ResourceManager.GetString("SelectHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Можно отдать.
+        /// </summary>
+        public static string SelectionMode {
+            get {
+                return ResourceManager.GetString("SelectionMode", resourceCulture);
             }
         }
         
@@ -1104,6 +1313,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Псевдонимы спецвопросов.
+        /// </summary>
+        public static string SpecialQuestionsAliases {
+            get {
+                return ResourceManager.GetString("SpecialQuestionsAliases", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Время на размышление над спецвопросом (с).
         /// </summary>
         public static string SpecialThinkingTime {
@@ -1136,6 +1354,15 @@ namespace SImulator.Properties {
         public static string StartGame {
             get {
                 return ResourceManager.GetString("StartGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Завершить.
+        /// </summary>
+        public static string Stop {
+            get {
+                return ResourceManager.GetString("Stop", resourceCulture);
             }
         }
         
@@ -1199,6 +1426,15 @@ namespace SImulator.Properties {
         public static string TextColor {
             get {
                 return ResourceManager.GetString("TextColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Тема.
+        /// </summary>
+        public static string Theme {
+            get {
+                return ResourceManager.GetString("Theme", resourceCulture);
             }
         }
         

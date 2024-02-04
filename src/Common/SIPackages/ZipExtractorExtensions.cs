@@ -15,7 +15,7 @@ internal static class PackageExtractor
     /// <param name="maxAllowedDataLength">Maximum allowed length of extracted data in archive.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Map of archive file names to extracted file names.</returns>
-    internal static Task<IReadOnlyDictionary<string, string>> ExtractPackageToFolderAsync(
+    internal static Task<IReadOnlyDictionary<string, ExtractedFileInfo>> ExtractPackageToFolderAsync(
         string sourceArchiveFilePath,
         string destinationFolderPath,
         long maxAllowedDataLength = long.MaxValue,

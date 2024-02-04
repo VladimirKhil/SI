@@ -1911,7 +1911,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return false;
         }
 
-        // It is no pressing time
+        // It is not pressing time
         if (_state != QuestionState.Pressing)
         {
             player.BlockedTime = DateTime.Now;
@@ -1962,7 +1962,21 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ThinkingTimeMax = Settings.Model.ThinkingTime2;
         RunThinkingTimer_Executed(0);
 
+        BlockNextButtonForAWhile();
+
         return true;
+    }
+
+    private async void BlockNextButtonForAWhile()
+    {
+        if (!_next.CanBeExecuted)
+        {
+            return;
+        }
+
+        _next.CanBeExecuted = false;
+        await Task.Delay(500);
+        UpdateNextCommand();
     }
 
     private void UnselectPlayer()

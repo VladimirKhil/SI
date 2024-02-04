@@ -6,6 +6,7 @@ using SIPackages.Models;
 using SIPackages.Properties;
 using System.Diagnostics;
 using System.Xml;
+using ZipUtils;
 
 namespace SIPackages;
 
@@ -192,7 +193,7 @@ public sealed class SIDocument : IDisposable
     /// <param name="read">Should the document be read-only.</param>
     [Obsolete("Use ExtractToFolderAndLoadAsync")]
     public static SIDocument Load(string folder, bool read = true) =>
-        Load(PackageContainerFactory.GetPackageContainer(folder, new Dictionary<string, string>()));
+        Load(PackageContainerFactory.GetPackageContainer(folder, new Dictionary<string, ExtractedFileInfo>()));
 
     /// <summary>
     /// Extracts document to folder and load from it.

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="siq" targetNamespace="https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd" elementFormDefault="qualified" xmlns="https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd" xmlns:mstns="http://vladimirkhil.com/siq_5.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema id="siq" targetNamespace="https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd" elementFormDefault="qualified" xmlns="https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd" xmlns:mstns="https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xs:element name="package">
 		<xs:annotation>
 			<xs:documentation>SIGame question package (version 5)</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:sequence>
+			<xs:all>
 				<xs:element name="tags" minOccurs="0" maxOccurs="1">
 					<xs:complexType>
 						<xs:sequence>
@@ -27,10 +27,10 @@
 						<xs:documentation>Global package info</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
-						<xs:sequence>
+						<xs:all>
 							<xs:element name="Authors" minOccurs="1" maxOccurs="1">
 								<xs:complexType>
-									<xs:sequence>
+									<xs:all>
 										<xs:element name="Name" type="xs:string" minOccurs="1" maxOccurs="1">
 											<xs:annotation>
 												<xs:documentation>Author's name</xs:documentation>
@@ -56,7 +56,7 @@
 												<xs:documentation>Author's city</xs:documentation>
 											</xs:annotation>
 										</xs:element>
-									</xs:sequence>
+									</xs:all>
 									<xs:attribute name="id" type="xs:string" use="required">
 										<xs:annotation>
 											<xs:documentation>Unique author identifier</xs:documentation>
@@ -66,7 +66,7 @@
 							</xs:element>
 							<xs:element name="Sources" minOccurs="1" maxOccurs="1">
 								<xs:complexType>
-									<xs:sequence>
+									<xs:all>
 										<xs:element name="Author" type="xs:string" minOccurs="1" maxOccurs="1">
 											<xs:annotation>
 												<xs:documentation>Source's authos</xs:documentation>
@@ -92,7 +92,7 @@
 												<xs:documentation>Source's publish city</xs:documentation>
 											</xs:annotation>
 										</xs:element>
-									</xs:sequence>
+									</xs:all>
 									<xs:attribute name="id" type="xs:string" use="required">
 										<xs:annotation>
 											<xs:documentation>Unique source identifier</xs:documentation>
@@ -100,10 +100,10 @@
 									</xs:attribute>
 								</xs:complexType>
 							</xs:element>
-						</xs:sequence>
+						</xs:all>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="rounds" minOccurs="1" maxOccurs="1">
+				<xs:element name="rounds" minOccurs="0" maxOccurs="1">
 					<xs:annotation>
 						<xs:documentation>Rounds</xs:documentation>
 					</xs:annotation>
@@ -114,13 +114,13 @@
 									<xs:documentation>Round</xs:documentation>
 								</xs:annotation>
 								<xs:complexType>
-									<xs:sequence>
+									<xs:all>
 										<xs:element name="info" type="infoType" minOccurs="0" maxOccurs="1">
 											<xs:annotation>
 												<xs:documentation>Round info</xs:documentation>
 											</xs:annotation>
 										</xs:element>
-										<xs:element name="themes" minOccurs="1" maxOccurs="1">
+										<xs:element name="themes" minOccurs="0" maxOccurs="1">
 											<xs:annotation>
 												<xs:documentation>Themes</xs:documentation>
 											</xs:annotation>
@@ -131,13 +131,13 @@
 															<xs:documentation>Theme</xs:documentation>
 														</xs:annotation>
 														<xs:complexType>
-															<xs:sequence>
+															<xs:all>
 																<xs:element name="info" type="infoType" minOccurs="0" maxOccurs="1">
 																	<xs:annotation>
 																		<xs:documentation>Theme info</xs:documentation>
 																	</xs:annotation>
 																</xs:element>
-																<xs:element name="questions" minOccurs="1" maxOccurs="1">
+																<xs:element name="questions" minOccurs="0" maxOccurs="1">
 																	<xs:annotation>
 																		<xs:documentation>Questions</xs:documentation>
 																	</xs:annotation>
@@ -148,7 +148,7 @@
 																					<xs:documentation>Question</xs:documentation>
 																				</xs:annotation>
 																				<xs:complexType>
-																					<xs:sequence>
+																					<xs:all>
 																						<xs:element name="info" type="infoType" minOccurs="0" maxOccurs="1">
 																							<xs:annotation>
 																								<xs:documentation>Question info</xs:documentation>
@@ -275,7 +275,7 @@
 																							</xs:annotation>
 																							<xs:complexType>
 																								<xs:sequence>
-																									<xs:element name="answer" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+																									<xs:element name="answer" type="xs:string" minOccurs="0" maxOccurs="unbounded">
 																										<xs:annotation>
 																											<xs:documentation>Answer</xs:documentation>
 																										</xs:annotation>
@@ -297,7 +297,7 @@
 																								</xs:sequence>
 																							</xs:complexType>
 																						</xs:element>
-																					</xs:sequence>
+																					</xs:all>
 																					<xs:attribute name="price" type="xs:int" use="required">
 																						<xs:annotation>
 																							<xs:documentation>Question price</xs:documentation>
@@ -313,7 +313,7 @@
 																		</xs:sequence>
 																	</xs:complexType>
 																</xs:element>
-															</xs:sequence>
+															</xs:all>
 															<xs:attribute name="name" type="xs:string" use="required">
 																<xs:annotation>
 																	<xs:documentation>Theme name</xs:documentation>
@@ -324,7 +324,7 @@
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
-									</xs:sequence>
+									</xs:all>
 									<xs:attribute name="name" type="xs:string" use="required">
 										<xs:annotation>
 											<xs:documentation>Round name</xs:documentation>
@@ -340,7 +340,7 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-			</xs:sequence>
+			</xs:all>
 			<xs:attribute name="id" type="xs:string" use="optional">
 				<xs:annotation>
 					<xs:documentation>Unique package identifier</xs:documentation>
@@ -388,6 +388,11 @@
 					<xs:documentation>Package language</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name="generator" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>The tool package was created with</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 			<xs:attribute name="contactUri" type="xs:string" use="optional">
 				<xs:annotation>
 					<xs:documentation>Author contact URI</xs:documentation>
@@ -409,7 +414,7 @@
 									<xs:documentation>Content item type</xs:documentation>
 								</xs:annotation>
 							</xs:attribute>
-							<xs:attribute name="isRef" type="xs:boolean" use="optional">
+							<xs:attribute name="isRef" type="xs:string" use="optional">
 								<xs:annotation>
 									<xs:documentation>Content item reference to resource marker</xs:documentation>
 								</xs:annotation>
@@ -419,12 +424,17 @@
 									<xs:documentation>Content item placement</xs:documentation>
 								</xs:annotation>
 							</xs:attribute>
-							<xs:attribute name="duration" type="xs:duration" use="optional">
+							<xs:attribute name="duration" use="optional">
 								<xs:annotation>
 									<xs:documentation>Content item duration</xs:documentation>
 								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:pattern value="\d{2}:\d{2}:\d{2}"/>
+									</xs:restriction>
+								</xs:simpleType>
 							</xs:attribute>
-							<xs:attribute name="waitForFinish" type="xs:boolean" use="optional">
+							<xs:attribute name="waitForFinish" type="xs:string" use="optional">
 								<xs:annotation>
 									<xs:documentation>Content item wait for finish marker</xs:documentation>
 								</xs:annotation>
@@ -486,7 +496,7 @@
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="infoType">
-		<xs:sequence>
+		<xs:all>
 			<xs:element name="authors" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Authors</xs:documentation>
@@ -530,6 +540,6 @@
 					<xs:documentation>Item information extension</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-		</xs:sequence>
+		</xs:all>
 	</xs:complexType>
 </xs:schema>

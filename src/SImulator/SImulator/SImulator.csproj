@@ -5,7 +5,7 @@
     <AssemblyTitle>SImulator</AssemblyTitle>
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
-    <Copyright>Copyright © Khil-soft 2010 - 2023</Copyright>
+    <Copyright>Copyright © Khil-soft 2010 - 2024</Copyright>
     <Version>$(SImulatorVersion)</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
