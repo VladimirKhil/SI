@@ -9,14 +9,23 @@
     mc:Ignorable="d" 
     d:DesignHeight="250"
     d:DesignWidth="200"
-    MaxWidth="700"
-    MaxHeight="1000"
+    MinWidth="500"
+    MaxWidth="900"
+    MinHeight="400"
+    MaxHeight="700"
     SizeToContent="WidthAndHeight"
     WindowStartupLocation="CenterOwner"
-    ResizeMode="NoResize"
+    ResizeMode="CanResize"
     Title="{x:Static lp:Resources.SetTags}"
     d:DataContext="{d:DesignInstance lvm:SelectTagsViewModel}">
-    <StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
         <ScrollViewer Margin="1">
             <ItemsControl ItemsSource="{Binding Tags}">
                 <ItemsControl.ItemsPanel>
@@ -43,6 +52,7 @@
         <ToggleButton
             IsChecked="{Binding CommonTag.IsSelected}"
             Content="{Binding CommonTag.Name}"
+            Grid.Row="1"
             Margin="5,15,5,5"
             Padding="4,10"
             Width="200"
@@ -50,7 +60,17 @@
             HorizontalAlignment="Center"
             Cursor="Hand" />
 
-        <TextBlock Text="{x:Static lp:Resources.CustomTagsHint}" HorizontalAlignment="Center" Margin="10" />
-        <Button Name="ok" Click="Button_Click" Content="OK" Margin="5" Width="200" Padding="60,6" HorizontalAlignment="Right" IsDefault="True" />
-    </StackPanel>
+        <TextBlock Grid.Row="2" Text="{x:Static lp:Resources.CustomTagsHint}" HorizontalAlignment="Center" Margin="10" />
+        
+        <Button
+            Grid.Row="3"
+            Name="ok"
+            Click="Button_Click"
+            Content="OK"
+            Margin="5"
+            Width="200"
+            Padding="60,6"
+            HorizontalAlignment="Right"
+            IsDefault="True" />
+    </Grid>
 </Window>

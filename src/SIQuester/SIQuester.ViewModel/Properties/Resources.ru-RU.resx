@@ -693,4 +693,19 @@ theme - тема Кота</value>
   <data name="CommonTag" xml:space="preserve">
     <value>Общие знания (солянка)</value>
   </data>
+  <data name="DefaultTags" xml:space="preserve">
+    <value>Астрономия
+Биология
+География
+Игры
+Искусство
+История
+Литература
+Мемы
+Математика
+ТВ
+Физика
+Химия
+Эрудиция</value>
+  </data>
 </root>

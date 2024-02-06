@@ -268,6 +268,27 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Art
+        ///Astronomy
+        ///Biology
+        ///Chemistry
+        ///Erudition
+        ///Games
+        ///Geography
+        ///History
+        ///Literature
+        ///Mathematics
+        ///Memes
+        ///Physics
+        ///TV.
+        /// </summary>
+        public static string DefaultTags {
+            get {
+                return ResourceManager.GetString("DefaultTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Document loading.
         /// </summary>
         public static string DocumentLoading {

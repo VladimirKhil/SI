@@ -186,6 +186,21 @@
   <data name="DBStorageComment" xml:space="preserve">
     <value>The package is stored in the Database {0} under the name {1}</value>
   </data>
+  <data name="DefaultTags" xml:space="preserve">
+    <value>Art
+Astronomy
+Biology
+Chemistry
+Erudition
+Games
+Geography
+History
+Literature
+Mathematics
+Memes
+Physics
+TV</value>
+  </data>
   <data name="DocumentLoading" xml:space="preserve">
     <value>Document loading</value>
   </data>
