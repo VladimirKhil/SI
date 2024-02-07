@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Helpers;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -23,6 +24,10 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
 
     public SimpleCommand DeleteItem { get; private set; }
 
+    public SimpleCommand MakeRight { get; private set; }
+
+    public QuestionViewModel Owner => _question;
+
     public StepParametersViewModel(QuestionViewModel question, StepParameters parameters)
     {
         _question = question;
@@ -39,6 +44,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
 
         AddItem = new SimpleCommand(AddItem_Executed);
         DeleteItem = new SimpleCommand(DeleteItem_Executed);
+        MakeRight = new SimpleCommand(MakeRight_Executed);
 
         UpdateCommands();
 
@@ -99,7 +105,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
         }
 
         var counter = Count;
-        var label = GetIndexLabel(counter);
+        var label = IndexLabelHelper.GetIndexLabel(counter);
 
         var stepParameter = new StepParameter
         {
@@ -130,11 +136,30 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
 
         for (int i = 0; i < Count; i++)
         {
-            this[i] = new StepParameterRecord(GetIndexLabel(i), this[i].Value);
+            this[i] = new StepParameterRecord(IndexLabelHelper.GetIndexLabel(i), this[i].Value);
         }
 
         UpdateCommands();
         change.Commit();
+    }
+
+    private void MakeRight_Executed(object? arg)
+    {
+        var item = (StepParameterRecord?)arg;
+
+        if (!item.HasValue || _question.OwnerTheme?.OwnerRound?.OwnerPackage == null)
+        {
+            return;
+        }
+
+        if (_question.Right.Count == 0)
+        {
+            _question.Right.Add(item.Value.Key);
+        }
+        else
+        {
+            _question.Right[0] = item.Value.Key;
+        }
     }
 
     private void StepParametersViewModel_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -220,8 +245,6 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
         parameter = null;
         return false;
     }
-
-    private static string GetIndexLabel(int index) => index < 26 ? ((char)('A' + index)).ToString() : 'A' + (index - 25).ToString();
 }
 
 public record struct StepParameterRecord(string Key, StepParameterViewModel Value);

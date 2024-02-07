@@ -1364,6 +1364,10 @@
                                                                         <Setter Property="ToolTip" Value="{x:Static lp:Resources.RemoveComplexAnswer}" />
                                                                         <Setter Property="Content" Value="{StaticResource RemoveMarkerImage}" />
                                                                     </MultiDataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding AnswerType}" Value="select">
+                                                                        <Setter Property="IsEnabled" Value="False" />
+                                                                    </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </Button.Style>
@@ -3410,15 +3414,14 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel Background="Transparent">
-                                        <Border
-                                            x:Name="delete"
-                                            Margin="0,2,0,0"
-                                            Visibility="Hidden">
+                                        <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
                                             <Button
+                                                x:Name="bDelete"
                                                 Command="{Binding DataContext.GroupValue.DeleteItem, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip="{x:Static lp:Resources.Delete}"
-                                                VerticalAlignment="Center">
+                                                VerticalAlignment="Center"
+                                                Visibility="Hidden">
                                                 <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="1" Data="M0,0L9,9M0,9L9,0" />
 
                                                 <Button.Style>
@@ -3431,7 +3434,28 @@
                                                     </Style>
                                                 </Button.Style>
                                             </Button>
-                                        </Border>
+
+                                            <Button
+                                                x:Name="bSetRight"
+                                                Command="{Binding DataContext.GroupValue.MakeRight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="{x:Static lp:Resources.MakeRight}"
+                                                Margin="2,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Visibility="Hidden">
+                                                <Image Source="{StaticResource AnswerTypeImage}" Width="14" Height="14" />
+
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter Property="ToolTip" Value="" />
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </StackPanel>
 
                                         <TextBlock
                                             x:Name="name"
@@ -3460,12 +3484,28 @@
 
                                     <DataTemplate.Triggers>
                                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                            <Setter TargetName="delete" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="bDelete" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
                                         </Trigger>
                                         
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="delete" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="bDelete" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
                                         </Trigger>
+
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource EqualsMultiConverter}">
+                                                    <MultiBinding.Bindings>
+                                                        <Binding Path="Key" />
+                                                        <Binding Path="DataContext.GroupValue.Owner.Right[0]" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                    </MultiBinding.Bindings>
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+
+                                            <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="bSetRight" Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -3733,6 +3773,7 @@
                         Text="(" Style="{StaticResource BlockStyleKey}"/>
                     
                     <StackPanel
+                        x:Name="answers"
                         MaxWidth="400"
                         Grid.Row="1"
                         Grid.Column="4"
@@ -3779,6 +3820,12 @@
                     
                     <DataTrigger Binding="{Binding IsDragged}" Value="True">
                         <Setter Property="Opacity" Value="0.2" />
+                    </DataTrigger>
+
+                    <DataTrigger Binding="{Binding AnswerType}" Value="select">
+                        <Setter TargetName="open" Property="Visibility" Value="Collapsed" />
+                        <Setter TargetName="answers" Property="Visibility" Value="Collapsed" />
+                        <Setter TargetName="close" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                 </HierarchicalDataTemplate.Triggers>
             </HierarchicalDataTemplate>

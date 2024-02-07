@@ -649,6 +649,9 @@
   <data name="MakeNonEmpty" xml:space="preserve">
     <value>Make non-empty</value>
   </data>
+  <data name="MakeRight" xml:space="preserve">
+    <value>Set as right answer</value>
+  </data>
   <data name="MircScript" xml:space="preserve">
     <value>mIRC Script</value>
   </data>

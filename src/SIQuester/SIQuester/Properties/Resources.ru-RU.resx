@@ -645,6 +645,9 @@
   <data name="MakeNonEmpty" xml:space="preserve">
     <value>Сделать непустым</value>
   </data>
+  <data name="MakeRight" xml:space="preserve">
+    <value>Задать как правильный ответ</value>
+  </data>
   <data name="MircScript" xml:space="preserve">
     <value>Скрипт mIRC</value>
   </data>

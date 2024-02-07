@@ -1655,6 +1655,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Set as right answer.
+        /// </summary>
+        public static string MakeRight {
+            get {
+                return ResourceManager.GetString("MakeRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на mIRC Script.
         /// </summary>
         public static string MircScript {

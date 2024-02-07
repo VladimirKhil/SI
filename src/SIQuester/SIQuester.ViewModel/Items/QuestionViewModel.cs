@@ -264,66 +264,85 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     private void SetAnswerType_Executed(object? arg)
     {
-        if (Parameters == null || arg == null)
+        try
         {
-            return;
-        }
-
-        var answerType = (string)arg;
-
-        if (answerType == StepParameterValues.SetAnswerTypeType_Text)
-        {
-            // Default value; remove parameter
-            Parameters.RemoveParameter(QuestionParameterNames.AnswerType);
-            Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
-            OnPropertyChanged(nameof(AnswerType));
-            return;
-        }
-
-        if (!Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter))
-        {
-            answerTypeParameter = new StepParameterViewModel(this, new StepParameter
+            var document = OwnerTheme?.OwnerRound?.OwnerPackage?.Document ?? throw new InvalidOperationException("document is undefined");
+            
+            if (Parameters == null || arg == null)
             {
-                Type = StepParameterTypes.Simple,
-                SimpleValue = answerType
-            });
+                return;
+            }
 
-            Parameters.AddParameter(QuestionParameterNames.AnswerType, answerTypeParameter);
-        }
-        else
-        {
-            answerTypeParameter.Model.SimpleValue = answerType;
-        }
+            var answerType = (string)arg;
 
-        if (answerType == StepParameterValues.SetAnswerTypeType_Select)
-        {
-            var options = new StepParameter
+            if (answerType == StepParameterValues.SetAnswerTypeType_Text)
             {
-                Type = StepParameterTypes.Group,
-                GroupValue = new StepParameters()
-            };
+                // Default value; remove parameter
+                using var innerChange = document.OperationsManager.BeginComplexChange();
 
-            static StepParameter answerOptionGenerator() => new()
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerType);
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
+                OnPropertyChanged(nameof(AnswerType));
+
+                innerChange.Commit();
+                return;
+            }
+
+            using var change = document.OperationsManager.BeginComplexChange();
+
+            if (!Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter))
             {
-                Type = StepParameterTypes.Content,
-                ContentValue = new List<ContentItem>
+                answerTypeParameter = new StepParameterViewModel(this, new StepParameter
+                {
+                    Type = StepParameterTypes.Simple,
+                    SimpleValue = answerType
+                });
+
+                Parameters.AddParameter(QuestionParameterNames.AnswerType, answerTypeParameter);
+            }
+            else
+            {
+                answerTypeParameter.Model.SimpleValue = answerType;
+            }
+
+            if (answerType == StepParameterValues.SetAnswerTypeType_Select)
+            {
+                var options = new StepParameter
+                {
+                    Type = StepParameterTypes.Group,
+                    GroupValue = new StepParameters()
+                };
+
+                static StepParameter answerOptionGenerator() => new()
+                {
+                    Type = StepParameterTypes.Content,
+                    ContentValue = new List<ContentItem>
                 {
                     new() { Type = ContentTypes.Text, Value = "" },
                 }
-            };
+                };
 
-            for (var i = 0; i < AppSettings.Default.SelectOptionCount; i++)
-            {
-                var label = i < 26 ? ((char)('A' + i)).ToString() : 'A' + (i - 25).ToString();
-                options.GroupValue.Add(label, answerOptionGenerator());
+                for (var i = 0; i < AppSettings.Default.SelectOptionCount; i++)
+                {
+                    options.GroupValue.Add(IndexLabelHelper.GetIndexLabel(i), answerOptionGenerator());
+                }
+
+                var optionsViewModel = new StepParameterViewModel(this, options);
+
+                Parameters.AddParameter(QuestionParameterNames.AnswerOptions, optionsViewModel);
+                Right.ClearOneByOne();
+                Right.Add(IndexLabelHelper.GetIndexLabel(0));
+                Wrong.ClearOneByOne();
             }
 
-            var optionsViewModel = new StepParameterViewModel(this, options);
+            change.Commit();
 
-            Parameters.AddParameter(QuestionParameterNames.AnswerOptions, optionsViewModel);
+            OnPropertyChanged(nameof(AnswerType));
         }
-
-        OnPropertyChanged(nameof(AnswerType));
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+        }
     }
 
     private void SwitchEmpty_Executed(object? arg)
