@@ -3,11 +3,9 @@
 /// <summary>
 /// Downloads files in background and allows to access to them after download.
 /// </summary>
-internal interface ILocalFileManager : IDisposable
+internal interface ILocalFileManager : IAsyncDisposable
 {
     event Action<Uri, Exception>? Error;
-
-    Task StartAsync(CancellationToken token);
 
     bool AddFile(Uri mediaUri);
 

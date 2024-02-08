@@ -248,11 +248,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             {
                 Error = exc.Message;
                 FullError = exc.ToString();
-
-                if (_host != null)
-                {
-                    await _host.DisposeAsync();
-                }
+                _host?.Dispose();
             }
             catch { }
         }
@@ -284,7 +280,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     protected async Task JoinGameCompletedAsync(GameRole role, bool isHost, CancellationToken cancellationToken = default)
     {
         await _node.ConnectionsLock.WithLockAsync(
-            async () =>
+            () =>
             {
                 var externalServer = _node.HostServer;
 
@@ -298,12 +294,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
                 else
                 {
                     Error = Resources.RejoinError;
-
-                    if (_host != null)
-                    {
-                        await _host.DisposeAsync();
-                    }
-
+                    _host?.Dispose();
                     return;
                 }
             },
@@ -324,44 +315,52 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         var actions = new ViewerActions(_client, localizer);
         var logic = new ViewerHumanLogic(data, actions, localizer, _settingsViewModel);
 
-        _host = role switch
+        try
         {
-            GameRole.Showman => new Showman(_client, humanPlayer, isHost, logic, actions, localizer, data),
-            GameRole.Player => new Player(_client, humanPlayer, isHost, logic, actions, localizer, data),
-            _ => new Viewer(_client, humanPlayer, isHost, logic, actions, localizer, data),
-        };
+            _host = role switch
+            {
+                GameRole.Showman => new Showman(_client, humanPlayer, isHost, logic, actions, localizer, data),
+                GameRole.Player => new Player(_client, humanPlayer, isHost, logic, actions, localizer, data),
+                _ => new Viewer(_client, humanPlayer, isHost, logic, actions, localizer, data),
+            };
 
-        _host.Avatar = _avatarLoadingTask != null ? (await _avatarLoadingTask).AvatarUrl : null;
+            _host.Avatar = _avatarLoadingTask != null ? (await _avatarLoadingTask).AvatarUrl : null;
 
-        _host.Connector = new ReconnectManager(_node, _client, _host, humanPlayer, role, GetExtraCredentials(), IsOnline)
-        {
-            ServerAddress = ServerAddress
-        };
+            _host.Connector = new ReconnectManager(_node, _client, _host, humanPlayer, role, GetExtraCredentials(), IsOnline)
+            {
+                ServerAddress = ServerAddress
+            };
 
-        _host.Client.ConnectTo(_node);
+            _host.Client.ConnectTo(_node);
 
-        _releaseServer = false;
+            _releaseServer = false;
 
-        if (!isHost && Ready != null)
-        {
-            Ready(_node, _host, logic, IsOnline); // Здесь происходит переход к игре
+            if (!isHost && Ready != null)
+            {
+                Ready(_node, _host, logic, IsOnline); // Здесь происходит переход к игре
+            }
+
+            if (_connector != null)
+            {
+                _connector.Dispose();
+                _connector = null;
+            }
+
+            await ClearConnectionAsync();
+
+            _host.GetInfo();
+
+            Trace.TraceInformation("INFO request sent");
+
+            Error = null;
+
+            _node.Error += Server_Error;
         }
-
-        if (_connector != null)
+        catch (Exception exc)
         {
-            _connector.Dispose();
-            _connector = null;
+            await logic.DisposeAsync();
+            throw;
         }
-
-        await ClearConnectionAsync();
-
-        _host.GetInfo();
-
-        Trace.TraceInformation("INFO request sent");
-
-        Error = null;
-
-        _node.Error += Server_Error;
     }
 
     private void Server_Error(Exception exc, bool isWarning) =>

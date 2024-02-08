@@ -1,40 +1,36 @@
 ﻿using SIData;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace SICore.Connections
+namespace SICore.Connections;
+
+/// <summary>
+/// Represents a connection to an external node.
+/// </summary>
+public interface IConnection : IAsyncDisposable
 {
-    /// <summary>
-    /// Represents a connection to an external node.
-    /// </summary>
-    public interface IConnection : IAsyncDisposable
-    {
-        object ClientsSync { get; }
+    object ClientsSync { get; }
 
-        string ConnectionId { get; }
+    string ConnectionId { get; }
 
-        string Id { get; }
+    string Id { get; }
 
-        List<string> Clients { get; }
+    List<string> Clients { get; }
 
-        string RemoteAddress { get; }
+    string RemoteAddress { get; }
 
-        bool IsAuthenticated { get; set; }
+    bool IsAuthenticated { get; set; }
 
-        int GameId { get; set; }
+    int GameId { get; set; }
 
-        string UserName { get; set; }
+    string UserName { get; set; }
 
-        event Action<IConnection, Message> MessageReceived;
-        event Action<IConnection, bool> ConnectionClose;
-        event Action<Exception, bool> Error;
-        event Action<Message, Exception> SerializationError;
+    event Action<IConnection, Message> MessageReceived;
+    event Action<IConnection, bool> ConnectionClose;
+    event Action<Exception, bool> Error;
+    event Action<Message, Exception> SerializationError;
 
-        event Action Reconnecting;
-        event Action Reconnected;
+    event Action Reconnecting;
+    event Action Reconnected;
 
-        ValueTask SendMessageAsync(Message m);
-        void Close();
-    }
+    ValueTask SendMessageAsync(Message m);
+    void Close();
 }

@@ -9,8 +9,10 @@ namespace SICore.Clients.Viewer;
 /// <inheritdoc cref="ILocalFileManager" />
 internal sealed class LocalFileManager : ILocalFileManager
 {
-
     private readonly HttpClient _client = new() { DefaultRequestVersion = HttpVersion.Version20 };
+
+    private readonly Task _localFileManagerTask;
+    private readonly CancellationTokenSource _cancellation = new();
 
     private readonly string _rootFolder;
 
@@ -37,6 +39,8 @@ internal sealed class LocalFileManager : ILocalFileManager
 
         _client = new(socketsHttpHandler) { DefaultRequestVersion = HttpVersion.Version20 };
         _rootFolder = Path.Combine(Path.GetTempPath(), "SIGame", Guid.NewGuid().ToString());
+
+        _localFileManagerTask = StartAsync(_cancellation.Token);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -139,10 +143,14 @@ internal sealed class LocalFileManager : ILocalFileManager
         return localFile;
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         try
         {
+            _cancellation.Cancel();
+            await _localFileManagerTask;
+            _cancellation.Dispose();
+
             try
             {
                 _processingQueue.Writer.Complete();

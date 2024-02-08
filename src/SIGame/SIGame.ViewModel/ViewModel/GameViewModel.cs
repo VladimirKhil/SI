@@ -420,6 +420,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         TInfo.TStage = TableStage.Void;
 
         await _node.DisposeAsync();
+        await _logic.DisposeAsync();
 
         if (_fileShare != null)
         {

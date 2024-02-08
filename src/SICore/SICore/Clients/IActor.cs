@@ -3,7 +3,7 @@ using SICore.Network.Contracts;
 
 namespace SICore;
 
-public interface IActor : IAsyncDisposable
+public interface IActor : IDisposable
 {
     IClient Client { get; }
 

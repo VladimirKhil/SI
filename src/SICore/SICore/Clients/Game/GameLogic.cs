@@ -24,7 +24,7 @@ namespace SICore;
 /// <summary>
 /// Executes SIGame logic implemented as a state machine.
 /// </summary>
-public sealed class GameLogic : Logic<GameData>
+public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDisposable
 {
     private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
@@ -33,8 +33,6 @@ public sealed class GameLogic : Logic<GameData>
     private const int DefaultAudioVideoTime = 1200; // maximum audio/video duration (120 s)
 
     private const int DefaultImageTime = 50;
-
-    private const int MaximumWaitTime = 1200;
 
     /// <summary>
     /// Maximum number of oversized media notifications.
@@ -90,8 +88,6 @@ public sealed class GameLogic : Logic<GameData>
 
     public SIEngine.EngineBase Engine { get; }
 
-    public bool IsRunning { get; set; }
-
     public event Action<GameLogic, GameStages, string, int, int>? StageChanged;
 
     public event Action<string, int, int>? AdShown;
@@ -106,6 +102,13 @@ public sealed class GameLogic : Logic<GameData>
         AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
 
     private readonly IFileShare _fileShare;
+    private readonly TaskRunner<Tasks> _taskRunner;
+
+    protected StopReason _stopReason = StopReason.None;
+
+    internal StopReason StopReason => _stopReason;
+
+    internal TaskRunner<Tasks> Runner => _taskRunner;
 
     public GameLogic(GameData data, GameActions gameActions, SIEngine.EngineBase engine, ILocalizer localizer, IFileShare fileShare)
         : base(data)
@@ -114,6 +117,7 @@ public sealed class GameLogic : Logic<GameData>
         Engine = engine;
         LO = localizer;
         _fileShare = fileShare;
+        _taskRunner = new(this);
     }
 
     internal void Run()
@@ -800,7 +804,7 @@ public sealed class GameLogic : Logic<GameData>
         else
         {
             // Round was finished manually. We need to cancel current waiting tasks in a safe way
-            ClearOldTasks();
+            _taskRunner.ClearOldTasks();
         }
     }
 
@@ -901,21 +905,20 @@ public sealed class GameLogic : Logic<GameData>
         ScheduleExecution(Tasks.Winner, 15 + Random.Shared.Next(10));
     }
 
-    protected override async ValueTask DisposeAsync(bool disposing) =>
-        await ClientData.TaskLock.TryLockAsync(
+    public void Dispose() =>
+        ClientData.TaskLock.WithLock(
             () =>
             {
+                _taskRunner.Dispose();
+
                 if (_data.Stage != GameStage.Before)
                 {
                     SendReport();
                 }
 
                 Engine.Dispose();
-
-                return base.DisposeAsync(disposing);
             },
-            5000,
-            true);
+            5000);
 
     private void SendReport()
     {
@@ -955,7 +958,7 @@ public sealed class GameLogic : Logic<GameData>
         _data.GameResultInfo.Duration = DateTimeOffset.UtcNow.Subtract(_data.GameResultInfo.StartTime);
     }
 
-    internal override bool Stop(StopReason reason)
+    internal bool Stop(StopReason reason)
     {
         if (_stopReason != StopReason.None)
         {
@@ -978,10 +981,10 @@ public sealed class GameLogic : Logic<GameData>
         return true;
     }
 
-    protected internal override void ExecuteImmediate()
+    internal void ExecuteImmediate()
     {
         _tasksHistory.AddLogEntry(nameof(ExecuteImmediate));
-        base.ExecuteImmediate();
+        _taskRunner.ExecuteImmediate();
     }
 
     internal void CancelStop() => _stopReason = StopReason.None;
@@ -1618,34 +1621,20 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
     {
-        taskTime = Math.Min(MaximumWaitTime, taskTime);
-
-        _tasksHistory.AddLogEntry($"Scheduled ({(Tasks)CurrentTask}): {task} {arg} {taskTime / 10}");
-
-        SetTask((int)task, arg);
-
-        if (_data.Settings.AppSettings.Managed && !force && _data.HostName != null && _data.AllPersons.ContainsKey(_data.HostName))
-        {
-            IsRunning = false;
-            return;
-        }
-
-        IsRunning = true;
-        RunTaskTimer(taskTime);
+        _tasksHistory.AddLogEntry($"Scheduled ({(Tasks)_taskRunner.CurrentTask}): {task} {arg} {taskTime / 10}");
+        _taskRunner.ScheduleExecution(task, taskTime, arg, force || ShouldRunTimer());
     }
 
-    internal string PrintOldTasks() => string.Join("|", OldTasks.Select(t => $"{(Tasks)t.Item1}:{t.Item2}"));
+    private bool ShouldRunTimer() => !_data.Settings.AppSettings.Managed || _data.HostName == null || !_data.AllPersons.ContainsKey(_data.HostName);
 
     /// <summary>
     /// Executes current task of the game state machine.
     /// </summary>
-    override protected void ExecuteTask(int taskId, int arg)
+    public void ExecuteTask(Tasks task, int arg)
     {
-        var task = (Tasks)taskId;
-
-        ClientData.TaskLock.WithLock(() =>
+        try
         {
-            try
+            ClientData.TaskLock.WithLock(() =>
             {
                 if (Engine == null) // disposed
                 {
@@ -1669,17 +1658,17 @@ public sealed class GameLogic : Logic<GameData>
                 _tasksHistory.AddLogEntry($"{task}:{arg}");
 
                 // Special catch for hanging old tasks
-                if (task == Tasks.AskToChoose && OldTasks.Any())
+                if (task == Tasks.AskToChoose && _taskRunner.OldTasks.Any())
                 {
-                    static string oldTaskPrinter(Tuple<int, int, int> t) => $"{(Tasks)t.Item1}:{t.Item2}";
+                    static string oldTaskPrinter(Tuple<Tasks, int, int> t) => $"{t.Item1}:{t.Item2}";
 
                     ClientData.Host.SendError(
                         new Exception(
-                            $"Hanging old tasks: {string.Join(", ", OldTasks.Select(oldTaskPrinter))};" +
+                            $"Hanging old tasks: {string.Join(", ", _taskRunner.OldTasks.Select(oldTaskPrinter))};" +
                             $" Task: {task}, param: {arg}, history: {_tasksHistory}"),
                         true);
 
-                    ClearOldTasks();
+                    _taskRunner.ClearOldTasks();
                 }
 
                 switch (task)
@@ -1860,16 +1849,16 @@ public sealed class GameLogic : Logic<GameData>
                         AutoGame?.Invoke();
                         break;
                 }
-            }
-            catch (Exception exc)
-            {
-                _data.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
-                ScheduleExecution(Tasks.NoTask, 10);
-                ClientData.MoveNextBlocked = true;
-                _gameActions.SpecialReplic("Game ERROR");
-            }
-        },
-        5000);
+            },
+            5000);
+        }
+        catch (Exception exc)
+        {
+            _data.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
+            ScheduleExecution(Tasks.NoTask, 10);
+            ClientData.MoveNextBlocked = true;
+            _gameActions.SpecialReplic("Game ERROR");
+        }
     }
 
     private void EndRound() => Engine.EndRound();
@@ -1902,8 +1891,8 @@ public sealed class GameLogic : Logic<GameData>
         switch (_stopReason)
         {
             case StopReason.Pause:
-                _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {PrintOldTasks()}");
-                PauseExecution((int)task, arg);
+                _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {_taskRunner.PrintOldTasks()}");
+                _taskRunner.PauseExecution(task, arg);
 
                 ClientData.PauseStartTime = DateTime.UtcNow;
 
@@ -1949,9 +1938,9 @@ public sealed class GameLogic : Logic<GameData>
             case StopReason.Appellation:
                 var savedTask = task == Tasks.WaitChoose ? Tasks.AskToChoose : task;
 
-                _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({PrintOldTasks()})");
+                _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({_taskRunner.PrintOldTasks()})");
 
-                PauseExecution((int)savedTask, arg);
+                _taskRunner.PauseExecution(savedTask, arg);
                 ScheduleExecution(Tasks.PrintAppellation, 10);
                 break;
 
@@ -3862,7 +3851,7 @@ public sealed class GameLogic : Logic<GameData>
     {
         if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
         {
-            _tasksHistory.AddLogEntry($"PrintAppellation resumed ({PrintOldTasks()})");
+            _tasksHistory.AddLogEntry($"PrintAppellation resumed ({_taskRunner.PrintOldTasks()})");
             ResumeExecution(40);
             return;
         }
@@ -3922,11 +3911,13 @@ public sealed class GameLogic : Logic<GameData>
         WaitFor(DecisionType.AppellationDecision, waitTime, -2);
     }
 
+    internal int ResumeExecution(int resumeTime = 0) => _taskRunner.ResumeExecution(resumeTime, ShouldRunTimer());
+
     private void CheckAppellation()
     {
         if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
         {
-            _tasksHistory.AddLogEntry($"CheckAppellation resumed ({PrintOldTasks()})");
+            _tasksHistory.AddLogEntry($"CheckAppellation resumed ({_taskRunner.PrintOldTasks()})");
             ResumeExecution(40);
             return;
         }
@@ -3938,7 +3929,7 @@ public sealed class GameLogic : Logic<GameData>
         if (votingForRight && positiveVoteCount <= negativeVoteCount || !votingForRight && positiveVoteCount >= negativeVoteCount)
         {
             _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
-            _tasksHistory.AddLogEntry($"CheckAppellation denied and resumed normally ({PrintOldTasks()})");
+            _tasksHistory.AddLogEntry($"CheckAppellation denied and resumed normally ({_taskRunner.PrintOldTasks()})");
             ResumeExecution(40);
             return;
         }
@@ -3956,7 +3947,7 @@ public sealed class GameLogic : Logic<GameData>
         _gameActions.InformSums();
         _gameActions.AnnounceSums();
 
-        _tasksHistory.AddLogEntry($"CheckAppellation resumed normally ({PrintOldTasks()})");
+        _tasksHistory.AddLogEntry($"CheckAppellation resumed normally ({_taskRunner.PrintOldTasks()})");
         ResumeExecution(40);
     }
 

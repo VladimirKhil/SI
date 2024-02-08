@@ -113,11 +113,11 @@ public sealed class Player : Viewer
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
     }
 
-    public override ValueTask DisposeAsync(bool disposing)
+    protected override void Dispose(bool disposing)
     {
         ClientData.AutoReadyChanged -= ClientData_AutoReadyChanged;
 
-        return base.DisposeAsync(disposing);
+        base.Dispose(disposing);
     }
 
     private void ClientData_AutoReadyChanged()

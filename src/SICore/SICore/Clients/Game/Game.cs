@@ -79,13 +79,14 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void Master_Unbanned(string clientId) => _gameActions.SendMessageWithArgs(Messages.Unbanned, clientId);
 
-    public override async ValueTask DisposeAsync(bool disposing)
+    protected override void Dispose(bool disposing)
     {
         // Logic must be disposed before TaskLock
-        await base.DisposeAsync(disposing);
-
+        Logic.Dispose();
         ClientData.TaskLock.Dispose();
         ClientData.TableInformStageLock.Dispose();
+
+        base.Dispose(disposing);
     }
 
     /// <summary>
@@ -916,7 +917,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
                     oldPrice));
 
-            var nextTask = (Tasks)Logic.PendingTask;
+            var nextTask = Logic.Runner.PendingTask;
 
             if ((nextTask == Tasks.AskToChoose || nextTask == Tasks.WaitChoose || nextTask == Tasks.AskFirst || nextTask == Tasks.WaitFirst) && _logic.Engine.LeftQuestionsCount == 0)
             {
@@ -1356,7 +1357,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             SelectNewHost();
 
-            if (ClientData.Settings.AppSettings.Managed && !_logic.IsRunning)
+            if (ClientData.Settings.AppSettings.Managed && !_logic.Runner.IsRunning)
             {
                 if (_logic.StopReason == StopReason.Pause || ClientData.TInfo.Pause)
                 {
@@ -1876,7 +1877,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             ClientData.IsThinking = true;
         }
 
-        _logic.AddHistory($"Pause resumed ({_logic.PrintOldTasks()} {_logic.StopReason})");
+        _logic.AddHistory($"Pause resumed ({_logic.Runner.PrintOldTasks()} {_logic.StopReason})");
 
         try
         {
@@ -2510,9 +2511,9 @@ public sealed class Game : Actor<GameData, GameLogic>
     {
         Logic.AddHistory($"PlanExecution {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
 
-        if (Logic.IsExecutionPaused)
+        if (Logic.Runner.IsExecutionPaused)
         {
-            Logic.UpdatePausedTask((int)task, arg, (int)taskTime);
+            Logic.Runner.UpdatePausedTask(task, arg, (int)taskTime);
         }
         else
         {
@@ -2790,7 +2791,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         // Drop answerer index
         ClientData.AnswererIndex = -1;
 
-        var nextTask = (Tasks)Logic.PendingTask;
+        var nextTask = (Tasks)Logic.Runner.PendingTask;
 
         Logic.AddHistory(
             $"AnswererIndex dropped; nextTask = {nextTask};" +

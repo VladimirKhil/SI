@@ -45,12 +45,11 @@ public abstract class Actor<D, L> : IActor
         LO = localizer;
     }
 
-    private async void Client_Disposed()
+    private void Client_Disposed()
     {
         try
         {
-            await DisposeAsync();
-
+            Dispose();
             ClientData.EventLog.Append("Client disposed");
         }
         catch (Exception exc)
@@ -61,17 +60,15 @@ public abstract class Actor<D, L> : IActor
 
     public void AddLog(string s) => _logic.AddLog(s);
 
-    public virtual ValueTask DisposeAsync(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         _client.MessageReceived -= OnMessageReceivedAsync;
         _client.Disposed -= Client_Disposed;
-
-        return _logic.DisposeAsync();
     }
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        await DisposeAsync(true);
+        Dispose(true);
         GC.SuppressFinalize(this);
     }
 }

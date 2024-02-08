@@ -64,7 +64,7 @@ public sealed class ViewerData : Data
         }
     }
 
-    public string ProtocolPath { get; set; }
+    public string? ProtocolPath { get; set; }
 
     private CustomCommand _kick;
 
@@ -187,9 +187,9 @@ public sealed class ViewerData : Data
     /// <summary>
     /// Файл протокола (логов)
     /// </summary>
-    public StreamWriter ProtocolWriter;
+    public StreamWriter? ProtocolWriter;
 
-    public PersonAccount Speaker { get; set; }
+    public PersonAccount? Speaker { get; set; }
 
     private string _printedText = "";
 

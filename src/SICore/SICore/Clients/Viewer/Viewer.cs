@@ -428,7 +428,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         break;
                     }
 
-                    await ProcessConfigAsync(mparams);
+                    ProcessConfig(mparams);
                     break;
 
                 case Messages.ReadingSpeed:
@@ -1433,7 +1433,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         _logic.OnReplic(personCode, text.ToString().Trim());
     }
 
-    private async ValueTask ProcessConfigAsync(string[] mparams)
+    private void ProcessConfig(string[] mparams)
     {
         switch (mparams[1])
         {
@@ -1442,19 +1442,19 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 break;
 
             case MessageParams.Config_Free:
-                await OnConfigFreeAsync(mparams);
+                OnConfigFree(mparams);
                 break;
 
             case MessageParams.Config_DeleteTable:
-                await OnConfigDeleteTableAsync(mparams);
+                OnConfigDeleteTable(mparams);
                 break;
 
             case MessageParams.Config_Set:
-                await OnConfigSetAsync(mparams);
+                OnConfigSet(mparams);
                 break;
 
             case MessageParams.Config_ChangeType:
-                await OnConfigChangeTypeAsync(mparams);
+                OnConfigChangeType(mparams);
                 break;
         }
 
@@ -1502,7 +1502,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
     }
 
-    private async ValueTask OnConfigFreeAsync(string[] mparams)
+    private void OnConfigFree(string[] mparams)
     {
         if (mparams.Length < 4)
         {
@@ -1554,13 +1554,13 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         if (account == me)
         {
             // Необходимо самого себя перевести в зрители
-            await SwitchToNewTypeAsync(GameRole.Viewer, newAccount, me);
+            SwitchToNewType(GameRole.Viewer, newAccount, me);
         }
 
         UpdateDeleteTableCommand();
     }
 
-    private async ValueTask OnConfigChangeTypeAsync(string[] mparams)
+    private void OnConfigChangeType(string[] mparams)
     {
         if (mparams.Length < 7)
         {
@@ -1655,7 +1655,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             if (account == me && newAccount != null)
             {
                 // Необходимо самого себя перевести в зрители
-                await SwitchToNewTypeAsync(GameRole.Viewer, newAccount, me);
+                SwitchToNewType(GameRole.Viewer, newAccount, me);
             }
 
             UpdateDeleteTableCommand();
@@ -1665,7 +1665,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
     private void ThrowComputerAccountError() =>
         throw new InvalidOperationException($"Computer account should never receive this\n{ClientData.EventLog}");
 
-    private async ValueTask OnConfigDeleteTableAsync(string[] mparams)
+    private void OnConfigDeleteTable(string[] mparams)
     {
         if (mparams.Length < 3)
         {
@@ -1728,7 +1728,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         if (account == me && newAccount != null && _logic.CanSwitchType)
         {
             // Необходимо самого себя перевести в зрители
-            await SwitchToNewTypeAsync(GameRole.Viewer, newAccount, me);
+            SwitchToNewType(GameRole.Viewer, newAccount, me);
         }
 
         UpdateDeleteTableCommand();
@@ -1749,7 +1749,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         return ClientData.ShowMan;
     }
 
-    private async ValueTask OnConfigSetAsync(string[] mparams)
+    private void OnConfigSet(string[] mparams)
     {
         if (mparams.Length < 6)
         {
@@ -1901,7 +1901,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                 if (newRole != role)
                 {
-                    await SwitchToNewTypeAsync(role, other, me);
+                    SwitchToNewType(role, other, me);
                 }
                 else
                 {
@@ -1920,7 +1920,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                 if (newRole != role)
                 {
-                    await SwitchToNewTypeAsync(newRole, account, me);
+                    SwitchToNewType(newRole, account, me);
                 }
                 else
                 {
@@ -1942,7 +1942,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
     /// Сменить тип своего аккаунта
     /// </summary>
     /// <param name="role">Целевой тип</param>
-    private async ValueTask SwitchToNewTypeAsync(GameRole role, ViewerAccount newAccount, ViewerAccount oldAccount)
+    private void SwitchToNewType(GameRole role, ViewerAccount newAccount, ViewerAccount oldAccount)
     {
         if (newAccount == null)
         {
@@ -2005,7 +2005,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         viewer.Init();
 
-        await DisposeAsync();
+        Dispose();
 
         viewer.RecreateCommands();
 

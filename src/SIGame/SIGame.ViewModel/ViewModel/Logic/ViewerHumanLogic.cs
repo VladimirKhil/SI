@@ -16,7 +16,7 @@ namespace SICore;
 /// <summary>
 /// Defines a human viewer logic.
 /// </summary>
-public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
+public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDisposable
 {
     private record struct ContentInfo(string Type, string Uri);
 
@@ -44,14 +44,11 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     private bool _disposed = false;
 
-    private readonly CancellationTokenSource _cancellation = new();
-
     private readonly ILocalFileManager _localFileManager = new LocalFileManager();
-    private readonly Task _localFileManagerTask;
 
-    protected readonly ViewerActions _viewerActions;
+    private readonly ViewerActions _viewerActions;
 
-    protected readonly ILocalizer _localizer;
+    private readonly ILocalizer _localizer;
 
     public TableInfoViewModel TInfo { get; }
 
@@ -84,7 +81,6 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions);
 
         _localFileManager.Error += LocalFileManager_Error;
-        _localFileManagerTask = _localFileManager.StartAsync(_cancellation.Token);
     }
 
     private void TInfo_QuestionSelected(QuestionInfoViewModel question)
@@ -188,7 +184,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
-    public virtual void ReceiveText(Message m)
+    public void ReceiveText(Message m)
     {
         _data.AddToChat(m);
 
@@ -205,7 +201,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     /// </summary>
     /// <param name="text">Выводимый текст</param>
     [Obsolete("Use OnReplic instead")]
-    virtual public void Print(string text)
+    public void Print(string text)
     {
         var chatMessageBuilder = new StringBuilder();
         var logMessageBuilder = new StringBuilder();
@@ -248,6 +244,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             }
 
             _data.Speaker = _data.MainPersons.FirstOrDefault(item => item.Name == pair[0]);
+
             if (_data.Speaker != null)
             {
                 _data.Speaker.Replic = speech.Trim();
@@ -537,13 +534,13 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    virtual public void GameThemes()
+    public void GameThemes()
     {
         TInfo.TStage = TableStage.GameThemes;
         _data.EnableMediaLoadButton = false;
     }
 
-    virtual public void RoundThemes(bool print) => UI.Execute(() => RoundThemesUI(print), exc => _data.Host.SendError(exc));
+    public void RoundThemes(bool print) => UI.Execute(() => RoundThemesUI(print), exc => _data.Host.SendError(exc));
 
     private void RoundThemesUI(bool print)
     {
@@ -580,7 +577,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         _appendTableText = null;
     }
 
-    virtual public async void Choice()
+    public async void Choice()
     {
         TInfo.Text = "";
         TInfo.MediaSource = null;
@@ -1217,7 +1214,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
-    virtual public void OnAtomHint(string hint)
+    public void OnAtomHint(string hint)
     {
         TInfo.Hint = hint;
 
@@ -1305,7 +1302,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     /// Нельзя жать на кнопку
     /// </summary>
     /// <param name="text">Кто уже нажал или время вышло</param>
-    virtual public void EndTry(string text)
+    public void EndTry(string text)
     {
         TInfo.QuestionStyle = QuestionStyle.Normal;
         TInfo.IsMediaStopped = true;
@@ -1324,12 +1321,12 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         _data.Players[number].State = PlayerState.Press;
     }
 
-    virtual public void ShowTablo() => TInfo.TStage = SIUI.ViewModel.TableStage.RoundTable;
+    public void ShowTablo() => TInfo.TStage = SIUI.ViewModel.TableStage.RoundTable;
 
     /// <summary>
     /// Игрок получил или потерял деньги
     /// </summary>
-    virtual public void Person(int playerIndex, bool isRight)
+    public void Person(int playerIndex, bool isRight)
     {
         if (isRight)
         {
@@ -1461,7 +1458,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     public void StopRound() => TInfo.TStage = TableStage.Sign;
 
-    virtual public void Out(int themeIndex)
+    public void Out(int themeIndex)
     {
         TInfo.PlaySelection(themeIndex);
         _data.Sound = Sounds.FinalDelete;
@@ -1482,7 +1479,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     public void TimeOut() => _data.Sound = Sounds.RoundTimeout;
 
-    protected override async ValueTask DisposeAsync(bool disposing)
+    public async ValueTask DisposeAsync()
     {
         if (_disposed)
         {
@@ -1497,14 +1494,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             _data.ProtocolWriter = null;
         }
 
-        _cancellation.Cancel();
-
-        await _localFileManagerTask;
-
-        _localFileManager.Dispose();
-        _cancellation.Dispose();
-
-        await base.DisposeAsync(disposing);
+        await _localFileManager.DisposeAsync();
     }
 
     public void FinalThink() => _data.Host.PlaySound(Sounds.FinalThink);
