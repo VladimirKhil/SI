@@ -106,7 +106,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при загрузке игрового пакета: {0}.
+        ///   Ищет локализованную строку, похожую на Ошибка при загрузке игрового пакета.
         /// </summary>
         internal static string GamePackageLoadError {
             get {
@@ -138,6 +138,15 @@ namespace SImulator.ViewModel.Properties {
         internal static string LoggerCreationWarning {
             get {
                 return ResourceManager.GetString("LoggerCreationWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка старта записи лога.
+        /// </summary>
+        internal static string LoggerInitError {
+            get {
+                return ResourceManager.GetString("LoggerInitError", resourceCulture);
             }
         }
         
@@ -183,6 +192,15 @@ namespace SImulator.ViewModel.Properties {
         internal static string OpenLicensesError {
             get {
                 return ResourceManager.GetString("OpenLicensesError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка подготовки пакета.
+        /// </summary>
+        internal static string PackagePreparationError {
+            get {
+                return ResourceManager.GetString("PackagePreparationError", resourceCulture);
             }
         }
         

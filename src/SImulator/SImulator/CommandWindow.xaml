@@ -36,7 +36,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Windows8Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
+
             <my:ScreenConverter x:Key="ScreenConverter1" />
             <my:CollectionsConverter x:Key="CollectionsConverter" />
             <my:PlacementConverter x:Key="PlacementConverter" />
@@ -51,7 +51,7 @@
             <my:LanguageConverter x:Key="LanguageConverter" />
 
             <my:PlayersConverter x:Key="PlayersConverter" />
-            
+
             <my:EqualityConverter x:Key="Equality" />
 
             <my:KeyConverter x:Key="KeyConverter" />
@@ -156,12 +156,12 @@
                 <Setter Property="Padding" Value="0" />
                 <Setter Property="FontSize" Value="20" />
                 <Setter Property="Foreground" Value="#FF2B2B2B"/>
-                
+
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
                             <TextBlock Name="tb" Text="?" Foreground="#FF404040" LineStackingStrategy="BlockLineHeight" LineHeight="21" />
-                            
+
                             <DataTemplate.Triggers>
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Setter TargetName="tb" Property="Foreground" Value="Gray" />
@@ -171,11 +171,11 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            
+
             <Style x:Key="TimeButton" TargetType="Button" BasedOn="{StaticResource ToolButton}">
                 <Setter Property="Command" Value="{Binding}" />
                 <Setter Property="ToolTip" Value="{Binding Name}" />
-                
+
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
@@ -186,10 +186,10 @@
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
-                
+
                 <Setter Property="Width" Value="35" />
                 <Setter Property="Padding" Value="3,5" />
-                
+
                 <Style.Triggers>
                     <Trigger Property="Command" Value="{x:Null}">
                         <Setter Property="IsEnabled" Value="False" />
@@ -208,7 +208,7 @@
                                                             <GeometryDrawing
                                                                 Geometry="M0,0L1,0L1,4L0,4z"
                                                                 Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                                            
+
                                                             <GeometryDrawing
                                                                 Geometry="M2,0L3,0L3,4L2,4z"
                                                                 Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
@@ -338,7 +338,7 @@
                                     <WrapPanel />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
-                            
+
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="uim:ItemViewModel">
                                     <Button
@@ -387,7 +387,7 @@
                     </DataTrigger>
                 </ControlTemplate.Triggers>
             </ControlTemplate>
-            
+
             <uic:TemplateConverter x:Key="Selector">
                 <uic:TemplateConverter.DefaultTemplate>
                     <DataTemplate>
@@ -399,27 +399,27 @@
                             Margin="30" />
                     </DataTemplate>
                 </uic:TemplateConverter.DefaultTemplate>
-                
+
                 <uic:TemplateConverter.Templates>
                     <DataTemplate x:Key="{x:Static uim:TableStage.Sign}">
                         <TextBlock Text="{x:Static lp:Resources.HintIntro}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.GameThemes}">
                         <TextBlock Text="{x:Static lp:Resources.HintGameThemes}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.Round}">
                         <TextBlock
                             Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1}, Path=DataContext.Game.ActiveRound.Name}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center" />
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.RoundThemes}">
                         <TextBlock Text="(Темы раунда)" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.RoundTable}">
                         <Grid>
                             <ItemsControl ItemsSource="{Binding RoundInfo}">
@@ -428,7 +428,7 @@
                                         <UniformGrid Columns="1" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
-                                
+
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -436,7 +436,7 @@
                                                 <ColumnDefinition Width="2*" />
                                                 <ColumnDefinition Width="5*" />
                                             </Grid.ColumnDefinitions>
-                                            
+
                                             <Border>
                                                 <TextBlock
                                                     Text="{Binding Name}"
@@ -446,14 +446,14 @@
                                                     TextWrapping="Wrap"
                                                     Margin="2" />
                                             </Border>
-                                            
+
                                             <ItemsControl ItemsSource="{Binding Questions}" Grid.Column="1" BorderBrush="Gray">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
                                                         <UniformGrid Rows="1" />
                                                     </ItemsPanelTemplate>
                                                 </ItemsControl.ItemsPanel>
-                                                
+
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <Button
@@ -463,7 +463,7 @@
                                                             CommandParameter="{Binding}"
                                                             Content="{Binding Price}"
                                                             Margin="-1,-1,0,0" />
-                                                        
+
                                                         <DataTemplate.Triggers>
                                                             <DataTrigger Binding="{Binding Price}" Value="-1">
                                                                 <Setter TargetName="but" Property="Content" Value="" />
@@ -526,7 +526,7 @@
                             <StackPanel.Resources>
                                 <CollectionViewSource x:Key="Parameters" Source="{Binding Parameters}" Filter="Parameters_Filter" />
                             </StackPanel.Resources>
-                            
+
                             <TextBlock
                                 Text="{Binding TypeName, Converter={StaticResource QuestionTypeConverter}}"
                                 TextWrapping="Wrap"
@@ -549,7 +549,7 @@
                             </ItemsControl>
                         </StackPanel>
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.Question}">
                         <ContentControl
                             Template="{StaticResource QuestGrid}"
@@ -557,11 +557,11 @@
                                 RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1},
                                 Path=DataContext.Game}" />
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.QuestionPrice}">
                         <TextBlock Text="{Binding Text}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.Theme}">
                         <TextBlock Text="{Binding Text}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
@@ -871,53 +871,8 @@
                     </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
-        </ResourceDictionary>        
+        </ResourceDictionary>
     </Window.Resources>
-
-    <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="SImulator">
-            <TaskbarItemInfo.ThumbButtonInfos>
-                <ThumbButtonInfo Description="{x:Static lp:Resources.Back}" Command="{Binding Game.Back}">
-                    <ThumbButtonInfo.ImageSource>
-                        <DrawingImage>
-                            <DrawingImage.Drawing>
-                                <GeometryDrawing
-                                    Geometry="M0,0L-17.3,10L0,20z"
-                                    Pen="{StaticResource TaskbarPen}"
-                                    Brush="{StaticResource TaskbarBrush}" />
-                            </DrawingImage.Drawing>
-                        </DrawingImage>
-                    </ThumbButtonInfo.ImageSource>
-                </ThumbButtonInfo>
-
-                <ThumbButtonInfo Description="{x:Static lp:Resources.Next}" Command="{Binding Game.Next}">
-                    <ThumbButtonInfo.ImageSource>
-                        <DrawingImage>
-                            <DrawingImage.Drawing>
-                                <GeometryDrawing
-                                    Geometry="M0,0L17.3,10L0,20z"
-                                    Pen="{StaticResource TaskbarPen}"
-                                    Brush="{StaticResource TaskbarBrush}" />
-                            </DrawingImage.Drawing>
-                        </DrawingImage>
-                    </ThumbButtonInfo.ImageSource>
-                </ThumbButtonInfo>
-
-                <ThumbButtonInfo Description="{x:Static lp:Resources.Stop}" Command="{Binding Game.Stop}">
-                    <ThumbButtonInfo.ImageSource>
-                        <DrawingImage>
-                            <DrawingImage.Drawing>
-                                <GeometryDrawing
-                                    Geometry="M0,0L20,0L20,20L0,20z"
-                                    Pen="{StaticResource TaskbarPen}"
-                                    Brush="{StaticResource TaskbarBrush}" />
-                            </DrawingImage.Drawing>
-                        </DrawingImage>
-                    </ThumbButtonInfo.ImageSource>
-                </ThumbButtonInfo>
-            </TaskbarItemInfo.ThumbButtonInfos>
-        </TaskbarItemInfo>
-    </Window.TaskbarItemInfo>
 
     <TabControl TabStripPlacement="Left" Background="White" BorderThickness="1,0,0,0" Padding="6,4,4,4" Margin="-2,0,0,0">
         <TabItem

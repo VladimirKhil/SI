@@ -349,7 +349,7 @@ internal sealed class DesktopManager : PlatformManager
     {
         if (folder == null)
         {
-            return Logger.Create(null);
+            return GameLogger.Create(null);
         }
 
         if (!Directory.Exists(folder))
@@ -357,7 +357,7 @@ internal sealed class DesktopManager : PlatformManager
             throw new Exception(string.Format(Resources.LogsFolderNotFound, folder));
         }
 
-        return Logger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
+        return GameLogger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
     }
 
     public override void ClearMedia()

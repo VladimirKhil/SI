@@ -345,15 +345,25 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         var (filePath, isTemporary) = await _packageSource.GetPackageFileAsync(cancellationToken);
 
         var tempDir = Path.Combine(Path.GetTempPath(), AppSettings.AppName, Guid.NewGuid().ToString());
+        SIDocument document;
 
-        var document = await SIDocument.ExtractToFolderAndLoadAsync(
-            filePath,
-            tempDir,
-            cancellationToken: cancellationToken);
-
-        if (isTemporary)
+        try
         {
-            File.Delete(filePath);
+            document = await SIDocument.ExtractToFolderAndLoadAsync(
+                filePath,
+                tempDir,
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception exc)
+        {
+            throw new Exception($"Extraction error. Extraction path: {tempDir}", exc);
+        }
+        finally
+        {
+            if (isTemporary)
+            {
+                File.Delete(filePath);
+            }
         }
 
         return document;
@@ -375,7 +385,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         };
     }
 
-    private IGameLogger CreateLogger()
+    private IGameLogger CreateGameLogger()
     {
         if (Settings.SaveLogs)
         {
@@ -424,7 +434,16 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             _start.CanBeExecuted = false;
             IsStarting = true;
 
-            var document = await PreparePackageAsync(_cancellationTokenSource.Token);
+            SIDocument document;
+
+            try
+            {
+                document = await PreparePackageAsync(_cancellationTokenSource.Token);
+            }
+            catch (Exception exc)
+            {
+                throw new Exception(Resources.PackagePreparationError, exc);
+            }
 
             ISIEngine engine;
 
@@ -443,7 +462,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             }
             catch (Exception exc)
             {
-                throw new Exception(string.Format(Resources.GamePackageLoadError, exc.Message));
+                throw new Exception(Resources.GamePackageLoadError, exc);
             }
 
             var presentationListener = new PresentationListener(engine);
@@ -457,7 +476,16 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             presentationController.UpdateShowPlayers(SettingsViewModel.Model.ShowPlayers);
             presentationController.Error += ShowError;
 
-            var logger = CreateLogger();
+            IGameLogger gameLogger;
+
+            try
+            {
+                gameLogger = CreateGameLogger();
+            }
+            catch (Exception exc)
+            {
+                throw new Exception(Resources.LoggerInitError, exc);
+            }
 
             var game = new GameViewModel(
                 SettingsViewModel,
@@ -465,7 +493,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 presentationListener,
                 presentationController,
                 Players,
-                logger);
+                gameLogger);
 
             Game = game;
 
@@ -492,9 +520,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            var reason = exc.InnerException ?? exc;
-
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, reason.Message), false);
+            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, exc), false);
 
             _game?.CloseMainView();
 

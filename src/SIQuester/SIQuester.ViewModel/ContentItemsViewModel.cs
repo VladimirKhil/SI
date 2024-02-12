@@ -125,7 +125,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         return contentItem;
     }
 
-    protected override void OnCurrentItemChanged(ContentItemViewModel oldValue, ContentItemViewModel newValue)
+    protected override void OnCurrentItemChanged(ContentItemViewModel? oldValue, ContentItemViewModel? newValue)
     {
         base.OnCurrentItemChanged(oldValue, newValue);
 
@@ -503,7 +503,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                     Duration = document.GetDurationByContentType(contentType),
                 });
 
-                Insert(index + 1, contentItemViewModel);
+                Insert(index + 1 + (i - initialItemCount), contentItemViewModel);
 
                 var file = collection.Files[i];
 

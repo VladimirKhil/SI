@@ -3,18 +3,18 @@ using System.IO;
 
 namespace SImulator.Implementation;
 
-internal sealed class Logger : IGameLogger
+internal sealed class GameLogger : IGameLogger
 {
-    private StreamWriter _writer;
+    private StreamWriter? _writer;
 
-    private Logger()
+    private GameLogger()
     {
 
     }
 
-    public static Logger Create(string? filename)
+    public static GameLogger Create(string? filename)
     {
-        var logger = new Logger();
+        var logger = new GameLogger();
 
         if (filename != null)
         {

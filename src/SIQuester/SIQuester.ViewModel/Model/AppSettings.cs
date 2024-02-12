@@ -216,7 +216,9 @@ public sealed class AppSettings : INotifyPropertyChanged
         {
             if (_history != value)
             {
+                _history.Files.CollectionChanged -= CollectionChanged;
                 _history = value;
+                _history.Files.CollectionChanged += CollectionChanged;
                 OnPropertyChanged();
             }
         }
@@ -247,9 +249,9 @@ public sealed class AppSettings : INotifyPropertyChanged
         {
             if (_costSetters != value)
             {
-                _costSetters.CollectionChanged -= CostSetters_CollectionChanged;
+                _costSetters.CollectionChanged -= CollectionChanged;
                 _costSetters = value;
-                _costSetters.CollectionChanged += CostSetters_CollectionChanged;
+                _costSetters.CollectionChanged += CollectionChanged;
                 OnPropertyChanged();
             }
         }
@@ -593,10 +595,11 @@ public sealed class AppSettings : INotifyPropertyChanged
 
     public AppSettings()
     {
-        _costSetters.CollectionChanged += CostSetters_CollectionChanged;
+        _costSetters.CollectionChanged += CollectionChanged;
+        _history.Files.CollectionChanged += CollectionChanged;
     }
 
-    private void CostSetters_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => HasChanges = true;
+    private void CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => HasChanges = true;
 
     public static AppSettings Create()
     {
