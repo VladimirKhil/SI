@@ -54,6 +54,10 @@ public interface IGameServerClient : IGameClient
 
     Task UploadPackageAsync(FileKey packageHash, Stream stream, CancellationToken cancellationToken = default);
 
+    Task<RunGameResponse> RunGameAsync(
+        RunGameRequest runGameRequest,
+        CancellationToken cancellationToken = default);
+
     Task<GameCreationResult> CreateGameAsync(
         GameSettingsCore<AppSettingsCore> gameSettings,
         PackageKey packageKey,

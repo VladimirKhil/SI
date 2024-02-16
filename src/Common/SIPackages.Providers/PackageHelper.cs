@@ -45,7 +45,17 @@ public static class PackageHelper
     {
         var doc = SIDocument.Create(name, author, folder);
 
-        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, culture, maxPackageCount, cancellationToken);
+        return GenerateCoreAsync(
+            provider,
+            roundsCount,
+            themesCount,
+            baseCost,
+            doc,
+            roundNameFormat, 
+            finalName,
+            culture,
+            maxPackageCount,
+            cancellationToken);
     }
 
     private static async Task<SIDocument> GenerateCoreAsync(

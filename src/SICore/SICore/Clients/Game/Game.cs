@@ -2987,7 +2987,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
 
         var oldName = account.Name;
-        GamePersonAccount newAccount;
+        GamePersonAccount? newAccount;
 
         if (!account.IsHuman)
         {

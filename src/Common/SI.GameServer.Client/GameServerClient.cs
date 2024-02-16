@@ -84,6 +84,9 @@ public sealed class GameServerClient : IGameServerClient
         };
     }
 
+    public Task<RunGameResponse> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default) =>
+        Connection.InvokeAsync<RunGameResponse>("RunGame", runGameRequest, cancellationToken);
+
     public Task<GameCreationResult> CreateGameAsync(
         GameSettingsCore<AppSettingsCore> gameSettings,
         PackageKey packageKey,
