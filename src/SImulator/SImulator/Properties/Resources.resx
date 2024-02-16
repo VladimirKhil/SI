@@ -174,6 +174,15 @@
   <data name="BackgroundVideo" xml:space="preserve">
     <value>Видеофайл-фон</value>
   </data>
+  <data name="ButtonBlockingTime" xml:space="preserve">
+    <value>Время блокировки кнопки (с)</value>
+  </data>
+  <data name="ButtonOrderHint" xml:space="preserve">
+    <value>Соответствуют позициям игроков в списке</value>
+  </data>
+  <data name="ButtonPressed" xml:space="preserve">
+    <value>Нажатие на кнопку</value>
+  </data>
   <data name="Buttons" xml:space="preserve">
     <value>Кнопки</value>
   </data>
@@ -251,6 +260,9 @@
 
 Приложение будет закрыто. Отправить информацию разработчику?</value>
   </data>
+  <data name="ExternalButtonsHint" xml:space="preserve">
+    <value>В данном режиме используются кнопки, не подключённые к программе (независимые устройства, хлопки и т.д.). Программа показывает рамку в момент, когда можно нажимать (при игре с фальстартами)</value>
+  </data>
   <data name="FalseStartGame" xml:space="preserve">
     <value>Игра с фальстартами</value>
   </data>
@@ -268,6 +280,12 @@
   <data name="FileDeletionError" xml:space="preserve">
     <value>Ошибка удаления файла: {0}</value>
   </data>
+  <data name="FinalThemeRemoval" xml:space="preserve">
+    <value>Удаление темы в финале</value>
+  </data>
+  <data name="FinalThink" xml:space="preserve">
+    <value>Размышление в финале</value>
+  </data>
   <data name="FinalThinkingTime" xml:space="preserve">
     <value>Время на размышление в финале (с)</value>
   </data>
@@ -280,6 +298,9 @@
   <data name="Game" xml:space="preserve">
     <value>Игра</value>
   </data>
+  <data name="GameButtons" xml:space="preserve">
+    <value>Игровые кнопки</value>
+  </data>
   <data name="GameModes_Sport" xml:space="preserve">
     <value>Упрощённая</value>
   </data>
@@ -291,6 +312,12 @@
   </data>
   <data name="GameRules" xml:space="preserve">
     <value>Правила игры</value>
+  </data>
+  <data name="GameStart" xml:space="preserve">
+    <value>Начало игры</value>
+  </data>
+  <data name="GameThemes" xml:space="preserve">
+    <value>Темы игры</value>
   </data>
   <data name="GameType" xml:space="preserve">
     <value>Тип игры</value>
@@ -359,6 +386,12 @@
   </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
+  </data>
+  <data name="NoAnswer" xml:space="preserve">
+    <value>Нет ответа</value>
+  </data>
+  <data name="NoRiskQuestion" xml:space="preserve">
+    <value>Вопрос без риска</value>
   </data>
   <data name="NotSelected" xml:space="preserve">
     <value>Не выбран</value>
@@ -432,6 +465,9 @@
   <data name="QuestionLineSpacing" xml:space="preserve">
     <value>Межстрочный интервал в вопросе</value>
   </data>
+  <data name="QuestionSelection" xml:space="preserve">
+    <value>Выбор вопроса</value>
+  </data>
   <data name="QuestionTime" xml:space="preserve">
     <value>Время вопроса (c)</value>
   </data>
@@ -462,23 +498,41 @@
   <data name="ResetSums" xml:space="preserve">
     <value>Удалить суммы и статистику</value>
   </data>
+  <data name="RightAnswer" xml:space="preserve">
+    <value>Правильный ответ</value>
+  </data>
   <data name="RightAnswers" xml:space="preserve">
     <value>Верных</value>
   </data>
   <data name="Round" xml:space="preserve">
     <value>Раунд</value>
   </data>
+  <data name="RoundStart" xml:space="preserve">
+    <value>Начало раунда</value>
+  </data>
+  <data name="RoundThemes" xml:space="preserve">
+    <value>Темы раунда</value>
+  </data>
   <data name="RoundTime" xml:space="preserve">
     <value>Время раунда (с)</value>
   </data>
+  <data name="RoundTimeout" xml:space="preserve">
+    <value>Окончание времени раунда</value>
+  </data>
   <data name="RuntimeBrokenError" xml:space="preserve">
     <value>Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}</value>
+  </data>
+  <data name="SaveLogsToFolder" xml:space="preserve">
+    <value>Сохранять логи в папку</value>
   </data>
   <data name="SavingSettingsError" xml:space="preserve">
     <value>Ошибка при сохранении настроек программы</value>
   </data>
   <data name="SecondaryScreen" xml:space="preserve">
     <value>Дополнительный</value>
+  </data>
+  <data name="SecretQuestion" xml:space="preserve">
+    <value>Вопрос с секретом</value>
   </data>
   <data name="Select" xml:space="preserve">
     <value>Выбрать</value>
@@ -531,6 +585,9 @@
   <data name="ShowTextNoFalseStartsHint" xml:space="preserve">
     <value>Показывать текст вопросов при игре без фальстартов</value>
   </data>
+  <data name="SignalsAfterTimerHint" xml:space="preserve">
+    <value>Принимать сигналы игроков после истечения времени на размышление</value>
+  </data>
   <data name="SIQuestions" xml:space="preserve">
     <value>Вопросы СИ</value>
   </data>
@@ -551,6 +608,9 @@
   </data>
   <data name="Stake" xml:space="preserve">
     <value>Ставка</value>
+  </data>
+  <data name="StakeQuestion" xml:space="preserve">
+    <value>Вопрос со ставкой</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Старт</value>
@@ -576,6 +636,12 @@
   <data name="Sum" xml:space="preserve">
     <value>Сумма</value>
   </data>
+  <data name="TableHotKeysHint" xml:space="preserve">
+    <value>Горячие клавиши игрового табло:
+Пробел (левая кнопка мыши) - перейти дальше
+Backspace - перейти назад
+Escape (правая кнопка мыши) - завершить игру</value>
+  </data>
   <data name="TestPackage" xml:space="preserve">
     <value>Пакет тест</value>
   </data>
@@ -597,11 +663,27 @@
   <data name="UnknownType" xml:space="preserve">
     <value>Неизвестный тип</value>
   </data>
+  <data name="UseKeysToSelectQuestions" xml:space="preserve">
+    <value>Использовать клавиатурный выбор на табло</value>
+  </data>
+  <data name="UseKeysToSelectQuestionsHint" xml:space="preserve">
+    <value>Позволяет выбирать вопросы на табло при помощи двух последовательных нажатий на цифровые кнопки (номер темы, номер вопроса/Escape для отмены) и убирать темы в финале при помощи одного нажатия</value>
+  </data>
   <data name="Version" xml:space="preserve">
     <value>Версия</value>
   </data>
   <data name="Video" xml:space="preserve">
     <value>Видео</value>
+  </data>
+  <data name="WebButtonsConnectionString" xml:space="preserve">
+    <value>Адрес для подключения к игре: http://</value>
+  </data>
+  <data name="WebButtonsHint" xml:space="preserve">
+    <value>В данном режиме в качестве кнопок используются мобильные устройства участников (телефоны, планшеты и пр.). Перед началом игры производится регистрация этих устройств и их связывание с игроками.
+Для игры необходимо организовать локальную сеть</value>
+  </data>
+  <data name="WebButtonsPort" xml:space="preserve">
+    <value>Порт веб-доступа</value>
   </data>
   <data name="Website" xml:space="preserve">
     <value>Сайт</value>
@@ -611,6 +693,9 @@
   </data>
   <data name="Window" xml:space="preserve">
     <value>Окно</value>
+  </data>
+  <data name="WrongAnswer" xml:space="preserve">
+    <value>Неверный ответ</value>
   </data>
   <data name="WrongAnswers" xml:space="preserve">
     <value>Неверных</value>

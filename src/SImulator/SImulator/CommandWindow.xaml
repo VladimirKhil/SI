@@ -1195,10 +1195,9 @@
                         HorizontalAlignment="Right"
                         Width="120"
                         Height="25"
-                        DockPanel.Dock="Right">
-                        Выбрать…
-                    </Button>
-                    
+                        DockPanel.Dock="Right"
+                        Content="{x:Static lp:Resources.SelectHeader}" />
+
                     <TextBox
                         Width="Auto"
                         IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
@@ -1216,9 +1215,8 @@
                         HorizontalAlignment="Right"
                         Width="120"
                         Height="25"
-                        DockPanel.Dock="Right">
-                        Выбрать…
-                    </Button>
+                        DockPanel.Dock="Right"
+                        Content="{x:Static lp:Resources.SelectHeader}" />
                     
                     <TextBox
                         Width="Auto"
@@ -1428,9 +1426,13 @@
                         </UniformGrid>
                     </Grid>
                 </Expander>
-                
-                <CheckBox IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" IsChecked="{Binding Settings.SaveLogs}" Margin="0,5">Сохранять логи в папку:</CheckBox>
-                
+
+                <CheckBox
+                    IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
+                    IsChecked="{Binding Settings.SaveLogs}"
+                    Margin="0,5"
+                    Content="{x:Static lp:Resources.SaveLogsToFolder}" />
+
                 <DockPanel IsEnabled="{Binding Settings.SaveLogs}">
                     <Button
                         Margin="5,0,4,0"
@@ -1438,9 +1440,8 @@
                         HorizontalAlignment="Right"
                         Width="120"
                         Height="25"
-                        DockPanel.Dock="Right">
-                        Выбрать…
-                    </Button>
+                        DockPanel.Dock="Right"
+                        Content="{x:Static lp:Resources.SelectHeader}" />
                     
                     <TextBox
                         Width="Auto"
@@ -1464,23 +1465,21 @@
 
         <TabItem Header="{x:Static lp:Resources.Buttons}">
             <StackPanel Margin="2,2,0,0">
-                <TextBlock Style="{StaticResource Title}">Кнопки</TextBlock>
-                <TextBlock FontStyle="Italic" TextWrapping="Wrap">Горячие клавиши игрового табло:<LineBreak />Пробел (левая кнопка мыши) - перейти дальше<LineBreak />Backspace - перейти назад<LineBreak />Escape (правая кнопка мыши) - завершить игру</TextBlock>
-                
+                <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.Buttons}" />
+                <TextBlock FontStyle="Italic" TextWrapping="Wrap" Text="{x:Static lp:Resources.TableHotKeysHint}" />
+
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding SettingsViewModel.SIUISettings.Model.KeyboardControl}" Margin="0,5">Использовать клавиатурный выбор на табло</CheckBox>
-                    
+                    <CheckBox IsChecked="{Binding SettingsViewModel.SIUISettings.Model.KeyboardControl}" Margin="0,5" Content="{x:Static lp:Resources.UseKeysToSelectQuestions}" />
+
                     <Button Style="{StaticResource HelpButton}">
                         <lb:TipBehavior.Tip>
-                            <TextBlock TextWrapping="Wrap">
-                                Позволяет выбирать вопросы на табло при помощи двух последовательных нажатий на цифровые кнопки (номер темы, номер вопроса/Escape для отмены) и убирать темы в финале при помощи одного нажатия
-                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.UseKeysToSelectQuestionsHint}" />
                         </lb:TipBehavior.Tip>
                     </Button>
                 </StackPanel>
-                
-                <TextBlock Style="{StaticResource Header}">Игровые кнопки</TextBlock>
-                
+
+                <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GameButtons}" />
+
                 <ComboBox
                     ItemsSource="{Binding Source={StaticResource TempPlayerButtonTypes}}"
                     SelectedItem="{Binding Settings.UsePlayersKeys}"
@@ -1528,9 +1527,9 @@
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    
-                    <TextBlock FontStyle="Italic" TextWrapping="Wrap" Margin="0,0,0,6">Соответствуют позициям игроков в списке</TextBlock>
-                    
+
+                    <TextBlock FontStyle="Italic" TextWrapping="Wrap" Margin="0,0,0,6" Text="{x:Static lp:Resources.ButtonOrderHint}" />
+
                     <ItemsControl
                         HorizontalAlignment="Left"
                         Margin="0,5"
@@ -1575,14 +1574,13 @@
                         Content="{Binding ActivePlayerButtonCommand.Name}"
                         IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
                         LostKeyboardFocus="Button_LostKeyboardFocus_1" />
-                    
+
                     <CheckBox
                         IsChecked="{Binding Settings.SignalsAfterTimer}"
-                        Margin="0,10,0,5">
-                        Принимать сигналы игроков после истечения времени на размышление
-                    </CheckBox>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Время блокировки кнопки (с)" />
+                        Margin="0,10,0,5"
+                        Content="{x:Static lp:Resources.SignalsAfterTimerHint}" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ButtonBlockingTime}" />
                     <TextBox lb:NumericBehavior.IsAttached="True" Text="{Binding Settings.BlockingTime}" />
                 </StackPanel>
                 
@@ -1590,7 +1588,7 @@
                     FontStyle="Italic"
                     Margin="0,5,0,0"
                     TextWrapping="Wrap"
-                    Text="В данном режиме используются кнопки, не подключённые к программе (независимые устройства, хлопки и т.д.). Программа показывает рамку в момент, когда можно нажимать (при игре с фальстартами).">
+                    Text="{x:Static lp:Resources.ExternalButtonsHint}">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -1605,14 +1603,8 @@
                 </TextBlock>
                 
                 <StackPanel>
-                    <TextBlock FontStyle="Italic" Margin="0,5,0,0" TextWrapping="Wrap">
-                        <Run>В данном режиме в качестве кнопок используются мобильные устройства участников (телефоны, планшеты и пр.). Перед началом игры производится регистрация этих устройств и их связывание с игроками.</Run>
-                        <LineBreak />
-                        <LineBreak />
-                        <Run>Для игры необходимо организовать локальную сеть.</Run>
-                    </TextBlock>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Порт веб-доступа" />
+                    <TextBlock FontStyle="Italic" Margin="0,5,0,0" TextWrapping="Wrap" Text="{x:Static lp:Resources.WebButtonsHint}" />
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.WebButtonsPort}" />
                     
                     <TextBox
                         lb:NumericBehavior.IsAttached="True"
@@ -1621,10 +1613,10 @@
                         IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     
                     <TextBlock>
-                        <Run Text="Адрес для подключения к игре: http://" /><Run Text="{Binding Host,Mode=OneTime}" FontWeight="Bold" /><Run Text=":" /><Run Text="{Binding Settings.WebPort}" />
+                        <Run Text="{x:Static lp:Resources.WebButtonsConnectionString}" /><Run Text="{Binding Host,Mode=OneTime}" FontWeight="Bold" /><Run Text=":" /><Run Text="{Binding Settings.WebPort}" />
                     </TextBlock>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Время блокировки кнопки (с)" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ButtonBlockingTime}" />
                     <TextBox Text="{Binding Settings.BlockingTime}" lb:NumericBehavior.IsAttached="True" />
                     
                     <StackPanel.Style>
@@ -1647,7 +1639,7 @@
                 <StackPanel Margin="2,2,0,0">
                     <CheckBox Margin="0,5" IsChecked="{Binding SettingsViewModel.Model.PlaySounds}" Content="{x:Static lp:Resources.PlaySounds}" />
 
-                    <TextBlock Style="{StaticResource Header}" Text="Начало игры" />
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GameStart}" />
                     
                     <DockPanel>
                         <Button
@@ -1657,9 +1649,8 @@
                             HorizontalAlignment="Right"
                             Width="120"
                             Height="25"
-                            DockPanel.Dock="Right">
-                            Выбрать…
-                        </Button>
+                            DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         
                         <TextBox
                             Width="Auto"
@@ -1668,8 +1659,8 @@
                             HorizontalAlignment="Stretch"
                             Text="{Binding SettingsViewModel.Model.Sounds.BeginGame}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Темы игры" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GameThemes}" />
                     
                     <DockPanel>
                         <Button
@@ -1679,9 +1670,8 @@
                             HorizontalAlignment="Right"
                             Width="120"
                             Height="25"
-                            DockPanel.Dock="Right">
-                            Выбрать…
-                        </Button>
+                            DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         
                         <TextBox
                             Width="Auto"
@@ -1690,8 +1680,8 @@
                             HorizontalAlignment="Stretch"
                             Text="{Binding SettingsViewModel.Model.Sounds.GameThemes}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Начало раунда" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RoundStart}" />
                     
                     <DockPanel>
                         <Button
@@ -1701,9 +1691,8 @@
                             HorizontalAlignment="Right"
                             Width="120"
                             Height="25"
-                            DockPanel.Dock="Right">
-                            Выбрать…
-                        </Button>
+                            DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         
                         <TextBox
                             Width="Auto"
@@ -1712,8 +1701,8 @@
                             HorizontalAlignment="Stretch"
                             Text="{Binding SettingsViewModel.Model.Sounds.RoundBegin}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Темы раунда" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RoundThemes}" />
                     
                     <DockPanel>
                         <Button
@@ -1723,9 +1712,8 @@
                             HorizontalAlignment="Right"
                             Width="120"
                             Height="25"
-                            DockPanel.Dock="Right">
-                            Выбрать…
-                        </Button>
+                            DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         
                         <TextBox
                             Width="Auto"
@@ -1734,8 +1722,8 @@
                             HorizontalAlignment="Stretch"
                             Text="{Binding SettingsViewModel.Model.Sounds.RoundThemes}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Выбор вопроса" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionSelection}" />
                     
                     <DockPanel>
                         <Button
@@ -1745,9 +1733,8 @@
                             HorizontalAlignment="Right"
                             Width="120"
                             Height="25"
-                            DockPanel.Dock="Right">
-                            Выбрать…
-                        </Button>
+                            DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         
                         <TextBox
                             Width="Auto"
@@ -1756,57 +1743,64 @@
                             HorizontalAlignment="Stretch"
                             Text="{Binding SettingsViewModel.Model.Sounds.QuestionSelected}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Нажатие на кнопку" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ButtonPressed}" />
                     
                     <DockPanel>
-                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="3" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="3" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.PlayerPressed}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Вопрос с секретом" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.SecretQuestion}" />
                     
                     <DockPanel>
-                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="4" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="4" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.SecretQuestion}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Вопрос со ставкой" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.StakeQuestion}" />
                     
                     <DockPanel>
-                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="5" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="5" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.StakeQuestion}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Вопрос без риска" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.NoRiskQuestion}" />
                     
                     <DockPanel>
-                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="6" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="6" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.NoRiskQuestion}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Правильный ответ" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RightAnswer}" />
                     
                     <DockPanel>
-                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="7" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="7" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.AnswerRight}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Неверный ответ" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.WrongAnswer}" />
                     
                     <DockPanel>
-                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="8" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="8" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.AnswerWrong}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Нет ответа" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.NoAnswer}" />
                     
                     <DockPanel>
-                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="9" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="9" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.NoAnswer}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Окончание времени раунда" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RoundTimeout}" />
                     
                     <DockPanel>
                         <Button
@@ -1816,9 +1810,8 @@
                             HorizontalAlignment="Right"
                             Width="120"
                             Height="25"
-                            DockPanel.Dock="Right">
-                            Выбрать…
-                        </Button>
+                            DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         
                         <TextBox
                             Width="Auto"
@@ -1827,8 +1820,8 @@
                             HorizontalAlignment="Stretch"
                             Text="{Binding SettingsViewModel.Model.Sounds.RoundTimeout}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Удаление темы в финале" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FinalThemeRemoval}" />
                     
                     <DockPanel>
                         <Button
@@ -1838,9 +1831,8 @@
                             HorizontalAlignment="Right"
                             Width="120"
                             Height="25"
-                            DockPanel.Dock="Right">
-                            Выбрать…
-                        </Button>
+                            DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         
                         <TextBox
                             Width="Auto"
@@ -1849,8 +1841,8 @@
                             HorizontalAlignment="Stretch"
                             Text="{Binding SettingsViewModel.Model.Sounds.FinalDelete}" />
                     </DockPanel>
-                    
-                    <TextBlock Style="{StaticResource Header}" Text="Размышление в финале" />
+
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FinalThink}" />
                     
                     <DockPanel>
                         <Button
@@ -1860,9 +1852,8 @@
                             HorizontalAlignment="Right"
                             Width="120"
                             Height="25"
-                            DockPanel.Dock="Right">
-                            Выбрать…
-                        </Button>
+                            DockPanel.Dock="Right"
+                            Content="{x:Static lp:Resources.SelectHeader}" />
                         
                         <TextBox
                             Width="Auto"
@@ -1876,7 +1867,7 @@
                         Command="{Binding SettingsViewModel.Reset}"
                         CommandParameter="8"
                         IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
-                        Content="По умолчанию"
+                        Content="{x:Static lp:Resources.ByDefault}"
                         Height="25"
                         Width="120"
                         Margin="0,15,4,5"

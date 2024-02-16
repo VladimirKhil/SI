@@ -232,6 +232,33 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Время блокировки кнопки (с).
+        /// </summary>
+        public static string ButtonBlockingTime {
+            get {
+                return ResourceManager.GetString("ButtonBlockingTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Соответствуют позициям игроков в списке.
+        /// </summary>
+        public static string ButtonOrderHint {
+            get {
+                return ResourceManager.GetString("ButtonOrderHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Нажатие на кнопку.
+        /// </summary>
+        public static string ButtonPressed {
+            get {
+                return ResourceManager.GetString("ButtonPressed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Кнопки.
         /// </summary>
         public static string Buttons {
@@ -459,6 +486,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на В данном режиме используются кнопки, не подключённые к программе (независимые устройства, хлопки и т.д.). Программа показывает рамку в момент, когда можно нажимать (при игре с фальстартами).
+        /// </summary>
+        public static string ExternalButtonsHint {
+            get {
+                return ResourceManager.GetString("ExternalButtonsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Игра с фальстартами.
         /// </summary>
         public static string FalseStartGame {
@@ -506,6 +542,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Удаление темы в финале.
+        /// </summary>
+        public static string FinalThemeRemoval {
+            get {
+                return ResourceManager.GetString("FinalThemeRemoval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Размышление в финале.
+        /// </summary>
+        public static string FinalThink {
+            get {
+                return ResourceManager.GetString("FinalThink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Время на размышление в финале (с).
         /// </summary>
         public static string FinalThinkingTime {
@@ -542,6 +596,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Игровые кнопки.
+        /// </summary>
+        public static string GameButtons {
+            get {
+                return ResourceManager.GetString("GameButtons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Упрощённая.
         /// </summary>
         public static string GameModes_Sport {
@@ -574,6 +637,24 @@ namespace SImulator.Properties {
         public static string GameRules {
             get {
                 return ResourceManager.GetString("GameRules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Начало игры.
+        /// </summary>
+        public static string GameStart {
+            get {
+                return ResourceManager.GetString("GameStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Темы игры.
+        /// </summary>
+        public static string GameThemes {
+            get {
+                return ResourceManager.GetString("GameThemes", resourceCulture);
             }
         }
         
@@ -760,6 +841,24 @@ namespace SImulator.Properties {
         public static string Next {
             get {
                 return ResourceManager.GetString("Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Нет ответа.
+        /// </summary>
+        public static string NoAnswer {
+            get {
+                return ResourceManager.GetString("NoAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос без риска.
+        /// </summary>
+        public static string NoRiskQuestion {
+            get {
+                return ResourceManager.GetString("NoRiskQuestion", resourceCulture);
             }
         }
         
@@ -980,6 +1079,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Выбор вопроса.
+        /// </summary>
+        public static string QuestionSelection {
+            get {
+                return ResourceManager.GetString("QuestionSelection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Время вопроса (c).
         /// </summary>
         public static string QuestionTime {
@@ -1070,6 +1178,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Правильный ответ.
+        /// </summary>
+        public static string RightAnswer {
+            get {
+                return ResourceManager.GetString("RightAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Верных.
         /// </summary>
         public static string RightAnswers {
@@ -1088,6 +1205,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Начало раунда.
+        /// </summary>
+        public static string RoundStart {
+            get {
+                return ResourceManager.GetString("RoundStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Темы раунда.
+        /// </summary>
+        public static string RoundThemes {
+            get {
+                return ResourceManager.GetString("RoundThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Время раунда (с).
         /// </summary>
         public static string RoundTime {
@@ -1097,11 +1232,29 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Окончание времени раунда.
+        /// </summary>
+        public static string RoundTimeout {
+            get {
+                return ResourceManager.GetString("RoundTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}.
         /// </summary>
         public static string RuntimeBrokenError {
             get {
                 return ResourceManager.GetString("RuntimeBrokenError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Сохранять логи в папку.
+        /// </summary>
+        public static string SaveLogsToFolder {
+            get {
+                return ResourceManager.GetString("SaveLogsToFolder", resourceCulture);
             }
         }
         
@@ -1120,6 +1273,15 @@ namespace SImulator.Properties {
         public static string SecondaryScreen {
             get {
                 return ResourceManager.GetString("SecondaryScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос с секретом.
+        /// </summary>
+        public static string SecretQuestion {
+            get {
+                return ResourceManager.GetString("SecretQuestion", resourceCulture);
             }
         }
         
@@ -1277,6 +1439,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Принимать сигналы игроков после истечения времени на размышление.
+        /// </summary>
+        public static string SignalsAfterTimerHint {
+            get {
+                return ResourceManager.GetString("SignalsAfterTimerHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Вопросы СИ.
         /// </summary>
         public static string SIQuestions {
@@ -1336,6 +1507,15 @@ namespace SImulator.Properties {
         public static string Stake {
             get {
                 return ResourceManager.GetString("Stake", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос со ставкой.
+        /// </summary>
+        public static string StakeQuestion {
+            get {
+                return ResourceManager.GetString("StakeQuestion", resourceCulture);
             }
         }
         
@@ -1412,6 +1592,18 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Горячие клавиши игрового табло:
+        ///Пробел (левая кнопка мыши) - перейти дальше
+        ///Backspace - перейти назад
+        ///Escape (правая кнопка мыши) - завершить игру.
+        /// </summary>
+        public static string TableHotKeysHint {
+            get {
+                return ResourceManager.GetString("TableHotKeysHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Пакет тест.
         /// </summary>
         public static string TestPackage {
@@ -1475,6 +1667,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Использовать клавиатурный выбор на табло.
+        /// </summary>
+        public static string UseKeysToSelectQuestions {
+            get {
+                return ResourceManager.GetString("UseKeysToSelectQuestions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Позволяет выбирать вопросы на табло при помощи двух последовательных нажатий на цифровые кнопки (номер темы, номер вопроса/Escape для отмены) и убирать темы в финале при помощи одного нажатия.
+        /// </summary>
+        public static string UseKeysToSelectQuestionsHint {
+            get {
+                return ResourceManager.GetString("UseKeysToSelectQuestionsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Версия.
         /// </summary>
         public static string Version {
@@ -1489,6 +1699,34 @@ namespace SImulator.Properties {
         public static string Video {
             get {
                 return ResourceManager.GetString("Video", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Адрес для подключения к игре: http://.
+        /// </summary>
+        public static string WebButtonsConnectionString {
+            get {
+                return ResourceManager.GetString("WebButtonsConnectionString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на В данном режиме в качестве кнопок используются мобильные устройства участников (телефоны, планшеты и пр.). Перед началом игры производится регистрация этих устройств и их связывание с игроками.
+        ///Для игры необходимо организовать локальную сеть.
+        /// </summary>
+        public static string WebButtonsHint {
+            get {
+                return ResourceManager.GetString("WebButtonsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Порт веб-доступа.
+        /// </summary>
+        public static string WebButtonsPort {
+            get {
+                return ResourceManager.GetString("WebButtonsPort", resourceCulture);
             }
         }
         
@@ -1516,6 +1754,15 @@ namespace SImulator.Properties {
         public static string Window {
             get {
                 return ResourceManager.GetString("Window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Неверный ответ.
+        /// </summary>
+        public static string WrongAnswer {
+            get {
+                return ResourceManager.GetString("WrongAnswer", resourceCulture);
             }
         }
         
