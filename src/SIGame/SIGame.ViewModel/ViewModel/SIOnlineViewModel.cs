@@ -921,6 +921,46 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         GameSettings.Message = Resources.Creating;
 
+
+        // TODO: enable after server update
+        //settings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
+
+        //var runGameResponse = await _gameServerClient.RunGameAsync(
+        //    new SI.GameServer.Contract.RunGameRequest((
+        //        GameSettingsCore<AppSettingsCore>)settings,
+        //        packageInfo,
+        //        computerAccounts.Select(ca => ca.Account).ToArray()),
+        //    cancellationToken);
+
+        //if (!runGameResponse.IsSuccess)
+        //{
+        //    throw new Exception(GetMessage(runGameResponse.ErrorType));
+        //}
+
+        // GameSettings.Message = Resources.GameEntering;
+
+        //var name = Human.Name;
+
+        //_password = settings.NetworkGamePassword;
+
+        //var game = new GameInfo
+        //{
+        //    HostUri = runGameResponse.HostUri,
+        //    GameID = runGameResponse.GameId,
+        //    Owner = name
+        //};
+
+        //await JoinGameAsync(game, settings.Role, runGameResponse.IsHost, cancellationToken);
+
+        //if (_host == null)
+        //{
+        //    return null;
+        //}
+
+        //_host.Connector?.SetGameID(runGameResponse.GameId);
+
+        //return (_node, _host);
+
         if (_userSettings.UseSignalRConnection)
         {
             var gameCreatingResult2 = await _gameServerClient.CreateAndJoinGame2Async(
