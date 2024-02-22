@@ -525,4 +525,7 @@
   <data name="UnknownError" xml:space="preserve">
     <value>Unknown error</value>
   </data>
+  <data name="TooMuchRandomPackages" xml:space="preserve">
+    <value>You created too much random pakages. Please try again later</value>
+  </data>
 </root>

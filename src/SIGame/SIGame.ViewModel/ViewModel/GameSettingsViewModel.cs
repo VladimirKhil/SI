@@ -1,4 +1,5 @@
-﻿using SICore;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SICore;
 using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Contracts;
@@ -14,6 +15,7 @@ using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Web;
 using SIPackages;
+using SIStorage.Service.Contract;
 using SIStorageService.ViewModel;
 using SIUI.ViewModel;
 using System.Collections.ObjectModel;
@@ -440,7 +442,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                         break;
 
                     case PackageSourceTypes.RandomServer:
-                        Package = new RandomServerPackageSource();
+                        Package = new RandomStoragePackageSource(PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageServiceClient>());
                         break;
 
                     case PackageSourceTypes.Local:
@@ -524,7 +526,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                 break;
 
             case PackageSourceTypes.RandomServer:
-                Package = new RandomServerPackageSource();
+                Package = new RandomStoragePackageSource(PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageServiceClient>());
                 break;
 
             case PackageSourceTypes.Local:
