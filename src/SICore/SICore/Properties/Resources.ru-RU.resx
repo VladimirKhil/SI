@@ -848,4 +848,10 @@
   <data name="ScoreChanged" xml:space="preserve">
     <value>{0} изменил{4} сумму на счёте {1} с {2} на {3}</value>
   </data>
+  <data name="RandomPackageName" xml:space="preserve">
+    <value>Случайный набор тем</value>
+  </data>
+  <data name="RoundName" xml:space="preserve">
+    <value>{0}-й раунд</value>
+  </data>
 </root>

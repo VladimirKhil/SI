@@ -843,4 +843,10 @@
   <data name="ScoreChanged" xml:space="preserve">
     <value>{0} changed {1} score from {2} to {3}</value>
   </data>
+  <data name="RandomPackageName" xml:space="preserve">
+    <value>Random themes</value>
+  </data>
+  <data name="RoundName" xml:space="preserve">
+    <value>Round {0}</value>
+  </data>
 </root>

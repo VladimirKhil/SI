@@ -1519,6 +1519,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Random themes.
+        /// </summary>
+        public static string RandomPackageName {
+            get {
+                return ResourceManager.GetString("RandomPackageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Random theme set.
         /// </summary>
         public static string RandomThemes {
@@ -1605,6 +1614,15 @@ namespace SICore.Properties {
         public static string Round {
             get {
                 return ResourceManager.GetString("Round", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Round {0}.
+        /// </summary>
+        public static string RoundName {
+            get {
+                return ResourceManager.GetString("RoundName", resourceCulture);
             }
         }
         

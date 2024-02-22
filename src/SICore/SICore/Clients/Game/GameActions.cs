@@ -2,11 +2,13 @@
 using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Contracts;
+using SICore.Extensions;
 using SICore.Network;
 using SICore.Network.Clients;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
+using SIStorage.Service.Contract.Models;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -94,7 +96,7 @@ public sealed class GameActions
 
         for (var i = 0; i < _gameData.Rounds.Length; i++)
         {
-            message.Append(Message.ArgsSeparatorChar).Append(_gameData.Rounds[i].Name);
+            message.Append(Message.ArgsSeparatorChar).Append(LO.GetRoundName(_gameData.Rounds[i].Name));
         }
 
         SendMessage(message.ToString(), person);

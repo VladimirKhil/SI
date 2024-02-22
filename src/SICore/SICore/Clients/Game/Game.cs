@@ -22,7 +22,7 @@ namespace SICore;
 // TODO: Global refactoring plan:
 // extract different script steps implementations (stake making, question selecting and giving etc.)
 // to separate classes (strategies)
-// Extract corresponging state from GameData class
+// Extract corresponding state from GameData class
 
 // Remove Final round logic; use only StakeAll question type which can also appear in standard round
 
@@ -2436,6 +2436,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
 
         var indexStr = args[2];
+
         if (ClientData.Players.Count <= 2 || !int.TryParse(indexStr, out int index) || index <= -1
             || index >= ClientData.Players.Count)
         {
@@ -2464,7 +2465,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             catch (Exception exc)
             {
                 throw new InvalidOperationException(
-                    $"DropPlayerIndex error. Persons history: {ClientData.PersonsUpdateHistory}; logic history: {Logic.PrintHistory()}",
+                    $"DropPlayerIndex error. Persons history: {ClientData.PersonsUpdateHistory}; logic history: {Logic.PrintHistory()}; stake history: {ClientData.OrderHistory}",
                     exc);
             }
 
@@ -2567,7 +2568,8 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (ClientData.Question != null &&
             ((ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Auction
-            || (ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Stake))
+            || (ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Stake)
+            && ClientData.Order.Length > 0)
         {
             DropPlayerFromStakes(playerIndex);
         }
@@ -3064,7 +3066,7 @@ public sealed class Game : Actor<GameData, GameLogic>
     {
         int otherIndex = -1;
         // На кого заменяем
-        ViewerAccount otherAccount = null;
+        ViewerAccount? otherAccount = null;
 
         ClientData.BeginUpdatePersons($"SetHumanPerson {account.Name} {account.IsConnected} {replacer} {index}");
 

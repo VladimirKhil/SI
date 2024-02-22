@@ -3,6 +3,7 @@ using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Clients.Game;
 using SICore.Contracts;
+using SICore.Extensions;
 using SICore.Models;
 using SICore.Results;
 using SICore.Utils;
@@ -26,6 +27,11 @@ namespace SICore;
 /// </summary>
 public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDisposable
 {
+    /// <summary>
+    /// Random package marker.
+    /// </summary>
+    private const string RandomIndicator = "@{random}";
+
     private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
     private const int MaxAnswerLength = 350;
@@ -401,7 +407,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         InitQuestionState(question);
 
-        // Если информация о теме ещё не выводилась
+        // If theme info has not been displayed yet
         if (!_data.ThemeInfoShown[themeIndex])
         {
             _data.ThemeInfoShown[themeIndex] = true;
@@ -424,6 +430,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPlayingMedia = false;
         _data.IsPlayingMediaPaused = false;
         _data.CurPriceRight = _data.CurPriceWrong = question.Price;
+        _data.Order = Array.Empty<int>();
+        _data.OrderIndex = -1;
 
         if (_data.Settings.AppSettings.HintShowman)
         {
@@ -2525,10 +2533,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
-        _gameActions.InformStage(name: _data.Round.Name, index: roundIndex);
+        var roundName = LO.GetRoundName(_data.Round.Name);
+
+        _gameActions.InformStage(name: roundName, index: roundIndex);
         _gameActions.InformRoundContent();
 
-        _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
+        _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");
 
         ScheduleExecution(Tasks.Round, 20, 2);
     }
@@ -4135,7 +4145,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             if (!isRandomPackage)
             {
-                _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], package.Name));
+                var packageName = package.Name == RandomIndicator ? LO[nameof(R.RandomPackageName)] : package.Name;
+
+                _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], packageName));
                 informed = true;
 
                 var logoItem = package.LogoItem;
@@ -4155,7 +4167,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             var authors = _data.PackageDoc.GetRealAuthors(package.Info.Authors);
 
-            if (!isRandomPackage && authors.Length > 0)
+            if (!isRandomPackage && package.Name != RandomIndicator && authors.Length > 0)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4187,7 +4199,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (stage == 4)
         {
-            if (package.Info.Comments.Text.Length > 0 && !isRandomPackage)
+            if (package.Info.Comments.Text.Length > 0 && !isRandomPackage && package.Name != RandomIndicator)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4276,27 +4288,29 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
             }
 
+            var roundName = LO.GetRoundName(round.Name);
+
             if (round.Type == RoundTypes.Final)
             {
                 _data.Stage = GameStage.Final;
-                OnStageChanged(GameStages.Round, round.Name, roundIndex + 1, _data.Rounds.Length);
+                OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
                 ScheduleExecution(Tasks.PrintFinal, 1, 1, true);
                 return;
             }
             else
             {
                 _data.Stage = GameStage.Round;
-                OnStageChanged(GameStages.Round, round.Name, roundIndex + 1, _data.Rounds.Length);
+                OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
             }
 
-            _gameActions.InformStage(name: skipRoundAnnounce ? "" : round.Name, index: roundIndex);
+            _gameActions.InformStage(name: skipRoundAnnounce ? "" : roundName, index: roundIndex);
             _gameActions.InformRoundContent();
 
             if (!skipRoundAnnounce)
             {
-                _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {round.Name}!");
+                _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");
                 _gameActions.SystemReplic(" "); // new line
-                _gameActions.SystemReplic(round.Name);
+                _gameActions.SystemReplic(roundName);
             }
             else
             {
