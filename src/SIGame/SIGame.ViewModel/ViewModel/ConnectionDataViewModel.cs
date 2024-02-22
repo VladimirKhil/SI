@@ -234,7 +234,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     private async void Join_Executed(object? arg) => await JoinGameAsync(null, (GameRole)arg);
 
-    protected virtual async Task JoinGameAsync(GameInfo gameInfo, GameRole role, bool host = false, CancellationToken cancellationToken = default)
+    protected virtual async Task JoinGameAsync(GameInfo? gameInfo, GameRole role, bool host = false, CancellationToken cancellationToken = default)
     {
         IsProgress = true;
 
@@ -259,7 +259,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     }
 
     public virtual async Task JoinGameCoreAsync(
-        GameInfo gameInfo,
+        GameInfo? gameInfo,
         GameRole role,
         bool isHost = false,
         CancellationToken cancellationToken = default)
