@@ -370,8 +370,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         _gameServerClient.Reconnected += GameServerClient_Reconnected;
         _gameServerClient.Closed += GameServerClient_Closed;
 
-        _gameServerClient.UploadProgress += GameServerClient_UploadProgress;
-
         ServerAddress = _gameServerClient.ServiceUri;
 
         AddEmoji = new CustomCommand(AddEmoji_Executed);
@@ -420,8 +418,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     }
 
     private void AddEmoji_Executed(object? arg) => ChatText += arg.ToString();
-
-    private void GameServerClient_UploadProgress(int progress) => UploadProgress = progress;
 
     private Task GameServerClient_Closed(Exception? exception)
     {
@@ -699,8 +695,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             _gameServerClient.Reconnecting -= GameServerClient_Reconnecting;
             _gameServerClient.Reconnected -= GameServerClient_Reconnected;
             _gameServerClient.Closed -= GameServerClient_Closed;
-
-            _gameServerClient.UploadProgress -= GameServerClient_UploadProgress;
         }
 
         await base.ClearConnectionAsync();
@@ -856,93 +850,41 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         GameSettings.Message = Resources.Creating;
 
+        settings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
 
-        // TODO: enable after server update
-        //settings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
-
-        //var runGameResponse = await _gameServerClient.RunGameAsync(
-        //    new SI.GameServer.Contract.RunGameRequest((
-        //        GameSettingsCore<AppSettingsCore>)settings,
-        //        packageInfo,
-        //        computerAccounts.Select(ca => ca.Account).ToArray()),
-        //    cancellationToken);
-
-        //if (!runGameResponse.IsSuccess)
-        //{
-        //    throw new Exception(GetMessage(runGameResponse.ErrorType));
-        //}
-
-        // GameSettings.Message = Resources.GameEntering;
-
-        //var name = Human.Name;
-
-        //_password = settings.NetworkGamePassword;
-
-        //var game = new GameInfo
-        //{
-        //    HostUri = runGameResponse.HostUri,
-        //    GameID = runGameResponse.GameId,
-        //    Owner = name
-        //};
-
-        //await JoinGameAsync(game, settings.Role, runGameResponse.IsHost, cancellationToken);
-
-        //if (_host == null)
-        //{
-        //    return null;
-        //}
-
-        //_host.Connector?.SetGameID(runGameResponse.GameId);
-
-        //return (_node, _host);
-
-        if (_userSettings.UseSignalRConnection)
-        {
-            var gameCreatingResult2 = await _gameServerClient.CreateAndJoinGame2Async(
-                (GameSettingsCore<AppSettingsCore>)settings,
+        var runGameResponse = await _gameServerClient.RunGameAsync(
+            new SI.GameServer.Contract.RunGameRequest((
+                GameSettingsCore<AppSettingsCore>)settings,
                 packageInfo,
-                computerAccounts.ToArray(),
-                Human.IsMale,
-                cancellationToken);
-
-            if (gameCreatingResult2.Code != SI.GameServer.Contract.GameCreationResultCode.Ok)
-            {
-                var errorDetail = gameCreatingResult2.ErrorMessage != null ? $": {gameCreatingResult2.ErrorMessage}" : null;
-                throw new Exception(GetMessage(gameCreatingResult2.Code) + errorDetail);
-            }
-
-            await InitNodeAndClientNewAsync(_gameServerClient, cancellationToken);
-            await JoinGameCompletedAsync(settings.Role, true, cancellationToken);
-
-            if (_host == null)
-            {
-                return null;
-            }
-
-            _host.Connector.SetGameID(gameCreatingResult2.GameId);
-
-            return (_node, _host);
-        }
-
-        var gameCreatingResult = await _gameServerClient.CreateGame2Async(
-            (GameSettingsCore<AppSettingsCore>)settings,
-            packageInfo,
-            computerAccounts.ToArray(),
+                computerAccounts.Select(ca => ca.Account).ToArray()),
             cancellationToken);
 
-        if (gameCreatingResult.Code != SI.GameServer.Contract.GameCreationResultCode.Ok)
+        if (!runGameResponse.IsSuccess)
         {
-            throw new Exception(GetMessage(gameCreatingResult.Code));
+            throw new Exception(GetMessage(runGameResponse.ErrorType));
         }
 
         GameSettings.Message = Resources.GameEntering;
 
-        await ConnectToServerAsHostAsync(gameCreatingResult.GameId, settings, cancellationToken);
+        var name = Human.Name;
+
+        _password = settings.NetworkGamePassword;
+
+        var game = new GameInfo
+        {
+            HostUri = runGameResponse.HostUri,
+            GameID = runGameResponse.GameId,
+            Owner = name
+        };
+
+        await JoinGameAsync(game, settings.Role, runGameResponse.IsHost, cancellationToken);
 
         if (_host == null)
         {
             return null;
         }
+
+        _host.Connector?.SetGameID(runGameResponse.GameId);
 
         return (_node, _host);
     }
@@ -1015,41 +957,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
         var randomIndex = Random.Shared.Next(_gamesHostInfo!.ContentInfos.Length);
         return _gamesHostInfo.ContentInfos[randomIndex];
-    }
-
-    private async Task<bool> UploadPackageAsync(
-        PackageSource packageSource,
-        PackageKey packageKey,
-        CancellationToken cancellationToken)
-    {
-        var data = await packageSource.GetPackageDataAsync(cancellationToken) ?? throw new Exception(Resources.BadPackage);
-
-        using (data)
-        {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            if (data.Length > _gamesHostInfo.MaxPackageSizeMb * 1024 * 1024)
-            {
-                throw new Exception($"{Resources.FileTooLarge}. {string.Format(Resources.MaximumFileSize, _gamesHostInfo.MaxPackageSizeMb)}");
-            }
-
-            GameSettings.Message = Resources.SendingPackageToServer;
-            ShowProgress = true;
-
-            try
-            {
-                await _gameServerClient.UploadPackageAsync(packageKey, data, cancellationToken);
-            }
-            finally
-            {
-                ShowProgress = false;
-            }
-        }
-
-        return true;
     }
 
     private async Task InitNodeAndClientNewAsync(IGameClient gameClient, CancellationToken cancellationToken = default)
@@ -1278,16 +1185,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             Error = exc.Message;
             FullError = exc.ToString();
         }
-    }
-
-    internal async Task ConnectToServerAsHostAsync(int gameID, GameSettings gameSettings, CancellationToken cancellationToken = default)
-    {
-        var name = Human.Name;
-
-        _password = gameSettings.NetworkGamePassword;
-        var game = new GameInfo { GameID = gameID, Owner = name };
-
-        await JoinGameAsync(game, gameSettings.Role, true, cancellationToken);
     }
 
     public void Say(string message, bool system = false)
