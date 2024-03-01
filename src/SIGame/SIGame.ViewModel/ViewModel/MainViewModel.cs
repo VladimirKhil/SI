@@ -100,7 +100,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public ICommand CloseSlideMenu { get; private set; }    
 
-    private string _startMenuPage;
+    private string _startMenuPage = "MainMenuView.xaml";
 
     public string StartMenuPage
     {

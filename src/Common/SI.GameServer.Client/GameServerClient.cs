@@ -6,11 +6,8 @@ using SI.GameServer.Contract;
 using SIData;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Handlers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -115,7 +112,7 @@ public sealed class GameServerClient : IGameServerClient
     public Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync<string[]>("GetUsers", cancellationToken);
 
-    private async Task<string> AuthenticateUserAsync(
+    private async Task AuthenticateUserAsync(
         string user,
         string password,
         CancellationToken cancellationToken = default)
@@ -133,7 +130,7 @@ public sealed class GameServerClient : IGameServerClient
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return;
         }
 
         throw response.StatusCode switch
@@ -151,14 +148,15 @@ public sealed class GameServerClient : IGameServerClient
             throw new InvalidOperationException("Client has been already opened");
         }
 
-        var token = await AuthenticateUserAsync(userName, "", cancellationToken);
+        await AuthenticateUserAsync(userName, "", cancellationToken);
 
         _connection = new HubConnectionBuilder()
             .WithUrl(
-                $"{ServiceUri}sionline?token={token}",
+                $"{ServiceUri}sionline",
                 options =>
                 {
                     options.AccessTokenProvider = () => Task.FromResult<string?>(Convert.ToBase64String(Encoding.UTF8.GetBytes(userName)));
+                    options.Cookies = _cookieContainer;
                 })
             .WithAutomaticReconnect(new ReconnectPolicy())
             .AddMessagePackProtocol()
@@ -205,24 +203,6 @@ public sealed class GameServerClient : IGameServerClient
     }
 
     public Task SayAsync(string message) => _connection.InvokeAsync("Say", message);
-
-    private static async Task<string> GetErrorMessageAsync(HttpResponseMessage response, CancellationToken cancellationToken)
-    {
-        var serverError = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge ||
-            response.StatusCode == HttpStatusCode.BadRequest && serverError == "Request body too large.")
-        {
-            return Resources.FileTooLarge;
-        }
-
-        if (response.StatusCode == HttpStatusCode.BadGateway)
-        {
-            return $"{response.StatusCode}: Bad Gateway";
-        }
-
-        return $"{response.StatusCode}: {serverError}";
-    }
 
     private Task OnConnectionClosedAsync(Exception? exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
 

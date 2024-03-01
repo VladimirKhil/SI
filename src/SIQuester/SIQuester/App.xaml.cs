@@ -1,6 +1,4 @@
-﻿using AppService.Client;
-using AppService.Client.Models;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,8 +24,12 @@ using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xaml;
+using AppRegistryService.Client;
+using AppRegistryService.Contract;
+using AppRegistryService.Contract.Requests;
+using AppRegistryService.Contract.Models;
 
-#if !DEBUG
+#if UPDATE
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Net;
 using System.Net.Http;
@@ -40,9 +42,13 @@ namespace SIQuester;
 /// </summary>
 public partial class App : Application
 {
+    /// <summary>
+    /// Unique application identifier.
+    /// </summary>
+    internal static readonly Guid AppId = Guid.Parse("42813995-fe5a-4de1-827e-af543293884e");
+
     private IHost? _host;
-    private AppSettings _settings = SettingsHelper.LoadUserSettings() ?? AppSettings.Create();
-    private bool _useAppService;
+    private readonly AppSettings _settings = SettingsHelper.LoadUserSettings() ?? AppSettings.Create();
 
     private readonly Implementation.DesktopManager _manager = new();
 
@@ -99,10 +105,7 @@ public partial class App : Application
 
         _manager.ServiceProvider = _host.Services;
 
-        var appServiceClientOptions = _host.Services.GetRequiredService<IOptions<AppServiceClientOptions>>().Value;
-        _useAppService = appServiceClientOptions.ServiceUri != null;
-
-#if !DEBUG
+#if UPDATE
         if (_settings.SearchForUpdates)
         {
             SearchForUpdatesAsync();
@@ -167,7 +170,7 @@ public partial class App : Application
 
     private void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
     {
-        services.AddAppServiceClient(ctx.Configuration);
+        services.AddAppRegistryServiceClient(ctx.Configuration);
         services.AddSIStorageServiceClient(ctx.Configuration);
         services.AddChgkServiceClient(ctx.Configuration);
 
@@ -179,24 +182,28 @@ public partial class App : Application
         services.AddSIQuester();
     }
 
-#if !DEBUG
+#if UPDATE
     private async void SendDelayedReports()
     {
-        if (!_useAppService || _host == null)
-        {
-            return;
-        }
+        EnsureThat.EnsureArg.IsNotNull(_host);
 
-        using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+        var appRegistryClient = _host.Services.GetRequiredService<IAppRegistryServiceClient>();
 
         try
         {
             while (_settings.DelayedErrors.Count > 0)
             {
                 var error = _settings.DelayedErrors[0];
-                var errorInfo = (Model.ErrorInfo)XamlServices.Load(error);
+                var report = (ErrorInfo)XamlServices.Load(error);
 
-                await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
+                await appRegistryClient.Apps.SendAppErrorReportAsync(
+                    AppId,
+                    new AppErrorRequest(report.Version, Environment.OSVersion.Version, RuntimeInformation.OSArchitecture)
+                    {
+                        ErrorMessage = report.Error,
+                        ErrorTime = report.Time
+                    });
+
                 _settings.DelayedErrors.RemoveAt(0);
             }
         }
@@ -221,27 +228,28 @@ public partial class App : Application
     /// <returns>Should the app be closed for update installation.</returns>
     private async Task<bool> SearchForUpdatesNewAsync(CancellationToken cancellationToken = default)
     {
-        if (!_useAppService || _host == null)
-        {
-            return false;
-        }
+        EnsureThat.EnsureArg.IsNotNull(_host);
 
-        using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+        var appRegistryClient = _host.Services.GetRequiredService<IAppRegistryServiceClient>();
 
         try
         {
-            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            var product = await appService.GetProductAsync("SIQuester", cancellationToken);
+            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version ?? throw new Exception("No app version found");
 
-            if (product != null && product.Version > currentVersion)
+            var productInfo = await appRegistryClient.Apps.PostAppUsageAsync(
+                AppId,
+                new AppUsageInfo(currentVersion, Environment.OSVersion.Version, RuntimeInformation.OSArchitecture),
+                cancellationToken);
+
+            if (productInfo != null && productInfo.Release?.Version > currentVersion)
             {
+                var updateUri = productInfo.Installer?.Uri!;
+
                 _logger?.LogInformation(
                     "Update detected. Current version: {currentVersion}. Product version: {productVersion}. Product uri: {productUri}",
                     currentVersion,
-                    product.Version,
-                    product.Uri);
-
-                var updateUri = product.Uri;
+                    productInfo.Release.Version,
+                    updateUri);
 
                 var localFile = Path.Combine(Path.GetTempPath(), "setup.exe");
 
@@ -286,6 +294,8 @@ public partial class App : Application
         {
             return;
         }
+
+        e.Handled = true;
 
         _hasError = true;
 
@@ -374,7 +384,7 @@ public partial class App : Application
             var exception = e.Exception;
             var message = new StringBuilder();
             var systemMessage = new StringBuilder();
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
 
             while (exception != null)
             {
@@ -388,7 +398,7 @@ public partial class App : Application
                 exception = exception.InnerException;
             }
 
-            var errorInfo = new Model.ErrorInfo { Time = DateTime.Now, Version = version, Error = systemMessage.ToString() };
+            var errorInfo = new ErrorInfo { Time = DateTime.Now, Version = version, Error = systemMessage.ToString() };
 #if !DEBUG
             var dialog = new TaskDialog
             {
@@ -415,22 +425,24 @@ public partial class App : Application
 #endif
         }
 
-        e.Handled = true;
         Shutdown();
     }
 
-    private async Task SendMessageAsync(Model.ErrorInfo errorInfo)
+    private async Task SendMessageAsync(ErrorInfo errorInfo)
     {
-        if (!_useAppService || _host == null)
-        {
-            return;
-        }
+        EnsureThat.EnsureArg.IsNotNull(_host);
 
-        using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+        var appRegistryServiceClient = _host.Services.GetRequiredService<IAppRegistryServiceClient>();
 
         try
         {
-            var result = await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
+            var result = await appRegistryServiceClient.Apps.SendAppErrorReportAsync(
+                AppId,
+                new AppErrorRequest(errorInfo.Version, Environment.OSVersion.Version, RuntimeInformation.OSArchitecture)
+                {
+                    ErrorMessage = errorInfo.Error,
+                    ErrorTime = errorInfo.Time,
+                });
 
             switch (result)
             {

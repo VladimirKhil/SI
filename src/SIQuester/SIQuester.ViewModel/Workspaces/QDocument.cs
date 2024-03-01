@@ -3179,7 +3179,10 @@ public sealed class QDocument : WorkspaceViewModel
                     atom.Model.Text = atom.Model.Text.ClearPoints();
                 }
 
-                questionViewModel.Right[0] = questionViewModel.Right[0].ClearPoints().GrowFirstLetter();
+                if (questionViewModel.Right.Count > 0)
+                {
+                    questionViewModel.Right[0] = questionViewModel.Right[0].ClearPoints().GrowFirstLetter();
+                }
             }
 
             if (ind < allthemes.Count)

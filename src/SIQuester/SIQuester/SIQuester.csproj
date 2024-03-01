@@ -20,6 +20,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <DefineConstants>$(DefineConstants);UPDATE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -32,7 +33,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
-    <None Remove="appsettings.Production.json" />
     <None Remove="Resources\logo.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +55,7 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.0" />
+    <PackageReference Include="VKhil.AppRegistry.Client" Version="1.0.1" />
     <PackageReference Include="WindowsAPICodePackShell" Version="7.0.4" />
 	<PackageReference Include="MahApps.Metro" Version="2.4.10" />
   </ItemGroup>
@@ -65,15 +66,9 @@
     <None Include="licenses\MahApps.Metro.LICENSE+">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="licenses\Newtonsoft.Json.LICENSE.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\Icons.xaml" />
     <None Include="Resources\IconsNonShared.xaml" />
     <Resource Include="Resources\Entypo.ttf" />
-    <Content Include="appsettings.Production.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -199,7 +194,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\AppService.Client\AppService.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
     <ProjectReference Include="..\..\Common\Utils.Wpf\Utils.Wpf.csproj" />

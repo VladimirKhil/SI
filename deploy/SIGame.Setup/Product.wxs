@@ -346,9 +346,6 @@
         <Component Guid="{214E3004-1EFF-4FC5-881A-4832D0FD7980}">
             <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Ben.Demystifier.LICENSE.txt" />
         </Component>
-        <Component Guid="{417121A7-629F-4FB1-BAD0-EBB15B8535A9}">
-            <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Newtonsoft.Json.LICENSE.md" />
-        </Component>
 		<Component Guid="{FCD1B58A-5BA3-4258-8A72-A1423D9A79EF}">
 			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Polly.LICENSE.txt" />
 		</Component>

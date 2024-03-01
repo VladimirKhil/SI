@@ -7,6 +7,9 @@ public static class UI
 {
     public static TaskScheduler? Scheduler { get; private set; } // TODO: -> private
 
+    /// <summary>
+    /// Captures UI thread task scheduler.
+    /// </summary>
     public static void Initialize()
     {
         Scheduler = TaskScheduler.FromCurrentSynchronizationContext();

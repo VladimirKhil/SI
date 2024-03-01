@@ -1,4 +1,4 @@
-﻿using AppService.Client;
+﻿using AppRegistryService.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,17 +17,21 @@ using SIStatisticsService.Client;
 using SIStorage.Service.Client;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Utils;
+
 #if UPDATE
-using AppService.Client.Models;
+using AppRegistryService.Contract;
+using AppRegistryService.Contract.Responses;
+using AppRegistryService.Contract.Requests;
 using SICore;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Net.Http;
 using System.Threading.Tasks;
 #endif
@@ -39,6 +43,11 @@ namespace SIGame;
 /// </summary>
 public partial class App : Application
 {
+    /// <summary>
+    /// Unique application identifier.
+    /// </summary>
+    internal static readonly Guid AppId = Guid.Parse("4394ecaf-e377-4fee-aba8-303adc8cdc36");
+
     private IHost? _host;
     private ILogger<App>? _logger;
 
@@ -90,7 +99,7 @@ public partial class App : Application
     {
         var configuration = ctx.Configuration;
 
-        services.AddAppServiceClient(configuration);
+        services.AddAppRegistryServiceClient(configuration);
         services.AddSIGameServerClient(configuration);
         services.AddSIStatisticsServiceClient(configuration);
         services.AddSIStorageServiceClient(configuration);
@@ -163,8 +172,6 @@ public partial class App : Application
                 }
             }
 
-            Trace.TraceInformation("Game launched");
-
             UserSettings.Default.UseSignalRConnection = UseSignalRConnection;
             UserSettings.Default.PropertyChanged += Default_PropertyChanged;
 
@@ -218,7 +225,7 @@ public partial class App : Application
     }
 
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) =>
-        _logger.LogError("Common game error: {error}", e.ExceptionObject);
+        _logger?.LogError("Common game error: {error}", e.ExceptionObject);
 
     private void Default_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -236,7 +243,7 @@ public partial class App : Application
     {
         try
         {
-            var updateInfo = await SearchForUpdatesAsync();
+            var updateInfo = await TryFindUpdateAsync();
 
             if (updateInfo != null)
             {
@@ -245,7 +252,7 @@ public partial class App : Application
         }
         catch (Exception exc)
         {
-            _logger.LogError(exc, "Update error: {error}", exc.Message);
+            _logger?.LogError(exc, "Update error: {error}", exc.Message);
 
             MessageBox.Show(
                 string.Format(SIGame.Properties.Resources.UpdateException, exc.Message),
@@ -256,38 +263,37 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Произвести поиск обновлений
+    /// Tries to find a product update.
     /// </summary>
-    /// <returns>Нужно ли завершить приложение для выполнения обновления</returns>
-    private async Task<AppInfo?> SearchForUpdatesAsync()
+    private async Task<AppInstallerReleaseInfoResponse?> TryFindUpdateAsync(CancellationToken cancellationToken = default)
     {
-        using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+        EnsureThat.EnsureArg.IsNotNull(_host);
 
-        var assembly = Assembly.GetAssembly(typeof(MainViewModel));
+        var assembly = Assembly.GetAssembly(typeof(MainViewModel)) ?? throw new Exception("Main assembly not found");
+        var currentVersion = assembly.GetName().Version ?? throw new Exception("No app version found");
 
-        if (assembly == null)
+        var appRegistryClient = _host.Services.GetRequiredService<IAppRegistryServiceClient>();
+
+        var productInfo = await appRegistryClient.Apps.PostAppUsageAsync(
+            AppId,
+            new AppUsageInfo(currentVersion, Environment.OSVersion.Version, RuntimeInformation.OSArchitecture),
+            cancellationToken);
+
+        if (productInfo?.Release?.Version > currentVersion)
         {
-            throw new Exception("assembly == null");
-        }
-
-        var currentVersion = assembly.GetName().Version;
-        var product = await appService.GetProductAsync("SI");
-
-        if (product?.Version > currentVersion)
-        {
-            return product;
+            return productInfo;
         }
 
         return null;
     }
 
-    private void SearchForUpdatesFinished(AppInfo updateInfo)
+    private void SearchForUpdatesFinished(AppInstallerReleaseInfoResponse updateInfo)
     {
-        var updateUri = updateInfo.Uri;
+        var updateUri = updateInfo.Installer?.Uri!;
 
         var mainViewModel = (MainViewModel)MainWindow.DataContext;
 
-        mainViewModel.StartMenu.UpdateVersion = updateInfo.Version;
+        mainViewModel.StartMenu.UpdateVersion = updateInfo.Release?.Version!;
         mainViewModel.StartMenu.Update = new CustomCommand(obj => Update_Executed(updateUri));
     }
 
@@ -351,6 +357,4 @@ public partial class App : Application
 
     private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) =>
         e.Handled = new ExceptionHandler(_host.Services.GetRequiredService<IErrorManager>()).Handle(e.Exception);
-
-    
 }
