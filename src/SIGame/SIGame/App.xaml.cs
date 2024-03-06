@@ -291,10 +291,17 @@ public partial class App : Application
     {
         var updateUri = updateInfo.Installer?.Uri!;
 
-        var mainViewModel = (MainViewModel)MainWindow.DataContext;
+        if (updateInfo.Release != null && updateInfo.Release.IsMandatory)
+        {
+            Update_Executed(updateUri);
+        }
+        else
+        {
+            var mainViewModel = (MainViewModel)MainWindow.DataContext;
 
-        mainViewModel.StartMenu.UpdateVersion = updateInfo.Release?.Version!;
-        mainViewModel.StartMenu.Update = new CustomCommand(obj => Update_Executed(updateUri));
+            mainViewModel.StartMenu.UpdateVersion = updateInfo.Release?.Version!;
+            mainViewModel.StartMenu.Update = new CustomCommand(obj => Update_Executed(updateUri));
+        }
     }
 
     private bool _isUpdating = false;

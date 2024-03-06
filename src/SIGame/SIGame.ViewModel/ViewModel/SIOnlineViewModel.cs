@@ -1174,6 +1174,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             }
 
             _host.Connector.SetGameID(gameInfo.GameID);
+            _host.Connector.SetHostUri(gameInfo.HostUri);
         }
         catch (TaskCanceledException exc)
         {

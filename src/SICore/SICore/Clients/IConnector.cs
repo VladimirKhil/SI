@@ -1,4 +1,5 @@
-﻿namespace SICore;
+﻿
+namespace SICore;
 
 public interface IConnector
 {
@@ -12,6 +13,8 @@ public interface IConnector
 
     int GameId { get; }
 
+    Uri? HostUri { get; }
+
     Task<bool> ReconnectToServer();
 
     Task RejoinGame();
@@ -19,4 +22,6 @@ public interface IConnector
     void SetHost(IViewerClient newHost);
 
     void SetGameID(int gameID);
+
+    void SetHostUri(Uri? hostUri);
 }

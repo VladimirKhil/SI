@@ -24,7 +24,7 @@ public static class MediaController
 
     public static void UpdateVolume(double factor)
     {
-        Volume *= factor;
+        Volume = Math.Min(1.0, Math.Max(0.0, Volume * factor));
         _ = waveOutSetVolume(IntPtr.Zero, (uint)(0xFFFF * 2 * Volume));
     }
 
@@ -125,9 +125,9 @@ public static class MediaController
             mediaElement.Dispatcher.BeginInvoke(mediaElement.Play);
         }
 
-        void volumeChangedHandler(double volume)
+        void volumeChangedHandler(double factor)
         {
-            mediaElement.Volume *= volume;
+            mediaElement.Volume = Math.Min(1.0, Math.Max(0.0, mediaElement.Volume * factor));
         }
 
         tableInfo.MediaSeek += seekHandler;

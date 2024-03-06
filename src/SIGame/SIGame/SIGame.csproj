@@ -42,7 +42,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.0" />
-    <PackageReference Include="VKhil.AppRegistry.Client" Version="1.0.1" />
+    <PackageReference Include="VKhil.AppRegistry.Client" Version="1.0.4" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Fonts\Jost-Bold.ttf" />
