@@ -119,9 +119,6 @@
 	  <Component Guid="{9E128CD4-80CB-4268-832B-C2D07E36E03D}">
 		<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
 	  </Component>
-	  <Component Guid="{84D30ED4-930D-436F-8287-A8FDB01860FA}">
-		<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
-	  </Component>
       <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
         <File KeyPath="yes" Source="$(var.PublishFolder)Help_ru.pdf" />
       </Component>
