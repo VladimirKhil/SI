@@ -3,6 +3,7 @@ using System.Windows.Data;
 using System.Windows;
 using SIUI.ViewModel.Core;
 using System.Globalization;
+using SImulator.Properties;
 
 namespace SImulator.Converters;
 
@@ -17,7 +18,7 @@ public sealed class FontFamilyConverter : IValueConverter
 
         if (fontFamily == Settings.DefaultTableFontFamily || fontFamily.StartsWith("pack:"))
         {
-            return "(по умолчанию)";
+            return Resources.Default;
         }
 
         return fontFamily;

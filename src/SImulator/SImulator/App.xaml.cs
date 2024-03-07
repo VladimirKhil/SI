@@ -100,15 +100,15 @@ public partial class App : Application
 
         UI.Initialize();
 
-        //if (Settings.Language != null)
-        //{
-        //    Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(Settings.Language);
-        //}
-        //else
-        //{
-        //    var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
-        //    Settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
-        //}
+        if (Settings.Language != null)
+        {
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(Settings.Language);
+        }
+        else
+        {
+            var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+            Settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
+        }
 
         var main = new MainViewModel(Settings);
 

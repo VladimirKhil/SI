@@ -322,7 +322,7 @@
                         </Style>
                     </Grid.Resources>
 
-                    <TextBlock Text="Имя" />
+                    <TextBlock Text="{x:Static lp:Resources.Name}" />
                     <TextBlock Grid.Column="2" Text="{x:Static lp:Resources.Sum}" />
                     <TextBlock Grid.Column="3" Text="{x:Static lp:Resources.RightAnswers}" />
                     <TextBlock Grid.Column="4" Text="{x:Static lp:Resources.WrongAnswers}" />

@@ -394,6 +394,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на (по умолчанию).
+        /// </summary>
+        public static string Default {
+            get {
+                return ResourceManager.GetString("Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Удалить.
         /// </summary>
         public static string Delete {
@@ -412,7 +421,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Закончилось место на диске!.
+        ///   Ищет локализованную строку, похожую на Закончилось место на диске.
         /// </summary>
         public static string DiskFullError {
             get {
@@ -890,7 +899,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Недостаточно памяти для выполнения программы!.
+        ///   Ищет локализованную строку, похожую на Недостаточно памяти для выполнения программы.
         /// </summary>
         public static string OutOfMemoryError {
             get {
@@ -1178,6 +1187,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ограничение.
+        /// </summary>
+        public static string Restriction {
+            get {
+                return ResourceManager.GetString("Restriction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Правильный ответ.
         /// </summary>
         public static string RightAnswer {
@@ -1241,7 +1259,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}.
+        ///   Ищет локализованную строку, похожую на Не удалось создать главное окно программы. Похоже, на вашем компьютере повреждена среда выполнения программ: {0}.
         /// </summary>
         public static string RuntimeBrokenError {
             get {
@@ -1264,6 +1282,15 @@ namespace SImulator.Properties {
         public static string SavingSettingsError {
             get {
                 return ResourceManager.GetString("SavingSettingsError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Экран.
+        /// </summary>
+        public static string Screen {
+            get {
+                return ResourceManager.GetString("Screen", resourceCulture);
             }
         }
         
@@ -1358,11 +1385,29 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Выбрать пакет.
+        /// </summary>
+        public static string SelectPackage {
+            get {
+                return ResourceManager.GetString("SelectPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Выберите пакет вопросов.
         /// </summary>
         public static string SelectQuestionPackage {
             get {
                 return ResourceManager.GetString("SelectQuestionPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на В отдельном окне.
+        /// </summary>
+        public static string SeparateWindow {
+            get {
+                return ResourceManager.GetString("SeparateWindow", resourceCulture);
             }
         }
         

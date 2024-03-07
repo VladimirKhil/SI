@@ -75,7 +75,7 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.0.0" />
     <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />
     <PackageReference Include="System.IO.Ports" Version="7.0.0" />
-    <PackageReference Include="VKhil.AppRegistry.Client" Version="1.0.1" />
+    <PackageReference Include="VKhil.AppRegistry.Client" Version="1.0.4" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
