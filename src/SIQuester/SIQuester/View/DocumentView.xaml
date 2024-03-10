@@ -656,10 +656,7 @@
                                                         </TabItem.Header>
                                                     </TabItem>
 
-                                                    <TabItem
-                                                        ToolTip="HTML"
-                                                        Content="{Binding Html}"
-                                                        Visibility="{Binding Package.IsUpgraded, Converter={StaticResource VisibilityConverter}}">
+                                                    <TabItem ToolTip="HTML" Content="{Binding Html}">
                                                         <TabItem.Header>
                                                             <Path
                                                                 Stretch="Uniform"

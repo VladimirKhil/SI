@@ -97,11 +97,6 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
                 await CopyCollectionsAsync(_document, targetDocument, allthemes[index - 1]);
             }
 
-            if (_appOptions.UpgradeNewPackages)
-            {
-                newDocument.Upgrade();
-            }
-
             OnNewItem(targetDocument);
         }
         catch (Exception exc)
@@ -131,11 +126,6 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
                 await CopyCollectionsAsync(_document, targetDocument, theme);
             }
 
-            if (_appOptions.UpgradeNewPackages)
-            {
-                newDocument.Upgrade();
-            }
-
             OnNewItem(targetDocument);
         }
         catch (Exception exc)
@@ -160,11 +150,6 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
     private static async Task CopyCollectionsAsync(QDocument oldDocument, QDocument newDocument, Question question, string tempMediaFolder)
     {
         oldDocument.Document.CopyAuthorsAndSources(newDocument.Document, question);
-
-        foreach (var atom in question.Scenario)
-        {
-            await CopyMediaAsync(oldDocument, newDocument, atom, tempMediaFolder);
-        }
 
         foreach (var contentItem in question.GetContent())
         {

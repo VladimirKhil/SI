@@ -106,6 +106,9 @@ public sealed class GameServerClient : IGameServerClient
     public Task<string> GetNewsAsync(CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync<string>("GetNews", cancellationToken);
 
+    public Task<string> GetNewsNewAsync(CancellationToken cancellationToken = default) =>
+        _connection.InvokeAsync<string>("GetNewsNew", cancellationToken);
+
     public Task<ChatMessage[]> GetLatestChatMessagesAsync(CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync<ChatMessage[]>("GetLatestChatMessages", cancellationToken);
 
@@ -126,7 +129,7 @@ public sealed class GameServerClient : IGameServerClient
                 ["password"] = password
             });
 
-        var response = await _client.PostAsync(uri, content, cancellationToken);
+        using var response = await _client.PostAsync(uri, content, cancellationToken);
 
         if (response.IsSuccessStatusCode)
         {

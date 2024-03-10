@@ -124,14 +124,6 @@ public static class SmartMenuManager
         }
 
         var context = control.DataContext;
-
-        // For backward compatibility
-        // TODO: remove after switching to new format
-        if (context is QuestionViewModel questionViewModel)
-        {
-            context = questionViewModel.Scenario;
-        }
-
         doc.ActiveItem = context;
 
         ActionMenuViewModel.Instance.PlacementTarget = e.OriginalSource as UIElement ?? control;

@@ -638,11 +638,18 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
         try
         {
-            var news = await _gameServerClient.GetNewsAsync(_cancellationTokenSource.Token);
+            var news = await _gameServerClient.GetNewsNewAsync(_cancellationTokenSource.Token);
 
             if (!string.IsNullOrEmpty(news))
             {
                 OnMessage(Resources.News, news);
+            }
+
+            var latestMesssages = await _gameServerClient.GetLatestChatMessagesAsync(_cancellationTokenSource.Token);
+
+            foreach (var item in latestMesssages)
+            {
+                OnMessage(item.UserName, item.Text);
             }
         }
         catch (Exception exc)

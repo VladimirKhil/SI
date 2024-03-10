@@ -401,15 +401,6 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                             return;
                         }
                     }
-
-                    foreach (var atom in question.Model.Scenario)
-                    {
-                        if (atom.IsLink && atom.Text.ExtractLink() == item.Name)
-                        {
-                            _document.Navigate.Execute(question);
-                            return;
-                        }
-                    }
                 }
             }
         }

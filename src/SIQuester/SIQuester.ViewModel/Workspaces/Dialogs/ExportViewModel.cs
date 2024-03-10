@@ -153,7 +153,6 @@ public sealed class ExportViewModel : WorkspaceViewModel
     /// <param name="filename">Имя основного файла для экспорта</param>
     private async Task ExportMediaAsync(string filename)
     {
-        var extMedia = new List<IMedia>();
         var extMediaNew = new List<(MediaInfo, string)>();
 
         foreach (var round in _source.Package.Rounds)
@@ -162,24 +161,6 @@ public sealed class ExportViewModel : WorkspaceViewModel
             {
                 foreach (var quest in theme.Questions)
                 {
-                    foreach (var atom in quest.Scenario)
-                    {
-                        var type = atom.Model.Type;
-
-                        if (type == AtomTypes.Image || type == AtomTypes.Audio || type == AtomTypes.AudioNew || type == AtomTypes.Video)
-                        {
-                            var media = _source.Document.GetLink(atom.Model);
-
-                            if (media.GetStream != null)
-                            {
-                                if (media.Uri != null)
-                                {
-                                    extMedia.Add(media);
-                                }
-                            }
-                        }
-                    }
-
                     foreach (var content in quest.Model.GetContent())
                     {
                         if (content.IsRef)
@@ -193,21 +174,6 @@ public sealed class ExportViewModel : WorkspaceViewModel
                         }
                     }
                 }
-            }
-        }
-
-        if (extMedia.Any())
-        {
-            var name = Path.GetFileNameWithoutExtension(filename);
-            var folder = Path.Combine(Path.GetDirectoryName(filename), name + "_Media");
-            Directory.CreateDirectory(folder);
-
-            foreach (var media in extMedia)
-            {
-                using var stream = media.GetStream().Stream;
-                var file = Path.Combine(folder, media.Uri);
-                using var fs = File.Open(file, FileMode.Create, FileAccess.Write);
-                await stream.CopyToAsync(fs);
             }
         }
 

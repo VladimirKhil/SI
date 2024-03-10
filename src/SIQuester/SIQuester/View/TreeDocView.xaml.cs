@@ -293,8 +293,6 @@ public partial class TreeDocView : UserControl
 
             e.Effects = DragDropEffects.Move;
 
-            var isUpgraded = document.Package.IsUpgraded;
-
             if (format == WellKnownDragFormats.Round)
             {
                 Round round;
@@ -313,28 +311,12 @@ public partial class TreeDocView : UserControl
                     round.ReadXml(reader);
                 }
 
-                if (isUpgraded)
+                // Remove later
+                foreach (var theme in round.Themes)
                 {
-                    foreach (var theme in round.Themes)
+                    foreach (var question in theme.Questions)
                     {
-                        foreach (var question in theme.Questions)
-                        {
-                            question.Upgrade();
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var theme in round.Themes)
-                    {
-                        foreach (var question in theme.Questions)
-                        {
-                            if (question.Parameters != null)
-                            {
-                                PlatformManager.Instance.ShowExclamationMessage(ViewModel.Properties.Resources.ObjectInNewFormat);
-                                return;
-                            }
-                        }
+                        question.Upgrade();
                     }
                 }
 
@@ -373,23 +355,10 @@ public partial class TreeDocView : UserControl
                     theme.ReadXml(reader);
                 }
 
-                if (isUpgraded)
+                // Remove later
+                foreach (var question in theme.Questions)
                 {
-                    foreach (var question in theme.Questions)
-                    {
-                        question.Upgrade();
-                    }
-                }
-                else
-                {
-                    foreach (var question in theme.Questions)
-                    {
-                        if (question.Parameters != null)
-                        {
-                            PlatformManager.Instance.ShowExclamationMessage(ViewModel.Properties.Resources.ObjectInNewFormat);
-                            return;
-                        }
-                    }
+                    question.Upgrade();
                 }
 
                 if (treeViewItem.DataContext is RoundViewModel docRound)
@@ -425,15 +394,8 @@ public partial class TreeDocView : UserControl
                     question.ReadXml(reader);
                 }
 
-                if (isUpgraded)
-                {
-                    question.Upgrade();
-                }
-                else if (question.Parameters != null)
-                {
-                    PlatformManager.Instance.ShowExclamationMessage(ViewModel.Properties.Resources.ObjectInNewFormat);
-                    return;
-                }
+                // Remove later
+                question.Upgrade();
 
                 if (treeViewItem.DataContext is ThemeViewModel docTheme)
                 {
@@ -590,29 +552,6 @@ public partial class TreeDocView : UserControl
             return false;
         }
 
-        if (question1.Type.Name != question2.Type.Name)
-        {
-            return false;
-        }
-
-        if (question1.Type.Params.Count != question2.Type.Params.Count)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < question1.Type.Params.Count; i++)
-        {
-            if (question1.Type.Params[i].Name != question2.Type.Params[i].Name)
-            {
-                return false;
-            }
-
-            if (question1.Type.Params[i].Value != question2.Type.Params[i].Value)
-            {
-                return false;
-            }
-        }
-
         if (!Equals(question1.Parameters, question2.Parameters))
         {
             return false;
@@ -621,32 +560,6 @@ public partial class TreeDocView : UserControl
         if (!Equals(question1.Script, question2.Script))
         {
             return false;
-        }
-
-        var scenario1 = question1.Scenario;
-        var scenario2 = question2.Scenario;
-
-        if (scenario1.Count != scenario2.Count)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < scenario1.Count; i++)
-        {
-            if (scenario1[i].Type != scenario2[i].Type)
-            {
-                return false;
-            }
-
-            if (scenario1[i].Text != scenario2[i].Text)
-            {
-                return false;
-            }
-
-            if (scenario1[i].AtomTime != scenario2[i].AtomTime)
-            {
-                return false;
-            }
         }
 
         if (question1.Right.Count != question2.Right.Count)

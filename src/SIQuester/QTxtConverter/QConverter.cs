@@ -1245,7 +1245,7 @@ public sealed class QConverter
     /// </summary>
     /// <param name="list"></param>
     /// <param name="templates"></param>
-    /// <param name="doc"></param>
+    /// <param name="document"></param>
     /// <param name="addToExisting"></param>
     public bool ReadFile(SIPart[][] list, SITemplate templates, ref SIDocument document, bool addToExisting, string docName, string authorName, string emptyRoundName, out int themesNum)
     {
@@ -1601,12 +1601,12 @@ public sealed class QConverter
 
                         #endregion
 
-                        var quest = document.Package.Rounds[roundIndex].Themes[themeIndex].CreateQuestion(int.Parse(questNumber.ClearPoints().GrowFirstLetter()));
+                        var quest = document.Package.Rounds[roundIndex].Themes[themeIndex].CreateQuestion(
+                            int.Parse(questNumber.ClearPoints().GrowFirstLetter()),
+                            text: questText.ClearPoints().GrowFirstLetter());
+
                         questIndex++;
 
-                        // The whole package is upgraded after completion
-                        quest.Scenario.Clear();
-                        quest.Scenario.Add(questText.ClearPoints().GrowFirstLetter());
                         quest.Right.Clear();
                         quest.Right.Add(questAnswer.ClearPoints().GrowFirstLetter());
 

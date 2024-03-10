@@ -246,35 +246,9 @@ public sealed class QDocument : WorkspaceViewModel
             return;
         }
 
-        foreach (var atom in question.Scenario)
-        {
-            ClearLinks(atom);
-        }
-
         foreach (var content in question.Model.GetContent())
         {
             ClearLinks(content);
-        }
-    }
-
-    internal void ClearLinks(AtomViewModel atom)
-    {
-        if (!AppSettings.Default.RemoveLinks || OperationsManager.IsMakingUndo)
-        {
-            return;
-        }
-
-        var link = atom.Model.Text;
-
-        if (!link.StartsWith("@")) // External link
-        {
-            return;
-        }
-
-        if (!HasLinksTo(link)) // Called after items removal so works properly
-        {
-            var collection = GetCollectionByMediaType(atom.Model.Type);
-            RemoveFileByName(collection, link[1..]);
         }
     }
 
@@ -321,14 +295,6 @@ public sealed class QDocument : WorkspaceViewModel
                     foreach (var contentItem in question.GetContent())
                     {
                         if (contentItem.IsRef && contentItem.Value == link)
-                        {
-                            return true;
-                        }
-                    }
-
-                    foreach (var atom in question.Scenario)
-                    {
-                        if (atom.Text == link)
                         {
                             return true;
                         }
@@ -760,20 +726,6 @@ public sealed class QDocument : WorkspaceViewModel
                 foreach (var question in theme.Questions)
                 {
                     question.Model.PropertyChanged += Object_PropertyValueChanged;
-                    question.Type.PropertyChanged += Object_PropertyValueChanged;
-                    question.Type.Params.CollectionChanged += Object_CollectionChanged;
-
-                    foreach (var param in question.Type.Params)
-                    {
-                        param.PropertyChanged += Object_PropertyValueChanged;
-                    }
-
-                    question.Scenario.CollectionChanged += Object_CollectionChanged;
-
-                    foreach (var atom in question.Model.Scenario)
-                    {
-                        atom.PropertyChanged += Object_PropertyValueChanged;
-                    }
 
                     if (question.Parameters != null)
                     {
@@ -986,66 +938,13 @@ public sealed class QDocument : WorkspaceViewModel
                 return;
             }
 
-            if (sender is QuestionTypeViewModel questionType)
-            {
-                OperationsManager.RecordComplexChange(() => OnQuestionTypeChanged(sender, e, ext, questionType));
-            }
-            else
-            {
-                OperationsManager.AddChange(
-                    new SimplePropertyValueChange
-                    {
-                        Element = sender,
-                        PropertyName = e.PropertyName,
-                        Value = ext.OldValue
-                    });
-            }
-        }
-    }
-
-    private void OnQuestionTypeChanged(object? sender, PropertyChangedEventArgs e, ExtendedPropertyChangedEventArgs<string> ext, QuestionTypeViewModel questionType)
-    {
-        OperationsManager.AddChange(new SimplePropertyValueChange
-        {
-            Element = sender,
-            PropertyName = e.PropertyName,
-            Value = ext.OldValue
-        });
-
-        foreach (var param in questionType.Params)
-        {
-            param.PropertyChanged -= Object_PropertyValueChanged;
-        }
-
-        var typeName = questionType.Model.Name;
-
-        if (typeName == QuestionTypes.Cat ||
-            typeName == QuestionTypes.BagCat ||
-            typeName == QuestionTypes.Auction ||
-            typeName == QuestionTypes.Simple ||
-            typeName == QuestionTypes.Sponsored)
-        {
-            while (questionType.Params.Count > 0) // Delete one be one to support undo operation (Undo reset does not work)
-            {
-                questionType.Params.RemoveAt(0);
-            }
-        }
-
-        if (typeName == QuestionTypes.Cat || typeName == QuestionTypes.BagCat)
-        {
-            questionType.AddParam(QuestionTypeParams.Cat_Theme, "");
-            questionType.AddParam(QuestionTypeParams.Cat_Cost, "0");
-
-            if (typeName == QuestionTypes.BagCat)
-            {
-                questionType.AddParam(QuestionTypeParams.BagCat_Self, QuestionTypeParams.BagCat_Self_Value_False);
-                questionType.AddParam(QuestionTypeParams.BagCat_Knows, QuestionTypeParams.BagCat_Knows_Value_After);
-            }
-        }
-
-        foreach (var param in questionType.Params)
-        {
-            param.PropertyChanged += Object_PropertyValueChanged;
+            OperationsManager.AddChange(
+                new SimplePropertyValueChange
+                {
+                    Element = sender,
+                    PropertyName = e.PropertyName,
+                    Value = ext.OldValue
+                });
         }
     }
 
@@ -1102,21 +1001,6 @@ public sealed class QDocument : WorkspaceViewModel
                                 {
                                     var questionViewModel = (QuestionViewModel)itemViewModel;
 
-                                    questionViewModel.Type.PropertyChanged += Object_PropertyValueChanged;
-                                    questionViewModel.Type.Params.CollectionChanged += Object_CollectionChanged;
-
-                                    foreach (var param in questionViewModel.Type.Params)
-                                    {
-                                        param.PropertyChanged += Object_PropertyValueChanged;
-                                    }
-
-                                    questionViewModel.Scenario.CollectionChanged += Object_CollectionChanged;
-
-                                    foreach (var atom in questionViewModel.Scenario)
-                                    {
-                                        atom.PropertyChanged += Object_PropertyValueChanged;
-                                    }
-
                                     if (questionViewModel.Parameters != null)
                                     {
                                         AttachParametersListener(questionViewModel.Parameters);
@@ -1129,11 +1013,6 @@ public sealed class QDocument : WorkspaceViewModel
                                 }
                             }
                         }
-                    }
-                    else if (item is QuestionTypeViewModel type)
-                    {
-                        type.PropertyChanged += Object_PropertyValueChanged;
-                        type.Params.CollectionChanged += Object_CollectionChanged;
                     }
                     else if (item is StepParameterRecord parameter)
                     {
@@ -1170,21 +1049,6 @@ public sealed class QDocument : WorkspaceViewModel
                                 {
                                     var questionViewModel = (QuestionViewModel)itemViewModel;
 
-                                    questionViewModel.Type.PropertyChanged -= Object_PropertyValueChanged;
-                                    questionViewModel.Type.Params.CollectionChanged -= Object_CollectionChanged;
-
-                                    foreach (var param in questionViewModel.Type.Params)
-                                    {
-                                        param.PropertyChanged -= Object_PropertyValueChanged;
-                                    }
-
-                                    questionViewModel.Scenario.CollectionChanged -= Object_CollectionChanged;
-
-                                    foreach (var atom in questionViewModel.Scenario)
-                                    {
-                                        atom.PropertyChanged -= Object_PropertyValueChanged;
-                                    }
-
                                     if (questionViewModel.Parameters != null)
                                     {
                                         DetachParametersLsteners(questionViewModel.Parameters);
@@ -1197,11 +1061,6 @@ public sealed class QDocument : WorkspaceViewModel
                                 }
                             }
                         }
-                    }
-                    else if (item is QuestionTypeViewModel type)
-                    {
-                        type.PropertyChanged -= Object_PropertyValueChanged;
-                        type.Params.CollectionChanged -= Object_CollectionChanged;
                     }
                     else if (item is StepParameterRecord parameter)
                     {
@@ -1576,54 +1435,6 @@ public sealed class QDocument : WorkspaceViewModel
                             errors.Add($"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingFile} \"{media.Uri}\"! {(allowExternal ? "" : Resources.ExternalLinksAreForbidden)}");
                         }
                     }
-
-                    foreach (var atom in question.Scenario)
-                    {
-                        ICollection<string> collection;
-                        HashSet<string> usedFiles;
-
-                        switch (atom.Model.Type)
-                        {
-                            case AtomTypes.Image:
-                                collection = images;
-                                usedFiles = usedImages;
-                                break;
-
-                            case AtomTypes.Audio:
-                            case AtomTypes.AudioNew:
-                                collection = audio;
-                                usedFiles = usedAudio;
-                                break;
-
-                            case AtomTypes.Video:
-                                collection = video;
-                                usedFiles = usedVideo;
-                                break;
-
-                            case AtomTypes.Html:
-                                collection = html;
-                                usedFiles = usedHtml;
-                                break;
-
-                            default:
-                                continue;
-                        }
-
-                        var media = Document.GetLink(atom.Model);
-
-                        if (collection.Contains(media.Uri))
-                        {
-                            usedFiles.Add(media.Uri);
-                        }
-                        else if (allowExternal && !atom.Model.Text.StartsWith("@"))
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            errors.Add($"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingFile} \"{media.Uri}\"! {(allowExternal ? "" : Resources.ExternalLinksAreForbidden)}");
-                        }
-                    }
                 }
             }
         }
@@ -1689,34 +1500,16 @@ public sealed class QDocument : WorkspaceViewModel
             var itemData = (InfoOwnerData)_clipboardService.GetData(ClipboardKey);
             var level = itemData.ItemLevel;
 
-            var isUpgraded = Package.IsUpgraded;
-
             if (level == InfoOwnerData.Level.Round)
             {
                 var round = (Round)itemData.GetItem();
 
-                if (isUpgraded)
+                // Remove later
+                foreach (var theme in round.Themes)
                 {
-                    foreach (var theme in round.Themes)
+                    foreach (var question in theme.Questions)
                     {
-                        foreach (var question in theme.Questions)
-                        {
-                            question.Upgrade();
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var theme in round.Themes)
-                    {
-                        foreach (var question in theme.Questions)
-                        {
-                            if (question.Parameters != null)
-                            {
-                                PlatformManager.Instance.ShowExclamationMessage(Resources.ObjectInNewFormat);
-                                return;
-                            }
-                        }
+                        question.Upgrade();
                     }
                 }
 
@@ -1740,23 +1533,10 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 var theme = (Theme)itemData.GetItem();
 
-                if (isUpgraded)
+                // Remove later
+                foreach (var question in theme.Questions)
                 {
-                    foreach (var question in theme.Questions)
-                    {
-                        question.Upgrade();
-                    }
-                }
-                else
-                {
-                    foreach (var question in theme.Questions)
-                    {
-                        if (question.Parameters != null)
-                        {
-                            PlatformManager.Instance.ShowExclamationMessage(Resources.ObjectInNewFormat);
-                            return;
-                        }
-                    }
+                    question.Upgrade();
                 }
 
                 if (_activeNode is RoundViewModel myRound)
@@ -1781,15 +1561,8 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 var question = (Question)itemData.GetItem();
 
-                if (isUpgraded)
-                {
-                    question.Upgrade();
-                }
-                else if (question.Parameters != null)
-                {
-                    PlatformManager.Instance.ShowExclamationMessage(Resources.ObjectInNewFormat);
-                    return;
-                }
+                // Remove later
+                question.Upgrade();
 
                 if (_activeNode is ThemeViewModel myTheme)
                 {
@@ -1945,16 +1718,7 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 using var stream = File.OpenRead(file);
                 using var doc = SIDocument.Load(stream);
-
-                if (Package.IsUpgraded)
-                {
-                    doc.Upgrade();
-                }
-                else if (doc.Package.Version >= 5.0)
-                {
-                    PlatformManager.Instance.ShowExclamationMessage(Resources.PackageInNewFormat);
-                    return;
-                }
+                doc.Upgrade();
 
                 CopyAuthorsAndSources(doc, doc.Package);
 
@@ -1978,19 +1742,6 @@ public sealed class QDocument : WorkspaceViewModel
                                 }
 
                                 await ImportContentItemAsync(doc, item, contentImportTable);
-                            }
-
-                            if (!Package.IsUpgraded)
-                            {
-                                foreach (var atom in question.Scenario)
-                                {
-                                    if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.AudioNew && atom.Type != AtomTypes.Video && atom.Type != AtomTypes.Html)
-                                    {
-                                        continue;
-                                    }
-
-                                    await ImportAtomAsync(doc, atom, scenarioImportTable);
-                                }
                             }
                         }
                     }
@@ -2046,47 +1797,6 @@ public sealed class QDocument : WorkspaceViewModel
 
         newCollection.AddFile(tempFile);
         contentItem.Value = fileName;
-    }
-
-    private async Task ImportAtomAsync(SIDocument doc, Atom atom, Dictionary<string, string> scenarioImportTable)
-    {
-        var collection = doc.GetCollection(atom.Type);
-        var newCollection = GetCollectionByMediaType(atom.Type);
-
-        var link = doc.GetLink(atom);
-
-        if (link.GetStream == null)
-        {
-            return;
-        }
-
-        if (scenarioImportTable.TryGetValue(link.Uri, out var newName))
-        {
-            SIDocument.SetLink(atom, newName);
-            return;
-        }
-
-        var fileName = FileHelper.GenerateUniqueFileName(link.Uri, name => newCollection.Files.Any(f => f.Model.Name == name));
-        scenarioImportTable[link.Uri] = fileName;
-
-        var tempPath = System.IO.Path.Combine(
-            System.IO.Path.GetTempPath(),
-            AppSettings.ProductName,
-            AppSettings.TempMediaFolderName,
-            Guid.NewGuid().ToString());
-
-        Directory.CreateDirectory(tempPath);
-
-        var tempFile = System.IO.Path.Combine(tempPath, fileName);
-
-        using (var fileStream = File.Create(tempFile))
-        using (var mediaStream = link.GetStream().Stream)
-        {
-            await mediaStream.CopyToAsync(fileStream);
-        }
-
-        newCollection.AddFile(tempFile);
-        SIDocument.SetLink(atom, fileName);
     }
 
     private void CopyAuthorsAndSources(SIDocument document, InfoOwner infoOwner)
@@ -2329,13 +2039,7 @@ public sealed class QDocument : WorkspaceViewModel
                             file.AppendLine(string.Format("[q{0}price]", qind));
                             file.AppendLine(question.Price.ToString());
                             file.AppendLine(string.Format("[q{0}type]", qind));
-                            file.AppendLine(question.Type.Name);
-
-                            foreach (QuestionTypeParam p in question.Type.Params)
-                            {
-                                file.AppendLine(string.Format("[q{0}{1}]", qind, p.Name));
-                                file.AppendLine(p.Value.Replace('[', '<').Replace(']', '>'));
-                            }
+                            file.AppendLine(question.TypeName);
 
                             var qText = new StringBuilder();
                             var showmanComments = new StringBuilder();
@@ -2383,41 +2087,6 @@ public sealed class QDocument : WorkspaceViewModel
 
                                         qText.Append(item.Value);
                                         break;
-                                }
-                            }
-
-                            foreach (var item in question.Scenario)
-                            {
-                                if (item.Type == AtomTypes.Image)
-                                {
-                                    if (showmanComments.Length > 0)
-                                        showmanComments.AppendLine();
-
-                                    showmanComments.Append($"* {Resources.MircImage}: ");
-                                    showmanComments.Append(item.Text);
-                                }
-                                else if (item.Type == AtomTypes.Audio || item.Type == AtomTypes.AudioNew)
-                                {
-                                    if (showmanComments.Length > 0)
-                                        showmanComments.AppendLine();
-
-                                    showmanComments.Append($"* {Resources.MircAudio}: ");
-                                    showmanComments.Append(item.Text);
-                                }
-                                else if (item.Type == AtomTypes.Video)
-                                {
-                                    if (showmanComments.Length > 0)
-                                        showmanComments.AppendLine();
-
-                                    showmanComments.Append($"* {Resources.MircVideo}: ");
-                                    showmanComments.Append(item.Text);
-                                }
-                                else
-                                {
-                                    if (qText.Length > 0)
-                                        qText.AppendLine();
-
-                                    qText.Append(item.Text);
                                 }
                             }
 
@@ -2976,14 +2645,6 @@ public sealed class QDocument : WorkspaceViewModel
 
                 foreach (var quest in theme.Questions)
                 {
-                    foreach (var atom in quest.Scenario)
-                    {
-                        if (atom.Model.Type == AtomTypes.Text)
-                        {
-                            atom.Model.Text = atom.Model.Text.Wikify();
-                        }
-                    }
-
                     foreach (var item in quest.Model.GetContent())
                     {
                         if (item.Type == ContentTypes.Text)
@@ -3061,8 +2722,6 @@ public sealed class QDocument : WorkspaceViewModel
     {
         try
         {
-            var upgraded = Package.IsUpgraded;
-
             var allthemes = new List<ThemeViewModel>();
             using var change = OperationsManager.BeginComplexChange();
 
@@ -3114,7 +2773,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                         if (themeViewModel.Questions.Count <= k)
                         {
-                            var question = PackageItemsHelper.CreateQuestion(100 * (i + 1) * (k + 1), upgraded);
+                            var question = PackageItemsHelper.CreateQuestion(100 * (i + 1) * (k + 1));
 
                             questionViewModel = new QuestionViewModel(question);
                             themeViewModel.Questions.Add(questionViewModel);
@@ -3123,14 +2782,6 @@ public sealed class QDocument : WorkspaceViewModel
                         {
                             questionViewModel = themeViewModel.Questions[k];
                             questionViewModel.Model.Price = (100 * (i + 1) * (k + 1));
-                        }
-
-                        foreach (var atom in questionViewModel.Scenario)
-                        {
-                            if (atom.Model.Type == AtomTypes.Text)
-                            {
-                                atom.Model.Text = atom.Model.Text.ClearPoints().GrowFirstLetter();
-                            }
                         }
 
                         if (questionViewModel.Right.Count > 0)
@@ -3163,7 +2814,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                 if (themeViewModel.Questions.Count == 0)
                 {
-                    var question = PackageItemsHelper.CreateQuestion(0, upgraded);
+                    var question = PackageItemsHelper.CreateQuestion(0);
 
                     questionViewModel = new QuestionViewModel(question);
                     themeViewModel.Questions.Add(questionViewModel);
@@ -3172,11 +2823,6 @@ public sealed class QDocument : WorkspaceViewModel
                 {
                     questionViewModel = themeViewModel.Questions[0];
                     questionViewModel.Model.Price = 0;
-                }
-
-                foreach (var atom in questionViewModel.Scenario)
-                {
-                    atom.Model.Text = atom.Model.Text.ClearPoints();
                 }
 
                 if (questionViewModel.Right.Count > 0)
@@ -3252,34 +2898,6 @@ public sealed class QDocument : WorkspaceViewModel
                     }
                 }
 
-                var singleAtom = theme.Questions.Count > 1 && theme.Questions[0].Scenario.Count > 1 ? theme.Questions[0].Scenario[0].Model.Text : null;
-
-                if (singleAtom != null)
-                {
-                    var allAtomsTheSame = true;
-
-                    for (int i = 1; i < theme.Questions.Count; i++)
-                    {
-                        var scenario = theme.Questions[i].Scenario;
-
-                        if (scenario.Count < 2 || scenario[0].Model.Text != singleAtom)
-                        {
-                            allAtomsTheSame = false;
-                            break;
-                        }
-                    }
-
-                    if (allAtomsTheSame)
-                    {
-                        for (int i = 0; i < theme.Questions.Count; i++)
-                        {
-                            theme.Questions[i].Scenario.RemoveAt(0);
-                        }
-
-                        theme.Info.Comments.Text += singleAtom;
-                    }
-                }
-
                 WikifyInfoOwner(theme);
 
                 foreach (var quest in theme.Questions)
@@ -3320,35 +2938,6 @@ public sealed class QDocument : WorkspaceViewModel
                                     {
                                         contentItem.Model.Value = contentItem.Model.Value.Wikify().ClearPoints().GrowFirstLetter();
                                     }
-                                }
-                            }
-                        }
-                    }
-
-                    foreach (var atom in quest.Scenario)
-                    {
-                        if (atom.Model.Type == AtomTypes.Text)
-                        {
-                            var text = atom.Model.Text;
-
-                            if (text != null)
-                            {
-                                atom.Model.Text = text.Wikify().ClearPoints().GrowFirstLetter();
-                            }
-                        }
-                    }
-
-                    if (quest.Type.Name == QuestionTypes.Cat || quest.Type.Name == QuestionTypes.BagCat)
-                    {
-                        foreach (var param in quest.Type.Params)
-                        {
-                            if (param.Model.Name == QuestionTypeParams.Cat_Theme)
-                            {
-                                var val = param.Model.Value;
-
-                                if (val != null)
-                                {
-                                    param.Model.Value = val.Wikify().ToUpper().ClearPoints();
                                 }
                             }
                         }
@@ -3519,11 +3108,6 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 foreach (var quest in theme.Questions)
                 {
-                    foreach (var atom in quest.Scenario)
-                    {
-                        atom.IsExpanded = expand;
-                    }
-
                     if (quest.Parameters != null)
                     {
                         foreach (var parameter in quest.Parameters)
@@ -3575,36 +3159,6 @@ public sealed class QDocument : WorkspaceViewModel
 
                         var link = Document.GetLink(contentItem);
                         var mediaStorage = GetCollectionByMediaType(contentItem.Type);
-
-                        if (mediaStorage.Files.Any(f => f.Model.Name == link.Uri))
-                        {
-                            continue;
-                        }
-
-                        var mediaFileName = System.IO.Path.Combine(folder, link.Uri);
-
-                        if (!File.Exists(mediaFileName))
-                        {
-                            mediaFileName = System.IO.Path.Combine(folder, mediaStorage.Name, link.Uri);
-
-                            if (!File.Exists(mediaFileName))
-                            {
-                                continue;
-                            }
-                        }
-
-                        mediaStorage.AddFile(mediaFileName);
-                    }
-
-                    foreach (var atom in question.Scenario)
-                    {
-                        if (!atom.Model.IsLink)
-                        {
-                            continue;
-                        }
-
-                        var link = Document.GetLink(atom.Model);
-                        var mediaStorage = GetCollectionByMediaType(atom.Model.Type);
 
                         if (mediaStorage.Files.Any(f => f.Model.Name == link.Uri))
                         {
@@ -3802,19 +3356,10 @@ public sealed class QDocument : WorkspaceViewModel
                                 questionViewModel.Info.Comments.Text = question.Info.Comments.Text;
 
                                 questionViewModel.Model.Price = question.Price;
-                                questionViewModel.Type.Name = question.Type.Name;
+                                questionViewModel.Model.TypeName = question.TypeName;
 
                                 questionViewModel.Right.Merge(question.Right);
                                 questionViewModel.Wrong.Merge(question.Wrong);
-
-                                questionViewModel.Type.Params.Merge(
-                                    question.Type.Params,
-                                    p => new QuestionTypeParamViewModel(p),
-                                    (vm, p) =>
-                                    {
-                                        vm.Model.Name = p.Name;
-                                        vm.Model.Value = p.Value;
-                                    });
 
                                 if (question.Parameters != null && questionViewModel.Parameters != null)
                                 {
@@ -3822,16 +3367,6 @@ public sealed class QDocument : WorkspaceViewModel
                                         question.Parameters.ToList(),
                                         p => new StepParameterRecord(p.Key, new StepParameterViewModel(questionViewModel, p.Value)));
                                 }
-
-                                questionViewModel.Scenario.Merge(
-                                    question.Scenario,
-                                    atom => new AtomViewModel(atom),
-                                    (atomViewModel, atom) =>
-                                    {
-                                        atomViewModel.Model.Type = atom.Type;
-                                        atomViewModel.Model.Text = atom.Text;
-                                        atomViewModel.Model.AtomTime = atom.AtomTime;
-                                    });
                             });
                     });
             });

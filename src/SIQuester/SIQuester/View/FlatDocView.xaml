@@ -36,13 +36,7 @@
         <lc:EqualityConverter x:Key="Equals2" />
 
         <Style x:Key="QHeaderStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{Binding Type.Model.Name, Converter={StaticResource QTypeToColorConverter}}" />
-
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
-                    <Setter Property="Foreground" Value="{Binding TypeName, Converter={StaticResource QTypeToColorConverter}}" />
-                </DataTrigger>
-            </Style.Triggers>
+            <Setter Property="Foreground" Value="{Binding TypeName, Converter={StaticResource QTypeToColorConverter}}" />
         </Style>
 
         <Style x:Key="RoundHeaderStyle" TargetType="TextBlock">
@@ -305,46 +299,9 @@
                     <TextBlock
                         Style="{StaticResource QHeaderStyle}"
                         Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}" />
-                    
-                    <ItemsControl Name="body" ItemsSource="{Binding Scenario}">
+
+                    <ItemsControl Name="body" ItemsSource="{Binding Parameters}">
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <ContentControl
-                                    Content="{Binding}"
-                                    ContentTemplate="{Binding Model.Type, Converter={StaticResource LocalAtomSelector}}"
-                                    KeyboardNavigation.IsTabStop="False" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-
-                <Border.ToolTip>
-                    <TextBlock Text="{Binding Model}" TextWrapping="Wrap" MaxWidth="400" />
-                </Border.ToolTip>
-            </Border>
-            
-            <DataTemplate.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter TargetName="bd" Property="Background" Value="#FF6985FF" />
-                </Trigger>
-                
-                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                    <Setter TargetName="bd" Property="Background" Value="#FF2F56FF" />
-                </DataTrigger>
-                
-                <DataTrigger Binding="{Binding Source={x:Static m:AppSettings.Default},Path=ShowToolTips}" Value="False">
-                    <Setter TargetName="bd" Property="ToolTip" Value="{x:Null}" />
-                </DataTrigger>
-                
-                <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
-                    <Setter TargetName="bd" Property="Margin" Value="2,2,1,2" />
-                </DataTrigger>
-
-                <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
-                    <Setter TargetName="body" Property="ItemsSource" Value="{Binding Parameters}" />
-                    
-                    <Setter TargetName="body" Property="ItemTemplate">
-                        <Setter.Value>
                             <DataTemplate>
                                 <DockPanel>
                                     <TextBlock
@@ -395,8 +352,30 @@
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
-                        </Setter.Value>
-                    </Setter>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <Border.ToolTip>
+                    <TextBlock Text="{Binding Model}" TextWrapping="Wrap" MaxWidth="400" />
+                </Border.ToolTip>
+            </Border>
+            
+            <DataTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="bd" Property="Background" Value="#FF6985FF" />
+                </Trigger>
+                
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter TargetName="bd" Property="Background" Value="#FF2F56FF" />
+                </DataTrigger>
+                
+                <DataTrigger Binding="{Binding Source={x:Static m:AppSettings.Default},Path=ShowToolTips}" Value="False">
+                    <Setter TargetName="bd" Property="ToolTip" Value="{x:Null}" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
+                    <Setter TargetName="bd" Property="Margin" Value="2,2,1,2" />
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -714,19 +693,8 @@
                                 x:Name="type"
                                 Margin="0,1,0,0"
                                 IsSynchronizedWithCurrentItem="False"
-                                ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}"
-                                SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}" />
-
-                            <ItemsControl x:Name="typeParams" ItemsSource="{Binding Type.Params}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Model.Name, Converter={StaticResource QuestionTypeParamConverter}}" Margin="0,5,0,0" />
-                                            <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource TypeParamSelector}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                ItemsSource="{Binding Source={StaticResource QuestionTypesNamesNew}}"
+                                SelectedItem="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
 
                             <ItemsControl x:Name="params" ItemsSource="{Binding Parameters}">
                                 <ItemsControl.ItemTemplate>
@@ -779,34 +747,10 @@
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
 
-                        <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
-                            <Setter
-                                TargetName="type"
-                                Property="ItemsSource"
-                                Value="{Binding Source={StaticResource QuestionTypesNamesNew}}" />
-                            
-                            <Setter
-                                TargetName="type"
-                                Property="SelectedItem"
-                                Value="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
-
-                            <!-- TODO: add new menu for upgraded question type params -->
-                            <Setter TargetName="typeParams" Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-
-                        <DataTrigger Binding="{Binding IsUpgraded}" Value="False">
-                            <Setter TargetName="params" Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding IsUpgraded}" Value="True" />
-                                <Condition Binding="{Binding TypeName}" Value="" />
-                            </MultiDataTrigger.Conditions>
-
+                        <DataTrigger Binding="{Binding TypeName}" Value="">
                             <Setter TargetName="typeHeader" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
-                        </MultiDataTrigger>
+                        </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ls:DictionaryTemplateSelector.Templates>
@@ -831,29 +775,13 @@
                 <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
                     <StackPanel Margin="8">
                         <TextBlock x:Name="typeHeader" Text="{x:Static lp:Resources.Type}" />
-                        
+
                         <ComboBox
                             x:Name="type"
                             Margin="0,1,0,0"
                             IsSynchronizedWithCurrentItem="False"
-                            SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}"
-                            ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}" />
-
-                        <ItemsControl
-                            x:Name="typeParams"
-                            ItemsSource="{Binding Type.Params}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel>
-                                        <TextBlock
-                                            Text="{Binding Model.Name, Converter={StaticResource QuestionTypeParamConverter}}"
-                                            Margin="0,5,0,0" />
-                                        
-                                        <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource TypeParamSelector}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            SelectedItem="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}"
+                            ItemsSource="{Binding Source={StaticResource QuestionTypesNamesNew}}" />
 
                         <StackPanel
                             Orientation="Horizontal"
@@ -883,23 +811,7 @@
                         <DataTrigger Binding="{Binding Model.Price}" Value="{x:Static p:Question.InvalidPrice}">
                             <Setter TargetName="typeHeader" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="typeParams" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="switch" Property="ToolTip" Value="{x:Static lp:Resources.MakeNonEmpty}" />
-                        </DataTrigger>
-
-                        <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
-                            <Setter
-                                TargetName="type"
-                                Property="ItemsSource"
-                                Value="{Binding Source={StaticResource QuestionTypesNamesNew}}" />
-
-                            <Setter
-                                TargetName="type"
-                                Property="SelectedItem"
-                                Value="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
-
-                            <!-- TODO: add new floating menu for upgraded question type params -->
-                            <Setter TargetName="typeParams" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>

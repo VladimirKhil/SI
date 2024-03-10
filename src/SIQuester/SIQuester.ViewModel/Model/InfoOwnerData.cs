@@ -189,37 +189,5 @@ public sealed class InfoOwnerData
                 targetCollection.Add(link, preparedMedia.Uri);
             }
         }
-
-        foreach (var atom in question.Scenario)
-        {
-            if (!atom.IsLink)
-            {
-                continue;
-            }
-
-            var collection = documentViewModel.TryGetCollectionByMediaType(atom.Type);
-
-            if (collection == null)
-            {
-                continue;
-            }
-
-            var targetCollection = atom.Type switch
-            {
-                AtomTypes.Image => Images,
-                AtomTypes.Audio => Audio,
-                AtomTypes.AudioNew => Audio,
-                AtomTypes.Video => Video,
-                _ => null,
-            };
-
-            var link = atom.Text[1..];
-
-            if (!targetCollection.ContainsKey(link))
-            {
-                var preparedMedia = collection.Wrap(link);
-                targetCollection.Add(link, preparedMedia.Uri);
-            }
-        }
     }
 }

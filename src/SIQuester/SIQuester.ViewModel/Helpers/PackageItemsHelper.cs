@@ -12,30 +12,23 @@ internal static class PackageItemsHelper
     /// Creates a question with provided price.
     /// </summary>
     /// <param name="price">Question price.</param>
-    /// <param name="upgraded">Should the question have upgraded format.</param>
-    internal static Question CreateQuestion(int price, bool upgraded)
+    internal static Question CreateQuestion(int price)
     {
-        var question = new Question { Price = price };
-
-        if (upgraded)
+        var question = new Question
         {
-            question.Parameters = new StepParameters
+            Price = price,
+            Parameters = new StepParameters
             {
                 [QuestionParameterNames.Question] = new StepParameter
                 {
                     Type = StepParameterTypes.Content,
                     ContentValue = new List<ContentItem>
                     {
-                        new ContentItem { Type = AtomTypes.Text, Value = "" },
+                        new() { Type = ContentTypes.Text, Value = "" },
                     }
                 }
-            };
-        }
-        else
-        {
-            var atom = new Atom();
-            question.Scenario.Add(atom);
-        }
+            }
+        };
 
         question.Right.Add("");
 

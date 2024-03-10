@@ -590,11 +590,6 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             Resources.ThemesCollection,
             out int themesNum);
 
-        if (_existing != null && _appOptions.UpgradeNewPackages)
-        {
-            _existing.Upgrade();
-        }
-
         return Tuple.Create(result, themesNum);
     }
 

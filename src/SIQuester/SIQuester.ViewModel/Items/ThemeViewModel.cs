@@ -52,11 +52,6 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     /// </summary>
     public ICommand ShuffleQuestions { get; private set; }
 
-    /// <summary>
-    /// Upgraded package flag.
-    /// </summary>
-    public bool IsUpgraded => OwnerRound?.OwnerPackage?.IsUpgraded == true;
-
     public ThemeViewModel(Theme theme)
         : base(theme)
     {
@@ -178,14 +173,12 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             var document = OwnerRound.OwnerPackage.Document;
             var price = DetectNextQuestionPrice();
 
-            var question = PackageItemsHelper.CreateQuestion(price, IsUpgraded);
+            var question = PackageItemsHelper.CreateQuestion(price);
 
             var questionViewModel = new QuestionViewModel(question);
             Questions.Add(questionViewModel);
 
-            QDocument.ActivatedObject = IsUpgraded
-                ? questionViewModel.Parameters?.FirstOrDefault().Value.ContentValue?.FirstOrDefault()
-                : questionViewModel.Scenario.FirstOrDefault();
+            QDocument.ActivatedObject = questionViewModel.Parameters?.FirstOrDefault().Value.ContentValue?.FirstOrDefault();
 
             document.Navigate.Execute(questionViewModel);
         }

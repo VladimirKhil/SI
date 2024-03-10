@@ -21,10 +21,6 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public AnswersViewModel Wrong { get; private set; }
 
-    public ScenarioViewModel Scenario { get; private set; }
-
-    public QuestionTypeViewModel Type { get; private set; }
-
     public event Action<QuestionViewModel, string>? TypeNameChanged;
 
     public string TypeName
@@ -53,11 +49,6 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     public SimpleCommand AddWrongAnswers { get; private set; }
 
     public ICommand ClearType { get; private set; }
-
-    /// <summary>
-    /// Upgraded package flag.
-    /// </summary>
-    public bool IsUpgraded => OwnerTheme?.OwnerRound?.OwnerPackage?.IsUpgraded == true;
 
     public override ICommand Add
     {
@@ -99,11 +90,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     public QuestionViewModel(Question question)
         : base(question)
     {
-        Type = new QuestionTypeViewModel(question.Type);
-
         Right = new AnswersViewModel(this, question.Right, true);
         Wrong = new AnswersViewModel(this, question.Wrong, false);
-        Scenario = new ScenarioViewModel(this, question.Scenario);
 
         if (question.Parameters != null)
         {
@@ -134,88 +122,17 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     private void Wrong_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;
 
-    private void AddComplexAnswer_Executed(object? arg)
-    {
-        if (IsUpgraded)
+    private void AddComplexAnswer_Executed(object? arg) =>
+        Parameters?.AddAnswer(new StepParameterViewModel(this, new StepParameter
         {
-            Parameters?.AddAnswer(new StepParameterViewModel(this, new StepParameter
-            {
-                Type = StepParameterTypes.Content,
-                ContentValue = new List<ContentItem>(new[]
+            Type = StepParameterTypes.Content,
+            ContentValue = new List<ContentItem>(new[]
                 {
-                    new ContentItem { Type = AtomTypes.Text, Placement = ContentPlacements.Screen, Value = "" }
+                    new ContentItem { Type = ContentTypes.Text, Placement = ContentPlacements.Screen, Value = "" }
                 })
-            }));
+        }));
 
-            return;
-        }
-
-        if (Scenario.IsComplex)
-        {
-            return;
-        }
-
-        var document = OwnerTheme.OwnerRound.OwnerPackage.Document;
-
-        try
-        {
-            using var change = document.OperationsManager.BeginComplexChange();
-
-            Scenario.AddMarker_Executed(arg);
-            Scenario.AddText_Executed(arg);
-
-            change.Commit();
-        }
-        catch (Exception exc)
-        {
-            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
-        }
-    }
-
-    private void RemoveComplexAnswer_Executed(object? arg)
-    {
-        if (IsUpgraded)
-        {
-            Parameters?.RemoveAnswer();
-            return;
-        }
-
-        if (!Scenario.IsComplex)
-        {
-            return;
-        }
-
-        var document = OwnerTheme.OwnerRound.OwnerPackage.Document;
-
-        try
-        {
-            using var change = document.OperationsManager.BeginComplexChange();
-
-            for (var i = 0; i < Scenario.Count; i++)
-            {
-                if (Scenario[i].Model.Type == AtomTypes.Marker)
-                {
-                    while (i < Scenario.Count)
-                    {
-                        Scenario.RemoveAt(i);
-                    }
-
-                    break;
-                }
-            }
-
-            if (Scenario.Count == 0)
-            {
-                Scenario.AddText_Executed(null);
-            }
-
-            change.Commit();
-        }
-        catch (Exception exc)
-        {
-            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
-        }
-    }
+    private void RemoveComplexAnswer_Executed(object? arg) => Parameters?.RemoveAnswer();
 
     private void AddWrongAnswers_Executed(object? arg)
     {
@@ -247,19 +164,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     private void SetQuestionType_Executed(object? arg)
     {
-        if (IsUpgraded)
-        {
-            var typeName = (string?)arg ?? "";
-            TypeName = typeName == QuestionTypes.Default ? "?" : typeName;
-            return;
-        }
-
-        if (arg == null)
-        {
-            throw new ArgumentNullException(nameof(arg));
-        }
-
-        Type.Model.Name = (string)arg;
+        var typeName = (string?)arg ?? "";
+        TypeName = typeName == QuestionTypes.Default ? "?" : typeName;
     }
 
     private void SetAnswerType_Executed(object? arg)
@@ -357,25 +263,16 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             {
                 Model.Price = AppSettings.Default.QuestionBase * ((OwnerTheme?.Questions.IndexOf(this) ?? 0) + 1);
 
-                if (IsUpgraded)
-                {
-                    Parameters!.ClearOneByOne();
+                Parameters!.ClearOneByOne();
 
-                    Parameters.AddParameter(QuestionParameterNames.Question, new StepParameterViewModel(this, new StepParameter
-                    {
-                        Type = StepParameterTypes.Content,
-                        ContentValue = new List<ContentItem>
+                Parameters.AddParameter(QuestionParameterNames.Question, new StepParameterViewModel(this, new StepParameter
+                {
+                    Type = StepParameterTypes.Content,
+                    ContentValue = new List<ContentItem>
                         {
                             new() { Type = ContentTypes.Text, Value = "" },
                         }
-                    }));
-                }
-                else
-                {
-                    Scenario.ClearOneByOne();
-                    Scenario.AddText_Executed(null);
-                    Type.Params.ClearOneByOne();
-                }
+                }));
 
                 Right.ClearOneByOne();
                 Right.Add("");
@@ -387,17 +284,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
             Model.Price = Question.InvalidPrice;
 
-            if (IsUpgraded)
-            {
-                Parameters?.ClearOneByOne();
-                TypeName = QuestionTypes.Default;
-            }
-            else
-            {
-                Scenario.ClearOneByOne();
-                Type.Params.ClearOneByOne();
-                Type.Name = QuestionTypes.Simple;
-            }
+            Parameters?.ClearOneByOne();
+            TypeName = QuestionTypes.Default;
 
             Right.ClearOneByOne();
             Wrong.ClearOneByOne();

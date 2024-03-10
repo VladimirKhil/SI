@@ -57,6 +57,10 @@ public interface IGameServerClient : IAsyncDisposable
 
     Task<string> GetNewsAsync(CancellationToken cancellationToken = default);
 
+    Task<string> GetNewsNewAsync(CancellationToken cancellationToken = default);
+
+    Task<ChatMessage[]> GetLatestChatMessagesAsync(CancellationToken cancellationToken = default);
+
     Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default);
 
     Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default);

@@ -30,11 +30,6 @@ public sealed class RoundViewModel : ItemViewModel<Round>
 
     public ICommand AddTheme { get; private set; }
 
-    /// <summary>
-    /// Upgraded package flag.
-    /// </summary>
-    public bool IsUpgraded => OwnerPackage?.IsUpgraded == true;
-
     public RoundViewModel(Round round)
         : base(round)
     {
@@ -122,7 +117,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        var question = PackageItemsHelper.CreateQuestion((i + 1) * AppSettings.Default.QuestionBase, IsUpgraded);
+                        var question = PackageItemsHelper.CreateQuestion((i + 1) * AppSettings.Default.QuestionBase);
                         themeViewModel.Questions.Add(new QuestionViewModel(question));
                     }
                 }

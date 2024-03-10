@@ -213,8 +213,6 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
             var qText = new StringBuilder();
             i--;
 
-            Question quest;
-
             #region questionsReading
 
             while (++i < text.Length)
@@ -229,10 +227,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 
                     if (qText.Length > 0)
                     {
-                        quest = theme.CreateQuestion(10 * (j - 1)); // Upgraded later
-                        quest.Type.Name = QuestionTypes.Simple;
-                        quest.Scenario.Clear();
-                        quest.Scenario.Add(qText.ToString().GrowFirstLetter().ClearPoints());
+                        theme.CreateQuestion(10 * (j - 1), text: qText.ToString().GrowFirstLetter().ClearPoints());
                     }
 
                     int add = 3;
@@ -255,19 +250,17 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
                 }
             }
 
+            var questionText = qText.ToString().GrowFirstLetter().ClearPoints();
+
             if (final)
             {
-                quest = theme.CreateQuestion(0);
-                quest.Right[0] = node2["Answer"].InnerText.Trim().GrowFirstLetter().ClearPoints();
+                var question = theme.CreateQuestion(0, text: questionText);
+                question.Right[0] = node2["Answer"].InnerText.Trim().GrowFirstLetter().ClearPoints();
             }
             else
             {
-                quest = theme.CreateQuestion(10 * j);
+                theme.CreateQuestion(10 * j, text: questionText);
             }
-
-            quest.Scenario.Clear();
-            quest.Scenario.Add(qText.ToString().GrowFirstLetter().ClearPoints());
-            quest.Type.Name = QuestionTypes.Simple;
 
             #endregion
 
@@ -400,11 +393,6 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
             }
 
             #endregion
-        }
-
-        if (_appOptions.UpgradeNewPackages)
-        {
-            siDocument.Upgrade();
         }
 
         return siDocument;

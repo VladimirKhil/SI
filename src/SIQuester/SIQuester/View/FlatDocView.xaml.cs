@@ -514,7 +514,6 @@ public partial class FlatDocView : UserControl
 
             var format = WellKnownDragFormats.GetDragFormat(e);
             var document = (QDocument)DataContext;
-            var isUpgraded = document.Package.IsUpgraded;
 
             InfoOwnerData dragData;
 
@@ -548,15 +547,8 @@ public partial class FlatDocView : UserControl
                     question.ReadXml(reader);
                 }
 
-                if (isUpgraded)
-                {
-                    question.Upgrade();
-                }
-                else if (question.Parameters != null)
-                {
-                    PlatformManager.Instance.ShowExclamationMessage(ViewModel.Properties.Resources.ObjectInNewFormat);
-                    return;
-                }
+                // Remove later
+                question.Upgrade();
 
                 var themeViewModel = _insertionPosition.Item1;
                 var index = _insertionPosition.Item2;

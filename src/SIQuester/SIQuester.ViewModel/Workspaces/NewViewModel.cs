@@ -156,15 +156,11 @@ public sealed class NewViewModel : WorkspaceViewModel
             if (_currentTemplate.FileName != null)
             {
                 siDocument = CreateFromCustomTemplate(_currentTemplate.FileName);
+                siDocument.Upgrade();
             }
             else
             {
                 siDocument = CreateFromStandardTemplate();
-            }
-
-            if (_appOptions.UpgradeNewPackages)
-            {
-                siDocument.Upgrade();
             }
 
             OnNewItem(_documentViewModelFactory.CreateViewModelFor(siDocument));

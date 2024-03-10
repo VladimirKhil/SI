@@ -16,7 +16,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     /// <summary>
     /// Default package version.
     /// </summary>
-    public const double DefaultVersion = 4.0;
+    public const double DefaultVersion = 5.0;
 
     /// <summary>
     /// Maximum supported package version.
