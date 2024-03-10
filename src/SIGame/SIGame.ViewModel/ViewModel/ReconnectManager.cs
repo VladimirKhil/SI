@@ -30,6 +30,8 @@ internal sealed class ReconnectManager : IConnector
 
     public int GameId { get; set; } = -1;
 
+    public Uri? HostUri { get; set; }
+
     public ReconnectManager(
         SecondaryNode server,
         Client client,
@@ -147,4 +149,6 @@ internal sealed class ReconnectManager : IConnector
     }
 
     public void SetHost(IViewerClient newHost) => _host = newHost;
+
+    public void SetHostUri(Uri? hostUri) => HostUri = hostUri;
 }

@@ -276,6 +276,11 @@ public static class Messages
     public const string Move = "MOVE";
 
     /// <summary>
+    /// Denotes that the person could be moved during the game.
+    /// </summary>
+    public const string Moveable = "MOVEABLE";
+
+    /// <summary>
     /// Выбрать следующего игрока
     /// </summary>
     public const string Next = "NEXT";

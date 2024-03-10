@@ -689,7 +689,7 @@
 
                         <RadioButton
                             GroupName="0"
-                            ToolTip="В отдельном окне"
+                            ToolTip="{x:Static lp:Resources.SeparateWindow}"
                             IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Separate}}">
                             <Image>
                                 <Image.Source>
@@ -956,7 +956,7 @@
                 </StackPanel>
                 
                 <StackPanel Grid.Row="1">
-                    <TextBlock Style="{StaticResource Header}" Margin="0,15,0,2" Text="Экран" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource Header}" Margin="0,15,0,2" Text="{x:Static lp:Resources.Screen}" VerticalAlignment="Center" />
                     
                     <ComboBox
                         Margin="0,2,0,0"
@@ -1891,7 +1891,7 @@
                             VerticalAlignment="Top" />                        
                         <StackPanel>
                             <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.AppName}" />
-                            <!--<TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
+                            <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
 
                             <ComboBox
                                 Margin="0,4,0,0"
@@ -1904,7 +1904,7 @@
                                         <TextBlock Text="{Binding Converter={StaticResource LanguageConverter}}" />
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
-                            </ComboBox>-->
+                            </ComboBox>
 
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Version}" />
                             <TextBlock Margin="1,1,5,1" Text="{Binding Version, ElementName=root}"/>

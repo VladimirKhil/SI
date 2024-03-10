@@ -102,11 +102,11 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <TextBlock TextWrapping="Wrap"><Run Text="Выберите пакет для игры" /></TextBlock>
+
+        <TextBlock TextWrapping="Wrap"><Run Text="{x:Static lp:Resources.SelectQuestionPackage}" /></TextBlock>
         
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5">
-            <TextBlock VerticalAlignment="Center" FontSize="14">Ограничение</TextBlock>
+            <TextBlock VerticalAlignment="Center" FontSize="14" Text="{x:Static lp:Resources.Restriction}" />
 
             <ComboBox
                 Width="135"
@@ -189,6 +189,6 @@
             HorizontalAlignment="Right"
             Click="Button_Click"
             Cursor="Hand"
-            Content="Выбрать пакет" />
+            Content="{x:Static lp:Resources.SelectPackage}" />
     </Grid>
 </Window>

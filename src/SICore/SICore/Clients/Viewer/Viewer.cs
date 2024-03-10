@@ -2138,6 +2138,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         UpdateDeleteTableCommand();
 
         SendPicture();
+        _viewerActions.SendMessage(Messages.Moveable);
     }
 
     private void UpdateDeleteTableCommand()

@@ -19,7 +19,7 @@
     <None Include="key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="VKhil.SIStorage.Client" Version="1.0.1" />
+    <PackageReference Include="VKhil.SIStorage.Client" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SIPackages\SIPackages.csproj" />

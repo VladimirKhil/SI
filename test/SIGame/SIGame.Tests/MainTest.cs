@@ -66,11 +66,11 @@ public class MainTest
         await mainViewModel.Open.ExecuteAsync(null);
 
         var contentBox = mainViewModel.ActiveView as ContentBox;
-        Assert.IsNull(contentBox, ((LoginViewModel?)contentBox?.Data)?.Error);
+        Assert.That(contentBox, Is.Null, ((LoginViewModel?)contentBox?.Data)?.Error);
 
         var siOnline = (SIOnlineViewModel?)mainViewModel.ActiveView;
 
-        Assert.IsNotNull(siOnline);
+        Assert.That(siOnline, Is.Not.Null);
 
         await siOnline!.InitAsync();
 
@@ -105,7 +105,7 @@ public class MainTest
 
             var package = gameSettings.StorageInfo.Model.Packages.FirstOrDefault(p => p.Model.Id == packageId);
 
-            Assert.IsNotNull(package, "Package not found");
+            Assert.That(package, Is.Not.Null, "Package not found");
 
             var storage = gameSettings.StorageInfo.Model.CurrentPackage = package;
 
@@ -114,11 +114,11 @@ public class MainTest
 
         await gameSettings.BeginGame.ExecuteAsync(null);
 
-        Assert.IsFalse(gameSettings.IsProgress);
-        Assert.IsNull(gameSettings.ErrorMessage);
+        Assert.That(gameSettings.IsProgress, Is.False);
+        Assert.That(gameSettings.ErrorMessage, Is.Null);
 
         var siOnlineError = mainViewModel.ActiveView as SIOnlineViewModel;
-        Assert.IsNull(siOnlineError, siOnlineError?.Error);
+        Assert.That(siOnlineError, Is.Null, siOnlineError?.Error);
 
         var game = (GameViewModel?)mainViewModel.ActiveView;
 
@@ -146,7 +146,7 @@ public class MainTest
         // Sometimes it does not have time to login again
 
         var contentBox2 = mainViewModel.ActiveView as ContentBox;
-        Assert.IsNull(contentBox2, ((LoginViewModel?)contentBox2?.Data)?.Error);
+        Assert.That(contentBox2, Is.Null, ((LoginViewModel?)contentBox2?.Data)?.Error);
 
         var siOnline2 = (SIOnlineViewModel?)mainViewModel.ActiveView;
         siOnline2?.Cancel.Execute(null);
@@ -154,6 +154,11 @@ public class MainTest
 
     private static async void TInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (sender == null)
+        {
+            return;
+        }
+
         if (e.PropertyName == nameof(TableInfoViewModel.MediaSource))
         {
             var mediaSource = ((TableInfoViewModel)sender).MediaSource;
@@ -161,12 +166,12 @@ public class MainTest
             if (mediaSource != null)
             {
                 var result = await HttpClient.GetAsync(mediaSource.Uri);
-                Assert.IsTrue(result.IsSuccessStatusCode);
+                Assert.That(result.IsSuccessStatusCode, Is.True);
             }
         }
         else if (e.PropertyName == nameof(TableInfoViewModel.SoundSource))
         {
-            await HttpClient.GetAsync(((TableInfoViewModel)sender).SoundSource.Uri);
+            await HttpClient.GetAsync(((TableInfoViewModel)sender).SoundSource?.Uri);
         }
     }
 }

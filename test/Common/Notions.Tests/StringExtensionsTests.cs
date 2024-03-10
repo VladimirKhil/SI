@@ -13,7 +13,7 @@ public sealed class StringExtensionTests
     public void GrowFirstLetter_Ok(string input, string expectedOutput)
     {
         var result = input.GrowFirstLetter();
-        Assert.AreEqual(expectedOutput, result);
+        Assert.That(expectedOutput, Is.EqualTo(result));
     }
 
     [TestCase("a sample text", 8, "a sample")]
@@ -23,6 +23,6 @@ public sealed class StringExtensionTests
     public void Shorten_Ok(string input, int maxLength, string expectedOutput)
     {
         var result = input.Shorten(maxLength);
-        Assert.AreEqual(expectedOutput, result);
+        Assert.That(expectedOutput, Is.EqualTo(result));
     }
 }

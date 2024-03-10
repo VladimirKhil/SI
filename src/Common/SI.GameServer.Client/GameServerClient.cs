@@ -6,11 +6,8 @@ using SI.GameServer.Contract;
 using SIData;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Handlers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,8 +19,6 @@ namespace SI.GameServer.Client;
 /// </summary>
 public sealed class GameServerClient : IGameServerClient
 {
-    private const int _BufferSize = 80 * 1024;
-
     private bool _isOpened;
 
     private readonly GameServerClientOptions _options;
@@ -31,7 +26,6 @@ public sealed class GameServerClient : IGameServerClient
     private readonly CookieContainer _cookieContainer;
     private readonly HttpClientHandler _httpClientHandler;
     private readonly HttpClient _client;
-    private readonly ProgressMessageHandler _progressMessageHandler;
 
     private HubConnection? _connection;
 
@@ -56,7 +50,6 @@ public sealed class GameServerClient : IGameServerClient
     public event Action<string>? Joined;
     public event Action<string>? Leaved;
     public event Action<string, string>? Receieve;
-    public event Action<int>? UploadProgress;
     public event Action<Message>? IncomingMessage;
 
     public event Func<Exception?, Task>? Closed;
@@ -73,10 +66,7 @@ public sealed class GameServerClient : IGameServerClient
         _cookieContainer = new CookieContainer();
         _httpClientHandler = new HttpClientHandler { CookieContainer = _cookieContainer };
 
-        _progressMessageHandler = new ProgressMessageHandler(_httpClientHandler);
-        _progressMessageHandler.HttpSendProgress += MessageHandler_HttpSendProgress;
-
-        _client = new HttpClient(_progressMessageHandler)
+        _client = new HttpClient(_httpClientHandler)
         {
             BaseAddress = new Uri(ServiceUri),
             Timeout = _options.Timeout,
@@ -86,74 +76,6 @@ public sealed class GameServerClient : IGameServerClient
 
     public Task<RunGameResponse> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default) =>
         Connection.InvokeAsync<RunGameResponse>("RunGame", runGameRequest, cancellationToken);
-
-    public Task<GameCreationResult> CreateGameAsync(
-        GameSettingsCore<AppSettingsCore> gameSettings,
-        PackageKey packageKey,
-        ComputerAccountInfo[] computerAccounts,
-        CancellationToken cancellationToken = default)
-    {
-        gameSettings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
-
-        return _connection.InvokeAsync<GameCreationResult>(
-            "CreateGame",
-            gameSettings,
-            packageKey,
-            computerAccounts.Select(ca => ca.Account).ToArray(),
-            cancellationToken);
-    }
-
-    public Task<GameCreationResult> CreateGame2Async(
-        GameSettingsCore<AppSettingsCore> gameSettings,
-        PackageInfo packageInfo,
-        ComputerAccountInfo[] computerAccounts,
-        CancellationToken cancellationToken = default)
-    {
-        gameSettings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
-
-        return Connection.InvokeAsync<GameCreationResult>(
-            "CreateGame2",
-            gameSettings,
-            packageInfo,
-            computerAccounts.Select(ca => ca.Account).ToArray(),
-            cancellationToken);
-    }
-
-    public Task<GameCreationResult> CreateAndJoinGameAsync(
-        GameSettingsCore<AppSettingsCore> gameSettings,
-        PackageKey packageKey,
-        ComputerAccountInfo[] computerAccounts,
-        bool isMale,
-        CancellationToken cancellationToken = default)
-    {
-        gameSettings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
-
-        return _connection.InvokeAsync<GameCreationResult>(
-            "CreateAndJoinGameNew",
-            gameSettings,
-            packageKey,
-            computerAccounts.Select(ca => ca.Account).ToArray(),
-            isMale,
-            cancellationToken);
-    }
-
-    public Task<GameCreationResult> CreateAndJoinGame2Async(
-        GameSettingsCore<AppSettingsCore> gameSettings,
-        PackageInfo packageInfo,
-        ComputerAccountInfo[] computerAccounts,
-        bool isMale,
-        CancellationToken cancellationToken = default)
-    {
-        gameSettings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
-
-        return Connection.InvokeAsync<GameCreationResult>(
-            "CreateAndJoinGame2",
-            gameSettings,
-            packageInfo,
-            computerAccounts.Select(ca => ca.Account).ToArray(),
-            isMale,
-            cancellationToken);
-    }
 
     public async ValueTask DisposeAsync()
     {
@@ -179,7 +101,7 @@ public sealed class GameServerClient : IGameServerClient
         _connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
 
     public Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<HostInfo>("GetGamesHostInfo", cancellationToken);
+        _connection.InvokeAsync<HostInfo>("GetGamesHostInfoNew", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
 
     public Task<string> GetNewsAsync(CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync<string>("GetNews", cancellationToken);
@@ -190,13 +112,7 @@ public sealed class GameServerClient : IGameServerClient
     public Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync<string[]>("GetUsers", cancellationToken);
 
-    public Task<bool> HasPackageAsync(PackageKey packageKey, CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<bool>("HasPackage", packageKey, cancellationToken);
-
-    public Task<string> HasImageAsync(FileKey imageKey, CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<string>("HasPicture", imageKey, cancellationToken);
-
-    private async Task<string> AuthenticateUserAsync(
+    private async Task AuthenticateUserAsync(
         string user,
         string password,
         CancellationToken cancellationToken = default)
@@ -214,7 +130,7 @@ public sealed class GameServerClient : IGameServerClient
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return;
         }
 
         throw response.StatusCode switch
@@ -232,14 +148,15 @@ public sealed class GameServerClient : IGameServerClient
             throw new InvalidOperationException("Client has been already opened");
         }
 
-        var token = await AuthenticateUserAsync(userName, "", cancellationToken);
+        await AuthenticateUserAsync(userName, "", cancellationToken);
 
         _connection = new HubConnectionBuilder()
             .WithUrl(
-                $"{ServiceUri}sionline?token={token}",
+                $"{ServiceUri}sionline",
                 options =>
                 {
                     options.AccessTokenProvider = () => Task.FromResult<string?>(Convert.ToBase64String(Encoding.UTF8.GetBytes(userName)));
+                    options.Cookies = _cookieContainer;
                 })
             .WithAutomaticReconnect(new ReconnectPolicy())
             .AddMessagePackProtocol()
@@ -287,98 +204,6 @@ public sealed class GameServerClient : IGameServerClient
 
     public Task SayAsync(string message) => _connection.InvokeAsync("Say", message);
 
-    public async Task UploadPackageAsync(FileKey packageKey, Stream stream, CancellationToken cancellationToken = default)
-    {
-        var url = "api/upload/package";
-        using var content = new StreamContent(stream, _BufferSize);
-
-        try
-        {
-            using var formData = new MultipartFormDataContent
-            {
-                { content, "file", packageKey.Name }
-            };
-
-            formData.Headers.ContentMD5 = packageKey.Hash;
-            using var response = await _client.PostAsync(url, formData, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorMessage = await GetErrorMessageAsync(response, cancellationToken);
-                throw new Exception(errorMessage);
-            }
-        }
-        catch (HttpRequestException exc)
-        {
-            throw new Exception(Resources.UploadPackageConnectionError, exc.InnerException ?? exc);
-        }
-        catch (TaskCanceledException exc)
-        {
-            if (!exc.CancellationToken.IsCancellationRequested)
-            {
-                throw new Exception(Resources.UploadPackageTimeout, exc);
-            }
-
-            throw exc;
-        }
-    }
-
-    public async Task<string> UploadImageAsync(FileKey imageKey, Stream data, CancellationToken cancellationToken = default)
-    {
-        var uri = "api/upload/image";
-
-        var bytesContent = new StreamContent(data, _BufferSize);
-
-        using var formData = new MultipartFormDataContent
-        {
-            { bytesContent, Convert.ToBase64String(imageKey.Hash), imageKey.Name }
-        };
-
-        formData.Headers.ContentMD5 = imageKey.Hash;
-
-        var response = await _client.PostAsync(uri, formData, cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorString = await response.Content.ReadAsStringAsync(cancellationToken);
-            throw new Exception($"{response.StatusCode}: {errorString}");
-        }
-
-        return await response.Content.ReadAsStringAsync(cancellationToken);
-    }
-
-    public Task<GameCreationResult> JoinGameAsync(
-        int gameId,
-        GameRole role,
-        bool isMale,
-        string password,
-        CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<GameCreationResult>("JoinGameNew", gameId, (int)role, isMale, password, cancellationToken);
-
-    public Task SendMessageAsync(Message message, CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync("SendMessage", message, cancellationToken);
-
-    public Task LeaveGameAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync("LeaveGame", cancellationToken);
-
-    private static async Task<string> GetErrorMessageAsync(HttpResponseMessage response, CancellationToken cancellationToken)
-    {
-        var serverError = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge ||
-            response.StatusCode == HttpStatusCode.BadRequest && serverError == "Request body too large.")
-        {
-            return Resources.FileTooLarge;
-        }
-
-        if (response.StatusCode == HttpStatusCode.BadGateway)
-        {
-            return $"{response.StatusCode}: Bad Gateway";
-        }
-
-        return $"{response.StatusCode}: {serverError}";
-    }
-
     private Task OnConnectionClosedAsync(Exception? exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
 
     private void OnUI(Action action)
@@ -391,8 +216,6 @@ public sealed class GameServerClient : IGameServerClient
 
         action();
     }
-
-    private void MessageHandler_HttpSendProgress(object? sender, HttpProgressEventArgs e) => UploadProgress?.Invoke(e.ProgressPercentage);
 
     private sealed class ReconnectPolicy : IRetryPolicy
     {

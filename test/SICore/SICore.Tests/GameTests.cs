@@ -31,8 +31,8 @@ public sealed class GameTests
 
         for (int i = 0; i < order.Length; i++)
         {
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(enumerator.Current.PlayerIndex, order[i]);
+            Assert.That(enumerator.MoveNext(), Is.True);
+            Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(order[i]));
 
             if (enumerator.Current.PlayerIndex == -1)
             {
@@ -42,7 +42,7 @@ public sealed class GameTests
                     if (playerSets[j].Intersect(enumerator.Current.PossibleIndicies).Any())
                     {
                         found = true;
-                        Assert.AreEqual(playerSets[j], enumerator.Current.PossibleIndicies);
+                        Assert.That(enumerator.Current.PossibleIndicies, Is.EqualTo(playerSets[j]));
                     }
                 }
 
@@ -53,7 +53,7 @@ public sealed class GameTests
             }
         }
 
-        Assert.IsFalse(enumerator.MoveNext());
+        Assert.That(enumerator.MoveNext(), Is.False);
 
         enumerator.Reset(false);
         while (enumerator.MoveNext())
@@ -66,9 +66,9 @@ public sealed class GameTests
 
                 enumerator.Current.SetIndex(newIndex);
 
-                Assert.AreEqual(enumerator.Current.PlayerIndex, newIndex);
-                Assert.IsTrue(list.Count == count - 1);
-                Assert.IsTrue(!list.Contains(newIndex));
+                Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(newIndex));
+                Assert.That(list.Count, Is.EqualTo(count - 1));
+                Assert.That(list.Contains(newIndex), Is.False);
             }
         }
     }

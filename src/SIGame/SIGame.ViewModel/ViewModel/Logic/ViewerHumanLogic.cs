@@ -699,7 +699,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         if (content.Count == 0)
         {
-            OnSpecialReplic("No content found");
             return;
         }
 

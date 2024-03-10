@@ -1231,6 +1231,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на You created too much random pakages. Please try again later.
+        /// </summary>
+        public static string TooMuchRandomPackages {
+            get {
+                return ResourceManager.GetString("TooMuchRandomPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Unknown error.
         /// </summary>
         public static string UnknownError {

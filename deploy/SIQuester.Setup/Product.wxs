@@ -161,9 +161,6 @@
 			<Component Guid="{6874C052-7D52-4E31-9BF3-D6563FE7F8AB}">
 				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\MahApps.Metro.LICENSE+" />
 			</Component>
-			<Component Guid="{E05E068D-CD01-4F91-90D2-B110E3A31DCA}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Newtonsoft.Json.LICENSE.md" />
-			</Component>
 			<Component Guid="{930943B4-D03E-40C3-8196-B966C21EB6C1}">
 				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Modern UI Icons.license.txt" />
 			</Component>

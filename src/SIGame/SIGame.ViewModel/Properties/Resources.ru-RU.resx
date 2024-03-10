@@ -522,4 +522,7 @@
   <data name="UnknownError" xml:space="preserve">
     <value>Неизвестная ошибка</value>
   </data>
+  <data name="TooMuchRandomPackages" xml:space="preserve">
+    <value>Вы создали слишком много случайных пакетов. Попробуйте ещё раз позже</value>
+  </data>
 </root>

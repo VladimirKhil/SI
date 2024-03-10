@@ -67,7 +67,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     private double _volume = 25;
 
     /// <summary>
-    /// Громкость звука
+    /// Sound volume level.
     /// </summary>
     public double Volume
     {

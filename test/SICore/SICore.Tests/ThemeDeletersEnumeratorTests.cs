@@ -13,7 +13,7 @@ public sealed class ThemeDeletersEnumeratorTests
         var enumerator = new ThemeDeletersEnumerator(new ThemeDeletersEnumerator.IndexInfo[] { new ThemeDeletersEnumerator.IndexInfo(new HashSet<int>(new int[] { 0 })) });
         enumerator.RemoveAt(0);
 
-        Assert.AreEqual(true, enumerator.IsEmpty());
+        Assert.That(enumerator.IsEmpty(), Is.True);
     }
 
     [Test]
@@ -41,27 +41,27 @@ public sealed class ThemeDeletersEnumeratorTests
 
         enumerator.Reset(false);
         enumerator.MoveNext();
-        Assert.AreEqual(3, enumerator.Current.PlayerIndex);
+        Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(3));
         enumerator.MoveNext();
-        Assert.AreEqual(0, enumerator.Current.PlayerIndex);
+        Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(0));
         enumerator.MoveNext();
-        Assert.AreEqual(2, enumerator.Current.PlayerIndex);
+        Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(2));
         enumerator.MoveNext();
-        Assert.AreEqual(-1, enumerator.Current.PlayerIndex);
-        Assert.AreEqual(newVariants, enumerator.Current.PossibleIndicies);
+        Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(-1));
+        Assert.That(enumerator.Current.PossibleIndicies, Is.EqualTo(newVariants));
         enumerator.MoveNext();
-        Assert.AreEqual(-1, enumerator.Current.PlayerIndex);
-        Assert.AreEqual(newVariants, enumerator.Current.PossibleIndicies);
+        Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(-1));
+        Assert.That(enumerator.Current.PossibleIndicies, Is.EqualTo(newVariants));
         enumerator.MoveNext();
-        Assert.AreEqual(-1, enumerator.Current.PlayerIndex);
-        Assert.AreEqual(newVariants, enumerator.Current.PossibleIndicies);
+        Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(-1));
+        Assert.That(enumerator.Current.PossibleIndicies, Is.EqualTo(newVariants));
         enumerator.MoveNext();
-        Assert.AreEqual(-1, enumerator.Current.PlayerIndex);
-        Assert.AreEqual(newVariants, enumerator.Current.PossibleIndicies);
+        Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(-1));
+        Assert.That(enumerator.Current.PossibleIndicies, Is.EqualTo(newVariants));
         enumerator.MoveNext();
-        Assert.AreEqual(4, enumerator.Current.PlayerIndex);
+        Assert.That(enumerator.Current.PlayerIndex, Is.EqualTo(4));
 
-        Assert.IsFalse(enumerator.MoveNext());
+        Assert.That(enumerator.MoveNext(), Is.False);
     }
 
     [Test]
@@ -85,6 +85,6 @@ public sealed class ThemeDeletersEnumeratorTests
         enumerator.MoveNext();
         enumerator.MoveNext();
         enumerator.MoveNext();
-        Assert.AreEqual(newVariants, enumerator.Current.PossibleIndicies);
+        Assert.That(enumerator.Current.PossibleIndicies, Is.EqualTo(newVariants));
     }
 }

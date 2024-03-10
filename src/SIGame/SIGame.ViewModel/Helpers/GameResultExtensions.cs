@@ -35,17 +35,13 @@ internal static class GameResultExtensions
 
         return new GameReport
         {
-            Info = new GameResultInfo
+            Info = new GameResultInfo(
+                new PackageInfo(gameResult.PackageName, gameResult.PackageHash, gameResult.PackageAuthors, gameResult.PackageAuthorsContacts),
+                gameResult.Language)
             {
                 FinishTime = DateTimeOffset.UtcNow,
                 Duration = gameResult.Duration,
                 Name = gameResult.Name,
-                Package = new PackageInfo
-                {
-                    Authors = gameResult.PackageAuthors,
-                    Hash = gameResult.PackageHash,
-                    Name = gameResult.PackageName
-                },
                 Platform = GamePlatforms.Local,
                 Results = gameResult.Results,
                 Reviews = gameResult.Reviews

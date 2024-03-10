@@ -373,7 +373,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         get => _volume;
         set
         {
-            if (_volume != value)
+            if (_volume != value && _volume >= 0.0 && _volume <= 1.0)
             {
                 var oldValue = _volume;
                 _volume = value;

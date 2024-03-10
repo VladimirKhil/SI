@@ -15,6 +15,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -188,7 +189,7 @@ internal sealed class DesktopManager : PlatformManager
         {
             var storage = ServiceProvider.GetRequiredService<StorageViewModel>();
             storage.DefaultRestriction = ((App)Application.Current).Settings.Restriction;
-            storage.DefaultLanguage = "ru-RU";
+            storage.DefaultLanguage = Thread.CurrentThread.CurrentUICulture.Name;
 
             storage.PropertyChanged += (s, e) =>
             {

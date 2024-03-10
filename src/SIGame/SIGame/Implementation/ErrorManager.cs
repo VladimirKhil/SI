@@ -1,6 +1,6 @@
-﻿using AppService.Client;
-using AppService.Client.Models;
-using Microsoft.Extensions.Options;
+﻿using AppRegistryService.Contract;
+using AppRegistryService.Contract.Models;
+using AppRegistryService.Contract.Requests;
 using SICore;
 using SIGame.Contracts;
 using SIGame.Properties;
@@ -9,6 +9,7 @@ using SIStatisticsService.Contract;
 using System;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -19,29 +20,23 @@ namespace SIGame.Implementation;
 /// <inheritdoc cref="IErrorManager" />
 internal sealed class ErrorManager : IErrorManager
 {
-    private const string AppCode = "SI";
     private static bool ErrorHappened = false;
     private static readonly object ErrorSync = new();
 
-    private readonly IAppServiceClient _appServiceClient;
+    private readonly IAppRegistryServiceClient _appRegistryServiceClient;
     private readonly ISIStatisticsServiceClient _siStatisticsServiceClient;
 
     private readonly AppState _appState;
 
-    private readonly bool _useAppService;
-
     public ErrorManager(
-        IAppServiceClient appServiceClient,
+        IAppRegistryServiceClient appRegistryServiceClient,
         ISIStatisticsServiceClient gameResultServiceClient,
-        AppState appState,
-        IOptions<AppServiceClientOptions> appServiceClientOptions)
+        AppState appState)
     {
-        _appServiceClient = appServiceClient;
+        _appRegistryServiceClient = appRegistryServiceClient;
         _siStatisticsServiceClient = gameResultServiceClient;
 
         _appState = appState;
-
-        _useAppService = appServiceClientOptions.Value.ServiceUri != null;
     }
 
     public bool SendErrorReport(Exception e)
@@ -96,12 +91,6 @@ internal sealed class ErrorManager : IErrorManager
 
     private async void SendErrorMessage(string errorMessage, object sync)
     {
-        if (!_useAppService)
-        {
-            MessageBox.Show(errorMessage);
-            return;
-        }
-
         try
         {
             var errorReport = new SIReport
@@ -112,18 +101,24 @@ internal sealed class ErrorManager : IErrorManager
                 Subtitle = Resources.ErrorDescribe
             };
 
-            var reportView = new GameReportView { DataContext = errorReport };
+            var reportView = new GameReportView { DataContext = errorReport, Foreground = Brushes.White, VerticalAlignment = VerticalAlignment.Center };
 
             var mainWindow = Application.Current.MainWindow;
 
             errorReport.SendReport = new CustomCommand(async arg =>
             {
-                var version = Assembly.GetExecutingAssembly().GetName().Version;
-                var message = errorMessage + Environment.NewLine + errorReport.Comment;
+                var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
 
                 try
                 {
-                    var result = await _appServiceClient.SendErrorReportAsync(AppCode, message, version, DateTime.Now);
+                    var result = await _appRegistryServiceClient.Apps.SendAppErrorReportAsync(
+                        App.AppId,
+                        new AppErrorRequest(version, Environment.OSVersion.Version, RuntimeInformation.OSArchitecture)
+                        {
+                            ErrorMessage = errorMessage,
+                            ErrorTime = DateTimeOffset.UtcNow,
+                            UserNotes = errorReport.Comment
+                        });
 
                     switch (result)
                     {
@@ -145,17 +140,15 @@ internal sealed class ErrorManager : IErrorManager
                         CommonSettings.Default.DelayedErrorsNew.Add(
                             new ErrorInfo
                             {
-                                Error = message,
+                                Error = errorMessage,
                                 Time = DateTime.Now,
-                                Version = version.ToString()
+                                Version = version.ToString(),
+                                UserNotes = errorReport.Comment
                             });
                     }
                 }
 
-                if (mainWindow != null)
-                {
-                    mainWindow.Close();
-                }
+                mainWindow?.Close();
 
                 Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
             });
@@ -184,10 +177,17 @@ internal sealed class ErrorManager : IErrorManager
         {
             if (MessageBox.Show(Resources.FatalErrorMessage, CommonSettings.AppName, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                var version = Assembly.GetExecutingAssembly().GetName().Version;
+                var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
+                
                 try
                 {
-                    await _appServiceClient.SendErrorReportAsync(AppCode, errorMessage, version, DateTime.Now);
+                    await _appRegistryServiceClient.Apps.SendAppErrorReportAsync(
+                        App.AppId,
+                        new AppErrorRequest(version, Environment.OSVersion.Version, RuntimeInformation.OSArchitecture)
+                        {
+                            ErrorMessage = errorMessage,
+                            ErrorTime = DateTimeOffset.UtcNow,
+                        });
                 }
                 catch (Exception)
                 {
@@ -219,15 +219,23 @@ internal sealed class ErrorManager : IErrorManager
                 return;
             }
 
-            if (_useAppService)
+            while (CommonSettings.Default.DelayedErrorsNew.Count > 0)
             {
-                while (CommonSettings.Default.DelayedErrorsNew.Count > 0)
-                {
-                    var report = CommonSettings.Default.DelayedErrorsNew[0];
+                var report = CommonSettings.Default.DelayedErrorsNew[0];
 
-                    await _appServiceClient.SendErrorReportAsync(AppCode, report.Error, Version.Parse(report.Version), report.Time);
-                    CommonSettings.Default.DelayedErrorsNew.RemoveAt(0);
+                if (report.Version != null && report.Error != null)
+                {
+                    await _appRegistryServiceClient.Apps.SendAppErrorReportAsync(
+                        App.AppId,
+                        new AppErrorRequest(Version.Parse(report.Version), Environment.OSVersion.Version, RuntimeInformation.OSArchitecture)
+                        {
+                            ErrorMessage = report.Error,
+                            ErrorTime = report.Time,
+                            UserNotes = report.UserNotes
+                        });
                 }
+
+                CommonSettings.Default.DelayedErrorsNew.RemoveAt(0);
             }
 
             while (_appState.DelayedReports.Count > 0)
