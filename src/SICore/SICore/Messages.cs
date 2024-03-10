@@ -39,6 +39,7 @@ public static class Messages
     /// <summary>
     /// Единица сценария вопроса
     /// </summary>
+    [Obsolete("Use Content")]
     public const string Atom = "ATOM";
 
     /// <summary>
@@ -49,6 +50,7 @@ public static class Messages
     /// <summary>
     /// Дополнительная единица сценария вопроса
     /// </summary>
+    [Obsolete("Use Content")]
     public const string Atom_Second = "ATOM_SECOND";
 
     /// <summary>
@@ -487,6 +489,7 @@ public static class Messages
     /// <summary>
     /// Форма текста
     /// </summary>
+    [Obsolete("Use ContentShape")]
     public const string TextShape = "TEXTSHAPE";
 
     /// <summary>

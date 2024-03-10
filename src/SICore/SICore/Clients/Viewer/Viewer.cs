@@ -902,23 +902,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     }
                 case Messages.WrongTry:
                     {
-                        #region WrongTry
-                        var p = int.Parse(mparams[1]);
-                        if (p > 0 && p < ClientData.Players.Count)
-                        {
-                            var player = ClientData.Players[p];
-                            if (player.State == PlayerState.None)
-                            {
-                                player.State = PlayerState.Lost;
-                                Task.Run(async () =>
-                                {
-                                    await Task.Delay(200);
-                                    if (player.State == PlayerState.Lost)
-                                        player.State = PlayerState.None;
-                                });
-                            }
-                        }
-                        #endregion
+                        OnWrongTry(mparams);
                         break;
                     }
                 case Messages.Person:
@@ -1100,6 +1084,33 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private void OnWrongTry(string[] mparams)
+    {
+        if (!int.TryParse(mparams[1], out var playerIndex) || playerIndex <= 0 || playerIndex >= ClientData.Players.Count)
+        {
+            return;
+        }
+
+        var player = ClientData.Players[playerIndex];
+
+        if (player.State != PlayerState.None)
+        {
+            return;
+        }
+
+        player.State = PlayerState.Lost;
+        
+        Task.Run(async () =>
+        {
+            await Task.Delay(200);
+
+            if (player.State == PlayerState.Lost)
+            {
+                player.State = PlayerState.None;
+            }
+        });
     }
 
     private void OnLayout(string[] mparams)

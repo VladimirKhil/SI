@@ -2566,9 +2566,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             DropCurrentStaker();
         }
 
-        if (ClientData.Question != null &&
-            ((ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Auction
-            || (ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Stake)
+        if (ClientData.Question != null
+            && ClientData.Question.TypeName == QuestionTypes.Stake
             && ClientData.Order.Length > 0)
         {
             DropPlayerFromStakes(playerIndex);

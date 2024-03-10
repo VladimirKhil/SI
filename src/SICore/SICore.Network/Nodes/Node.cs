@@ -1,5 +1,6 @@
 ﻿using Notions;
 using SICore.Connections;
+using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using SIData;
@@ -108,7 +109,7 @@ public abstract class Node : INode
 
             if (clientName != null)
             {
-                var m = new Message(string.Join(Message.ArgsSeparator, SystemMessages.Disconnect, clientName, (withError ? "+" : "-")), "", NetworkConstants.GameName);
+                var m = new Message(string.Join(Message.ArgsSeparator, SystemMessages.Disconnect, clientName, withError ? "+" : "-"), "", NetworkConstants.GameName);
                 await ProcessOutgoingMessageAsync(m);
             }
         }
@@ -371,6 +372,12 @@ public abstract class Node : INode
         {
             OnError(exc, false);
         }
+    }
+
+    public async Task NotifyGameCloseAsync()
+    {
+        var m = new Message(SystemMessages.GameClosed, NetworkConstants.GameName, NetworkConstants.Everybody);
+        await ProcessOutgoingMessageAsync(m);
     }
 
     /// <summary>

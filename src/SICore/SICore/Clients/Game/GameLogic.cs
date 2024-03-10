@@ -261,7 +261,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.AnswererIndex = -1;
         _data.QuestionPlayState.Clear();
         _data.StakerIndex = -1;
-        _data.Type = null;
         _data.ThemeDeleters = null;
 
         OnRound(round, 1);
@@ -463,6 +462,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessageWithArgs(Messages.ContentShape, ContentPlacements.Screen, 0, ContentTypes.Text, shape.EscapeNewLines());
 
             _data.Text = text;
+            _data.InitialPartialTextLength = 0;
+            _data.PartialIterationCounter = 0;
             _data.TextLength = 0;
             ScheduleExecution(Tasks.PrintPartial, 1);
             return;
@@ -485,7 +486,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private bool IsPartial() =>
         _data.Round != null
             && _data.Round.Type != RoundTypes.Final
-            && (_data.Question.TypeName ?? _data.Type?.Name) == QuestionTypes.Simple
+            && _data.Question?.TypeName == QuestionTypes.Simple
             && _data.Settings != null
             && !_data.Settings.AppSettings.FalseStart
             && _data.Settings.AppSettings.PartialText
@@ -787,7 +788,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.AnswererIndex = -1;
         _data.QuestionPlayState.Clear();
         _data.StakerIndex = -1;
-        _data.Type = null;
     }
 
     private void FinishRound(bool move = true)
@@ -1476,6 +1476,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         // Resume question playing
         if (_data.IsPartial)
         {
+            _data.InitialPartialTextLength = _data.TextLength;
+            _data.PartialIterationCounter = 0;
             ScheduleExecution(Tasks.PrintPartial, 5, force: true);
         }
         else
@@ -1881,7 +1883,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return;
         }
 
-        ScheduleExecution(Tasks.AskAnswer, 7, force: true);
+        ScheduleExecution(Tasks.AskAnswer, 1, force: true);
     }
 
     private (bool, Tasks) ProcessStopReason(Tasks task, int arg)
@@ -1939,7 +1941,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 if (stop)
                 {
-                    ScheduleExecution(Tasks.AskAnswer, 7, force: true);
+                    ScheduleExecution(Tasks.AskAnswer, 1, force: true);
                 }
                 break;
 
@@ -2689,8 +2691,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (arg == 3)
         {
-            _data.Type = _data.Question.Type;
-            var typeName = _data.Question.TypeName ?? _data.Question.Type.Name;
+            var typeName = _data.Question?.TypeName;
 
             // Only StakeAll type is supported in final for now
             // This will be removed when full question type support will have been implemented
@@ -2704,21 +2705,18 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             switch (typeName)
             {
-                case QuestionTypes.Auction:
                 case QuestionTypes.Stake:
                     _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
                     delay = 16;
                     break;
 
-                case QuestionTypes.Cat:
-                case QuestionTypes.BagCat:
                 case QuestionTypes.Secret:
                 case QuestionTypes.SecretPublicPrice:
                 case QuestionTypes.SecretNoQuestion:
                     var replic = new StringBuilder(LO[nameof(R.YouReceiveCat)]);
 
-                    var selectionMode = _data.Question.Parameters?.FirstOrDefault(p => p.Key == QuestionParameterNames.SelectionMode);
+                    var selectionMode = _data.Question?.Parameters?.FirstOrDefault(p => p.Key == QuestionParameterNames.SelectionMode);
 
                     if (selectionMode?.Value?.SimpleValue == StepParameterValues.SetAnswererSelect_Any)
                     {
@@ -2730,7 +2728,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     delay = 10;
                     break;
 
-                case QuestionTypes.Sponsored:
                 case QuestionTypes.NoRisk:
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
@@ -2746,7 +2743,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     break;
 
                 default:
-                    OnUnsupportedQuestionType(typeName);
+                    OnUnsupportedQuestionType(typeName ?? "");
                     return;
             }
 
@@ -2761,26 +2758,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private static string MakeCompatibleQuestionTypeName(string typeName) => typeName switch
     {
-        QuestionTypes.Auction or QuestionTypes.Stake => QuestionTypes.Auction,
-        QuestionTypes.Cat or QuestionTypes.BagCat or QuestionTypes.Secret or QuestionTypes.SecretPublicPrice or QuestionTypes.SecretNoQuestion => QuestionTypes.Cat,
-        QuestionTypes.Sponsored or QuestionTypes.NoRisk => QuestionTypes.Sponsored,
+        QuestionTypes.Stake => QuestionTypes.Auction,
+        QuestionTypes.Secret or QuestionTypes.SecretPublicPrice or QuestionTypes.SecretNoQuestion => QuestionTypes.Cat,
+        QuestionTypes.NoRisk => QuestionTypes.Sponsored,
         _ => typeName,
     };
 
     private void OnUnsupportedQuestionType(string typeName)
     {
         var sp = new StringBuilder(LO[nameof(R.UnknownType)]).Append(' ').Append(typeName);
-
-        // Obsolete
-        if (_data.Type != null && _data.Type.Params.Count > 0)
-        {
-            sp.Append(' ').Append(LO[nameof(R.WithParams)]);
-
-            foreach (var p in _data.Type.Params)
-            {
-                sp.Append(' ').Append(p);
-            }
-        }
 
         _gameActions.SpecialReplic(sp.ToString());
         _gameActions.SpecialReplic(LO[nameof(R.GameWillResume)]);
@@ -2802,25 +2788,31 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return;
         }
 
-        var printingLength = Math.Max(
-            1,
-            Math.Min(
-                text.Length - _data.TextLength,
-                (int)(_data.Settings.AppSettings.ReadingSpeed * PartialPrintFrequencyPerSecond)));
+        _data.PartialIterationCounter++;
 
-        // Align to next space position
-        while (_data.TextLength + printingLength + 1 < text.Length && !char.IsWhiteSpace(text[_data.TextLength + printingLength]))
+        var newTextLength = Math.Min(
+            _data.InitialPartialTextLength
+                + (int)(_data.Settings.AppSettings.ReadingSpeed * PartialPrintFrequencyPerSecond * _data.PartialIterationCounter),
+            text.Length);
+
+        if (newTextLength > _data.TextLength)
         {
-            printingLength++;
+            var printingLength = newTextLength - _data.TextLength;
+
+            // Align to next space position
+            while (_data.TextLength + printingLength + 1 < text.Length && !char.IsWhiteSpace(text[_data.TextLength + printingLength]))
+            {
+                printingLength++;
+            }
+
+            var subText = text.Substring(_data.TextLength, printingLength);
+
+            _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
+            _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
+            _gameActions.SystemReplic(subText);
+
+            _data.TextLength += printingLength;
         }
-
-        var subText = text.Substring(_data.TextLength, printingLength);
-
-        _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
-        _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
-        _gameActions.SystemReplic(subText);
-
-        _data.TextLength += printingLength;
 
         if (_data.TextLength < text.Length)
         {
@@ -2945,16 +2937,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             var index = ClientData.PendingAnswererIndicies.Count == 1 ? 0 : Random.Shared.Next(ClientData.PendingAnswererIndicies.Count);
             ClientData.PendingAnswererIndex = ClientData.PendingAnswererIndicies[index];
-
-            for (var i = 0; i < ClientData.PendingAnswererIndicies.Count; i++)
-            {
-                if (i == index)
-                {
-                    continue;
-                }
-
-                _gameActions.SendMessageWithArgs(Messages.WrongTry, i);
-            }
         }
 
         if (ClientData.PendingAnswererIndex < 0 || ClientData.PendingAnswererIndex >= ClientData.Players.Count)
@@ -3387,6 +3369,23 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.ShowmanReplic(_data.Answerer.Name + answerReplic);
 
         _data.Answerer.Answer = "";
+
+        var buttonPressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+
+        if (buttonPressMode == ButtonPressMode.RandomWithinInterval)
+        {
+            for (var i = 0; i < ClientData.PendingAnswererIndicies.Count; i++)
+            {
+                var playerIndex = ClientData.PendingAnswererIndicies[i];
+
+                if (playerIndex == ClientData.PendingAnswererIndex)
+                {
+                    continue;
+                }
+
+                _gameActions.SendMessageWithArgs(Messages.WrongTry, playerIndex);
+            }
+        }
 
         ScheduleExecution(Tasks.WaitAnswer, time1);
         WaitFor(DecisionType.Answering, time1, _data.AnswererIndex);

@@ -146,11 +146,6 @@ public sealed class GameData : Data
     /// </summary>
     internal Question? Question { get; set; }
 
-    /// <summary>
-    /// Currently playing question type.
-    /// </summary>
-    internal QuestionType? Type { get; set; }
-
     private NumberSet? _catInfo = null;
 
     public NumberSet? CatInfo
@@ -560,6 +555,10 @@ public sealed class GameData : Data
     public bool IsPartial { get; internal set; }
 
     public bool MediaOk { get; internal set; }
+
+    public int InitialPartialTextLength { get; internal set; }
+
+    public int PartialIterationCounter { get; internal set; }
 
     public int TextLength { get; internal set; }
 

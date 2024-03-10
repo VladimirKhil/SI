@@ -8,7 +8,6 @@ using SICore.Network.Clients;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
-using SIStorage.Service.Contract.Models;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -63,7 +62,7 @@ public sealed class GameActions
             ? ReplicCodes.System.ToString()
             : messageType == MessageTypes.Special
                 ? ReplicCodes.Special.ToString()
-                : (personRole == GameRole.Player
+                : (personRole == GameRole.Player && personIndex.HasValue
                     ? ReplicCodes.Player + personIndex.Value.ToString()
                     : ReplicCodes.Showman.ToString());
 
@@ -220,15 +219,14 @@ public sealed class GameActions
 
                     switch (contentType)
                     {
-                        case AtomTypes.Image:
-                        case AtomTypes.Audio:
-                        case AtomTypes.AudioNew:
-                        case AtomTypes.Video:
-                        case AtomTypes.Html:
+                        case ContentTypes.Image:
+                        case ContentTypes.Audio:
+                        case ContentTypes.Video:
+                        case ContentTypes.Html:
                             {
                                 if (!contentItem.IsRef) // External link
                                 {
-                                    if (contentType == AtomTypes.Html)
+                                    if (contentType == ContentTypes.Html)
                                     {
                                         continue;
                                     }
