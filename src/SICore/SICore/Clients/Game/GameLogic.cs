@@ -2800,7 +2800,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var printingLength = newTextLength - _data.TextLength;
 
             // Align to next space position
-            while (_data.TextLength + printingLength + 1 < text.Length && !char.IsWhiteSpace(text[_data.TextLength + printingLength]))
+            while (_data.TextLength + printingLength < text.Length && !char.IsWhiteSpace(text[_data.TextLength + printingLength]))
             {
                 printingLength++;
             }

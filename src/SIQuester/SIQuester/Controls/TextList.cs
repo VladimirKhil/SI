@@ -210,6 +210,11 @@ public sealed class TextList : TextBox
 
                 Select(start, end - start);
                 _infos.RemoveRange(e.OldStartingIndex, e.OldItems.Count);
+
+                if (_infos.Count != ItemsSource.Count)
+                {
+                    throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems.Count}");
+                }
             }
             finally
             {
@@ -244,7 +249,7 @@ public sealed class TextList : TextBox
         {
             if (Text != ItemsSource[0].ToString())
             {
-                MessageBox.Show("Ошибка редактирования! Обратитесь к разработчику.");
+                MessageBox.Show("Editing error. Send message to author");
                 SetText();
             }
         }
@@ -271,6 +276,11 @@ public sealed class TextList : TextBox
                 var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeSpecified, out string tail);
                 text.Append(toAdd);
                 _infos.Insert(index++, new ItemInfo(toAdd.Length, isLink ? toAdd.Length : -1, canBeSpecified));
+            }
+
+            if (_infos.Count != ItemsSource.Count)
+            {
+                throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.NewItems.Count: {e.NewItems.Count}");
             }
 
             if (e.NewStartingIndex == 0 && index < _infos.Count)
@@ -411,11 +421,9 @@ public sealed class TextList : TextBox
             return;
         }
 
-        int index = 0;
-
         foreach (var change in e.Changes)
         {
-            var offset = ConvertGlobalOffsetToLocalOffset(change.Offset, out index);
+            var offset = ConvertGlobalOffsetToLocalOffset(change.Offset, out var index);
 
             var origin = ItemsSource[index].ToString();
             _blockNotificationsFlag = true;
