@@ -531,11 +531,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                 }
 
                 useMarker = true;
-
-                var answerContent = new StepParameter { Type = StepParameterTypes.Content, ContentValue = new() };
-                Parameters[QuestionParameterNames.Answer] = answerContent;
-
-                currentContent = answerContent;
+                currentContent = new StepParameter { Type = StepParameterTypes.Content, ContentValue = new() };
                 continue;
             }
 
@@ -549,6 +545,11 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     WaitForFinish = atom.AtomTime != -1,
                     IsRef = atom.IsLink
                 });            
+        }
+
+        if (useMarker && currentContent.ContentValue.Count > 0)
+        {
+            Parameters[QuestionParameterNames.Answer] = currentContent;
         }
 
         Scenario.Clear();

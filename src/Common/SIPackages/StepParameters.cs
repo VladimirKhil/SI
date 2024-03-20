@@ -57,7 +57,7 @@ public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatab
                     switch (reader.LocalName)
                     {
                         case "param":
-                            if (limits == null || Count < limits.ParameterCount)
+                            if (!reader.IsEmptyElement && (limits == null || Count < limits.ParameterCount))
                             {
                                 var name = "";
 
