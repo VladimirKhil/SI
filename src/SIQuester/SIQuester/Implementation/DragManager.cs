@@ -1,6 +1,6 @@
 ﻿using SIPackages;
-using SIPackages.Core;
 using SIQuester.Contracts;
+using SIQuester.Helpers;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System.Text;
@@ -174,11 +174,13 @@ internal static class DragManager
                             index++;
                         }
 
+                        var currentPrices = themeViewModel.CapturePrices();
+
                         themeViewModel.Questions.RemoveAt(index);
 
                         if (AppSettings.Default.ChangePriceOnMove)
                         {
-                            RecountPrices(themeViewModel);
+                            themeViewModel.ResetPrices(currentPrices);
                         }
                     }
 
@@ -189,30 +191,6 @@ internal static class DragManager
                     questionViewModel.IsDragged = false;
                 }
             }
-        }
-    }
-
-    internal static void RecountPrices(ThemeViewModel theme)
-    {
-        var round = theme.OwnerRound;
-
-        if (round == null || round.Model == null || round.OwnerPackage?.Rounds == null)
-        {
-            return;
-        }
-
-        var coef = round.Model.Type == RoundTypes.Final ? 0 : round.OwnerPackage.Rounds.IndexOf(round) + 1;
-        var counter = 0;
-
-        for (int i = 0; i < theme.Questions.Count; i++)
-        {
-            if (theme.Questions[i].Model.Price == Question.InvalidPrice) // Price is not recounted
-            {
-                continue;
-            }
-
-            theme.Questions[i].Model.Price = coef * AppSettings.Default.QuestionBase * (counter + 1);
-            counter++;
         }
     }
 }

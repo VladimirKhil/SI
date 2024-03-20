@@ -397,46 +397,58 @@ public partial class TreeDocView : UserControl
                 // Remove later
                 question.Upgrade();
 
-                if (treeViewItem.DataContext is ThemeViewModel docTheme)
+                if (treeViewItem.DataContext is ThemeViewModel targetTheme)
                 {
-                    if (docTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
+                    if (targetTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
                     {
-                        question = question.Clone();
+                        question = question.Clone(); // That enables original question safe remove after drag finish
                     }
 
-                    docTheme.Questions.Add(new QuestionViewModel(question) { IsSelected = true });
+                    var currentPrices = targetTheme.CapturePrices();
+
+                    targetTheme.Questions.Add(new QuestionViewModel(question) { IsSelected = true });
 
                     if (AppSettings.Default.ChangePriceOnMove)
                     {
-                        DragManager.RecountPrices(docTheme);
+                        targetTheme.ResetPrices(currentPrices);
                     }
 
-                    docTheme.IsExpanded = true;
+                    targetTheme.IsExpanded = true;
 
-                    document.ApplyData(dragData);
+                    if (dragData != null)
+                    {
+                        document.ApplyData(dragData);
+                    }
                 }
-                else if (treeViewItem.DataContext is QuestionViewModel docQuestion)
+                else if (treeViewItem.DataContext is QuestionViewModel targetQuestion)
                 {
-                    if (AreEqual(docQuestion.Model, question))
+                    var targetOwnerTheme = targetQuestion.OwnerTheme;
+
+                    if (targetQuestion.Model == question || targetOwnerTheme == null)
                     {
                         e.Effects = DragDropEffects.None;
                         return;
                     }
 
-                    if (docQuestion.OwnerTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
+                    if (targetOwnerTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
                     {
-                        question = question.Clone();
+                        question = question.Clone(); // That enables original question safe remove after drag finish
                     }
 
-                    int pos = docQuestion.OwnerTheme.Questions.IndexOf(docQuestion);
-                    docQuestion.OwnerTheme.Questions.Insert(pos, new QuestionViewModel(question) { IsSelected = true });
+                    var currentPrices = targetOwnerTheme.CapturePrices();
+
+                    var questionIndex = targetOwnerTheme.Questions.IndexOf(targetQuestion);
+                    targetOwnerTheme.Questions.Insert(questionIndex, new QuestionViewModel(question) { IsSelected = true });
 
                     if (AppSettings.Default.ChangePriceOnMove)
                     {
-                        DragManager.RecountPrices(docQuestion.OwnerTheme);
+                        targetOwnerTheme.ResetPrices(currentPrices);
                     }
 
-                    document.ApplyData(dragData);
+                    if (dragData != null)
+                    {
+                        document.ApplyData(dragData);
+                    }
                 }
             }
             else
@@ -502,92 +514,5 @@ public partial class TreeDocView : UserControl
 
             question.Right.Add(Path.GetFileNameWithoutExtension(item.Model.Name));
         }
-    }
-
-    private static bool AreEqual(Question question1, Question question2)
-    {
-        if (question1.Info.Authors.Count != question2.Info.Authors.Count)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < question1.Info.Authors.Count; i++)
-        {
-            if (question1.Info.Authors[i] != question2.Info.Authors[i])
-            {
-                return false;
-            }
-        }
-
-        if (question1.Info.Sources.Count != question2.Info.Sources.Count)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < question1.Info.Sources.Count; i++)
-        {
-            if (question1.Info.Sources[i] != question2.Info.Sources[i])
-            {
-                return false;
-            }
-        }
-
-        if (question1.Info.Comments.Text != question2.Info.Comments.Text)
-        {
-            return false;
-        }
-
-        if (question1.Info.Extension != question2.Info.Extension)
-        {
-            return false;
-        }
-
-        if (question1.Price != question2.Price)
-        {
-            return false;
-        }
-
-        if (question1.TypeName != question2.TypeName)
-        {
-            return false;
-        }
-
-        if (!Equals(question1.Parameters, question2.Parameters))
-        {
-            return false;
-        }
-
-        if (!Equals(question1.Script, question2.Script))
-        {
-            return false;
-        }
-
-        if (question1.Right.Count != question2.Right.Count)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < question1.Right.Count; i++)
-        {
-            if (question1.Right[i] != question2.Right[i])
-            {
-                return false;
-            }
-        }
-
-        if (question1.Wrong.Count != question2.Wrong.Count)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < question1.Wrong.Count; i++)
-        {
-            if (question1.Wrong[i] != question2.Wrong[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

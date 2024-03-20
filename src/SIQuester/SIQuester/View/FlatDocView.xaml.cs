@@ -5,7 +5,6 @@ using SIQuester.Helpers;
 using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.ViewModel;
-using SIQuester.ViewModel.PlatformSpecific;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
@@ -558,12 +557,14 @@ public partial class FlatDocView : UserControl
                     question = question.Clone();
                 }
 
+                var currentPrices = themeViewModel.CapturePrices();
+
                 var questionViewModelNew = new QuestionViewModel(question);
                 themeViewModel.Questions.Insert(index, questionViewModelNew);
 
                 if (AppSettings.Default.ChangePriceOnMove)
                 {
-                    DragManager.RecountPrices(themeViewModel);
+                    themeViewModel.ResetPrices(currentPrices);
                 }
 
                 document.ApplyData(dragData);
