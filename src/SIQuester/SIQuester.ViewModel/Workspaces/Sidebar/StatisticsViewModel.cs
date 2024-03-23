@@ -181,12 +181,13 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                 {
                     var questionText = question.GetText();
 
-                    var emptyQuestion = question.Price > Question.InvalidPrice
-                        && question.TypeName != QuestionTypes.SecretNoQuestion
+                    var emptyNormal = question.Price == Question.InvalidPrice || question.TypeName == QuestionTypes.SecretNoQuestion;
+                    
+                    var emptyQuestion = !emptyNormal
                         && (questionText == "" || questionText == Resources.Question)
                         && !question.HasMediaContent();
 
-                    var noAnswer = question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]);
+                    var noAnswer = !emptyNormal && (question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]));
                     var emptySources = question.Info.Sources.Count == 0 && _checkEmptySources;
 
                     var bracketsData = new StringBuilder();

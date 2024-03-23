@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Notions;
 using SIPackages;
 using SIPackages.Containers;
 using SIPackages.Core;
 using SIQuester.Model;
-using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
@@ -706,6 +704,7 @@ public sealed class QDocument : WorkspaceViewModel
     {
         Package.Model.PropertyChanged += Object_PropertyValueChanged;
         Package.Rounds.CollectionChanged += Object_CollectionChanged;
+        Package.Tags.CollectionChanged += Object_CollectionChanged;
 
         Listen(Package);
 
@@ -1322,7 +1321,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         CheckCommonFiles(images, audio, video, html, errors);
 
-        var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(allowExternal, images, audio, video, html, errors);
+        var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(allowExternal, images, errors);
 
         foreach (var item in images.Except(usedImages))
         {
@@ -1358,9 +1357,6 @@ public sealed class QDocument : WorkspaceViewModel
     private (ICollection<string> usedImages, ICollection<string> usedAudio, ICollection<string> usedVideo, ICollection<string> usedHtml) CollectUsedFiles(
         bool allowExternal,
         ICollection<string> images,
-        ICollection<string> audio,
-        ICollection<string> video,
-        ICollection<string> html,
         List<string> errors)
     {
         var usedImages = new HashSet<string>();
@@ -1390,29 +1386,23 @@ public sealed class QDocument : WorkspaceViewModel
                 {
                     foreach (var contentItem in question.Model.GetContent())
                     {
-                        ICollection<string> collection;
                         HashSet<string> usedFiles;
 
                         switch (contentItem.Type)
                         {
-                            case AtomTypes.Image:
-                                collection = images;
+                            case ContentTypes.Image:
                                 usedFiles = usedImages;
                                 break;
 
-                            case AtomTypes.Audio:
-                            case AtomTypes.AudioNew:
-                                collection = audio;
+                            case ContentTypes.Audio:
                                 usedFiles = usedAudio;
                                 break;
 
-                            case AtomTypes.Video:
-                                collection = video;
+                            case ContentTypes.Video:
                                 usedFiles = usedVideo;
                                 break;
 
-                            case AtomTypes.Html:
-                                collection = html;
+                            case ContentTypes.Html:
                                 usedFiles = usedHtml;
                                 break;
 
@@ -1420,11 +1410,11 @@ public sealed class QDocument : WorkspaceViewModel
                                 continue;
                         }
 
-                        var media = Document.GetLink(contentItem);
+                        var media = Document.TryGetMedia(contentItem);
 
-                        if (collection.Contains(media.Uri))
+                        if (media.HasValue && media.Value.HasStream)
                         {
-                            usedFiles.Add(media.Uri);
+                            usedFiles.Add(contentItem.Value);
                         }
                         else if (allowExternal && !contentItem.IsRef)
                         {
@@ -1432,7 +1422,9 @@ public sealed class QDocument : WorkspaceViewModel
                         }
                         else
                         {
-                            errors.Add($"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingFile} \"{media.Uri}\"! {(allowExternal ? "" : Resources.ExternalLinksAreForbidden)}");
+                            errors.Add(
+                                $"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingFile} " +
+                                $"\"{contentItem.Value}\"! {(allowExternal ? "" : Resources.ExternalLinksAreForbidden)}");
                         }
                     }
                 }
@@ -1763,21 +1755,23 @@ public sealed class QDocument : WorkspaceViewModel
         var collection = doc.GetCollection(contentItem.Type);
         var newCollection = GetCollectionByMediaType(contentItem.Type);
 
-        var link = doc.GetLink(contentItem);
+        var media = doc.TryGetMedia(contentItem);
 
-        if (link.GetStream == null)
+        if (!media.HasValue || !media.Value.HasStream)
         {
             return;
         }
 
-        if (contentImportTable.TryGetValue(link.Uri, out var newName))
+        var mediaName = contentItem.Value;
+
+        if (contentImportTable.TryGetValue(mediaName, out var newName))
         {
             contentItem.Value = newName;
             return;
         }
 
-        var fileName = FileHelper.GenerateUniqueFileName(link.Uri, name => newCollection.Files.Any(f => f.Model.Name == name));
-        contentImportTable[link.Uri] = fileName;
+        var fileName = FileHelper.GenerateUniqueFileName(mediaName, name => newCollection.Files.Any(f => f.Model.Name == name));
+        contentImportTable[mediaName] = fileName;
 
         var tempPath = System.IO.Path.Combine(
             System.IO.Path.GetTempPath(),
@@ -1787,10 +1781,10 @@ public sealed class QDocument : WorkspaceViewModel
 
         Directory.CreateDirectory(tempPath);
 
-        var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
+        var tempFile = System.IO.Path.Combine(tempPath, mediaName);
 
         using (var fileStream = File.Create(tempFile))
-        using (var mediaStream = link.GetStream().Stream)
+        using (var mediaStream = media.Value.Stream!)
         {
             await mediaStream.CopyToAsync(fileStream);
         }
@@ -3064,7 +3058,6 @@ public sealed class QDocument : WorkspaceViewModel
     {
         var selectThemesViewModel = new SelectThemesViewModel(
             this,
-            PlatformManager.Instance.ServiceProvider.GetRequiredService<IOptions<AppOptions>>().Value,
             PlatformManager.Instance.ServiceProvider.GetRequiredService<IDocumentViewModelFactory>());
 
         selectThemesViewModel.NewItem += OnNewItem;
@@ -3157,19 +3150,19 @@ public sealed class QDocument : WorkspaceViewModel
                             continue;
                         }
 
-                        var link = Document.GetLink(contentItem);
+                        var mediaName = contentItem.Value;
                         var mediaStorage = GetCollectionByMediaType(contentItem.Type);
 
-                        if (mediaStorage.Files.Any(f => f.Model.Name == link.Uri))
+                        if (mediaStorage.Files.Any(f => f.Model.Name == mediaName))
                         {
                             continue;
                         }
 
-                        var mediaFileName = System.IO.Path.Combine(folder, link.Uri);
+                        var mediaFileName = System.IO.Path.Combine(folder, mediaName);
 
                         if (!File.Exists(mediaFileName))
                         {
-                            mediaFileName = System.IO.Path.Combine(folder, mediaStorage.Name, link.Uri);
+                            mediaFileName = System.IO.Path.Combine(folder, mediaStorage.Name, mediaName);
 
                             if (!File.Exists(mediaFileName))
                             {
@@ -3387,7 +3380,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         CheckCommonFiles(images, audio, video, html, errors);
 
-        var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(true, images, audio, video, html, errors);
+        var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(true, images, errors);
 
         var unusedImages = images.Except(usedImages);
         var unusedAudio = audio.Except(usedAudio);

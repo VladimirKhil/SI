@@ -673,10 +673,10 @@ public sealed class SIDocument : IDisposable
     /// <returns>Found collection or null.</returns>
     public DataCollection? TryGetCollection(string mediaType) => mediaType switch
     {
-        AtomTypes.Image => _images,
-        AtomTypes.Audio or AtomTypes.AudioNew => _audio,
-        AtomTypes.Video => _video,
-        AtomTypes.Html => _html,
+        ContentTypes.Image => _images,
+        ContentTypes.Audio => _audio,
+        ContentTypes.Video => _video,
+        ContentTypes.Html => _html,
         _ => null,
     };
 

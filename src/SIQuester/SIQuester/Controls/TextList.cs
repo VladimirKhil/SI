@@ -139,6 +139,11 @@ public sealed class TextList : TextBox
 
             case NotifyCollectionChangedAction.Remove:
                 OnItemsRemoved(e);
+
+                if (_infos.Count != ItemsSource.Count)
+                {
+                    throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems.Count}");
+                }
                 break;
 
             case NotifyCollectionChangedAction.Replace:
@@ -188,6 +193,11 @@ public sealed class TextList : TextBox
         }
 
         OnItemsAdded(e);
+
+        if (_infos.Count != ItemsSource.Count)
+        {
+            throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems.Count}");
+        }
     }
 
     private void OnItemsRemoved(NotifyCollectionChangedEventArgs e)
@@ -210,11 +220,6 @@ public sealed class TextList : TextBox
 
                 Select(start, end - start);
                 _infos.RemoveRange(e.OldStartingIndex, e.OldItems.Count);
-
-                if (_infos.Count != ItemsSource.Count)
-                {
-                    throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems.Count}");
-                }
             }
             finally
             {

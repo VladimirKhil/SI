@@ -2860,7 +2860,7 @@
                                                 Margin="2,0,0,0"
                                                 VerticalAlignment="Center"
                                                 Visibility="Hidden">
-                                                <Image Source="{StaticResource AnswerTypeImage}" Width="14" Height="14" />
+                                                <Image x:Name="iSetRight" Source="{StaticResource SetRightAnswerImage}" Width="14" Height="14" />
 
                                                 <Button.Style>
                                                     <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
@@ -2922,6 +2922,7 @@
 
                                             <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
                                             <Setter TargetName="bSetRight" Property="IsEnabled" Value="False" />
+                                            <Setter TargetName="iSetRight" Property="Source" Value="{StaticResource AnswerTypeImage}" />
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>

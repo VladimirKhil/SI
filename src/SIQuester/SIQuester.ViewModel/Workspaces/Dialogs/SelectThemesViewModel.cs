@@ -15,7 +15,6 @@ namespace SIQuester.ViewModel;
 public sealed class SelectThemesViewModel : WorkspaceViewModel
 {
     private readonly QDocument _document;
-    private readonly AppOptions _appOptions;
 
     public override string Header => $"{_document.Document.Package.Name}: {Resources.ThemesSelection}";
 
@@ -59,10 +58,9 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
 
     private readonly IDocumentViewModelFactory _documentViewModelFactory;
 
-    public SelectThemesViewModel(QDocument document, AppOptions appOptions, IDocumentViewModelFactory documentViewModelFactory)
+    public SelectThemesViewModel(QDocument document, IDocumentViewModelFactory documentViewModelFactory)
     {
         _document = document;
-        _appOptions = appOptions;
         _documentViewModelFactory = documentViewModelFactory;
 
         Themes = _document.Document.Package.Rounds
@@ -163,41 +161,6 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
 
         var collection = oldDocument.Document.TryGetCollection(contentItem.Type);
         var newCollection = newDocument.TryGetCollectionByMediaType(contentItem.Type);
-
-        if (collection == null || newCollection == null)
-        {
-            return;
-        }
-
-        if (newCollection.Files.Any(f => f.Model.Name == link))
-        {
-            return;
-        }
-
-        var file = collection.GetFile(link);
-
-        if (file == null)
-        {
-            return;
-        }
-
-        using var stream = file.Stream;
-        var tempFile = Path.Combine(tempMediaFolder, link);
-
-        using (var fs = File.Create(tempFile))
-        {
-            await stream.CopyToAsync(fs);
-        }
-
-        newCollection.AddFile(tempFile, link);
-    }
-
-    private static async Task CopyMediaAsync(QDocument oldDocument, QDocument newDocument, Atom atom, string tempMediaFolder)
-    {
-        var link = atom.Text.ExtractLink();
-
-        var collection = oldDocument.Document.TryGetCollection(atom.Type);
-        var newCollection = newDocument.TryGetCollectionByMediaType(atom.Type);
 
         if (collection == null || newCollection == null)
         {

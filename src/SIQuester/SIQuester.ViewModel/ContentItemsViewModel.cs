@@ -257,18 +257,23 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     private void ExportMedia_Executed(object? arg)
     {
+        if (CurrentItem == null)
+        {
+            return;
+        }
+
         try
         {
             var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
-            var media = document.Document.GetLink(CurrentItem.Model);
+            var media = document.Document.TryGetMedia(CurrentItem.Model);
 
-            if (media.GetStream != null && media.Uri != null)
+            if (media.HasValue && media.Value.HasStream)
             {
-                var fileName = media.Uri;
+                var fileName = CurrentItem.Model.Value;
 
                 if (PlatformManager.Instance.ShowSaveUI(Resources.ExportMedia, "", null, ref fileName))
                 {
-                    using var stream = media.GetStream().Stream;
+                    using var stream = media.Value.Stream!;
                     using var fileStream = File.Open(fileName, FileMode.Create, FileAccess.Write);
 
                     stream.CopyTo(fileStream);

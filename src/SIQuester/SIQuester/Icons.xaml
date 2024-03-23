@@ -183,6 +183,12 @@
         </DrawingImage.Drawing>
     </DrawingImage>
 
+    <DrawingImage x:Key="SetRightAnswerImage">
+        <DrawingImage.Drawing>
+            <GeometryDrawing Brush="Gray" Geometry="{Binding Source={StaticResource app_answer},Path=Data}" />
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
     <DrawingImage x:Key="UpImage">
         <DrawingImage.Drawing>
             <GeometryDrawing Brush="#FF263281" Geometry="{Binding Source={StaticResource app_up},Path=Data}" />

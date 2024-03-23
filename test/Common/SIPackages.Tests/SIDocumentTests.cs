@@ -12,7 +12,7 @@ public sealed class SIDocumentTests
         var video = document.Video.ToArray();
 
         var atomLinks = document.Package.Rounds[0].Themes[0].Questions
-            .Select(q => document.GetLink(q.Scenario[0]).Uri)
+            .Select(q => q.GetContent().First().Value)
             .ToArray();
 
         Assert.Multiple(() =>
