@@ -3,12 +3,12 @@
 		<Authors>Vladimir Khil</Authors>
 		<Company>Khil-soft</Company>
 		<SIGameVersion>7.11.11</SIGameVersion>
-		<SIQuesterVersion>6.0.2</SIQuesterVersion>
+		<SIQuesterVersion>6.0.3</SIQuesterVersion>
 		<SImulatorVersion>2.15.0</SImulatorVersion>
 	</PropertyGroup>
 	
-  <PropertyGroup>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)\obj\$(Platform).$(Configuration)\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-    <OutputPath>$(MSBuildThisFileDirectory)\bin\$(Platform).$(Configuration)\$(MSBuildProjectName)</OutputPath>
-  </PropertyGroup>
+	<PropertyGroup>
+		<BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)\obj\$(Platform).$(Configuration)\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+		<OutputPath>$(MSBuildThisFileDirectory)\bin\$(Platform).$(Configuration)\$(MSBuildProjectName)</OutputPath>
+	</PropertyGroup>
 </Project>

@@ -7,17 +7,9 @@ public interface ISIEngine
 {
     GameStage Stage { get; }
 
-    int LeftQuestionsCount { get; }
-
     bool CanMoveBack { get; }
 
-    bool IsIntro();
-
-    void OnIntroFinished();
-
     void MoveNext();
-
-    void SelectQuestion(int theme, int question);
 
     void SelectTheme(int publicThemeIndex);
 

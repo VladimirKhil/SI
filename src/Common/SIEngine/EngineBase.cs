@@ -16,8 +16,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected Func<EngineOptions> OptionsProvider { get; }
 
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
-
     protected GameStage _stage = GameStage.Begin;
 
     /// <summary>
@@ -46,13 +44,35 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected Round? _activeRound;
 
+    protected Round ActiveRound
+    {
+        get
+        {
+            if (_activeRound == null)
+            {
+                throw new InvalidOperationException("_activeRound == null");
+            }
+
+            return _activeRound;
+        }
+    }
+
     protected Theme? _activeTheme;
 
     protected Question? _activeQuestion;
 
-    protected bool _inAutoMode;
+    protected Question ActiveQuestion
+    {
+        get
+        {
+            if (_activeQuestion == null)
+            {
+                throw new InvalidOperationException("_activeQuestion == null");
+            }
 
-    protected object _autoLock = new();
+            return _activeQuestion;
+        }
+    }
 
     protected bool _timeout = false;
 
@@ -117,6 +137,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             }
         }
     }
+
     public bool CanMoveBackRound
     {
         get => _canMoveBackRound;
@@ -130,26 +151,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         }
     }
 
-    public bool CanChangeSum() =>
-        _stage == GameStage.Question
-        || _stage == GameStage.RoundTable
-        || _stage == GameStage.AfterFinalThink;
-
-    public bool IsQuestion() => _stage == GameStage.Question;
-
-    public void OnIntroFinished()
-    {
-        if (_stage == GameStage.GameThemes)
-        {
-            AutoNext(1000);
-        }
-    }
-
-    /// <summary>
-    /// Is engine currently staying in the intro stage.
-    /// </summary>
-    public bool IsIntro() => _roundIndex == -1;
-
     #region Events
 
     public event Action<Package>? Package;
@@ -157,10 +158,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action<bool>? NextRound;
     public event Action<Round>? Round;
     public event Action? RoundSkip;
-    public event Action<Theme[]>? RoundThemes;
     public event Action<Theme>? Theme;
     public event Action<Question>? Question;
-    public event Action<int, int, Theme, Question>? QuestionSelected;
 
     public event Action? QuestionPostInfo;
 
@@ -176,9 +175,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action? WaitDelete;
     public event Action<int>? ThemeSelected;
     public event Action<Theme, Question>? PrepareFinalQuestion;
-
-    [Obsolete]
-    public event Action<string>? Sound;
 
     public event Action<string>? Error;
 
@@ -217,14 +213,9 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected void OnRoundSkip() => RoundSkip?.Invoke();
 
-    protected void OnRoundThemes(Theme[] roundThemes) => RoundThemes?.Invoke(roundThemes);
-
     protected void OnTheme(Theme theme) => Theme?.Invoke(theme);
 
     protected void OnQuestion(Question question) => Question?.Invoke(question);
-
-    protected void OnQuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question) =>
-        QuestionSelected?.Invoke(themeIndex, questionIndex, theme, question);
 
     protected void OnQuestionPostInfo() => QuestionPostInfo?.Invoke();
 
@@ -260,66 +251,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public object SyncRoot { get; } = new object();
 
     /// <summary>
-    /// Number of unanswered questions in round.
-    /// </summary>
-    public abstract int LeftQuestionsCount { get; }
-
-    /// <summary>
-    /// Move game futher automatically after specified amount of time.
-    /// </summary>
-    /// <param name="milliseconds">Amount of time in milliseconds to delay before moving futher.</param>
-    protected async void AutoNext(int milliseconds)
-    {
-        try
-        {
-            if (milliseconds < 0)
-            {
-                throw new ArgumentException(
-                    $"Value of milliseconds ({milliseconds}) must be greater or equal to 0",
-                    nameof(milliseconds));
-            }
-
-            if (OptionsProvider().AutomaticGame)
-            {
-                lock (_autoLock)
-                {
-                    if (_inAutoMode)
-                    {
-                        return;
-                    }
-
-                    _inAutoMode = true;
-                }
-
-                await Task.Delay(milliseconds, _cancellationTokenSource.Token);
-
-                lock (SyncRoot)
-                {
-                    if (_isDisposed)
-                    {
-                        return;
-                    }
-
-                    AutoNextCore();
-                    MoveNext();
-                }
-
-                lock (_autoLock)
-                {
-                    _inAutoMode = false;
-                }
-            }
-        }
-        catch (TaskCanceledException) { }
-        catch (Exception exc)
-        {
-            OnError($"Engine error: {exc}");
-        }
-    }
-
-    protected virtual void AutoNextCore() { }
-
-    /// <summary>
     /// Moves to the next round.
     /// </summary>
     /// <param name="showSign">Should the logo be shown.</param>
@@ -327,21 +258,18 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     {
         var moved = true;
 
-        do
+        if (_roundIndex + 1 < _document.Package.Rounds.Count)
         {
-            if (_roundIndex + 1 < _document.Package.Rounds.Count)
-            {
-                _roundIndex++;
-                SetActiveRound();
-                Stage = GameStage.Round;
-            }
-            else
-            {
-                Stage = GameStage.End;
-                OnEndGame();
-                moved = false;
-            }
-        } while (_stage == GameStage.Round && !AcceptRound(_activeRound));
+            _roundIndex++;
+            SetActiveRound();
+            Stage = GameStage.Round;
+        }
+        else
+        {
+            Stage = GameStage.End;
+            OnEndGame();
+            moved = false;
+        }
 
         CanMoveBack = false;
         UpdateCanMoveNextRound();
@@ -372,9 +300,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             return false;
         }
 
-        if (roundIndex < 0 ||
-            roundIndex >= _document.Package.Rounds.Count ||
-            !AcceptRound(_document.Package.Rounds[roundIndex]))
+        if (roundIndex < 0 || roundIndex >= _document.Package.Rounds.Count)
         {
             return false;
         }
@@ -392,11 +318,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         return true;
     }
 
-    public static bool AcceptRound(Round? round) =>
-        round != null
-        && round.Themes.Any(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice)
-        && (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null)));
-
     public virtual bool MoveBackRound()
     {
         if (!CanMoveBackRound)
@@ -412,19 +333,16 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         }
         else
         {
-            do
+            if (_roundIndex == 0)
             {
-                if (_roundIndex == 0)
-                {
-                    // Cannot find suitable round while moving back. So returning forward to the first matching round
-                    return MoveNextRound();
-                }
+                // Cannot find suitable round while moving back. So returning forward to the first matching round
+                return MoveNextRound();
+            }
 
-                _roundIndex--;
-                SetActiveRound();
+            _roundIndex--;
+            SetActiveRound();
 
-                Stage = GameStage.Round;
-            } while (!AcceptRound(_activeRound));
+            Stage = GameStage.Round;
         }
 
         CanMoveBack = false;
@@ -477,7 +395,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         {
             OnQuestionPostInfo();
             Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
-            AutoNext(3000);
         }
     }
 
@@ -492,11 +409,10 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         {
             OnQuestionPostInfo();
             Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
-            AutoNext(3000);
         }
     }
 
-    public void EndRound()
+    protected void EndRound()
     {
         OnRoundEmpty();
         DoFinishRound();
@@ -519,24 +435,17 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         {
             MoveNextRound();
         }
-
-        AutoNext(5000);
     }
 
     protected void OnMoveToQuestion()
     {
-        var isFinal = _activeRound!.Type == RoundTypes.Final;
+        var isFinal = ActiveRound.Type == RoundTypes.Final;
         Stage = isFinal ? GameStage.FinalQuestion : GameStage.Question;
 
         var options = OptionsProvider();
 
-        if (_activeQuestion == null)
-        {
-            throw new InvalidOperationException("_activeQuestion == null");
-        }
-
         QuestionEngine = _questionEngineFactory.CreateEngine(
-            _activeQuestion,
+            ActiveQuestion,
             new QuestionEngineOptions
             {
                 FalseStarts = options.IsPressMode
@@ -568,19 +477,12 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             return;
         }
 
-        _cancellationTokenSource.Cancel();
         _document.Dispose();
 
         _isDisposed = true;
     }
 
-    public abstract void SelectQuestion(int themeIndex, int questionIndex);
-
     public abstract int OnReady(out bool more);
 
     public abstract void SelectTheme(int publicThemeIndex);
-
-    public abstract bool RemoveQuestion(int themeIndex, int questionIndex);
-
-    public abstract int? RestoreQuestion(int themeIndex, int questionIndex);
 }

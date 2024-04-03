@@ -877,12 +877,17 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnToggle(Message message, string[] args)
     {
+        if (ClientData.TableController == null)
+        {
+            return;
+        }
+
         if (message.Sender != ClientData.ShowMan.Name || args.Length < 3)
         {
             return;
         }
 
-        if (!int.TryParse(args[1], out int themeIndex) || !int.TryParse(args[2], out int questionIndex))
+        if (!int.TryParse(args[1], out var themeIndex) || !int.TryParse(args[2], out var questionIndex))
         {
             return;
         }
@@ -901,7 +906,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (question.IsActive())
         {
-            if (!_logic.Engine.RemoveQuestion(themeIndex, questionIndex))
+            if (!ClientData.TableController.RemoveQuestion(themeIndex, questionIndex))
             {
                 return;
             }
@@ -916,18 +921,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                     message.Sender,
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
                     oldPrice));
-
-            var nextTask = Logic.Runner.PendingTask;
-
-            if ((nextTask == Tasks.AskToChoose || nextTask == Tasks.WaitChoose || nextTask == Tasks.AskFirst || nextTask == Tasks.WaitFirst) && _logic.Engine.LeftQuestionsCount == 0)
-            {
-                // Round is empty
-                PlanExecution(Tasks.EndRound, 10);
-            }
         }
         else
         {
-            var restoredPrice = _logic.Engine.RestoreQuestion(themeIndex, questionIndex);
+            var restoredPrice = ClientData.TableController.RestoreQuestion(themeIndex, questionIndex);
 
             if (!restoredPrice.HasValue)
             {
@@ -2508,6 +2505,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         OnPersonsChanged();
     }
 
+    [Obsolete("Use Logic.PlanExecution()")]
     private void PlanExecution(Tasks task, double taskTime, int arg = 0)
     {
         Logic.AddHistory($"PlanExecution {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");

@@ -15,6 +15,7 @@ using SIPackages.Providers;
 using SIUI.Model;
 using System.Text;
 using System.Text.RegularExpressions;
+using Utils.Timers;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -69,6 +70,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     /// Execution continuation.
     /// </summary>
     private Action? _continuation;
+
+    internal void SetContinuation(Action continuation) => _continuation = continuation;
 
     internal void ClearContinuation() => _continuation = null;
 
@@ -132,10 +135,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         Engine.GameThemes += Engine_GameThemes;
         Engine.Round += Engine_Round;
         Engine.RoundSkip += Engine_RoundSkip;
-        Engine.RoundThemes += Engine_RoundThemes;
         Engine.Theme += Engine_Theme;
         Engine.Question += Engine_Question; // Simple game mode question
-        Engine.QuestionSelected += Engine_QuestionSelected; // Classic game mode question
 
         Engine.QuestionPostInfo += Engine_QuestionPostInfo;
         Engine.QuestionFinish += Engine_QuestionFinish;
@@ -227,9 +228,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Package = package;
 
         _data.Rounds = _data.Package.Rounds
-            .Select((round, index) => (round, index))
-            .Where(roundTuple => SIEngine.EngineBase.AcceptRound(roundTuple.round))
-            .Select(roundTuple => new RoundInfo { Index = roundTuple.index, Name = roundTuple.round.Name })
+            .Select((round, index) => new RoundInfo { Index = index, Name = round.Name })
             .ToArray();
 
         if (_data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator))
@@ -265,11 +264,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         OnRound(round, 1);
         SetRoundPrices(round);
-
-        if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
-        {
-            RunRoundTimer();
-        }
+        RunRoundTimer();
     }
 
     private void SetRoundPrices(Round round)
@@ -300,7 +295,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         // ClientData.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
     }
 
-    private void InitThemes(Theme[] themes, bool willPlayAllThemes, bool isFirstPlay)
+    internal void InitThemes(IEnumerable<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
         _data.TInfo.RoundInfo.Clear();
 
@@ -332,50 +327,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         5000);
     }
 
-    private void Engine_RoundThemes(Theme[] themes)
-    {
-        if (themes.Length == 0)
-        {
-            throw new ArgumentException("themes.Length == 0", nameof(themes));
-        }
-
-        InitThemes(themes, false, true);
-
-        // Filling initial questions table
-        _data.ThemeInfoShown = new bool[themes.Length];
-
-        var maxQuestionsInTheme = themes.Max(t => t.Questions.Count);
-
-        for (var i = 0; i < themes.Length; i++)
-        {
-            var questionsCount = themes[i].Questions.Count;
-            _data.TInfo.RoundInfo[i].Questions.Clear();
-
-            for (var j = 0; j < maxQuestionsInTheme; j++)
-            {
-                _data.TInfo.RoundInfo[i].Questions.Add(
-                    new QuestionInfo
-                    {
-                        Price = j < questionsCount ? themes[i].Questions[j].Price : Question.InvalidPrice
-                    });
-            }
-        }
-
-        _data.TableInformStageLock.WithLock(() =>
-        {
-            _gameActions.InformTable();
-            _data.TableInformStage = 2;
-        },
-        5000);
-
-        _data.IsQuestionPlaying = false;
-        ScheduleExecution(Tasks.AskFirst, 19 * _data.TInfo.RoundInfo.Count + Random.Shared.Next(10));
-    }
-
     /// <summary>
     /// Число активных вопросов в раунде
     /// </summary>
-    private int GetRoundActiveQuestionsCount() => _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
+    internal int GetRoundActiveQuestionsCount() => _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
 
     private void Engine_Theme(Theme theme)
     {
@@ -395,16 +350,21 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.QuestionType, 10, 1, true);
     }
 
-    private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
+    internal void OnQuestionSelected(int themeIndex, int questionIndex)
     {
+        if (_data.Round == null)
+        {
+            throw new InvalidOperationException("_data.Round == null");
+        }
+
         _gameActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
 
-        _data.Theme = theme;
-        _data.Question = question;
+        _data.Theme = _data.Round.Themes[themeIndex];
+        _data.Question = _data.Theme.Questions[questionIndex];
 
         _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
 
-        InitQuestionState(question);
+        InitQuestionState(_data.Question);
 
         // If theme info has not been displayed yet
         if (!_data.ThemeInfoShown[themeIndex])
@@ -760,22 +720,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void Engine_NextQuestion()
     {
-        if (_data.Settings.AppSettings.GameMode == GameModes.Tv)
-        {
-            var activeQuestionsCount = GetRoundActiveQuestionsCount();
-
-            if (activeQuestionsCount == 0)
-            {
-                throw new Exception($"{nameof(activeQuestionsCount)} == 0! {Engine.LeftQuestionsCount}");
-            }
-
-            ScheduleExecution(Tasks.AskToChoose, 1, force: true);
-        }
-        else
-        {
-            ScheduleExecution(Tasks.MoveNext, 10, force: true);
-        }
-
         foreach (var player in _data.Players)
         {
             if (player.PingPenalty > 0)
@@ -788,6 +732,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.AnswererIndex = -1;
         _data.QuestionPlayState.Clear();
         _data.StakerIndex = -1;
+
+        ScheduleExecution(Tasks.MoveNext, 1, force: true);
     }
 
     private void FinishRound(bool move = true)
@@ -1025,7 +971,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         StopWaiting();
-        Engine.SelectQuestion(_data.ThemeIndex, _data.QuestionIndex);
+        ScheduleExecution(Tasks.MoveNext, 1);
         return true;
     }
 
@@ -1538,18 +1484,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var msg = string.Format(GetRandomString(LO[nameof(R.InformChooser)]), _data.Chooser.Name);
         _gameActions.ShowmanReplic(msg);
-
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-
-        var activeQuestionsCount = GetRoundActiveQuestionsCount();
-
-        if (activeQuestionsCount == 0)
-        {
-            throw new Exception($"{nameof(activeQuestionsCount)} == 0! {Engine.LeftQuestionsCount}");
-        }
-
-        ScheduleExecution(Tasks.AskToChoose, 20);
-        RunRoundTimer();
+        
+        ScheduleExecution(Tasks.MoveNext, 20);
 
         return true;
     }
@@ -1629,9 +1566,23 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal string PrintHistory() => _tasksHistory.ToString();
 
+    internal void PlanExecution(Tasks task, double taskTime, int arg = 0)
+    {
+        _tasksHistory.AddLogEntry($"PlanExecution {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
+
+        if (Runner.IsExecutionPaused)
+        {
+            Runner.UpdatePausedTask(task, arg, (int)taskTime);
+        }
+        else
+        {
+            _taskRunner.ScheduleExecution(task, taskTime, arg, ShouldRunTimer());
+        }
+    }
+
     internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
     {
-        _tasksHistory.AddLogEntry($"Scheduled ({(Tasks)_taskRunner.CurrentTask}): {task} {arg} {taskTime / 10}");
+        _tasksHistory.AddLogEntry($"Scheduled ({_taskRunner.CurrentTask}): {task} {arg} {taskTime / 10}");
         _taskRunner.ScheduleExecution(task, taskTime, arg, force || ShouldRunTimer());
     }
 
@@ -1700,7 +1651,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         break;
 
                     case Tasks.AskFirst:
-                        AskFirst();
+                        GiveMoveToPlayerWithMinimumScore();
                         break;
 
                     case Tasks.WaitFirst:
@@ -1839,10 +1790,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         AnnounceStake();
                         break;
 
-                    case Tasks.EndRound:
-                        EndRound();
-                        break;
-
                     case Tasks.WaitReport:
                         WaitReport();
                         break;
@@ -1870,8 +1817,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SpecialReplic("Game ERROR");
         }
     }
-
-    private void EndRound() => Engine.EndRound();
 
     private void AskAnswerDeferred()
     {
@@ -3084,7 +3029,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (activeQuestionsCount == 0)
         {
-            throw new Exception($"activeQuestionsCount == 0 {Engine.Stage} {Engine.LeftQuestionsCount}");
+            throw new Exception($"activeQuestionsCount == 0 {Engine.Stage}");
         }
 
         msg.Append(GetRandomString(LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
@@ -3169,7 +3114,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         WaitFor(DecisionType.QuestionAnswererSelection, waitTime, _data.ChooserIndex);
     }
 
-    private void AskFirst()
+    /// <summary>
+    /// Finds players with minimum sum.
+    /// If there is only one player, they got the move.
+    /// Otherwise ask showman to select moving player.
+    /// </summary>
+    private void GiveMoveToPlayerWithMinimumScore()
     {
         var min = _data.Players.Min(player => player.Sum);
         var total = 0;

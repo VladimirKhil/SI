@@ -51,7 +51,7 @@ public abstract class PlatformManager
 
     public abstract void NavigateToSite();
 
-    public abstract void PlaySound(string name, Action onFinish);
+    public abstract void PlaySound(string name, Action? onFinish = null);
 
     public abstract IGameLogger CreateGameLogger(string? folder);
 

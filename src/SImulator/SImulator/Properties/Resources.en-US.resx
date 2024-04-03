@@ -435,7 +435,7 @@ By installing and using the Program, you automatically accept this Agreement. Yo
     <value>To exit, press Escape, right mouse button, or tap slightly with your finger</value>
   </data>
   <data name="PresentationTitle" xml:space="preserve">
-    <value>Game scoreboard</value>
+    <value>Game table</value>
   </data>
   <data name="PressButton" xml:space="preserve">
     <value>Press the button</value>
@@ -651,7 +651,7 @@ By installing and using the Program, you automatically accept this Agreement. Yo
     <value>Sum</value>
   </data>
   <data name="TableHotKeysHint" xml:space="preserve">
-    <value>Game scoreboard hotkeys:
+    <value>Game table hotkeys:
 Space (left mouse button) - proceed
 Backspace - go back
 Escape (right mouse button) - end game</value>

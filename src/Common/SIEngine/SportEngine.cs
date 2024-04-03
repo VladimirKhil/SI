@@ -8,8 +8,6 @@ namespace SIEngine;
 /// </summary>
 public sealed class SportEngine : EngineBase
 {
-    public override int LeftQuestionsCount => throw new NotImplementedException();
-
     protected override GameRules GameRules => WellKnownGameRules.Simple;
 
     public SportEngine(
@@ -29,10 +27,8 @@ public sealed class SportEngine : EngineBase
         {
             case GameStage.Begin:
                 #region Begin
-                //this.Stage = GameStage.GameThemes;
                 OnPackage(_document.Package);
                 MoveNextRound(false);
-                AutoNext(1000);
                 break;
                 #endregion
 
@@ -48,8 +44,6 @@ public sealed class SportEngine : EngineBase
                 MoveNextTheme();
                 Stage = GameStage.Theme;
                 UpdateCanNext();
-
-                AutoNext(4000 + 1700 * _activeRound.Themes.Count);
                 break;
                 #endregion
 
@@ -69,7 +63,6 @@ public sealed class SportEngine : EngineBase
                         Stage = GameStage.Theme;
                         UpdateCanNext();
                         OnNextQuestion();
-                        AutoNext(500);
                     }
                     else
                     {
@@ -87,7 +80,6 @@ public sealed class SportEngine : EngineBase
 
             case GameStage.Score:
                 MoveNextRound();
-                AutoNext(5000);
                 break;
 
             case GameStage.Question:
@@ -112,7 +104,6 @@ public sealed class SportEngine : EngineBase
                     Stage = GameStage.NextQuestion;
                     UpdateCanNext();
                     OnNextQuestion();
-                    AutoNext(3000);
                 }
 
                 break;
@@ -122,7 +113,6 @@ public sealed class SportEngine : EngineBase
                 Stage = GameStage.NextQuestion;
                 UpdateCanNext();
                 OnNextQuestion();
-                AutoNext(3000);
                 break;
             
             case GameStage.End:
@@ -197,13 +187,7 @@ public sealed class SportEngine : EngineBase
 
     public override bool CanNext() => _stage != GameStage.End;
 
-    public override void SelectQuestion(int theme, int question) => throw new NotSupportedException();
-
     public override int OnReady(out bool more) => throw new NotImplementedException();
 
     public override void SelectTheme(int publicThemeIndex) => throw new NotImplementedException();
-
-    public override bool RemoveQuestion(int themeIndex, int questionIndex) => throw new NotImplementedException();
-
-    public override int? RestoreQuestion(int themeIndex, int questionIndex) => throw new NotImplementedException();
 }

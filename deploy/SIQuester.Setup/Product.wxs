@@ -123,9 +123,6 @@
 			<Component Guid="{45D455A2-7D37-4D27-8973-B26CA236C2EE}">
 				<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
 			</Component>
-			<Component Guid="{40264622-CFCF-41EB-A76C-31911128E031}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
-			</Component>
 			<Component Guid="52e158c9-4d0b-48e9-ba43-3c81c3799910">
 				<File KeyPath="yes" Source="$(var.PublishFolder)Help.ru-RU.pdf" />
 			</Component>

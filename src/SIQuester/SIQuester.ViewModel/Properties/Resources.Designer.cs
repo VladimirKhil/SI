@@ -178,6 +178,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cannot create temporary file. Try to turn off antivirus software.
+        /// </summary>
+        public static string CannotCreateTemporaryFile {
+            get {
+                return ResourceManager.GetString("CannotCreateTemporaryFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Championship.
         /// </summary>
         public static string Championship {

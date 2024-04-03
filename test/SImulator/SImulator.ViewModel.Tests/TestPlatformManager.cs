@@ -52,12 +52,9 @@ internal sealed class TestPlatformManager : PlatformManager
         
     }
 
-    public override IAnimatableTimer CreateAnimatableTimer()
-    {
-        throw new NotImplementedException();
-    }
+    public override IAnimatableTimer CreateAnimatableTimer() => new TestAnimatableTimer();
 
-    public override IGameLogger CreateGameLogger(string folder) => new TestLogger();
+    public override IGameLogger CreateGameLogger(string? folder) => new TestLogger();
 
     public override Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen) => Task.CompletedTask;
 

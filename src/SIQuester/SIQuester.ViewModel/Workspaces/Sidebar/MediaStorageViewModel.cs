@@ -539,6 +539,13 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                 newName = string.Format("{0}_{1}{2}", baseName, ind++, ext);
             } while (Files.Any(named => named.Model.Name == newName));
 
+            _logger.LogInformation(
+                "File {fileName} is already present in collection {collectionName}. Renaming it to {newFileName} ({stackTrace})",
+                localName,
+                Name,
+                newName,
+                Environment.StackTrace);
+
             localName = newName;
         }
 

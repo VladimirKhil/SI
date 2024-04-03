@@ -11,15 +11,15 @@ public sealed class PresentationListener : IExtendedListener
 
     public bool IsMediaEnded { get; set; }
 
-    public ICommand Next { get; set; }
+    public ICommand? Next { get; set; }
 
-    public ICommand Back { get; set; }
+    public ICommand? Back { get; set; }
 
-    public ICommand NextRound { get; set; }
+    public ICommand? NextRound { get; set; }
 
-    public ICommand PreviousRound { get; set; }
+    public ICommand? PreviousRound { get; set; }
 
-    public ICommand Stop { get; set; }
+    public ICommand? Stop { get; set; }
 
     public event Action? MediaStart;
 
@@ -32,8 +32,6 @@ public sealed class PresentationListener : IExtendedListener
     public event Action<int>? AnswerSelected;
 
     public PresentationListener(ISIEngine engine) => _engine = engine;
-
-    public void OnQuestionSelected(int theme, int question) => _engine.SelectQuestion(theme, question);
 
     public void OnThemeSelected(int themeIndex)
     {
@@ -105,18 +103,11 @@ public sealed class PresentationListener : IExtendedListener
 
     public void OnMediaEnd()
     {
-        if (_engine.IsIntro())
-        {
-            return;
-        }
-
         IsMediaEnded = true;
         MediaEnd?.Invoke();
     }
 
     public void OnMediaProgress(double progress) => MediaProgress?.Invoke(progress);
-
-    public void OnIntroFinished() => _engine.OnIntroFinished();
 
     public void OnRoundThemesFinished() => RoundThemesFinished?.Invoke();
 }

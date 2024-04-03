@@ -1366,7 +1366,7 @@
                             </lb:TipBehavior.Tip>
                         </Button>
                     </StackPanel>
-                    
+
                     <StackPanel Orientation="Horizontal">
                         <CheckBox IsChecked="{Binding FalseStart}" Margin="0,5" Content="{x:Static lp:Resources.FalseStartGame}" />
 
@@ -1377,10 +1377,8 @@
                         </Button>
                     </StackPanel>
 
-                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding AutomaticGame}" Content="{x:Static lp:Resources.AutomaticGame}" />
-
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding FalseStart}">
-                        <CheckBox IsChecked="{Binding FalseStartMultimedia}" Margin="0,5" Content="{x:Static lp:Resources.FalseStartMultimedia}" />
+                        <CheckBox IsChecked="{Binding FalseStartMultimedia}" Margin="5,5,5,0" Content="{x:Static lp:Resources.FalseStartMultimedia}" />
                         
                         <Button Style="{StaticResource HelpButton}">
                             <lb:TipBehavior.Tip>
@@ -1389,9 +1387,9 @@
                         </Button>
                     </StackPanel>
 
-                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
-                    <CheckBox IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
-                    <CheckBox Margin="5,0,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
+                    <CheckBox Margin="0,0,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
+                    <CheckBox Margin="5,5,0,0" IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
+                    <CheckBox Margin="0,0,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
                 </UniformGrid>
                 
                 <Expander

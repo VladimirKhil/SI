@@ -9,15 +9,15 @@ public interface IExtendedListener : IPresentationListener
 {
     bool IsMediaEnded { get; set; }
 
-    ICommand Next { get; set; }
+    ICommand? Next { get; set; }
 
-    ICommand Back { get; set; }
+    ICommand? Back { get; set; }
 
-    ICommand NextRound { get; set; }
+    ICommand? NextRound { get; set; }
 
-    ICommand PreviousRound { get; set; }
+    ICommand? PreviousRound { get; set; }
 
-    ICommand Stop { get; set; }
+    ICommand? Stop { get; set; }
 
     event Action MediaStart;
 

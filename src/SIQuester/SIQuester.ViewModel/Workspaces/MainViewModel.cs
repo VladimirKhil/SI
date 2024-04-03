@@ -538,6 +538,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         {
             using var stream = File.OpenRead(file);
             var doc = SIDocument.LoadXml(stream);
+            doc.Upgrade();
 
             var docViewModel = _documentViewModelFactory.CreateViewModelFor(doc, Path.GetFileNameWithoutExtension(file));
 

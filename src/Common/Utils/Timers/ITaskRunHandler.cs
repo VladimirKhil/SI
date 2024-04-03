@@ -1,9 +1,9 @@
-﻿namespace SICore.Clients.Game;
+﻿namespace Utils.Timers;
 
 /// <summary>
 /// Handles <see cref="TaskRunner" /> tasks.
 /// </summary>
-internal interface ITaskRunHandler<T>
+public interface ITaskRunHandler<T>
 {
     /// <summary>
     /// Executes a task.

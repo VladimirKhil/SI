@@ -11,6 +11,7 @@ internal sealed class TvEngineTests
     public void CommonTest()
     {
         var document = CreateDocument();
+        var engineHandler = new SIEnginePlayHandlerMock();
 
         var engine = EngineFactory.CreateEngine(
             true,
@@ -19,41 +20,41 @@ internal sealed class TvEngineTests
             {
                 ShowRight = true,
                 ShowScore = false,
-                AutomaticGame = false,
                 PlaySpecials = true,
                 ThinkingTime = 3,
                 IsPressMode = true,
                 IsMultimediaPressMode = true,
             },
-            new SIEnginePlayHandlerMock(),
+            engineHandler,
             new QuestionEnginePlayHandlerMock());
 
         Assert.That(engine.Stage, Is.EqualTo(GameStage.Begin));
 
         AssertMove(engine, GameStage.GameThemes);
         AssertMove(engine, GameStage.Round);
-        AssertMove(engine, GameStage.RoundThemes);
-        AssertMove(engine, GameStage.RoundTable);
+        AssertMove(engine, GameStage.SelectingQuestion);
+        AssertMove(engine, GameStage.SelectingQuestion);
+        AssertMove(engine, GameStage.SelectingQuestion);
 
-        engine.SelectQuestion(0, 0);
-
-        Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
-
-        AssertMove(engine, GameStage.Question);
-        AssertMove(engine, GameStage.Question);
-        AssertMove(engine, GameStage.EndQuestion);
-        AssertMove(engine, GameStage.RoundTable);
-
-        engine.SelectQuestion(0, 1);
+        engineHandler.SelectQuestion?.Invoke(0, 0);
 
         Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
 
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.EndQuestion);
-        AssertMove(engine, GameStage.RoundTable);
+        AssertMove(engine, GameStage.SelectingQuestion);
 
-        engine.SelectQuestion(0, 2);
+        engineHandler.SelectQuestion?.Invoke(0, 1);
+
+        Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
+
+        AssertMove(engine, GameStage.Question);
+        AssertMove(engine, GameStage.Question);
+        AssertMove(engine, GameStage.EndQuestion);
+        AssertMove(engine, GameStage.SelectingQuestion);
+
+        engineHandler.SelectQuestion?.Invoke(0, 2);
 
         Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
 

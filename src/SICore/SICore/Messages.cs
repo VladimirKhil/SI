@@ -183,7 +183,7 @@ public static class Messages
     public const string FinalThink = "FINALTHINK";
 
     /// <summary>
-    /// Информация о том, кто будет первым выбирать вопрос
+    /// Showman should give a move to a player.
     /// </summary>
     public const string First = "FIRST";
 

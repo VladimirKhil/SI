@@ -21,7 +21,6 @@ public sealed class GameRunner
         IsPressMode = appSettingsCore.FalseStart,
         ShowRight = true,
         ShowScore = false,
-        AutomaticGame = false,
         PlaySpecials = true,
         ThinkingTime = 0,
         PlayAllQuestionsInFinalRound = appSettingsCore.PlayAllQuestionsInFinalRound,
@@ -166,9 +165,11 @@ public sealed class GameRunner
         var client = Client.Create(NetworkConstants.GameName, _node);
 
         var gameActions = new GameActions(client, gameData, localizer, _fileShare);
-        var gameLogic = new GameLogic(gameData, gameActions, engine, localizer, _fileShare);
+        var gameLogic = new GameLogic(gameData, gameActions, /* TODO: This dependency should be removed by using engine callbacks */ engine, localizer, _fileShare);
 
         questionPlayHandler.GameLogic = gameLogic;
+        playHandler.GameActions = gameActions;
+        playHandler.GameLogic = gameLogic;
 
         var game = new Game(
             client,

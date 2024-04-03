@@ -26,7 +26,7 @@ public enum Tasks
     /// </summary>
     Round,
     /// <summary>
-    /// Выяснение того, кто начнёт раунд
+    /// Detect the next moving player.
     /// </summary>
     AskFirst,
     /// <summary>
@@ -157,10 +157,6 @@ public enum Tasks
     /// Объявление ставки игрока в финале
     /// </summary>
     AnnounceStake,
-    /// <summary>
-    /// End current round.
-    /// </summary>
-    EndRound,
     /// <summary>
     /// Завершение игры
     /// </summary>
@@ -320,10 +316,12 @@ public enum DecisionType
     /// Проверка правильности ответа
     /// </summary>
     AnswerValidating,
+
     /// <summary>
-    /// Выбор игрока, начинающего раунд
+    /// Selecting the moving player.
     /// </summary>
     StarterChoosing,
+
     /// <summary>
     /// Выбор следующего ставящего на Вопросе со ставкой
     /// </summary>

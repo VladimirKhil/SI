@@ -45,6 +45,7 @@ public sealed class QuestionEngine
                 ? options.DefaultTypeName
                 : _question.TypeName;
 
+            // TODO: do not update package objects; they should be read only
             question.TypeName = typeName;
 
             ScriptsLibrary.Scripts.TryGetValue(typeName, out _script);

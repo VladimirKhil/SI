@@ -1,12 +1,10 @@
-﻿using Utils;
-
-namespace SICore.Clients.Game;
+﻿namespace Utils.Timers;
 
 /// <summary>
 /// Runs tasks with specified intervals.
 /// </summary>
 /// <typeparam name="T">Task type.</typeparam>
-internal sealed class TaskRunner<T> : IDisposable where T : struct
+public sealed class TaskRunner<T> : IDisposable where T : struct
 {
     /// <summary>
     /// Maximum time to schedule a task, 0.1 s.
@@ -30,13 +28,13 @@ internal sealed class TaskRunner<T> : IDisposable where T : struct
 
     private readonly Stack<Tuple<T, int, int>> _oldTasks = new();
 
-    internal IEnumerable<Tuple<T, int, int>> OldTasks => _oldTasks;
+    public IEnumerable<Tuple<T, int, int>> OldTasks => _oldTasks;
 
-    internal T CurrentTask { get; private set; }
+    public T CurrentTask { get; private set; }
 
     public bool IsExecutionPaused => _oldTasks.Any() && EqualityComparer<T>.Default.Equals(CurrentTask, default);
 
-    internal T PendingTask => IsExecutionPaused ? _oldTasks.Peek().Item1 : CurrentTask;
+    public T PendingTask => IsExecutionPaused ? _oldTasks.Peek().Item1 : CurrentTask;
 
     public bool IsRunning { get; set; }
 
@@ -46,7 +44,7 @@ internal sealed class TaskRunner<T> : IDisposable where T : struct
         _taskRunHandler = taskRunHandler;
     }
 
-    internal string PrintOldTasks() => string.Join("|", OldTasks.Select(t => $"{t.Item1}:{t.Item2}"));
+    public string PrintOldTasks() => string.Join("|", OldTasks.Select(t => $"{t.Item1}:{t.Item2}"));
 
     internal void SetTask(T task, int taskArgument)
     {
@@ -54,7 +52,7 @@ internal sealed class TaskRunner<T> : IDisposable where T : struct
         _taskArgument = taskArgument;
     }
 
-    internal void ExecuteImmediate() =>
+    public void ExecuteImmediate() =>
         _taskTimerLock.WithLock(() =>
         {
             if (!_disposed)
@@ -63,7 +61,7 @@ internal sealed class TaskRunner<T> : IDisposable where T : struct
             }
         });
 
-    internal void ScheduleExecution(T task, double taskTime, int taskArgument = 0, bool runTimer = true)
+    public void ScheduleExecution(T task, double taskTime, int taskArgument = 0, bool runTimer = true)
     {
         SetTask(task, taskArgument);
 
@@ -77,7 +75,7 @@ internal sealed class TaskRunner<T> : IDisposable where T : struct
         RunTaskTimer(Math.Min(MaximumWaitTime, taskTime));
     }
 
-    internal void PauseExecution(T task, int taskArgument)
+    public void PauseExecution(T task, int taskArgument)
     {
         var now = DateTime.UtcNow;
 
@@ -88,7 +86,7 @@ internal sealed class TaskRunner<T> : IDisposable where T : struct
         CurrentTask = default;
     }
 
-    internal int ResumeExecution(int resumeTime = 0, bool runTimer = true)
+    public int ResumeExecution(int resumeTime = 0, bool runTimer = true)
     {
         if (!_oldTasks.Any())
         {
@@ -103,7 +101,7 @@ internal sealed class TaskRunner<T> : IDisposable where T : struct
         return taskTime;
     }
 
-    internal void UpdatePausedTask(T task, int taskArgument, int taskTime)
+    public void UpdatePausedTask(T task, int taskArgument, int taskTime)
     {
         if (_oldTasks.Any())
         {
@@ -113,7 +111,7 @@ internal sealed class TaskRunner<T> : IDisposable where T : struct
         _oldTasks.Push(Tuple.Create(task, taskArgument, taskTime));
     }
 
-    internal void ClearOldTasks() => _oldTasks.Clear();
+    public void ClearOldTasks() => _oldTasks.Clear();
 
     private void RunTaskTimer(double taskTime)
     {

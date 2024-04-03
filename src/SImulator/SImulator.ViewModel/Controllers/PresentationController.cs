@@ -70,6 +70,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         set { if (_showPlayers != value) { _showPlayers = value; OnPropertyChanged(); } }
     }
 
+    public Action<int, int>? SelectionCallback { get; set; }
+
     public PresentationController(IDisplayDescriptor screen)
     {
         Screen = screen;
@@ -157,15 +159,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
     }
 
-    public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound, SoundFinished), exc => Error?.Invoke(exc));
-
-    private void SoundFinished()
-    {
-        if (TInfo.TStage == TableStage.Sign)
-        {
-            _listener?.OnIntroFinished();
-        }
-    }
+    public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound), exc => Error?.Invoke(exc));
 
     public async void Start()
     {
@@ -359,7 +353,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
             }
         }
 
-        Listener?.OnQuestionSelected(themeIndex, questionIndex);
+        SelectionCallback?.Invoke(themeIndex, questionIndex);
     }
 
     public void PlaySimpleSelection(int theme, int quest) => TInfo.PlaySimpleSelectionAsync(theme, quest);
@@ -406,7 +400,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
                                 && code < TInfo.RoundInfo[_previousCode].Questions.Count
                                 && TInfo.RoundInfo[_previousCode].Questions[code].Price > -1)
                             {
-                                Listener?.OnQuestionSelected(_previousCode, code);
+                                SelectionCallback?.Invoke(_previousCode, code);
                                 _previousCode = -1;
                                 return true;
                             }

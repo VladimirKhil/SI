@@ -71,11 +71,6 @@ internal sealed class TestGameHost : IExtendedListener
         throw new NotImplementedException();
     }
 
-    public void OnQuestionSelected(int theme, int question)
-    {
-        ((TvEngine)_engine).SelectQuestion(theme, question);
-    }
-
     public void OnReady()
     {
         throw new NotImplementedException();

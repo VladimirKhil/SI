@@ -26,11 +26,6 @@ public sealed class EngineOptions
     public bool ShowScore { get; init; }
 
     /// <summary>
-    /// Run game automatically.
-    /// </summary>
-    public bool AutomaticGame { get; init; }
-
-    /// <summary>
     /// Play special questions.
     /// </summary>
     public bool PlaySpecials { get; init; }

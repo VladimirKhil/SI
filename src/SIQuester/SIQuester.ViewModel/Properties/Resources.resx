@@ -156,6 +156,9 @@
   <data name="BaseSources" xml:space="preserve">
     <value>Source</value>
   </data>
+  <data name="CannotCreateTemporaryFile" xml:space="preserve">
+    <value>Cannot create temporary file. Try to turn off antivirus software</value>
+  </data>
   <data name="Championship" xml:space="preserve">
     <value>Championship</value>
   </data>

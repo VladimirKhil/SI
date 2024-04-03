@@ -57,6 +57,12 @@ internal static class ContentCollectionBehavior
 
     private static void CalculateRowDefinitions(Grid grid, TableInfoViewModel tableInfoViewModel)
     {
+        if (grid.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
+        {
+            grid.Dispatcher.Invoke(CalculateRowDefinitions, grid, tableInfoViewModel);
+            return;
+        }
+
         var content = tableInfoViewModel.Content;
 
         if (content == null)

@@ -23,12 +23,18 @@ internal static class FileHelper
         }
 
         var index = 0;
+        var directoryName = Path.GetDirectoryName(fileName);
         var extension = Path.GetExtension(fileName);
         var baseName = Path.GetFileNameWithoutExtension(fileName);
 
         do
         {
             var newName = Path.ChangeExtension($"{baseName}_{index++}.", extension);
+
+            if (directoryName != null && directoryName.Length > 0)
+            {
+                newName = Path.Combine(directoryName, newName);
+            }
 
             if (!dublicateCondition(newName))
             {

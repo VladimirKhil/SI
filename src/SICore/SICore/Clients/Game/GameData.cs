@@ -3,6 +3,7 @@ using SICore.Contracts;
 using SICore.Models;
 using SICore.Results;
 using SIData;
+using SIEngine;
 using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
@@ -626,6 +627,11 @@ public sealed class GameData : Data
     /// Allowed join game mode.
     /// </summary>
     public JoinMode JoinMode { get; internal set; }
+
+    /// <summary>
+    /// Round table controller.
+    /// </summary>
+    public IRoundTableController? TableController { get; internal set; }
 
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {

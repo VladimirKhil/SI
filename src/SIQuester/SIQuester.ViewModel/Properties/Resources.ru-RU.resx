@@ -708,4 +708,7 @@ theme - тема Кота</value>
 Химия
 Эрудиция</value>
   </data>
+  <data name="CannotCreateTemporaryFile" xml:space="preserve">
+    <value>Не удалось создать временный файл. Попробуйте отключить антивирус</value>
+  </data>
 </root>

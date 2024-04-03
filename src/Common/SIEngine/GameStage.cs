@@ -8,8 +8,12 @@ public enum GameStage
     Begin,
     GameThemes,
     Round,
-    RoundThemes,
-    RoundTable,
+
+    /// <summary>
+    /// Question to play selection.
+    /// </summary>
+    SelectingQuestion,
+
     Theme,
     NextQuestion,
     Score, // ?

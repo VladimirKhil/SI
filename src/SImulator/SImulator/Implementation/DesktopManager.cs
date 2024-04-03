@@ -295,7 +295,7 @@ internal sealed class DesktopManager : PlatformManager
         }
     }
 
-    public override void PlaySound(string name, Action onFinish)
+    public override void PlaySound(string name, Action? onFinish = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -320,7 +320,7 @@ internal sealed class DesktopManager : PlatformManager
         {
             _mediaTimeline = new MediaTimeline();
             _player = new MediaPlayer();
-            _mediaTimeline.Completed += (sender, e) => onFinish();
+            _mediaTimeline.Completed += (sender, e) => onFinish?.Invoke();
         }
         else
         {

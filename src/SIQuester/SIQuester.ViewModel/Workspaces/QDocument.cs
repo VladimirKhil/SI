@@ -2292,7 +2292,16 @@ public sealed class QDocument : WorkspaceViewModel
              // 1. Saving at temporary path to validate saved file first
              var tempPath = FileHelper.GenerateUniqueFilePath(System.IO.Path.ChangeExtension(_path, "tmp"));
 
-             var tempStream = File.Open(tempPath, FileMode.CreateNew, FileAccess.ReadWrite);
+             FileStream tempStream;
+
+             try
+             {
+                 tempStream = File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite);
+             }
+             catch (FileNotFoundException ex)
+             {
+                 throw new Exception(Resources.CannotCreateTemporaryFile, ex);
+             }
 
              using (var tempDoc = Document.SaveAs(tempStream, false))
              {
@@ -2316,6 +2325,8 @@ public sealed class QDocument : WorkspaceViewModel
                      await Html.CommitAsync(tempDoc.Html);
                  }
              }
+
+             File.SetAttributes(tempPath, File.GetAttributes(tempPath) | FileAttributes.Hidden);
 
              _logger.LogInformation("SaveInternalAsync: document has been saved to temp path: {path}", tempPath);
 

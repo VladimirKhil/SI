@@ -1,6 +1,5 @@
 ﻿using SIEngine;
 using SIEngine.Core;
-using SIEngine.Rules;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
 using SIPackages;
@@ -449,5 +448,14 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return true;
     }
 
-    public bool ShouldPlayRound(QuestionSelectionStrategyType questionSelectionStrategyType) => true;
+    public bool ShouldPlayQuestionForAll() => true;
+
+    public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController) => GameViewModel?.OnRoundThemes(themes);
+
+    public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback) =>
+        PresentationController.SelectionCallback = selectCallback;
+
+    public void CancelQuestionSelection() => PresentationController.SelectionCallback = null;
+
+    public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel?.OnQuestionSelected(themeIndex, questionIndex);
 }
