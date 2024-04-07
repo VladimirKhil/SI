@@ -3,4 +3,4 @@ param (
     [string]$platform = "x64"
 )
 
-& "$Env:PROGRAMFILES\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" ..\deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=$platform /p:OutputPath=../../bin/.Release/SIQuester.Setup/$platform /p:BuildProjectReferences=false /p:MsiProductVersion=$version
+dotnet build ..\deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=$platform /p:MsiProductVersion=$version /p:OutputPath=../../bin/.Release/SIQuester.Setup/$platform /p:BuildProjectReferences=false

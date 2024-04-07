@@ -31,7 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Ensure.That" Version="10.1.0" />
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-    <PackageReference Include="VKhil.ZipUtils" Version="1.1.0" />
+    <PackageReference Include="VKhil.ZipUtils" Version="1.1.1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
