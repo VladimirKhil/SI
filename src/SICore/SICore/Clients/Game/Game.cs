@@ -14,6 +14,7 @@ using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
+using System.Security.Principal;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -31,13 +32,14 @@ namespace SICore;
 /// </summary>
 public sealed class Game : Actor<GameData, GameLogic>
 {
+    private const string VideoAvatarUri = "https://vdo.ninja/";
+
     public event Action<Game, bool, bool>? PersonsChanged;
 
     /// <summary>
     /// Informs the hosting environment that a person with provided name should be disconnected.
     /// </summary>
     public event Action<string>? DisconnectRequested;
-
     private readonly GameActions _gameActions;
 
     private IPrimaryNode Master => (IPrimaryNode)_client.Node;
@@ -484,7 +486,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 // Action according to protocol
                 switch (args[0])
                 {
-                    case Messages.GameInfo:
+                    case Messages.GameInfo: // TODO: will be deprecated after switching to SIGame 8
                         #region GameInfo
 
                         // Информация о текущей игре для подключающихся по сети
@@ -518,11 +520,11 @@ public sealed class Game : Actor<GameData, GameLogic>
                         #endregion
                         break;
 
-                    case Messages.Connect:
+                    case Messages.Connect: // TODO: will be deprecated after switching to SIGame 8
                         await OnConnectAsync(message, args);
                         break;
 
-                    case SystemMessages.Disconnect:
+                    case SystemMessages.Disconnect: // TODO: will be deprecated after switching to SIGame 8
                         OnDisconnect(args);
                         break;
 
@@ -531,7 +533,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.Config:
-                        ProcessConfig(message, args);
+                        OnConfig(message, args);
                         break;
 
                     case Messages.First:
@@ -601,6 +603,14 @@ public sealed class Game : Actor<GameData, GameLogic>
 
                     case Messages.Picture:
                         OnPicture(message, args);
+                        break;
+
+                    case Messages.Avatar:
+                        OnAvatar(message, args);
+                        break;
+
+                    case Messages.Moveable:
+                        OnMoveable(message);
                         break;
 
                     case Messages.Choice:
@@ -837,6 +847,14 @@ public sealed class Game : Actor<GameData, GameLogic>
                 _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
+
+    private void OnMoveable(Message message)
+    {
+        if (ClientData.AllPersons.TryGetValue(message.Sender, out var person))
+        {
+            person.IsMoveable = true;
+        }
+    }
 
     private void OnReport(Message message, string[] args)
     {
@@ -1099,6 +1117,11 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnPicture(Message message, string[] args)
     {
+        if (args.Length < 2)
+        {
+            return;
+        }
+
         var path = args[1];
         var person = ClientData.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
 
@@ -1137,6 +1160,35 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
 
         InformAvatar(person);
+    }
+
+    private void OnAvatar(Message message, string[] args)
+    {
+        if (args.Length < 3)
+        {
+            return;
+        }
+
+        var contentType = args[1];
+        var avatarUri = args[2];
+        var person = ClientData.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
+
+        if (person == null)
+        {
+            return;
+        }
+
+        if (contentType == ContentTypes.Image)
+        {
+            person.Picture = avatarUri;
+            _gameActions.SendMessageWithArgs(Messages.Avatar, person.Name, contentType, avatarUri);
+            _gameActions.SendMessageWithArgs(Messages.Picture, person.Name, avatarUri); // for backward compatibility
+        }
+        else if (contentType == ContentTypes.Video && (avatarUri.Length == 0 || avatarUri.StartsWith(VideoAvatarUri)))
+        {
+            person.AvatarVideoUri = avatarUri;
+            _gameActions.SendMessageWithArgs(Messages.Avatar, person.Name, contentType, avatarUri);
+        }
     }
 
     private void OnStake(Message message, string[] args)
@@ -2351,11 +2403,9 @@ public sealed class Game : Actor<GameData, GameLogic>
     private void OnDisconnectRequested(string person) => DisconnectRequested?.Invoke(person);
 
     /// <summary>
-    /// Изменить конфигурацию игры
+    /// Updates game configuration.
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="args"></param>
-    private void ProcessConfig(Message message, string[] args)
+    private void OnConfig(Message message, string[] args)
     {
         if (message.Sender != ClientData.HostName || args.Length <= 1)
         {
@@ -2434,7 +2484,9 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         var indexStr = args[2];
 
-        if (ClientData.Players.Count <= 2 || !int.TryParse(indexStr, out int index) || index <= -1
+        if (ClientData.Players.Count <= 2
+            || !int.TryParse(indexStr, out int index)
+            || index <= -1
             || index >= ClientData.Players.Count)
         {
             return;
@@ -3190,7 +3242,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         string newName = "";
         bool newIsMale = true;
 
-        Account? newAcc = null;
+        ViewerAccount? newAcc = null;
 
         ClientData.BeginUpdatePersons($"ChangePersonType {personType} {indexStr}");
 
@@ -3499,7 +3551,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnPersonsChanged(bool joined = true, bool withError = false) => PersonsChanged?.Invoke(this, joined, withError);
 
-    private void InformAvatar(Account account)
+    private void InformAvatar(ViewerAccount account)
     {
         foreach (var personName in ClientData.AllPersons.Keys)
         {
@@ -3510,18 +3562,24 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
     }
 
-    private void InformAvatar(Account account, string receiver)
+    private void InformAvatar(ViewerAccount account, string receiver)
     {
-        if (string.IsNullOrEmpty(account.Picture))
+        if (!string.IsNullOrEmpty(account.Picture))
         {
-            return;
+            _gameActions.SendMessageWithArgs(Messages.Avatar, account.Name, ContentTypes.Image, account.Picture);
+
+            // for backward compatibility
+            var link = CreateUri(account.Name, account.Picture, receiver);
+
+            if (link != null)
+            {
+                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Picture, account.Name, link), receiver);
+            }
         }
 
-        var link = CreateUri(account.Name, account.Picture, receiver);
-
-        if (link != null)
+        if (!string.IsNullOrEmpty(account.AvatarVideoUri))
         {
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Picture, account.Name, link), receiver);
+            _gameActions.SendMessageWithArgs(Messages.Avatar, account.Name, ContentTypes.Video, account.AvatarVideoUri);
         }
     }
 

@@ -394,7 +394,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         if (!QuestionEngine.PlayNext())
         {
             OnQuestionPostInfo();
-            Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
+            Stage = ActiveRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
         }
     }
 
@@ -408,7 +408,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         if (!QuestionEngine.PlayNext())
         {
             OnQuestionPostInfo();
-            Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
+            Stage = ActiveRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
         }
     }
 

@@ -753,6 +753,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (move)
         {
+            ClearContinuation();
             ScheduleExecution(Tasks.MoveNext, 40);
         }
         else
@@ -765,7 +766,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private void Engine_RoundEmpty()
     {
         _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)]));
-
         FinishRound();
     }
 

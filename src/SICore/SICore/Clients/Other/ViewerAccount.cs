@@ -1,40 +1,55 @@
 ﻿using SIData;
 using System.Diagnostics;
 
-namespace SICore
+namespace SICore;
+
+/// <summary>
+/// Common viewer account.
+/// </summary>
+public class ViewerAccount : Account
 {
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _isConnected = false;
+
     /// <summary>
-    /// Аккаунт с информацией о присутствии в игре
+    /// Is connected to game.
     /// </summary>
-    public class ViewerAccount : Account
+    public bool IsConnected
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool _isConnected = false;
+        get => _isConnected;
+        set { if (_isConnected != value) { _isConnected = value; OnPropertyChanged(); } }
+    }
 
-        /// <summary>
-        /// В игре ли
-        /// </summary>
-        public bool IsConnected
-        {
-            get { return _isConnected; }
-            set { if (_isConnected != value) { _isConnected = value; OnPropertyChanged(); } }
-        }
+    private string? _avatarVideoUri;
 
-        public ViewerAccount(string name, bool isMale, bool isConnected)
-            : base(name, isMale)
-        {
-            _isConnected = isConnected;
-        }
+    /// <summary>
+    /// Account video avatar uri.
+    /// </summary>
+    public string? AvatarVideoUri
+    {
+        get => _avatarVideoUri;
+        set { if (_avatarVideoUri != null) { _avatarVideoUri = value; OnPropertyChanged(); } }
+    }
 
-        public ViewerAccount(Account account)
-            : base(account)
-        {
+    /// <summary>
+    /// Can the account be moved.
+    /// </summary>
+    public bool IsMoveable { get; set; }
 
-        }
+    public ViewerAccount(string name, bool isMale, bool isConnected)
+        : base(name, isMale)
+    {
+        _isConnected = isConnected;
+    }
 
-        public ViewerAccount()
-        {
+    public ViewerAccount(Account account)
+        : base(account)
+    {
 
-        }
+    }
+
+    public ViewerAccount()
+    {
+
     }
 }

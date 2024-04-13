@@ -11,6 +11,11 @@ public static class Messages
     public const string Accepted = "ACCEPTED";
 
     /// <summary>
+    /// User action error message.
+    /// </summary>
+    public const string ActionError = "ACTION_ERROR";
+
+    /// <summary>
     /// Реклама
     /// </summary>
     public const string Ads = "ADS";
@@ -52,6 +57,12 @@ public static class Messages
     /// </summary>
     [Obsolete("Use Content")]
     public const string Atom_Second = "ATOM_SECOND";
+
+    /// <summary>
+    /// Person's avatar.
+    /// </summary>
+    [IdempotencyRequired]
+    public const string Avatar = "AVATAR";
 
     /// <summary>
     /// Забанить участника
@@ -350,6 +361,7 @@ public static class Messages
     /// Картинка участника
     /// </summary>
     [IdempotencyRequired]
+    [Obsolete]
     public const string Picture = "PICTURE";
 
     /// <summary>

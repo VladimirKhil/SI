@@ -9,10 +9,11 @@ internal static class QuestionSelectionStrategyFactory
         Round round,
         QuestionSelectionStrategyType questionSelectionStrategyType,
         ISIEnginePlayHandler playHandler,
-        Action<int, int> selectionCallback) =>
+        Action<int, int> selectionCallback,
+        Action endRoundCallback) =>
         questionSelectionStrategyType switch
         {
-            QuestionSelectionStrategyType.SelectByPlayer => new SelectByPlayerStrategy(round, playHandler, selectionCallback),
+            QuestionSelectionStrategyType.SelectByPlayer => new SelectByPlayerStrategy(round, playHandler, selectionCallback, endRoundCallback),
             QuestionSelectionStrategyType.Sequential => new SequentialStrategy(round, playHandler, selectionCallback),
             QuestionSelectionStrategyType.RemoveOtherThemes => new RemoveOtherThemesStrategy(round, playHandler, selectionCallback),
             _ => throw new InvalidOperationException($"Invalid stategy type {questionSelectionStrategyType}")

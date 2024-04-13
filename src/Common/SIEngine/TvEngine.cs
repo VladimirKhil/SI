@@ -101,7 +101,8 @@ public sealed class TvEngine : EngineBase
                     ActiveRound,
                     GameRules.GetRulesForRoundType(ActiveRound.Type).QuestionSelectionStrategyType,
                     PlayHandler,
-                    SelectQuestion);
+                    SelectQuestion,
+                    EndRound);
 
                 if (_selectionStrategy.ShouldPlayRound())
                 {

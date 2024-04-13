@@ -10,6 +10,7 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
     private readonly Round _round;
     private readonly ISIEnginePlayHandler _playHandler;
     private readonly Action<int, int> _selectionCallback;
+    private readonly Action _endRoundCallback;
 
     private Stage _stage = Stage.RoundThemes;
 
@@ -24,11 +25,13 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
     public SelectByPlayerStrategy(
         Round round,
         ISIEnginePlayHandler playHandler,
-        Action<int, int> selectionCallback)
+        Action<int, int> selectionCallback,
+        Action endRoundCallback)
     {
         _round = round;
         _playHandler = playHandler;
         _selectionCallback = selectionCallback;
+        _endRoundCallback = endRoundCallback;
 
         for (var themeIndex = 0; themeIndex < _round.Themes.Count; themeIndex++)
         {
@@ -85,6 +88,7 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
         {
             _playHandler.CancelQuestionSelection();
             _stage = Stage.RoundTable;
+            _endRoundCallback();
         }
 
         return result;
@@ -136,8 +140,12 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
 
     private void SelectQuestion(int themeIndex, int questionIndex)
     {
+        if (!_questionsTable.Remove((themeIndex, questionIndex)))
+        {
+            return;
+        }
+
         _history.Push((themeIndex, questionIndex));
-        _questionsTable.Remove((themeIndex, questionIndex));
         _selectionCallback(themeIndex, questionIndex);
         _playHandler.OnQuestionSelected(themeIndex, questionIndex);
 
