@@ -1,31 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
 	<?define Manufacturer="Khil-soft" ?>
 	<?define ProductName="SIQuester" ?>
 	<?define ProductDescription="SIGame packages editor" ?>
-	<?define ManufacturerEn="Khil-soft" ?>
-	<?define ProductNameEn="SIQuester" ?>
 	<?define UpgradeCode="C2EAE409-B7B9-49C4-AE2C-B2AD43FDD0FE" ?>
-	<?define ProductNameR="SIQuester" ?>
+	<?define PublishFolder = "$(sys.SOURCEFILEDIR)..\..\bin\.Release\SIQuester\net6.0-windows\win-$(var.Platform)\publish\" ?>
+	
+	<?ifndef var.ProductVersion ?>
+	  <?define ProductVersion="1.0.0" ?>
+	<?endif ?>
 
-    <?define SolutionDir = "$(var.SIQuester.ProjectDir)..\..\..\" ?>
-	<?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIQuester\net6.0-windows\win-$(var.Platform)\publish\" ?>
+	<?ifndef var.SolutionDir ?>
+	  <?define SolutionDir = "$(sys.SOURCEFILEDIR)..\..\" ?>
+	<?endif ?>
 
-	<Product
-	  Id="*"
-	  Name="$(var.ProductName)"
-	  Language="1049"
-	  Version="$(var.ProductVersion)"
-	  Manufacturer="$(var.Manufacturer)"
-	  UpgradeCode="$(var.UpgradeCode)">
-
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
-
-		<MajorUpgrade
-		  DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled."
-		  Schedule="afterInstallInitialize"
-		  IgnoreRemoveFailure="yes" />
+	<Package Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)" InstallerVersion="200" Scope="perUser">
+		<MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductName) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
 
 		<MediaTemplate EmbedCab="yes" />
 
@@ -33,13 +23,13 @@
 		<Property Id="ARPPRODUCTICON" Value="AppIcon" />
 
 		<Property Id="WixShellExecTarget" Value="[#SIQuester.exe]" />
-		<CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+		<CustomAction Id="LaunchApplication" DllEntry="WixShellExec" Impersonate="yes" BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)" />
 
 		<InstallExecuteSequence>
 			<LaunchConditions After="AppSearch" />
 			<FindRelatedProducts After="LaunchConditions" />
 
-			<Custom Action="LaunchApplication" After="InstallFinalize">Not Installed OR WIX_UPGRADE_DETECTED</Custom>
+			<Custom Action="LaunchApplication" After="InstallFinalize" Condition="Not Installed OR WIX_UPGRADE_DETECTED" />
 		</InstallExecuteSequence>
 
 		<InstallUISequence>
@@ -58,13 +48,12 @@
 			<ComponentGroupRef Id="runtimes" />
 			<ComponentGroupRef Id="platform" />
 		</Feature>
-	</Product>
+	</Package>
 
 	<Fragment>
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="LocalAppDataFolder">
-				<Directory Id="ManufacturerFolder" Name="$(var.ManufacturerEn)">
-					<Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
+			<StandardDirectory Id="LocalAppDataFolder">
+				<Directory Id="ManufacturerFolder" Name="$(var.Manufacturer)">
+					<Directory Id="INSTALLLOCATION" Name="$(var.ProductName)">
 						<Directory Id="LicensesFolder" Name="Licenses" />
 						<Directory Id="WWWRootFolder" Name="wwwroot" />
 						<Directory Id="RuntimesFolder" Name="runtimes">
@@ -74,21 +63,18 @@
 						</Directory>
 					</Directory>
 				</Directory>
-			</Directory>
-			<Directory Id="ProgramMenuFolder">
+			</StandardDirectory>
+			<StandardDirectory Id="ProgramMenuFolder">
 				<Directory Id="ManufacturerProgramMenuFolder" Name="$(var.Manufacturer)">
 					<Directory Id="ApplicationProgramMenuFolder" Name="$(var.ProductName)" />
 				</Directory>
-			</Directory>
-		</Directory>
-	</Fragment>
+			</StandardDirectory>
+		</Fragment>
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
 			<Component Guid="34937928-a817-430e-bc55-e9b75525ae8e">
-				<File Source="$(var.PublishFolder)SIQuester.exe" KeyPath="yes" Checksum="yes">
-					<netfx:NativeImage Id="ngen_SIQuester.exe" Priority="0" AppBaseDirectory="INSTALLLOCATION" />
-				</File>
+				<File Id="SIQuester.exe" Source="$(var.PublishFolder)SIQuester.exe" KeyPath="yes" Checksum="yes" />
 
 				<ProgId Id="SI.Question" Description="SIGame packages" Advertise="yes">
 					<Extension Id="siq" ContentType="application/x-zip-compressed">
@@ -97,53 +83,46 @@
 				</ProgId>
 			</Component>
 			<Component Guid="c4fc8a86-f9a5-476b-a95c-2c3e4884477e">
-				<File KeyPath="yes" Source="$(var.PublishFolder)D3DCompiler_47_cor3.dll" />
+				<File Id="D3DCompiler_47_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)D3DCompiler_47_cor3.dll" />
 			</Component>
 			<Component Guid="a7ea249a-13bc-4bf0-9abe-04f7de993268">
-				<File KeyPath="yes" Source="$(var.PublishFolder)PenImc_cor3.dll" />
+				<File Id="PenImc_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)PenImc_cor3.dll" />
 			</Component>
 			<Component Guid="63df2917-c057-4f59-9c06-5eb182fa6943">
-				<File KeyPath="yes" Source="$(var.PublishFolder)PresentationNative_cor3.dll" />
+				<File Id="PresentationNative_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)PresentationNative_cor3.dll" />
 			</Component>
 			<Component Guid="9576edf4-0ee1-4a34-93ae-54ed9370d9e1">
-				<File KeyPath="yes" Source="$(var.PublishFolder)vcruntime140_cor3.dll" />
+				<File Id="vcruntime140_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)vcruntime140_cor3.dll" />
 			</Component>
 			<Component Guid="b8c64957-04ea-472e-ae01-3627baab2f6b">
-				<File KeyPath="yes" Source="$(var.PublishFolder)wpfgfx_cor3.dll" />
+				<File Id="wpfgfx_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)wpfgfx_cor3.dll" />
 			</Component>
 			<Component Guid="{BE062A3B-5687-4676-9F5B-710AFB837C5F}">
-				<File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
+				<File Id="api_ms_win_core_winrt_l1_1_0.dll" KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
 			</Component>
 		  <Component Guid="{35c2036e-b32a-4d84-b53a-39027e7eb66b}">
-			<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
+			<File Id="WebView2Loader.dll" KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
 		  </Component>
 			<Component Guid="{9DDD698F-CC42-450B-A706-73F395AF1F74}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
+				<File Id="aspnetcorev2_inprocess.dll" KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
 			</Component>
 			<Component Guid="{45D455A2-7D37-4D27-8973-B26CA236C2EE}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
+				<File Id="appsettings.json" KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
 			</Component>
 			<Component Guid="52e158c9-4d0b-48e9-ba43-3c81c3799910">
-				<File KeyPath="yes" Source="$(var.PublishFolder)Help.ru-RU.pdf" />
+				<File Id="Help.ru_RU.pdf" KeyPath="yes" Source="$(var.PublishFolder)Help.ru-RU.pdf" />
 			</Component>
 			<Component Guid="3b169511-36e4-4d4a-b0d3-128175610b1f">
-				<File KeyPath="yes" Source="$(var.PublishFolder)Help.en-US.pdf" />
+				<File Id="Help.en_US.pdf" KeyPath="yes" Source="$(var.PublishFolder)Help.en-US.pdf" />
 			</Component>
 			<Component Guid="46306d8e-094a-4559-a541-df3cbf95b19a">
-				<File KeyPath="yes" Source="$(var.PublishFolder)ygpackagekey3.0.xslt" />
+				<File Id="ygpackagekey3.0.xslt" KeyPath="yes" Source="$(var.PublishFolder)ygpackagekey3.0.xslt" />
 			</Component>
 			<Component Guid="f23e003c-a0d6-4352-8ad7-8b6ecd104322">
-				<File KeyPath="yes" Source="$(var.PublishFolder)ygpackagesimple3.0.xslt" />
+				<File Id="ygpackagesimple3.0.xslt" KeyPath="yes" Source="$(var.PublishFolder)ygpackagesimple3.0.xslt" />
 			</Component>
 			<Component Id="RegistryPath" Guid="88aa1365-b38f-4c3d-ad27-a9aeb64154f2">
-				<RegistryValue
-				  Id="InstallFolder"
-				  Root="HKMU"
-				  Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
-				  Name="InstallDir"
-				  Action="write"
-				  Type="string"
-				  Value="[INSTALLLOCATION]" />
+				<RegistryValue Id="InstallFolder" Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="InstallDir" Action="write" Type="string" Value="[INSTALLLOCATION]" />
 
 				<RemoveFolder Id="INSTALLLOCATION" On="uninstall" />
 			</Component>
@@ -153,38 +132,31 @@
 	<Fragment>
 		<ComponentGroup Id="Licenses" Directory="LicensesFolder">
 			<Component Guid="{EE005A72-17BE-4FA6-BB19-3F6C55338951}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\MahApps.Metro.LICENSE" />
+				<File Id="MahApps.Metro.LICENSE" KeyPath="yes" Source="$(var.PublishFolder)licenses\MahApps.Metro.LICENSE" />
 			</Component>
 			<Component Guid="{6874C052-7D52-4E31-9BF3-D6563FE7F8AB}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\MahApps.Metro.LICENSE+" />
+				<File Id="MahApps.Metro.LICENSE_" KeyPath="yes" Source="$(var.PublishFolder)licenses\MahApps.Metro.LICENSE+" />
 			</Component>
 			<Component Guid="{930943B4-D03E-40C3-8196-B966C21EB6C1}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Modern UI Icons.license.txt" />
+				<File Id="Modern_UI_Icons.license.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\Modern UI Icons.license.txt" />
 			</Component>
 			<Component Guid="{61EE4A7F-8729-4ABE-8BF8-4C2293620BE3}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\WindowsAPICodePack.LICENSE.txt" />
+				<File Id="WindowsAPICodePack.LICENSE.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\WindowsAPICodePack.LICENSE.txt" />
 			</Component>
 			<Component Guid="{61DE6CC1-243C-473A-B297-D5B35A113F5D}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Ben.Demystifier.LICENSE.txt" />
+				<File Id="Ben.Demystifier.LICENSE.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\Ben.Demystifier.LICENSE.txt" />
 			</Component>
 			<Component Guid="{D24545DB-5745-4EFF-B17D-87EBFCAC2849}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\YamlDotNet.LICENSE.txt" />
+				<File Id="YamlDotNet.LICENSE.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\YamlDotNet.LICENSE.txt" />
 			</Component>
 			<Component Guid="{b108abbc-642a-4b49-9f33-e11b3e071fd3}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Polly.LICENSE.txt" />
+				<File Id="Polly.LICENSE.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\Polly.LICENSE.txt" />
 			</Component>
 			<Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
-				<File KeyPath="yes" Source="$(var.SolutionDir)LICENSE" />
+				<File Id="LICENSE" KeyPath="yes" Source="$(var.SolutionDir)LICENSE" />
 			</Component>
 			<Component Id="LicensesReg" Guid="{E903B74E-2536-49A6-B842-4D8A3BAA342A}">
-				<RegistryValue
-				  Id="LicensesFolderReg"
-				  Root="HKMU"
-				  Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
-				  Name="licenses"
-				  Type="integer"
-				  Value="1"
-				  KeyPath="yes" />
+				<RegistryValue Id="LicensesFolderReg" Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="licenses" Type="integer" Value="1" KeyPath="yes" />
 
 				<RemoveFolder Id="LicensesFolder" On="uninstall" />
 			</Component>
@@ -194,32 +166,25 @@
 	<Fragment>
 		<ComponentGroup Id="wwwroot" Directory="WWWRootFolder">
 			<Component Guid="{1e004fe0-3407-4abd-bfeb-d9d9b8094c17}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\Clefs.ttf" />
+				<File Id="Clefs.ttf" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\Clefs.ttf" />
 			</Component>
 			<Component Guid="{564f0b39-4189-4e20-a61d-47334c10cd82}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\index.html" />
+				<File Id="index.html" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\index.html" />
 			</Component>
 			<Component Guid="{9981e64f-4579-4076-ae13-393af8e6da7d}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\main.js" />
+				<File Id="main.js" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\main.js" />
 			</Component>
 			<Component Guid="{c17c0222-cbed-4df1-b2a8-015fc6a9f5bb}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\script.js" />
+				<File Id="script.js" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\script.js" />
 			</Component>
 			<Component Guid="{67efe4f6-377d-4ea8-8e54-527ac0f7571d}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\style.css" />
+				<File Id="style.css" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\style.css" />
 			</Component>
 			<Component Guid="{ee41f1be-f740-419e-978d-44c6dcdf4e15}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)wwwroot\vendor.js" />
+				<File Id="vendor.js" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\vendor.js" />
 			</Component>
 			<Component Id="WWWRootReg" Guid="{099327ca-de3f-4991-808e-f1bd8b7ad0ea}">
-				<RegistryValue
-				  Id="WWWRootFolderReg"
-				  Root="HKMU"
-				  Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
-				  Name="wwwroot"
-				  Type="integer"
-				  Value="1"
-				  KeyPath="yes" />
+				<RegistryValue Id="WWWRootFolderReg" Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="wwwroot" Type="integer" Value="1" KeyPath="yes" />
 
 				<RemoveFolder Id="WWWRootFolder" On="uninstall" />
 			</Component>
@@ -229,7 +194,7 @@
 	<Fragment>
 		<ComponentGroup Id="runtimes" Directory="RuntimesFolder">
 			<Component Guid="{ead36f5b-feec-4a79-a93b-a0b5dbe28015}">
-				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="runtimes" Type="integer" Value="1" KeyPath="yes" />
+				<RegistryValue Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="runtimes" Type="integer" Value="1" KeyPath="yes" />
 				<RemoveFolder Id="RuntimesFolder" On="uninstall" />
 			</Component>
 		</ComponentGroup>
@@ -239,7 +204,7 @@
 		<ComponentGroup Id="platform" Directory="PlatformFolder">
 			<Component Guid="{9960fb88-6ad2-434e-902a-6c2765dfba21}">
 				<RemoveFolder Id="PlatformFolder" On="uninstall" />
-				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="platform" Type="integer" Value="1" KeyPath="yes" />
+				<RegistryValue Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="platform" Type="integer" Value="1" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
@@ -250,7 +215,7 @@
 				<File KeyPath="yes" Id="runtimeLoader" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
 			</Component>
 			<Component Id="NativeReg" Guid="{25579643-4b1e-4de4-9135-40d79f16d7e6}">
-				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="native" Type="integer" Value="1" KeyPath="yes" />
+				<RegistryValue Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="native" Type="integer" Value="1" KeyPath="yes" />
 				<RemoveFolder Id="NativeFolder" On="uninstall" />
 			</Component>
 		</ComponentGroup>
@@ -260,13 +225,7 @@
 		<ComponentGroup Id="Manufacturer" Directory="ManufacturerFolder">
 			<Component Guid="{D25F3F12-BFB4-447B-959B-276F4CB6C931}">
 				<RemoveFolder Id="ManufacturerFolder" On="uninstall" />
-				<RegistryValue
-				  Root="HKMU"
-				  Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
-				  Name="installed2"
-				  Type="integer"
-				  Value="1"
-				  KeyPath="yes" />
+				<RegistryValue Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="installed2" Type="integer" Value="1" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
@@ -275,13 +234,7 @@
 		<ComponentGroup Id="ManufacturerProgramMenu" Directory="ManufacturerProgramMenuFolder">
 			<Component Id="ManufacturerProgramMenuFolderComponent" Guid="ef32132e-376b-4474-ad3e-fee22dd8a1c1">
 				<RemoveFolder Id="ManufacturerProgramMenuFolder" On="uninstall" />
-				<RegistryValue
-				  Root="HKMU"
-				  Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
-				  Name="installed"
-				  Type="integer"
-				  Value="1"
-				  KeyPath="yes" />
+				<RegistryValue Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="installed" Type="integer" Value="1" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
@@ -289,22 +242,11 @@
 	<Fragment>
 		<ComponentGroup Id="ApplicationProgramMenu" Directory="ApplicationProgramMenuFolder">
 			<Component Id="ApplicationShortcut" Guid="0e6c2180-0b6c-4c3f-bb40-bdb1e7b2f407">
-				<Shortcut
-				  Id="Shortcut"
-				  Name="$(var.ProductName)"
-				  Description="$(var.ProductDescription)"
-				  Target="[INSTALLLOCATION]SIQuester.exe"
-				  WorkingDirectory="INSTALLLOCATION" />
+				<Shortcut Id="Shortcut" Name="$(var.ProductName)" Description="$(var.ProductDescription)" Target="[INSTALLLOCATION]SIQuester.exe" WorkingDirectory="INSTALLLOCATION" />
 
 				<RemoveFolder Id="ApplicationProgramMenuFolder" On="uninstall" />
 
-				<RegistryValue
-				  Root="HKMU"
-				  Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
-				  Name="installed2"
-				  Type="integer"
-				  Value="1"
-				  KeyPath="yes" />
+				<RegistryValue Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="installed2" Type="integer" Value="1" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
