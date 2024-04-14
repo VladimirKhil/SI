@@ -1,0 +1,80 @@
+﻿<UserControl
+    x:Class="SIQuester.View.PackagePreview"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
+    xmlns:lc="clr-namespace:SIQuester.Converters"
+    mc:Ignorable="d" 
+    d:DesignHeight="450"
+    d:DesignWidth="1200"
+    d:DataContext="{d:DesignInstance vm:PreviewViewModel}"
+    Background="White">
+    <UserControl.Resources>
+        <lc:ContentTypeConverter x:Key="ContentTypeConverter" />
+    </UserControl.Resources>
+    
+    <StackPanel HorizontalAlignment="Stretch" Margin="10">
+        <TextBlock FontSize="35" FontWeight="Bold">
+            <Run Text="{Binding Document.Package.Name}" /><Run Text=" (" /><Run Text="{Binding QuestionCount, Mode=OneWay}" /><Run Text=")" />
+        </TextBlock>
+
+        <ItemsControl ItemsSource="{Binding Content}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Margin="2" Background="Lavender" Padding="5,3">
+                        <Run Text="{Binding Key, Mode=OneWay, Converter={StaticResource ContentTypeConverter}}" /><Run Text=" (" /><Run Text="{Binding Value, Mode=OneWay}" /><Run Text=")" />
+                    </TextBlock>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ItemsControl ItemsSource="{Binding Document.Package.Tags}" Margin="0,5">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Margin="2" Background="#DDDDDD" Padding="5,3" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ItemsControl ItemsSource="{Binding Document.Package.Rounds}" HorizontalContentAlignment="Left">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="p:Round">
+                    <StackPanel Margin="0,5,5,0" Background="LightBlue">
+                        <TextBlock Text="{Binding Name}" FontSize="25" FontWeight="Bold" Margin="10,6" />
+
+                        <ItemsControl ItemsSource="{Binding Themes}" Margin="10,4" Width="400">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="p:Theme">
+                                    <TextBlock FontSize="20" Margin="0,2" TextWrapping="Wrap">
+                                        <Run Text="• " /><Run Text="{Binding Name, Mode=OneWay}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>

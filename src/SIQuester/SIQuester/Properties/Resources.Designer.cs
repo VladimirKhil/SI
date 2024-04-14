@@ -1276,24 +1276,6 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на SNS.
-        /// </summary>
-        public static string ExportFormatsSns {
-            get {
-                return ResourceManager.GetString("ExportFormatsSns", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на SIGame TV version.
-        /// </summary>
-        public static string ExportFormatsTvSI {
-            get {
-                return ResourceManager.GetString("ExportFormatsTvSI", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Unload media….
         /// </summary>
         public static string ExportMediaCommand {
@@ -2038,6 +2020,15 @@ namespace SIQuester.Properties {
         public static string PlayQuestion {
             get {
                 return ResourceManager.GetString("PlayQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Preview.
+        /// </summary>
+        public static string Preview {
+            get {
+                return ResourceManager.GetString("Preview", resourceCulture);
             }
         }
         
@@ -2938,6 +2929,15 @@ namespace SIQuester.Properties {
         public static string Template {
             get {
                 return ResourceManager.GetString("Template", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Text.
+        /// </summary>
+        public static string Text {
+            get {
+                return ResourceManager.GetString("Text", resourceCulture);
             }
         }
         

@@ -154,22 +154,7 @@
                                 Command="{Binding SaveAsTemplate}" />
 
                             <Separator />
-                            <MenuItem Header="HTML" Command="{Binding ExportHtml}" />
-                            <MenuItem Header="{x:Static lp:Resources.PrintedHtml}" Command="{Binding ExportPrintHtml}" />
-                            
-                            <MenuItem
-                                Header="{x:Static lp:Resources.FormattedHtml}"
-                                Command="{Binding ExportFormattedHtml}"
-                                ToolTip="{x:Static lp:Resources.FormattedHtmlHint}" />
-
-                            <MenuItem
-                                Header="{x:Static lp:Resources.MircScript}"
-                                Command="{Binding ExportMirc}"
-                                ToolTip="{x:Static lp:Resources.MircScriptHint}">
-                                <MenuItem.Icon>
-                                    <Image Source="{StaticResource MircImage}" />
-                                </MenuItem.Icon>
-                            </MenuItem>
+                            <MenuItem Header="{x:Static lp:Resources.Preview}" Command="{Binding ExportPreview}" />
 
                             <MenuItem Header="{x:Static lp:Resources.TableFormat}" Command="{Binding ExportTable}" />
                             <MenuItem Header="YAML" Command="{Binding ExportYaml}" />

@@ -522,12 +522,6 @@
   <data name="ExportFormatsDinabank" xml:space="preserve">
     <value>Динабанк</value>
   </data>
-  <data name="ExportFormatsSns" xml:space="preserve">
-    <value>СНС</value>
-  </data>
-  <data name="ExportFormatsTvSI" xml:space="preserve">
-    <value>Телевизионный аналог SIGame</value>
-  </data>
   <data name="ExportMediaCommand" xml:space="preserve">
     <value>Выгрузить медиа…</value>
   </data>
@@ -773,6 +767,9 @@
   </data>
   <data name="PlayQuestion" xml:space="preserve">
     <value>Запустить вопрос</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Превью</value>
   </data>
   <data name="PreviousFragment" xml:space="preserve">
     <value>Предыдущий фрагмент</value>
@@ -1073,6 +1070,9 @@
   </data>
   <data name="Template" xml:space="preserve">
     <value>Шаблон</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>Текст</value>
   </data>
   <data name="TextBeforeThemeName" xml:space="preserve">
     <value>Текст перед темой</value>

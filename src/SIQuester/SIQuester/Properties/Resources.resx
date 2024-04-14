@@ -522,12 +522,6 @@
   <data name="ExportFormatsDinabank" xml:space="preserve">
     <value>Dinabank</value>
   </data>
-  <data name="ExportFormatsSns" xml:space="preserve">
-    <value>SNS</value>
-  </data>
-  <data name="ExportFormatsTvSI" xml:space="preserve">
-    <value>SIGame TV version</value>
-  </data>
   <data name="ExportMediaCommand" xml:space="preserve">
     <value>Unload media…</value>
   </data>
@@ -777,6 +771,9 @@
   </data>
   <data name="PlayQuestion" xml:space="preserve">
     <value>Start question</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Preview</value>
   </data>
   <data name="PreviousFragment" xml:space="preserve">
     <value>Previous fragment</value>
@@ -1077,6 +1074,9 @@
   </data>
   <data name="Template" xml:space="preserve">
     <value>Template</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>Text</value>
   </data>
   <data name="TextBeforeThemeName" xml:space="preserve">
     <value>Text before theme name</value>

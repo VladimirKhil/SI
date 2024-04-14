@@ -9,10 +9,6 @@ public enum ExportFormats
 {
     [Description("ExportFormatsDinabank")]
     Dinabank,
-    [Description("ExportFormatsTvSI")]
-    TvSI,
-    [Description("ExportFormatsSns")]
-    Sns,
     [Description("ExportFormatsDb")]
     Db
 }

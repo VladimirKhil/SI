@@ -330,37 +330,20 @@ public sealed class QDocument : WorkspaceViewModel
     public ICommand SaveAsTemplate { get; private set; }
 
     /// <summary>
-    /// Экспорт в HTML
+    /// Exports package into preview image.
     /// </summary>
-    public ICommand ExportHtml { get; private set; }
+    public ICommand ExportPreview { get; private set; }
+
     /// <summary>
-    /// Экспорт в HTML
-    /// </summary>
-    public ICommand ExportPrintHtml { get; private set; }
-    /// <summary>
-    /// Экспорт в HTML
-    /// </summary>
-    public ICommand ExportFormattedHtml { get; private set; }
-    /// <summary>
-    /// Экспорт в HTML
+    /// Exports package to question database format.
     /// </summary>
     public ICommand ExportBase { get; private set; }
-    /// <summary>
-    /// Экспорт в HTML
-    /// </summary>
-    public ICommand ExportMirc { get; private set; }
-    /// <summary>
-    /// Экспорт в HTML
-    /// </summary>
-    public ICommand ExportTvSI { get; private set; }
-    /// <summary>
-    /// Экспорт в HTML
-    /// </summary>
-    public ICommand ExportSns { get; private set; }
+    
     /// <summary>
     /// Экспорт в формат Динабанка
     /// </summary>
     public ICommand ExportDinabank { get; private set; }
+    
     /// <summary>
     /// Экспорт в табличный формат
     /// </summary>
@@ -1163,13 +1146,8 @@ public sealed class QDocument : WorkspaceViewModel
         SaveAs = new AsyncCommand(SaveAs_Executed);
         SaveAsTemplate = new AsyncCommand(SaveAsTemplate_Executed);
 
-        ExportHtml = new SimpleCommand(ExportHtml_Executed);
-        ExportPrintHtml = new SimpleCommand(ExportPrintHtml_Executed);
-        ExportFormattedHtml = new SimpleCommand(ExportFormattedHtml_Executed);
+        ExportPreview = new SimpleCommand(ExportPreview_Executed);
         ExportBase = new SimpleCommand(ExportBase_Executed);
-        ExportMirc = new SimpleCommand(ExportMirc_Executed);
-        ExportTvSI = new SimpleCommand(ExportTvSI_Executed);
-        ExportSns = new SimpleCommand(ExportSns_Executed);
         ExportDinabank = new SimpleCommand(ExportDinabank_Executed);
         ExportTable = new SimpleCommand(ExportTable_Executed);
         ExportYaml = new SimpleCommand(ExportYaml_Executed);
@@ -1949,186 +1927,9 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private void ExportHtml_Executed(object? arg) =>
-        TransformPackage(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ygpackagekey3.0.xslt"));
-
-    private void ExportPrintHtml_Executed(object? arg) =>
-        TransformPackage(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ygpackagesimple3.0.xslt"));
-
-    private void ExportFormattedHtml_Executed(object? arg) => Dialog = new ExportHtmlViewModel(this);
+    private void ExportPreview_Executed(object? arg) => PlatformManager.Instance.CreatePreview(Document);
 
     private void ExportBase_Executed(object? arg) => Dialog = new ExportViewModel(this, ExportFormats.Db);
-
-    private void ExportMirc_Executed(object? arg)
-    {
-        try
-        {
-            string? filename = string.Format("{0}IRCScriptFile", FileName.Replace(".", "-"));
-
-            var filter = new Dictionary<string, string>
-            {
-                [Resources.TextFiles] = "txt"
-            };
-
-            if (PlatformManager.Instance.ShowSaveUI(Resources.ToIRC, "txt", filter, ref filename))
-            {
-                var file = new StringBuilder();
-                file.AppendLine(Document.Package.Rounds.Count.ToString());
-
-                Document.Package.Rounds.ForEach(round =>
-                {
-                    file.AppendLine(round.Themes.Count.ToString());
-                    round.Themes.ForEach(theme => file.AppendLine(theme.Questions.Count.ToString()));
-                });
-
-                file.AppendLine();
-                file.AppendLine(Resources.ToIRCtext);
-                file.AppendLine();
-
-                int pind = 1, rind = 1, tind = 1, qind = 1;
-
-                file.AppendLine(string.Format("[p{0}name]", pind));
-                file.AppendLine(Document.Package.Name);
-
-                file.AppendLine(string.Format("[p{0}auth]", pind));
-                file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(Document.Package.Info.Authors)));
-
-                file.AppendLine(string.Format("[p{0}sour]", pind));
-                file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(Document.Package.Info.Sources)));
-
-                file.AppendLine(string.Format("[p{0}comm]", pind));
-                file.AppendLine(Document.Package.Info.Comments.Text.GrowFirstLetter().EndWithPoint());
-
-                Document.Package.Rounds.ForEach(round =>
-                {
-                    file.AppendLine(string.Format("[r{0}name]", rind));
-                    file.AppendLine(round.Name);
-                    file.AppendLine(string.Format("[r{0}type]", rind));
-
-                    if (round.Type == RoundTypes.Standart)
-                        file.AppendLine(Resources.Simple);
-                    else
-                        file.AppendLine(Resources.Final);
-
-                    file.AppendLine(string.Format("[r{0}auth]", rind));
-                    file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(round.Info.Authors)));
-                    file.AppendLine(string.Format("[r{0}sour]", rind));
-                    file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(round.Info.Sources)));
-                    file.AppendLine(string.Format("[r{0}comm]", rind));
-                    file.AppendLine(round.Info.Comments.Text.GrowFirstLetter().EndWithPoint());
-
-                    round.Themes.ForEach(theme =>
-                    {
-                        file.AppendLine(string.Format("[t{0}name]", tind));
-                        file.AppendLine(theme.Name);
-                        file.AppendLine(string.Format("[t{0}auth]", tind));
-                        file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(theme.Info.Authors)));
-                        file.AppendLine(string.Format("[t{0}sour]", tind));
-                        file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(theme.Info.Sources)));
-                        file.AppendLine(string.Format("[t{0}comm]", tind));
-                        file.AppendLine(theme.Info.Comments.Text.GrowFirstLetter().EndWithPoint());
-
-                        theme.Questions.ForEach(question =>
-                        {
-                            file.AppendLine(string.Format("[q{0}price]", qind));
-                            file.AppendLine(question.Price.ToString());
-                            file.AppendLine(string.Format("[q{0}type]", qind));
-                            file.AppendLine(question.TypeName);
-
-                            var qText = new StringBuilder();
-                            var showmanComments = new StringBuilder();
-
-                            foreach (var item in question.GetContent())
-                            {
-                                switch (item.Type)
-                                {
-                                    case AtomTypes.Image:
-                                        if (showmanComments.Length > 0)
-                                        {
-                                            showmanComments.AppendLine();
-                                        }
-
-                                        showmanComments.Append($"* {Resources.MircImage}: ");
-                                        showmanComments.Append(item.Value);
-                                        break;
-
-                                    case AtomTypes.Audio:
-                                    case AtomTypes.AudioNew:
-                                        if (showmanComments.Length > 0)
-                                        {
-                                            showmanComments.AppendLine();
-                                        }
-
-                                        showmanComments.Append($"* {Resources.MircAudio}: ");
-                                        showmanComments.Append(item.Value);
-                                        break;
-
-                                    case AtomTypes.Video:
-                                        if (showmanComments.Length > 0)
-                                        {
-                                            showmanComments.AppendLine();
-                                        }
-
-                                        showmanComments.Append($"* {Resources.MircVideo}: ");
-                                        showmanComments.Append(item.Value);
-                                        break;
-
-                                    default:
-                                        if (qText.Length > 0)
-                                        {
-                                            qText.AppendLine();
-                                        }
-
-                                        qText.Append(item.Value);
-                                        break;
-                                }
-                            }
-
-                            var comments = question.Info.Comments.Text.GrowFirstLetter().EndWithPoint();
-
-                            if (showmanComments.Length == 0 || comments.Length > 0)
-                            {
-                                if (showmanComments.Length > 0)
-                                    showmanComments.AppendLine();
-
-                                showmanComments.Append(comments);
-                            }
-
-                            file.AppendLine(string.Format("[q{0}text]", qind));
-                            file.AppendLine(qText.ToString());
-                            file.AppendLine(string.Format("[q{0}right]", qind));
-                            file.AppendLine(string.Join(Environment.NewLine, question.Right.ToArray()));
-                            file.AppendLine(string.Format("[q{0}wrong]", qind));
-                            file.AppendLine(string.Join(Environment.NewLine, question.Wrong.ToArray()));
-                            file.AppendLine(string.Format("[q{0}auth]", qind));
-                            file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(question.Info.Authors)));
-                            file.AppendLine(string.Format("[q{0}sour]", qind));
-                            file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(question.Info.Sources)));
-                            file.AppendLine(string.Format("[q{0}comm]", qind));
-                            file.AppendLine(showmanComments.ToString());
-
-                            qind++;
-                        });
-
-                        tind++;
-                    });
-
-                    rind++;
-                });
-
-                using var writer = new StreamWriter(filename, false);
-                writer.Write(file);
-            }
-        }
-        catch (Exception exc)
-        {
-            OnError(exc);
-        }
-    }
-
-    private void ExportTvSI_Executed(object? arg) => Dialog = new ExportViewModel(this, ExportFormats.TvSI);
-
-    private void ExportSns_Executed(object? arg) => Dialog = new ExportViewModel(this, ExportFormats.Sns);
 
     private void ExportDinabank_Executed(object? arg) => Dialog = new ExportViewModel(this, ExportFormats.Dinabank);
 

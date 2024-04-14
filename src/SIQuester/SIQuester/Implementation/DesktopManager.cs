@@ -10,10 +10,13 @@ using SIQuester.ViewModel;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
@@ -48,6 +51,51 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
     public override Tuple<int, int, int>? GetCurrentItemSelectionArea() =>
         ActionMenuViewModel.Instance.PlacementTarget is TextList box ? box.GetSelectionInfo() : null;
+
+    public override void CreatePreview(SIDocument document)
+    {
+        string? fileName = null;
+
+        var filter = new Dictionary<string, string>
+        {
+            [Resources.Images] = "png"
+        };
+
+        if (ShowSaveUI(null, "png", filter, ref fileName))
+        {
+            var view = new PackagePreview { DataContext = new PreviewViewModel(document) };
+            using var source = new HwndSource(new HwndSourceParameters()) { RootVisual = view };
+            
+            SaveImage(view, fileName);
+        }
+    }
+
+    private static void SaveImage(Control control, string path)
+    {
+        using var stream = File.Create(path);
+        GenerateImage(control, stream);
+    }
+
+    private static void GenerateImage(Control control, Stream result)
+    {
+        var controlSize = RetrieveDesiredSize(control);
+        var rect = new Rect(0, 0, controlSize.Width, controlSize.Height);
+
+        var rtb = new RenderTargetBitmap((int)controlSize.Width, (int)controlSize.Height, 96, 96, PixelFormats.Pbgra32);
+
+        control.Arrange(rect);
+        rtb.Render(control);
+
+        var png = new PngBitmapEncoder();
+        png.Frames.Add(BitmapFrame.Create(rtb));
+        png.Save(result);
+    }
+
+    private static Size RetrieveDesiredSize(Control control)
+    {
+        control.Measure(new Size(1200.0, double.PositiveInfinity));
+        return control.DesiredSize;
+    }
 
     public override string[]? ShowOpenUI()
     {
@@ -90,7 +138,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
     /// <param name="filter">Фильтры расширений</param>
     /// <param name="filename">Выбранный файл пакета</param>
     /// <returns>Был ли сделан выбор</returns>
-    public override bool ShowSaveUI(string? title, string defaultExtension, Dictionary<string, string>? filter, ref string? filename)
+    public override bool ShowSaveUI(string? title, string defaultExtension, Dictionary<string, string>? filter, [NotNullWhen(true)] ref string? filename)
     {
         int filterIndex = 0;
         return ShowSaveUICore(title, defaultExtension, filter, ref filename, ref filterIndex, null);
@@ -99,7 +147,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
     public override bool ShowExportUI(
         string title,
         Dictionary<string, string> filter,
-        ref string filename,
+        [NotNullWhen(true)] ref string? filename,
         ref int filterIndex,
         out Encoding encoding,
         out bool start)
@@ -150,7 +198,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         string? title,
         string? defaultExtension,
         Dictionary<string, string>? filter,
-        ref string? filename,
+        [NotNullWhen(true)] ref string? filename,
         ref int filterIndex,
         Action<int>? fileTypeChanged,
         params Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogControl[] richUI)
@@ -189,10 +237,10 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                 dialog.Title = title;
             }
 
-            bool result = dialog.ShowDialog() == CommonFileDialogResult.Ok;
+            var dialogResult = dialog.ShowDialog();
             filterIndex = dialog.SelectedFileTypeIndex;
 
-            if (result)
+            if (dialogResult == CommonFileDialogResult.Ok && dialog.FileName != null)
             {
                 filename = dialog.FileName;
 
@@ -202,15 +250,21 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
                     if (File.Exists(filename))
                     {
-                        if (MessageBox.Show(string.Format(Resources.FileExistReplace, Path.GetFileName(filename)), AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                        if (MessageBox.Show(
+                            string.Format(Resources.FileExistReplace, Path.GetFileName(filename)),
+                            AppSettings.ProductName,
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question) == MessageBoxResult.No)
                         {
                             return false;
                         }
                     }
                 }
+
+                return true;
             }
 
-            return result;
+            return false;
         }
         else
         {
@@ -391,97 +445,6 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                                 paragraph.AppendLine();
                             });
                         }
-                    });
-
-                    document.Blocks.Add(paragraph);
-                }
-                break;
-
-            case ExportFormats.TvSI:
-                {
-                    var paragraph = new Paragraph();
-
-                    doc.Package.Rounds.ForEach(
-                        round => round.Themes.ForEach(
-                            theme => theme.Questions.ForEach(
-                                quest =>
-                                {
-                                    paragraph.AppendFormat("\\{0}\\", theme.Name).AppendLine();
-                                    paragraph.AppendFormat("\\{0}", quest.GetText());
-
-                                    if (quest.Info.Comments.Text.Length > 0)
-                                    {
-                                        paragraph.AppendFormat(". {0}: {1}", Resources.Comments, quest.Info.Comments.Text);
-                                    }
-
-                                    paragraph.Append('\\').AppendLine().Append('\\');
-                                    paragraph.Append(string.Join(", ", quest.Right.ToArray()));
-
-                                    if (quest.Info.Sources.Count > 0)
-                                    {
-                                        paragraph.Append('\\').AppendLine().Append('\\');
-                                        paragraph.Append(string.Join(", ", doc.GetRealSources(quest.Info.Sources)));
-                                    }
-
-                                    paragraph.Append('\\').AppendLine().AppendLine();
-                                })));
-
-                    document.Blocks.Add(paragraph);
-                }
-                break;
-
-            case ExportFormats.Sns:
-                {
-                    var paragraph = new Paragraph();
-
-                    paragraph.AppendLine(doc.Package.Name);
-                    int i = 0;
-
-                    doc.Package.Rounds.ForEach(round =>
-                    {
-                        paragraph.AppendLine();
-                        paragraph.AppendLine(round.Name);
-                        paragraph.AppendLine();
-                        paragraph.AppendLine(Resources.YourThemes);
-
-                        round.Themes.ForEach(theme =>
-                        {
-                            paragraph.AppendFormat(STR_ExtendedDefinition, Resources.Theme, theme.Name.ToUpper(), ++i);
-                            paragraph.AppendLine();
-                        });
-
-                        round.Themes.ForEach(theme =>
-                        {
-                            paragraph.AppendLine();
-                            paragraph.AppendFormat(STR_Definition, Resources.Theme, theme.Name.ToUpper());
-                            paragraph.AppendLine();
-
-                            if (theme.Info.Comments.Text.Length > 0)
-                            {
-                                paragraph.AppendFormat(STR_ExtendedDefinition, Resources.Author, string.Join(", ", doc.GetRealAuthors(theme.Info.Authors)), theme.Info.Comments.Text);
-                            }
-                            else
-                            {
-                                paragraph.AppendFormat(STR_Definition, Resources.Author, string.Join(", ", doc.GetRealAuthors(theme.Info.Authors)));
-                            }
-
-                            paragraph.AppendLine();
-                            
-                            theme.Questions.ForEach(quest =>
-                            {
-                                paragraph.AppendLine();
-                                paragraph.Append(quest.Price.ToString());
-                                paragraph.AppendLine(".");
-                                paragraph.AppendLine(quest.GetText().Replace(Environment.NewLine, "//").EndWithPoint());
-                                paragraph.AppendLine();
-                                paragraph.AppendFormat(STR_Definition, Resources.Answer, string.Join(", ", quest.Right.ToArray()).GrowFirstLetter().EndWithPoint());
-                                paragraph.AppendLine();
-                                paragraph.AppendFormat(STR_Definition, Resources.Comment, (quest.Info.Comments.Text.Length > 0 ? quest.Info.Comments.Text.GrowFirstLetter() : Resources.No.ToLower()).EndWithPoint());
-                                paragraph.AppendLine();
-                                paragraph.AppendFormat(STR_Definition, Resources.Source, (quest.Info.Sources.Count > 0 ? string.Join(", ", quest.Info.Sources.ToArray()).GrowFirstLetter() : Resources.No.ToLower()).EndWithPoint());
-                                paragraph.AppendLine();
-                            });
-                        });
                     });
 
                     document.Blocks.Add(paragraph);

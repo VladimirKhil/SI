@@ -186,12 +186,6 @@
     <None Include="Resources\cancel.png" />
     <None Include="Resources\color_wheel.png" />
     <None Include="Resources\arrow_down.png" />
-    <Content Include="ygpackagekey3.0.xslt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="ygpackagesimple3.0.xslt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
@@ -230,9 +224,6 @@
     </None>
     <None Update="wwwroot\vendor.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="ygpackage3.1.xsd">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

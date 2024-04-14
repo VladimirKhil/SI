@@ -100,6 +100,7 @@ public sealed class ExportViewModel : WorkspaceViewModel
             {
                 OnClosed();
                 await ExportAsync(filename, index, encoding);
+                
                 if (start)
                 {
                     try

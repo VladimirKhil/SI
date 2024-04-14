@@ -28,6 +28,12 @@ public abstract class PlatformManager
 
     public abstract Tuple<int, int, int>? GetCurrentItemSelectionArea();
 
+    /// <summary>
+    /// Creates document preview image and saves it to file.
+    /// </summary>
+    /// <param name="document">Document to process.</param>
+    public abstract void CreatePreview(SIDocument document);
+
     public abstract string[]? ShowOpenUI();
 
     public abstract string[]? ShowMediaOpenUI(string mediaCategory);
@@ -38,7 +44,13 @@ public abstract class PlatformManager
         Dictionary<string, string>? filter,
         [NotNullWhen(true)] ref string? filename);
 
-    public abstract bool ShowExportUI(string title, Dictionary<string, string> filter, ref string filename, ref int filterIndex, out Encoding encoding, out bool start);
+    public abstract bool ShowExportUI(
+        string title,
+        Dictionary<string, string> filter,
+        [NotNullWhen(true)] ref string? filename,
+        ref int filterIndex,
+        out Encoding encoding,
+        out bool start);
 
     public abstract string? ShowImportUI(string fileExtension, string fileFilter);
 
