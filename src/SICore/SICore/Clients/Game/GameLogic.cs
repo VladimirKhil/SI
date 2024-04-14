@@ -750,10 +750,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Decision = DecisionType.None;
 
         _data.IsRoundEnding = true;
+        ClearContinuation();
 
         if (move)
         {
-            ClearContinuation();
             ScheduleExecution(Tasks.MoveNext, 40);
         }
         else
