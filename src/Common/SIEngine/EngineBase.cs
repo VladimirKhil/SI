@@ -171,11 +171,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action? NextQuestion;
     public event Action? RoundTimeout;
 
-    public event Action<Theme[], bool, bool>? FinalThemes;
-    public event Action? WaitDelete;
-    public event Action<int>? ThemeSelected;
-    public event Action<Theme, Question>? PrepareFinalQuestion;
-
     public event Action<string>? Error;
 
     public event Action? EndGame;
@@ -232,15 +227,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnNextQuestion() => NextQuestion?.Invoke();
 
     protected void OnRoundTimeout() => RoundTimeout?.Invoke();
-
-    protected void OnFinalThemes(Theme[] finalThemes, bool willPlayAllThemes, bool isFirstPlay) =>
-        FinalThemes?.Invoke(finalThemes, willPlayAllThemes, isFirstPlay);
-
-    protected void OnWaitDelete() => WaitDelete?.Invoke();
-
-    protected void OnThemeSelected(int themeIndex) => ThemeSelected?.Invoke(themeIndex);
-
-    protected void OnPrepareFinalQuestion(Theme theme, Question question) => PrepareFinalQuestion?.Invoke(theme, question);
 
     protected void OnError(string error) => Error?.Invoke(error);
 
@@ -361,15 +347,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     public void SetTimeout() => _timeout = true;
 
-    public void SkipQuestion()
-    {
-        if (_activeRound == null)
-        {
-            throw new InvalidOperationException("_activeRound is null");
-        }
-
-        Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
-    }
+    public void SkipQuestion() => Stage = GameStage.EndQuestion;
 
     /// <summary>
     /// Skips rest of the question and goes directly to answer.
@@ -394,21 +372,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         if (!QuestionEngine.PlayNext())
         {
             OnQuestionPostInfo();
-            Stage = ActiveRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
-        }
-    }
-
-    protected void OnFinalQuestion()
-    {
-        if (QuestionEngine == null)
-        {
-            throw new InvalidOperationException("QuestionEngine == null");
-        }
-
-        if (!QuestionEngine.PlayNext())
-        {
-            OnQuestionPostInfo();
-            Stage = ActiveRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
+            Stage = GameStage.EndQuestion;
         }
     }
 
@@ -440,7 +404,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnMoveToQuestion()
     {
         var isFinal = ActiveRound.Type == RoundTypes.Final;
-        Stage = isFinal ? GameStage.FinalQuestion : GameStage.Question;
+        Stage = GameStage.Question;
 
         var options = OptionsProvider();
 
@@ -481,8 +445,4 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
         _isDisposed = true;
     }
-
-    public abstract int OnReady(out bool more);
-
-    public abstract void SelectTheme(int publicThemeIndex);
 }

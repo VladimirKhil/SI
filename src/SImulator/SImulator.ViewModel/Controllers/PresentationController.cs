@@ -72,6 +72,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public Action<int, int>? SelectionCallback { get; set; }
 
+    public Action<int>? DeletionCallback { get; set; }
+
     public PresentationController(IDisplayDescriptor screen)
     {
         Screen = screen;
@@ -317,7 +319,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
             }
         }
 
-        Listener?.OnThemeSelected(themeIndex);
+        DeletionCallback?.Invoke(themeIndex);
     }
 
     private void QuestionInfo_Selected(QuestionInfoViewModel question)
@@ -423,7 +425,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
                         if (code < TInfo.RoundInfo.Count && TInfo.RoundInfo[code].Name != null)
                         {
-                            Listener?.OnThemeSelected(code);
+                            DeletionCallback?.Invoke(code);
                             return true;
                         }
                     }

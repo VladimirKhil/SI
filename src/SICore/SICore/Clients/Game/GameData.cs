@@ -38,6 +38,7 @@ public sealed class GameData : Data
     /// </summary>
     public Round? Round { get; set; }
 
+    // TODO: try to remove this property
     /// <summary>
     /// Currently playing theme.
     /// </summary>

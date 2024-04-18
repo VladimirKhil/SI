@@ -20,6 +20,15 @@ public interface ISIEnginePlayHandler
     void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController);
 
     /// <summary>
+    /// Handles final round themes list. 
+    /// </summary>
+    /// <param name="themes">Round themes.</param>
+    /// <param name="willPlayAllThemes">Will all the themes be played.</param>
+    /// <param name="isFirstPlay">Is this the first theme in this round.</param>
+    /// <remarks>Could be called multiple times per round.</remarks>
+    void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay);
+
+    /// <summary>
     /// Handles question selection request.
     /// </summary>
     /// <param name="options">Possible selection options.</param>
@@ -40,4 +49,22 @@ public interface ISIEnginePlayHandler
     /// <param name="themeIndex">Question theme index.</param>
     /// <param name="questionIndex">Question index.</param>
     void OnQuestionSelected(int themeIndex, int questionIndex);
+
+    /// <summary>
+    /// Handles theme deletion request.
+    /// </summary>
+    /// <param name="deleteCallback">Deletion callback.</param>
+    void AskForThemeDelete(Action<int> deleteCallback);
+
+    /// <summary>
+    /// Handles theme deletion.
+    /// </summary>
+    /// <param name="themeIndex">Index of theme being deleted.</param>
+    void OnThemeDeleted(int themeIndex);
+
+    /// <summary>
+    /// Handles final theme selection (the theme that is left).
+    /// </summary>
+    /// <param name="themeIndex">Selected theme index.</param>
+    void OnThemeSelected(int themeIndex);
 }

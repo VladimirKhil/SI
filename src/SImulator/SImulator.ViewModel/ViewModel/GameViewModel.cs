@@ -295,7 +295,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private Round? _activeRound;
 
-    public Round? ActiveRound => _activeRound;
+    public Round ActiveRound => _activeRound ?? throw new InvalidOperationException("Active round is undefined");
 
     private Question? _activeQuestion;
 
@@ -556,9 +556,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _engine.RoundTimeout += Engine_RoundTimeout;
         _engine.NextQuestion += Engine_NextQuestion;
         _engine.RoundEmpty += Engine_RoundEmpty;
-        _engine.FinalThemes += Engine_FinalThemes;
-        _engine.ThemeSelected += Engine_ThemeSelected;
-        _engine.PrepareFinalQuestion += Engine_PrepareFinalQuestion;
         _engine.Error += OnError;
         _engine.EndGame += Engine_EndGame;
 
@@ -823,7 +820,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             }
         }
 
-        _presentationListener.OnThemeSelected(themeIndex);
+        PresentationController.DeletionCallback?.Invoke(themeIndex);
     }
 
     private void QuestionInfo_Selected(QuestionInfoViewModel question)
@@ -1532,7 +1529,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         NegativePrice = null;
     }
 
-    private void Engine_FinalThemes(Theme[] finalThemes, bool willPlayAllThemes, bool isFirstPlay)
+    internal void OnFinalThemes(IReadOnlyList<Theme> finalThemes)
     {
         LocalInfo.RoundInfo.Clear();
 
@@ -1550,6 +1547,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), true);
         PresentationController.SetSound();
         LocalInfo.TStage = TableStage.Final;
+        _taskRunner.ScheduleExecution(Tasks.MoveNext, 1);
     }
 
     /// <summary>
@@ -1622,10 +1620,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     #endregion
 
-    private void Engine_ThemeSelected(int themeIndex)
+    internal void OnThemeDeleted(int themeIndex)
     {
         PresentationController.PlaySelection(themeIndex);
         SetSound(Settings.Model.Sounds.FinalDelete);
+        _taskRunner.ScheduleExecution(Tasks.MoveNext, 1);
     }
 
     private void UpdateNextCommand() => _next.CanBeExecuted = _continuation != null || _engine != null && _engine.CanMoveNext;
@@ -1717,10 +1716,12 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _isDisposed = true;
     }
 
-    private void Engine_PrepareFinalQuestion(Theme theme, Question question)
+    internal void OnThemeSelected(int themeIndex)
     {
+        var theme = ActiveRound.Themes[themeIndex];
+
         ActiveTheme = theme;
-        ActiveQuestion = question;
+        ActiveQuestion = theme.Questions[0];
 
         PresentationController.SetSound();
         SetCaption(theme.Name);
@@ -1831,15 +1832,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             {
                 SetSound(Settings.Model.Sounds.QuestionSelected);
                 PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
-
-                try
-                {
-                    _taskRunner.ScheduleExecution(Tasks.MoveNext, 7);
-                }
-                catch (Exception exc)
-                {
-                    Trace.TraceError("QuestionSelected error: " + exc.Message);
-                }
+                _taskRunner.ScheduleExecution(Tasks.MoveNext, 7);
             }
             else
             {

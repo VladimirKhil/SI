@@ -458,4 +458,13 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     public void CancelQuestionSelection() => PresentationController.SelectionCallback = null;
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel?.OnQuestionSelected(themeIndex, questionIndex);
+
+    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay) => GameViewModel?.OnFinalThemes(themes);
+
+    public void AskForThemeDelete(Action<int> deleteCallback) =>
+        PresentationController.DeletionCallback = deleteCallback;
+
+    public void OnThemeDeleted(int themeIndex) => GameViewModel?.OnThemeDeleted(themeIndex);
+
+    public void OnThemeSelected(int themeIndex) => GameViewModel?.OnThemeSelected(themeIndex);
 }

@@ -5,8 +5,19 @@
 /// </summary>
 public enum GameStage
 {
+    /// <summary>
+    /// Initial stage.
+    /// </summary>
     Begin,
+
+    /// <summary>
+    /// Showing all game themes.
+    /// </summary>
     GameThemes,
+
+    /// <summary>
+    /// Starting round.
+    /// </summary>
     Round,
 
     /// <summary>
@@ -16,14 +27,21 @@ public enum GameStage
 
     Theme,
     NextQuestion,
-    Score, // ?
-    Special,
+    [Obsolete]
+    Score,
+    
+    /// <summary>
+    /// Question is played.
+    /// </summary>
     Question,
+
+    /// <summary>
+    /// Question play finished.
+    /// </summary>
     EndQuestion,
-    FinalThemes,
-    WaitDelete,
-    AfterDelete,
-    FinalQuestion,
-    AfterFinalThink,
+
+    /// <summary>
+    /// Final stage.
+    /// </summary>
     End
 }

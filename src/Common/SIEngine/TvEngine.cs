@@ -18,33 +18,17 @@ namespace SIEngine;
 /// </remarks>
 public sealed class TvEngine : EngineBase
 {
-    private readonly HashSet<int> _leftFinalThemesIndicies = new();
-    private readonly List<Theme> _finalThemes = new();
-
     protected override GameRules GameRules => WellKnownGameRules.Classic;
 
     private ISelectionStrategy? _selectionStrategy;
 
-    private ISelectionStrategy SelectionStrategy
-    {
-        get
-        {
-            if (_selectionStrategy == null)
-            {
-                throw new InvalidOperationException("_selectionStrategy == null");
-            }
-
-            return _selectionStrategy;
-        }
-    }
+    private ISelectionStrategy SelectionStrategy => _selectionStrategy ?? throw new InvalidOperationException("_selectionStrategy == null");
 
     private void SetActiveThemeQuestion()
     {
         _activeTheme = ActiveRound.Themes[_themeIndex];
         _activeQuestion = _activeTheme.Questions[_questionIndex];
     }
-
-    public bool CanSelectTheme => _stage == GameStage.WaitDelete;
 
     public TvEngine(
         SIDocument document,
@@ -99,6 +83,7 @@ public sealed class TvEngine : EngineBase
 
                 _selectionStrategy = QuestionSelectionStrategyFactory.GetStrategy(
                     ActiveRound,
+                    OptionsProvider(),
                     GameRules.GetRulesForRoundType(ActiveRound.Type).QuestionSelectionStrategyType,
                     PlayHandler,
                     SelectQuestion,
@@ -107,7 +92,7 @@ public sealed class TvEngine : EngineBase
                 if (_selectionStrategy.ShouldPlayRound())
                 {
                     OnRound(ActiveRound);
-                    Stage = ActiveRound.Type != RoundTypes.Final ? GameStage.SelectingQuestion : GameStage.FinalThemes;
+                    Stage = GameStage.SelectingQuestion;
                 }
                 else
                 {
@@ -116,7 +101,7 @@ public sealed class TvEngine : EngineBase
                 }
 
                 break;
-            #endregion
+                #endregion
 
             case GameStage.SelectingQuestion:
                 OnSelectingQuestion();
@@ -152,65 +137,7 @@ public sealed class TvEngine : EngineBase
                 }
 
                 break;
-            #endregion
-
-            case GameStage.FinalThemes:
-                #region FinalThemes
-                var finalThemes = ActiveRound.Themes;
-                _finalThemes.Clear();
-
-                for (var i = 0; i < finalThemes.Count; i++)
-                {
-                    if (!string.IsNullOrEmpty(finalThemes[i].Name) && finalThemes[i].Questions.Any())
-                    {
-                        _finalThemes.Add(finalThemes[i]);
-                    }
-                }
-
-                if (_finalThemes.Count > 0)
-                {
-                    PlayNextFinalTheme(true);
-                }
-                else
-                {
-                    DoFinishRound();
-                }
-
-                break;
                 #endregion
-
-            case GameStage.WaitDelete:
-                OnWaitDelete();
-                break;
-
-            case GameStage.FinalQuestion:
-                OnFinalQuestion();
-                break;
-
-            case GameStage.AfterFinalThink:
-                if (OptionsProvider().PlayAllQuestionsInFinalRound)
-                {
-                    _finalThemes.RemoveAt(_themeIndex);
-
-                    if (_finalThemes.Count > 0)
-                    {
-                        if (SelectionStrategy.ShouldPlayRound())
-                        {
-                            PlayNextFinalTheme(false);
-                            break;
-                        }
-                        else
-                        {
-                            OnRoundSkip();
-                        }
-                    }
-                }
-                
-                DoFinishRound();
-                break;
-
-            case GameStage.End:
-                break;
         }
     }
 
@@ -220,35 +147,7 @@ public sealed class TvEngine : EngineBase
         UpdateCanNext();
     }
 
-    private void PlayNextFinalTheme(bool isFirstPlay)
-    {
-        _leftFinalThemesIndicies.Clear();
-
-        for (var i = 0; i < _finalThemes.Count; i++)
-        {
-            _leftFinalThemesIndicies.Add(i);
-        }
-
-        OnFinalThemes(_finalThemes.ToArray(), OptionsProvider().PlayAllQuestionsInFinalRound, isFirstPlay);
-
-        var count = _finalThemes.Count;
-
-        if (count > 1)
-        {
-            Stage = GameStage.WaitDelete;
-            UpdateCanNext();
-        }
-        else if (count == 1)
-        {
-            DoPrepareFinalQuestion();
-        }
-        else
-        {
-            Stage = GameStage.AfterFinalThink;
-            MoveNext();
-        }
-    }
-
+    // TODO: restore price by callback; return nothing here
     public override Tuple<int, int, int> MoveBack()
     {
         var (themeIndex, questionIndex) = SelectionStrategy.MoveBack();
@@ -274,70 +173,8 @@ public sealed class TvEngine : EngineBase
 
         OnMoveToQuestion();
         UpdateCanNext();
-        CanMoveBack = true;
+        CanMoveBack = SelectionStrategy.CanMoveBack();
     }
 
-    public override void SelectTheme(int themeIndex)
-    {
-        if (_stage == GameStage.FinalQuestion)
-        {
-            MoveNext();
-            return;
-        }
-
-        if (_stage != GameStage.WaitDelete)
-        {
-            return;
-        }
-
-        Stage = GameStage.AfterDelete;
-        _themeIndex = themeIndex;
-        _questionIndex = 0;
-
-        OnThemeSelected(themeIndex);
-        UpdateCanNext();
-    }
-
-    private void DoPrepareFinalQuestion()
-    {
-        _themeIndex = _leftFinalThemesIndicies.First();
-        _questionIndex = 0;
-
-        _activeTheme = _finalThemes[_themeIndex];
-        _activeQuestion = _activeTheme.Questions[_questionIndex];
-
-        OnPrepareFinalQuestion(_activeTheme, _activeQuestion);
-        UpdateCanNext();
-
-        OnMoveToQuestion();
-    }
-
-    public override int OnReady(out bool more)
-    {
-        var result = -1;
-        more = false;
-
-        if (_stage == GameStage.AfterDelete)
-        {
-            result = _themeIndex;
-            _leftFinalThemesIndicies.Remove(_themeIndex);
-
-            if (_leftFinalThemesIndicies.Count == 1)
-            {
-                DoPrepareFinalQuestion();
-            }
-            else
-            {
-                Stage = GameStage.WaitDelete;
-                more = true;
-            }
-        }
-
-        UpdateCanNext();
-        return result;
-    }
-
-    public override bool CanNext() => _stage != GameStage.End
-        && _stage != GameStage.WaitDelete
-        && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
+    public override bool CanNext() => _stage != GameStage.End && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
 }

@@ -7,8 +7,6 @@ public interface IPresentationListener
 {
     void OnAnswerSelected(int answerIndex);
 
-    void OnThemeSelected(int themeIndex);
-
     void AskNext();
 
     void AskBack();

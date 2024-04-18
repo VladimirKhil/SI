@@ -144,11 +144,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         Engine.RoundEmpty += Engine_RoundEmpty;
         Engine.RoundTimeout += Engine_RoundTimeout;
 
-        Engine.FinalThemes += Engine_FinalThemes;
-        Engine.WaitDelete += Engine_WaitDelete;
-        Engine.ThemeSelected += Engine_ThemeDeleted;
-        Engine.PrepareFinalQuestion += Engine_PrepareFinalQuestion;
-
         Engine.EndGame += Engine_EndGame;
 
         _data.PackageDoc = Engine.Document;
@@ -291,8 +286,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _minRoundPrice = Math.Max(1, _minRoundPrice);
-        // Uncomment after client update
-        // ClientData.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
+        ClientData.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
     }
 
     internal void InitThemes(IEnumerable<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
@@ -750,6 +744,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Decision = DecisionType.None;
 
         _data.IsRoundEnding = true;
+        
+        // This is quite ugly bit here but as we interrupt normal flow we need to cut continuation
+        // (or we could replace it with a normal move)
         ClearContinuation();
 
         if (move)
@@ -773,34 +770,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         _gameActions.SendMessage(Messages.Timeout);
         _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllTime)]));
-
         FinishRound();
     }
 
-    private void Engine_FinalThemes(Theme[] themes, bool willPlayAllThemes, bool isFirstPlay)
-    {
-        var s = new MessageBuilder(Messages.FinalRound);
-
-        for (var i = 0; i < _data.Players.Count; i++)
-        {
-            s.Add(_data.Players[i].InGame ? '+' : '-');
-        }
-
-        _gameActions.SendMessage(s.ToString());
-
-        _data.AnnounceAnswer = true; // initialization
-
-        InitThemes(themes, willPlayAllThemes, isFirstPlay);
-
-        _data.ThemeDeleters = new ThemeDeletersEnumerator(_data.Players, _data.TInfo.RoundInfo.Count(t => t.Name != null));
-        _data.ThemeDeleters.Reset(true);
-
-        ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));
-    }
-
-    private void Engine_WaitDelete() => ScheduleExecution(Tasks.AskToDelete, 1);
-
-    private void Engine_ThemeDeleted(int themeIndex)
+    internal void OnThemeDeleted(int themeIndex)
     {
         if (themeIndex < 0 || themeIndex >= _data.TInfo.RoundInfo.Count)
         {
@@ -813,10 +786,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
         }
 
-        if (_data.ThemeDeleters.IsEmpty())
+        if (_data.ThemeDeleters == null || _data.ThemeDeleters.IsEmpty())
         {
-            throw new InvalidOperationException("_data.ThemeDeleters.IsEmpty()");
+            throw new InvalidOperationException("_data.ThemeDeleters are undefined");
         }
+
+        _data.TInfo.RoundInfo[themeIndex].Name = QuestionHelper.InvalidThemeName;
 
         _gameActions.SendMessageWithArgs(Messages.Out, themeIndex);
 
@@ -824,19 +799,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var themeName = _data.TInfo.RoundInfo[themeIndex].Name;
 
         _gameActions.PlayerReplic(playerIndex, themeName);
+        ScheduleExecution(Tasks.MoveNext, 10);
     }
 
-    private void Engine_PrepareFinalQuestion(Theme theme, Question question)
-    {
-        AddHistory("::Engine_PrepareFinalQuestion");
-
-        _data.ThemeIndex = _data.Round.Themes.IndexOf(theme);
-        _data.Theme = theme;
-
-        ScheduleExecution(Tasks.AnnounceFinalTheme, 15);
-    }
-
-    private void AnnounceFinalTheme()
+    internal void AnnounceFinalTheme()
     {
         _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_data.Theme.Name}");
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _data.Theme.Name);
@@ -1029,11 +995,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private void ProceedToFinalQuestion()
     {
         _gameActions.ShowmanReplic(LO[nameof(R.ThankYou)]);
-
-        var questionsCount = _data.Theme.Questions.Count;
-        _data.QuestionIndex = Random.Shared.Next(questionsCount);
-        _data.Question = _data.Theme.Questions[_data.QuestionIndex];
-
         ScheduleExecution(Tasks.QuestionType, 10, 1);
     }
 
@@ -1066,27 +1027,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         StopWaiting();
-
-        Engine.SelectTheme(_data.ThemeIndexToDelete);
-
-        var innerThemeIndex = Engine.OnReady(out var more);
-
-        if (innerThemeIndex > -1)
-        {
-            // innerThemeIndex может не совпадать с _data.ThemeIndex. См. TvEngine.SelectTheme()
-            if (_data.ThemeIndexToDelete < 0 || _data.ThemeIndexToDelete >= _data.TInfo.RoundInfo.Count)
-            {
-                throw new Exception($"OnDecisionFinalThemeDeleting: _data.ThemeIndexToDelete: {_data.ThemeIndexToDelete}, " +
-                    $"_data.TInfo.RoundInfo.Count: {_data.TInfo.RoundInfo.Count}");
-            }
-
-            _data.TInfo.RoundInfo[_data.ThemeIndexToDelete].Name = QuestionHelper.InvalidThemeName;
-            if (more)
-            {
-                ScheduleExecution(Tasks.MoveNext, 10);
-            }
-        }
-
+        ScheduleExecution(Tasks.MoveNext, 1);
         return true;
     }
 
@@ -1772,10 +1713,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                     case Tasks.WaitDelete:
                         WaitDelete();
-                        break;
-
-                    case Tasks.AnnounceFinalTheme:
-                        AnnounceFinalTheme();
                         break;
 
                     case Tasks.WaitFinalStake:
@@ -3377,7 +3314,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.ActivePlayer = _data.Players[playerIndex];
 
             RequestForThemeDelete();
-
         }
         catch (Exception exc)
         {
@@ -4628,7 +4564,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         var answerers = new List<int>();
 
-        for (int i = 0; i < ClientData.Players.Count; i++)
+        for (var i = 0; i < ClientData.Players.Count; i++)
         {
             if (ClientData.Players[i].Sum > 0 || ClientData.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes)
             {
@@ -4637,7 +4573,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         ClientData.QuestionPlayState.SetMultipleAnswerers(answerers);
-
         AskFinalStake();
     }
 

@@ -11,7 +11,17 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         SelectQuestion = selectCallback;
     }
 
+    public void AskForThemeDelete(Action<int> deleteCallback)
+    {
+        
+    }
+
     public void CancelQuestionSelection()
+    {
+        
+    }
+
+    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
         
     }
@@ -22,6 +32,16 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
     }
 
     public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController)
+    {
+        
+    }
+
+    public void OnThemeDeleted(int themeIndex)
+    {
+        
+    }
+
+    public void OnThemeSelected(int themeIndex)
     {
         
     }

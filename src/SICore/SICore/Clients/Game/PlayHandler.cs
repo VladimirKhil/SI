@@ -1,4 +1,5 @@
-﻿using SIEngine;
+﻿using SICore.Utils;
+using SIEngine;
 using SIPackages;
 using SIUI.Model;
 
@@ -44,12 +45,13 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
             }
         }
 
-        _gameData.TableInformStageLock.WithLock(() =>
-        {
-            GameActions?.InformTable();
-            _gameData.TableInformStage = 2;
-        },
-        5000);
+        _gameData.TableInformStageLock.WithLock(
+            () =>
+            {
+                GameActions?.InformTable();
+                _gameData.TableInformStage = 2;
+            },
+            5000);
 
         _gameData.TableController = tableController;
         _gameData.IsQuestionPlaying = false;
@@ -100,4 +102,49 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     }
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameLogic?.OnQuestionSelected(themeIndex, questionIndex);
+
+    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
+    {
+        var s = new MessageBuilder(Messages.FinalRound);
+
+        for (var i = 0; i < _gameData.Players.Count; i++)
+        {
+            s.Add(_gameData.Players[i].InGame ? '+' : '-');
+        }
+
+        GameActions?.SendMessage(s.ToString());
+
+        _gameData.AnnounceAnswer = true; // initialization
+
+        GameLogic?.InitThemes(themes, willPlayAllThemes, isFirstPlay);
+        _gameData.ThemeDeleters = new ThemeDeletersEnumerator(_gameData.Players, _gameData.TInfo.RoundInfo.Count(t => t.Name != null));
+        _gameData.ThemeDeleters.Reset(true);
+        GameLogic?.ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));
+    }
+
+    public void AskForThemeDelete(Action<int> deleteCallback)
+    {
+        GameLogic?.SetContinuation(() => deleteCallback(_gameData.ThemeIndexToDelete));
+        GameLogic?.ScheduleExecution(Tasks.AskToDelete, 1);
+    }
+
+    public void OnThemeDeleted(int themeIndex) => GameLogic?.OnThemeDeleted(themeIndex);
+
+    public void OnThemeSelected(int themeIndex)
+    {
+        if (_gameData.Round == null)
+        {
+            throw new InvalidOperationException("_gameData.Round == null");
+        }
+
+        GameLogic?.AddHistory("::OnThemeSelected");
+        _gameData.ThemeIndex = themeIndex;
+        _gameData.Theme = _gameData.Round.Themes[themeIndex];
+
+        var questionsCount = _gameData.Theme.Questions.Count;
+        _gameData.QuestionIndex = Random.Shared.Next(questionsCount);
+        _gameData.Question = _gameData.Theme.Questions[_gameData.QuestionIndex];
+
+        GameLogic?.AnnounceFinalTheme();
+    }
 }

@@ -33,12 +33,6 @@ public sealed class PresentationListener : IExtendedListener
 
     public PresentationListener(ISIEngine engine) => _engine = engine;
 
-    public void OnThemeSelected(int themeIndex)
-    {
-        _engine.SelectTheme(themeIndex);
-        _engine.OnReady(out _);
-    }
-
     public void OnAnswerSelected(int answerIndex) => AnswerSelected?.Invoke(answerIndex);
 
     private readonly object _moveLock = new();

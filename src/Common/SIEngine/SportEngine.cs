@@ -86,10 +86,6 @@ public sealed class SportEngine : EngineBase
                 OnQuestion();
                 break;
 
-            case GameStage.FinalQuestion:
-                OnFinalQuestion();
-                break;
-
             case GameStage.EndQuestion:
                 #region EndQuestion
                 OnQuestionFinish();
@@ -108,12 +104,6 @@ public sealed class SportEngine : EngineBase
 
                 break;
             #endregion
-
-            case GameStage.AfterFinalThink:
-                Stage = GameStage.NextQuestion;
-                UpdateCanNext();
-                OnNextQuestion();
-                break;
             
             case GameStage.End:
                 break;
@@ -186,8 +176,4 @@ public sealed class SportEngine : EngineBase
     }
 
     public override bool CanNext() => _stage != GameStage.End;
-
-    public override int OnReady(out bool more) => throw new NotImplementedException();
-
-    public override void SelectTheme(int publicThemeIndex) => throw new NotImplementedException();
 }

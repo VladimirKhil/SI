@@ -142,10 +142,6 @@ public enum Tasks
     /// </summary>
     WaitDelete,
     /// <summary>
-    /// Объявление темы финального раунда
-    /// </summary>
-    AnnounceFinalTheme,
-    /// <summary>
     /// Ожидание ставки игроков в финале
     /// </summary>
     WaitFinalStake,

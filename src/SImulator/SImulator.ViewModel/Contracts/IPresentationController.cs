@@ -10,6 +10,7 @@ namespace SImulator.ViewModel.Contracts;
 public interface IPresentationController : IDisposable
 {
     Action<int, int>? SelectionCallback { get; set; }
+    Action<int>? DeletionCallback { get; set; }
 
     /// <summary>
     /// Starts new game.
