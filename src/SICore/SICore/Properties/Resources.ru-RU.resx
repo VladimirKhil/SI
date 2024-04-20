@@ -866,4 +866,7 @@
   <data name="ScoreLost" xml:space="preserve">
     <value>Очков потеряно</value>
   </data>
+  <data name="Tables" xml:space="preserve">
+    <value>Столы</value>
+  </data>
 </root>

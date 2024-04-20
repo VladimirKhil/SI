@@ -1152,4 +1152,7 @@
   <data name="BindNextButton" xml:space="preserve">
     <value>Активировать кнопку "Далее" по стрелке вправо</value>
   </data>
+  <data name="Tables" xml:space="preserve">
+    <value>Столы</value>
+  </data>
 </root>

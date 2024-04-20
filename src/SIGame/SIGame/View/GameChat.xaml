@@ -171,6 +171,76 @@
             </DockPanel>
         </TabItem>
 
+        <TabItem Header="🎓" ToolTip="{x:Static lp:Resources.Tables}" Style="{StaticResource StudiaTab}">
+            <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
+                <DockPanel
+                    DockPanel.Dock="Bottom"
+                    Visibility="{Binding Data.IsNetworkGame, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                    <UniformGrid
+                        DockPanel.Dock="Bottom"
+                        Columns="2"
+                        Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                        <!--<Button
+                            Style="{StaticResource SIButtonSimple}"
+                            Background="{StaticResource WindowBackground}"
+                            Margin="-1,-1,0,-1"
+                            Padding="20,4"
+                            Command="{Binding Data.Kick}"
+                            CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
+                            FontSize="14"
+                            TextBlock.LineHeight="18"
+                            Content="{x:Static lp:Resources.Free}" />-->
+
+                        <Button
+                            Style="{StaticResource SIButtonSimple}"
+                            Background="{StaticResource WindowBackground}"
+                            Margin="-1,-1,-1,-1"
+                            Padding="20,4"
+                            Command="{Binding DeleteTable}"
+                            CommandParameter="{Binding Data.CurrentPlayer}"
+                            FontSize="14"
+                            TextBlock.LineHeight="18"
+                            Content="{x:Static lp:Resources.DeleteTable}" />
+                    </UniformGrid>
+                </DockPanel>
+
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="{StaticResource WindowBackground}">
+                    <TextBlock Text="{x:Static lp:Resources.Players}" Margin="10,4,0,4" />
+                    
+                    <Button
+                        Command="{Binding Data.AddTable}"
+                        ToolTip="{x:Static lp:Resources.AddTable}"
+                        Style="{StaticResource SIButtonSimple}"
+                        BorderThickness="0"
+                        Margin="2,0,0,0"
+                        Padding="2"
+                        Width="30"
+                        FontWeight="Bold">+</Button>
+                </StackPanel>
+                
+                <ListBox
+                    IsSynchronizedWithCurrentItem="True"
+                    ItemsSource="{Binding Data.PlayersObservable}"
+                    SelectedItem="{Binding Data.CurrentPlayer}"
+                    Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}"
+                    FontSize="16">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Margin="0,5">
+                                <Run Text="{Binding Name, Mode=OneWay}" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Background" Value="#22000000" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </DockPanel>
+        </TabItem>
+
         <TabItem Header="🚫" ToolTip="{x:Static lp:Resources.BannedList}" Style="{StaticResource StudiaTab}">
             <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
                 <Button

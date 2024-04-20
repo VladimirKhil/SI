@@ -3,10 +3,10 @@ using Utils;
 
 namespace SICore;
 
-// TODO: в перспективе перенести в SIGame
 /// <summary>
 /// Оптимизированная команда (не использует проверку исполнения с параметром)
 /// </summary>
+[Obsolete("Use Utils.SimpleCommand")]
 public class CustomCommand : ICommand
 {
     #region Fields
@@ -54,11 +54,6 @@ public class CustomCommand : ICommand
 
     #endregion // Constructors
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="parameter">Этот параметр игнорируется</param>
-    /// <returns></returns>
     public bool CanExecute(object? parameter) => _canBeExecuted;
 
     public event EventHandler? CanExecuteChanged;

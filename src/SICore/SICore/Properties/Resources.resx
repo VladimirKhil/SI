@@ -861,4 +861,7 @@
   <data name="ScoreLost" xml:space="preserve">
     <value>Score lost</value>
   </data>
+  <data name="Tables" xml:space="preserve">
+    <value>Tables</value>
+  </data>
 </root>

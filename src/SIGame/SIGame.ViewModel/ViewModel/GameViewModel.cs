@@ -14,6 +14,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 using Utils.Timers;
 
 namespace SIGame.ViewModel;
@@ -48,6 +49,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     /// Open provided link.
     /// </summary>
     public ICommand OpenLink { get; private set; }
+
+    /// <summary>
+    /// Deletes player table.
+    /// </summary>
+    public SimpleCommand DeleteTable { get; private set; }
 
     private bool _networkGame = false;
 
@@ -179,6 +185,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Popup = new CustomCommand(arg => UseDialogWindow = true);
 
         EnableExtrenalMediaLoad = new CustomCommand(EnableExtrenalMediaLoad_Executed);
+        DeleteTable = new SimpleCommand(DeleteTable_Executed) { CanBeExecuted = false };
 
         for (int i = 0; i < Timers.Length; i++)
         {
@@ -188,7 +195,15 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Timers[1].TimeChanged += GameViewModel_TimeChanged;
 
         OpenLink = new CustomCommand(OpenLink_Executed);
+        Host.MyData.CurrentPlayerChanged += MyData_CurrentPlayerChanged;
     }
+
+    private void MyData_CurrentPlayerChanged()
+    {
+        DeleteTable.CanBeExecuted = Host.IsHost && Host.MyData.Players.Count > 2 && Host.MyData.CurrentPlayer != null;
+    }
+
+    private void DeleteTable_Executed(object? arg) => Host.MyData.CurrentPlayer?.Delete.Execute(arg);
 
     private void OpenLink_Executed(object? arg)
     {

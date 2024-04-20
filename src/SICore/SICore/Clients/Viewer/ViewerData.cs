@@ -327,6 +327,19 @@ public sealed class ViewerData : Data
     /// </summary>
     public ObservableCollection<PlayerAccount> PlayersObservable { get; } = new();
 
+    private PlayerAccount? _currentPlayer;
+
+    /// <summary>
+    /// Currently selected player.
+    /// </summary>
+    public PlayerAccount? CurrentPlayer
+    {
+        get => _currentPlayer;
+        set { if (_currentPlayer != value) { _currentPlayer = value; OnPropertyChanged(); CurrentPlayerChanged?.Invoke(); } }
+    }
+
+    public event Action? CurrentPlayerChanged;
+
     private PersonAccount? _showMan = null;
 
     /// <summary>

@@ -1149,4 +1149,7 @@
   <data name="BindNextButton" xml:space="preserve">
     <value>Activate "Next" button by Right keyboard button</value>
   </data>
+  <data name="Tables" xml:space="preserve">
+    <value>Tables</value>
+  </data>
 </root>

@@ -209,14 +209,8 @@
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
-                    
+
                     <MenuItem Header="{x:Static lp:Resources.Free}" Command="{Binding Free}" CommandParameter="{Binding}" />
-                    
-                    <MenuItem
-                        Header="{x:Static lp:Resources.DeleteTable}"
-                        Command="{Binding Delete}"
-                        CommandParameter="{Binding}"
-                        Visibility="{Binding Command,RelativeSource={RelativeSource Self}, Converter={StaticResource NotNullToVisibilityConverter1}}" />
                 </ContextMenu>
             </lb:DropDownBehavior.DropDown>
             
