@@ -535,34 +535,12 @@ public sealed class Game : Actor<GameData, GameLogic>
                         OnConfig(message, args);
                         break;
 
-                    case Messages.First:
-                        if (ClientData.IsWaiting &&
-                            ClientData.Decision == DecisionType.StarterChoosing &&
-                            message.Sender == ClientData.ShowMan.Name &&
-                            args.Length > 1)
-                        {
-                            #region First
-                            // Ведущий прислал номер того, кто начнёт игру
-                            if (int.TryParse(args[1], out int playerIndex) && playerIndex > -1 && playerIndex < ClientData.Players.Count && ClientData.Players[playerIndex].Flag)
-                            {
-                                ClientData.ChooserIndex = playerIndex;
-                                _logic.Stop(StopReason.Decision);
-                            }
-                            #endregion
-                        }
+                    case Messages.First: // TODO: merge First and SetChooser messages
+                        OnFirst(message, args);
                         break;
 
                     case Messages.SetChooser:
-                        if (message.Sender == ClientData.ShowMan.Name && args.Length > 1)
-                        {
-                            if (int.TryParse(args[1], out int playerIndex) && playerIndex > -1 && playerIndex < ClientData.Players.Count)
-                            {
-                                ClientData.ChooserIndex = playerIndex;
-                                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-
-                                _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name));
-                            }
-                        }
+                        OnSetChooser(message, args);
                         break;
 
                     case Messages.SetJoinMode:
@@ -613,53 +591,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.Choice:
-                        if (ClientData.IsWaiting &&
-                            ClientData.Decision == DecisionType.QuestionSelection &&
-                            args.Length == 3 &&
-                            ClientData.Chooser != null &&
-                                (message.Sender == ClientData.Chooser.Name ||
-                                ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
-                        {
-                            #region Choice
-
-                            if (!int.TryParse(args[1], out int i) || !int.TryParse(args[2], out int j))
-                            {
-                                break;
-                            }
-
-                            if (i < 0 || i >= ClientData.TInfo.RoundInfo.Count)
-                            {
-                                break;
-                            }
-
-                            if (j < 0 || j >= ClientData.TInfo.RoundInfo[i].Questions.Count)
-                            {
-                                break;
-                            }
-
-                            if (ClientData.TInfo.RoundInfo[i].Questions[j].IsActive())
-                            {
-                                lock (ClientData.ChoiceLock)
-                                {
-                                    ClientData.ThemeIndex = i;
-                                    ClientData.QuestionIndex = j;
-                                }
-
-                                if (ClientData.IsOralNow)
-                                {
-                                    _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
-                                }
-
-                                if (Logic.CanPlayerAct())
-                                {
-                                    _gameActions.SendMessage(Messages.Cancel, ClientData.Chooser.Name);
-                                }
-
-                                _logic.Stop(StopReason.Decision);
-                            }
-
-                            #endregion
-                        }
+                        OnChoice(message, args);
                         break;
 
                     case Messages.Toggle:
@@ -846,6 +778,121 @@ public sealed class Game : Actor<GameData, GameLogic>
                 _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
+
+    private void OnChoice(Message message, string[] args)
+    {
+        if (!ClientData.IsWaiting
+            || ClientData.Decision != DecisionType.QuestionSelection
+            || args.Length != 3
+            || ClientData.Chooser == null
+            || message.Sender != ClientData.Chooser.Name
+                && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
+        {
+            return;
+        }
+
+        if (!int.TryParse(args[1], out var themeIndex) || !int.TryParse(args[2], out var questionIndex))
+        {
+            return;
+        }
+
+        if (themeIndex < 0 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        {
+            return;
+        }
+
+        if (questionIndex < 0 || questionIndex >= ClientData.TInfo.RoundInfo[themeIndex].Questions.Count)
+        {
+            return;
+        }
+
+        if (!ClientData.TInfo.RoundInfo[themeIndex].Questions[questionIndex].IsActive())
+        {
+            return;
+        }
+        
+        lock (ClientData.ChoiceLock)
+        {
+            ClientData.ThemeIndex = themeIndex;
+            ClientData.QuestionIndex = questionIndex;
+        }
+
+        if (ClientData.IsOralNow)
+        {
+            _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+        }
+
+        if (Logic.CanPlayerAct())
+        {
+            _gameActions.SendMessage(Messages.Cancel, ClientData.Chooser.Name);
+        }
+
+        _logic.Stop(StopReason.Decision);
+    }
+
+    private void OnFirst(Message message, string[] args)
+    {
+        if (!ClientData.IsWaiting
+            || ClientData.Decision != DecisionType.StarterChoosing
+            || message.Sender != ClientData.ShowMan.Name
+            || args.Length <= 1)
+        {
+            return;
+        }
+
+        if (!int.TryParse(args[1], out int playerIndex) || playerIndex <= -1 || playerIndex >= ClientData.Players.Count || !ClientData.Players[playerIndex].Flag)
+        {
+            return;
+        }
+
+        ClientData.ChooserIndex = playerIndex;
+        _logic.Stop(StopReason.Decision);
+    }
+
+    private void OnSetChooser(Message message, string[] args)
+    {
+        if (message.Sender != ClientData.ShowMan.Name || args.Length <= 1)
+        {
+            return;
+        }
+
+        if (!int.TryParse(args[1], out int playerIndex) || playerIndex <= -1 || playerIndex >= ClientData.Players.Count)
+        {
+            return;
+        }
+
+        if (ClientData.ChooserIndex == playerIndex)
+        {
+            return;
+        }
+
+        var isChoosingNow = _logic.Runner.PendingTask == Tasks.WaitChoose;
+
+        if (isChoosingNow)
+        {
+            _logic.StopWaiting();
+
+            if (ClientData.IsOralNow)
+            {
+                _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+            }
+
+            if (ClientData.Chooser != null && Logic.CanPlayerAct())
+            {
+                _gameActions.SendMessage(Messages.Cancel, ClientData.Chooser.Name);
+            }
+        }
+
+        ClientData.ChooserIndex = playerIndex;
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name));
+
+        if (isChoosingNow)
+        {
+            _logic.PlanExecution(Tasks.AskToChoose, 10);
+        }
+    }
 
     private void OnMoveable(Message message)
     {

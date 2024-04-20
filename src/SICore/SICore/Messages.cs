@@ -438,7 +438,7 @@ public static class Messages
     public const string RoundThemes = "ROUNDTHEMES";
 
     /// <summary>
-    /// Задать игрока, выбирающего вопросы
+    /// Gives move to player.
     /// </summary>
     public const string SetChooser = "SETCHOOSER";
 
