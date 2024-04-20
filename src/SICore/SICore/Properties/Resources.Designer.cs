@@ -610,6 +610,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game statistics.
+        /// </summary>
+        public static string GameStatistics {
+            get {
+                return ResourceManager.GetString("GameStatistics", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Game table number.
         /// </summary>
         public static string GameTableNumber {
@@ -1609,6 +1618,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Right answers.
+        /// </summary>
+        public static string RightAnswers {
+            get {
+                return ResourceManager.GetString("RightAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         public static string Round {
@@ -1650,6 +1668,24 @@ namespace SICore.Properties {
         public static string ScoreChanged {
             get {
                 return ResourceManager.GetString("ScoreChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Score earned.
+        /// </summary>
+        public static string ScoreEarned {
+            get {
+                return ResourceManager.GetString("ScoreEarned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Score lost.
+        /// </summary>
+        public static string ScoreLost {
+            get {
+                return ResourceManager.GetString("ScoreLost", resourceCulture);
             }
         }
         

@@ -60,6 +60,7 @@ public partial class GameChat : UserControl
         }
 
         var pos = text.VerticalOffset;
+        message = message.Replace("\r\n", "\r");
 
         if (person != null)
         {

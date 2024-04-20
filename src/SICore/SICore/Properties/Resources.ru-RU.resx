@@ -854,4 +854,16 @@
   <data name="RoundName" xml:space="preserve">
     <value>{0}-й раунд</value>
   </data>
+  <data name="GameStatistics" xml:space="preserve">
+    <value>Статистика игры</value>
+  </data>
+  <data name="RightAnswers" xml:space="preserve">
+    <value>Правильные ответы</value>
+  </data>
+  <data name="ScoreEarned" xml:space="preserve">
+    <value>Очков заработано</value>
+  </data>
+  <data name="ScoreLost" xml:space="preserve">
+    <value>Очков потеряно</value>
+  </data>
 </root>

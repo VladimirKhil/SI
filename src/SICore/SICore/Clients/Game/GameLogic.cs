@@ -1194,7 +1194,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 _gameActions.SendMessage(s.ToString());
 
-                _data.Answerer.Sum += (int)(_data.CurPriceRight * _data.Answerer.AnswerIsRightFactor);
+                _data.Answerer.AddRightSum((int)(_data.CurPriceRight * _data.Answerer.AnswerIsRightFactor));
                 _data.ChooserIndex = _data.AnswererIndex;
                 _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
                 _gameActions.InformSums();
@@ -1284,7 +1284,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 _gameActions.SendMessage(s.ToString());
 
-                _data.Answerer.Sum -= _data.CurPriceWrong;
+                _data.Answerer.SubtractWrongSum(_data.CurPriceWrong);
                 _data.Answerer.CanPress = false;
                 _gameActions.InformSums();
 
@@ -1964,7 +1964,28 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
         _gameActions.InformStage();
 
+        SendStatistics();
         AskForPlayerReviews();
+    }
+
+    private void SendStatistics()
+    {
+        var message = new StringBuilder(LO[nameof(R.GameStatistics)]).Append(':').AppendLine().AppendLine();
+
+        foreach (var player in _data.Players)
+        {
+            var statistic = player.Statistic;
+
+            message.Append(player.Name).Append(':').AppendLine();
+            message.Append("   ").Append(LO[nameof(R.RightAnswers)]).Append(": ").Append(statistic.RightAnswerCount).AppendLine();
+            message.Append("   ").Append(LO[nameof(R.WrongAnswers)]).Append(": ").Append(statistic.WrongAnswerCount).AppendLine();
+            message.Append("   ").Append(LO[nameof(R.ScoreEarned)]).Append(": ").Append(statistic.RightTotal).AppendLine();
+            message.Append("   ").Append(LO[nameof(R.ScoreLost)]).Append(": ").Append(statistic.WrongTotal).AppendLine();
+
+            message.AppendLine();
+        }
+
+        _gameActions.SpecialReplic(message.ToString());
     }
 
     private void AskForPlayerReviews()
@@ -2327,12 +2348,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (_data.PlayerIsRight)
         {
             msg.Append('+');
-            _data.Answerer.Sum += _data.Answerer.FinalStake;
+            _data.Answerer.AddRightSum(_data.Answerer.FinalStake);
         }
         else
         {
             msg.Append('-');
-            _data.Answerer.Sum -= _data.Answerer.FinalStake;
+            _data.Answerer.SubtractWrongSum(_data.Answerer.FinalStake);
         }
 
         msg.Append(Message.ArgsSeparatorChar).Append(_data.AnswererIndex);
@@ -3901,11 +3922,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 {
                     if (_data.QuestionHistory[i].IsRight)
                     {
-                        _data.Players[index].Sum -= _data.CurPriceRight;
+                        _data.Players[index].UndoRightSum(_data.CurPriceRight);
                     }
                     else
                     {
-                        _data.Players[index].Sum += _data.CurPriceWrong;
+                        _data.Players[index].UndoWrongSum(_data.CurPriceWrong);
                     }
                 }
             }
@@ -3917,13 +3938,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                     if (_data.QuestionHistory[i].IsRight)
                     {
-                        _data.Players[index].Sum -= _data.CurPriceRight + _data.CurPriceWrong;
+                        _data.Players[index].UndoRightSum(_data.CurPriceRight);
+                        _data.Players[index].SubtractWrongSum(_data.CurPriceWrong);
                     }
                     else
                     {
-                        _data.Players[index].Sum += _data.CurPriceWrong + _data.CurPriceRight;
+                        _data.Players[index].UndoWrongSum(_data.CurPriceWrong);
+                        _data.Players[index].AddRightSum(_data.CurPriceRight);
 
-                        if (Engine.CanMoveBack) // Not the biginning of a round
+                        if (Engine.CanMoveBack) // Not the beginning of a round
                         {
                             _data.ChooserIndex = index;
                             _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
@@ -3932,13 +3955,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
                 else
                 {
+                    var stake = _data.Players[index].FinalStake;
+
                     if (_data.QuestionHistory[i].IsRight)
                     {
-                        _data.Players[index].Sum -= _data.Players[index].FinalStake * 2;
+                        _data.Players[index].UndoRightSum(stake);
+                        _data.Players[index].SubtractWrongSum(stake);
                     }
                     else
                     {
-                        _data.Players[index].Sum += _data.Players[index].FinalStake * 2;
+                        _data.Players[index].UndoWrongSum(stake);
+                        _data.Players[index].AddRightSum(stake);
                     }
                 }
             }
@@ -4598,10 +4625,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void AcceptQuestion()
     {
+        if (_data.Answerer == null)
+        {
+            throw new InvalidOperationException("_data.Answerer == null");
+        }
+
         _gameActions.ShowmanReplic(LO[nameof(R.EasyCat)]);
         _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, _data.CurPriceRight);
 
-        _data.Answerer.Sum += _data.CurPriceRight;
+        _data.Answerer.AddRightSum(_data.CurPriceRight);
         _data.ChooserIndex = _data.AnswererIndex;
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
         _gameActions.InformSums();

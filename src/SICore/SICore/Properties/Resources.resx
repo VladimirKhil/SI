@@ -849,4 +849,16 @@
   <data name="RoundName" xml:space="preserve">
     <value>Round {0}</value>
   </data>
+  <data name="GameStatistics" xml:space="preserve">
+    <value>Game statistics</value>
+  </data>
+  <data name="RightAnswers" xml:space="preserve">
+    <value>Right answers</value>
+  </data>
+  <data name="ScoreEarned" xml:space="preserve">
+    <value>Score earned</value>
+  </data>
+  <data name="ScoreLost" xml:space="preserve">
+    <value>Score lost</value>
+  </data>
 </root>

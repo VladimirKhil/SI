@@ -1,4 +1,5 @@
-﻿using SIData;
+﻿using SICore.Clients.Other;
+using SIData;
 
 namespace SICore;
 
@@ -19,6 +20,11 @@ public sealed class GamePlayerAccount : GamePersonAccount
         get => _sum;
         set { _sum = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// Player statistic.
+    /// </summary>
+    public PlayerStatistic Statistic { get; } = new();
 
     // TODO: Will be replaced with QuestionPlayState.PossibleAnswerers indicies collection
     /// <summary>
@@ -87,8 +93,9 @@ public sealed class GamePlayerAccount : GamePersonAccount
     internal bool StakeMaking { get; set; }
 
     /// <summary>
-    /// Штраф за пинг (для выравнивания шансов)
+    /// Ping penalty.
     /// </summary>
+    [Obsolete]
     internal int PingPenalty { get; set; }
 
     /// <summary>
@@ -105,5 +112,33 @@ public sealed class GamePlayerAccount : GamePersonAccount
     public GamePlayerAccount()
     {
 
+    }
+
+    internal void AddRightSum(int sum)
+    {
+        Sum += sum;
+        Statistic.RightAnswerCount++;
+        Statistic.RightTotal += sum;
+    }
+
+    internal void SubtractWrongSum(int sum)
+    {
+        Sum -= sum;
+        Statistic.WrongAnswerCount++;
+        Statistic.WrongTotal += sum;
+    }
+
+    internal void UndoRightSum(int sum)
+    {
+        Sum -= sum;
+        Statistic.RightAnswerCount--;
+        Statistic.RightTotal -= sum;
+    }
+
+    internal void UndoWrongSum(int sum)
+    {
+        Sum += sum;
+        Statistic.WrongAnswerCount--;
+        Statistic.WrongTotal -= sum;
     }
 }
