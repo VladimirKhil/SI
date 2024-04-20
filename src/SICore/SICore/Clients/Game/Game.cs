@@ -14,7 +14,6 @@ using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
-using System.Security.Principal;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -2020,10 +2019,9 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == message.Sender && ClientData.QuestionPlayState.AnswererIndicies.Contains(i))
+                if (ClientData.Players[i].Name == message.Sender && ClientData.QuestionPlayState.AnswererIndicies.Contains(i) && ClientData.Players[i].Answer == "")
                 {
                     ClientData.AnswererIndex = i;
-
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
                     break;
                 }
@@ -2034,9 +2032,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                 return;
             }
         }
-        else if (!ClientData.IsWaiting || ClientData.Answerer != null
-            && ClientData.Answerer.Name != message.Sender
-            && !(ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
+        else if (!ClientData.IsWaiting
+            || ClientData.Answerer != null
+                && ClientData.Answerer.Name != message.Sender
+                && !(ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
         {
             return;
         }
@@ -2149,7 +2148,9 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }
 
-        if (ClientData.Round.Type != RoundTypes.Final)
+        ClientData.AnswerCount--;
+
+        if (ClientData.AnswerCount == 0)
         {
             _logic.Stop(StopReason.Decision);
         }

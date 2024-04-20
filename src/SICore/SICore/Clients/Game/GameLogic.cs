@@ -3203,6 +3203,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
             }
 
+            _data.AnswerCount = _data.QuestionPlayState.AnswererIndicies.Count;
             ScheduleExecution(Tasks.WaitAnswer, timeSettings.TimeForFinalThinking * 10, force: true);
             WaitFor(DecisionType.Answering, timeSettings.TimeForFinalThinking * 10, -2, false);
             return;
@@ -3274,6 +3275,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
+        _data.AnswerCount = 1;
         ScheduleExecution(Tasks.WaitAnswer, time1);
         WaitFor(DecisionType.Answering, time1, _data.AnswererIndex);
     }

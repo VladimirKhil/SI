@@ -634,6 +634,11 @@ public sealed class GameData : Data
     /// </summary>
     public IRoundTableController? TableController { get; internal set; }
 
+    /// <summary>
+    /// Number of answers to collect.
+    /// </summary>
+    public int AnswerCount { get; internal set; }
+
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
         _showMan = showman;
