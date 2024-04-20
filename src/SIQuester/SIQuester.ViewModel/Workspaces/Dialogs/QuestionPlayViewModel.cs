@@ -199,7 +199,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public bool OnAnnouncePrice(NumberSet? availableRange) => false;
 
-    public bool OnAnswerOptions(AnswerOption[] answerOptions)
+    public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {
         var options = new List<AnswerOptionViewModel>();
 
