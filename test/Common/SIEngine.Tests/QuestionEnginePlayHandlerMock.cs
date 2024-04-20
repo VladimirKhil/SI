@@ -16,7 +16,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         throw new NotImplementedException();
     }
 
-    public bool OnAnswerOptions(AnswerOption[] answerOptions) => false;
+    public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence) => false;
 
     public void OnAskAnswer(string mode)
     {

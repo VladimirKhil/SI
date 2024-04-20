@@ -37,7 +37,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public GameEngineController(SIDocument document) => _document = document;
 
-    public bool OnAnswerOptions(AnswerOption[] answerOptions)
+    public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {
         var options = new List<ItemViewModel>();
 
