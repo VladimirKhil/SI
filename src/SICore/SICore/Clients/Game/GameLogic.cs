@@ -4642,12 +4642,24 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, 20, 1);
     }
 
-    internal void OnAnswerOptions(bool questionHasScreenContent, AnswerOption[] answerOptions)
+    internal void OnAnswerOptions()
     {
-        var messageBuilder = new MessageBuilder(Messages.Layout).Add(MessageParams.Layout_AnswerOptions).Add(questionHasScreenContent ? '+' : '-');
-        messageBuilder.AddRange(answerOptions.Select(o => o.Content.Type));
+        var screenContentSequence = _data.QuestionPlayState.ScreenContentSequence;
+        var answerOptions = _data.QuestionPlayState.AnswerOptions;
+
+        if (answerOptions == null || screenContentSequence == null)
+        {
+            return;
+        }
+
+        var messageBuilder = new MessageBuilder(Messages.Layout)
+            .Add(MessageParams.Layout_AnswerOptions)
+            .Add(string.Join("|", screenContentSequence.Select(group => string.Join("+", group.Select(serializeContentItem)))))
+            .AddRange(answerOptions.Select(o => o.Content.Type));
 
         _gameActions.SendMessage(messageBuilder.ToString());
+
+        static string serializeContentItem(ContentItem ci) => $"{ci.Type}{(ci.Type == ContentTypes.Text ? "." + ci.Value.Length : "")}";
     }
 
     internal void ShowAnswerOptions(Action? continuation)

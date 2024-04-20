@@ -11,7 +11,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     private GameData? GameData => GameLogic?.ClientData;
 
-    public bool OnAnswerOptions(AnswerOption[] answerOptions)
+    public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {
         if (GameLogic == null || GameData == null)
         {
@@ -19,6 +19,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         }
 
         GameData.QuestionPlayState.AnswerOptions = answerOptions;
+        GameData.QuestionPlayState.ScreenContentSequence = screenContentSequence;
         return false;
     }
 
@@ -37,7 +38,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
         if (GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.LayoutShown)
         {
-            GameLogic.OnAnswerOptions(false, GameData.QuestionPlayState.AnswerOptions);
+            GameLogic.OnAnswerOptions();
             GameData.QuestionPlayState.LayoutShown = true;
         }
 
@@ -93,7 +94,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         // TODO: merge somehow with GameLogic.AskToPress() and OnAskAnswer() for buttons
         if (GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.LayoutShown)
         {
-            GameLogic.OnAnswerOptions(false, GameData.QuestionPlayState.AnswerOptions);
+            GameLogic.OnAnswerOptions();
             GameData.QuestionPlayState.LayoutShown = true;
         }
 
@@ -116,9 +117,9 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
             return;
         }
 
-        if (contentItems.Any(item => item.Placement == ContentPlacements.Screen) && GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.LayoutShown)
+        if (GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.LayoutShown)
         {
-            GameLogic.OnAnswerOptions(true, GameData.QuestionPlayState.AnswerOptions);
+            GameLogic.OnAnswerOptions();
             GameData.QuestionPlayState.LayoutShown = true;
         }
 

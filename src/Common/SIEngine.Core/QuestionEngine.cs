@@ -210,8 +210,42 @@ public sealed class QuestionEngine
                         continue;
                     }
 
+                    var allTypes = new List<ContentItem[]>();
+
+                    if (_question.Parameters != null)
+                    {
+                        foreach (var param in _question.Parameters)
+                        {
+                            if (param.Value.ContentValue != null)
+                            {
+                                var types = new List<ContentItem>();
+
+                                foreach (var contentItem in param.Value.ContentValue)
+                                {
+                                    if (contentItem.Placement != ContentPlacements.Screen)
+                                    {
+                                        continue;
+                                    }
+
+                                    types.Add(contentItem);
+
+                                    if (contentItem.WaitForFinish)
+                                    {
+                                        allTypes.Add(types.ToArray());
+                                        types.Clear();
+                                    }
+                                }
+
+                                if (types.Count > 0)
+                                {
+                                    allTypes.Add(types.ToArray());
+                                }
+                            }
+                        }
+                    }
+
                     _isAnswerTypeSelect = true;
-                    var setAnswerOptions = _playHandler.OnAnswerOptions(answerOptions.ToArray());
+                    var setAnswerOptions = _playHandler.OnAnswerOptions(answerOptions.ToArray(), allTypes);
                     _stepIndex++;
                     
                     if (setAnswerOptions)

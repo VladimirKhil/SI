@@ -12,7 +12,8 @@ public interface IQuestionEnginePlayHandler
     /// Sets answer options.
     /// </summary>
     /// <param name="answerOptions">Answer options.</param>
-    bool OnAnswerOptions(AnswerOption[] answerOptions);
+    /// <param name="screenContentSequence">Screen content sequence.</param>
+    bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence);
 
     /// <summary>
     /// Shows question content.

@@ -1,4 +1,5 @@
 ﻿using SIEngine.Core;
+using SIPackages;
 
 namespace SICore.Clients.Game;
 
@@ -31,6 +32,11 @@ internal sealed class QuestionPlayState
     /// Are answer options shown.
     /// </summary>
     internal bool AnswerOptionsShown { get; set; }
+
+    /// <summary>
+    /// Screen content sequence.
+    /// </summary>
+    internal IReadOnlyList<ContentItem[]>? ScreenContentSequence { get; set; }
 
     internal void Clear()
     {
