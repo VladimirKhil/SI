@@ -51,9 +51,24 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public ICommand OpenLink { get; private set; }
 
     /// <summary>
+    /// Frees table.
+    /// </summary>
+    public SimpleCommand FreeTable { get; private set; }
+
+    /// <summary>
     /// Deletes player table.
     /// </summary>
     public SimpleCommand DeleteTable { get; private set; }
+
+    /// <summary>
+    /// Replaces table person.
+    /// </summary>
+    public SimpleCommand Replace { get; private set; }
+
+    /// <summary>
+    /// Changes table type.
+    /// </summary>
+    public SimpleCommand ChangeType { get; private set; }
 
     private bool _networkGame = false;
 
@@ -185,7 +200,10 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Popup = new CustomCommand(arg => UseDialogWindow = true);
 
         EnableExtrenalMediaLoad = new CustomCommand(EnableExtrenalMediaLoad_Executed);
+        FreeTable = new SimpleCommand(FreeTable_Executed) { CanBeExecuted = false };
         DeleteTable = new SimpleCommand(DeleteTable_Executed) { CanBeExecuted = false };
+        ChangeType = new SimpleCommand(ChangeType_Executed) { CanBeExecuted = false };
+        Replace = new SimpleCommand(Replace_Executed) { CanBeExecuted = false };
 
         for (int i = 0; i < Timers.Length; i++)
         {
@@ -200,10 +218,19 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void MyData_CurrentPlayerChanged()
     {
-        DeleteTable.CanBeExecuted = Host.IsHost && Host.MyData.Players.Count > 2 && Host.MyData.CurrentPlayer != null;
+        FreeTable.CanBeExecuted = Host.IsHost && Host.MyData.CurrentPerson != null && Host.MyData.CurrentPerson.IsHuman && Host.MyData.CurrentPerson.IsConnected;
+        DeleteTable.CanBeExecuted = Host.IsHost && Host.MyData.Players.Count > 2 && Host.MyData.CurrentPerson is PlayerAccount;
+        ChangeType.CanBeExecuted = Host.IsHost;
+        Replace.CanBeExecuted = Host.IsHost && Host.MyData.CurrentPerson != null && Host.MyData.CurrentPerson.Others != null && Host.MyData.CurrentPerson.Others.Any();
     }
 
-    private void DeleteTable_Executed(object? arg) => Host.MyData.CurrentPlayer?.Delete.Execute(arg);
+    private void FreeTable_Executed(object? arg) => Host.MyData.CurrentPerson?.Free.Execute(arg);
+
+    private void DeleteTable_Executed(object? arg) => ((PlayerAccount?)Host.MyData.CurrentPerson)?.Delete.Execute(arg);
+
+    private void ChangeType_Executed(object? arg) => Host.MyData.CurrentPerson?.ChangeType.Execute(arg);
+
+    private void Replace_Executed(object? arg) => Host.MyData.CurrentPerson?.Replace.Execute(arg);
 
     private void OpenLink_Executed(object? arg)
     {

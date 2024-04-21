@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace SIGame;
@@ -92,5 +93,13 @@ public partial class GameChat : UserControl
         {
             text.ScrollToEnd();
         }
+    }
+
+    private void Label_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        this.playerTables.SelectedItem = null;
+        var label = (Label)sender;
+        var data = ((GameViewModel)label.DataContext).Data;
+        data.CurrentPerson = data.ShowMan;
     }
 }

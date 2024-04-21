@@ -8,6 +8,7 @@
     d:DesignHeight="243"
     d:DesignWidth="389"
     Background="#88000000"
+    xmlns:lb="clr-namespace:SIGame.Behaviors"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:lc="clr-namespace:SIGame.Converters"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
@@ -180,16 +181,16 @@
                         DockPanel.Dock="Bottom"
                         Columns="2"
                         Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
-                        <!--<Button
+                        <Button
                             Style="{StaticResource SIButtonSimple}"
                             Background="{StaticResource WindowBackground}"
                             Margin="-1,-1,0,-1"
                             Padding="20,4"
-                            Command="{Binding Data.Kick}"
-                            CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
+                            Command="{Binding FreeTable}"
+                            CommandParameter="{Binding Data.CurrentPerson}"
                             FontSize="14"
                             TextBlock.LineHeight="18"
-                            Content="{x:Static lp:Resources.Free}" />-->
+                            Content="{x:Static lp:Resources.Free}" />
 
                         <Button
                             Style="{StaticResource SIButtonSimple}"
@@ -197,12 +198,96 @@
                             Margin="-1,-1,-1,-1"
                             Padding="20,4"
                             Command="{Binding DeleteTable}"
-                            CommandParameter="{Binding Data.CurrentPlayer}"
+                            CommandParameter="{Binding Data.CurrentPerson}"
                             FontSize="14"
                             TextBlock.LineHeight="18"
                             Content="{x:Static lp:Resources.DeleteTable}" />
                     </UniformGrid>
                 </DockPanel>
+                
+                <DockPanel
+                    DockPanel.Dock="Bottom"
+                    Visibility="{Binding Data.IsNetworkGame, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                    <UniformGrid
+                        DockPanel.Dock="Bottom"
+                        Columns="2"
+                        Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                        <Button
+                            Style="{StaticResource SIButtonSimple}"
+                            Background="{StaticResource WindowBackground}"
+                            Margin="-1,-1,0,-1"
+                            Padding="2"
+                            Command="{Binding ChangeType}"
+                            CommandParameter="{Binding Data.CurrentPerson}"
+                            FontSize="10"
+                            Height="30"
+                            Content="{Binding Data.CurrentPerson.IsHuman, Converter={StaticResource ChangeTypeConverter}}" />
+
+                        <Button
+                            Background="{StaticResource WindowBackground}"
+                            Margin="-1,-1,-1,-1"
+                            Padding="20,4"
+                            FontSize="14"
+                            TextBlock.LineHeight="18"
+                            Content="{x:Static lp:Resources.ReplaceTo}">
+                            <lb:DropDownBehavior.DropDown>
+                                <ContextMenu Style="{StaticResource SIContextMenuStyle}" ItemsSource="{Binding Data.CurrentPerson.Others}">
+                                    <ContextMenu.ItemContainerStyle>
+                                        <Style TargetType="MenuItem">
+                                            <Setter
+                                                Property="Command"
+                                                Value="{Binding DataContext.Replace, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+
+                                            <Setter Property="CommandParameter" Value="{Binding}" />
+                                            <Setter Property="Cursor" Value="Hand" />
+                                            <Setter Property="Height" Value="40" />
+                                            <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+                                        </Style>
+                                    </ContextMenu.ItemContainerStyle>
+                                </ContextMenu>
+                            </lb:DropDownBehavior.DropDown>
+
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SIButtonSimple}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Data.CurrentPerson.Others.Length}" Value="0">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </UniformGrid>
+                </DockPanel>
+
+                <TextBlock DockPanel.Dock="Top" Text="{x:Static lp:Resources.Showman}" Padding="10,4,0,4" Background="{StaticResource WindowBackground}" />
+
+                <Label
+                    DockPanel.Dock="Top"
+                    Margin="1,2"
+                    Content="{Binding Data.ShowMan.Name}"
+                    Foreground="Black"
+                    FontSize="16"
+                    MouseDown="Label_MouseDown">
+                    <Label.Style>
+                        <Style TargetType="Label">
+                            <Setter Property="Background" Value="#22000000" />
+                            
+                            <Style.Triggers>
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <MultiBinding Converter="{StaticResource Equals}">
+                                            <Binding Path="Data.ShowMan" />
+                                            <Binding Path="Data.CurrentPerson" />
+                                        </MultiBinding>
+                                    </DataTrigger.Binding>
+
+                                    <Setter Property="Background" Value="#3D26A0DA" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Label.Style>
+                </Label>
 
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="{StaticResource WindowBackground}">
                     <TextBlock Text="{x:Static lp:Resources.Players}" Margin="10,4,0,4" />
@@ -221,9 +306,10 @@
                 <ListBox
                     IsSynchronizedWithCurrentItem="True"
                     ItemsSource="{Binding Data.PlayersObservable}"
-                    SelectedItem="{Binding Data.CurrentPlayer}"
+                    SelectedItem="{Binding Data.CurrentPerson}"
                     Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}"
-                    FontSize="16">
+                    FontSize="16"
+                    Name="playerTables">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Margin="0,5">
@@ -235,6 +321,7 @@
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Background" Value="#22000000" />
+                            <Setter Property="BorderThickness" Value="0" />
                         </Style>
                     </ListBox.ItemContainerStyle>
                 </ListBox>
