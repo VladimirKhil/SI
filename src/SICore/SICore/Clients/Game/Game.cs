@@ -2484,7 +2484,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 break;
 
             case MessageParams.Config_ChangeType:
-                if (ClientData.Stage == GameStage.Before && args.Length > 2)
+                if (args.Length > 2)
                 {
                     ChangePersonType(args[2], args.Length < 4 ? "" : args[3], host);
                 }
@@ -2543,7 +2543,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var account = ClientData.Players[index];
         var isOnline = account.IsConnected;
 
-        if (ClientData.Stage != GameStage.Before && account.IsHuman && isOnline)
+        if (ClientData.Stage != GameStage.Before && account.IsHuman && isOnline && !account.IsMoveable)
         {
             return;
         }
@@ -2978,7 +2978,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void FreeTable(Message message, string[] args, Account host)
     {
-        if (ClientData.Stage != GameStage.Before || args.Length <= 2)
+        if (args.Length <= 2)
         {
             return;
         }
@@ -3010,7 +3010,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             account = ClientData.ShowMan;
         }
 
-        if (!account.IsConnected || !account.IsHuman)
+        if (!account.IsConnected || !account.IsHuman || ClientData.Stage != GameStage.Before && !account.IsMoveable)
         {
             return;
         }
@@ -3055,7 +3055,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void SetPerson(string[] args, Account host)
     {
-        if (ClientData.Stage != GameStage.Before || args.Length <= 4)
+        if (args.Length <= 4)
         {
             return;
         }
@@ -3063,7 +3063,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var personType = args[2];
         var replacer = args[4];
 
-        // Кого заменяем
+        // Who is replaced
         GamePersonAccount account;
         int index = -1;
 
@@ -3083,6 +3083,11 @@ public sealed class Game : Actor<GameData, GameLogic>
         else
         {
             account = ClientData.ShowMan;
+        }
+
+        if (ClientData.Stage != GameStage.Before && account.IsConnected && !account.IsMoveable)
+        {
+            return;
         }
 
         var oldName = account.Name;
@@ -3116,7 +3121,11 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else
         {
-            SetHumanPerson(isPlayer, account, replacer, index);
+            if (!SetHumanPerson(isPlayer, account, replacer, index))
+            {
+                return;
+            }
+
             newAccount = account;
         }
 
@@ -3159,10 +3168,10 @@ public sealed class Game : Actor<GameData, GameLogic>
         return null;
     }
 
-    internal void SetHumanPerson(bool isPlayer, GamePersonAccount account, string replacer, int index)
+    internal bool SetHumanPerson(bool isPlayer, GamePersonAccount account, string replacer, int index)
     {
         int otherIndex = -1;
-        // На кого заменяем
+        // Who replaces
         ViewerAccount? otherAccount = null;
 
         ClientData.BeginUpdatePersons($"SetHumanPerson {account.Name} {account.IsConnected} {replacer} {index}");
@@ -3173,10 +3182,16 @@ public sealed class Game : Actor<GameData, GameLogic>
             {
                 otherAccount = ClientData.ShowMan;
 
+                if (ClientData.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
+                {
+                    return false;
+                }
+
                 ClientData.ShowMan = new GamePersonAccount(account)
                 {
                     Ready = account.Ready,
-                    IsConnected = account.IsConnected
+                    IsConnected = account.IsConnected,
+                    IsMoveable = account.IsMoveable
                 };
             }
             else
@@ -3187,10 +3202,16 @@ public sealed class Game : Actor<GameData, GameLogic>
                     {
                         otherAccount = ClientData.Players[i];
 
+                        if (ClientData.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
+                        {
+                            return false;
+                        }
+
                         ClientData.Players[i] = new GamePlayerAccount(account)
                         {
                             Ready = account.Ready,
-                            IsConnected = account.IsConnected
+                            IsConnected = account.IsConnected,
+                            IsMoveable = account.IsMoveable
                         };
 
                         otherIndex = i;
@@ -3207,6 +3228,11 @@ public sealed class Game : Actor<GameData, GameLogic>
                             otherAccount = ClientData.Viewers[i];
                             otherIndex = i;
 
+                            if (ClientData.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
+                            {
+                                return false;
+                            }
+
                             if (account.IsConnected)
                             {
                                 ClientData.Viewers[i] = new ViewerAccount(account) { IsConnected = true };
@@ -3221,18 +3247,18 @@ public sealed class Game : Actor<GameData, GameLogic>
                     }
                 }
 
-                if (otherIndex == -1)
+                if (otherIndex == -1 || otherAccount == null)
                 {
-                    return;
+                    return false;
                 }
             }
 
-            // Живой персонаж меняется на другого живого
+            // Human account is replaced by another human account
             var otherPerson = otherAccount as GamePersonAccount;
 
             if (isPlayer)
             {
-                ClientData.Players[index] = new GamePlayerAccount(otherAccount) { IsConnected = otherAccount.IsConnected };
+                ClientData.Players[index] = new GamePlayerAccount(otherAccount) { IsConnected = otherAccount.IsConnected, IsMoveable = otherAccount.IsMoveable };
 
                 if (otherPerson != null)
                 {
@@ -3241,7 +3267,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             else
             {
-                ClientData.ShowMan = new GamePersonAccount(otherAccount) { IsConnected = otherAccount.IsConnected };
+                ClientData.ShowMan = new GamePersonAccount(otherAccount) { IsConnected = otherAccount.IsConnected, IsMoveable = otherAccount.IsMoveable };
 
                 if (otherPerson != null)
                 {
@@ -3250,6 +3276,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
 
             InformAvatar(otherAccount);
+            return true;
         }
         finally
         {
@@ -3281,6 +3308,11 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (account == null)
         {
             ClientData.Host.LogWarning("ChangePersonType: account == null");
+            return;
+        }
+
+        if (ClientData.Stage != GameStage.Before && account.IsConnected && !account.IsMoveable)
+        {
             return;
         }
 

@@ -114,7 +114,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         ClientData.SetHost = new CustomCommand(SetHost_Executed) { CanBeExecuted = IsHost };
         ClientData.Unban = new CustomCommand(Unban_Executed) { CanBeExecuted = IsHost };
 
-        ClientData.ForceStart = new CustomCommand(ForceStart_Executed) { CanBeExecuted = IsHost };
+        ClientData.ForceStart = new CustomCommand(ForceStart_Executed) { CanBeExecuted = IsHost && ClientData.Stage == GameStage.Before };
         ClientData.AddTable = new CustomCommand(AddTable_Executed) { CanBeExecuted = IsHost };
         ClientData.DeleteTable = new CustomCommand(DeleteTable_Executed) { CanBeExecuted = IsHost };
 
@@ -1528,6 +1528,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         PersonAccount account;
 
         var isPlayer = personType == Constants.Player;
+        
         if (isPlayer)
         {
             if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
@@ -1548,6 +1549,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         clone.Add(newAccount);
 
         ClientData.BeginUpdatePersons($"Config_Free {string.Join(" ", mparams)}");
+        
         try
         {
             ClientData.Viewers = clone;
@@ -1564,7 +1566,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         if (account == me)
         {
-            // Необходимо самого себя перевести в зрители
+            // Should move to viewers itself
             SwitchToNewType(GameRole.Viewer, newAccount, me);
         }
 

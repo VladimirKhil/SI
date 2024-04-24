@@ -34,6 +34,7 @@ public abstract class Actor<D, L> : IActor
 
     public ILocalizer LO { get; protected set; }
 
+    // TODO: Actor should be Client's handler and do not have a link to the client
     protected Actor(Client client, ILocalizer localizer, D data)
     {
         _client = client;
