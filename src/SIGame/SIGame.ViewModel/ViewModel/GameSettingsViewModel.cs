@@ -272,7 +272,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         {
             _package = value;
             _model.PackageKey = value.Key;
-            _model.RandomSpecials = value.RandomSpecials;
             OnPropertyChanged();
             SetErrorMessage();
         }
@@ -627,8 +626,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         try
         {
-            _model.RandomSpecials = _package.RandomSpecials;
-
             if (CreateGame != null)
             {
                 var info = await CreateGame(_model, _package);

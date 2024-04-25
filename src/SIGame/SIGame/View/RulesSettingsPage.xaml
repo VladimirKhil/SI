@@ -201,7 +201,7 @@
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ReadingSpeed}" />
         
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.CharactersPerSecond}" />
-        
+
         <DockPanel>
             <local:NumericTextBox
                 Style="{StaticResource {x:Type TextBox}}"
@@ -214,13 +214,9 @@
                 Text="{Binding Model.ReadingSpeed, UpdateSourceTrigger=PropertyChanged}"
                 Minimum="1"
                 Maximum="100" />
-            
+
             <Slider Value="{Binding Model.ReadingSpeed}" Margin="-5,0,0,0" Maximum="100" Minimum="1" VerticalAlignment="Center" />
         </DockPanel>
-
-        <CheckBox IsChecked="{Binding Model.Managed}" Style="{StaticResource HeaderBox}">
-            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.RandomSpecials}" />
-        </CheckBox>
 
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RandomRoundsCount}" />
         <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,5,0,0" Padding="1" FontWeight="Light" Text="{Binding Model.RandomRoundsCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="6" />

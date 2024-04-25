@@ -16,14 +16,6 @@ public class GameSettingsCore<T> : IGameSettingsCore<T>
     public string HumanPlayerName { get; set; }
 
     /// <summary>
-    /// Случайные спецвопросы
-    /// </summary>
-    [XmlAttribute]
-    [DefaultValue(false)]
-    [DataMember]
-    public bool RandomSpecials { get; set; }
-
-    /// <summary>
     /// Имя сетевой игры
     /// </summary>
     [XmlAttribute]

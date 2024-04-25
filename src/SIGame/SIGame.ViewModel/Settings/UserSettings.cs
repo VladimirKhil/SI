@@ -298,7 +298,6 @@ public sealed class UserSettings : INotifyPropertyChanged
 
         GameSettings.AppSettings.Set(settings.GameSettings.AppSettings);
         GameSettings.NetworkPort = settings.GameSettings.NetworkPort;
-        GameSettings.RandomSpecials = settings.GameSettings.RandomSpecials;
         GameSettings.IsPrivate = settings.GameSettings.IsPrivate;
         GameSettings.IsAutomatic = settings.GameSettings.IsAutomatic;
 

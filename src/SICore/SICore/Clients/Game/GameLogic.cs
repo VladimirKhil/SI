@@ -4230,12 +4230,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 baseTime = 1;
             }
-
-            // Create random special questions
-            if (_data.Settings.RandomSpecials)
-            {
-                RoundRandomizer.RandomizeSpecials(round);
-            }
         }
         else if (stage == 2)
         {

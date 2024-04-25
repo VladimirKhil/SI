@@ -21,11 +21,6 @@ public interface IGameSettingsCore<out T> where T: IAppSettingsCore
     /// </summary>
     T AppSettings { get; }
 
-    /// <summary>
-    /// Generate random special questions in every round.
-    /// </summary>
-    bool RandomSpecials { get; }
-
     string NetworkGameName { get; }
 
     string NetworkGamePassword { get; }

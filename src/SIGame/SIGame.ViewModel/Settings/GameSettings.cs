@@ -75,7 +75,6 @@ public sealed class GameSettings : GameSettingsCore<AppSettings>, IHumanPlayerOw
             NetworkGamePassword = settings.NetworkGamePassword,
             NetworkVoiceChat = settings.NetworkVoiceChat,
             Players = Convert(settings.Players),
-            RandomSpecials = settings.RandomSpecials,
             Showman = Convert(settings.Showman),
             Viewers = Convert(settings.Viewers),
         };
