@@ -2294,19 +2294,20 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }
 
-        if (canPressChanged && ClientData.Players.All(p => !p.CanPress) && ClientData.Decision == DecisionType.Pressing && !ClientData.TInfo.Pause)
+        if (canPressChanged
+            && ClientData.Players.All(p => !p.CanPress || !p.IsConnected)
+            && ClientData.Decision == DecisionType.Pressing
+            && !ClientData.TInfo.Pause
+            && !ClientData.IsAnswer)
         {
-            if (!ClientData.IsAnswer)
+            if (!ClientData.IsQuestionFinished)
             {
-                if (!ClientData.IsQuestionFinished)
-                {
-                    _logic.Engine.MoveToAnswer();
-                }
-
-                _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All);
-                _logic.ClearContinuation();
-                _logic.ScheduleExecution(Tasks.MoveNext, 1, force: true);
+                _logic.Engine.MoveToAnswer();
             }
+
+            _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All);
+            _logic.ClearContinuation();
+            _logic.ScheduleExecution(Tasks.MoveNext, 1, force: true);
         }
     }
 
