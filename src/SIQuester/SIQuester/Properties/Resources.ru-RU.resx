@@ -804,6 +804,9 @@
   <data name="QuestionParsing" xml:space="preserve">
     <value>Импорт вопросов</value>
   </data>
+  <data name="Questions" xml:space="preserve">
+    <value>вопросов</value>
+  </data>
   <data name="QuestionSplitting" xml:space="preserve">
     <value>Разделение текста на вопросы</value>
   </data>

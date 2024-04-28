@@ -808,6 +808,9 @@
   <data name="QuestionParsing" xml:space="preserve">
     <value>Import questions</value>
   </data>
+  <data name="Questions" xml:space="preserve">
+    <value>questions</value>
+  </data>
   <data name="QuestionSplitting" xml:space="preserve">
     <value>Splitting text into questions</value>
   </data>

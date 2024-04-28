@@ -2132,6 +2132,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на questions.
+        /// </summary>
+        public static string Questions {
+            get {
+                return ResourceManager.GetString("Questions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Splitting text into questions.
         /// </summary>
         public static string QuestionSplitting {

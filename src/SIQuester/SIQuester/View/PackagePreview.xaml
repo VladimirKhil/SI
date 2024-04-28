@@ -7,6 +7,7 @@
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
     xmlns:lc="clr-namespace:SIQuester.Converters"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
     mc:Ignorable="d" 
     d:DesignHeight="450"
     d:DesignWidth="1200"
@@ -18,7 +19,8 @@
     
     <StackPanel HorizontalAlignment="Stretch" Margin="10">
         <TextBlock FontSize="35" FontWeight="Bold">
-            <Run Text="{Binding Document.Package.Name}" /><Run Text=" (" /><Run Text="{Binding QuestionCount, Mode=OneWay}" /><Run Text=")" />
+            <Run Text="{Binding Document.Package.Name}" />
+            <Run Text="(" /><Run Text="{x:Static lp:Resources.Questions}" /><Run Text=": " /><Run Text="{Binding QuestionCount, Mode=OneWay}" /><Run Text=")" />
         </TextBlock>
 
         <ItemsControl ItemsSource="{Binding Content}">
