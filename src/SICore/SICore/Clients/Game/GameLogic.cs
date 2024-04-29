@@ -3220,6 +3220,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 if (_data.QuestionPlayState.AnswererIndicies.Contains(i))
                 {
                     _data.Players[i].Answer = "";
+                    _data.Players[i].Flag = true;
                     _gameActions.SendMessage(Messages.Answer, _data.Players[i].Name);
                 }
             }
