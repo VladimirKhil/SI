@@ -220,10 +220,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     {
         await _node.ConnectAsync(upgrade);
 
-        if (_connector != null)
-        {
-            _connector.Dispose();
-        }
+        _connector?.Dispose();
 
         _connector = new Connector(_node, _client);
     }

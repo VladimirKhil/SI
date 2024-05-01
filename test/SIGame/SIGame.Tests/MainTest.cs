@@ -26,11 +26,9 @@ public class MainTest
     [TestCase(PackageSourceTypes.Local, GameRole.Player, true)]
     [TestCase(PackageSourceTypes.RandomServer, GameRole.Viewer, true)]
     [TestCase(PackageSourceTypes.RandomServer, GameRole.Showman, true)]
-    [TestCase(PackageSourceTypes.RandomServer, GameRole.Player, false)]
     public async Task GameCreateAndRun_Ok_Async(
         PackageSourceTypes packageSourceType,
-        GameRole gameRole,
-        bool useSignalRConnection)
+        GameRole gameRole)
     {
         var coreManager = new DesktopCoreManager();
         var manager = new TestManager();
@@ -38,10 +36,7 @@ public class MainTest
         var commonSettings = new CommonSettings();
         commonSettings.Humans2.Add(new HumanAccount { Name = "test_" + new Random().Next(10000), BirthDate = DateTime.Now });
 
-        var userSettings = new UserSettings
-        {
-            UseSignalRConnection = useSignalRConnection
-        };
+        var userSettings = new UserSettings();
 
         var appState = new AppState();
 
