@@ -2066,9 +2066,12 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == message.Sender && ClientData.QuestionPlayState.AnswererIndicies.Contains(i) && ClientData.Players[i].Answer == "")
+                if (ClientData.Players[i].Name == message.Sender
+                    && ClientData.QuestionPlayState.AnswererIndicies.Contains(i)
+                    && ClientData.Players[i].Flag)
                 {
                     ClientData.AnswererIndex = i;
+                    ClientData.Players[i].Flag = false;
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
                     break;
                 }
