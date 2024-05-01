@@ -153,6 +153,12 @@ public enum Tasks
     /// Объявление ставки игрока в финале
     /// </summary>
     AnnounceStake,
+    
+    /// <summary>
+    /// Announce stake after right answer.
+    /// </summary>
+    AnnouncePostStake,
+    
     /// <summary>
     /// Завершение игры
     /// </summary>

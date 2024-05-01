@@ -535,7 +535,7 @@
     <value>The game is over</value>
   </data>
   <data name="Stake" xml:space="preserve">
-    <value>Bet</value>
+    <value>Stake of</value>
   </data>
   <data name="StakeMakes" xml:space="preserve">
     <value>Is making a bet</value>

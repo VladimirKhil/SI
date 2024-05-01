@@ -96,7 +96,20 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     private readonly QuestionEngineFactory _questionEngineFactory;
 
-    protected QuestionEngine? QuestionEngine { get; private set; }
+    private QuestionEngine? _questionEngine;
+
+    protected QuestionEngine QuestionEngine
+    {
+        get
+        {
+            if (_questionEngine == null)
+            {
+                throw new InvalidOperationException("_questionEngine == null");
+            }
+
+            return _questionEngine;
+        }
+    }
 
     public bool CanMoveNext
     {
@@ -352,23 +365,10 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     /// <summary>
     /// Skips rest of the question and goes directly to answer.
     /// </summary>
-    public void MoveToAnswer()
-    {
-        if (QuestionEngine == null)
-        {
-            throw new InvalidOperationException("QuestionEngine == null");
-        }
-
-        QuestionEngine.MoveToAnswer();
-    }
+    public void MoveToAnswer() => QuestionEngine.MoveToAnswer();
 
     protected void OnQuestion()
     {
-        if (QuestionEngine == null)
-        {
-            throw new InvalidOperationException("QuestionEngine == null");
-        }
-
         if (!QuestionEngine.PlayNext())
         {
             OnQuestionPostInfo();
@@ -408,7 +408,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
         var options = OptionsProvider();
 
-        QuestionEngine = _questionEngineFactory.CreateEngine(
+        _questionEngine = _questionEngineFactory.CreateEngine(
             ActiveQuestion,
             new QuestionEngineOptions
             {

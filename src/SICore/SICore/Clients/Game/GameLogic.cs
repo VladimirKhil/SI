@@ -8,7 +8,6 @@ using SICore.Models;
 using SICore.Results;
 using SICore.Utils;
 using SIData;
-using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
 using SIPackages.Providers;
@@ -1221,16 +1220,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 _gameActions.ShowmanReplic(s.ToString());
 
-                if (_data.QuestionPlayState.AnswerOptions != null && _data.Answerer.Answer != null)
-                {
-                    var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
-
-                    if (answerIndex > -1)
-                    {
-                        _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Right);
-                    }
-                }
-
                 if (isAnswerCanonical)
                 {
                     _data.AnnounceAnswer = false;
@@ -1729,6 +1718,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                     case Tasks.AnnounceStake:
                         AnnounceStake();
+                        break;
+
+                    case Tasks.AnnouncePostStake:
+                        AnnouncePostStake();
                         break;
 
                     case Tasks.WaitReport:
@@ -2336,15 +2329,37 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
+    private void AnnouncePostStake()
+    {
+        if (_data.AnnouncedAnswerersEnumerator == null || !_data.AnnouncedAnswerersEnumerator.MoveNext())
+        {
+            ScheduleExecution(Tasks.MoveNext, 15, 1, true);
+            return;
+        }
+
+        var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
+        _data.AnswererIndex = answererIndex;
+
+        _data.PlayerIsRight = _data.Answerer?.Answer == _data.RightOptionLabel;
+        AnnounceStakeCore();
+        ScheduleExecution(Tasks.AnnouncePostStake, 15);
+    }
+
     private void AnnounceStake()
     {
-        if (_data.AnswererIndex == -1)
+        AnnounceStakeCore();
+        ScheduleExecution(Tasks.Announce, 15);
+    }
+
+    private void AnnounceStakeCore()
+    {
+        if (_data.Answerer == null)
         {
-            throw new ArgumentException($"{nameof(_data.AnswererIndex)} == -1", nameof(_data.AnswererIndex));
+            throw new ArgumentException($"{nameof(_data.Answerer)} == null", nameof(_data.Answerer));
         }
 
         var msg = new StringBuilder();
-        msg.AppendFormat("{0}: {1}", LO[nameof(R.Stake)], Notion.FormatNumber(_data.Answerer.FinalStake));
+        msg.AppendFormat("{0} {1}: {2}", LO[nameof(R.Stake)], _data.Answerer.Name, Notion.FormatNumber(_data.Answerer.FinalStake));
         _gameActions.ShowmanReplic(msg.ToString());
 
         msg = new StringBuilder(Messages.Person).Append(Message.ArgsSeparatorChar);
@@ -2367,8 +2382,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.InformSums();
 
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.Answerer.FinalStake);
-
-        ScheduleExecution(Tasks.Announce, 15);
     }
 
     private void AskFinalStake()
@@ -2601,7 +2614,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var typeName = _data.Question?.TypeName;
 
             // Only StakeAll type is supported in final for now
-            // This will be removed when full question type support will have been implemented
+            // This will be removed when full question type support will be implemented
             if (IsFinalRound())
             {
                 typeName = QuestionTypes.StakeAll;
@@ -2796,39 +2809,31 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         if (_data.AnnouncedAnswerersEnumerator == null || !_data.AnnouncedAnswerersEnumerator.MoveNext())
         {
+            if (_data.QuestionPlayState.AnswerOptions != null)
+            {
+                var m = new MessageBuilder(Messages.Answers);
+                m.AddRange(_data.Players.Select(p => p.Answer ?? ""));
+                _gameActions.SendMessage(m.ToString());
+            }
+
             ScheduleExecution(Tasks.MoveNext, 15, 1, true);
             return;
         }
 
         var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
-
-        if (answererIndex < 0 || answererIndex >= _data.Players.Count)
-        {
-            throw new IndexOutOfRangeException($"answererIndex: {answererIndex}; player count: {_data.Players.Count}");
-        }
-
         _data.AnswererIndex = answererIndex;
+        var answer = _data.Answerer?.Answer ?? LO[nameof(R.IDontKnow)];
 
-        var msg = new StringBuilder()
-            .Append(LO[nameof(R.Answer)])
-            .Append(' ')
-            .Append(_data.Answerer.Name)
-            .Append(": ")
-            .Append(_data.Answerer.Answer);
-
-        _gameActions.ShowmanReplic(msg.ToString());
+        _gameActions.PlayerReplic(answererIndex, answer);
 
         if (_data.QuestionPlayState.AnswerOptions != null)
         {
-            var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
-
-            if (answerIndex > -1)
-            {
-                _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Active);
-            }
+            ScheduleExecution(Tasks.Announce, 15, force: true);
         }
-
-        ScheduleExecution(Tasks.AskRight, 20, force: true);
+        else
+        {
+            ScheduleExecution(Tasks.AskRight, 20, force: true);
+        }
     }
 
     internal bool PrepareForAskAnswer()
@@ -4455,8 +4460,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void OnRightAnswerOption(string rightOptionLabel)
     {
+        _data.RightOptionLabel = rightOptionLabel;
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
         var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
+
+        if (IsFinalRound() && _data.AnnouncedAnswerersEnumerator != null)
+        {
+            _data.AnnouncedAnswerersEnumerator.Reset();
+            ScheduleExecution(Tasks.AnnouncePostStake, (answerTime == 0 ? 2 : answerTime) * 10);
+            return;
+        }
+
         ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);
     }
 

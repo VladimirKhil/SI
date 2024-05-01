@@ -967,6 +967,10 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     OnPersonStake(mparams);
                     break;
 
+                case Messages.Answers:
+                    OnAnswers(mparams);
+                    break;
+
                 case Messages.Stop:
                     {
                         #region Stop
@@ -1086,6 +1090,14 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
     }
 
+    private void OnAnswers(string[] mparams)
+    {
+        for (var i = 1; i < mparams.Length && i - 1 < ClientData.Players.Count; i++)
+        {
+            ClientData.Players[i - 1].Answer = mparams[i];
+        }
+    }
+
     private void OnWrongTry(string[] mparams)
     {
         if (!int.TryParse(mparams[1], out var playerIndex) || playerIndex <= 0 || playerIndex >= ClientData.Players.Count)
@@ -1177,11 +1189,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         foreach (var player in ClientData.Players.ToArray())
         {
-            player.State = PlayerState.None;
-            player.Pass = false;
-            player.Stake = 0;
-            player.SafeStake = false;
-            player.MediaLoaded = false;
+            player.ClearState();
         }
 
         _logic.ClearQuestionState();
@@ -1372,11 +1380,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
     {
         foreach (var player in ClientData.Players)
         {
-            player.State = PlayerState.None;
-            player.Pass = false;
-            player.Stake = 0;
-            player.SafeStake = false;
-            player.MediaLoaded = false;
+            player.ClearState();
         }
 
         OnAd();

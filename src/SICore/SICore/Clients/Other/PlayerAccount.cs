@@ -99,6 +99,24 @@ public sealed class PlayerAccount : PersonAccount
         set { if (delete != value) { delete = value; OnPropertyChanged(); } }
     }
 
+    private string _answer = "";
+
+    /// <summary>
+    /// Player's answer.
+    /// </summary>
+    public string Answer
+    {
+        get => _answer;
+        set
+        {
+            if (_answer != value)
+            {
+                _answer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public PlayerAccount(string name, bool isMale, bool connected, bool gameStarted)
         : base(name, isMale, connected, gameStarted)
     {
@@ -114,5 +132,15 @@ public sealed class PlayerAccount : PersonAccount
     private void Init()
     {
         Select = new CustomCommand(arg => SelectionCallback?.Invoke(this));
+    }
+
+    public void ClearState()
+    {
+        State = PlayerState.None;
+        Pass = false;
+        Stake = 0;
+        SafeStake = false;
+        MediaLoaded = false;
+        Answer = "";
     }
 }

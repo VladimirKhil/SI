@@ -508,12 +508,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 TInfo.Selectable = false;
                 _data.Sound = Sounds.RoundBegin;
 
-                foreach (var item in _data.Players)
+                foreach (var player in _data.Players)
                 {
-                    item.State = PlayerState.None;
-                    item.Stake = 0;
-
-                    item.SafeStake = false;
+                    player.ClearState();
                 }
                 break;
 
@@ -583,11 +580,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.MediaSource = null;
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
-
-        foreach (var item in _data.Players)
-        {
-            item.State = PlayerState.None;
-        }
 
         var select = false;
 

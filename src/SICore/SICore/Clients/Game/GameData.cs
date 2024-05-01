@@ -639,6 +639,8 @@ public sealed class GameData : Data
     /// </summary>
     public int AnswerCount { get; internal set; }
 
+    public string RightOptionLabel { get; internal set; }
+
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
         _showMan = showman;

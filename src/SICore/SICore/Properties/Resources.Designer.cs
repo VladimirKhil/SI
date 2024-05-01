@@ -1843,7 +1843,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Bet.
+        ///   Ищет локализованную строку, похожую на Stake of.
         /// </summary>
         public static string Stake {
             get {

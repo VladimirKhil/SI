@@ -157,6 +157,28 @@
 
         <Button Grid.Column="1" Style="{StaticResource PersonAreaStyle}" />
 
+        <TextBlock
+            Grid.ColumnSpan="3"
+            Text="{Binding Answer}"
+            Foreground="Orange"
+            FontSize="20"
+            FontWeight="SemiBold"
+            HorizontalAlignment="Stretch"
+            TextAlignment="Center"
+            VerticalAlignment="Bottom">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Background" Value="#AA000000" />
+                    
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Answer.Length}" Value="0">
+                            <Setter Property="Background" Value="{x:Null}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
         <Border Grid.Row="1" Grid.ColumnSpan="3" Background="{StaticResource PersonGradient}" Margin="3">
             <TextBlock Style="{StaticResource PersonTextStyle}" Text="{Binding Name}" TextWrapping="Wrap" />
         </Border>

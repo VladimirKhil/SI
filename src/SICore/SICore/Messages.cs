@@ -26,6 +26,11 @@ public static class Messages
     public const string Answer = "ANSWER";
 
     /// <summary>
+    /// Contains all players answers.
+    /// </summary>
+    public const string Answers = "ANSWERS";
+
+    /// <summary>
     /// Answer version. Denotes a preliminary answer printed by player.
     /// </summary>
     public const string AnswerVersion = "ANSWER_VERSION";
