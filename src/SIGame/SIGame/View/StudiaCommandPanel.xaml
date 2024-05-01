@@ -235,8 +235,134 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
+        <ControlTemplate x:Key="PassButtonTemplate" TargetType="{x:Type Button}">
+            <Border
+                Name="Bd"
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch"
+                BorderBrush="#77000000"
+                CornerRadius="25"
+                BorderThickness="1"
+                MaxWidth="{Binding Path=ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource Multiplier}, ConverterParameter=5}">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Offset="0" Color="#FFE5E5E5" />
+                        <GradientStop Offset="0.5" Color="#FFBDBDBD" />
+                        <GradientStop Offset="0.5" Color="#FF8C8C8C" />
+                        <GradientStop Offset="1" Color="#FF595959" />
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <Border Name="BdI" BorderThickness="0" CornerRadius="25" Opacity="0">
+                    <Border.Background>
+                        <RadialGradientBrush RadiusX="1.0" RadiusY="1.0">
+                            <GradientStop Offset="0" Color="#FFD9D9D9" />
+                            <GradientStop Offset="0.5" Color="#FF7F7F7F" />
+                            <GradientStop Offset="0.8" Color="#FF404040" />
+                        </RadialGradientBrush>
+                    </Border.Background>
+                </Border>
+            </Border>
+
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation
+                                    Storyboard.TargetName="BdI"
+                                    Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
+                                    To="#77666666"
+                                    Duration="0:0:0.0" />
+
+                                <ColorAnimation
+                                    Storyboard.TargetName="BdI"
+                                    Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
+                                    To="#77666666"
+                                    Duration="0:0:0.0" />
+
+                                <ColorAnimation
+                                    Storyboard.TargetName="BdI"
+                                    Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                    To="#77666666"
+                                    Duration="0:0:0.0" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation
+                                    Storyboard.TargetName="BdI"
+                                    Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
+                                    Duration="0:0:0.0" />
+
+                                <ColorAnimation
+                                    Storyboard.TargetName="BdI"
+                                    Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
+                                    Duration="0:0:0.0" />
+
+                                <ColorAnimation
+                                    Storyboard.TargetName="BdI"
+                                    Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                    Duration="0:0:0.0" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                    <Setter TargetName="BdI" Property="Opacity" Value="1" />
+                </Trigger>
+
+                <EventTrigger RoutedEvent="Control.MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0:0:0.5" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+
+                <EventTrigger RoutedEvent="Control.MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+
+                <EventTrigger RoutedEvent="Button.Click">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetName="BdI"
+                                Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
+                                To="#D7D7D7"
+                                Duration="0:0:0.2" />
+
+                            <ColorAnimation
+                                Storyboard.TargetName="BdI"
+                                Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
+                                BeginTime="0:0:0.4"
+                                Duration="0:0:0.2" />
+
+                            <ThicknessAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Margin)" To="-7" Duration="0:0:0.2" />
+
+                            <ThicknessAnimation
+                                Storyboard.TargetName="BdI"
+                                Storyboard.TargetProperty="(Border.Margin)"
+                                BeginTime="0:0:0.4"
+                                Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
         <Style x:Key="GameButton" TargetType="{x:Type Button}">
             <Setter Property="Template" Value="{StaticResource GameButtonTemplate}"/>
+        </Style>
+
+        <Style x:Key="PassButton" TargetType="{x:Type Button}">
+            <Setter Property="Template" Value="{StaticResource PassButtonTemplate}"/>
         </Style>
 
         <Storyboard x:Key="gameSB">
@@ -254,8 +380,9 @@
     
     <Grid>        
         <Grid.RowDefinitions>
-            <RowDefinition Height="16*" />
+            <RowDefinition Height="6*" />
             <RowDefinition Height="0*" />
+            <RowDefinition Height="14*" />
             <RowDefinition Height="14*" />
             <RowDefinition Height="8*" />
             <RowDefinition Height="8*" />
@@ -272,7 +399,7 @@
             Style="{StaticResource GameButton}"
             Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}"
             Command="{Binding Data.PlayerDataExtensions.PressGameButton}" />
-        
+
         <Border Grid.Row="2" Grid.ColumnSpan="3" Margin="6" Name="gameBorder" Visibility="Hidden" CornerRadius="20" Opacity="0">
             <Border.Background>
                 <RadialGradientBrush RadiusX="1.0" RadiusY="1.0">
@@ -283,7 +410,16 @@
             </Border.Background>
         </Border>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button
+            Grid.Row="3"
+            Grid.ColumnSpan="3"
+            Cursor="Hand"
+            Margin="0,8"
+            Style="{StaticResource PassButton}"
+            Command="{Binding Data.PlayerDataExtensions.Pass}"
+            ToolTip="{x:Static lp:Resources.Pass}" />
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
             <local:DropDownButton
                 Style="{StaticResource SIDropDownButton}"
                 BorderThickness="0"
@@ -384,7 +520,7 @@
             </Button>
         </StackPanel>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button
                 Width="70"
                 Cursor="Hand"
@@ -438,14 +574,6 @@
             <Button
                 Width="70"
                 Cursor="Hand"
-                Command="{Binding Data.PlayerDataExtensions.Pass}"
-                Content="⏩"
-                ToolTip="{x:Static lp:Resources.Pass}"
-                FontSize="20" />
-
-            <Button
-                Width="70"
-                Cursor="Hand"
                 Command="{Binding Data.ShowmanDataExtensions.ChangeActivePlayer}"
                 ToolTip="{x:Static lp:Resources.ChangeActivePlayer_Hint}">
                 <Image Source="/SIGame;component/Resources/active_player.png" RenderOptions.BitmapScalingMode="Fant" Height="24" />
@@ -466,7 +594,7 @@
             Padding="0"
             FontSize="24"
             BorderBrush="{StaticResource MainColor}"
-            Grid.Row="6"
+            Grid.Row="7"
             Width="70"
             HorizontalAlignment="Right"
             Cursor="Hand"

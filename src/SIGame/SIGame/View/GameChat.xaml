@@ -174,9 +174,7 @@
 
         <TabItem Header="🎓" ToolTip="{x:Static lp:Resources.Tables}" Style="{StaticResource StudiaTab}">
             <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
-                <DockPanel
-                    DockPanel.Dock="Bottom"
-                    Visibility="{Binding Data.IsNetworkGame, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                <DockPanel DockPanel.Dock="Bottom">
                     <UniformGrid
                         DockPanel.Dock="Bottom"
                         Columns="2"
@@ -205,9 +203,7 @@
                     </UniformGrid>
                 </DockPanel>
                 
-                <DockPanel
-                    DockPanel.Dock="Bottom"
-                    Visibility="{Binding Data.IsNetworkGame, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                <DockPanel DockPanel.Dock="Bottom">
                     <UniformGrid
                         DockPanel.Dock="Bottom"
                         Columns="2"
