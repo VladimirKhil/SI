@@ -12,6 +12,7 @@ using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Utils;
 using Utils.Commands;
 
 namespace SIGame.ViewModel;
@@ -19,6 +20,10 @@ namespace SIGame.ViewModel;
 public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 {
     public const string MainMenuSound = "main_menu";
+
+    public static bool IsSupportedOS => Environment.OSVersion.Version >= new Version(6, 2);
+
+    public const string SIGameOnlineUrl = "https://sigame.vladimirkhil.com";
 
     public ICommand NewGame { get; private set; }
 
@@ -129,7 +134,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         ShowMenu();
 
-        NewGame = new CustomCommand(New_Executed);
+        NewGame = new SimpleCommand(New_Executed);
         Open = new AsyncCommand(OnlineGame_Executed);
         NetworkGame = new CustomCommand(NetworkGame_Executed);
         BestPlayers = new CustomCommand(Best_Executed);
@@ -296,6 +301,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     private async Task OnlineGame_Executed(object? arg)
     {
         await Task.Delay(300);
+
+        if (!IsSupportedOS)
+        {
+            Browser.Open(SIGameOnlineUrl);
+            return;
+        }
 
         var login = new LoginViewModel(_serviceProvider.GetRequiredService<IGameServerClientFactory>()) { Login = Human.HumanPlayer.Name };
 

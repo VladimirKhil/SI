@@ -59,8 +59,6 @@ public partial class App : Application
 
     private AppState _appState = new();
 
-    private static readonly bool UseSignalRConnection = Environment.OSVersion.Version >= new Version(6, 2);
-
     /// <summary>
     /// Application name.
     /// </summary>
@@ -172,7 +170,6 @@ public partial class App : Application
                 }
             }
 
-            UserSettings.Default.UseSignalRConnection = UseSignalRConnection;
             UserSettings.Default.PropertyChanged += Default_PropertyChanged;
 
             MainWindow = new MainWindow

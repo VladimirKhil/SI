@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Security.Cryptography;
 using Utils;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -86,7 +87,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     public CustomCommand Cancel { get; set; }
 
-    public CustomCommand AddEmoji { get; set; }
+    public SimpleCommand AddEmoji { get; set; }
 
     public GamesFilter GamesFilter
     {
@@ -314,7 +315,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     public string[] Emoji { get; } =
         new string[] { "😃", "😁", "😪", "🎄", "🎓", "💥", "🦄", "🍋", "🍄", "🔥", "❤️", "✨", "🎅", "🎁", "☃️", "🦌" };
 
-    private string _chatText;
+    private string _chatText = "";
 
     public string ChatText
     {
@@ -372,7 +373,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         ServerAddress = _gameServerClient.ServiceUri;
 
-        AddEmoji = new CustomCommand(AddEmoji_Executed);
+        AddEmoji = new SimpleCommand(AddEmoji_Executed);
 
         _defaultSIContentClientOptions = siContentClientOptions.ServiceUri != null ? siContentClientOptions : null;
         _logger = logger;
@@ -417,7 +418,13 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         return Task.CompletedTask;
     }
 
-    private void AddEmoji_Executed(object? arg) => ChatText += arg.ToString();
+    private void AddEmoji_Executed(object? arg)
+    {
+        if (arg != null)
+        {
+            ChatText += arg.ToString();
+        }
+    }
 
     private Task GameServerClient_Closed(Exception? exception)
     {
@@ -430,7 +437,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         return Task.CompletedTask;
     }
 
-    public event Action<string, string> Message;
+    public event Action<string, string>? Message;
 
     private void OnMessage(string userName, string message) => Message?.Invoke(userName, message);
 
@@ -719,7 +726,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                 RecountGames();
             }
 
-            SI.GameServer.Contract.Slice<SI.GameServer.Contract.GameInfo> gamesSlice = null;
+            SI.GameServer.Contract.Slice<SI.GameServer.Contract.GameInfo>? gamesSlice = null;
             var whileGuard = 100;
 
             do
@@ -1125,60 +1132,44 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         try
         {
-            _logger.LogInformation("Joining game: UseSignalRConnection = {useSignalRConnection}", _userSettings.UseSignalRConnection);
+            Error = "";
 
-            if (_userSettings.UseSignalRConnection)
+            _logger.LogInformation("Joining game");
+
+            var siHostClient = await SIHostClient.CreateAsync(
+                new SIHostClientOptions { ServiceUri = gameInfo.HostUri },
+                cancellationToken);
+
+            var result = await siHostClient.JoinGameAsync(
+                new SI.GameServer.Contract.JoinGameRequest(
+                    gameInfo.GameID,
+                    Human.Name,
+                    role,
+                    Human.IsMale ? SI.GameServer.Contract.Sex.Male : SI.GameServer.Contract.Sex.Female,
+                    _password),
+                cancellationToken);
+
+            if (!result.IsSuccess)
             {
-                var siHostClient = await SIHostClient.CreateAsync(
-                    new SIHostClientOptions { ServiceUri = gameInfo.HostUri },
-                    cancellationToken);
-
-                var result = await siHostClient.JoinGameAsync(
-                    new SI.GameServer.Contract.JoinGameRequest(
-                        gameInfo.GameID,
-                        Human.Name,
-                        role,
-                        Human.IsMale ? SI.GameServer.Contract.Sex.Male : SI.GameServer.Contract.Sex.Female,
-                        _password),
-                    cancellationToken);
-
-                if (!result.IsSuccess)
+                Error = result.ErrorType switch
                 {
-                    Error = result.ErrorType switch
-                    {
-                        SI.GameServer.Contract.JoinGameErrorType.GameNotFound => Resources.GameNotFound,
-                        SI.GameServer.Contract.JoinGameErrorType.CommonJoinError => Resources.CommonJoinError,
-                        SI.GameServer.Contract.JoinGameErrorType.InvalidRole => Resources.InvalidRole,
-                        SI.GameServer.Contract.JoinGameErrorType.InternalServerError => Resources.InternalServerError,
-                        SI.GameServer.Contract.JoinGameErrorType.Forbidden => Resources.JoinForbidden,
-                        _ => Resources.UnknownError
-                    } + ' ' + result.Message;
+                    SI.GameServer.Contract.JoinGameErrorType.GameNotFound => Resources.GameNotFound,
+                    SI.GameServer.Contract.JoinGameErrorType.CommonJoinError => Resources.CommonJoinError,
+                    SI.GameServer.Contract.JoinGameErrorType.InvalidRole => Resources.InvalidRole,
+                    SI.GameServer.Contract.JoinGameErrorType.InternalServerError => Resources.InternalServerError,
+                    SI.GameServer.Contract.JoinGameErrorType.Forbidden => Resources.JoinForbidden,
+                    _ => Resources.UnknownError
+                } + ' ' + result.Message;
 
-                    await siHostClient.DisposeAsync();
+                await siHostClient.DisposeAsync();
 
-                    return;
-                }
-
-                await InitNodeAndClientNewAsync(siHostClient, cancellationToken);
-                await JoinGameCompletedAsync(role, isHost, cancellationToken);
-
-                await _gameServerClient.DisposeAsync();
+                return;
             }
-            else
-            {
-                await InitServerAndClientAsync(_gamesHostInfo.Host ?? new Uri(ServerAddress).Host, _gamesHostInfo.Port);
-                await ConnectCoreAsync(true);
 
-                var result = await _connector.SetGameIdAsync(gameInfo.GameID);
+            await InitNodeAndClientNewAsync(siHostClient, cancellationToken);
+            await JoinGameCompletedAsync(role, isHost, cancellationToken);
 
-                if (!result)
-                {
-                    Error = Resources.CreatedGameNotFound;
-                    return;
-                }
-
-                await base.JoinGameCoreAsync(gameInfo, role, isHost, cancellationToken);
-            }
+            await _gameServerClient.DisposeAsync();
 
             _host.Connector.SetGameID(gameInfo.GameID);
             _host.Connector.SetHostUri(gameInfo.HostUri);

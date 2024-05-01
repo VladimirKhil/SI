@@ -238,9 +238,6 @@ public sealed class UserSettings : INotifyPropertyChanged
         }
     }
 
-    [XmlIgnore]
-    public bool UseSignalRConnection { get; set; }
-
     #endregion
 
     public void Save(Stream stream, XmlSerializer? serializer = null)
@@ -250,25 +247,22 @@ public sealed class UserSettings : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Загрузить пользовательские настройки
+    /// Loads user settings from file.
     /// </summary>
-    /// <returns></returns>
     public static UserSettings? LoadOld(string configFileName)
     {
-        using (var file = IsolatedStorageFile.GetUserStoreForAssembly())
+        using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+        if (file.FileExists(configFileName) && Monitor.TryEnter(configFileName, 2000))
         {
-            if (file.FileExists(configFileName) && Monitor.TryEnter(configFileName, 2000))
+            try
             {
-                try
-                {
-                    using var stream = file.OpenFile(configFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return Load(stream);
-                }
-                catch { }
-                finally
-                {
-                    Monitor.Exit(configFileName);
-                }
+                using var stream = file.OpenFile(configFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                return Load(stream);
+            }
+            catch { }
+            finally
+            {
+                Monitor.Exit(configFileName);
             }
         }
 
