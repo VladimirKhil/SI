@@ -1271,7 +1271,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             if (!IsFinalRound())
             {
-                s.AppendFormat(" (-{0})", Notion.FormatNumber(_data.CurPriceWrong));
+                s.AppendFormat(
+                    " (-{0}{1})",
+                    _data.CurPriceWrong.ToString().FormatNumber(),
+                    Math.Abs(_data.Answerer.AnswerIsRightFactor - 1.0) < double.Epsilon ? "" : " * " + _data.Answerer.AnswerIsRightFactor);
+                
                 _gameActions.ShowmanReplic(s.ToString());
 
                 s = new StringBuilder(Messages.Person)
@@ -1284,7 +1288,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 _gameActions.SendMessage(s.ToString());
 
-                _data.Answerer.SubtractWrongSum(_data.CurPriceWrong);
+                _data.Answerer.SubtractWrongSum((int)(_data.CurPriceWrong * _data.Answerer.AnswerIsRightFactor));
                 _data.Answerer.CanPress = false;
                 _gameActions.InformSums();
 

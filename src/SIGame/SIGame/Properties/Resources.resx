@@ -1152,4 +1152,10 @@
   <data name="Tables" xml:space="preserve">
     <value>Tables</value>
   </data>
+  <data name="Decline200Percent" xml:space="preserve">
+    <value>Take doubled price</value>
+  </data>
+  <data name="Decline50Percent" xml:space="preserve">
+    <value>Take half of price</value>
+  </data>
 </root>

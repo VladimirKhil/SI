@@ -1155,4 +1155,10 @@
   <data name="Tables" xml:space="preserve">
     <value>Столы</value>
   </data>
+  <data name="Decline200Percent" xml:space="preserve">
+    <value>Отнять удвоенную сумму</value>
+  </data>
+  <data name="Decline50Percent" xml:space="preserve">
+    <value>Отнять половину суммы</value>
+  </data>
 </root>

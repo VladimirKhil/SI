@@ -24,7 +24,7 @@ public sealed class Showman : Viewer
 
         ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg =>
         {
-            _viewerActions.SendMessage(Messages.IsRight, "-");
+            _viewerActions.SendMessage(Messages.IsRight, "-", arg?.ToString() ?? "1");
             ClearSelections();
         });
 

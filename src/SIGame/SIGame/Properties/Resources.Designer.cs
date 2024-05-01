@@ -601,6 +601,24 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Take doubled price.
+        /// </summary>
+        public static string Decline200Percent {
+            get {
+                return ResourceManager.GetString("Decline200Percent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Take half of price.
+        /// </summary>
+        public static string Decline50Percent {
+            get {
+                return ResourceManager.GetString("Decline50Percent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на (default).
         /// </summary>
         public static string Default {

@@ -171,16 +171,54 @@
                 BorderThickness="0,1.5,1.5,1.5"
                 ToolTip="{x:Static lp:Resources.Accept200Percent}" />
         </Grid>
-        
-        <Button
-            Style="{StaticResource SIButton}"
-            Command="{Binding IsWrong}"
-            Grid.Row="2"
-            Grid.Column="1"
-            Margin="-1,0,0,0"
-            Content="{x:Static lp:Resources.No}"
-            FontSize="25"
-            FontWeight="SemiBold"
-            Padding="30,8"/>
+
+        <Grid Grid.Row="2" Grid.Column="1" Margin="-1,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Grid.ColumnSpan="3"
+                Command="{Binding IsWrong}"
+                Content="{x:Static lp:Resources.No}"
+                FontSize="25"
+                FontWeight="SemiBold"
+                Padding="30,8">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource SIButton}">
+                        <Setter Property="BorderThickness" Value="1.5" />
+                        
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowExtraRightButtons}" Value="True">
+                                <Setter Property="BorderThickness" Value="0,1.5" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <Button
+                Visibility="{Binding ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Style="{StaticResource SIButton}"
+                Command="{Binding IsWrong}" 
+                CommandParameter="0.5"
+                Content="×0.5"
+                Width="50"
+                BorderThickness="1.5,1.5,0,1.5"
+                ToolTip="{x:Static lp:Resources.Decline50Percent}" />
+
+            <Button
+                Grid.Column="2"
+                Visibility="{Binding ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Style="{StaticResource SIButton}"
+                Command="{Binding IsWrong}" 
+                CommandParameter="2.0"
+                Content="×2"
+                Width="50"
+                BorderThickness="0,1.5,1.5,1.5"
+                ToolTip="{x:Static lp:Resources.Decline200Percent}" />
+        </Grid>
     </Grid>
 </UserControl>

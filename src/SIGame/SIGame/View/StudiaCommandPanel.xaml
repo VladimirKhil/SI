@@ -121,7 +121,6 @@
                 CornerRadius="25"
                 BorderThickness="1"
                 MaxWidth="{Binding Path=ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource Multiplier}, ConverterParameter=5}">
-
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                         <GradientStop Offset="0" Color="#FFFF7F7F" />
@@ -416,6 +415,7 @@
             Cursor="Hand"
             Margin="0,8"
             Style="{StaticResource PassButton}"
+            Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}"
             Command="{Binding Data.PlayerDataExtensions.Pass}"
             ToolTip="{x:Static lp:Resources.Pass}" />
 
