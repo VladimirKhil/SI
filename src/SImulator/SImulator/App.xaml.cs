@@ -122,7 +122,7 @@ public partial class App : Application
             new Package
             {
                 Name = SImulator.Properties.Resources.TestPackage,
-                ContentUri = new Uri("https://vladimirkhil.com/sistorage/packages/98658de3-5992-43ed-9655-4ed3c02672a2.siq")
+                ContentUri = new Uri("https://vladimirkhil.com/sistorage/packages/d8faa1a4-2a6f-4103-b298-fd15c6ee3ea6.siq")
             });
 #else
         ProcessAsync();

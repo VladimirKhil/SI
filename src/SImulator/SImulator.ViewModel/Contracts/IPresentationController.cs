@@ -10,7 +10,10 @@ namespace SImulator.ViewModel.Contracts;
 public interface IPresentationController : IDisposable
 {
     Action<int, int>? SelectionCallback { get; set; }
+    
     Action<int>? DeletionCallback { get; set; }
+
+    event Action<Exception>? Error;
 
     /// <summary>
     /// Starts new game.
@@ -29,6 +32,8 @@ public interface IPresentationController : IDisposable
     void SetMedia(MediaSource media, bool background);
 
     void SetStage(TableStage stage);
+
+    void SetRound(string roundName);
 
     void SetText(string text = "");
 
@@ -107,4 +112,6 @@ public interface IPresentationController : IDisposable
     void SetAnswerState(int answerIndex, ItemState state);
 
     void OnQuestionStart();
+
+    void BeginPressButton() { }
 }

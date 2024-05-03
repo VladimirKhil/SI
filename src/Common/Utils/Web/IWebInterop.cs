@@ -1,4 +1,4 @@
-﻿namespace SIQuester.ViewModel.Contracts;
+﻿namespace Utils.Web;
 
 public interface IWebInterop
 {

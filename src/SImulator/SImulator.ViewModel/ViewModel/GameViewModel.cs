@@ -11,7 +11,6 @@ using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
@@ -1339,8 +1338,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             return;
         }
 
-        PresentationController.SetText(round.Name);
-        PresentationController.SetStage(TableStage.Round);
+        PresentationController.SetRound(round.Name);
         SetSound(Settings.Model.Sounds.RoundBegin);
         LocalInfo.TStage = TableStage.Round;
 
@@ -2040,7 +2038,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     internal void StartButtons() => _buttonManager?.Start();
 
-    internal void AskAnswerButton() => State = QuestionState.Pressing;
+    internal void AskAnswerButton()
+    {
+        PresentationController.BeginPressButton();
+        State = QuestionState.Pressing;
+    }
 
     internal void OnQuestionStart()
     {

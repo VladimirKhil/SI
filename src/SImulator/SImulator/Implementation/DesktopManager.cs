@@ -51,21 +51,25 @@ internal sealed class DesktopManager : PlatformManager
 
     public override void CreatePlayersView(object dataContext)
     {
-        if (_playersWindow == null)
+        if (_playersWindow != null)
         {
-            _playersWindow = new PlayersWindow { DataContext = dataContext };
-            _playersWindow.Show();
+            return;
         }
+        
+        _playersWindow = new PlayersWindow { DataContext = dataContext };
+        _playersWindow.Show();
     }
 
     public override void ClosePlayersView()
     {
-        if (_playersWindow != null)
+        if (_playersWindow == null)
         {
-            _playersWindow.CanClose = true;
-            _playersWindow.Close();
-            _playersWindow = null;
+            return;
         }
+        
+        _playersWindow.CanClose = true;
+        _playersWindow.Close();
+        _playersWindow = null;
     }
 
     public override Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen)
@@ -114,7 +118,7 @@ internal sealed class DesktopManager : PlatformManager
 
     public override IDisplayDescriptor[] GetScreens() =>
         Screen.AllScreens.Select(screen => new ScreenDisplayDescriptor(screen))
-            .Concat(new IDisplayDescriptor[] { WindowDisplayDescriptor.Instance /*, WebView.Instance */ })
+            .Concat(new IDisplayDescriptor[] { WindowDisplayDescriptor.Instance/*, WebDisplayDescriptor.Instance */ })
             .ToArray();
 
     public override string[] GetLocalComputers()

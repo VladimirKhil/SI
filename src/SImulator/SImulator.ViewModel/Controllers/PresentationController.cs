@@ -18,8 +18,6 @@ namespace SImulator.ViewModel.Controllers;
 /// <inheritdoc cref="IPresentationController" />
 public sealed class PresentationController : IPresentationController, INotifyPropertyChanged
 {
-    public Uri Source { get; } = new($"file:///{AppDomain.CurrentDomain.BaseDirectory}webtable/index.html");
-
     private int _previousCode = -1;
 
     private readonly IAnimatableTimer _animatableTimer = PlatformManager.Instance.CreateAnimatableTimer();
@@ -564,6 +562,12 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     public void OnQuestionStart() => TInfo.LayoutMode = LayoutMode.Simple;
 
     public void Dispose() => _animatableTimer.Dispose();
+
+    public void SetRound(string roundName)
+    {
+        SetText(roundName);
+        SetStage(TableStage.Round);
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }

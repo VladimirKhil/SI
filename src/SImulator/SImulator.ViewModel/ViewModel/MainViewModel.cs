@@ -466,10 +466,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             var presentationListener = new PresentationListener(engine);
 
-            var presentationController = new PresentationController(screen)
-            {
-                Listener = presentationListener
-            };
+            IPresentationController presentationController = screen.IsWebView
+                ? new WebPresentationController(screen, presentationListener)
+                : new PresentationController(screen)
+                {
+                    Listener = presentationListener
+                };
 
             presentationController.UpdateSettings(SettingsViewModel.SIUISettings.Model);
             presentationController.UpdateShowPlayers(SettingsViewModel.Model.ShowPlayers);

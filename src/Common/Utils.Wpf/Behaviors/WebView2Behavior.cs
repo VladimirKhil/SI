@@ -1,15 +1,15 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
-using SIQuester.ViewModel.Contracts;
 using System.Diagnostics;
 using System.Windows;
+using Utils.Web;
 
-namespace SIQuester.Behaviors;
+namespace Utils.Wpf.Behaviors;
 
 /// <summary>
 /// Attaches additional behavior for WebView2 control.
 /// </summary>
-internal static class WebView2Behavior
+public static class WebView2Behavior
 {
     public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
 

@@ -1,1 +1,1 @@
-sigame.runTable('reactHost', 1);
+sigame.run('reactHost');
