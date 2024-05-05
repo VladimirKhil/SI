@@ -20,6 +20,22 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
 
     public bool HasComplexAnswer => Model.ContainsKey(QuestionParameterNames.Answer);
 
+    /// <summary>
+    /// Question answer type.
+    /// </summary>
+    public string AnswerType
+    {
+        get
+        {
+            if (!TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter))
+            {
+                return StepParameterValues.SetAnswerTypeType_Text;
+            }
+
+            return answerTypeParameter.Model.SimpleValue;
+        }
+    }
+
     public SimpleCommand AddItem { get; private set; }
 
     public SimpleCommand DeleteItem { get; private set; }
@@ -200,6 +216,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
         }
 
         OnPropertyChanged(new PropertyChangedEventArgs(nameof(HasComplexAnswer)));
+        OnPropertyChanged(new PropertyChangedEventArgs(nameof(AnswerType)));
         UpdateCommands();
     }
 

@@ -67,23 +67,19 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     public ICommand SwitchEmpty { get; private set; }
 
     /// <summary>
-    /// Question answer type.
+    /// Tries to get question answer options.
     /// </summary>
-    public string AnswerType
+    public StepParameterViewModel? AnswerOptions
     {
         get
         {
             if (Parameters == null)
             {
-                return StepParameterValues.SetAnswerTypeType_Text;
-            }
-            
-            if (!Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter))
-            {
-                return StepParameterValues.SetAnswerTypeType_Text;
+                return null;
             }
 
-            return answerTypeParameter.Model.SimpleValue;
+            Parameters.TryGetValue(QuestionParameterNames.AnswerOptions, out var answerOptionsParameter);
+            return answerOptionsParameter;
         }
     }
 
@@ -188,7 +184,6 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerType);
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
-                OnPropertyChanged(nameof(AnswerType));
 
                 innerChange.Commit();
                 return;
@@ -223,9 +218,9 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                 {
                     Type = StepParameterTypes.Content,
                     ContentValue = new List<ContentItem>
-                {
-                    new() { Type = ContentTypes.Text, Value = "" },
-                }
+                    {
+                        new() { Type = ContentTypes.Text, Value = "" },
+                    }
                 };
 
                 for (var i = 0; i < AppSettings.Default.SelectOptionCount; i++)
@@ -242,8 +237,6 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             }
 
             change.Commit();
-
-            OnPropertyChanged(nameof(AnswerType));
         }
         catch (Exception exc)
         {

@@ -1055,7 +1055,7 @@
                                                                     <Binding Path="Key" />
 
                                                                     <Binding
-                                                                        Path="DataContext.AnswerType"
+                                                                        Path="DataContext.Parameters.AnswerType"
                                                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}" />
                                                                 </MultiBinding.Bindings>
                                                             </MultiBinding>
@@ -1295,14 +1295,10 @@
                                                                 <Setter Property="Content" Value="{StaticResource AddMarkerImage}" />
 
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Parameters.HasComplexAnswer}" Value="True">                                                                        
+                                                                    <DataTrigger Binding="{Binding Parameters.HasComplexAnswer}" Value="True">
                                                                         <Setter Property="Command" Value="{Binding RemoveComplexAnswer}" />
                                                                         <Setter Property="ToolTip" Value="{x:Static lp:Resources.RemoveComplexAnswer}" />
                                                                         <Setter Property="Content" Value="{StaticResource RemoveMarkerImage}" />
-                                                                    </DataTrigger>
-
-                                                                    <DataTrigger Binding="{Binding AnswerType}" Value="select">
-                                                                        <Setter Property="IsEnabled" Value="False" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
@@ -2413,7 +2409,8 @@
                     ItemsSource="{Binding}"
                     Background="#FFFFE1E6"
                     siq:SmartMenuManager.SecondMenu="True"
-                    siq:ActivateManager.IsWatching="True" />
+                    siq:ActivateManager.IsWatching="True"
+                    Padding="4" />
             </DataTemplate>
 
             <Style x:Key="WrongAnswersStyle" TargetType="{x:Type ContentControl}">
@@ -2752,6 +2749,104 @@
                 </siqcv:TemplateConverter.Templates>
             </siqcv:TemplateConverter>
 
+            <DataTemplate x:Key="GroupItemTemplate">
+                <DockPanel Background="Transparent">
+                    <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                        <Button
+                            x:Name="bDelete"
+                            Command="{Binding DataContext.GroupValue.DeleteItem, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            CommandParameter="{Binding}"
+                            ToolTip="{x:Static lp:Resources.Delete}"
+                            VerticalAlignment="Center"
+                            Visibility="Hidden">
+                            <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="1" Data="M0,0L9,9M0,9L9,0" />
+
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <Button
+                            x:Name="bSetRight"
+                            Command="{Binding DataContext.GroupValue.MakeRight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            CommandParameter="{Binding}"
+                            ToolTip="{x:Static lp:Resources.MakeRight}"
+                            Margin="2,0,0,0"
+                            VerticalAlignment="Center"
+                            Visibility="Hidden">
+                            <Image x:Name="iSetRight" Source="{StaticResource SetRightAnswerImage}" Width="14" Height="14" />
+
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="ToolTip" Value="" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+
+                    <TextBlock
+                        x:Name="name"
+                        Text="{Binding Key}"
+                        DockPanel.Dock="Left"
+                        MinWidth="25"
+                        FontWeight="Bold"
+                        Foreground="Black"
+                        VerticalAlignment="Center"
+                        TextAlignment="Left"
+                        Margin="5,2,3,2" />
+
+                    <Border
+                        Background="LightBlue"
+                        MinWidth="25"
+                        Margin="1">
+                        <ContentControl
+                            x:Name="value"
+                            Margin="0,2,0,0"
+                            TextBlock.Foreground="Black"
+                            Content="{Binding Value}"
+                            ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource GroupParameterSelector}}"
+                            KeyboardNavigation.IsTabStop="False" />
+                    </Border>
+                </DockPanel>
+
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter TargetName="bDelete" Property="Visibility" Value="Visible" />
+                        <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
+                    </Trigger>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="bDelete" Property="Visibility" Value="Visible" />
+                        <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
+                    </Trigger>
+
+                    <DataTrigger Value="True">
+                        <DataTrigger.Binding>
+                            <MultiBinding Converter="{StaticResource EqualsMultiConverter}">
+                                <MultiBinding.Bindings>
+                                    <Binding Path="Key" />
+                                    <Binding Path="DataContext.GroupValue.Owner.Right[0]" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                </MultiBinding.Bindings>
+                            </MultiBinding>
+                        </DataTrigger.Binding>
+
+                        <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
+                        <Setter TargetName="bSetRight" Property="IsEnabled" Value="False" />
+                        <Setter TargetName="iSetRight" Property="Source" Value="{StaticResource AnswerTypeImage}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
             <siqcv:TemplateConverter x:Key="ParameterSelector">
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <!-- pc:StepParameterTypes.Simple -->
@@ -2827,107 +2922,7 @@
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="vm:StepParameterViewModel">
-                        <ItemsControl ItemsSource="{Binding GroupValue}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <DockPanel Background="Transparent">
-                                        <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
-                                            <Button
-                                                x:Name="bDelete"
-                                                Command="{Binding DataContext.GroupValue.DeleteItem, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip="{x:Static lp:Resources.Delete}"
-                                                VerticalAlignment="Center"
-                                                Visibility="Hidden">
-                                                <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="1" Data="M0,0L9,9M0,9L9,0" />
-
-                                                <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                                        <Style.Triggers>
-                                                            <Trigger Property="IsEnabled" Value="False">
-                                                                <Setter Property="Visibility" Value="Hidden" />
-                                                            </Trigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                            </Button>
-
-                                            <Button
-                                                x:Name="bSetRight"
-                                                Command="{Binding DataContext.GroupValue.MakeRight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip="{x:Static lp:Resources.MakeRight}"
-                                                Margin="2,0,0,0"
-                                                VerticalAlignment="Center"
-                                                Visibility="Hidden">
-                                                <Image x:Name="iSetRight" Source="{StaticResource SetRightAnswerImage}" Width="14" Height="14" />
-
-                                                <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                                        <Style.Triggers>
-                                                            <Trigger Property="IsEnabled" Value="False">
-                                                                <Setter Property="ToolTip" Value="" />
-                                                            </Trigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                            </Button>
-                                        </StackPanel>
-
-                                        <TextBlock
-                                            x:Name="name"
-                                            Text="{Binding Key}"
-                                            DockPanel.Dock="Left"
-                                            MinWidth="25"
-                                            FontWeight="Bold"
-                                            Foreground="Black"
-                                            VerticalAlignment="Center"
-                                            TextAlignment="Left"
-                                            Margin="5,2,3,2" />
-
-                                        <Border
-                                            Background="LightBlue"
-                                            MinWidth="25"
-                                            Margin="1">
-                                            <ContentControl
-                                                x:Name="value"
-                                                Margin="0,2,0,0"
-                                                TextBlock.Foreground="Black"
-                                                Content="{Binding Value}"
-                                                ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource GroupParameterSelector}}"
-                                                KeyboardNavigation.IsTabStop="False" />
-                                        </Border>
-                                    </DockPanel>
-
-                                    <DataTemplate.Triggers>
-                                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                            <Setter TargetName="bDelete" Property="Visibility" Value="Visible" />
-                                            <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
-                                        </Trigger>
-
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="bDelete" Property="Visibility" Value="Visible" />
-                                            <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
-                                        </Trigger>
-
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <MultiBinding Converter="{StaticResource EqualsMultiConverter}">
-                                                    <MultiBinding.Bindings>
-                                                        <Binding Path="Key" />
-                                                        <Binding Path="DataContext.GroupValue.Owner.Right[0]" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
-                                                    </MultiBinding.Bindings>
-                                                </MultiBinding>
-                                            </DataTrigger.Binding>
-
-                                            <Setter TargetName="bSetRight" Property="Visibility" Value="Visible" />
-                                            <Setter TargetName="bSetRight" Property="IsEnabled" Value="False" />
-                                            <Setter TargetName="iSetRight" Property="Source" Value="{StaticResource AnswerTypeImage}" />
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding GroupValue}" ItemTemplate="{StaticResource GroupItemTemplate}" />
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="vm:StepParameterViewModel">
@@ -2974,7 +2969,7 @@
                 </siqcv:TemplateConverter.Templates>
             </siqcv:TemplateConverter>
 
-            <Style x:Key="ScenarioStyle" TargetType="{x:Type ItemsControl}">
+            <Style x:Key="ParametersStyle" TargetType="{x:Type ItemsControl}">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="ItemsSource" Value="{Binding Parameters}" />
                 
@@ -3019,6 +3014,11 @@
                                     <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
                                     <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerOptions}">
+                                    <Setter TargetName="name" Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+                                    <Setter TargetName="value" Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+                                </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </Setter.Value>
@@ -3026,6 +3026,56 @@
                 
                 <Setter Property="siq:SmartMenuManager.SecondMenu" Value="False" />
                 <Setter Property="vm1:ItemsControlWatcher.IsWatching" Value="False" />
+            </Style>
+
+            <DataTemplate x:Key="SimpleAnswerTemplate">
+                <StackPanel
+                    MaxWidth="400"
+                    Orientation="Vertical"
+                    VerticalAlignment="Center"
+                    TextBlock.FontStyle="Italic"
+                    Background="Honeydew">
+                    <siq:TextList
+                        x:Name="right"
+                        Style="{StaticResource LightTextBox}"
+                        siq:SmartMenuManager.SecondMenu="True"
+                        CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
+                        DataContext="{Binding Right}"
+                        ItemsSource="{Binding}"
+                        MinWidth="75"
+                        TabIndex="3"
+                        Padding="3" />
+
+                    <ContentControl
+                        Style="{StaticResource WrongAnswersStyle}"
+                        Content="{Binding Wrong}"
+                        KeyboardNavigation.IsTabStop="False" />
+                </StackPanel>
+
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Model.Price}" Value="{x:Static p:Question.InvalidPrice}">
+                        <Setter TargetName="right" Property="IsEnabled" Value="False" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <DataTemplate x:Key="AnswerOptionsTemplate">
+                <ItemsControl
+                    DataContext="{Binding AnswerOptions}"
+                    ItemsSource="{Binding GroupValue}"                    
+                    ItemTemplate="{StaticResource GroupItemTemplate}"
+                    Background="Honeydew"
+                    MaxWidth="800" />
+            </DataTemplate>
+
+            <Style x:Key="AnswerBlockStyle" TargetType="ContentControl">
+                <Setter Property="ContentTemplate" Value="{StaticResource SimpleAnswerTemplate}" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Parameters.AnswerType}" Value="select">
+                        <Setter Property="ContentTemplate" Value="{StaticResource AnswerOptionsTemplate}" />
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
 
             <HierarchicalDataTemplate DataType="{x:Type vm:QuestionViewModel}">
@@ -3064,80 +3114,35 @@
                         KeyboardNavigation.IsTabStop="False" />
 
                     <ItemsControl
-                        Name="scenario"
+                        Name="parameters"
                         Grid.Row="1"
                         Grid.Column="2"
-                        Style="{StaticResource ScenarioStyle}"
+                        Style="{StaticResource ParametersStyle}"
                         KeyboardNavigation.IsTabStop="False" />
-                    
+
                     <ContentControl
                         Grid.Row="2"
                         Grid.Column="1"
                         Grid.ColumnSpan="5"
                         Content="{Binding Info}"
                         KeyboardNavigation.IsTabStop="False" />
-                    
-                    <TextBlock
-                        x:Name="open"
-                        Grid.Row="1"
-                        Grid.Column="3"
-                        VerticalAlignment="Center"
-                        Text="(" Style="{StaticResource BlockStyleKey}"/>
-                    
-                    <StackPanel
-                        x:Name="answers"
-                        MaxWidth="400"
+
+                    <ContentControl
+                        x:Name="answer"
                         Grid.Row="1"
                         Grid.Column="4"
-                        Orientation="Vertical"
-                        VerticalAlignment="Center"
-                        TextBlock.FontStyle="Italic">
-                        <siq:TextList
-                            x:Name="right"
-                            Style="{StaticResource LightTextBox}"
-                            siq:SmartMenuManager.SecondMenu="True"
-                            CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
-                            DataContext="{Binding Right}"
-                            ItemsSource="{Binding}"
-                            MinWidth="50"
-                            TabIndex="3" />
-                        
-                        <ContentControl
-                            Style="{StaticResource WrongAnswersStyle}"
-                            Content="{Binding Wrong}"
-                            KeyboardNavigation.IsTabStop="False" />
-                    </StackPanel>
-
-                    <TextBlock
-                        x:Name="close"
-                        Grid.Row="1"
-                        Grid.Column="5"
-                        VerticalAlignment="Center"
-                        Text=")"
-                        Style="{StaticResource BlockStyleKey}" />
+                        Content="{Binding}"
+                        Style="{StaticResource AnswerBlockStyle}" />
                 </Grid>
-                
+
                 <HierarchicalDataTemplate.Triggers>
-                    <Trigger SourceName="scenario" Property="IsMouseOver" Value="True">
-                        <Setter TargetName="right" Property="Control.Background" Value="{StaticResource SecondHighlightColor}" />
-                    </Trigger>
-                    
                     <DataTrigger Binding="{Binding Model.Price}" Value="{x:Static p:Question.InvalidPrice}">
                         <Setter TargetName="price" Property="IsEnabled" Value="False" />
-                        <Setter TargetName="scenario" Property="IsEnabled" Value="False" />
-                        <Setter TargetName="open" Property="Visibility" Value="Collapsed" />
-                        <Setter TargetName="right" Property="IsEnabled" Value="False" />
-                        <Setter TargetName="close" Property="Visibility" Value="Collapsed" />
+                        <Setter TargetName="parameters" Property="IsEnabled" Value="False" />
                     </DataTrigger>
                     
                     <DataTrigger Binding="{Binding IsDragged}" Value="True">
                         <Setter Property="Opacity" Value="0.2" />
-                    </DataTrigger>
-
-                    <DataTrigger Binding="{Binding AnswerType}" Value="select">
-                        <Setter TargetName="open" Property="Visibility" Value="Collapsed" />
-                        <Setter TargetName="answers" Property="Visibility" Value="Collapsed" />
-                        <Setter TargetName="close" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                 </HierarchicalDataTemplate.Triggers>
             </HierarchicalDataTemplate>
