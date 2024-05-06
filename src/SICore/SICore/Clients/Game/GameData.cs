@@ -217,9 +217,9 @@ public sealed class GameData : Data
     internal List<string> UsedWrongVersions = new();
 
     /// <summary>
-    /// Marks whether theme info has been alreay shown.
+    /// Marks whether theme info has been already shown.
     /// </summary>
-    internal bool[] ThemeInfoShown { get; set; }
+    internal HashSet<Theme> ThemeInfoShown { get; } = new();
 
     /// <summary>
     /// Ожидается ли решение

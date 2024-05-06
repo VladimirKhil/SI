@@ -330,9 +330,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.ShowmanReplic($"{_data.Theme.Name}, {question.Price}");
         _gameActions.SendMessageWithArgs(Messages.Question, question.Price);
 
-        InitQuestionState(question);
-
-        ScheduleExecution(Tasks.QuestionType, 10, 1, true);
+        InitQuestionState(_data.Question);
+        ProceedToThemeAndQuestion();
     }
 
     internal void OnQuestionSelected(int themeIndex, int questionIndex)
@@ -350,11 +349,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
 
         InitQuestionState(_data.Question);
+        ProceedToThemeAndQuestion();
+    }
 
-        // If theme info has not been displayed yet
-        if (!_data.ThemeInfoShown[themeIndex])
+    private void ProceedToThemeAndQuestion()
+    {
+        if (!_data.ThemeInfoShown.Contains(_data.Theme))
         {
-            _data.ThemeInfoShown[themeIndex] = true;
             ScheduleExecution(Tasks.Theme, 10, 1, true);
         }
         else
@@ -798,7 +799,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_data.Theme.Name}");
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _data.Theme.Name);
 
-        ScheduleExecution(Tasks.Theme, 10, 1);
+        ProceedToThemeAndQuestion();
     }
 
     private void Engine_EndGame()
@@ -986,7 +987,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private void ProceedToFinalQuestion()
     {
         _gameActions.ShowmanReplic(LO[nameof(R.ThankYou)]);
-        ScheduleExecution(Tasks.QuestionType, 10, 1);
+        ScheduleExecution(Tasks.MoveNext, 20);
     }
 
     private bool OnNextPersonFinalThemeDeleting()
@@ -2565,6 +2566,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void OnQuestionType(int arg)
     {
+        var returnDelay = 20;
+
         if (arg == 1)
         {
             if (_data.Question == null)
@@ -2594,11 +2597,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 _gameActions.ShowmanReplic(themeComments);
                 _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines());
-                ScheduleExecution(Tasks.QuestionType, 10, arg + 1);
-                return;
+                returnDelay = 10;
             }
-
-            arg++;
+            else
+            {
+                arg++;
+            }
         }
 
         if (arg == 3)
@@ -2665,9 +2669,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return;
         }
 
-        ScheduleExecution(Tasks.QuestionType, 20, arg + 1);
+        ScheduleExecution(Tasks.QuestionType, returnDelay, arg + 1);
     }
 
+    // TODO: remove after all clients upgrade to 7.11+
     private static string MakeCompatibleQuestionTypeName(string typeName) => typeName switch
     {
         QuestionTypes.Stake => QuestionTypes.Auction,
@@ -2814,7 +2819,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
         _data.AnswererIndex = answererIndex;
-        var answer = _data.Answerer?.Answer ?? LO[nameof(R.IDontKnow)];
+        var playerAnswer = _data.Answerer?.Answer;
+        var answer = string.IsNullOrEmpty(playerAnswer) ? LO[nameof(R.IDontKnow)] : playerAnswer;
 
         _gameActions.PlayerReplic(answererIndex, answer);
 
@@ -3978,11 +3984,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         var informed = false;
 
-        if (arg == 0)
-        {
-            _gameActions.SendMessageWithArgs(Messages.Theme, theme.Name);
-        }
-
         if (arg == 1)
         {
             var authors = _data.PackageDoc.GetRealAuthors(theme.Info.Authors);
@@ -4023,13 +4024,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
+            _data.ThemeInfoShown.Add(_data.Theme);
             var delay = informed ? 20 : 1;
 
-            if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
-            {
-                ScheduleExecution(Tasks.MoveNext, delay);
-            }
-            else if (_data.Round.Type != RoundTypes.Final)
+            if (_data.Question != null)
             {
                 ScheduleExecution(Tasks.QuestionType, delay, 1, force: !informed);
             }
@@ -4186,13 +4184,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.TableInformStage = 0;
             _data.IsRoundEnding = false;
 
-            // TODO: do not rely on strings
-            var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
-
-            var skipRoundAnnounce = isRandomPackage &&
-                _data.Settings.AppSettings.GameMode == GameModes.Sport &&
-                _data.Package.Rounds.Count == 2; // second round is always the final in random package
-
             var roundIndex = -1;
 
             for (var i = 0; i < _data.Rounds.Length; i++)
@@ -4219,19 +4210,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
             }
 
-            _gameActions.InformStage(name: skipRoundAnnounce ? "" : roundName, index: roundIndex);
+            _gameActions.InformStage(name: roundName, index: roundIndex);
             _gameActions.InformRoundContent();
 
-            if (!skipRoundAnnounce)
-            {
-                _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");
-                _gameActions.SystemReplic(" "); // new line
-                _gameActions.SystemReplic(roundName);
-            }
-            else
-            {
-                baseTime = 1;
-            }
+            _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");
+            _gameActions.SystemReplic(" "); // new line
+            _gameActions.SystemReplic(roundName);
         }
         else if (stage == 2)
         {

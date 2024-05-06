@@ -26,7 +26,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         GameLogic?.InitThemes(themes, false, true);
 
         // Filling initial questions table
-        _gameData.ThemeInfoShown = new bool[themes.Count];
+        _gameData.ThemeInfoShown.Clear();
 
         var maxQuestionsInTheme = themes.Max(t => t.Questions.Count);
 
@@ -151,7 +151,9 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     public void OnTheme(Theme theme)
     {
         _gameData.Theme = theme;
-        GameLogic?.ScheduleExecution(Tasks.Theme, 1);
+        _gameData.Question = null; // It is important for moving next after theme
+        GameActions?.SendMessageWithArgs(Messages.Theme, theme.Name);
+        GameLogic?.ScheduleExecution(Tasks.Theme, 10, 1);
     }
 
     public void OnQuestion(Question question) => GameLogic?.OnQuestion(question);
