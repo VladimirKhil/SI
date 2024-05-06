@@ -44,7 +44,7 @@ internal static class WellKnownGameRules
         Simple.RoundRules[RoundTypes.Final] = new()
         {
             DefaultQuestionType = QuestionTypes.StakeAll,
-            QuestionSelectionStrategyType = QuestionSelectionStrategyType.Sequential
+            QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes
         };
     }
 }

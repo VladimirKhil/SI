@@ -34,7 +34,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         }
     }
 
-    protected abstract GameRules GameRules { get; }
+    protected GameRules GameRules { get; private set; }
 
     protected readonly SIDocument _document;
 
@@ -171,8 +171,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action<bool>? NextRound;
     public event Action<Round>? Round;
     public event Action? RoundSkip;
-    public event Action<Theme>? Theme;
-    public event Action<Question>? Question;
 
     public event Action? QuestionPostInfo;
 
@@ -192,11 +190,13 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected EngineBase(
         SIDocument document,
+        GameRules gameRules,
         Func<EngineOptions> optionsProvider,
         ISIEnginePlayHandler playHandler,
         QuestionEngineFactory questionEngineFactory)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
+        GameRules = gameRules;
         OptionsProvider = optionsProvider ?? throw new ArgumentNullException(nameof(optionsProvider));
         PlayHandler = playHandler;
         _questionEngineFactory = questionEngineFactory;
@@ -220,10 +220,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnRound(Round round) => Round?.Invoke(round);
 
     protected void OnRoundSkip() => RoundSkip?.Invoke();
-
-    protected void OnTheme(Theme theme) => Theme?.Invoke(theme);
-
-    protected void OnQuestion(Question question) => Question?.Invoke(question);
 
     protected void OnQuestionPostInfo() => QuestionPostInfo?.Invoke();
 

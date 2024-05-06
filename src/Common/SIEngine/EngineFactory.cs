@@ -1,9 +1,8 @@
 ﻿using SIEngine.Core;
+using SIEngine.Rules;
 using SIPackages;
 
 namespace SIEngine;
-
-// TODO: Merge two engines into one and provide different strategies for its question selection logic
 
 /// <summary>
 /// Provides a method for creating SIGame engine.
@@ -24,7 +23,10 @@ public static class EngineFactory
         Func<EngineOptions> optionsProvider,
         ISIEnginePlayHandler playHandler,
         IQuestionEnginePlayHandler questionPlayHandler) =>
-        classical
-            ? new TvEngine(document, optionsProvider, playHandler, new QuestionEngineFactory(questionPlayHandler))
-            : new SportEngine(document, optionsProvider, playHandler, new QuestionEngineFactory(questionPlayHandler));
+        new GameEngine(
+            document,
+            classical ? WellKnownGameRules.Classic : WellKnownGameRules.Simple,
+            optionsProvider,
+            playHandler,
+            new QuestionEngineFactory(questionPlayHandler));
 }

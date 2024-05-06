@@ -147,4 +147,12 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
         GameLogic?.AnnounceFinalTheme();
     }
+
+    public void OnTheme(Theme theme)
+    {
+        _gameData.Theme = theme;
+        GameLogic?.ScheduleExecution(Tasks.Theme, 1);
+    }
+
+    public void OnQuestion(Question question) => GameLogic?.OnQuestion(question);
 }

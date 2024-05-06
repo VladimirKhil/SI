@@ -379,8 +379,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsMultimediaPressMode = options.FalseStart && options.FalseStartMultimedia && options.UsePlayersKeys != PlayerKeysModes.None,
             ShowRight = options.ShowRight,
             ShowScore = false,
-            PlaySpecials = options.PlaySpecials,
-            ThinkingTime = options.ThinkingTime
+            PlaySpecials = options.PlaySpecials
         };
     }
 

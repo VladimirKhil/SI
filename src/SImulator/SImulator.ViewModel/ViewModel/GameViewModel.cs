@@ -545,8 +545,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _engine.GameThemes += Engine_GameThemes;
         _engine.NextRound += Engine_NextRound;
         _engine.Round += Engine_Round;
-        _engine.Theme += Engine_Theme;
-        _engine.Question += Engine_Question;
         _engine.ShowScore += Engine_ShowScore;
         _engine.LogScore += LogScore;
         _engine.QuestionPostInfo += Engine_QuestionPostInfo;
@@ -1145,7 +1143,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    private void Engine_Question(Question question)
+    internal void OnQuestion(Question question)
     {
         ActiveQuestion = question;
 
@@ -1163,7 +1161,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void SetCaption(string caption) => PresentationController.SetCaption(Settings.Model.ShowTableCaption ? caption : "");
 
-    private void Engine_Theme(Theme theme)
+    internal void OnTheme(Theme theme)
     {
         PresentationController.SetText($"{Resources.Theme}: {theme.Name}");
         PresentationController.SetStage(TableStage.Theme);

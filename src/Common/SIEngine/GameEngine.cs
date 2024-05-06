@@ -5,10 +5,6 @@ using SIPackages.Core;
 
 namespace SIEngine;
 
-// TODO: support simple SIGame mode here too
-// (allow to provide different GameRules instances here)
-// After that, remove SportEngine class
-
 /// <summary>
 /// Plays SIGame package and calls play handler callbacks.
 /// </summary>
@@ -16,10 +12,8 @@ namespace SIEngine;
 /// Uses selection strategy to select questions in each game round. Then tranfers question play to question engine.
 /// The strategy is selected by game rules and round type.
 /// </remarks>
-public sealed class TvEngine : EngineBase
+public sealed class GameEngine : EngineBase
 {
-    protected override GameRules GameRules => WellKnownGameRules.Classic;
-
     private ISelectionStrategy? _selectionStrategy;
 
     private ISelectionStrategy SelectionStrategy => _selectionStrategy ?? throw new InvalidOperationException("_selectionStrategy == null");
@@ -30,12 +24,13 @@ public sealed class TvEngine : EngineBase
         _activeQuestion = _activeTheme.Questions[_questionIndex];
     }
 
-    public TvEngine(
+    public GameEngine(
         SIDocument document,
+        GameRules gameRules,
         Func<EngineOptions> optionsProvider,
         ISIEnginePlayHandler playHandler,
         QuestionEngineFactory questionEngineFactory)
-        : base(document, optionsProvider, playHandler, questionEngineFactory) { }
+        : base(document, gameRules, optionsProvider, playHandler, questionEngineFactory) { }
 
     /// <summary>
     /// Moves to the next game stage.

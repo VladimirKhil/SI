@@ -134,8 +134,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         Engine.GameThemes += Engine_GameThemes;
         Engine.Round += Engine_Round;
         Engine.RoundSkip += Engine_RoundSkip;
-        Engine.Theme += Engine_Theme;
-        Engine.Question += Engine_Question; // Simple game mode question
 
         Engine.QuestionPostInfo += Engine_QuestionPostInfo;
         Engine.QuestionFinish += Engine_QuestionFinish;
@@ -321,17 +319,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     }
 
     /// <summary>
-    /// Число активных вопросов в раунде
+    /// Gets count of questions left to play in current round.
     /// </summary>
     internal int GetRoundActiveQuestionsCount() => _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
 
-    private void Engine_Theme(Theme theme)
-    {
-        _data.Theme = theme;
-        ScheduleExecution(Tasks.Theme, 1);
-    }
-
-    private void Engine_Question(Question question)
+    internal void OnQuestion(Question question)
     {
         _data.Question = question;
 
@@ -2828,11 +2820,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (_data.QuestionPlayState.AnswerOptions != null)
         {
-            ScheduleExecution(Tasks.Announce, 15, force: true);
+            ScheduleExecution(Tasks.Announce, 25, force: true);
         }
         else
         {
-            ScheduleExecution(Tasks.AskRight, 20, force: true);
+            ScheduleExecution(Tasks.AskRight, 35, force: true);
         }
     }
 

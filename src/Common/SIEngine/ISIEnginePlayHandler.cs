@@ -67,4 +67,16 @@ public interface ISIEnginePlayHandler
     /// </summary>
     /// <param name="themeIndex">Selected theme index.</param>
     void OnThemeSelected(int themeIndex);
+
+    /// <summary>
+    /// Handles theme play start.
+    /// </summary>
+    /// <param name="theme">Theme to play.</param>
+    void OnTheme(Theme theme);
+
+    /// <summary>
+    /// Handles question play start.
+    /// </summary>
+    /// <param name="question">Question to play.</param>
+    void OnQuestion(Question question);
 }

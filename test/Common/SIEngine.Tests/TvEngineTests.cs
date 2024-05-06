@@ -21,7 +21,6 @@ internal sealed class TvEngineTests
                 ShowRight = true,
                 ShowScore = false,
                 PlaySpecials = true,
-                ThinkingTime = 3,
                 IsPressMode = true,
                 IsMultimediaPressMode = true,
             },

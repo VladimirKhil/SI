@@ -26,12 +26,22 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
+    public void OnQuestion(Question question)
+    {
+        
+    }
+
     public void OnQuestionSelected(int themeIndex, int questionIndex)
     {
         
     }
 
     public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController)
+    {
+        
+    }
+
+    public void OnTheme(Theme theme)
     {
         
     }

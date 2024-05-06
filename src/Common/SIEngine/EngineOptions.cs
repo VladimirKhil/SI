@@ -31,11 +31,6 @@ public sealed class EngineOptions
     public bool PlaySpecials { get; init; }
 
     /// <summary>
-    /// Question thinking time for automatic game mode.
-    /// </summary>
-    public int ThinkingTime { get; init; }
-
-    /// <summary>
     /// Play all questions in final round.
     /// </summary>
     public bool PlayAllQuestionsInFinalRound { get; set; }

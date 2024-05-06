@@ -22,7 +22,6 @@ public sealed class GameRunner
         ShowRight = true,
         ShowScore = false,
         PlaySpecials = true,
-        ThinkingTime = 0,
         PlayAllQuestionsInFinalRound = appSettingsCore.PlayAllQuestionsInFinalRound,
     };
 
