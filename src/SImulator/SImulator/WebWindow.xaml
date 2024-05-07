@@ -12,7 +12,8 @@
     mc:Ignorable="d"
     Title="{x:Static lp:Resources.PresentationTitle}"
     Height="450"
-    Width="800">
+    Width="800"
+    Closing="Window_Closing">
     <wv2:WebView2
         x:Name="webView"
         Source="{Binding Path=Source}"

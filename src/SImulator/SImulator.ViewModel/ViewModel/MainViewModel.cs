@@ -472,8 +472,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                     Listener = presentationListener
                 };
 
-            presentationController.UpdateSettings(SettingsViewModel.SIUISettings.Model);
-            presentationController.UpdateShowPlayers(SettingsViewModel.Model.ShowPlayers);
             presentationController.Error += ShowError;
 
             IGameLogger gameLogger;
@@ -499,7 +497,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             gameEngineController.GameViewModel = game;
 
-            game.Start();
+            await game.StartAsync();
 
             game.Error += ShowError;
             game.RequestStop += Game_RequestStop;
@@ -522,7 +520,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, exc), false);
 
-            _game?.CloseMainView();
+            if (_game != null)
+            {
+                await _game.CloseMainViewAsync();
+            }
 
             await EndGameAsync();
             return;
@@ -552,7 +553,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         if (_game != null)
         {
-            _game.CloseMainView();
+            await _game.CloseMainViewAsync();
         }
 
         await EndGameAsync();

@@ -1,6 +1,7 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -1115,7 +1116,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ReturnToQuestion();
     }
 
-    internal void Start()
+    internal async Task StartAsync()
     {
         UpdateNextCommand();
 
@@ -1127,7 +1128,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             PresentationController.UpdatePlayerInfo(i, Players[i]);
         }
 
-        PresentationController.Start();
+        await PresentationController.StartAsync();
+
+        PresentationController.UpdateSettings(Settings.SIUISettings.Model);
+        PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
 
         _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
 
@@ -1147,8 +1151,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         ActiveQuestion = question;
 
-        PresentationController.SetText(question.Price.ToString());
-        PresentationController.SetStage(TableStage.QuestionPrice);
+        PresentationController.SetQuestion(question.Price);
 
         CurrentTheme = ActiveTheme?.Name;
         Price = question.Price;
@@ -1163,8 +1166,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     internal void OnTheme(Theme theme)
     {
-        PresentationController.SetText($"{Resources.Theme}: {theme.Name}");
-        PresentationController.SetStage(TableStage.Theme);
+        PresentationController.SetTheme(theme.Name);
 
         LocalInfo.Text = $"{Resources.Theme}: {theme.Name}";
         LocalInfo.TStage = TableStage.Theme;
@@ -1383,7 +1385,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     private bool AfterRoundThemes()
     {
         Continuation = null;
-        PresentationController.SetStage(TableStage.RoundTable);
+        PresentationController.SetRoundTable();
         _engine.MoveNext();
 
         if (!Players.Any())
@@ -1463,7 +1465,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         if (Settings.Model.GameMode == GameModes.Tv)
         {
-            PresentationController.SetStage(TableStage.RoundTable);
+            PresentationController.SetRoundTable();
             LocalInfo.TStage = TableStage.RoundTable;
             _engine.MoveNext();
         }
@@ -1558,7 +1560,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             LocalInfo.RoundInfo[data.Item1].Questions[data.Item2].Price = data.Item3;
 
             PresentationController.RestoreQuestion(data.Item1, data.Item2, data.Item3);
-            PresentationController.SetStage(TableStage.RoundTable);
+            PresentationController.SetRoundTable();
             LocalInfo.TStage = TableStage.RoundTable;
         }
         else
@@ -2032,7 +2034,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    internal void CloseMainView() => PresentationController.StopGame();
+    internal Task CloseMainViewAsync() => PresentationController.StopAsync();
 
     internal void StartButtons() => _buttonManager?.Start();
 

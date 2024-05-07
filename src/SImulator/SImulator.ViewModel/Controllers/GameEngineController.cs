@@ -5,7 +5,6 @@ using SImulator.ViewModel.Model;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
-using SIUI.ViewModel.Core;
 
 namespace SImulator.ViewModel.Controllers;
 
@@ -13,19 +12,9 @@ namespace SImulator.ViewModel.Controllers;
 internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEnginePlayHandler
 {
     /// <summary>
-    /// Minimum weight for the small content.
-    /// </summary>
-    private const double SmallContentWeight = 1.0;
-
-    /// <summary>
     /// Relative media content group weight on screen.
     /// </summary>
     private const double MediaContentGroupWeight = 5.0;
-
-    /// <summary>
-    /// Length of text having weight of 1.
-    /// </summary>
-    private const int TextLengthWithBasicWeight = 80;
 
     public GameViewModel? GameViewModel { get; set; }
 
@@ -148,132 +137,18 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
-        var screenContent = new List<ContentGroup>();
-        ContentGroup? currentGroup = null;
+        var textToShow =
+            GameViewModel.Settings.Model.FalseStart
+                || GameViewModel.Settings.Model.ShowTextNoFalstart
+                || GameViewModel.ActiveRound?.Type == RoundTypes.Final
+            ? null
+            : $"{GameViewModel.CurrentTheme}\n{GameViewModel.Price}";
 
-        foreach (var contentItem in content)
+        var hasMedia = PresentationController.OnQuestionContent(content, TryGetMediaUri, textToShow);
+
+        if (hasMedia)
         {
-            switch (contentItem.Placement)
-            {
-                case ContentPlacements.Screen:
-                    switch (contentItem.Type)
-                    {
-                        case ContentTypes.Text:
-                            if (currentGroup != null)
-                            {
-                                currentGroup.Init();
-                                screenContent.Add(currentGroup);
-                                currentGroup = null;
-                            }
-
-                            // Show theme name and question price instead of empty text
-                            var displayedText =
-                                GameViewModel.Settings.Model.FalseStart
-                                    || GameViewModel.Settings.Model.ShowTextNoFalstart
-                                    || GameViewModel.ActiveRound?.Type == RoundTypes.Final
-                                ? contentItem.Value
-                                : $"{GameViewModel.CurrentTheme}\n{GameViewModel.Price}";
-
-                            PresentationController.SetText(displayedText); // For simple answer
-                            
-                            var groupWeight = Math.Max(
-                                SmallContentWeight,
-                                Math.Min(MediaContentGroupWeight, (double)displayedText.Length / TextLengthWithBasicWeight));
-
-                            var group = new ContentGroup { Weight = groupWeight };
-                            group.Content.Add(new ContentViewModel(ContentType.Text, displayedText));
-                            screenContent.Add(group);
-                            break;
-
-                        case ContentTypes.Image:
-                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
-                            var imageUri = TryGetMediaUri(contentItem);
-
-                            if (imageUri != null)
-                            {
-                                currentGroup.Content.Add(new ContentViewModel(ContentType.Image, imageUri));
-                            }
-                            else
-                            {
-                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
-                            }
-                            break;
-
-                        case ContentTypes.Video:
-                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
-                            var videoUri = TryGetMediaUri(contentItem);
-
-                            if (videoUri != null)
-                            {
-                                currentGroup.Content.Add(new ContentViewModel(ContentType.Video, videoUri));
-                                PresentationController.SetSound();
-                                GameViewModel.InitMedia();
-                            }
-                            else
-                            {
-                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
-                            }
-                            break;
-
-                        case ContentTypes.Html:
-                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
-                            var htmlUri = TryGetMediaUri(contentItem);
-
-                            if (htmlUri != null)
-                            {
-                                currentGroup.Content.Add(new ContentViewModel(ContentType.Html, htmlUri));
-                                PresentationController.SetQuestionSound(false);
-                                PresentationController.SetSound();
-                            }
-                            else
-                            {
-                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
-                    break;
-
-                case ContentPlacements.Replic:
-                    if (contentItem.Type == ContentTypes.Text)
-                    {
-                        // Show nothing. The text should be read by showman
-                    }
-                    break;
-
-                case ContentPlacements.Background:
-                    if (contentItem.Type == ContentTypes.Audio)
-                    {
-                        PresentationController.SetQuestionSound(true);
-
-                        var audioUri = TryGetMediaUri(contentItem);
-
-                        PresentationController.SetSound();
-
-                        if (audioUri != null)
-                        {
-                            PresentationController.SetMedia(new MediaSource(audioUri), true);
-                            GameViewModel.InitMedia();
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        if (currentGroup != null)
-        {
-            currentGroup.Init();
-            screenContent.Add(currentGroup);
-        }
-
-        if (screenContent.Any())
-        {
-            PresentationController.SetScreenContent(screenContent);
+            GameViewModel.InitMedia();
         }
 
         GameViewModel.ActiveContent = content;
@@ -394,10 +269,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
 
         GameViewModel.OnContentStart();
-        PresentationController.SetQuestionSound(false);
-        PresentationController.SetQuestionContentType(QuestionContentType.Void);
-        PresentationController.SetStage(TableStage.Question);
-        PresentationController.SetSound();
+        PresentationController.OnContentStart();
 
         GameViewModel.ContentItems = contentItems;
         GameViewModel.ActiveMediaCommand = null;

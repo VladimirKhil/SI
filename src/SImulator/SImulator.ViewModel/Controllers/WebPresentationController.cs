@@ -2,16 +2,16 @@
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIPackages;
+using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
-using System;
 using System.Text.Json;
 using Utils;
 using Utils.Web;
 
 namespace SImulator.ViewModel.Controllers;
 
-internal sealed class WebPresentationController : IPresentationController, IWebInterop
+public sealed class WebPresentationController : IPresentationController, IWebInterop
 {
     private readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -52,10 +52,7 @@ internal sealed class WebPresentationController : IPresentationController, IWebI
         // TODO
     }
 
-    public void ClearPlayersState()
-    {
-        // TODO
-    }
+    public void ClearPlayersState() { }
 
     public void Dispose() { }
 
@@ -98,10 +95,11 @@ internal sealed class WebPresentationController : IPresentationController, IWebI
         throw new NotImplementedException();
     }
 
-    public void RunTimer()
+    public void RunTimer() => OnMessage(new
     {
-        throw new NotImplementedException();
-    }
+        Type = "timerResume",
+        TimerIndex = 1
+    });
 
     public void SeekMedia(int position)
     {
@@ -110,7 +108,7 @@ internal sealed class WebPresentationController : IPresentationController, IWebI
 
     public void SetActivePlayerIndex(int playerIndex)
     {
-        throw new NotImplementedException();
+        // TODO
     }
 
     public void SetAnswerOptions(ItemViewModel[] answerOptions)
@@ -171,11 +169,6 @@ internal sealed class WebPresentationController : IPresentationController, IWebI
         });
     }
 
-    public void SetScreenContent(IReadOnlyCollection<ContentGroup> content)
-    {
-        // TODO: next
-    }
-
     public void SetSound(string sound = "")
     {
         // TODO
@@ -183,14 +176,13 @@ internal sealed class WebPresentationController : IPresentationController, IWebI
 
     public void SetStage(TableStage stage)
     {
-        if (stage == TableStage.RoundTable)
-        {
-            OnMessage(new
-            {
-                Type = "showTable"
-            });
-        }
+        // TODO
     }
+
+    public void SetRoundTable() => OnMessage(new
+    {
+        Type = "showTable"
+    });
 
     public void SetRound(string roundName) => OnMessage(new
     {
@@ -205,22 +197,21 @@ internal sealed class WebPresentationController : IPresentationController, IWebI
         // TODO
     }
 
-    public void SetTimerMaxTime(int maxTime)
+    public void SetTimerMaxTime(int maxTime) => OnMessage(new
     {
-        throw new NotImplementedException();
-    }
+        Type = "timerMaximum",
+        TimerIndex = 1,
+        Maximum = maxTime
+    });
 
     public void ShowAnswerOptions()
     {
         throw new NotImplementedException();
     }
 
-    public async void Start()
-    {
-        await PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor);
-    }
+    public Task StartAsync() => PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor);
 
-    public async void StopGame() => await PlatformManager.Instance.CloseMainViewAsync();
+    public Task StopAsync() => PlatformManager.Instance.CloseMainViewAsync();
 
     public void StopMedia()
     {
@@ -239,16 +230,110 @@ internal sealed class WebPresentationController : IPresentationController, IWebI
 
     public void UpdateSettings(Settings settings)
     {
-        // TODO
+        // TODO: will be implemented in the future
     }
 
-    public void UpdateShowPlayers(bool showPlayers)
+    public void UpdateShowPlayers(bool showPlayers) => OnMessage(new
     {
-        // TODO
+        Type = "playersVisibilityChanged",
+        IsVisible = showPlayers
+    });
+
+    public void SetTheme(string themeName) => OnMessage(new
+    {
+        Type = "theme",
+        ThemeName = themeName
+    });
+
+    public void SetQuestion(int questionPrice) => OnMessage(new
+    {
+        Type = "question",
+        QuestionPrice = questionPrice
+    });
+
+    public bool OnQuestionContent(IReadOnlyCollection<ContentItem> content, Func<ContentItem, string?> tryGetMediaUri, string? textToShow)
+    {
+        var hasMedia = false;
+        var screenContent = new List<ContentInfo>();
+
+        foreach (var contentItem in content)
+        {
+            switch (contentItem.Placement)
+            {
+                case ContentPlacements.Replic:
+                    OnMessage(new
+                    {
+                        Type = "replic",
+                        PersonCode = "s",
+                        Text = contentItem.Value
+                    });
+                    break;
+
+                case ContentPlacements.Screen:
+                    switch (contentItem.Type)
+                    {
+                        case ContentTypes.Text:
+                            screenContent.Add(new ContentInfo(ContentType.Text, contentItem.Value));
+                            break;
+
+                        case ContentTypes.Image:
+                            screenContent.Add(new ContentInfo(ContentType.Image, tryGetMediaUri(contentItem) ?? ""));
+                            break;
+
+                        case ContentTypes.Video:
+                            screenContent.Add(new ContentInfo(ContentType.Video, tryGetMediaUri(contentItem) ?? ""));
+                            hasMedia = true;
+                            break;
+
+                        case ContentTypes.Html:
+                            screenContent.Add(new ContentInfo(ContentType.Html, tryGetMediaUri(contentItem) ?? ""));
+                            break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
+                case ContentPlacements.Background:
+                    var sound = tryGetMediaUri(contentItem);
+
+                    OnMessage(new
+                    {
+                        Type = "content",
+                        Placement = "background",
+                        Content = new object[] { new { Type = "audio", Value = sound } }
+                    });
+
+                    hasMedia = true;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        if (screenContent.Count > 0)
+        {
+            OnMessage(new
+            {
+                Type = "content",
+                Placement = "screen",
+                Content = screenContent.Select(sc => new { Type = sc.Type.ToString().ToLowerInvariant(), sc.Value }).ToArray()
+            });
+        }
+
+        return hasMedia;
     }
 
     private void OnMessage(object message) =>
         UI.Execute(
             () => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions)),
             exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
+    /// <summary>
+    /// Defines content info.
+    /// </summary>
+    /// <param name="Type">Content type.</param>
+    /// <param name="Value">Content value.</param>
+    private sealed record ContentInfo(ContentType Type, string Value);
 }

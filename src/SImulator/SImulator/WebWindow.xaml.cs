@@ -8,4 +8,9 @@ namespace SImulator;
 public partial class WebWindow : Window
 {
     public WebWindow() => InitializeComponent();
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        e.Cancel = !MainWindow.CanClose;
+    }
 }

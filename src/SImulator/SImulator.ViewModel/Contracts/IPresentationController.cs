@@ -1,4 +1,5 @@
 ﻿using SImulator.ViewModel.Model;
+using SIPackages;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 
@@ -18,12 +19,12 @@ public interface IPresentationController : IDisposable
     /// <summary>
     /// Starts new game.
     /// </summary>
-    void Start();
+    Task StartAsync();
 
     /// <summary>
     /// Stops the game.
     /// </summary>
-    void StopGame();
+    Task StopAsync();
 
     void SetGameThemes(IEnumerable<string> themes);
 
@@ -33,19 +34,21 @@ public interface IPresentationController : IDisposable
 
     void SetStage(TableStage stage);
 
+    void SetRoundTable();
+
     void SetRound(string roundName);
 
-    void SetText(string text = "");
+    void SetTheme(string themeName);
 
-    /// <summary>
-    /// Sets content to display.
-    /// </summary>
-    /// <param name="content">Content to display.</param>
-    void SetScreenContent(IReadOnlyCollection<ContentGroup> content);
+    void SetQuestion(int questionPrice);
+
+    void SetText(string text = "");
 
     void SetQuestionContentType(QuestionContentType questionContentType);
 
     void SetQuestionStyle(QuestionStyle questionStyle);
+
+    void OnContentStart() { }
 
     void SetQuestionSound(bool sound);
 
@@ -114,4 +117,9 @@ public interface IPresentationController : IDisposable
     void OnQuestionStart();
 
     void BeginPressButton() { }
+
+    bool OnQuestionContent(
+        IReadOnlyCollection<ContentItem> content,
+        Func<ContentItem, string?> tryGetMediaUri,
+        string? textToShow);
 }

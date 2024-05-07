@@ -2,6 +2,9 @@
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
+using SImulator.ViewModel.Properties;
+using SIPackages;
+using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
@@ -18,6 +21,21 @@ namespace SImulator.ViewModel.Controllers;
 /// <inheritdoc cref="IPresentationController" />
 public sealed class PresentationController : IPresentationController, INotifyPropertyChanged
 {
+    /// <summary>
+    /// Minimum weight for the small content.
+    /// </summary>
+    private const double SmallContentWeight = 1.0;
+
+    /// <summary>
+    /// Length of text having weight of 1.
+    /// </summary>
+    private const int TextLengthWithBasicWeight = 80;
+    
+    /// <summary>
+    /// Relative media content group weight on screen.
+    /// </summary>
+    private const double MediaContentGroupWeight = 5.0;
+
     private int _previousCode = -1;
 
     private readonly IAnimatableTimer _animatableTimer = PlatformManager.Instance.CreateAnimatableTimer();
@@ -161,15 +179,13 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound), exc => Error?.Invoke(exc));
 
-    public async void Start()
+    public async Task StartAsync()
     {
         await PlatformManager.Instance.CreateMainViewAsync(this, Screen);
         TInfo.TStage = TableStage.Sign;
     }
 
-    private void RemoteGameUI_Closed(object sender, EventArgs e) => UI.Execute(StopGame, exc => Error?.Invoke(exc));
-
-    public async void StopGame()
+    public async Task StopAsync()
     {
         await PlatformManager.Instance.CloseMainViewAsync();
 
@@ -205,29 +221,28 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
     }
 
+    public void SetRoundTable()
+    {
+        _stageCallbackBlock = true;
+        
+        SetStage(TableStage.RoundTable);
+        
+        _stageCallbackBlock = false;
+        _previousCode = -1;
+        TInfo.QuestionStyle = QuestionStyle.Normal;
+    }
+
     public void SetStage(TableStage stage)
     {
-        if (stage == TableStage.RoundTable)
-        {
-            _stageCallbackBlock = true;
-        }
-
         lock (TInfo.TStageLock)
         {
             TInfo.TStage = stage;
-        }
-
-        if (stage == TableStage.RoundTable)
-        {
-            _stageCallbackBlock = false;
-            _previousCode = -1;
-            TInfo.QuestionStyle = QuestionStyle.Normal;
         }
     }
 
     public void SetText(string text) => TInfo.Text = text;
 
-    public void SetScreenContent(IReadOnlyCollection<ContentGroup> content)
+    private void SetScreenContent(IReadOnlyCollection<ContentGroup> content)
     {
         TInfo.Content = content;
         SetQuestionContentType(QuestionContentType.Collection);
@@ -247,6 +262,14 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     }
 
     public void SetQuestionStyle(QuestionStyle questionStyle) => TInfo.QuestionStyle = questionStyle;
+
+    public void OnContentStart()
+    {
+        SetQuestionSound(false);
+        SetQuestionContentType(QuestionContentType.Void);
+        SetStage(TableStage.Question);
+        SetSound();
+    }
 
     public void SetQuestionSound(bool sound)
     {
@@ -567,6 +590,150 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     {
         SetText(roundName);
         SetStage(TableStage.Round);
+    }
+
+    public void SetTheme(string themeName)
+    {
+        SetText($"{Resources.Theme}: {themeName}");
+        SetStage(TableStage.Theme);
+    }
+
+    public void SetQuestion(int questionPrice)
+    {
+        SetText(questionPrice.ToString());
+        SetStage(TableStage.QuestionPrice);
+    }
+
+    public bool OnQuestionContent(
+        IReadOnlyCollection<ContentItem> content,
+        Func<ContentItem, string?> tryGetMediaUri,
+        string? textToShow)
+    {
+        var hasMedia = false;
+
+        var screenContent = new List<ContentGroup>();
+        ContentGroup? currentGroup = null;
+
+        foreach (var contentItem in content)
+        {
+            switch (contentItem.Placement)
+            {
+                case ContentPlacements.Screen:
+                    switch (contentItem.Type)
+                    {
+                        case ContentTypes.Text:
+                            if (currentGroup != null)
+                            {
+                                currentGroup.Init();
+                                screenContent.Add(currentGroup);
+                                currentGroup = null;
+                            }
+
+                            // Show theme name and question price instead of empty text
+                            var displayedText = textToShow ?? contentItem.Value;
+                            SetText(displayedText); // For simple answer
+
+                            var groupWeight = Math.Max(
+                                SmallContentWeight,
+                                Math.Min(MediaContentGroupWeight, (double)displayedText.Length / TextLengthWithBasicWeight));
+
+                            var group = new ContentGroup { Weight = groupWeight };
+                            group.Content.Add(new ContentViewModel(ContentType.Text, displayedText));
+                            screenContent.Add(group);
+                            break;
+
+                        case ContentTypes.Image:
+                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
+                            var imageUri = tryGetMediaUri(contentItem);
+
+                            if (imageUri != null)
+                            {
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Image, imageUri));
+                            }
+                            else
+                            {
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
+                            }
+                            break;
+
+                        case ContentTypes.Video:
+                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
+                            var videoUri = tryGetMediaUri(contentItem);
+
+                            if (videoUri != null)
+                            {
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Video, videoUri));
+                                SetSound();
+                                hasMedia = true;
+                            }
+                            else
+                            {
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
+                            }
+                            break;
+
+                        case ContentTypes.Html:
+                            currentGroup ??= new ContentGroup { Weight = MediaContentGroupWeight };
+                            var htmlUri = tryGetMediaUri(contentItem);
+
+                            if (htmlUri != null)
+                            {
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Html, htmlUri));
+                                SetQuestionSound(false);
+                                SetSound();
+                            }
+                            else
+                            {
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
+                case ContentPlacements.Replic:
+                    if (contentItem.Type == ContentTypes.Text)
+                    {
+                        // Show nothing. The text should be read by showman
+                    }
+                    break;
+
+                case ContentPlacements.Background:
+                    if (contentItem.Type == ContentTypes.Audio)
+                    {
+                        SetQuestionSound(true);
+
+                        var audioUri = tryGetMediaUri(contentItem);
+
+                        SetSound();
+
+                        if (audioUri != null)
+                        {
+                            SetMedia(new MediaSource(audioUri), true);
+                            hasMedia = true;
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        if (currentGroup != null)
+        {
+            currentGroup.Init();
+            screenContent.Add(currentGroup);
+        }
+
+        if (screenContent.Any())
+        {
+            SetScreenContent(screenContent);
+        }
+
+        return hasMedia;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
