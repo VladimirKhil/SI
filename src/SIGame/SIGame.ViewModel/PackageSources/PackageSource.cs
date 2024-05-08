@@ -41,7 +41,5 @@ public abstract class PackageSource
     /// </summary>
     public abstract Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default);
 
-    public virtual bool RandomSpecials => false;
-
     public override string ToString() => Source;
 }

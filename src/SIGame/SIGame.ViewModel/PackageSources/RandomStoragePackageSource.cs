@@ -17,8 +17,6 @@ public sealed class RandomStoragePackageSource : PackageSource
 
     public override string Source => Resources.RandomServerThemes;
 
-    public override bool RandomSpecials => true;
-
     public RandomStoragePackageSource(ISIStorageServiceClient storageServiceClient) => _storageServiceClient = storageServiceClient;
 
     public override Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default) =>
@@ -42,10 +40,16 @@ public sealed class RandomStoragePackageSource : PackageSource
     {
         try
         {
+            var languages = await _storageServiceClient.Facets.GetLanguagesAsync(cancellationToken);
+            var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+
+            var language = languages.FirstOrDefault(l => l.Code == currentLanguage);
+
             var package = await _storageServiceClient.Packages.GetRandomPackageAsync(
                 new RandomPackageParameters
                 {
-                    RestrictionIds = new int[] { -1 }
+                    RestrictionIds = new int[] { -1 },
+                    LanguageId = language?.Id
                 },
                 cancellationToken);
 

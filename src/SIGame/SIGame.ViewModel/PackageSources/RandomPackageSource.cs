@@ -11,11 +11,9 @@ internal sealed class RandomPackageSource : PackageSource
 {
     private readonly int _packageId = new Random().Next(int.MaxValue);
 
-    public override PackageSourceKey Key => new PackageSourceKey { Type = PackageSourceTypes.Random };
+    public override PackageSourceKey Key => new() { Type = PackageSourceTypes.Random };
 
     public override string Source => Resources.RandomThemes;
-
-    public override bool RandomSpecials { get { return true; } }
 
     public override async Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default)
     {
@@ -30,7 +28,7 @@ internal sealed class RandomPackageSource : PackageSource
         return (fileName, true);
     }
 
-    private static Task<SIDocument> GetPackageCore(Stream stream = null)
+    private static Task<SIDocument> GetPackageCore(Stream? stream = null)
     {
         var settings = UserSettings.Default.GameSettings.AppSettings;
 
