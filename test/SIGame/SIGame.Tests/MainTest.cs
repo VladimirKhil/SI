@@ -21,11 +21,11 @@ public class MainTest
 {
     private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
-    [TestCase(PackageSourceTypes.RandomServer, GameRole.Player, true)]
-    [TestCase(PackageSourceTypes.SIStorage, GameRole.Player, true)]
-    [TestCase(PackageSourceTypes.Local, GameRole.Player, true)]
-    [TestCase(PackageSourceTypes.RandomServer, GameRole.Viewer, true)]
-    [TestCase(PackageSourceTypes.RandomServer, GameRole.Showman, true)]
+    [TestCase(PackageSourceTypes.RandomServer, GameRole.Player)]
+    [TestCase(PackageSourceTypes.SIStorage, GameRole.Player)]
+    [TestCase(PackageSourceTypes.Local, GameRole.Player)]
+    [TestCase(PackageSourceTypes.RandomServer, GameRole.Viewer)]
+    [TestCase(PackageSourceTypes.RandomServer, GameRole.Showman)]
     public async Task GameCreateAndRun_Ok_Async(
         PackageSourceTypes packageSourceType,
         GameRole gameRole)

@@ -3650,7 +3650,7 @@ public sealed class Game : Actor<GameData, GameLogic>
     {
         if (!string.IsNullOrEmpty(account.Picture))
         {
-            _gameActions.SendMessageWithArgs(Messages.Avatar, account.Name, ContentTypes.Image, account.Picture);
+            _gameActions.SendMessageToWithArgs(receiver, Messages.Avatar, account.Name, ContentTypes.Image, account.Picture);
 
             // for backward compatibility
             var link = CreateUri(account.Name, account.Picture, receiver);
@@ -3663,7 +3663,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (!string.IsNullOrEmpty(account.AvatarVideoUri))
         {
-            _gameActions.SendMessageWithArgs(Messages.Avatar, account.Name, ContentTypes.Video, account.AvatarVideoUri);
+            _gameActions.SendMessageToWithArgs(receiver, Messages.Avatar, account.Name, ContentTypes.Video, account.AvatarVideoUri);
         }
     }
 
