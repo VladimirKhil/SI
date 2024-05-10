@@ -28,8 +28,40 @@ public class ViewerAccount : Account
     public string? AvatarVideoUri
     {
         get => _avatarVideoUri;
-        set { if (_avatarVideoUri != null) { _avatarVideoUri = value; OnPropertyChanged(); } }
+        set
+        {
+            if (_avatarVideoUri != value)
+            {
+                _avatarVideoUri = value;
+
+                try
+                {
+                    OnPropertyChanged();
+                }
+                catch (NotImplementedException exc) when (exc.Message.Contains("The Source property cannot be set to null"))
+                {
+                    // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
+                }
+
+                try
+                {
+                    OnPropertyChanged(nameof(HasVideoAvatar));
+                }
+                catch (NotImplementedException exc) when (exc.Message.Contains("The Source property cannot be set to null"))
+                {
+                    // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
+                }
+            }
+        }
     }
+
+    /// <summary>
+    /// Video avatar marker.
+    /// </summary>
+    /// <remarks>
+    /// Cannot bind directly to <see cref="AvatarVideoUri" /> because of the WebView2 bug.
+    /// </remarks>
+    public bool HasVideoAvatar => _avatarVideoUri != null;
 
     /// <summary>
     /// Can the account be moved.

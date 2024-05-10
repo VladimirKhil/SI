@@ -1161,4 +1161,7 @@
   <data name="Decline50Percent" xml:space="preserve">
     <value>Отнять половину суммы</value>
   </data>
+  <data name="ShowVideoAvatars" xml:space="preserve">
+    <value>Показывать видео аватары</value>
+  </data>
 </root>

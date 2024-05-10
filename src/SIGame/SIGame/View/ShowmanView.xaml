@@ -9,9 +9,14 @@
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:l="clr-namespace:SIGame"
     xmlns:lc="clr-namespace:SIGame.Converters"
-    mc:Ignorable="d" Name="root"
+    xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+    xmlns:uwb="clr-namespace:Utils.Wpf.Behaviors;assembly=Utils.Wpf"
+    xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    mc:Ignorable="d"
+    Name="root"
     d:DesignHeight="300"
-    d:DesignWidth="206">
+    d:DesignWidth="206"
+    d:DataContext="{d:DesignInstance sc:PersonAccount}">
     <UserControl.Resources>
         <lc:ShowmanTransformConverter x:Key="ShowmanTransformConverter" />
     </UserControl.Resources>
@@ -45,11 +50,51 @@
                         Name="border"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
                         Cursor="{TemplateBinding Cursor}">
                         <Grid>
                             <Image Name="image" lb:ImageLoader.ImageSource="{Binding}" Stretch="Uniform" />
+
+                            <ContentControl
+                                x:Name="video"
+                                Content="{Binding}"
+                                VerticalAlignment="Stretch"
+                                HorizontalAlignment="Stretch"
+                                VerticalContentAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch">
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Setter Property="ContentTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate>
+                                                    <wv2:WebView2
+                                                        Source="{Binding AvatarVideoUri}"
+                                                        uwb:WebView2Behavior.IsAttached="True"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch" />
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasVideoAvatar}" Value="False">
+                                                <Setter Property="ContentTemplate">
+                                                    <Setter.Value>
+                                                        <DataTemplate />
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+
+                                            <DataTrigger
+                                                Binding="{Binding DataContext.UserSettings.GameSettings.AppSettings.ShowVideoAvatars, RelativeSource={RelativeSource AncestorType=Grid, AncestorLevel=3}}"
+                                                Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
 
                             <Rectangle
                                 Width="15"
@@ -79,6 +124,16 @@
                     </Border>
 
                     <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding AvatarVideoUri}" Value="{x:Null}">
+                            <Setter TargetName="border" Property="HorizontalAlignment" Value="Center" />
+                            <Setter TargetName="border" Property="VerticalAlignment" Value="Center" />
+                        </DataTrigger>
+
+                        <DataTrigger Binding="{Binding DataContext.UserSettings.GameSettings.AppSettings.ShowVideoAvatars, RelativeSource={RelativeSource AncestorType=Grid, AncestorLevel=3}}" Value="False">
+                            <Setter TargetName="border" Property="HorizontalAlignment" Value="Center" />
+                            <Setter TargetName="border" Property="VerticalAlignment" Value="Center" />
+                        </DataTrigger>
+
                         <Trigger SourceName="image" Property="ActualWidth" Value="0">
                             <Setter TargetName="border" Property="Background" Value="Transparent" />
                             <Setter TargetName="border" Property="HorizontalAlignment" Value="Stretch" />

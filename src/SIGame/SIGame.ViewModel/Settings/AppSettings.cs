@@ -126,13 +126,13 @@ public sealed class AppSettings : AppSettingsCore
     private bool _areAnswersShown = true;
 
     /// <summary>
-    /// Показывать ли ответы в окне принятия решений ведущим
+    /// Expand right and wrong answers in showman validation dialog.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(true)]
     public bool AreAnswersShown
     {
-        get { return _areAnswersShown; }
+        get => _areAnswersShown;
         set { _areAnswersShown = value; OnPropertyChanged(); }
     }
 
@@ -140,13 +140,13 @@ public sealed class AppSettings : AppSettingsCore
     private bool _isChatShown = true;
 
     /// <summary>
-    /// Показывать ли игровой чат в лобби
+    /// Show chat in lobby.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(true)]
     public bool IsChatShown
     {
-        get { return _isChatShown; }
+        get => _isChatShown;
         set { _isChatShown = value; OnPropertyChanged(); }
     }
 
@@ -154,14 +154,43 @@ public sealed class AppSettings : AppSettingsCore
     private bool _showBorderOnFalseStart = true;
 
     /// <summary>
-    /// Показывать рамку при игре с фальстартами
+    /// Show border at the beginning when playing NON! false start game.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(true)]
     public bool ShowBorderOnFalseStart
     {
-        get { return _showBorderOnFalseStart; }
+        get => _showBorderOnFalseStart;
         set { if (_showBorderOnFalseStart != value) { _showBorderOnFalseStart = value; OnPropertyChanged(); } }
+    }
+
+    private bool _showVideoAvatars = true;
+
+    /// <summary>
+    /// Show video avatars.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(true)]
+    public bool ShowVideoAvatars
+    {
+        get => _showVideoAvatars;
+        set
+        {
+            if (_showVideoAvatars != value)
+            {
+                _showVideoAvatars = value;
+                
+                try
+                {
+                    OnPropertyChanged();
+                }
+                catch (NotImplementedException exc) when (exc.Message.Contains("The Source property cannot be set to null"))
+                {
+                    // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
+                    try { OnPropertyChanged(); } catch { }
+                }
+            }
+        }
     }
 
     public AppSettings()

@@ -13,6 +13,7 @@
     xmlns:vm="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+    xmlns:uwb="clr-namespace:Utils.Wpf.Behaviors;assembly=Utils.Wpf"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -544,6 +545,12 @@
                         </Style.Triggers>
                     </Style>
 
+                    <x:Array x:Key="AllowedHosts" Type="sys:String">
+                        <sys:String>file:///</sys:String>
+                        <sys:String>https://www.youtube.com/</sys:String>
+                        <sys:String>http://localhost:</sys:String>
+                    </x:Array>
+
                     <localc:TemplateConverter x:Key="QuestionContentSelector2">
                         <localc:TemplateConverter.Templates>
                             <DataTemplate x:Key="{x:Static vm:ContentType.Void}" />
@@ -568,7 +575,7 @@
                             </DataTemplate>
 
                             <DataTemplate x:Key="{x:Static vm:ContentType.Html}">
-                                <wv2:WebView2 Source="{Binding Value}" lb:WebView2Behavior.IsAttached="True" />
+                                <wv2:WebView2 Source="{Binding Value}" uwb:WebView2Behavior.IsAttached="True" uwb:WebView2Behavior.AllowedHosts="{StaticResource AllowedHosts}" />
                             </DataTemplate>
                         </localc:TemplateConverter.Templates>
                     </localc:TemplateConverter>
@@ -608,7 +615,7 @@
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Html}">
-                                <wv2:WebView2 Source="{Binding MediaSource.Uri}" lb:WebView2Behavior.IsAttached="True" />
+                                <wv2:WebView2 Source="{Binding MediaSource.Uri}" uwb:WebView2Behavior.IsAttached="True" uwb:WebView2Behavior.AllowedHosts="{StaticResource AllowedHosts}" />
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.SpecialText}">

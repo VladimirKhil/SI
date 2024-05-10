@@ -1158,4 +1158,7 @@
   <data name="Decline50Percent" xml:space="preserve">
     <value>Take half of price</value>
   </data>
+  <data name="ShowVideoAvatars" xml:space="preserve">
+    <value>Show video avatars</value>
+  </data>
 </root>

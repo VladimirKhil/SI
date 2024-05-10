@@ -614,6 +614,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     break;
 
                 case Messages.Stage:
+                case Messages.StageInfo:
                     {
                         #region Stage
 
@@ -634,8 +635,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             ClientData.ForceStart.CanBeExecuted = false;
                         }
 
-                        _logic.SetCaption("");
-
                         if (mparams.Length > 3)
                         {
                             if (int.TryParse(mparams[3], out var roundIndex))
@@ -648,33 +647,39 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             }
                         }
 
-                        switch (ClientData.Stage)
-                        {
-                            case GameStage.Round:
-                                _logic.SetText(mparams[2]);
-
-                                for (int i = 0; i < ClientData.Players.Count; i++)
-                                {
-                                    ClientData.Players[i].InGame = true;
-                                    ClientData.Players[i].IsChooser = false;
-                                }
-
-                                break;
-
-                            case GameStage.Final:
-                                _logic.SetText(mparams[2]);
-                                ClientData.AtomType = AtomTypes.Text;
-                                break;
-
-                            case GameStage.After:
-                                ClientData.Host.OnGameFinished(ClientData.PackageId);
-                                ClientData.StageName = "";
-                                break;
-                        }
-
-                        _logic.Stage();
                         StageChanged?.Invoke(ClientData.Stage);
-                        OnAd();
+
+                        if (mparams[0] == Messages.Stage)
+                        {
+                            _logic.SetCaption("");
+
+                            switch (ClientData.Stage)
+                            {
+                                case GameStage.Round:
+                                    _logic.SetText(mparams[2]);
+
+                                    for (int i = 0; i < ClientData.Players.Count; i++)
+                                    {
+                                        ClientData.Players[i].InGame = true;
+                                        ClientData.Players[i].IsChooser = false;
+                                    }
+
+                                    break;
+
+                                case GameStage.Final:
+                                    _logic.SetText(mparams[2]);
+                                    ClientData.AtomType = AtomTypes.Text;
+                                    break;
+
+                                case GameStage.After:
+                                    ClientData.Host.OnGameFinished(ClientData.PackageId);
+                                    ClientData.StageName = "";
+                                    break;
+                            }
+
+                            _logic.Stage();
+                            OnAd();
+                        }
 
                         #endregion
                         break;
@@ -1059,6 +1064,10 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         break;
                     }
 
+                case Messages.Avatar:
+                    OnAvatar(mparams);
+                    break;
+
                 case Messages.SetChooser:
                     {
                         var index = int.Parse(mparams[1]);
@@ -1087,6 +1096,21 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         catch (Exception exc)
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
+        }
+    }
+
+    private void OnAvatar(string[] mparams)
+    {
+        if (mparams.Length < 4)
+        {
+            return;
+        }
+
+        var person = ClientData.MainPersons.FirstOrDefault(person => person.Name == mparams[1]);
+
+        if (person != null)
+        {
+            _logic.UpdateAvatar(person, mparams[2], mparams[3]);
         }
     }
 
@@ -1815,6 +1839,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             var name = account.Name;
             var sex = account.IsMale;
             var picture = account.Picture;
+            var videoAvatar = account.AvatarVideoUri;
             var ready = account.Ready;
             var isOnline = account.IsConnected;
 
@@ -1836,12 +1861,14 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     account.Name = showman.Name;
                     account.IsMale = showman.IsMale;
                     account.Picture = showman.Picture;
+                    account.AvatarVideoUri = showman.AvatarVideoUri;
                     account.Ready = showman.Ready;
                     account.IsConnected = showman.IsConnected;
 
                     showman.Name = name;
                     showman.IsMale = sex;
                     showman.Picture = picture;
+                    showman.AvatarVideoUri = videoAvatar;
                     showman.Ready = ready;
                     showman.IsConnected = isOnline;
                 }
@@ -1859,12 +1886,14 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             account.Name = item.Name;
                             account.IsMale = item.IsMale;
                             account.Picture = item.Picture;
+                            account.AvatarVideoUri = item.AvatarVideoUri;
                             account.Ready = item.Ready;
                             account.IsConnected = item.IsConnected;
 
                             item.Name = name;
                             item.IsMale = sex;
                             item.Picture = picture;
+                            item.AvatarVideoUri = videoAvatar;
                             item.Ready = ready;
                             item.IsConnected = isOnline;
 
@@ -1885,6 +1914,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                                 account.Name = item.Name;
                                 account.IsMale = item.IsMale;
                                 account.Picture = item.Picture;
+                                account.AvatarVideoUri = item.AvatarVideoUri;
                                 account.Ready = false;
 
                                 if (isOnline)
@@ -1892,6 +1922,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                                     item.Name = name;
                                     item.IsMale = sex;
                                     item.Picture = picture;
+                                    item.AvatarVideoUri = videoAvatar;
                                 }
                                 else
                                 {

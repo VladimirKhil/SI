@@ -93,6 +93,10 @@
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowBorderOnFalseStart}" />
         </CheckBox>
 
+        <CheckBox IsChecked="{Binding Model.ShowVideoAvatars}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowVideoAvatars}" />
+        </CheckBox>
+
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.MediaPort}" />
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.LocalNetworkOnly}" />
 

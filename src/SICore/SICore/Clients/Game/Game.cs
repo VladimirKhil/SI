@@ -528,7 +528,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.Info:
-                        OnInfo(message);
+                        OnInfo(message.Sender);
                         break;
 
                     case Messages.Config:
@@ -1301,15 +1301,15 @@ public sealed class Game : Actor<GameData, GameLogic>
         _logic.Stop(StopReason.Decision);
     }
 
-    private void OnInfo(Message message)
+    private void OnInfo(string person)
     {
-        Inform(message.Sender);
+        Inform(person);
 
         foreach (var item in ClientData.MainPersons)
         {
             if (item.Ready)
             {
-                _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
+                _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", person);
             }
         }
 
@@ -1324,13 +1324,13 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }
 
-        _gameActions.InformStage(message.Sender); // deprecated
-        _gameActions.InformStageInfo(message.Sender, roundIndex);
-        _gameActions.InformSums(message.Sender);
+        _gameActions.InformStage(person); // deprecated
+        _gameActions.InformStageInfo(person, roundIndex);
+        _gameActions.InformSums(person);
 
         if (ClientData.Stage != GameStage.Before)
         {
-            _gameActions.InformRoundsNames(message.Sender);
+            _gameActions.InformRoundsNames(person);
         }
 
         if (ClientData.Stage == GameStage.Round)
@@ -1339,17 +1339,17 @@ public sealed class Game : Actor<GameData, GameLogic>
             {
                 if (ClientData.TableInformStage > 0)
                 {
-                    _gameActions.InformRoundThemes(message.Sender, false);
+                    _gameActions.InformRoundThemes(person, false);
 
                     if (ClientData.TableInformStage > 1)
                     {
-                        _gameActions.InformTable(message.Sender);
+                        _gameActions.InformTable(person);
                     }
                 }
             },
             5000);
 
-            _gameActions.InformRoundContent(message.Sender);
+            _gameActions.InformRoundContent(person);
         }
         else if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
         {
@@ -1357,7 +1357,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             if (leftTimeBeforeStart > 0)
             {
-                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, MessageParams.Timer_Go, leftTimeBeforeStart, -2), message.Sender);
+                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, MessageParams.Timer_Go, leftTimeBeforeStart, -2), person);
             }
         }
     }
@@ -3353,6 +3353,11 @@ public sealed class Game : Actor<GameData, GameLogic>
                 account.Picture = "";
                 account.Ready = false;
                 account.IsConnected = false;
+
+                if (!isPlayer)
+                {
+                    ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
+                }
             }
             else if (isPlayer)
             {
@@ -3406,6 +3411,8 @@ public sealed class Game : Actor<GameData, GameLogic>
                 newAcc = CreateNewComputerShowman(showman);
                 newName = newAcc.Name;
                 newIsMale = newAcc.IsMale;
+
+                ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
             }
         }
         finally
@@ -3456,7 +3463,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var logic = new ViewerComputerLogic(data, actions, account);
         _ = new Player(playerClient, account, false, logic, actions, LO, data);
 
-        Inform(newAccount.Name);
+        OnInfo(newAccount.Name);
 
         return newAccount;
     }
@@ -3485,7 +3492,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var logic = new ViewerComputerLogic(data, actions, account);
         var showman = new Showman(showmanClient, account, false, logic, actions, LO, data);
 
-        Inform(newAccount.Name);
+        OnInfo(newAccount.Name);
 
         return newAccount;
     }

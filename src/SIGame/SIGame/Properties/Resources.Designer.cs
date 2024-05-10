@@ -2617,6 +2617,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Show video avatars.
+        /// </summary>
+        public static string ShowVideoAvatars {
+            get {
+                return ResourceManager.GetString("ShowVideoAvatars", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на SIGame questions.
         /// </summary>
         public static string SIQuestions {

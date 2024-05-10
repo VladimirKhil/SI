@@ -1522,6 +1522,63 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
+    public void UpdateAvatar(PersonAccount account, string contentType, string uri)
+    {
+        var preprocessedUri = PreprocessUri(uri);
+
+        if (preprocessedUri == null)
+        {
+            return;
+        }
+
+        switch (contentType)
+        {
+            case ContentTypes.Image:
+                account.Picture = preprocessedUri;
+                break;
+
+            case ContentTypes.Video:
+                account.AvatarVideoUri = string.IsNullOrEmpty(preprocessedUri) ? null : preprocessedUri;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private string? PreprocessUri(string uri)
+    {
+        if (uri.Contains(Constants.GameHost))
+        {
+            if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
+            {
+                var remoteUri = ClientData.ServerAddress;
+
+                if (Uri.TryCreate(remoteUri, UriKind.Absolute, out var hostUri))
+                {
+                    return uri.Replace(Constants.GameHost, hostUri.Host);
+                }
+                else
+                {
+                    _data.Host.OnPictureError(remoteUri);
+                }
+            }
+        }
+        else if (uri.Contains(Constants.ServerHost))
+        {
+            if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
+            {
+                return uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
+            }
+        }
+        else
+        {
+            return uri;
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// Попытка осуществить повторное подключение к серверу
     /// </summary>

@@ -201,4 +201,6 @@ public interface IViewerLogic : ILogic
     void ClearQuestionState() { }
 
     void OnThemeComments(string comments) { }
+
+    void UpdateAvatar(PersonAccount person, string contentType, string uri) { }
 }
