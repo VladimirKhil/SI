@@ -1132,6 +1132,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         PresentationController.UpdateSettings(Settings.SIUISettings.Model);
         PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
+        PresentationController.ClearPlayersState();
 
         _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
 
@@ -1139,7 +1140,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _gameLogger.Write("Package: {0}", _engine.PackageName);
 
         _selectedPlayers.Clear();
-        PresentationController.ClearPlayersState();
 
         if (Settings.Model.AutomaticGame)
         {
@@ -1262,18 +1262,18 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             case QuestionTypes.SecretPublicPrice:
             case QuestionTypes.SecretNoQuestion:
                 SetSound(Settings.Model.Sounds.SecretQuestion);
-                PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
+                PrintQuestionType(typeName, Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
                 highlightTheme = false;
                 break;
 
             case QuestionTypes.Stake:
                 SetSound(Settings.Model.Sounds.StakeQuestion);
-                PrintQuestionType(Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
+                PrintQuestionType(typeName, Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
                 break;
 
             case QuestionTypes.NoRisk:
                 SetSound(Settings.Model.Sounds.NoRiskQuestion);
-                PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
+                PrintQuestionType(typeName, Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
                 highlightTheme = false;
                 break;
 
@@ -1514,6 +1514,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         PresentationController.SetText();
         PresentationController.SetActivePlayerIndex(-1);
+        PresentationController.FinishQuestion();
 
         CurrentTheme = null;
         Price = 0;
@@ -1845,11 +1846,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    private void PrintQuestionType(string originalTypeName, string? aliasName)
+    private void PrintQuestionType(string typeName, string originalTypeName, string? aliasName)
     {
         var actualName = string.IsNullOrWhiteSpace(aliasName) ? originalTypeName : aliasName;
 
-        PresentationController.SetText(actualName);
+        PresentationController.SetQuestionType(typeName, actualName);
         _gameLogger.Write(actualName);
     }
 

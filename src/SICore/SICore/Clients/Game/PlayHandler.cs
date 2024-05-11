@@ -23,7 +23,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         }
 
         // _gameData.TInfo.RoundInfo is initialized here
-        GameLogic?.InitThemes(themes, false, true);
+        GameLogic?.InitThemes(themes, false, true, Models.ThemesPlayMode.OneByOne);
 
         // Filling initial questions table
         _gameData.ThemeInfoShown.Clear();
@@ -116,7 +116,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
         _gameData.AnnounceAnswer = true; // initialization
 
-        GameLogic?.InitThemes(themes, willPlayAllThemes, isFirstPlay);
+        GameLogic?.InitThemes(themes, willPlayAllThemes, isFirstPlay, Models.ThemesPlayMode.AllTogether);
         _gameData.ThemeDeleters = new ThemeDeletersEnumerator(_gameData.Players, _gameData.TInfo.RoundInfo.Count(t => t.Name != null));
         _gameData.ThemeDeleters.Reset(true);
         GameLogic?.ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));

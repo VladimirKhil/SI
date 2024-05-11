@@ -122,4 +122,8 @@ public interface IPresentationController : IDisposable
         IReadOnlyCollection<ContentItem> content,
         Func<ContentItem, string?> tryGetMediaUri,
         string? textToShow);
+    
+    void FinishQuestion() { }
+
+    void SetQuestionType(string typeName, string aliasName);
 }

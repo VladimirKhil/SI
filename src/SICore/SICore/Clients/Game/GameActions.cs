@@ -3,8 +3,10 @@ using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Contracts;
 using SICore.Extensions;
+using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
+using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
@@ -161,15 +163,18 @@ public sealed class GameActions
     public void InformStageInfo(string person, int stageIndex) =>
         SendMessageToWithArgs(person, Messages.StageInfo, _gameData.Stage.ToString(), _gameData.Round?.Name ?? "", stageIndex);
 
-    internal void InformRoundThemes(string person = NetworkConstants.Everybody, bool play = true)
+    internal void InformRoundThemes(string person = NetworkConstants.Everybody, ThemesPlayMode playMode = ThemesPlayMode.None)
     {
         var msg = new StringBuilder(Messages.RoundThemes)
             .Append(Message.ArgsSeparatorChar)
-            .Append(play ? '+' : '-')
+            .Append(playMode != ThemesPlayMode.None ? '+' : '-')
             .Append(Message.ArgsSeparatorChar)
             .Append(string.Join(Message.ArgsSeparator, _gameData.TInfo.RoundInfo.Select(info => info.Name)));
 
         SendMessage(msg.ToString(), person);
+
+        var messageBuilder = new MessageBuilder(Messages.RoundThemes2, playMode).AddRange(_gameData.TInfo.RoundInfo.Select(info => info.Name));
+        SendMessage(messageBuilder.ToString(), person);
     }
 
     /// <summary>

@@ -79,6 +79,7 @@ public static class WebView2Behavior
             if (webView2.DataContext is IWebInterop webInterop)
             {
                 webInterop.SendJsonMessage -= coreWebView.PostWebMessageAsJson;
+                webView2.WebMessageReceived -= WebView2_WebMessageReceived;
             }
         }
     }
@@ -96,11 +97,20 @@ public static class WebView2Behavior
             if (webView2.DataContext is IWebInterop webInterop)
             {
                 webInterop.SendJsonMessage += webView2.CoreWebView2.PostWebMessageAsJson;
+                webView2.WebMessageReceived += WebView2_WebMessageReceived;
             }
         }
         catch (Exception exc)
         {
             Trace.TraceError(exc.ToString());
+        }
+    }
+
+    private static void WebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        if (sender is WebView2 webView2 && webView2.DataContext is IWebInterop webInterop)
+        {
+            webInterop.OnMessage(e.WebMessageAsJson);
         }
     }
 }

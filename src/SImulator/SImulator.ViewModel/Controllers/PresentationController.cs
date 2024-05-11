@@ -736,5 +736,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         return hasMedia;
     }
 
+    public void SetQuestionType(string typeName, string aliasName) => SetText(aliasName);
+
     public event PropertyChangedEventHandler? PropertyChanged;
 }

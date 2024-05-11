@@ -116,7 +116,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
             case StepParameterValues.AskAnswerMode_Direct:
                 GameViewModel.AskAnswerDirect();
-                GameViewModel.State = Model.QuestionState.Thinking;
+                GameViewModel.State = QuestionState.Thinking;
                 break;
 
             default:

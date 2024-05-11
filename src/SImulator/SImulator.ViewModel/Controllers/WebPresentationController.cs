@@ -20,6 +20,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     private readonly IDisplayDescriptor _displayDescriptor;
     private readonly IPresentationListener _presentationListener;
+    private readonly TaskCompletionSource _loadTSC = new();
 
     public Uri Source { get; } = new($"file:///{AppDomain.CurrentDomain.BaseDirectory}webtable/index.html");
 
@@ -63,17 +64,19 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         throw new NotImplementedException();
     }
 
-    public void PlayComplexSelection(int theme, int quest, bool setActive)
+    public void PlayComplexSelection(int theme, int quest, bool setActive) => OnMessageSend(new
     {
-        throw new NotImplementedException();
-    }
+        Type = "questionSelected",
+        ThemeIndex = theme,
+        QuestionIndex = quest
+    });
 
     public void PlaySelection(int theme)
     {
         throw new NotImplementedException();
     }
 
-    public void PlaySimpleSelection(int theme, int quest) => OnMessage(new
+    public void PlaySimpleSelection(int theme, int quest) => OnMessageSend(new
     {
         Type = "questionSelected",
         ThemeIndex = theme,
@@ -87,7 +90,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void RestoreQuestion(int themeIndex, int questionIndex, int price)
     {
-        throw new NotImplementedException();
+        // TODO
     }
 
     public void RunMedia()
@@ -95,7 +98,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         throw new NotImplementedException();
     }
 
-    public void RunTimer() => OnMessage(new
+    public void RunTimer() => OnMessageSend(new
     {
         Type = "timerResume",
         TimerIndex = 1
@@ -121,13 +124,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         throw new NotImplementedException();
     }
 
-    public void SetCaption(string caption) => OnMessage(new
+    public void SetCaption(string caption) => OnMessageSend(new
     {
         Type = "tableCaption",
         Caption = caption
     });
 
-    public void SetGameThemes(IEnumerable<string> themes) => OnMessage(new
+    public void SetGameThemes(IEnumerable<string> themes) => OnMessageSend(new
     {
         Type = "gameThemes",
         Themes = themes.ToArray()
@@ -147,21 +150,26 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetQuestionStyle(QuestionStyle questionStyle) { }
 
-    public void BeginPressButton() => OnMessage(new
+    public void BeginPressButton() => OnMessageSend(new
     {
         Type = "beginPressButton"
     });
 
+    public void FinishQuestion() => OnMessageSend(new
+    {
+        Type = "endPressButtonByTimeout"
+    });
+
     public void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal)
     {
-        OnMessage(new
+        OnMessageSend(new
         {
             Type = "roundThemes",
             Themes = themes.Select(t => t.Name).ToArray(),
-            Print = true
+            PlayMode = isFinal ? "AllTogether" : "OneByOne"
         });
 
-        OnMessage(new
+        OnMessageSend(new
         {
             Type = "table",
             Table = themes.Select(t => new { t.Name, Questions = t.Questions.Select(q => q.Price).ToArray() }).ToArray(),
@@ -179,12 +187,12 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         // TODO
     }
 
-    public void SetRoundTable() => OnMessage(new
+    public void SetRoundTable() => OnMessageSend(new
     {
         Type = "showTable"
     });
 
-    public void SetRound(string roundName) => OnMessage(new
+    public void SetRound(string roundName) => OnMessageSend(new
     {
         Type = "stage",
         Stage = "Round",
@@ -197,7 +205,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         // TODO
     }
 
-    public void SetTimerMaxTime(int maxTime) => OnMessage(new
+    public void SetTimerMaxTime(int maxTime) => OnMessageSend(new
     {
         Type = "timerMaximum",
         TimerIndex = 1,
@@ -209,7 +217,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         throw new NotImplementedException();
     }
 
-    public Task StartAsync() => PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor);
+    public Task StartAsync() => Task.WhenAll(_loadTSC.Task, PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor));
 
     public Task StopAsync() => PlatformManager.Instance.CloseMainViewAsync();
 
@@ -220,7 +228,16 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void StopTimer()
     {
-        // TODO
+        OnMessageSend(new
+        {
+            Type = "timerStop",
+            TimerIndex = 1
+        });
+
+        OnMessageSend(new
+        {
+            Type = "endPressButtonByTimeout"
+        });
     }
 
     public void UpdatePlayerInfo(int index, PlayerInfo player)
@@ -233,19 +250,19 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         // TODO: will be implemented in the future
     }
 
-    public void UpdateShowPlayers(bool showPlayers) => OnMessage(new
+    public void UpdateShowPlayers(bool showPlayers) => OnMessageSend(new
     {
         Type = "playersVisibilityChanged",
         IsVisible = showPlayers
     });
 
-    public void SetTheme(string themeName) => OnMessage(new
+    public void SetTheme(string themeName) => OnMessageSend(new
     {
         Type = "theme",
         ThemeName = themeName
     });
 
-    public void SetQuestion(int questionPrice) => OnMessage(new
+    public void SetQuestion(int questionPrice) => OnMessageSend(new
     {
         Type = "question",
         QuestionPrice = questionPrice
@@ -261,7 +278,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             switch (contentItem.Placement)
             {
                 case ContentPlacements.Replic:
-                    OnMessage(new
+                    OnMessageSend(new
                     {
                         Type = "replic",
                         PersonCode = "s",
@@ -297,7 +314,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                 case ContentPlacements.Background:
                     var sound = tryGetMediaUri(contentItem);
 
-                    OnMessage(new
+                    OnMessageSend(new
                     {
                         Type = "content",
                         Placement = "background",
@@ -314,7 +331,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
         if (screenContent.Count > 0)
         {
-            OnMessage(new
+            OnMessageSend(new
             {
                 Type = "content",
                 Placement = "screen",
@@ -325,7 +342,39 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         return hasMedia;
     }
 
-    private void OnMessage(object message) =>
+    public void SetQuestionType(string typeName, string aliasName) => OnMessageSend(new
+    {
+        Type = "questionType",
+        QuestionType = typeName
+    });
+
+    public void OnMessage(string message)
+    {
+        var data = JsonSerializer.Deserialize<Dictionary<string, string>>(message);
+
+        if (data == null)
+        {
+            return;
+        }
+
+        var type = data["type"];
+        
+        switch (type)
+        {
+            case "loaded":
+                _loadTSC.SetResult();
+                break;
+
+            case "loadError":
+                _loadTSC.SetException(new Exception((string)data["error"]));
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void OnMessageSend(object message) =>
         UI.Execute(
             () => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions)),
             exc => PlatformManager.Instance.ShowMessage(exc.Message));

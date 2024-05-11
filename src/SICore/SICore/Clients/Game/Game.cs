@@ -1012,7 +1012,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             {
                 if (ClientData.TableInformStage > 1)
                 {
-                    _gameActions.InformRoundThemes(play: false);
+                    _gameActions.InformRoundThemes();
                     _gameActions.InformTable();
                 }
             },
@@ -1339,7 +1339,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             {
                 if (ClientData.TableInformStage > 0)
                 {
-                    _gameActions.InformRoundThemes(person, false);
+                    _gameActions.InformRoundThemes(person);
 
                     if (ClientData.TableInformStage > 1)
                     {

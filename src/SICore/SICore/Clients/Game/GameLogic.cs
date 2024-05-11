@@ -286,7 +286,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ClientData.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
     }
 
-    internal void InitThemes(IEnumerable<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
+    internal void InitThemes(IEnumerable<Theme> themes, bool willPlayAllThemes, bool isFirstPlay, ThemesPlayMode playMode)
     {
         _data.TInfo.RoundInfo.Clear();
 
@@ -312,7 +312,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.TableInformStageLock.WithLock(() =>
         {
-            _gameActions.InformRoundThemes();
+            _gameActions.InformRoundThemes(playMode: playMode);
             _data.TableInformStage = 1;
         },
         5000);

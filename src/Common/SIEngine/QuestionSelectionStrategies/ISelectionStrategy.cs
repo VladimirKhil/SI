@@ -18,7 +18,7 @@ internal interface ISelectionStrategy
     /// <summary>
     /// Moves the game forward.
     /// </summary>
-    void MoveNext() { }
+    void MoveNext() { } // TODO: can this method return selected question so the selection callback could be removed?
 
     /// <summary>
     /// Can the game move backwards.

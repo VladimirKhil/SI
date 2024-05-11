@@ -443,6 +443,12 @@ public static class Messages
     public const string RoundThemes = "ROUNDTHEMES";
 
     /// <summary>
+    /// Round themes names.
+    /// </summary>
+    [IdempotencyRequired]
+    public const string RoundThemes2 = "ROUND_THEMES2";
+
+    /// <summary>
     /// Gives move to player.
     /// </summary>
     public const string SetChooser = "SETCHOOSER";
