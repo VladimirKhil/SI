@@ -232,11 +232,20 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Common knowledge.
+        ///   Ищет локализованную строку, похожую на General knowledge.
         /// </summary>
         public static string CommonTag {
             get {
                 return ResourceManager.GetString("CommonTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Common.
+        /// </summary>
+        public static string CommonTags {
+            get {
+                return ResourceManager.GetString("CommonTags", resourceCulture);
             }
         }
         
@@ -277,19 +286,31 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Art
+        ///   Ищет локализованную строку, похожую на Cars
+        ///Anime
         ///Astronomy
         ///Biology
-        ///Chemistry
-        ///Erudition
-        ///Games
         ///Geography
+        ///Games: Consoles, Soundtracks, Board games
+        ///Art
         ///History
-        ///Literature
-        ///Mathematics
+        ///Movies: Directors, Actors, Awards
+        ///Books: Comics
         ///Memes
+        ///Mathematics
+        ///Music: Rock, Pop, Rap, Jazz, Metal, Electronic, Covers, Russian music, Classical music
+        ///Cartoons
+        ///Rebuses
+        ///Comics
+        ///TV series
+        ///Mixed (hodgepodge)
+        ///Sports: Football
+        ///TV
+        ///Science fiction
         ///Physics
-        ///TV.
+        ///Chemistry
+        ///Erudition: Intellectual games, Politics, Personalities
+        ///Humor.
         /// </summary>
         public static string DefaultTags {
             get {

@@ -62,7 +62,7 @@ public abstract class PlatformManager
 
     public abstract string? AskText(string title, bool multiline = false);
 
-    public abstract string[]? AskTags(string[] possibleTags);
+    public abstract void AskTags(ItemsViewModel<string> tags);
 
     public abstract IFlowDocumentWrapper BuildDocument(SIDocument doc, ExportFormats format);
 

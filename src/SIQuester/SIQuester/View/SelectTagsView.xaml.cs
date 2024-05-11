@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using SIQuester.ViewModel;
+using System.Windows;
 
 namespace SIQuester.View;
 
@@ -13,5 +14,15 @@ public partial class SelectTagsView : Window
     {
         DialogResult = true;
         Close();
+    }
+
+    private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key != System.Windows.Input.Key.Enter || DataContext is not SelectTagsViewModel viewModel || !viewModel.AddItem.CanBeExecuted)
+        {
+            return;
+        }
+
+        viewModel.AddItem.Execute(null);
     }
 }

@@ -393,11 +393,11 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         return view.ShowDialog() == true ? viewModel.Uri : null;
     }
 
-    public override string[]? AskTags(string[] possibleTags)
+    public override void AskTags(ItemsViewModel<string> tags)
     {
-        var viewModel = new SelectTagsViewModel(possibleTags);
+        var viewModel = new SelectTagsViewModel(tags);
         var view = new SelectTagsView { DataContext = viewModel, Owner = Application.Current.MainWindow };
-        return view.ShowDialog() == true ? viewModel.SelectedTags : null;
+        view.ShowDialog();
     }
 
     /// <summary>

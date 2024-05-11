@@ -175,7 +175,10 @@
     <value>Comments</value>
   </data>
   <data name="CommonTag" xml:space="preserve">
-    <value>Common knowledge</value>
+    <value>General knowledge</value>
+  </data>
+  <data name="CommonTags" xml:space="preserve">
+    <value>Common</value>
   </data>
   <data name="ConfirmFilesRemoval" xml:space="preserve">
     <value>Do you really want to delete all unused media files in the package?</value>
@@ -190,19 +193,31 @@
     <value>The package is stored in the Database {0} under the name {1}</value>
   </data>
   <data name="DefaultTags" xml:space="preserve">
-    <value>Art
+    <value>Cars
+Anime
 Astronomy
 Biology
-Chemistry
-Erudition
-Games
 Geography
+Games: Consoles, Soundtracks, Board games
+Art
 History
-Literature
-Mathematics
+Movies: Directors, Actors, Awards
+Books: Comics
 Memes
+Mathematics
+Music: Rock, Pop, Rap, Jazz, Metal, Electronic, Covers, Russian music, Classical music
+Cartoons
+Rebuses
+Comics
+TV series
+Mixed (hodgepodge)
+Sports: Football
+TV
+Science fiction
 Physics
-TV</value>
+Chemistry
+Erudition: Intellectual games, Politics, Personalities
+Humor</value>
   </data>
   <data name="DocumentLoading" xml:space="preserve">
     <value>Document loading</value>

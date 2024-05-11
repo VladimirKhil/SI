@@ -90,13 +90,12 @@ public sealed class PackageViewModel : ItemViewModel<Package>
 
         BindHelper.Bind(Tags, Model.Tags);
 
-        Tags.CollectionChanged += Tags_CollectionChanged;
         Model.PropertyChanged += Model_PropertyChanged;
         Rounds.CollectionChanged += Rounds_CollectionChanged;
 
         Add = AddRound = new SimpleCommand(AddRound_Executed);
         AddRestrictions = new SimpleCommand(AddRestrictions_Executed);
-        AddTags = new SimpleCommand(AddTags_Executed) { CanBeExecuted = Tags.Count == 0 };
+        AddTags = new SimpleCommand(AddTags_Executed);
 
         ChangeLanguage = new SimpleCommand(ChangeLanguage_Executed);
 
@@ -107,11 +106,6 @@ public sealed class PackageViewModel : ItemViewModel<Package>
     private void ChangeLanguage_Executed(object? arg)
     {
         Model.Language = Model.Language == "ru-RU" ? "en-US" : "ru-RU";
-    }
-
-    private void Tags_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        AddTags.CanBeExecuted = Tags.Count == 0;
     }
 
     private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -182,29 +176,7 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         Model.Restriction = Resources.Restriction;
     }
 
-    private void AddTags_Executed(object? arg)
-    {
-        var tags = PlatformManager.Instance.AskTags(Document.StorageContext.Tags);
-
-        if (tags == null)
-        {
-            return;
-        }
-
-        QDocument.ActivatedObject = Tags;
-
-        if (tags.Length > 0)
-        {
-            foreach (var tag in tags)
-            {
-                Tags.Add(tag);
-            }
-        }
-        else
-        {
-            Tags.Add("");
-        }
-    }
+    private void AddTags_Executed(object? arg) => PlatformManager.Instance.AskTags(Tags);
 
     private void SelectLogo_Executed(object? arg)
     {

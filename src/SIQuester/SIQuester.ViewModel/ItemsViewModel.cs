@@ -102,11 +102,15 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
 
     protected virtual bool CanRemove() => true;
 
-    private void AddItem_Executed(object? arg) => Add((T)(object)"");
+    private void AddItem_Executed(object? arg) => Add((T)(arg ?? ""));
 
     private void RemoveItem_Executed(object? arg)
     {
-        if (_currentPosition > -1 && _currentPosition < Count)
+        if (arg != null)
+        {
+            Remove((T)arg);
+        }
+        else if (_currentPosition > -1 && _currentPosition < Count)
         {
             RemoveAt(_currentPosition);
         }

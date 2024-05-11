@@ -1913,14 +1913,27 @@
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <siq:TextList
-                                        Style="{StaticResource LightTextBox}"
-                                        DataContext="{Binding Tags}"
-                                        ItemsSource="{Binding}"
-                                        CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
-                                        siq:SmartMenuManager.SecondMenu="True"
-                                        IsSynchronizedWithCurrentItem="True"
-                                        siq:ActivateManager.IsWatching="True" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <siq:TextList
+                                            Style="{StaticResource LightTextBox}"
+                                            DataContext="{Binding Tags}"
+                                            ItemsSource="{Binding}"
+                                            CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
+                                            siq:SmartMenuManager.SecondMenu="True"
+                                            IsSynchronizedWithCurrentItem="True"
+                                            siq:ActivateManager.IsWatching="True" />
+
+                                        <Button
+                                            ToolTip="{x:Static lp:Resources.SetTags}"
+                                            Command="{Binding AddTags}"
+                                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                            Width="25"
+                                            Cursor="Hand"
+                                            HorizontalAlignment="Left"
+                                            Padding="2">
+                                            <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                                        </Button>
+                                    </StackPanel>
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>

@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:lc="clr-namespace:SIQuester.Converters"
     mc:Ignorable="d" 
     d:DesignHeight="250"
     d:DesignWidth="200"
@@ -13,56 +14,81 @@
     MaxWidth="900"
     MinHeight="400"
     MaxHeight="700"
-    SizeToContent="WidthAndHeight"
     WindowStartupLocation="CenterOwner"
     ResizeMode="CanResize"
     Title="{x:Static lp:Resources.SetTags}"
     d:DataContext="{d:DesignInstance lvm:SelectTagsViewModel}">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        
-        <ScrollViewer Margin="1">
-            <ItemsControl ItemsSource="{Binding Tags}">
+    <Window.Resources>
+        <lc:NotContainsToVisibilityConverter x:Key="NotContainsToVisibilityConverter" />
+    </Window.Resources>
+    
+    <DockPanel>
+        <WrapPanel DockPanel.Dock="Top" TextBlock.FontSize="20" Margin="5">
+            <ItemsControl ItemsSource="{Binding Items}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-
+                
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ToggleButton
-                            IsChecked="{Binding IsSelected}"
-                            Content="{Binding Name}"
-                            Margin="5"
-                            Padding="4,10"
-                            Width="200"
-                            BorderThickness="0"
-                            Cursor="Hand" />
+                        <Border Margin="0,5,5,0" Background="Lavender" Padding="5,3,3,3">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding}" FontSize="18" Margin="0,0,0,5" />
+
+                                <Button
+                                    Command="{Binding DataContext.RemoveItem, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}"
+                                    ToolTip="{x:Static lp:Resources.Delete}"
+                                    Width="25"
+                                    Margin="1,0,0,0"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    Cursor="Hand">
+                                    <Path
+                                        Stretch="Uniform"
+                                        Stroke="#FF555555"
+                                        StrokeThickness="2"
+                                        Margin="4"
+                                        Data="{Binding Source={StaticResource app_delete},Path=Data}" />
+                                </Button>
+                            </StackPanel>
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </ScrollViewer>
-        
-        <ToggleButton
-            IsChecked="{Binding CommonTag.IsSelected}"
-            Content="{Binding CommonTag.Name}"
-            Grid.Row="1"
-            Margin="5,15,5,5"
-            Padding="4,10"
-            Width="200"
-            BorderThickness="0"
-            HorizontalAlignment="Center"
-            Cursor="Hand" />
 
-        <TextBlock Grid.Row="2" Text="{x:Static lp:Resources.CustomTagsHint}" HorizontalAlignment="Center" Margin="10" />
-        
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <TextBox
+                    Text="{Binding NewItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    Width="200"
+                    FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+                    KeyDown="TextBox_KeyDown"
+                    Padding="2,4,2,2"
+                    FontSize="18"
+                    BorderThickness="0"
+                    Background="Lavender" />
+
+                <Button
+                    Command="{Binding AddItem}"
+                    ToolTip="{x:Static lp:Resources.Add}"
+                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                    Cursor="Hand"
+                    FontSize="15"
+                    Padding="5,3"
+                    Height="30"
+                    Margin="5,0,0,0">
+                    <Path
+                        Stretch="Uniform"
+                        Fill="Green"
+                        Margin="1"
+                        Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                </Button>
+            </StackPanel>
+        </WrapPanel>
+
         <Button
+            DockPanel.Dock="Bottom"
             Grid.Row="3"
             Name="ok"
             Click="Button_Click"
@@ -70,7 +96,47 @@
             Margin="5"
             Width="200"
             Padding="60,6"
-            HorizontalAlignment="Right"
-            IsDefault="True" />
-    </Grid>
+            HorizontalAlignment="Right" />
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{x:Static lvm:SelectTagsViewModel.TagsGroups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" FontSize="15" Margin="5,5,0,0" />
+
+                            <ItemsControl ItemsSource="{Binding Tags}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Content="{Binding Name}"
+                                            Command="{Binding DataContext.AddKnownItem, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}"
+                                            CommandParameter="{Binding Name}"
+                                            Margin="2"
+                                            Padding="4,10"
+                                            Width="150"
+                                            BorderThickness="0"
+                                            Cursor="Hand">
+                                            <Button.Visibility>
+                                                <MultiBinding Converter="{StaticResource NotContainsToVisibilityConverter}">
+                                                    <Binding Path="DataContext.Items" RelativeSource="{RelativeSource AncestorType=ItemsControl, AncestorLevel=2}" />
+                                                    <Binding Path="Name" />
+                                                </MultiBinding>
+                                            </Button.Visibility>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
 </Window>
