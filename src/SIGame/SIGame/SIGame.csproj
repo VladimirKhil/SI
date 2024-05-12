@@ -3,10 +3,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <AssemblyTitle>SIGame</AssemblyTitle>
-    <Company>Khil-soft</Company>
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
-    <Copyright>Copyright © Khil-soft 2002-2024</Copyright>
     <Version>$(SIGameVersion)</Version>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -51,7 +49,9 @@
     <Resource Include="Fonts\Jost-Regular.ttf" />
     <Resource Include="Fonts\Jost-SemiBold.ttf" />
     <Resource Include="Fonts\Jost-Thin.ttf" />
+    <Resource Include="Resources\discord_logo.png" />
     <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
+    <Resource Include="Resources\twitch_logo.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.ru-RU.resx">
@@ -227,6 +227,7 @@
     <None Remove="Fonts\Jost-Thin.ttf" />
     <None Remove="Resources\active_player.png" />
     <None Remove="Resources\appellation.png" />
+    <None Remove="Resources\discord_logo.png" />
     <None Remove="Resources\edit.png" />
     <None Remove="Resources\exit.png" />
     <None Remove="Resources\game_button.png" />
@@ -239,6 +240,7 @@
     <None Remove="Resources\settings.png" />
     <None Remove="Resources\sound.png" />
     <None Remove="Resources\sums.png" />
+    <None Remove="Resources\twitch_logo.png" />
     <None Remove="Theme\main_background.png" />
     <None Remove="Theme\studia.png" />
   </ItemGroup>

@@ -1161,4 +1161,10 @@
   <data name="ShowVideoAvatars" xml:space="preserve">
     <value>Show video avatars</value>
   </data>
+  <data name="DiscordHint" xml:space="preserve">
+    <value>Go to Discord server</value>
+  </data>
+  <data name="TwitchHint" xml:space="preserve">
+    <value>Go to Twitch category</value>
+  </data>
 </root>

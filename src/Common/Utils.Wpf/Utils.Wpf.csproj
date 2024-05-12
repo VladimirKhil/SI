@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<Description>Common WPF content</Description>
-	<Copyright>Copyright © Khil-soft 2023 - 2024</Copyright>
+	<Version>$(SIGameVersion)</Version>
   </PropertyGroup>
 
   <ItemGroup>

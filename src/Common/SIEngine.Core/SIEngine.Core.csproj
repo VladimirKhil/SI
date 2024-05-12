@@ -5,8 +5,7 @@
     <Nullable>enable</Nullable>
 	<SignAssembly>True</SignAssembly>
 	<AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-	<Company>Khil-soft</Company>
-	<Copyright>Copyright © Khil-soft 2022 - 2024</Copyright>
+	<Version>$(SIGameVersion)</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
 	<DebugType>none</DebugType>

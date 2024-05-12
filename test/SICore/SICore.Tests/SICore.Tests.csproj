@@ -6,11 +6,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Authors>Vladimir Khil</Authors>
-    <Company>Khil-soft</Company>
     <Version>1.0.0</Version>
     <Description>SICore tests</Description>
-    <Copyright>Copyright © Khil-soft 2017 - 2023</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

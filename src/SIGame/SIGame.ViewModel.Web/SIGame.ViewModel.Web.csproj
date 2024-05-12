@@ -3,11 +3,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-    <Authors>Vladimir Khil</Authors>
-    <Company>Khil-soft</Company>
     <Version>$(SIGameVersion)</Version>
     <Description>SIGame web connector</Description>
-    <Copyright>Copyright © Khil-soft 2005 - 2023</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

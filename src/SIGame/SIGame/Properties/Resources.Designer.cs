@@ -682,6 +682,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Go to Discord server.
+        /// </summary>
+        public static string DiscordHint {
+            get {
+                return ResourceManager.GetString("DiscordHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Display questions sources.
         /// </summary>
         public static string DisplaySources {
@@ -3018,6 +3027,15 @@ namespace SIGame.Properties {
         public static string TryReinstallApp {
             get {
                 return ResourceManager.GetString("TryReinstallApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Go to Twitch category.
+        /// </summary>
+        public static string TwitchHint {
+            get {
+                return ResourceManager.GetString("TwitchHint", resourceCulture);
             }
         }
         

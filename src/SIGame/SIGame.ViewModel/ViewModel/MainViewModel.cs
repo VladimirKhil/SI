@@ -89,7 +89,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public CustomCommand Cancel { get; private set; }
 
-    private readonly StartMenuViewModel _startMenu = new();
+    private readonly StartMenuViewModel _startMenu;
 
     public StartMenuViewModel StartMenu => _startMenu;
 
@@ -132,8 +132,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         Cancel = new CustomCommand(Cancel_Executed);
 
-        ShowMenu();
-
         NewGame = new SimpleCommand(New_Executed);
         Open = new AsyncCommand(OnlineGame_Executed);
         NetworkGame = new CustomCommand(NetworkGame_Executed);
@@ -142,6 +140,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         SetProfile = new CustomCommand(SetProfile_Executed);
 
+        _startMenu = new StartMenuViewModel(Human, SetProfile);
+
         _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_SingleGame.ToUpper(), Command = NewGame });
         _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_OnlineGame.ToUpper(), Command = Open });
         _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_NetworkGame.ToUpper(), Command = NetworkGame });
@@ -149,8 +149,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_About.ToUpper(), Command = About });
         _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_Exit.ToUpper(), Command = PlatformSpecific.PlatformManager.Instance.Close });
 
-        _startMenu.Human = Human;
-        _startMenu.SetProfile = SetProfile;
+        ShowMenu();
 
         Human.NewAccountCreating += HumanPlayer_NewAccountCreating;
         Human.NewAccountCreated += HumanPlayer_NewAccountCreated;

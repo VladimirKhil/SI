@@ -1,21 +1,31 @@
-﻿using SICore;
-using SIGame.ViewModel.Properties;
+﻿using SIGame.ViewModel.Properties;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
+/// <summary>
+/// Defines a start menu view model.
+/// </summary>
 public sealed class StartMenuViewModel : INotifyPropertyChanged
 {
-    public UICommandCollection MainCommands { get; } = new UICommandCollection();
+    private const string TwitchUri = @"https://www.twitch.tv/directory/category/sigame";
+    private const string DiscordUri = @"https://discord.gg/pGXTE37gpv";
 
-    public HumanPlayerViewModel Human { get; set; }
+    public UICommandCollection MainCommands { get; } = new();
 
-    public ICommand SetProfile { get; set; }
+    public HumanPlayerViewModel Human { get; }
+
+    public ICommand SetProfile { get; }
 
     public ICommand NavigateToVK { get; private set; }
+
+    public ICommand NavigateToTwitch { get; private set; }
+
+    public ICommand NavigateToDiscord { get; private set; }
 
     private ICommand? _update;
 
@@ -31,15 +41,28 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
 
     public ICommand CancelUpdate { get; set; }
 
-    public Version UpdateVersion { get; set; }
+    public Version UpdateVersion { get; set; } = new();
 
     public string UpdateVersionMessage => string.Format(Resources.UpdateVersionMessage, UpdateVersion);
 
-    public StartMenuViewModel()
+    public StartMenuViewModel(HumanPlayerViewModel human, ICommand setProfile)
     {
-        NavigateToVK = new CustomCommand(NavigateToVK_Executed);
+        Human = human;
+        SetProfile = setProfile;
 
-        CancelUpdate = new CustomCommand(obj => Update = null);
+        NavigateToVK = new SimpleCommand(NavigateToVK_Executed)
+        { 
+            CanBeExecuted = Thread.CurrentThread.CurrentUICulture.Name == "ru-RU"
+        };
+
+        NavigateToTwitch = new SimpleCommand(NavigateToTwitch_Executed);
+        
+        NavigateToDiscord = new SimpleCommand(NavigateToDiscord_Executed)
+        {
+            CanBeExecuted = Thread.CurrentThread.CurrentUICulture.Name != "ru-RU"
+        };
+
+        CancelUpdate = new SimpleCommand(obj => Update = null);
     }
 
     private void NavigateToVK_Executed(object? arg)
@@ -52,6 +75,34 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
         {
             PlatformSpecific.PlatformManager.Instance.ShowMessage(
                 string.Format(Resources.SiteNavigationError + "\r\n{1}", Resources.GroupLink, exc.Message),
+                PlatformSpecific.MessageType.Error);
+        }
+    }
+
+    private void NavigateToTwitch_Executed(object? arg)
+    {
+        try
+        {
+            Browser.Open(TwitchUri);
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.SiteNavigationError + "\r\n{1}", TwitchUri, exc.Message),
+                PlatformSpecific.MessageType.Error);
+        }
+    }
+
+    private void NavigateToDiscord_Executed(object? arg)
+    {
+        try
+        {
+            Browser.Open(DiscordUri);
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.SiteNavigationError + "\r\n{1}", DiscordUri, exc.Message),
                 PlatformSpecific.MessageType.Error);
         }
     }

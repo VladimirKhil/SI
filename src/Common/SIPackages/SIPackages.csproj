@@ -4,10 +4,7 @@
 	<SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Description>SIGame packages processor</Description>
-    <Company>Khil-soft</Company>
     <Version>7.10.0</Version>
-    <Authors>Vladimir Khil</Authors>
-    <Copyright>Copyright © Khil-soft 2007 - 2024</Copyright>
     <PackageProjectUrl>https://github.com/VladimirKhil/SI</PackageProjectUrl>
     <RepositoryUrl>https://github.com/VladimirKhil/SI</RepositoryUrl>
     <PackageTags>SIGame</PackageTags>

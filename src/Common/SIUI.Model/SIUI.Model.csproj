@@ -4,10 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
 	<SignAssembly>True</SignAssembly>
 	<AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-	<Company>Khil-soft</Company>
 	<Description>Game table model</Description>
 	<Version>7.6.0</Version>
-    <Copyright>Copyright © Khil-soft 2010 - 2024</Copyright>
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

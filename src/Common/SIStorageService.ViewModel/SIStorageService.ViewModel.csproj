@@ -6,8 +6,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Company>Khil-soft</Company>
-    <Copyright>Copyright © Khil-soft 2021 - 2024</Copyright>
+	<Version>$(SIGameVersion)</Version>
   </PropertyGroup>
 
   <ItemGroup>

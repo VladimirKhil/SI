@@ -2,11 +2,9 @@
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
     <AssemblyTitle>SIUI</AssemblyTitle>
-    <Company>Khil-soft</Company>
     <Product>SIUI</Product>
     <Description>SIGame table ui</Description>
-    <Copyright>Copyright © Khil-soft 2010 - 2024</Copyright>
-    <Version>7.7.3</Version>
+	<Version>$(SIGameVersion)</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
 	<Nullable>enable</Nullable>
@@ -33,7 +31,6 @@
     <Resource Include="Fonts\Clefs.ttf" />
     <Resource Include="Fonts\DINCondensedC.ttf" />
     <None Include="key.snk" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
