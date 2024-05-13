@@ -8,6 +8,7 @@ using SICore.Contracts;
 using SICore.Network.Servers;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Settings;
+using SIStatisticsService.Contract;
 using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -322,11 +323,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 _commonSettings,
                 _userSettings,
                 Settings.ThemeSettings.SIUISettings,
+                _serviceProvider.GetRequiredService<ISIStatisticsServiceClient>(),
                 _serviceProvider.GetRequiredService<IOptions<SIContentClientOptions>>().Value,
-                _serviceProvider.GetRequiredService<ILogger<SIOnlineViewModel>>())
+                _serviceProvider.GetRequiredService<ILogger<SIOnlineViewModel>>(),
+                Cancel)
             {
                 Human = humanAccount,
-                Cancel = Cancel,
                 ChangeSettings = ShowSlideMenu
             };
 

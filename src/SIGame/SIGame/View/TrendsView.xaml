@@ -1,0 +1,124 @@
+﻿<UserControl
+    x:Class="SIGame.View.TrendsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lc="clr-namespace:SIGame.Converters"
+    xmlns:lp="clr-namespace:SIGame.Properties"
+    xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    mc:Ignorable="d" 
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    FontSize="18"
+    d:DataContext="{d:DesignInstance lvm:TrendsViewModel}"
+    Background="#FFC0CFF4"
+    Foreground="Black"
+    Cursor="Arrow">
+    <UserControl.Resources>
+        <lc:StringJoinConverter x:Key="StringJoinConverter" />
+        <lc:DictionaryStringJoinConverter x:Key="DictionaryStringJoinConverter" />
+        <lc:DictionaryInt32JoinConverter x:Key="DictionaryInt32JoinConverter" />
+        <lc:IsValidLinkConverter x:Key="IsValidLinkConverter" />
+
+        <Style x:Key="Item" TargetType="TextBlock">
+            <Setter Property="Background" Value="#22000000" />
+            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="Padding" Value="6" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer>
+        <StackPanel Margin="10">
+            <TextBlock Text="{x:Static lp:Resources.TopPackages}" FontSize="24" FontWeight="Bold" />
+
+            <ItemsControl ItemsSource="{Binding Packages}" Margin="0,5,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ContentControl x:Name="text" Content="{Binding}">
+                            <ContentControl.ContentTemplate>
+                                <DataTemplate>
+                                    <TextBlock Style="{StaticResource Item}" TextWrapping="Wrap" Background="#22000000" Padding="6">
+                                        <Run Text="{Binding Package.Name, Mode=OneWay}" FontWeight="Bold" />
+                                        <Run Text="(" /><Run Text="{x:Static lp:Resources.OfGames}" /><Run Text=":" /><Run Text="{Binding GameCount, Mode=OneWay}" /><Run Text=")" />
+                                        <LineBreak />
+                                        <Run Text="{x:Static lp:Resources.By}" />
+                                        <Run ToolTip="{Binding Package.AuthorsContacts}" Text="{Binding Package.Authors, Mode=OneWay, Converter={StaticResource StringJoinConverter}}" FontWeight="Bold" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Package.AuthorsContacts, Converter={StaticResource IsValidLinkConverter}}" Value="True">
+                                <Setter TargetName="text" Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <TextBlock Style="{StaticResource Item}" TextWrapping="Wrap" Background="#22000000" Padding="6">
+                                                <Run Text="{Binding Package.Name, Mode=OneWay}" FontWeight="Bold" />
+                                                <Run Text="(" /><Run Text="{x:Static lp:Resources.OfGames}" /><Run Text=":" /><Run Text="{Binding GameCount, Mode=OneWay}" /><Run Text=")" />
+                                                <LineBreak />
+                                                <Run Text="{x:Static lp:Resources.By}" />
+                                                <Hyperlink
+                                                    NavigateUri="{Binding Package.AuthorsContacts}"
+                                                    TargetName="_blank"
+                                                    Click="Hyperlink_Click"><Run
+                                                    Text="{Binding Package.Authors, Mode=OneWay, Converter={StaticResource StringJoinConverter}}"
+                                                    FontWeight="Bold" /></Hyperlink>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Text="{x:Static lp:Resources.GamesStatistics}" FontSize="24" FontWeight="Bold" Margin="0,5,0,0" />
+
+            <TextBlock TextWrapping="Wrap" Margin="0,5,0,0">
+                <Run Text="{x:Static lp:Resources.GameCount}" /><Run Text=":" />
+                <Run Text="{Binding Games.GameCount, Mode=OneWay}" />
+            </TextBlock>
+
+            <TextBlock Text="{x:Static lp:Resources.LatestGames}" FontSize="24" FontWeight="Bold" Margin="0,5,0,0" />
+
+            <ItemsControl ItemsSource="{Binding LatestGames.Results}" Margin="0,5,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ContentControl x:Name="text" Content="{Binding}">
+                            <ContentControl.ContentTemplate>
+                                <DataTemplate>
+                                    <TextBlock Style="{StaticResource Item}" TextWrapping="Wrap">
+                                        <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" />
+                                        <LineBreak />
+                                        <Run Text="{x:Static lp:Resources.Results}" /><Run Text=":" /><Run Text="{Binding Results, Mode=OneWay, Converter={StaticResource DictionaryInt32JoinConverter}}" />
+                                        <LineBreak />
+                                        <Run Text="{x:Static lp:Resources.Reviews}" /><Run Text=":" /><Run Text="{Binding Reviews, Mode=OneWay, Converter={StaticResource DictionaryStringJoinConverter}}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Reviews.Count}" Value="0">
+                                <Setter TargetName="text" Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <TextBlock Style="{StaticResource Item}" TextWrapping="Wrap">
+                                                <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" />
+                                                <LineBreak />
+                                                <Run Text="{x:Static lp:Resources.Results}" /><Run Text=":" /><Run Text="{Binding Results, Mode=OneWay, Converter={StaticResource DictionaryInt32JoinConverter}}" />
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

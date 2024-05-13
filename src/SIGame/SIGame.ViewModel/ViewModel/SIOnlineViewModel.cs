@@ -12,10 +12,12 @@ using SIGame.ViewModel.Implementation;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Properties;
+using SIStatisticsService.Contract;
 using SIUI.ViewModel;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Security.Cryptography;
+using System.Windows.Input;
 using Utils;
 using Utils.Commands;
 
@@ -44,6 +46,21 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     protected override long? MaxPackageSize => _gamesHostInfo?.MaxPackageSizeMb;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    private TrendsViewModel? _trends = null;
+
+    public TrendsViewModel? Trends
+    {
+        get => _trends;
+        set
+        {
+            if (_trends != value)
+            {
+                _trends = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     private GameInfo? _currentGame = null;
 
@@ -85,7 +102,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     private void CheckJoin() =>
         CanJoin = _currentGame != null && (!_currentGame.PasswordRequired || !string.IsNullOrEmpty(_password));
 
-    public CustomCommand Cancel { get; set; }
+    public ICommand Cancel { get; }
 
     public SimpleCommand AddEmoji { get; set; }
 
@@ -346,6 +363,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     private readonly SIContentClientOptions? _defaultSIContentClientOptions;
     private readonly ILogger<SIOnlineViewModel> _logger;
+    private readonly ISIStatisticsServiceClient _siStatisticsServiceClient;
 
     public SIOnlineViewModel(
         ConnectionData connectionData,
@@ -353,8 +371,10 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         CommonSettings commonSettings,
         UserSettings userSettings,
         SettingsViewModel settingsViewModel,
+        ISIStatisticsServiceClient siStatisticsServiceClient,
         SIContentClientOptions siContentClientOptions,
-        ILogger<SIOnlineViewModel> logger)
+        ILogger<SIOnlineViewModel> logger,
+        ICommand cancel)
         : base(connectionData, commonSettings, userSettings, settingsViewModel)
     {
         _gameServerClient = gameServerClient;
@@ -375,8 +395,11 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         AddEmoji = new SimpleCommand(AddEmoji_Executed);
 
+        _siStatisticsServiceClient = siStatisticsServiceClient;
+
         _defaultSIContentClientOptions = siContentClientOptions.ServiceUri != null ? siContentClientOptions : null;
         _logger = logger;
+        Cancel = cancel;
 
         NewGame.CanBeExecuted = false;
     }
@@ -614,6 +637,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
             _avatarLoadingTask = UploadUserAvatarAsync();
 
+            LoadTrendsAsync(_cancellationTokenSource.Token);
+
             NewGame.CanBeExecuted = true;
         }
         catch (TaskCanceledException)
@@ -632,6 +657,37 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         finally
         {
             IsProgress = false;
+        }
+    }
+
+    private async void LoadTrendsAsync(CancellationToken token)
+    {
+        try
+        {
+            var filter = new SIStatisticsService.Contract.Models.StatisticFilter
+            {
+                Platform = SIStatisticsService.Contract.Models.GamePlatforms.GameServer,
+                From = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(1)),
+                To = DateTimeOffset.UtcNow,
+                LanguageCode = Thread.CurrentThread.CurrentUICulture.Name[0..2],
+                Count = 6
+            };
+
+            var packagesStatistics = (await _siStatisticsServiceClient.GetLatestTopPackagesAsync(filter, token)
+                ?? new SIStatisticsService.Contract.Models.PackagesStatistic())
+                .Packages.Where(p => p.Package?.Name != RandomIndicator).ToArray();
+
+            filter.Count = 5;
+            var gameStatistcs = (await _siStatisticsServiceClient.GetLatestGamesStatisticAsync(filter, token)) ?? new SIStatisticsService.Contract.Models.GamesStatistic();
+
+            filter.Count = 25;
+            var latestGames = (await _siStatisticsServiceClient.GetLatestGamesInfoAsync(filter, token)) ?? new SIStatisticsService.Contract.Models.GamesResponse();
+
+            Trends = new TrendsViewModel(packagesStatistics, gameStatistcs, latestGames);
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError(exc, "Load trends error");
         }
     }
 

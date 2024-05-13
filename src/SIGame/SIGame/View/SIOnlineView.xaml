@@ -7,6 +7,7 @@
     xmlns:localc="clr-namespace:SIGame.Converters"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     xmlns:lp="clr-namespace:SIGame.Properties"
+    xmlns:lv="clr-namespace:SIGame.View"
     xmlns:vmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
     xmlns:behaviors="clr-namespace:SIGame.Behaviors"
     xmlns:data="clr-namespace:SIData;assembly=SIData"
@@ -665,6 +666,10 @@
                 VerticalAlignment="Center" />
             
             <TabControl Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Margin="0,-5,0,0" Padding="0" BorderThickness="0" FontSize="23">
+                <TabItem Header="{x:Static lp:Resources.Trends}" Style="{StaticResource TabItemStyle1}">
+                    <lv:TrendsView DataContext="{Binding Trends}" />
+                </TabItem>
+                
                 <TabItem Header="{x:Static lp:Resources.Tab_Chat}" Style="{StaticResource TabItemStyle1}">
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Bottom" Height="46" Background="#FF5A95E2">
@@ -769,11 +774,11 @@
                             ScrollViewer.VerticalScrollBarVisibility="Visible" />
                     </DockPanel>
                 </TabItem>
-                
-                <TabItem Style="{StaticResource TabItemStyle1}" Header="{Binding Users.Count}">
+
+                <TabItem Header="{Binding Users.Count}" Style="{StaticResource TabItemStyle1}">
                     <TabItem.HeaderTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3">
+                            <Border BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3" Margin="5,0,0,0">
                                 <TextBlock Effect="{StaticResource Effect}" FontWeight="Bold" FontSize="23">
                                     <Run Text="{x:Static lp:Resources.Tab_Players}" /><Run Text=" " /><Run Text="{Binding StringFormat=(\{0\}), Mode=OneWay}" />
                                 </TextBlock>

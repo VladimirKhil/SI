@@ -1170,4 +1170,31 @@
   <data name="TwitchHint" xml:space="preserve">
     <value>Перейти в категорию на Twitch</value>
   </data>
+  <data name="TopPackages" xml:space="preserve">
+    <value>Лучшие пакеты за 24 часа</value>
+  </data>
+  <data name="Trends" xml:space="preserve">
+    <value>Тренды</value>
+  </data>
+  <data name="By" xml:space="preserve">
+    <value>от</value>
+  </data>
+  <data name="GameCount" xml:space="preserve">
+    <value>Всего игр</value>
+  </data>
+  <data name="GamesStatistics" xml:space="preserve">
+    <value>Игры за 24 часа</value>
+  </data>
+  <data name="LatestGames" xml:space="preserve">
+    <value>Последние игры</value>
+  </data>
+  <data name="OfGames" xml:space="preserve">
+    <value>игр</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Результаты</value>
+  </data>
+  <data name="Reviews" xml:space="preserve">
+    <value>Отзывы</value>
+  </data>
 </root>

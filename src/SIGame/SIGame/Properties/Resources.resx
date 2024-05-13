@@ -1167,4 +1167,31 @@
   <data name="TwitchHint" xml:space="preserve">
     <value>Go to Twitch category</value>
   </data>
+  <data name="TopPackages" xml:space="preserve">
+    <value>Top packages for 24 hours</value>
+  </data>
+  <data name="Trends" xml:space="preserve">
+    <value>Trends</value>
+  </data>
+  <data name="By" xml:space="preserve">
+    <value>by</value>
+  </data>
+  <data name="GameCount" xml:space="preserve">
+    <value>Game count</value>
+  </data>
+  <data name="GamesStatistics" xml:space="preserve">
+    <value>Games for the last 24 hours</value>
+  </data>
+  <data name="LatestGames" xml:space="preserve">
+    <value>Latest games</value>
+  </data>
+  <data name="OfGames" xml:space="preserve">
+    <value>games count</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="Reviews" xml:space="preserve">
+    <value>Reviews</value>
+  </data>
 </root>

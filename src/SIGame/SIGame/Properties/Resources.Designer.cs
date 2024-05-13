@@ -457,6 +457,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на by.
+        /// </summary>
+        public static string By {
+            get {
+                return ResourceManager.GetString("By", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cancel readiness.
         /// </summary>
         public static string CancelReady {
@@ -1087,6 +1096,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game count.
+        /// </summary>
+        public static string GameCount {
+            get {
+                return ResourceManager.GetString("GameCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Game info.
         /// </summary>
         public static string GameInfo {
@@ -1164,6 +1182,15 @@ namespace SIGame.Properties {
         public static string GameRules {
             get {
                 return ResourceManager.GetString("GameRules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Games for the last 24 hours.
+        /// </summary>
+        public static string GamesStatistics {
+            get {
+                return ResourceManager.GetString("GamesStatistics", resourceCulture);
             }
         }
         
@@ -1389,6 +1416,15 @@ namespace SIGame.Properties {
         public static string Kick {
             get {
                 return ResourceManager.GetString("Kick", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Latest games.
+        /// </summary>
+        public static string LatestGames {
+            get {
+                return ResourceManager.GetString("LatestGames", resourceCulture);
             }
         }
         
@@ -1731,6 +1767,15 @@ namespace SIGame.Properties {
         public static string NotSet {
             get {
                 return ResourceManager.GetString("NotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на games count.
+        /// </summary>
+        public static string OfGames {
+            get {
+                return ResourceManager.GetString("OfGames", resourceCulture);
             }
         }
         
@@ -2154,6 +2199,24 @@ namespace SIGame.Properties {
         public static string Result {
             get {
                 return ResourceManager.GetString("Result", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Results.
+        /// </summary>
+        public static string Results {
+            get {
+                return ResourceManager.GetString("Results", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Reviews.
+        /// </summary>
+        public static string Reviews {
+            get {
+                return ResourceManager.GetString("Reviews", resourceCulture);
             }
         }
         
@@ -3013,11 +3076,29 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Top packages for 24 hours.
+        /// </summary>
+        public static string TopPackages {
+            get {
+                return ResourceManager.GetString("TopPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Translate the game into the chat.
         /// </summary>
         public static string TranslateToChat {
             get {
                 return ResourceManager.GetString("TranslateToChat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Trends.
+        /// </summary>
+        public static string Trends {
+            get {
+                return ResourceManager.GetString("Trends", resourceCulture);
             }
         }
         
