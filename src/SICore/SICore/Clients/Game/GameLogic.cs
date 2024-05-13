@@ -1148,7 +1148,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (_data.Answerer.AnswerIsRight)
         {
             answerResult.IsRight = true;
-            var showmanReplic = IsFinalRound() || _data.Question.Type.Name == QuestionTypes.Stake ? nameof(R.Bravo) : nameof(R.Right);
+            var showmanReplic = IsFinalRound() || _data.Question?.TypeName == QuestionTypes.Stake ? nameof(R.Bravo) : nameof(R.Right);
             
             var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
@@ -1370,12 +1370,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Decision = DecisionType.Pressing;
     }
 
-    private bool IsSpecialQuestion()
-    {
-        var questTypeName = _data.Question.TypeName ?? _data.Question.Type.Name;
-
-        return questTypeName != QuestionTypes.Simple;
-    }
+    private bool IsSpecialQuestion() => _data.Question?.TypeName != QuestionTypes.Simple;
 
     private bool OnDecisionNextPersonStakeMaking()
     {
@@ -3244,12 +3239,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return;
         }
 
-        if (_data.Question.Type.Name == QuestionTypes.Simple)
+        if (_data.Question?.TypeName == QuestionTypes.Simple)
         {
             _gameActions.SendMessageWithArgs(Messages.EndTry, _data.AnswererIndex);
         }
 
-        var time1 = _data.Question.Type.Name != QuestionTypes.Simple
+        var waitAnswerTime = _data.Question?.TypeName != QuestionTypes.Simple
             ? timeSettings.TimeForThinkingOnSpecial * 10
             : timeSettings.TimeForPrintingAnswer * 10;
 
@@ -3305,8 +3300,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _data.AnswerCount = 1;
-        ScheduleExecution(Tasks.WaitAnswer, time1);
-        WaitFor(DecisionType.Answering, time1, _data.AnswererIndex);
+        ScheduleExecution(Tasks.WaitAnswer, waitAnswerTime);
+        WaitFor(DecisionType.Answering, waitAnswerTime, _data.AnswererIndex);
     }
 
     private void AskToDelete()
@@ -4427,8 +4422,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (last == null || !last.IsRight) // There has been no right answer
         {
             var printedAnswer = answer != null ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
-
             _gameActions.ShowmanReplic(printedAnswer);
+        }
+
+        if (_data.QuestionPlayState.AnswerOptions != null)
+        {
+            var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == answer);
+
+            if (answerIndex > -1)
+            {
+                _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Right);
+            }
         }
 
         _gameActions.SendMessageWithArgs(Messages.RightAnswerStart, ContentTypes.Text, answer ?? "");

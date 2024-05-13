@@ -1376,7 +1376,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         switch (_data.QuestionType)
         {
-            case QuestionTypes.Auction: // deprecated
             case QuestionTypes.Stake:
                 {
                     TInfo.Text = _localizer[nameof(R.Label_Auction)];
@@ -1394,8 +1393,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     break;
                 }
 
-            case QuestionTypes.Cat: // deprecated
-            case QuestionTypes.BagCat: // deprecated
             case QuestionTypes.Secret:
             case QuestionTypes.SecretNoQuestion:
             case QuestionTypes.SecretPublicPrice:
@@ -1416,7 +1413,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     break;
                 }
 
-            case QuestionTypes.Sponsored: // deprecated
             case QuestionTypes.NoRisk:
                 {
                     TInfo.Text = _localizer[nameof(R.Label_Sponsored)];

@@ -583,8 +583,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public bool Equals(Question? other) =>
         other is not null
         && Price.Equals(other.Price)
-        && Type.Equals(other.Type)
-        && Scenario.Equals(other.Scenario)
         && Equals(Script, other.Script)
         && Equals(Parameters, other.Parameters)
         && Right.Equals(other.Right)
@@ -594,18 +592,13 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public override bool Equals(object? obj) => Equals(obj as Question);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Price, Type, Scenario, Script, Parameters, Right, Wrong);
+    public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Price, Script, Parameters, Right, Wrong);
 
     /// <summary>
     /// Gets question text part.
     /// </summary>
     public string GetText()
     {
-        if (Scenario.Any())
-        {
-            return GetTextFromScenario();
-        }
-
         if (Script == null)
         {
             if (Parameters == null)
