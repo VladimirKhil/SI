@@ -111,15 +111,17 @@
         
         <ToggleButton
             IsChecked="{Binding AreAnswersShown}"
-            Width="34"
-            Height="34"
-            Margin="0,5,0,0"
+            Width="40"
+            Height="40"
+            Margin="0,0,0,0"
             Style="{StaticResource SIButtonSimple}"
             BorderThickness="0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            FontSize="15"
-            Grid.ColumnSpan="2">
+            FontSize="19"
+            Grid.ColumnSpan="2"
+            Foreground="{StaticResource WindowBackground}"
+            Background="#22000000">
             👁
         </ToggleButton>
 

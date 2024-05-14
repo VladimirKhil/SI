@@ -99,6 +99,19 @@ public sealed class SettingsViewModel : ViewModelBase<Settings>
         set { if (_model.QuestionLineSpacing != value) { _model.QuestionLineSpacing = value; OnPropertyChanged(); } }
     }
 
+    public bool DisplayAnswerOptionsLabels
+    {
+        get => _model.DisplayAnswerOptionsLabels;
+        set
+        {
+            if (_model.DisplayAnswerOptionsLabels != value)
+            {
+                _model.DisplayAnswerOptionsLabels = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public string[] FontFamilies { get; } = new string[] { Settings.DefaultTableFontFamily }
         .Concat(new string[] { "Arial", "Segoe UI" })
         .ToArray();

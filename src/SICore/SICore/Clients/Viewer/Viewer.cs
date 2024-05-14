@@ -1,4 +1,5 @@
-﻿using SICore.BusinessLogic;
+﻿using Notions;
+using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
 using SICore.Models;
 using SICore.Network;
@@ -431,6 +432,10 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     ProcessConfig(mparams);
                     break;
 
+                case Messages.Options:
+                    _logic.OnOptions(mparams);
+                    break;
+
                 case Messages.ReadingSpeed:
                     {
                         #region ReadingSpeed
@@ -816,6 +821,13 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                 case Messages.TextShape:
                     _logic.OnTextShape(mparams);
+                    break;
+
+                case Messages.ContentShape:
+                    if (mparams.Length > 4)
+                    {
+                        _logic.OnContentShape(mparams[4].UnescapeNewLines());
+                    }
                     break;
 
                 case Messages.Atom: // deprecated

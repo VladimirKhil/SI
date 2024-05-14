@@ -8,7 +8,7 @@ namespace SICore.Contracts;
 /// <summary>
 /// Defines a host that runs the game.
 /// </summary>
-public interface IGameHost : IPlatformManager
+public interface IGameHost
 {
     /// <summary>
     /// Gets host options.
@@ -24,6 +24,8 @@ public interface IGameHost : IPlatformManager
     bool MakeLogs { get; }
 
     string LogsFolder { get; }
+
+    Stream CreateLog(string userName, out string logUri);
 
     bool AttachContentToTable { get; }
 

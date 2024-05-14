@@ -30,7 +30,7 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
-        <CollectionViewSource x:Key="ButtonPressModeFiltered" Source="{StaticResource ButtonPressMode}" Filter="ButtonPressMode_Filter" />
+        <CollectionViewSource x:Key="ButtonPressModeFiltered" Source="{StaticResource ButtonPressMode}" />
 
         <localc:EnumConverter x:Key="GameModesConverter" EnumType="{x:Type data:GameModes}" />
         <localc:EnumConverter x:Key="ButtonPressModeConverter" EnumType="{x:Type data:ButtonPressMode}" />
@@ -99,20 +99,6 @@
         
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{Binding GameModeHint}" TextWrapping="Wrap" />
 
-        <CheckBox IsChecked="{Binding Model.PlayAllQuestionsInFinalRound}">
-            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PlayAllQuestionsInFinalRound}" />
-
-            <CheckBox.Style>
-                <Style TargetType="CheckBox" BasedOn="{StaticResource HeaderBox}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding GameMode}" Value="{x:Static data:GameModes.Sport}">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </CheckBox.Style>
-        </CheckBox>
-
         <CheckBox IsChecked="{Binding Model.Oral}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.OralGame}" />
         </CheckBox>
@@ -138,8 +124,12 @@
             IsEnabled="{Binding Model.FalseStart, Converter={StaticResource NotToCheckedConverter}}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PartialQuestions}" />
         </CheckBox>
-        
+
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.PartialQuestions_Hint}" />
+
+        <CheckBox Style="{StaticResource HeaderBox}" IsChecked="{Binding Model.PlayAllQuestionsInFinalRound}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PlayAllQuestionsInFinalRound}" />
+        </CheckBox>
 
         <CheckBox
             IsChecked="{Binding Model.AllowEveryoneToPlayHiddenStakes}"
@@ -167,8 +157,12 @@
 
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.ApellationsHint}" />
 
-        <CheckBox IsChecked="{Binding Model.UsePingPenalty}" Style="{StaticResource HeaderBox}">
-            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.UsePingPenalty}" />
+        <CheckBox IsChecked="{Binding Model.DisplayAnswerOptionsOneByOne}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.DisplayAnswerOptionsOneByOne}" />
+        </CheckBox>
+
+        <CheckBox IsChecked="{Binding Model.DisplayAnswerOptionsLabels}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.DisplayAnswerOptionsLabels}" />
         </CheckBox>
 
         <TextBlock Text="{x:Static lp:Resources.ButtonPressMode}" Style="{StaticResource Header}" />

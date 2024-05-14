@@ -706,14 +706,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void Engine_NextQuestion()
     {
-        foreach (var player in _data.Players)
-        {
-            if (player.PingPenalty > 0)
-            {
-                player.PingPenalty--;
-            }
-        }
-
         _data.CanMarkQuestion = false;
         _data.AnswererIndex = -1;
         _data.QuestionPlayState.Clear();
@@ -2852,11 +2844,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ClientData.AnswererIndex = ClientData.PendingAnswererIndex;
         ClientData.QuestionPlayState.SetSingleAnswerer(ClientData.PendingAnswererIndex);
 
-        if (ClientData.Settings.AppSettings.UsePingPenalty)
-        {
-            ClientData.Answerer.PingPenalty = Math.Min(MaxPenalty, ClientData.Answerer.PingPenalty + PenaltyIncrement);
-        }
-
         if (!ClientData.Settings.AppSettings.FalseStart)
         {
             // Stop question reading
@@ -2950,11 +2937,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             rules.Add(LO[nameof(R.TypeManaged)]);
         }
 
-        if (settings.UsePingPenalty)
-        {
-            rules.Add(LO[nameof(R.TypeUsePingPenalty)]);
-        }
-
         if (settings.AllowEveryoneToPlayHiddenStakes)
         {
             rules.Add(LO[nameof(R.TypeAllowEveryoneToPlayStakes)]);
@@ -2998,9 +2980,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         lock (_data.ChoiceLock)
         {
-            _data.PrevoiusTheme = _data.ThemeIndex;
-            _data.PreviousQuest = _data.QuestionIndex;
-
             _data.ThemeIndex = -1;
             _data.QuestionIndex = -1;
         }
@@ -3876,14 +3855,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         var appelaer = _data.Players[_data.AppelaerIndex];
 
-        int theme = 0, quest = 0;
-
-        lock (_data.ChoiceLock)
-        {
-            theme = _data.ThemeIndex > -1 ? _data.ThemeIndex : _data.PrevoiusTheme;
-            quest = _data.QuestionIndex > -1 ? _data.QuestionIndex : _data.PreviousQuest;
-        }
-
         var themeName = _data.Theme.Name;
         var questionText = _data.Question?.GetText();
 
@@ -4702,7 +4673,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendMessage(messageBuilder.ToString());
 
         var nextTask = optionIndex + 1 < ClientData.QuestionPlayState.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
-        ScheduleExecution(nextTask, 10, optionIndex + 1);
+        ScheduleExecution(nextTask, ClientData.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? 10 : 1, optionIndex + 1);
     }
 
     internal void OnComplexContent(Dictionary<string, List<ContentItem>> contentTable)

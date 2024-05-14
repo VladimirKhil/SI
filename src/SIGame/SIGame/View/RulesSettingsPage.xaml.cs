@@ -10,7 +10,4 @@ namespace SIGame.View;
 public partial class RulesSettingsPage : Page
 {
     public RulesSettingsPage() => InitializeComponent();
-
-    private void ButtonPressMode_Filter(object sender, FilterEventArgs e) =>
-        e.Accepted = e.Item is not ButtonPressMode buttonPressMode || buttonPressMode != ButtonPressMode.UsePingPenalty;
 }

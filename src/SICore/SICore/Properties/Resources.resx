@@ -367,7 +367,7 @@
     <value>Is not set</value>
   </data>
   <data name="NotSure" xml:space="preserve">
-    <value>Probably, #?:#?;Maybe,#;#, I think;Is it #?;I guess, the answer is#;I assume, the answer is #;#, I guess;It seems to me that the answer is #;Isn't it #?;Is it really#?;Obviously #;I presume, #;#, as far as I can see;It should be #;Probably, it is #;It's apparently #</value>
+    <value>Probably, #?:#?;Maybe, #;#, I think;Is it #?;I guess, the answer is #;I assume, the answer is #;#, I guess;It seems to me that the answer is #;Isn't it #?;Is it really #?;Obviously #;I presume, #;#, as far as I can see;It should be #;Probably, it is #;It's apparently #</value>
   </data>
   <data name="NoWinner" xml:space="preserve">
     <value>We have no winner today</value>

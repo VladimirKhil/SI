@@ -187,6 +187,9 @@ public sealed class Game : Actor<GameData, GameLogic>
         _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, "MAXTIME", maxPressingTime);
 
         _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, ClientData.JoinMode);
+
+        _gameActions.SendMessageToWithArgs(person, Messages.Options,
+            nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels);
     }
 
     private void InformBanned(string person)
@@ -2353,11 +2356,6 @@ public sealed class Game : Actor<GameData, GameLogic>
                 }
                 break;
 
-            case ButtonPressMode.UsePingPenalty:
-                // Special mode when answerer with penalty waits a little bit while other players with less penalty could try to press
-                ProcessPenalizedAnswerer(answererIndex);
-                break;
-
             default:
                 ProcessAnswererWithinInterval(answererIndex);
                 break;
@@ -2374,40 +2372,6 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (!ClientData.IsDeferringAnswer)
         {            
             ClientData.WaitInterval = (int)(ClientData.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
-            _logic.Stop(StopReason.Wait);
-        }
-    }
-
-    private void ProcessPenalizedAnswerer(int answererIndex)
-    {
-        var penalty = ClientData.Players[answererIndex].PingPenalty;
-        var penaltyStartTime = DateTime.UtcNow;
-
-        if (ClientData.IsDeferringAnswer)
-        {
-            var futureTime = penaltyStartTime.AddMilliseconds(penalty * 100);
-            var currentFutureTime = ClientData.PenaltyStartTime.AddMilliseconds(ClientData.WaitInterval * 100);
-
-            if (futureTime >= currentFutureTime) // New answerer candidate has bigger penalized time so he looses the hit
-            {
-                return;
-            }
-        }
-
-        ClientData.PendingAnswererIndex = answererIndex;
-
-        if (penalty == 0) // Act like in mode without penalty
-        {
-            if (_logic.Stop(StopReason.Answer))
-            {
-                ClientData.Decision = DecisionType.None;
-            }
-        }
-        else
-        {
-            ClientData.PenaltyStartTime = penaltyStartTime;
-            ClientData.WaitInterval = penalty;
-
             _logic.Stop(StopReason.Wait);
         }
     }

@@ -1099,7 +1099,7 @@
     <value>Играть все вопросы в финальном раунде</value>
   </data>
   <data name="AllowEveryoneToPlayHiddenStakes" xml:space="preserve">
-    <value>Все могут играть общий вопрос со ставками (финал)</value>
+    <value>Все могут играть Общий вопрос со ставками (финал)</value>
   </data>
   <data name="TypeUsePingPenalty" xml:space="preserve">
     <value>замедление пинга</value>
@@ -1196,5 +1196,11 @@
   </data>
   <data name="Reviews" xml:space="preserve">
     <value>Отзывы</value>
+  </data>
+  <data name="DisplayAnswerOptionsLabels" xml:space="preserve">
+    <value>Показывать буквы вариантов ответа</value>
+  </data>
+  <data name="DisplayAnswerOptionsOneByOne" xml:space="preserve">
+    <value>Показывать варианты ответа по очереди</value>
   </data>
 </root>

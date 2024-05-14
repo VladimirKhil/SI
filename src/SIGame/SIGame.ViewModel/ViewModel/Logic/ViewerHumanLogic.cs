@@ -639,6 +639,43 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.QuestionContentType = QuestionContentType.Text;
     }
 
+    public void OnContentShape(string shape)
+    {
+        if (TInfo.TStage == TableStage.Question)
+        {
+            // Toggle TStage change to reapply QuestionTemplateSelector template
+            TInfo.TStage = TableStage.Void;
+        }
+
+        TInfo.TextLength = 0;
+        TInfo.PartialText = true;
+        TInfo.Text = shape;
+        TInfo.TStage = TableStage.Question;
+        TInfo.QuestionContentType = QuestionContentType.Text;
+    }
+
+    public void OnOptions(string[] mparams)
+    {
+        for (var i = 1; i + 1 < mparams.Length; i += 2)
+        {
+            var optionName = mparams[i];
+            var optionValue = mparams[i + 1];
+
+            switch (optionName)
+            {
+                case nameof(AppSettingsCore.DisplayAnswerOptionsLabels):
+                    if (bool.TryParse(optionValue, out var flag))
+                    {
+                        TInfo.Settings.Model.DisplayAnswerOptionsLabels = flag;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
     public void OnContent(string[] mparams)
     {
         if (mparams.Length < 5)
@@ -1279,7 +1316,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.Sound = false;
 
         _prependTableText = null;
-        _appendTableText = answer.LeaveFirst(MaxAdditionalTableTextLength);
+
+        if (TInfo.LayoutMode == LayoutMode.Simple)
+        {
+            _appendTableText = answer.LeaveFirst(MaxAdditionalTableTextLength);
+        }
     }
 
     public void OnThemeComments(string comments)
@@ -1915,5 +1956,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.AnswerOptions.Options = optionsTypes.Select(i => new ItemViewModel()).ToArray();
         TInfo.LayoutMode = LayoutMode.AnswerOptions;
         TInfo.TStage = TableStage.Question;
+        TInfo.Text = "";
     }
 }

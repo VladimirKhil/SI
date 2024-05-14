@@ -1099,7 +1099,7 @@
     <value>Play all questions in final round</value>
   </data>
   <data name="AllowEveryoneToPlayHiddenStakes" xml:space="preserve">
-    <value>Everybody could play all stakes (final) question</value>
+    <value>Everybody could play Common Stakes (final) question</value>
   </data>
   <data name="EvenWithNegativeScore" xml:space="preserve">
     <value>even having 0 or negative score</value>
@@ -1193,5 +1193,11 @@
   </data>
   <data name="Reviews" xml:space="preserve">
     <value>Reviews</value>
+  </data>
+  <data name="DisplayAnswerOptionsLabels" xml:space="preserve">
+    <value>Display answer options labels</value>
+  </data>
+  <data name="DisplayAnswerOptionsOneByOne" xml:space="preserve">
+    <value>Display answer options one by one</value>
   </data>
 </root>

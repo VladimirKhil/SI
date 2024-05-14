@@ -17,10 +17,5 @@ public enum ButtonPressMode
     /// First to press wins the button.
     /// </summary>
     [Display(Description = "ButtonPressMode_FirstWins")]
-    FirstWins,
-
-    /// <summary>
-    /// Players with good ping get penalty.
-    /// </summary>
-    UsePingPenalty,
+    FirstWins
 }

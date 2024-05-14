@@ -40,7 +40,8 @@
                                 <DataTemplate>
                                     <TextBlock Style="{StaticResource Item}" TextWrapping="Wrap" Background="#22000000" Padding="6">
                                         <Run Text="{Binding Package.Name, Mode=OneWay}" FontWeight="Bold" />
-                                        <Run Text="(" /><Run Text="{x:Static lp:Resources.OfGames}" /><Run Text=":" /><Run Text="{Binding GameCount, Mode=OneWay}" /><Run Text=")" />
+                                        <Run Text="(" /><Run Text="{x:Static lp:Resources.OfGames}" /><Run Text=":" />
+                                        <Run Text="{Binding GameCount, Mode=OneWay}" /><Run Text=")" />
                                         <LineBreak />
                                         <Run Text="{x:Static lp:Resources.By}" />
                                         <Run ToolTip="{Binding Package.AuthorsContacts}" Text="{Binding Package.Authors, Mode=OneWay, Converter={StaticResource StringJoinConverter}}" FontWeight="Bold" />
@@ -56,7 +57,8 @@
                                         <DataTemplate>
                                             <TextBlock Style="{StaticResource Item}" TextWrapping="Wrap" Background="#22000000" Padding="6">
                                                 <Run Text="{Binding Package.Name, Mode=OneWay}" FontWeight="Bold" />
-                                                <Run Text="(" /><Run Text="{x:Static lp:Resources.OfGames}" /><Run Text=":" /><Run Text="{Binding GameCount, Mode=OneWay}" /><Run Text=")" />
+                                                <Run Text="(" /><Run Text="{x:Static lp:Resources.OfGames}" /><Run Text=":" />
+                                                <Run Text="{Binding GameCount, Mode=OneWay}" /><Run Text=")" />
                                                 <LineBreak />
                                                 <Run Text="{x:Static lp:Resources.By}" />
                                                 <Hyperlink
@@ -93,9 +95,11 @@
                                     <TextBlock Style="{StaticResource Item}" TextWrapping="Wrap">
                                         <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" />
                                         <LineBreak />
-                                        <Run Text="{x:Static lp:Resources.Results}" /><Run Text=":" /><Run Text="{Binding Results, Mode=OneWay, Converter={StaticResource DictionaryInt32JoinConverter}}" />
+                                        <Run Text="{x:Static lp:Resources.Results}" /><Run Text=":" />
+                                        <Run Text="{Binding Results, Mode=OneWay, Converter={StaticResource DictionaryInt32JoinConverter}}" />
                                         <LineBreak />
-                                        <Run Text="{x:Static lp:Resources.Reviews}" /><Run Text=":" /><Run Text="{Binding Reviews, Mode=OneWay, Converter={StaticResource DictionaryStringJoinConverter}}" />
+                                        <Run Text="{x:Static lp:Resources.Reviews}" /><Run Text=":" />
+                                        <Run Text="{Binding Reviews, Mode=OneWay, Converter={StaticResource DictionaryStringJoinConverter}}" />
                                     </TextBlock>
                                 </DataTemplate>
                             </ContentControl.ContentTemplate>
@@ -109,7 +113,8 @@
                                             <TextBlock Style="{StaticResource Item}" TextWrapping="Wrap">
                                                 <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" />
                                                 <LineBreak />
-                                                <Run Text="{x:Static lp:Resources.Results}" /><Run Text=":" /><Run Text="{Binding Results, Mode=OneWay, Converter={StaticResource DictionaryInt32JoinConverter}}" />
+                                                <Run Text="{x:Static lp:Resources.Results}" /><Run Text=":" />
+                                                <Run Text="{Binding Results, Mode=OneWay, Converter={StaticResource DictionaryInt32JoinConverter}}" />
                                             </TextBlock>
                                         </DataTemplate>
                                     </Setter.Value>

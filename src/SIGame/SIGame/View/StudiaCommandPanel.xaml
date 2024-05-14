@@ -593,7 +593,6 @@
             Style="{StaticResource SIDropDownButton}"
             Padding="0"
             FontSize="24"
-            BorderBrush="{StaticResource MainColor}"
             Grid.Row="7"
             Width="70"
             HorizontalAlignment="Right"

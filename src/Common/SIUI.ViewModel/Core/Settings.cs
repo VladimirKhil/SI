@@ -19,6 +19,7 @@ public sealed class Settings : INotifyPropertyChanged
     public const double DefaultQuestionLineSpacing = 1.5;
     public const string DefaultBackgroundImageUri = null;
     public const string DefaultBackgroundVideoUri = null;
+    public const bool DefaultDisplayAnswerOptionsLabels = true;
 
     private string _tableFontFamily = DefaultTableFontFamily;
 
@@ -178,6 +179,26 @@ public sealed class Settings : INotifyPropertyChanged
             if (_backgroundVideoUri != value)
             {
                 _backgroundVideoUri = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _displayAnswerOptionsLabels = DefaultDisplayAnswerOptionsLabels;
+
+    /// <summary>
+    /// Display answer options labels.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultDisplayAnswerOptionsLabels)]
+    public bool DisplayAnswerOptionsLabels
+    {
+        get => _displayAnswerOptionsLabels;
+        set 
+        {
+            if (_displayAnswerOptionsLabels != value)
+            {
+                _displayAnswerOptionsLabels = value;
                 OnPropertyChanged();
             }
         }

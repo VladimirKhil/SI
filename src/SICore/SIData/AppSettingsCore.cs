@@ -28,6 +28,8 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const int DefaultRandomThemesCount = 6;
     public const int DefaultRandomQuestionsBasePrice = 100;
     public const bool DefaultUseApellations = true;
+    public const bool DefaultDisplayAnswerOptionsOneByOne = true;
+    public const bool DefaultDisplayAnswerOptionsLabels = true;
 
     /// <summary>
     /// Time settings.
@@ -213,21 +215,6 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         set { _displaySources = value; OnPropertyChanged(); }
     }
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private bool _usePingPenalty = DefaultUsePingPenalty;
-
-    /// <summary>
-    /// Should the players with good ping get penalty.
-    /// </summary>
-    [XmlAttribute]
-    [DefaultValue(DefaultUsePingPenalty)]
-    [Obsolete("Replaced with ButtonPressMode property")]
-    public bool UsePingPenalty
-    {
-        get => _usePingPenalty;
-        set { _usePingPenalty = value; OnPropertyChanged(); }
-    }
-
     private ButtonPressMode _buttonPressMode = DefaultButtonPressMode;
 
     /// <summary>
@@ -333,6 +320,34 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         set { _useApellations = value; OnPropertyChanged(); }
     }
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _displayAnswerOptionsOneByOne = DefaultDisplayAnswerOptionsOneByOne;
+
+    /// <summary>
+    /// Display answer options one by one.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultDisplayAnswerOptionsOneByOne)]
+    public bool DisplayAnswerOptionsOneByOne
+    {
+        get => _displayAnswerOptionsOneByOne;
+        set { _displayAnswerOptionsOneByOne = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _displayAnswerOptionsLabels = DefaultDisplayAnswerOptionsLabels;
+
+    /// <summary>
+    /// Display answer options labels.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultDisplayAnswerOptionsLabels)]
+    public bool DisplayAnswerOptionsLabels
+    {
+        get => _displayAnswerOptionsLabels;
+        set { _displayAnswerOptionsLabels = value; OnPropertyChanged(); }
+    }
+
     /// <summary>
     /// Game culture.
     /// </summary>
@@ -354,7 +369,6 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         AllowEveryoneToPlayHiddenStakes = origin.AllowEveryoneToPlayHiddenStakes;
         _oral = origin._oral;
         _ignoreWrong = origin._ignoreWrong;
-        _usePingPenalty = origin.UsePingPenalty;
         ButtonPressMode = origin.ButtonPressMode;
         _preloadRoundContent = origin.PreloadRoundContent;
         _gameMode = origin._gameMode;
@@ -364,6 +378,8 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         _randomQuestionsBasePrice = origin._randomQuestionsBasePrice;
 
         _useApellations = origin.UseApellations;
+        _displayAnswerOptionsOneByOne = origin.DisplayAnswerOptionsOneByOne;
+        _displayAnswerOptionsLabels = origin.DisplayAnswerOptionsLabels;
 
         Culture = origin.Culture;
     }
@@ -382,7 +398,6 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         Oral = settings._oral;
         OralPlayersActions = settings.OralPlayersActions;
         _ignoreWrong = settings._ignoreWrong;
-        _usePingPenalty = settings.UsePingPenalty;
         ButtonPressMode = settings.ButtonPressMode;
         _preloadRoundContent = settings.PreloadRoundContent;
         _gameMode = settings._gameMode;
@@ -392,6 +407,8 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         _randomQuestionsBasePrice = settings._randomQuestionsBasePrice;
 
         _useApellations = settings.UseApellations;
+        _displayAnswerOptionsOneByOne = settings.DisplayAnswerOptionsOneByOne;
+        _displayAnswerOptionsLabels = settings.DisplayAnswerOptionsLabels;
 
         Culture = settings.Culture;
     }

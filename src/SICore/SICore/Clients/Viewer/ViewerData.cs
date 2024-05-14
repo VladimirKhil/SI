@@ -543,6 +543,11 @@ public sealed class ViewerData : Data
         }
     }
 
+    /// <summary>
+    /// Contains information about system errors in the game, which would be good to send to the author, but do not lead to a system crash.
+    /// </summary>
+    public StringBuilder SystemLog { get; } = new();
+
     public event Action<JoinMode>? JoinModeChanged;
 
     private void OnJoinModeChanged(JoinMode joinMode) => JoinModeChanged?.Invoke(joinMode);

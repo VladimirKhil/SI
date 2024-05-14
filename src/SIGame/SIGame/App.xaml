@@ -161,8 +161,8 @@
                         <DataTemplate>
                             <Path
                                 Data="M0,19L20,0L8,0.2M20,-1.5L20,10"
-                                Stroke="{StaticResource MainColor}"
-                                StrokeThickness="2"
+                                Stroke="Orange"
+                                StrokeThickness="3"
                                 StrokeLineJoin="Bevel"
                                 Stretch="Uniform"
                                 Margin="4" />

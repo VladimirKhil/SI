@@ -93,12 +93,6 @@ public sealed class GamePlayerAccount : GamePersonAccount
     internal bool StakeMaking { get; set; }
 
     /// <summary>
-    /// Ping penalty.
-    /// </summary>
-    [Obsolete]
-    internal int PingPenalty { get; set; }
-
-    /// <summary>
     /// Time of the last button misfire for the player.
     /// </summary>
     internal DateTime LastBadTryTime { get; set; }

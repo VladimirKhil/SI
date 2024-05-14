@@ -312,6 +312,12 @@ public static class Messages
     public const string NoGame = "NOGAME";
 
     /// <summary>
+    /// Game options.
+    /// </summary>
+    [IdempotencyRequired]
+    public const string Options = "OPTIONS";
+
+    /// <summary>
     /// Удалена финальная тема
     /// </summary>
     public const string Out = "OUT";

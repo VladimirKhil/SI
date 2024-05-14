@@ -203,4 +203,8 @@ public interface IViewerLogic : ILogic
     void OnThemeComments(string comments) { }
 
     void UpdateAvatar(PersonAccount person, string contentType, string uri) { }
+
+    void OnContentShape(string shape) { }
+
+    void OnOptions(string[] mparams) { }
 }

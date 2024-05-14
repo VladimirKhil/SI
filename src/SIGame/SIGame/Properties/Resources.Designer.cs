@@ -187,7 +187,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Everybody could play all stakes (final) question.
+        ///   Ищет локализованную строку, похожую на Everybody could play Common Stakes (final) question.
         /// </summary>
         public static string AllowEveryoneToPlayHiddenStakes {
             get {
@@ -696,6 +696,24 @@ namespace SIGame.Properties {
         public static string DiscordHint {
             get {
                 return ResourceManager.GetString("DiscordHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Display answer options labels.
+        /// </summary>
+        public static string DisplayAnswerOptionsLabels {
+            get {
+                return ResourceManager.GetString("DisplayAnswerOptionsLabels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Display answer options one by one.
+        /// </summary>
+        public static string DisplayAnswerOptionsOneByOne {
+            get {
+                return ResourceManager.GetString("DisplayAnswerOptionsOneByOne", resourceCulture);
             }
         }
         

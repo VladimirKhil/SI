@@ -10,7 +10,7 @@ namespace SICore;
 /// <summary>
 /// Represents common client data.
 /// </summary>
-public abstract class Data : ITimeProvider, INotifyPropertyChanged
+public abstract class Data : INotifyPropertyChanged
 {
     /// <summary>
     /// Game host.
@@ -23,10 +23,6 @@ public abstract class Data : ITimeProvider, INotifyPropertyChanged
     public TableInfo TInfo { get; } = new();
 
     public object TInfoLock { get; } = new object();
-
-    public int PrevoiusTheme { get; set; } = -1;
-    
-    public int PreviousQuest { get; set; } = -1;
 
     /// <summary>
     /// Currently played theme index.
@@ -54,50 +50,13 @@ public abstract class Data : ITimeProvider, INotifyPropertyChanged
         set { _stage = value; OnPropertyChanged(); }
     }
 
-    private int _roundTime = 0;
-    /// <summary>
-    /// Время раунда
-    /// </summary>
-    public int RoundTime
-    {
-        get => _roundTime;
-        set { if (_roundTime != value) { _roundTime = value; OnPropertyChanged(); } }
-    }
-
-    private int _pressingTime = 0;
-
-    /// <summary>
-    /// Время на нажатие на кнопку
-    /// </summary>
-    public int PressingTime
-    {
-        get => _pressingTime;
-        set { if (_pressingTime != value) { _pressingTime = value; OnPropertyChanged(); } }
-    }
-
-    private int _thinkingTime = 0;
-
-    /// <summary>
-    /// Время для принятия решения
-    /// </summary>
-    public int ThinkingTime
-    {
-        get => _thinkingTime;
-        set { if (_thinkingTime != value) { _thinkingTime = value; OnPropertyChanged(); } }
-    }
-
     public int CurPriceRight { get; set; }
 
     public int CurPriceWrong { get; set; }
 
-    /// <summary>
-    /// Информация о системных ошибках в игре, которые неплохо бы отправлять автору, но которые не приводят к краху системы
-    /// </summary>
-    public StringBuilder SystemLog { get; } = new();
+    public StringBuilder EventLog { get; } = new();
 
     public StringBuilder PersonsUpdateHistory { get; } = new();
-
-    public StringBuilder EventLog { get; } = new();
 
     public Data(IGameHost gameManager)
     {

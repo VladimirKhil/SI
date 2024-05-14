@@ -1186,7 +1186,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Probably, #?:#?;Maybe,#;#, I think;Is it #?;I guess, the answer is#;I assume, the answer is #;#, I guess;It seems to me that the answer is #;Isn&apos;t it #?;Is it really#?;Obviously #;I presume, #;#, as far as I can see;It should be #;Probably, it is #;It&apos;s apparently #.
+        ///   Ищет локализованную строку, похожую на Probably, #?:#?;Maybe, #;#, I think;Is it #?;I guess, the answer is #;I assume, the answer is #;#, I guess;It seems to me that the answer is #;Isn&apos;t it #?;Is it really #?;Obviously #;I presume, #;#, as far as I can see;It should be #;Probably, it is #;It&apos;s apparently #.
         /// </summary>
         public static string NotSure {
             get {
