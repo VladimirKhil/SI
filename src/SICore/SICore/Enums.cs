@@ -41,10 +41,17 @@ public enum Tasks
     /// Ожидание выбора вопроса
     /// </summary>
     WaitChoose,
+    
     /// <summary>
-    /// Объявление темы
+    /// Theme information.
     /// </summary>
     Theme,
+    
+    /// <summary>
+    /// Theme information without question play.
+    /// </summary>
+    ThemeInfo,
+    
     /// <summary>
     /// Объявление типа вопроса
     /// </summary>

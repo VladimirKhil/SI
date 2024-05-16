@@ -1581,7 +1581,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         break;
 
                     case Tasks.Theme:
-                        OnTheme(_data.Theme, arg);
+                    case Tasks.ThemeInfo:
+                        OnTheme(_data.Theme, arg, task == Tasks.Theme);
                         break;
 
                     case Tasks.QuestionType:
@@ -3112,6 +3113,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AskRight()
     {
+        if (_data.Answerer == null)
+        {
+            throw new InvalidOperationException("Answerer is null");
+        }
+
         _data.ShowmanDecision = false;
 
         if (_data.QuestionPlayState.AnswerOptions != null)
@@ -3119,7 +3125,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.IsWaiting = true;
             _data.Decision = DecisionType.AnswerValidating;
 
-            var rightLabel = ClientData.Question.Right.FirstOrDefault();
+            var rightLabel = ClientData.Question?.Right.FirstOrDefault();
 
             _data.Answerer.AnswerIsRight = _data.Answerer.Answer == rightLabel;
             _data.Answerer.AnswerIsRightFactor = 1.0;
@@ -3142,7 +3148,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             if (!_data.IsOralNow || IsFinalRound())
             {
-                SendAnswersInfoToShowman(_data.Answerer.Answer);
+                SendAnswersInfoToShowman(_data.Answerer.Answer ?? "");
             }
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
@@ -3160,10 +3166,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.ShowMan.Name);
     }
 
+    [Obsolete]
     private string BuildValidationMessage(string name, string answer, bool isCheckingForTheRight = true)
     {
-        var rightAnswers = _data.Question.Right;
-        var wrongAnswers = _data.Question.Wrong;
+        var question = _data.Question ?? throw new InvalidOperationException("Question is null");
+
+        var rightAnswers = question.Right;
+        var wrongAnswers = question.Wrong;
 
         return new MessageBuilder(Messages.Validation, name, answer, isCheckingForTheRight ? '+' : '-', rightAnswers.Count)
             .AddRange(rightAnswers)
@@ -3173,8 +3182,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private string BuildValidation2Message(string name, string answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
     {
-        var rightAnswers = _data.Question.Right;
-        var wrongAnswers = _data.Question.Wrong;
+        var question = _data.Question ?? throw new InvalidOperationException("Question is null");
+
+        var rightAnswers = question.Right;
+        var wrongAnswers = question.Wrong;
 
         return new MessageBuilder(
             Messages.Validation2,
@@ -3757,6 +3768,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         var appelaer = _data.Players[_data.AppelaerIndex];
+
         var given = LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
         var apellationReplic = string.Format(LO[nameof(R.PleaseCheckApellation)], given);
 
@@ -3766,8 +3778,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _gameActions.ShowmanReplic($"{_data.AppellationSource} {origin}. {apellationReplic}");
 
-        var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
-        var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer, false, _data.IsAppelationForRightAnswer);
+        var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer ?? "", _data.IsAppelationForRightAnswer);
+        var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, _data.IsAppelationForRightAnswer);
 
         _data.AppellationAwaitedVoteCount = 0;
         _data.AppellationTotalVoteCount = _data.Players.Count + 1; // players and showman
@@ -3946,7 +3958,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
-    private void OnTheme(Theme theme, int arg)
+    private void OnTheme(Theme theme, int arg, bool isFull)
     {
         var informed = false;
 
@@ -3986,14 +3998,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (arg < 2)
         {
-            ScheduleExecution(Tasks.Theme, 20, arg + 1);
+            ScheduleExecution(isFull ? Tasks.Theme : Tasks.ThemeInfo, 20, arg + 1);
         }
         else
         {
             _data.ThemeInfoShown.Add(_data.Theme);
             var delay = informed ? 20 : 1;
 
-            if (_data.Question != null)
+            if (isFull)
             {
                 ScheduleExecution(Tasks.QuestionType, delay, 1, force: !informed);
             }
