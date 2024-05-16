@@ -738,5 +738,17 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void SetQuestionType(string typeName, string aliasName) => SetText(aliasName);
 
+    public void SetSimpleAnswer()
+    {
+        SetQuestionSound(false);
+        SetQuestionContentType(QuestionContentType.Void);
+        SetStage(TableStage.Answer);
+        SetSound();
+    }
+
+    public void OnAnswerStart() => SetSound();
+
+    public void ClearState() => SetStage(TableStage.Sign);
+
     public event PropertyChangedEventHandler? PropertyChanged;
 }

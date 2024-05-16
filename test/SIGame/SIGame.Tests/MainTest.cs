@@ -8,6 +8,7 @@ using SIData;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Settings;
+using SIStatisticsService.Client;
 using SIStorage.Service.Client;
 using SIUI.ViewModel;
 using System.ComponentModel;
@@ -51,6 +52,7 @@ public class MainTest
         services.AddSIGameServerClient(configuration);
         services.AddSingleton<IUIThreadExecutor>(manager);
         services.AddSIStorageServiceClient(configuration);
+        services.AddSIStatisticsServiceClient(configuration);
         services.AddTransient(typeof(SIStorageService.ViewModel.StorageViewModel));
 
         var serviceProvider = services.BuildServiceProvider();

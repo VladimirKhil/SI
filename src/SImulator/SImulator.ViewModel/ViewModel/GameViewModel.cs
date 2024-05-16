@@ -883,7 +883,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);
         ActiveRoundCommand = null;
-        PresentationController.SetStage(TableStage.Sign);
+        PresentationController.ClearState();
         LocalInfo.TStage = TableStage.Sign;
         Continuation = null;
     }
@@ -1130,6 +1130,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         await PresentationController.StartAsync();
 
+        PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
         PresentationController.UpdateSettings(Settings.SIUISettings.Model);
         PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
         PresentationController.ClearPlayersState();
@@ -1174,7 +1175,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveTheme = theme;
     }
 
-    private void Engine_EndGame() => PresentationController?.SetStage(TableStage.Sign);
+    private void Engine_EndGame() => PresentationController.ClearState();
 
     private void Stop_Executed(object? arg = null) => RequestStop?.Invoke();
 
@@ -1622,6 +1623,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     internal void OnThemeDeleted(int themeIndex)
     {
         PresentationController.PlaySelection(themeIndex);
+        LocalInfo.RoundInfo[themeIndex].Name = "";
         SetSound(Settings.Model.Sounds.FinalDelete);
         _taskRunner.ScheduleExecution(Tasks.MoveNext, 1);
     }
@@ -1760,7 +1762,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (showSign)
         {
-            PresentationController.SetStage(TableStage.Sign);
+            PresentationController.ClearState();
         }
     }
 

@@ -258,7 +258,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
 
         GameViewModel.State = QuestionState.Normal;
-        PresentationController.SetSound();
+        PresentationController.OnAnswerStart();
     }
 
     public void OnContentStart(IEnumerable<ContentItem> contentItems)
@@ -283,10 +283,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
-        PresentationController.SetQuestionSound(false);
-        PresentationController.SetQuestionContentType(QuestionContentType.Void);
-        PresentationController.SetStage(TableStage.Answer);
-        PresentationController.SetSound();
+        PresentationController.SetSimpleAnswer();
         GameViewModel.OnRightAnswer();
     }
 

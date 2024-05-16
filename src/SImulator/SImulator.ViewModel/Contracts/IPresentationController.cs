@@ -48,7 +48,7 @@ public interface IPresentationController : IDisposable
 
     void SetQuestionStyle(QuestionStyle questionStyle);
 
-    void OnContentStart() { }
+    void OnContentStart();
 
     void SetQuestionSound(bool sound);
 
@@ -126,4 +126,12 @@ public interface IPresentationController : IDisposable
     void FinishQuestion() { }
 
     void SetQuestionType(string typeName, string aliasName);
+    
+    void SetLanguage(string language) { }
+
+    void SetSimpleAnswer() { }
+
+    void OnAnswerStart();
+
+    void ClearState();
 }

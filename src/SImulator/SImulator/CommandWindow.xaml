@@ -510,6 +510,11 @@
                                             <Setter TargetName="But" Property="IsEnabled" Value="False" />
                                             <Setter TargetName="But" Property="Content" Value="" />
                                         </DataTrigger>
+                                        
+                                        <DataTrigger Binding="{Binding Name}" Value="">
+                                            <Setter TargetName="But" Property="IsEnabled" Value="False" />
+                                            <Setter TargetName="But" Property="Content" Value="" />
+                                        </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

@@ -22,6 +22,9 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private readonly IPresentationListener _presentationListener;
     private readonly TaskCompletionSource _loadTSC = new();
 
+    private bool _isAnswer = false;
+    private bool _isAnswerSimple = false;
+
     public Uri Source { get; } = new($"file:///{AppDomain.CurrentDomain.BaseDirectory}webtable/index.html");
 
     public Action<int, int>? SelectionCallback { get; set; }
@@ -57,14 +60,18 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void Dispose() { }
 
-    public void OnQuestionStart() { }
+    public void OnQuestionStart()
+    {
+        _isAnswerSimple = false;
+        _isAnswer = false;
+    }
 
     public void PauseTimer(int currentTime)
     {
         throw new NotImplementedException();
     }
 
-    public void PlayComplexSelection(int theme, int quest, bool setActive) => OnMessageSend(new
+    public void PlayComplexSelection(int theme, int quest, bool setActive) => SendMessage(new
     {
         Type = "questionSelected",
         ThemeIndex = theme,
@@ -73,10 +80,20 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void PlaySelection(int theme)
     {
-        throw new NotImplementedException();
+        SendMessage(new
+        {
+            Type = "themeDeleted",
+            ThemeIndex = theme,
+        });
+
+        // TODO: do not send when last theme left
+        SendMessage(new
+        {
+            Type = "choose"
+        });
     }
 
-    public void PlaySimpleSelection(int theme, int quest) => OnMessageSend(new
+    public void PlaySimpleSelection(int theme, int quest) => SendMessage(new
     {
         Type = "questionSelected",
         ThemeIndex = theme,
@@ -98,7 +115,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         throw new NotImplementedException();
     }
 
-    public void RunTimer() => OnMessageSend(new
+    public void RunTimer() => SendMessage(new
     {
         Type = "timerResume",
         TimerIndex = 1
@@ -124,13 +141,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         throw new NotImplementedException();
     }
 
-    public void SetCaption(string caption) => OnMessageSend(new
+    public void SetCaption(string caption) => SendMessage(new
     {
         Type = "tableCaption",
         Caption = caption
     });
 
-    public void SetGameThemes(IEnumerable<string> themes) => OnMessageSend(new
+    public void SetGameThemes(IEnumerable<string> themes) => SendMessage(new
     {
         Type = "gameThemes",
         Themes = themes.ToArray()
@@ -150,31 +167,39 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetQuestionStyle(QuestionStyle questionStyle) { }
 
-    public void BeginPressButton() => OnMessageSend(new
+    public void BeginPressButton() => SendMessage(new
     {
         Type = "beginPressButton"
     });
 
-    public void FinishQuestion() => OnMessageSend(new
+    public void FinishQuestion() => SendMessage(new
     {
         Type = "endPressButtonByTimeout"
     });
 
     public void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal)
     {
-        OnMessageSend(new
+        SendMessage(new
         {
             Type = "roundThemes",
             Themes = themes.Select(t => t.Name).ToArray(),
             PlayMode = isFinal ? "AllTogether" : "OneByOne"
         });
 
-        OnMessageSend(new
+        SendMessage(new
         {
             Type = "table",
             Table = themes.Select(t => new { t.Name, Questions = t.Questions.Select(q => q.Price).ToArray() }).ToArray(),
             IsFinal = isFinal
         });
+
+        if (isFinal)
+        {
+            SendMessage(new
+            {
+                Type = "choose"
+            });
+        }
     }
 
     public void SetSound(string sound = "")
@@ -187,12 +212,20 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         // TODO
     }
 
-    public void SetRoundTable() => OnMessageSend(new
+    public void SetRoundTable()
     {
-        Type = "showTable"
-    });
+        SendMessage(new
+        {
+            Type = "showTable"
+        });
 
-    public void SetRound(string roundName) => OnMessageSend(new
+        SendMessage(new
+        {
+            Type = "choose"
+        });
+    }
+
+    public void SetRound(string roundName) => SendMessage(new
     {
         Type = "stage",
         Stage = "Round",
@@ -205,7 +238,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         // TODO
     }
 
-    public void SetTimerMaxTime(int maxTime) => OnMessageSend(new
+    public void SetTimerMaxTime(int maxTime) => SendMessage(new
     {
         Type = "timerMaximum",
         TimerIndex = 1,
@@ -228,13 +261,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void StopTimer()
     {
-        OnMessageSend(new
+        SendMessage(new
         {
             Type = "timerStop",
             TimerIndex = 1
         });
 
-        OnMessageSend(new
+        SendMessage(new
         {
             Type = "endPressButtonByTimeout"
         });
@@ -250,23 +283,37 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         // TODO: will be implemented in the future
     }
 
-    public void UpdateShowPlayers(bool showPlayers) => OnMessageSend(new
+    public void UpdateShowPlayers(bool showPlayers) => SendMessage(new
     {
         Type = "playersVisibilityChanged",
         IsVisible = showPlayers
     });
 
-    public void SetTheme(string themeName) => OnMessageSend(new
+    public void SetTheme(string themeName) => SendMessage(new
     {
         Type = "theme",
         ThemeName = themeName
     });
 
-    public void SetQuestion(int questionPrice) => OnMessageSend(new
+    public void SetQuestion(int questionPrice) => SendMessage(new
     {
         Type = "question",
         QuestionPrice = questionPrice
     });
+
+    public void OnContentStart()
+    {
+        if (_isAnswer && !_isAnswerSimple)
+        {
+            SendMessage(new
+            {
+                Type = "rightAnswerStart",
+                Answer = "" // TODO: provide simple right answer here
+            });
+
+            _isAnswer = false;
+        }
+    }
 
     public bool OnQuestionContent(IReadOnlyCollection<ContentItem> content, Func<ContentItem, string?> tryGetMediaUri, string? textToShow)
     {
@@ -278,7 +325,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             switch (contentItem.Placement)
             {
                 case ContentPlacements.Replic:
-                    OnMessageSend(new
+                    SendMessage(new
                     {
                         Type = "replic",
                         PersonCode = "s",
@@ -290,6 +337,17 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                     switch (contentItem.Type)
                     {
                         case ContentTypes.Text:
+                            if (_isAnswerSimple)
+                            {
+                                SendMessage(new
+                                {
+                                    Type = "rightAnswer",
+                                    Answer = contentItem.Value
+                                });
+
+                                break;
+                            }
+
                             screenContent.Add(new ContentInfo(ContentType.Text, contentItem.Value));
                             break;
 
@@ -314,7 +372,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                 case ContentPlacements.Background:
                     var sound = tryGetMediaUri(contentItem);
 
-                    OnMessageSend(new
+                    SendMessage(new
                     {
                         Type = "content",
                         Placement = "background",
@@ -331,7 +389,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
         if (screenContent.Count > 0)
         {
-            OnMessageSend(new
+            SendMessage(new
             {
                 Type = "content",
                 Placement = "screen",
@@ -342,22 +400,49 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         return hasMedia;
     }
 
-    public void SetQuestionType(string typeName, string aliasName) => OnMessageSend(new
+    public void SetQuestionType(string typeName, string aliasName) => SendMessage(new
     {
         Type = "questionType",
         QuestionType = typeName
     });
 
+    public void SetLanguage(string language) => SendMessage(new
+    {
+        Type = "setLanguage",
+        Language = language
+    });
+
+    public void SetSimpleAnswer()
+    {
+        _isAnswerSimple = true;
+    }
+
+    public void OnAnswerStart()
+    {
+        _isAnswer = true;
+    }
+
+    public void ClearState()
+    {
+        SelectionCallback = null;
+        DeletionCallback = null;
+        
+        SendMessage(new
+        {
+            Type = "stop"
+        });
+    }
+
     public void OnMessage(string message)
     {
-        var data = JsonSerializer.Deserialize<Dictionary<string, string>>(message);
+        var data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(message);
 
         if (data == null)
         {
             return;
         }
 
-        var type = data["type"];
+        var type = data["type"].GetString();
         
         switch (type)
         {
@@ -366,7 +451,19 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                 break;
 
             case "loadError":
-                _loadTSC.SetException(new Exception((string)data["error"]));
+                _loadTSC.SetException(new Exception(data["error"].GetString()));
+                break;
+
+            case "move":
+                _presentationListener.AskNext();
+                break;
+
+            case "selectQuestion":
+                SelectionCallback?.Invoke(data["themeIndex"].GetInt32(), data["questionIndex"].GetInt32());
+                break;
+
+            case "deleteTheme":
+                DeletionCallback?.Invoke(data["themeIndex"].GetInt32());
                 break;
 
             default:
@@ -374,7 +471,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         }
     }
 
-    private void OnMessageSend(object message) =>
+    private void SendMessage(object message) =>
         UI.Execute(
             () => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions)),
             exc => PlatformManager.Instance.ShowMessage(exc.Message));
