@@ -25,6 +25,13 @@ public static class WebView2Behavior
     public static readonly DependencyProperty AllowedHostsProperty =
         DependencyProperty.RegisterAttached("AllowedHosts", typeof(string[]), typeof(WebView2), new PropertyMetadata(Array.Empty<string>()));
 
+    public static bool GetAllowLocalFilesAccess(DependencyObject obj) => (bool)obj.GetValue(AllowLocalFilesAccessProperty);
+
+    public static void SetAllowLocalFilesAccess(DependencyObject obj, bool value) => obj.SetValue(AllowLocalFilesAccessProperty, value);
+
+    public static readonly DependencyProperty AllowLocalFilesAccessProperty =
+        DependencyProperty.RegisterAttached("AllowLocalFilesAccess", typeof(bool), typeof(WebView2), new PropertyMetadata(false));
+
     public static void OnIsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (!(bool)e.NewValue)
@@ -88,8 +95,9 @@ public static class WebView2Behavior
     {
         try
         {
+            var allowLocalFilesAccess = GetAllowLocalFilesAccess(webView2);
             // Allowing autoplay
-            var options = new CoreWebView2EnvironmentOptions("--autoplay-policy=no-user-gesture-required");
+            var options = new CoreWebView2EnvironmentOptions("--autoplay-policy=no-user-gesture-required" + (allowLocalFilesAccess ? " --allow-file-access-from-files" : ""));
             var environment = await CoreWebView2Environment.CreateAsync(null, null, options);
 
             await webView2.EnsureCoreWebView2Async(environment);

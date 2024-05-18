@@ -1588,6 +1588,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Think!.
+        /// </summary>
+        public static string ThinkAll {
+            get {
+                return ResourceManager.GetString("ThinkAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Export to Question Base.
         /// </summary>
         public static string ToBase {

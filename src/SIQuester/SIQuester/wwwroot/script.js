@@ -1,5 +1,5 @@
 try {
-    sigame.runTable('reactHost');
+    sigame.run('reactHost');
 } catch (e) {
     alert(e.message);
 }

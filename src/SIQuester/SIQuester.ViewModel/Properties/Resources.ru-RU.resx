@@ -729,4 +729,7 @@ theme - тема Кота</value>
   <data name="FilesDownloaded" xml:space="preserve">
     <value>Загружено файлов: {0}</value>
   </data>
+  <data name="ThinkAll" xml:space="preserve">
+    <value>Думайте!</value>
+  </data>
 </root>

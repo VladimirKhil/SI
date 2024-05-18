@@ -1,6 +1,7 @@
 ﻿using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Workspaces.Dialogs.Play;
 using System.Text.Json;
 using Utils.Commands;
@@ -43,7 +44,6 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     public QuestionPlayViewModel(QuestionViewModel question, QDocument document)
     {
         var questionClone = question.Model.Clone();
-        questionClone.Upgrade();
 
         _questionEngine = new QuestionEngine(
             questionClone,
@@ -51,7 +51,8 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             {
                 FalseStarts = FalseStartMode.Enabled,
                 ShowSimpleRightAnswers = true,
-                DefaultTypeName = QuestionTypes.Simple
+                ForceDefaultTypeName = true,
+                DefaultTypeName = question.OwnerTheme?.OwnerRound?.Model.Type == RoundTypes.Final ? QuestionTypes.StakeAll : QuestionTypes.Simple
             },
             this);
 
@@ -162,10 +163,25 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         }
     }
 
-    public void OnAskAnswer(string mode) => OnMessage(new
+    public void OnAskAnswer(string mode)
     {
-        Type = "beginPressButton"
-    });
+        if (mode == StepParameterValues.AskAnswerMode_Button)
+        {
+            OnMessage(new
+            {
+                Type = "beginPressButton"
+            });
+        }
+        else
+        {
+            OnMessage(new
+            {
+                Type = "replic",
+                PersonCode = "s",
+                Text = Resources.ThinkAll
+            });
+        }
+    }
 
     public bool OnButtonPressStart() => false;
 

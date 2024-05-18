@@ -642,6 +642,9 @@ Humor</value>
   <data name="ThemesSelection" xml:space="preserve">
     <value>theme selection</value>
   </data>
+  <data name="ThinkAll" xml:space="preserve">
+    <value>Think!</value>
+  </data>
   <data name="ToBase" xml:space="preserve">
     <value>Export to Question Base</value>
   </data>

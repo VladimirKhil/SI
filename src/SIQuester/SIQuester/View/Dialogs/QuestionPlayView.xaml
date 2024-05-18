@@ -29,6 +29,7 @@
             <wv2:WebView2
                 x:Name="webView"
                 Source="{Binding Path=Source}"
+                ub:WebView2Behavior.AllowLocalFilesAccess="True"
                 ub:WebView2Behavior.IsAttached="True" />
         </Border>
     </DockPanel>
