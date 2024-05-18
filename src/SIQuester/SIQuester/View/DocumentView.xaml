@@ -259,10 +259,11 @@
                                 Style="{StaticResource CommandRoutedItem}"
                                 Header="{x:Static lp:Resources.ExpandAllMedia}"
                                 Command="{Binding ExpandAllMedia}" />
-                            
-                            <!-- Temporary disabled -->
-                            <!--<Separator />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="{x:Static lp:Resources.SendToPCGame}" Command="{Binding SendToGame}" />-->
+
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.DownloadAllExternalMedia}"
+                                Command="{Binding DownloadAllExternalMedia}" />
                         </ContextMenu>
                     </siq:DropDownButton.DropDown>
                 </siq:DropDownButton>

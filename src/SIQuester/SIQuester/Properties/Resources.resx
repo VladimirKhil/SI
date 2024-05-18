@@ -453,6 +453,9 @@
   <data name="Donate" xml:space="preserve">
     <value>Thank the author…</value>
   </data>
+  <data name="DownloadAllExternalMedia" xml:space="preserve">
+    <value>Download all external media into package</value>
+  </data>
   <data name="DuplicateAnd" xml:space="preserve">
     <value>A and B =&gt; A and B + B and A</value>
   </data>

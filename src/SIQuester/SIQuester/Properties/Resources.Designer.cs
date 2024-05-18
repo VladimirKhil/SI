@@ -1069,6 +1069,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Download all external media into package.
+        /// </summary>
+        public static string DownloadAllExternalMedia {
+            get {
+                return ResourceManager.GetString("DownloadAllExternalMedia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на A and B =&gt; A and B + B and A.
         /// </summary>
         public static string DuplicateAnd {

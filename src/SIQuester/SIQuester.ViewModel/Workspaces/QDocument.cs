@@ -19,6 +19,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Input;
@@ -36,6 +37,7 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class QDocument : WorkspaceViewModel
 {
+    private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
     private const string ClipboardKey = "siqdata";
 
     private const string SIExtension = "siq";
@@ -378,6 +380,8 @@ public sealed class QDocument : WorkspaceViewModel
     public ICommand CollapseAllMedia { get; private set; }
 
     public ICommand ExpandAllMedia { get; private set; }
+
+    public ICommand DownloadAllExternalMedia { get; private set; }
 
     public SimpleCommand SendToGame { get; private set; }
 
@@ -1168,6 +1172,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         CollapseAllMedia = new SimpleCommand(CollapseAllMedia_Executed);
         ExpandAllMedia = new SimpleCommand(ExpandAllMedia_Executed);
+        DownloadAllExternalMedia = new SimpleCommand(DownloadAllExternalMedia_Executed);
 
         SendToGame = new SimpleCommand(SendToGame_Executed);
 
@@ -2926,6 +2931,74 @@ public sealed class QDocument : WorkspaceViewModel
     }
 
     private void ExpandAllMedia_Executed(object? arg) => ToggleMedia(true);
+
+    private async void DownloadAllExternalMedia_Executed(object? arg)
+    {
+        var tempMediaFolder = System.IO.Path.Combine(System.IO.Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName, Guid.NewGuid().ToString());
+        var directoryCreated = false;
+        var downloadCounter = 0;
+
+        using var change = OperationsManager.BeginComplexChange();
+
+        try
+        {
+            foreach (var round in Package.Rounds)
+            {
+                foreach (var theme in round.Themes)
+                {
+                    foreach (var question in theme.Questions)
+                    {
+                        foreach (var content in question.Model.GetContent())
+                        {
+                            if (content.Type == ContentTypes.Text || content.IsRef)
+                            {
+                                continue;
+                            }
+
+                            var collection = TryGetCollectionByMediaType(content.Type);
+                            var fileName = System.IO.Path.GetFileName(content.Value);
+
+                            if (collection == null
+                                || string.IsNullOrEmpty(fileName)
+                                || string.IsNullOrEmpty(System.IO.Path.GetExtension(fileName)))
+                            {
+                                continue;
+                            }
+
+                            if (!directoryCreated)
+                            {
+                                Directory.CreateDirectory(tempMediaFolder);
+                                directoryCreated = true;
+                            }
+
+                            var link = content.Value;
+                            var tmpFile = System.IO.Path.Combine(tempMediaFolder, fileName);
+
+                            using (var stream = await HttpClient.GetStreamAsync(link))
+                            using (var fs = File.Create(tmpFile))
+                            {
+                                await stream.CopyToAsync(fs);
+                            }
+
+                            var item = collection.AddFile(tmpFile);
+                            content.Value = item.Name;
+                            content.IsRef = true;
+
+                            downloadCounter++;
+                        }
+                    }
+                }
+            }
+
+            change.Commit();
+
+            PlatformManager.Instance.Inform(string.Format(Resources.FilesDownloaded, downloadCounter));
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
+    }
 
     private void Delete_Executed(object? arg) => ActiveNode?.Remove?.Execute(null);
 

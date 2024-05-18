@@ -544,6 +544,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Files downloaded: {0}.
+        /// </summary>
+        public static string FilesDownloaded {
+            get {
+                return ResourceManager.GetString("FilesDownloaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на File search.
         /// </summary>
         public static string FileSearch {

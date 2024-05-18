@@ -294,6 +294,9 @@ Humor</value>
   <data name="FileOpenError" xml:space="preserve">
     <value>File open error</value>
   </data>
+  <data name="FilesDownloaded" xml:space="preserve">
+    <value>Files downloaded: {0}</value>
+  </data>
   <data name="FileSearch" xml:space="preserve">
     <value>File search</value>
   </data>

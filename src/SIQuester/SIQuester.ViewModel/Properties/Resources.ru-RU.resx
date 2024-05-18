@@ -726,4 +726,7 @@ theme - тема Кота</value>
   <data name="CommonTags" xml:space="preserve">
     <value>Основные</value>
   </data>
+  <data name="FilesDownloaded" xml:space="preserve">
+    <value>Загружено файлов: {0}</value>
+  </data>
 </root>
