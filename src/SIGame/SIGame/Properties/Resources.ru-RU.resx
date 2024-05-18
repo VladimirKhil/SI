@@ -1203,4 +1203,7 @@
   <data name="DisplayAnswerOptionsOneByOne" xml:space="preserve">
     <value>Показывать варианты ответа по очереди</value>
   </data>
+  <data name="CancelAnswer" xml:space="preserve">
+    <value>Отменить ответ игрока</value>
+  </data>
 </root>

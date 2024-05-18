@@ -1200,4 +1200,7 @@
   <data name="DisplayAnswerOptionsOneByOne" xml:space="preserve">
     <value>Display answer options one by one</value>
   </data>
+  <data name="CancelAnswer" xml:space="preserve">
+    <value>Cancel player answering</value>
+  </data>
 </root>

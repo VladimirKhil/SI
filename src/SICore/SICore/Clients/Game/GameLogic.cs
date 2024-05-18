@@ -1336,30 +1336,37 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 
                 _gameActions.ShowmanReplic(s.ToString());
 
-                s = new StringBuilder(Messages.Person)
-                    .Append(Message.ArgsSeparatorChar)
-                    .Append('-')
-                    .Append(Message.ArgsSeparatorChar)
-                    .Append(_data.AnswererIndex)
-                    .Append(Message.ArgsSeparatorChar)
-                    .Append(_data.CurPriceWrong);
-
-                _gameActions.SendMessage(s.ToString());
-
-                _data.Answerer.SubtractWrongSum((int)(_data.CurPriceWrong * _data.Answerer.AnswerIsRightFactor));
-                _data.Answerer.CanPress = false;
-                _gameActions.InformSums();
-
-                if (_data.Answerer.IsHuman)
+                if (_data.Answerer.AnswerIsRightFactor == 0)
                 {
-                    _data.GameResultInfo.RejectedAnswers.Add(new QuestionReport
+                    _gameActions.SendMessageWithArgs(Messages.Pass, _data.AnswererIndex);
+                }
+                else
+                {
+                    s = new StringBuilder(Messages.Person)
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append('-')
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append(_data.AnswererIndex)
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append(_data.CurPriceWrong);
+
+                    _gameActions.SendMessage(s.ToString());
+
+                    _data.Answerer.SubtractWrongSum((int)(_data.CurPriceWrong * _data.Answerer.AnswerIsRightFactor));
+                    _gameActions.InformSums();
+
+                    if (_data.Answerer.IsHuman)
                     {
-                        ThemeName = _data.Theme.Name,
-                        QuestionText = _data.Question?.GetText(),
-                        ReportText = _data.Answerer.Answer
-                    });
+                        _data.GameResultInfo.RejectedAnswers.Add(new QuestionReport
+                        {
+                            ThemeName = _data.Theme.Name,
+                            QuestionText = _data.Question?.GetText(),
+                            ReportText = _data.Answerer.Answer
+                        });
+                    }
                 }
 
+                _data.Answerer.CanPress = false;
                 ScheduleExecution(Tasks.ContinueQuestion, 1);
             }
             else

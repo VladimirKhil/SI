@@ -466,6 +466,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cancel player answering.
+        /// </summary>
+        public static string CancelAnswer {
+            get {
+                return ResourceManager.GetString("CancelAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cancel readiness.
         /// </summary>
         public static string CancelReady {

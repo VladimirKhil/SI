@@ -108,22 +108,38 @@
                     ItemTemplate="{StaticResource ItemTemplate}" />
             </ScrollViewer>
         </Grid>
-        
-        <ToggleButton
-            IsChecked="{Binding AreAnswersShown}"
-            Width="40"
-            Height="40"
-            Margin="0,0,0,0"
-            Style="{StaticResource SIButtonSimple}"
-            BorderThickness="0"
+
+        <StackPanel
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            FontSize="19"
             Grid.ColumnSpan="2"
-            Foreground="{StaticResource WindowBackground}"
-            Background="#22000000">
-            👁
-        </ToggleButton>
+            Orientation="Horizontal">
+            <Button
+                Visibility="{Binding ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Style="{StaticResource SIButton}"
+                Command="{Binding IsWrong}" 
+                CommandParameter="0"
+                Content="−0"
+                Foreground="DarkRed"
+                FontSize="20"
+                Width="50"
+                BorderThickness="0"
+                ToolTip="{x:Static lp:Resources.CancelAnswer}"
+                Background="#22000000" />
+
+            <ToggleButton
+                IsChecked="{Binding AreAnswersShown}"
+                Width="40"
+                Height="40"
+                Margin="0,0,0,0"
+                Style="{StaticResource SIButtonSimple}"
+                BorderThickness="0"
+                FontSize="19"
+                Foreground="{StaticResource WindowBackground}"
+                Background="#22000000">
+                👁
+            </ToggleButton>
+        </StackPanel>
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
