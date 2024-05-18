@@ -405,6 +405,9 @@
   <data name="Copy" xml:space="preserve">
     <value>Copy</value>
   </data>
+  <data name="CopyInfo" xml:space="preserve">
+    <value>Copy info</value>
+  </data>
   <data name="CopyTemplate" xml:space="preserve">
     <value>Copy template</value>
   </data>
@@ -765,6 +768,9 @@
   </data>
   <data name="Paste" xml:space="preserve">
     <value>Insert</value>
+  </data>
+  <data name="PasteInfo" xml:space="preserve">
+    <value>Paste info</value>
   </data>
   <data name="PasteTemplate" xml:space="preserve">
     <value>Paste template</value>

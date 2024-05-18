@@ -83,6 +83,12 @@
         </DrawingImage.Drawing>
     </DrawingImage>
 
+    <DrawingImage x:Key="PasteImage">
+        <DrawingImage.Drawing>
+            <GeometryDrawing Brush="Gray" Geometry="{Binding Source={StaticResource app_paste},Path=Data}" />
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
     <DrawingImage x:Key="AddImageImage">
         <DrawingImage.Drawing>
             <GeometryDrawing Brush="Gray" Geometry="{Binding Source={StaticResource app_image},Path=Data}" />

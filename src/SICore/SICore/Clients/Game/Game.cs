@@ -1459,12 +1459,12 @@ public sealed class Game : Actor<GameData, GameLogic>
             {
                 if (_logic.StopReason == StopReason.Pause || ClientData.TInfo.Pause)
                 {
-                    _logic.AddHistory($"Managed game pause autoremoved.");
-                    OnPauseCore(false);
+                    _logic.AddHistory("Managed game pause autoremoved");
+                    _logic.OnPauseCore(false);
                     return;
                 }
 
-                _logic.AddHistory($"Managed game move autostarted.");
+                _logic.AddHistory("Managed game move autostarted");
 
                 ClientData.MoveDirection = MoveDirections.Next;
                 _logic.Stop(StopReason.Move);
@@ -1851,7 +1851,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         // Resume paused game
         if (ClientData.TInfo.Pause)
         {
-            OnPauseCore(false);
+            _logic.OnPauseCore(false);
             return;
         }
 
@@ -1914,86 +1914,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        OnPauseCore(args[1] == "+");
-    }
-
-    private void OnPauseCore(bool isPauseEnabled)
-    {
-        // Game host or showman requested a game pause
-
-        if (isPauseEnabled)
-        {
-            if (ClientData.TInfo.Pause)
-            {
-                return;
-            }
-
-            if (_logic.Stop(StopReason.Pause))
-            {
-                ClientData.TInfo.Pause = true;
-                Logic.AddHistory("Pause activated");
-            }
-
-            return;
-        }
-
-        if (_logic.StopReason == StopReason.Pause)
-        {
-            // We are currently moving into pause mode. Resuming
-            ClientData.TInfo.Pause = false;
-            _logic.AddHistory("Immediate pause resume");
-            _logic.CancelStop();
-            return;
-        }
-
-        if (!ClientData.TInfo.Pause)
-        {
-            return;
-        }
-
-        ClientData.TInfo.Pause = false;
-
-        var pauseDuration = DateTime.UtcNow.Subtract(ClientData.PauseStartTime);
-
-        var times = new int[Constants.TimersCount];
-
-        for (var i = 0; i < Constants.TimersCount; i++)
-        {
-            times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
-            ClientData.TimerStartTime[i] = ClientData.TimerStartTime[i].Add(pauseDuration);
-        }
-
-        if (ClientData.IsPlayingMediaPaused)
-        {
-            ClientData.IsPlayingMediaPaused = false;
-            ClientData.IsPlayingMedia = true;
-        }
-
-        if (ClientData.IsThinkingPaused)
-        {
-            ClientData.IsThinkingPaused = false;
-            ClientData.IsThinking = true;
-        }
-
-        _logic.AddHistory($"Pause resumed ({_logic.Runner.PrintOldTasks()} {_logic.StopReason})");
-
-        try
-        {
-            var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
-            times[1] = maxPressingTime - _logic.ResumeExecution();
-        }
-        catch (Exception exc)
-        {
-            throw new Exception($"Resume execution error: {_logic.PrintHistory()}", exc);
-        }
-
-        if (_logic.StopReason == StopReason.Decision)
-        {
-            _logic.ExecuteImmediate(); // Decision could be ready
-        }
-
-        _gameActions.SpecialReplic(LO[nameof(R.GameResumed)]);
-        _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
+        _logic.OnPauseCore(args[1] == "+");
     }
 
     private void OnAtom()

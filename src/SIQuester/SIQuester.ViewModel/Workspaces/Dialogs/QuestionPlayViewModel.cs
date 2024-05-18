@@ -212,7 +212,11 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
                     break;
 
                 case ContentTypes.Image:
-                    options.Add(new AnswerOptionViewModel(option.Label, new ContentInfo(ContentType.Image, option.Content.IsRef ? _qDocument.Images.Wrap(option.Content.Value).Uri : option.Content.Value)));
+                    options.Add(new AnswerOptionViewModel(
+                        option.Label,
+                        new ContentInfo(
+                            ContentType.Image,
+                            option.Content.IsRef ? _qDocument.Images.Wrap(option.Content.Value).Uri : option.Content.Value)));
                     break;
 
                 default:

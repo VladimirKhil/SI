@@ -36,11 +36,6 @@ public interface ISIEnginePlayHandler
     void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback);
 
     /// <summary>
-    /// Cancels question selection request.
-    /// </summary>
-    void CancelQuestionSelection();
-
-    /// <summary>
     /// Handles question selection.
     /// </summary>
     /// <remarks>

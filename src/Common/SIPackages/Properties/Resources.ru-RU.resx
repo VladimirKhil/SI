@@ -138,9 +138,6 @@
   <data name="Round" xml:space="preserve">
     <value>Раунд</value>
   </data>
-  <data name="RoundTrailing" xml:space="preserve">
-    <value>-й раунд</value>
-  </data>
   <data name="Sources" xml:space="preserve">
     <value>Источники</value>
   </data>

@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -393,11 +394,12 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         return view.ShowDialog() == true ? viewModel.Uri : null;
     }
 
-    public override void AskTags(ItemsViewModel<string> tags)
+    public override IEnumerable<string>? AskTags(ItemsViewModel<string> tags)
     {
         var viewModel = new SelectTagsViewModel(tags);
         var view = new SelectTagsView { DataContext = viewModel, Owner = Application.Current.MainWindow };
-        view.ShowDialog();
+
+        return view.ShowDialog() == true ? viewModel.Items : null;
     }
 
     /// <summary>
@@ -995,6 +997,10 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
     }
 
     public override void Exit() => Application.Current.MainWindow?.Close();
+
+    public override void CopyInfo(object info) => Clipboard.SetText(JsonSerializer.Serialize(info));
+
+    public override Dictionary<string, JsonElement>? PasteInfo() => JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Clipboard.GetText());
 
     public override string CompressImage(string imageUri)
     {

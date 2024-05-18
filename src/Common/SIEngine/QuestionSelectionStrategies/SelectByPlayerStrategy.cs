@@ -86,7 +86,6 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
 
         if (result && _stage == Stage.WaitSelection && !_questionsTable.Any())
         {
-            _playHandler.CancelQuestionSelection();
             _stage = Stage.RoundTable;
             _endRoundCallback();
         }

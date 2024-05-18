@@ -138,9 +138,6 @@
   <data name="Round" xml:space="preserve">
     <value>Round</value>
   </data>
-  <data name="RoundTrailing" xml:space="preserve">
-    <value> round</value>
-  </data>
   <data name="Sources" xml:space="preserve">
     <value>Sources</value>
   </data>

@@ -735,13 +735,97 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (move)
         {
-            ScheduleExecution(Tasks.MoveNext, 40);
+            PlanExecution(Tasks.MoveNext, 40);
+
+            if (ClientData.TInfo.Pause)
+            {
+                OnPauseCore(false);
+            }
         }
         else
         {
             // Round was finished manually. We need to cancel current waiting tasks in a safe way
             _taskRunner.ClearOldTasks();
         }
+    }
+
+    internal void OnPauseCore(bool isPauseEnabled)
+    {
+        // Game host or showman requested a game pause
+
+        if (isPauseEnabled)
+        {
+            if (ClientData.TInfo.Pause)
+            {
+                return;
+            }
+
+            if (Stop(StopReason.Pause))
+            {
+                ClientData.TInfo.Pause = true;
+                AddHistory("Pause activated");
+            }
+
+            return;
+        }
+
+        if (StopReason == StopReason.Pause)
+        {
+            // We are currently moving into pause mode. Resuming
+            ClientData.TInfo.Pause = false;
+            AddHistory("Immediate pause resume");
+            CancelStop();
+            return;
+        }
+
+        if (!ClientData.TInfo.Pause)
+        {
+            return;
+        }
+
+        ClientData.TInfo.Pause = false;
+
+        var pauseDuration = DateTime.UtcNow.Subtract(ClientData.PauseStartTime);
+
+        var times = new int[Constants.TimersCount];
+
+        for (var i = 0; i < Constants.TimersCount; i++)
+        {
+            times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
+            ClientData.TimerStartTime[i] = ClientData.TimerStartTime[i].Add(pauseDuration);
+        }
+
+        if (ClientData.IsPlayingMediaPaused)
+        {
+            ClientData.IsPlayingMediaPaused = false;
+            ClientData.IsPlayingMedia = true;
+        }
+
+        if (ClientData.IsThinkingPaused)
+        {
+            ClientData.IsThinkingPaused = false;
+            ClientData.IsThinking = true;
+        }
+
+        AddHistory($"Pause resumed ({Runner.PrintOldTasks()} {StopReason})");
+
+        try
+        {
+            var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
+            times[1] = maxPressingTime - ResumeExecution();
+        }
+        catch (Exception exc)
+        {
+            throw new Exception($"Resume execution error: {PrintHistory()}", exc);
+        }
+
+        if (StopReason == StopReason.Decision)
+        {
+            ExecuteImmediate(); // Decision could be ready
+        }
+
+        _gameActions.SpecialReplic(LO[nameof(R.GameResumed)]);
+        _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
     }
 
     private void Engine_RoundEmpty()

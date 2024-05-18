@@ -133,15 +133,6 @@ namespace SIPackages.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на  round.
-        /// </summary>
-        public static string RoundTrailing {
-            get {
-                return ResourceManager.GetString("RoundTrailing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Sources.
         /// </summary>
         public static string Sources {

@@ -76,6 +76,10 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         }
     }
 
+    public ICommand CopyInfo { get; private set; }
+
+    public ICommand PasteInfo { get; private set; }
+
     public PackageViewModel(Package package, QDocument document)
         : base(package)
     {
@@ -101,6 +105,162 @@ public sealed class PackageViewModel : ItemViewModel<Package>
 
         SelectLogo = new SimpleCommand(SelectLogo_Executed);
         RemoveLogo = new SimpleCommand(RemoveLogo_Executed);
+        
+        CopyInfo = new SimpleCommand(CopyInfo_Executed);
+        PasteInfo = new SimpleCommand(PasteInfo_Executed);
+    }
+
+    private void CopyInfo_Executed(object? arg)
+    {
+        try
+        {
+            PlatformManager.Instance.CopyInfo(new
+            {
+                Model.Info.Authors,
+                Model.Info.Sources,
+                Comments = Model.Info.Comments.Text,
+                Model.Tags,
+                Model.Restriction,
+                Model.Difficulty,
+                Model.Name,
+                Model.ContactUri,
+                Model.Date,
+                Model.Publisher
+            });
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowErrorMessage(exc.Message);
+        }
+    }
+
+    private void PasteInfo_Executed(object? arg)
+    {
+        try
+        {
+            var info = PlatformManager.Instance.PasteInfo();
+
+            if (info == null)
+            {
+                return;
+            }
+
+            using var change = Document.OperationsManager.BeginComplexChange();
+
+            foreach (var pair in info)
+            {
+                switch (pair.Key)
+                {
+                    case nameof(Model.Info.Authors):
+                        Info.Authors.ClearOneByOne();
+
+                        foreach (var item in pair.Value.EnumerateArray())
+                        {
+                            Info.Authors.Add(item.GetString() ?? "");
+                        }
+                        break;
+
+                    case nameof(Model.Info.Sources):
+                        Info.Sources.ClearOneByOne();
+
+                        foreach (var item in pair.Value.EnumerateArray())
+                        {
+                            Info.Sources.Add(item.GetString() ?? "");
+                        }
+                        break;
+
+                    case nameof(Model.Info.Comments):
+                        {
+                            var value = pair.Value.GetString();
+
+                            if (value != null)
+                            {
+                                Info.Comments.Text = value;
+                            }
+                        }
+                        break;
+
+                    case nameof(Model.Tags):
+                        Tags.ClearOneByOne();
+
+                        foreach (var item in pair.Value.EnumerateArray())
+                        {
+                            Tags.Add(item.GetString() ?? "");
+                        }
+                        break;
+
+                    case nameof(Model.Restriction):
+                        {
+                            var value = pair.Value.GetString();
+
+                            if (value != null)
+                            {
+                                Model.Restriction = value;
+                            }
+                        }
+                        break;
+
+                    case nameof(Model.Difficulty):
+                        {
+                            Model.Difficulty = pair.Value.GetInt32();
+                        }
+                        break;
+
+                    case nameof(Model.Name):
+                        {
+                            var value = pair.Value.GetString();
+
+                            if (value != null)
+                            {
+                                Model.Name = value;
+                            }
+                        }
+                        break;
+
+                    case nameof(Model.ContactUri):
+                        {
+                            var value = pair.Value.GetString();
+
+                            if (value != null)
+                            {
+                                Model.ContactUri = value;
+                            }
+                        }
+                        break;
+
+                    case nameof(Model.Date):
+                        {
+                            var value = pair.Value.GetString();
+
+                            if (value != null)
+                            {
+                                Model.Date = value;
+                            }
+                        }
+                        break;
+
+                    case nameof(Model.Publisher):
+                        {
+                            var value = pair.Value.GetString();
+
+                            if (value != null)
+                            {
+                                Model.Publisher = value;
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowErrorMessage(exc.Message);
+        }
     }
 
     private void ChangeLanguage_Executed(object? arg)
@@ -176,7 +336,24 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         Model.Restriction = Resources.Restriction;
     }
 
-    private void AddTags_Executed(object? arg) => PlatformManager.Instance.AskTags(Tags);
+    private void AddTags_Executed(object? arg)
+    {
+        var newTags = PlatformManager.Instance.AskTags(Tags);
+
+        if (newTags != null)
+        {
+            using var change = Document.OperationsManager.BeginComplexChange();
+
+            Tags.ClearOneByOne();
+
+            foreach (var item in newTags)
+            {
+                Tags.Add(item);
+            }
+
+            change.Commit();
+        }
+    }
 
     private void SelectLogo_Executed(object? arg)
     {

@@ -1,4 +1,5 @@
 ﻿using SIQuester.ViewModel.Properties;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -38,7 +39,7 @@ public sealed class SelectTagsViewModel : INotifyPropertyChanged
             }
         }
 
-        tagGroups.Add(new TagGroup(Resources.CommonTags, commonTags.OrderBy(t => t, comparer).Select(t => new Tag(t)).ToArray()));
+        tagGroups.Insert(1, new TagGroup(Resources.CommonTags, commonTags.OrderBy(t => t, comparer).Select(t => new Tag(t)).ToArray()));
 
         TagsGroups = tagGroups.ToArray();
     }
@@ -59,7 +60,7 @@ public sealed class SelectTagsViewModel : INotifyPropertyChanged
         }
     }
 
-    public ItemsViewModel<string> Items { get; private set; }
+    public ObservableCollection<string> Items { get; } = new();
 
     public SimpleCommand AddItem { get; private set; }
 
@@ -69,7 +70,7 @@ public sealed class SelectTagsViewModel : INotifyPropertyChanged
 
     public SelectTagsViewModel(ItemsViewModel<string> items)
     {
-        Items = items;
+        Items = new ObservableCollection<string>(items);
 
         AddItem = new SimpleCommand(AddItem_Executed);
         AddKnownItem = new SimpleCommand(AddKnownItem_Executed);
@@ -78,20 +79,59 @@ public sealed class SelectTagsViewModel : INotifyPropertyChanged
 
     private void AddItem_Executed(object? arg)
     {
-        Items.AddItem.Execute(NewItem);
+        var items = NewItem.Split(',');
+        var added = false;
+
+        foreach (var item in items)
+        {
+            var value = item.Trim();
+
+            if (value.Length > 0 && !Items.Contains(value))
+            {
+                Items.Add(value);
+                added = true;
+            }
+        }
+        
         NewItem = "";
-        OnPropertyChanged(nameof(Items));
+
+        if (added)
+        {
+            OnPropertyChanged(nameof(Items));
+        }
     }
 
     private void AddKnownItem_Executed(object? arg)
     {
-        Items.AddItem.Execute(arg ?? NewItem);
+        var value = arg?.ToString();
+
+        if (value == null)
+        {
+            return;
+        }
+
+        if (Items.Contains(value))
+        {
+            Items.Remove(value);
+        }
+        else
+        {
+            Items.Add(value);
+        }
+
         OnPropertyChanged(nameof(Items));
     }
 
     private void RemoveItem_Executed(object? arg)
     {
-        Items.RemoveItem.Execute(arg);
+        var value = arg?.ToString();
+
+        if (value == null)
+        {
+            return;
+        }
+
+        Items.Remove(value);
         OnPropertyChanged(nameof(Items));
     }
 

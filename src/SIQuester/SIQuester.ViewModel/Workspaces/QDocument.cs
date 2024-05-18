@@ -2791,22 +2791,13 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 allq.AddRange(theme.Questions);
 
-                while (theme.Questions.Any())
-                {
-                    theme.Questions.RemoveAt(0);
-                }
+                theme.Questions.ClearOneByOne();
             }
 
-            while (round.Themes.Count > 0)
-            {
-                round.Themes.RemoveAt(0);
-            }
+            round.Themes.ClearOneByOne();
         }
 
-        while (Package.Rounds.Count > 0)
-        {
-            Package.Rounds.RemoveAt(0);
-        }
+        Package.Rounds.ClearOneByOne();
 
         var ind = 0;
 

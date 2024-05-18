@@ -238,7 +238,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     {
         var round = new Round
         {
-            Name = name ?? $"{Rounds.Count + 1}{Resources.RoundTrailing}",
+            Name = name ?? (Rounds.Count + 1).ToString(),
             Type = type
         };
 

@@ -95,12 +95,6 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         GameLogic?.ScheduleExecution(Tasks.AskToChoose, 20);
     }
 
-    public void CancelQuestionSelection()
-    {
-        GameLogic?.ClearContinuation();
-        GameLogic?.PlanExecution(Tasks.MoveNext, 1);
-    }
-
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameLogic?.OnQuestionSelected(themeIndex, questionIndex);
 
     public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)

@@ -1154,6 +1154,10 @@
                                                     <Button ToolTip="{x:Static lp:Resources.Authors}" Content="{StaticResource AuthorsImageKey}" Command="{Binding AddAuthors}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="{x:Static lp:Resources.Sources}" Content="{StaticResource SourcesImageKey}" Command="{Binding AddSources}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="{x:Static lp:Resources.Comments}" Content="{StaticResource TextImage}" Command="{Binding AddComments}" Style="{StaticResource MenuButton}" />
+
+                                                    <Separator Style="{StaticResource MenuSeparator}" />
+                                                    <Button ToolTip="{x:Static lp:Resources.CopyInfo}" Content="{StaticResource CloneImage}" Command="{Binding CopyInfo}" Style="{StaticResource MenuButton}" />
+                                                    <Button ToolTip="{x:Static lp:Resources.PasteInfo}" Content="{StaticResource PasteImage}" Command="{Binding PasteInfo}" Style="{StaticResource MenuButton}" />
                                                 </StackPanel>
                                             </DataTemplate>
 
@@ -1891,6 +1895,8 @@
                 </Style.Triggers>
             </Style>
 
+            <siqcv:CollectionConverter x:Key="CollectionConverter" />
+
             <Style x:Key="TagsViewStyle" TargetType="ContentControl">
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
@@ -1913,17 +1919,9 @@
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <siq:TextList
-                                            Style="{StaticResource LightTextBox}"
-                                            DataContext="{Binding Tags}"
-                                            ItemsSource="{Binding}"
-                                            CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
-                                            siq:SmartMenuManager.SecondMenu="True"
-                                            IsSynchronizedWithCurrentItem="True"
-                                            siq:ActivateManager.IsWatching="True" />
-
+                                    <DockPanel>
                                         <Button
+                                            DockPanel.Dock="Right"
                                             ToolTip="{x:Static lp:Resources.SetTags}"
                                             Command="{Binding AddTags}"
                                             Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
@@ -1933,7 +1931,15 @@
                                             Padding="2">
                                             <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
                                         </Button>
-                                    </StackPanel>
+
+                                        <TextBox
+                                            Text="{Binding Tags, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                                            IsReadOnly="True"
+                                            BorderThickness="0"
+                                            Background="Transparent"
+                                            TextWrapping="Wrap"
+                                            VerticalAlignment="Center" />
+                                    </DockPanel>
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>

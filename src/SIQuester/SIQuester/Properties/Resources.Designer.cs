@@ -925,6 +925,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Copy info.
+        /// </summary>
+        public static string CopyInfo {
+            get {
+                return ResourceManager.GetString("CopyInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Copy template.
         /// </summary>
         public static string CopyTemplate {
@@ -2002,6 +2011,15 @@ namespace SIQuester.Properties {
         public static string Paste {
             get {
                 return ResourceManager.GetString("Paste", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Paste info.
+        /// </summary>
+        public static string PasteInfo {
+            get {
+                return ResourceManager.GetString("PasteInfo", resourceCulture);
             }
         }
         

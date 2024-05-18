@@ -4,6 +4,7 @@ using SIQuester.Model;
 using SIQuester.ViewModel.Model;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json;
 
 namespace SIQuester.ViewModel.PlatformSpecific;
 
@@ -62,7 +63,7 @@ public abstract class PlatformManager
 
     public abstract string? AskText(string title, bool multiline = false);
 
-    public abstract void AskTags(ItemsViewModel<string> tags);
+    public abstract IEnumerable<string>? AskTags(ItemsViewModel<string> tags);
 
     public abstract IFlowDocumentWrapper BuildDocument(SIDocument doc, ExportFormats format);
 
@@ -89,4 +90,8 @@ public abstract class PlatformManager
     public abstract void Exit();
 
     public abstract string CompressImage(string imageUri);
+
+    public abstract void CopyInfo(object info);
+
+    public abstract Dictionary<string, JsonElement>? PasteInfo();
 }

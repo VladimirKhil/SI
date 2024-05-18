@@ -11,7 +11,7 @@
     d:DesignHeight="250"
     d:DesignWidth="200"
     MinWidth="500"
-    MaxWidth="900"
+    MaxWidth="1200"
     MinHeight="400"
     MaxHeight="700"
     WindowStartupLocation="CenterOwner"
@@ -19,7 +19,7 @@
     Title="{x:Static lp:Resources.SetTags}"
     d:DataContext="{d:DesignInstance lvm:SelectTagsViewModel}">
     <Window.Resources>
-        <lc:NotContainsToVisibilityConverter x:Key="NotContainsToVisibilityConverter" />
+        <lc:ContainsConverter x:Key="ContainsConverter" />
     </Window.Resources>
     
     <DockPanel>
@@ -103,7 +103,15 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
-                            <TextBlock Text="{Binding Name}" FontSize="15" Margin="5,5,0,0" />
+                            <TextBlock
+                                Text="{Binding Name}"
+                                FontSize="17"
+                                FontWeight="Bold"
+                                Margin="5,5,0,5"
+                                Padding="3"
+                                HorizontalAlignment="Stretch"
+                                TextAlignment="Center"
+                                Background="#330000AA" />
 
                             <ItemsControl ItemsSource="{Binding Tags}">
                                 <ItemsControl.ItemsPanel>
@@ -118,17 +126,33 @@
                                             Content="{Binding Name}"
                                             Command="{Binding DataContext.AddKnownItem, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}"
                                             CommandParameter="{Binding Name}"
-                                            Margin="2"
+                                            Margin="4"
                                             Padding="4,10"
                                             Width="150"
                                             BorderThickness="0"
                                             Cursor="Hand">
-                                            <Button.Visibility>
-                                                <MultiBinding Converter="{StaticResource NotContainsToVisibilityConverter}">
-                                                    <Binding Path="DataContext.Items" RelativeSource="{RelativeSource AncestorType=ItemsControl, AncestorLevel=2}" />
-                                                    <Binding Path="Name" />
-                                                </MultiBinding>
-                                            </Button.Visibility>
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Value="True">
+                                                            <DataTrigger.Binding>
+                                                                <MultiBinding Converter="{StaticResource ContainsConverter}">
+                                                                    <Binding Path="DataContext.Items" RelativeSource="{RelativeSource AncestorType=ItemsControl, AncestorLevel=2}" />
+                                                                    <Binding Path="Name" />
+                                                                </MultiBinding>
+                                                            </DataTrigger.Binding>
+
+                                                            <Setter Property="Background" Value="Lavender" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+
+                                            <Button.Resources>
+                                                <Style TargetType="{x:Type Border}">
+                                                    <Setter Property="CornerRadius" Value="7" />
+                                                </Style>
+                                            </Button.Resources>
                                         </Button>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
