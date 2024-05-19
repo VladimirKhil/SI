@@ -952,6 +952,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Online question library.
+        /// </summary>
+        public static string QuestionLibrary {
+            get {
+                return ResourceManager.GetString("QuestionLibrary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Random server themes.
         /// </summary>
         public static string RandomServerThemes {

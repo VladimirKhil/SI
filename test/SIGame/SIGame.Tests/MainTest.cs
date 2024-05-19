@@ -53,7 +53,6 @@ public class MainTest
         services.AddSingleton<IUIThreadExecutor>(manager);
         services.AddSIStorageServiceClient(configuration);
         services.AddSIStatisticsServiceClient(configuration);
-        services.AddTransient(typeof(SIStorageService.ViewModel.StorageViewModel));
 
         var serviceProvider = services.BuildServiceProvider();
         manager.ServiceProvider = serviceProvider;
@@ -78,35 +77,37 @@ public class MainTest
         gameSettings.NetworkGamePassword = "testpass";
         gameSettings.Role = gameRole;
 
-        gameSettings.StorageInfo.Model.DefaultRestriction = null;
-
         await gameSettings.SelectPackage.ExecuteAsync(packageSourceType);
 
         if (packageSourceType == PackageSourceTypes.SIStorage)
         {
             var counter = 10;
 
-            while (gameSettings.StorageInfo.Model.Packages == null && counter > 0)
+            var storageInfo = (SIStorageViewModel)siOnline.Content.Content.Data;
+
+            storageInfo.Model.DefaultRestriction = null;
+
+            while (storageInfo.Model.Packages == null && counter > 0)
             {
                 counter--;
                 await Task.Delay(1000);
             }
 
-            if (gameSettings.StorageInfo.Model.Packages == null)
+            if (storageInfo.Model.Packages == null)
             {
                 Assert.Fail("Could not load storage packages");
                 return;
             }
 
-            var packageId = Guid.Parse("d8faa1a4-2a6f-4103-b298-fd15c6ee3ea6");
+            var packageId = Guid.Parse("3cb371d6-aaff-4623-bc3b-382be11d5f9a");
 
-            var package = gameSettings.StorageInfo.Model.Packages.FirstOrDefault(p => p.Model.Id == packageId);
+            var package = storageInfo.Model.Packages.FirstOrDefault(p => p.Model.Id == packageId);
 
             Assert.That(package, Is.Not.Null, "Package not found");
 
-            var storage = gameSettings.StorageInfo.Model.CurrentPackage = package;
+            var storage = storageInfo.Model.CurrentPackage = package;
 
-            gameSettings.StorageInfo.LoadStorePackage.Execute(null);
+            storageInfo.LoadStorePackage.Execute(null);
         }
 
         await gameSettings.BeginGame.ExecuteAsync(null);

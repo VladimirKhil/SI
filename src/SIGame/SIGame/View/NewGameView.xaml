@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:l="clr-namespace:SIGame"
+    xmlns:lm="clr-namespace:SIGame.ViewModel.Models;assembly=SIGame.ViewModel"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     xmlns:lb="clr-namespace:SIGame.Behaviors"
     xmlns:lc="clr-namespace:SIGame.Converters"
@@ -495,13 +496,19 @@
                             <MenuItem Header="{x:Static lp:Resources.QuestionLibrary}" Template="{StaticResource CustomMenuItem}">
                                 <MenuItem
                                     Header="{x:Static lp:Resources.SelectMenu}"
-                                    Command="{Binding SelectPackage}"
-                                    CommandParameter="{x:Static ps:PackageSourceTypes.SIStorage}" />
+                                    Command="{Binding SelectPackage}">
+                                    <MenuItem.CommandParameter>
+                                        <lm:SIStorageParameters StorageIndex="0" IsRandom="False" />
+                                    </MenuItem.CommandParameter>
+                                </MenuItem>
 
                                 <MenuItem
                                     Header="{x:Static lp:Resources.RandomThemes}"
-                                    Command="{Binding SelectPackage}"
-                                    CommandParameter="{x:Static ps:PackageSourceTypes.RandomServer}" />
+                                    Command="{Binding SelectPackage}">
+                                    <MenuItem.CommandParameter>
+                                        <lm:SIStorageParameters StorageIndex="0" IsRandom="True" />
+                                    </MenuItem.CommandParameter>
+                                </MenuItem>
                             </MenuItem>
 
                             <Separator />

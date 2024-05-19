@@ -1,4 +1,5 @@
-﻿using SIGame.ViewModel.PackageSources;
+﻿using SIGame.ViewModel.Contracts;
+using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Properties;
 using SIStorageService.ViewModel;
 using Utils.Commands;
@@ -11,7 +12,7 @@ public sealed class SIStorageViewModel : ViewModel<StorageViewModel>, INavigatio
 
     public SimpleCommand LoadStorePackage { get; }
 
-    internal event Action<PackageSource>? AddPackage;
+    private readonly IPackageSelector _packageSelector;
 
     public bool IsProgress => Model.IsLoading || Model.IsLoadingPackages || IsLoading;
 
@@ -23,9 +24,11 @@ public sealed class SIStorageViewModel : ViewModel<StorageViewModel>, INavigatio
         set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(nameof(IsProgress)); } }
     }
 
-    public SIStorageViewModel(StorageViewModel siStorage, UserSettings userSettings)
+    public SIStorageViewModel(StorageViewModel siStorage, UserSettings userSettings, IPackageSelector packageSelector)
         : base(siStorage)
     {
+        _packageSelector = packageSelector;
+
         _model.DefaultRestriction =  userSettings.Restriction;
         _model.DefaultPublisher = userSettings.Publisher;
         _model.DefaultTag = userSettings.Tag;
@@ -84,8 +87,7 @@ public sealed class SIStorageViewModel : ViewModel<StorageViewModel>, INavigatio
             }
 
             var packageSource = new SIStoragePackageSource(packageInfo.ContentUri, 0, packageInfo.Name ?? "", packageInfo.Id.ToString());
-
-            AddPackage?.Invoke(packageSource);
+            _packageSelector.SelectPackageSource(packageSource);
             
             IsLoading = false;
         }

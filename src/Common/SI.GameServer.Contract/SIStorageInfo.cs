@@ -14,4 +14,14 @@ public sealed class SIStorageInfo
     /// Storage name.
     /// </summary>
     public string Name { get; set; } = "";
+
+    /// <summary>
+    /// Are random packages supported.
+    /// </summary>
+    public bool RandomPackagesSupported { get; set; } = true;
+
+    /// <summary>
+    /// Are integer identifiers supported.
+    /// </summary>
+    public bool IdentifiersSupported { get; set; } = true;
 }

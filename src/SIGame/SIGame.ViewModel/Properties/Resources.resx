@@ -528,4 +528,7 @@
   <data name="TooMuchRandomPackages" xml:space="preserve">
     <value>You created too much random pakages. Please try again later</value>
   </data>
+  <data name="QuestionLibrary" xml:space="preserve">
+    <value>Online question library</value>
+  </data>
 </root>

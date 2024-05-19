@@ -103,8 +103,6 @@ public partial class App : Application
         services.AddSIStorageServiceClient(configuration);
         services.AddSIContentServiceClient(configuration);
 
-        services.AddTransient(typeof(SIStorageService.ViewModel.StorageViewModel));
-
         services.AddSingleton(_appState);
 
         services.AddSingleton<IUIThreadExecutor>(_manager);

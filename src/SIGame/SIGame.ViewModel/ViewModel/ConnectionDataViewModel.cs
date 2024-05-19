@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SICore;
 using SICore.BusinessLogic;
 using SICore.Contracts;
@@ -10,10 +11,11 @@ using SIData;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
-using SIStorageService.ViewModel;
+using SIStorage.Service.Client;
 using SIUI.ViewModel;
 using System.Diagnostics;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -40,7 +42,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     /// </summary>
     public ICommand Join => _join;
 
-    public CustomCommand NewGame { get; private set; }
+    public SimpleCommand NewGame { get; private set; }
 
     protected abstract bool IsOnline { get; }
 
@@ -144,17 +146,36 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         base.Initialize();
 
         _join = new ExtendedCommand(Join_Executed);
-        NewGame = new CustomCommand(NewGame_Executed);
+        NewGame = new SimpleCommand(NewGame_Executed);
     }
 
     private void NewGame_Executed(object? arg)
     {
         _userSettings.GameSettings.HumanPlayerName = Human.Name;
 
-        var siStorage = PlatformManager.Instance.ServiceProvider.GetRequiredService<StorageViewModel>();
-        siStorage.DefaultLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+        var siStorageClientFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageClientFactory>();
+        var siStorageClientOptions = PlatformManager.Instance.ServiceProvider!.GetRequiredService<IOptions<SIStorageClientOptions>>().Value;
 
-        GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, _settingsViewModel, siStorage, true, MaxPackageSize)
+        var libraries = new SI.GameServer.Contract.SIStorageInfo[]
+        {
+            new()
+            {
+                ServiceUri = siStorageClientOptions.ServiceUri,
+                Name = Resources.QuestionLibrary,
+                RandomPackagesSupported = true,
+                IdentifiersSupported = true
+            }
+        };
+
+        GameSettings = new GameSettingsViewModel(
+            _userSettings.GameSettings,
+            _commonSettings,
+            _userSettings,
+            _settingsViewModel,
+            siStorageClientFactory,
+            libraries,
+            true,
+            MaxPackageSize)
         {
             Human = Human,
             ChangeSettings = ChangeSettings

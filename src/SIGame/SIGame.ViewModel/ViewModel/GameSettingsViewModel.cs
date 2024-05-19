@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SI.GameServer.Contract;
 using SICore;
 using SICore.BusinessLogic;
 using SICore.Clients;
@@ -9,12 +10,15 @@ using SICore.Network.Servers;
 using SICore.Special;
 using SICore.Utils;
 using SIData;
+using SIGame.ViewModel.Contracts;
 using SIGame.ViewModel.Data;
+using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Web;
 using SIPackages;
+using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
 using SIStorageService.ViewModel;
 using SIUI.ViewModel;
@@ -29,7 +33,7 @@ using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
-public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings>, INavigatable, IDisposable
+public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings>, INavigatable, IPackageSelector, IDisposable
 {
     private readonly Random _random = new();
 
@@ -55,7 +59,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                 _model.Role = value;
                 OnPropertyChanged();
                 UpdateRoleTrigger();
-                NetworkGameOrRoleChanged(true, false);
+                NetworkGameOrRoleChanged(true);
             }
         }
     }
@@ -72,7 +76,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             OnPropertyChanged();
             UpdateRoleTrigger();
             SetErrorMessage();
-            NetworkGameOrRoleChanged(false, true);
+            NetworkGameOrRoleChanged(false);
         }
     }
 
@@ -206,8 +210,8 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         new Localizer(Thread.CurrentThread.CurrentUICulture.Name),
         Global.PhotoUri);
 
-    private readonly ComputerAccount _newPlayerAccount = new ComputerAccount(Resources.New + "…", true);
-    private readonly ComputerAccount _newShowmanAccount = new ComputerAccount(Resources.New + "…", true);
+    private readonly ComputerAccount _newPlayerAccount = new(Resources.New + "…", true);
+    private readonly ComputerAccount _newShowmanAccount = new(Resources.New + "…", true);
 
     private ComputerAccount[] _computerPlayers;
     private ComputerAccount[] _computerShowmans;
@@ -277,8 +281,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         }
     }
 
-    public SIStorageViewModel StorageInfo { get; private set; }
-
     public IAsyncCommand BeginGame { get; private set; }
 
     public ICommand RemoveComputerAccount { get; private set; }
@@ -312,7 +314,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             if (players[i] == origin)
             {
                 var oldAccount = players[i];
-                GameAccount playerAcc = null;
+                GameAccount? playerAcc = null;
 
                 var gamePlayers = Players;
 
@@ -379,25 +381,31 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     private readonly long? _maxPackageSize;
     private readonly SettingsViewModel _settingsViewModel;
 
+    private readonly SIStorageInfo[] _libraries;
+
+    private readonly UserSettings _userSettings;
+    private readonly ISIStorageClientFactory _siStorageClientFactory;
+
     public GameSettingsViewModel(
         GameSettings gameSettings,
         CommonSettings commonSettings,
         UserSettings userSettings,
         SettingsViewModel settingsViewModel,
-        StorageViewModel siStorage,
+        ISIStorageClientFactory siStorageClientFactory,
+        SIStorageInfo[] libraries,
         bool isNetworkGame = false,
         long? maxPackageSize = null)
         : base(gameSettings)
     {
         NetworkGame = isNetworkGame;
         _commonSettings = commonSettings;
+        _userSettings = userSettings;
         _settingsViewModel = settingsViewModel;
+        _siStorageClientFactory = siStorageClientFactory;
+        _libraries = libraries;
 
         UpdateComputerPlayers();
         UpdateComputerShowmans();
-
-        StorageInfo = new SIStorageViewModel(siStorage, userSettings);
-        StorageInfo.AddPackage += StorageInfo_AddPackage;
 
         gameSettings.Updated += GameSettings_Updated;
 
@@ -407,6 +415,9 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         _selectPackage.ExecutionContext.Add(PackageSourceTypes.Local);
         _selectPackage.ExecutionContext.Add(PackageSourceTypes.SIStorage);
+        _selectPackage.ExecutionContext.Add(PackageSourceTypes.RandomServer);
+        _selectPackage.ExecutionContext.Add(new SIStorageParameters { StorageIndex = 0, IsRandom = true });
+        _selectPackage.ExecutionContext.Add(new SIStorageParameters { StorageIndex = 0, IsRandom = false });
         _selectPackage.ExecutionContext.Add(PackageSourceTypes.VK);
 
         var packageDirExists = Directory.Exists(Global.PackagesUri);
@@ -414,11 +425,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         if (packageDirExists)
         {
             _selectPackage.ExecutionContext.Add(PackageSourceTypes.Random);
-        }
-
-        if (NetworkGame && NetworkGameType == NetworkGameType.GameServer)
-        {
-            _selectPackage.ExecutionContext.Add(PackageSourceTypes.RandomServer);
         }
 
         if (packageDirExists)
@@ -476,12 +482,12 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         BeginGame = new AsyncCommand(BeginGame_ExecutedAsync);
 
-        RemoveComputerAccount = new CustomCommand(RemoveComputerAccount_Executed);
-        RemoveShowmanAccount = new CustomCommand(RemoveShowmanAccount_Executed);
-        EditComputerAccount = new CustomCommand(EditComputerAccount_Executed);
+        RemoveComputerAccount = new SimpleCommand(RemoveComputerAccount_Executed);
+        RemoveShowmanAccount = new SimpleCommand(RemoveShowmanAccount_Executed);
+        EditComputerAccount = new SimpleCommand(EditComputerAccount_Executed);
 
-        _closeNewShowman = new CustomCommand(CloseNewShowman_Executed);
-        _closeNewPlayer = new CustomCommand(CloseNewPlayer_Executed);
+        _closeNewShowman = new SimpleCommand(CloseNewShowman_Executed);
+        _closeNewPlayer = new SimpleCommand(CloseNewPlayer_Executed);
 
         SetErrorMessage();
     }
@@ -512,6 +518,30 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             return;
         }
 
+        if (arg is SIStorageParameters storageParameters)
+        {
+            var siStorageClient = _siStorageClientFactory.CreateClient(_libraries[storageParameters.StorageIndex].ServiceUri);
+
+            if (storageParameters.IsRandom)
+            {
+                Package = new RandomStoragePackageSource(siStorageClient);
+            }
+            else
+            {
+                var storageViewModel = new StorageViewModel(siStorageClient)
+                {
+                    DefaultLanguage = Thread.CurrentThread.CurrentUICulture.Name
+                };
+
+                var storageInfo = new SIStorageViewModel(storageViewModel, _userSettings, this);
+                var contentBox = new ContentBox { Data = storageInfo, Title = Resources.SIStorage };
+                await storageInfo.InitAsync();
+                Navigate?.Invoke(contentBox);
+            }
+
+            return;
+        }
+
         var code = (PackageSourceTypes)arg;
 
         switch (code)
@@ -524,10 +554,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                 Package = new RandomPackageSource();
                 break;
 
-            case PackageSourceTypes.RandomServer:
-                Package = new RandomStoragePackageSource(PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageServiceClient>());
-                break;
-
             case PackageSourceTypes.Local:
                 var packagePath = PlatformManager.Instance.SelectLocalPackage(_maxPackageSize);
 
@@ -535,12 +561,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                 {
                     Package = new CustomPackageSource(packagePath);
                 }
-                break;
-
-            case PackageSourceTypes.SIStorage:
-                var contentBox = new ContentBox { Data = StorageInfo, Title = Resources.SIStorage };
-                await StorageInfo.InitAsync();
-                Navigate?.Invoke(contentBox);
                 break;
 
             case PackageSourceTypes.VK:
@@ -768,12 +788,9 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             isWarning ? MessageType.Warning : MessageType.Error,
             true);
 
-    private void StorageInfo_AddPackage(PackageSource package)
-    {
-        Package = package;
-    }
+    public void SelectPackageSource(PackageSource packageSource) => Package = packageSource;
 
-    private void NetworkGameOrRoleChanged(bool roleChanged, bool networkGameChanged)
+    private void NetworkGameOrRoleChanged(bool roleChanged)
     {
         if (_showman == null)
         {
@@ -848,7 +865,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _model.Players = Players.Select(acc => acc.SelectedAccount).ToArray();
     }
 
-    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         var acc = (GameAccount)sender;
         if (e.PropertyName == nameof(GameAccount.AccountType))
@@ -901,7 +918,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _model.Viewers = Viewers.Select(acc => acc.SelectedAccount).ToArray();
     }
 
-    void Viewer_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Viewer_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SimpleAccount<HumanAccount>.SelectedAccount))
         {

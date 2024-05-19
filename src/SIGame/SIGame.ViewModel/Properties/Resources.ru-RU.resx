@@ -525,4 +525,7 @@
   <data name="TooMuchRandomPackages" xml:space="preserve">
     <value>Вы создали слишком много случайных пакетов. Попробуйте ещё раз позже</value>
   </data>
+  <data name="QuestionLibrary" xml:space="preserve">
+    <value>Онлайн Библиотека вопросов</value>
+  </data>
 </root>

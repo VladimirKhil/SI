@@ -247,8 +247,8 @@ public sealed class StorageViewModel : INotifyPropertyChanged
 
     public StorageViewModel() => throw new NotImplementedException();
 
-    public StorageViewModel(ISIStorageServiceClient sIStorageServiceClient) =>
-        _siStorageServiceClient = sIStorageServiceClient;
+    public StorageViewModel(ISIStorageServiceClient siStorageServiceClient) =>
+        _siStorageServiceClient = siStorageServiceClient;
 
     public async Task OpenAsync(CancellationToken cancellationToken = default)
     {

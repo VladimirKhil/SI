@@ -2,13 +2,16 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SI.GameServer.Client;
+using SI.GameServer.Contract;
 using SIContentService.Client;
 using SICore;
 using SICore.Contracts;
 using SICore.Network.Servers;
+using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Settings;
 using SIStatisticsService.Contract;
+using SIStorage.Service.Client;
 using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -274,10 +277,27 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     {
         await Task.Delay(500);
 
-        var siStorage = _serviceProvider.GetRequiredService<StorageViewModel>();
-        siStorage.DefaultLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+        var siStorageClientFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageClientFactory>();
+        var siStorageClientOptions = PlatformManager.Instance.ServiceProvider!.GetRequiredService<IOptions<SIStorageClientOptions>>().Value;
 
-        var gameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, Settings.ThemeSettings.SIUISettings, siStorage)
+        var libraries = new SIStorageInfo[]
+        {
+            new()
+            {
+                ServiceUri = siStorageClientOptions.ServiceUri,
+                Name = Resources.QuestionLibrary,
+                RandomPackagesSupported = true,
+                IdentifiersSupported = true
+            }
+        };
+
+        var gameSettings = new GameSettingsViewModel(
+            _userSettings.GameSettings,
+            _commonSettings,
+            _userSettings,
+            Settings.ThemeSettings.SIUISettings,
+            siStorageClientFactory,
+            libraries)
         {
             Human = Human.HumanPlayer,
             ChangeSettings = ShowSlideMenu

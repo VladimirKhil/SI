@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="VKhil.SIStorage.Client" Version="1.1.0" />
+    <PackageReference Include="VKhil.SIStorage.Client" Version="1.2.2" />
   </ItemGroup>
 
 </Project>

@@ -10,6 +10,8 @@ namespace SIGame.ViewModel.PackageSources;
 /// </summary>
 public sealed class RandomStoragePackageSource : PackageSource
 {
+    private static readonly HttpClient Client = new() { DefaultRequestVersion = HttpVersion.Version20 };
+
     private readonly ISIStorageServiceClient _storageServiceClient;
     private Uri? _packageUri;
 
@@ -19,8 +21,26 @@ public sealed class RandomStoragePackageSource : PackageSource
 
     public RandomStoragePackageSource(ISIStorageServiceClient storageServiceClient) => _storageServiceClient = storageServiceClient;
 
-    public override Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    public override async Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default)
+    {
+        if (_packageUri == null)
+        {
+            _packageUri = await CreateRandomPackageAsync(cancellationToken);
+        }
+
+        var response = await Client.GetAsync(_packageUri, cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        var fileName = Path.GetTempFileName();
+        using (var fs = File.OpenWrite(fileName))
+        using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
+        {
+            await stream.CopyToAsync(fs, 81920 /* default */, cancellationToken);
+        }
+
+        return (fileName, true);
+    }
 
     public override async Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default)
     {
