@@ -448,6 +448,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Who pressed first (according to client).
+        /// </summary>
+        public static string ButtonPressMode_FirstWinsClient {
+            get {
+                return ResourceManager.GetString("ButtonPressMode_FirstWinsClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Random from early pressers.
         /// </summary>
         public static string ButtonPressMode_RandomWithinInterval {

@@ -1203,4 +1203,7 @@
   <data name="CancelAnswer" xml:space="preserve">
     <value>Cancel player answering</value>
   </data>
+  <data name="ButtonPressMode_FirstWinsClient" xml:space="preserve">
+    <value>Who pressed first (according to client)</value>
+  </data>
 </root>

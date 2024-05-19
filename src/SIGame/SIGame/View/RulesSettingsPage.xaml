@@ -30,8 +30,6 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
-        <CollectionViewSource x:Key="ButtonPressModeFiltered" Source="{StaticResource ButtonPressMode}" />
-
         <localc:EnumConverter x:Key="GameModesConverter" EnumType="{x:Type data:GameModes}" />
         <localc:EnumConverter x:Key="ButtonPressModeConverter" EnumType="{x:Type data:ButtonPressMode}" />
 
@@ -171,7 +169,7 @@
             Style="{StaticResource ComboBoxStyle}"
             Foreground="White"
             FontWeight="Light"
-            ItemsSource="{Binding Source={StaticResource ButtonPressModeFiltered}}"
+            ItemsSource="{Binding Source={StaticResource ButtonPressMode}}"
             SelectedValue="{Binding Model.ButtonPressMode}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>

@@ -370,6 +370,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.AllowAppellation = false;
         _data.IsAnswer = false;
         _data.QuestionHistory.Clear();
+        _data.PendingAnswererIndex = -1;
+        _data.AnswererPressDuration = -1;
         _data.PendingAnswererIndicies.Clear();
         _data.IsQuestionPlaying = true;
         _data.IsPlayingMedia = false;
@@ -1411,6 +1413,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
+        _data.PendingAnswererIndex = -1;
+        _data.AnswererPressDuration = -1;
         _data.PendingAnswererIndicies.Clear();
 
         if (!ClientData.Settings.AppSettings.FalseStart)
@@ -3365,24 +3369,29 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var buttonPressMode = ClientData.Settings.AppSettings.ButtonPressMode;
 
-        if (buttonPressMode == ButtonPressMode.RandomWithinInterval)
+        if (buttonPressMode != ButtonPressMode.FirstWins)
         {
-            for (var i = 0; i < ClientData.PendingAnswererIndicies.Count; i++)
-            {
-                var playerIndex = ClientData.PendingAnswererIndicies[i];
-
-                if (playerIndex == ClientData.PendingAnswererIndex)
-                {
-                    continue;
-                }
-
-                _gameActions.SendMessageWithArgs(Messages.WrongTry, playerIndex);
-            }
+            InformWrongTries();
         }
 
         _data.AnswerCount = 1;
         ScheduleExecution(Tasks.WaitAnswer, waitAnswerTime);
         WaitFor(DecisionType.Answering, waitAnswerTime, _data.AnswererIndex);
+    }
+
+    private void InformWrongTries()
+    {
+        for (var i = 0; i < ClientData.PendingAnswererIndicies.Count; i++)
+        {
+            var playerIndex = ClientData.PendingAnswererIndicies[i];
+
+            if (playerIndex == ClientData.PendingAnswererIndex)
+            {
+                continue;
+            }
+
+            _gameActions.SendMessageWithArgs(Messages.WrongTry, playerIndex);
+        }
     }
 
     private void AskToDelete()

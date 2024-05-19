@@ -1206,4 +1206,7 @@
   <data name="CancelAnswer" xml:space="preserve">
     <value>Отменить ответ игрока</value>
   </data>
+  <data name="ButtonPressMode_FirstWinsClient" xml:space="preserve">
+    <value>Кто первым нажал (по версии клиента)</value>
+  </data>
 </root>

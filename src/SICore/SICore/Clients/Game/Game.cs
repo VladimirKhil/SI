@@ -602,7 +602,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.I:
-                        OnI(message.Sender);
+                        OnI(message.Sender, args.Length > 1 && int.TryParse(args[1], out var pressDuration) ? pressDuration : -1);
                         break;
 
                     case Messages.Pass:
@@ -2242,7 +2242,8 @@ public sealed class Game : Actor<GameData, GameLogic>
     /// Handles player button press.
     /// </summary>
     /// <param name="playerName">Pressed player name.</param>
-    private void OnI(string playerName)
+    /// <param name="pressDurationMs">Player reaction time.</param>
+    private void OnI(string playerName, int pressDurationMs)
     {
         if (ClientData.TInfo.Pause)
         {
@@ -2264,26 +2265,38 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        var pressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = ClientData.Settings.AppSettings.ButtonPressMode;
 
-        switch (pressMode)
+        switch (buttonPressMode)
         {
             case ButtonPressMode.FirstWins:
-                ClientData.PendingAnswererIndex = answererIndex;
+                ProcessAnswerer_FirstWins(answererIndex);
+                break;
 
-                if (_logic.Stop(StopReason.Answer))
-                {
-                    ClientData.Decision = DecisionType.None;
-                }
+            case ButtonPressMode.RandomWithinInterval:
+                ProcessAnswerer_RandomWithinInterval(answererIndex);
+                break;
+
+            case ButtonPressMode.FirstWinsClient:
+                ProcessAnswerer_FirstWinsClient(answererIndex, pressDurationMs);
                 break;
 
             default:
-                ProcessAnswererWithinInterval(answererIndex);
                 break;
         }
     }
 
-    private void ProcessAnswererWithinInterval(int answererIndex)
+    private void ProcessAnswerer_FirstWins(int answererIndex)
+    {
+        ClientData.PendingAnswererIndex = answererIndex;
+
+        if (_logic.Stop(StopReason.Answer))
+        {
+            ClientData.Decision = DecisionType.None;
+        }
+    }
+
+    private void ProcessAnswerer_RandomWithinInterval(int answererIndex)
     {
         if (!ClientData.PendingAnswererIndicies.Contains(answererIndex))
         {
@@ -2292,6 +2305,25 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (!ClientData.IsDeferringAnswer)
         {            
+            ClientData.WaitInterval = (int)(ClientData.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
+            _logic.Stop(StopReason.Wait);
+        }
+    }
+
+    private void ProcessAnswerer_FirstWinsClient(int answererIndex, int pressDurationMs)
+    {
+        if (ClientData.PendingAnswererIndex == -1 || pressDurationMs > 0 && pressDurationMs < ClientData.AnswererPressDuration)
+        {
+            ClientData.PendingAnswererIndex = answererIndex;
+            ClientData.AnswererPressDuration = pressDurationMs > 0 ? pressDurationMs : (int)ClientData.Host.Options.ButtonsAcceptInterval.TotalMilliseconds;
+        }
+        else
+        {
+            ClientData.PendingAnswererIndicies.Add(answererIndex);
+        }
+
+        if (!ClientData.IsDeferringAnswer)
+        {
             ClientData.WaitInterval = (int)(ClientData.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
             _logic.Stop(StopReason.Wait);
         }

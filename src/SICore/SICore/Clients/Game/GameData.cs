@@ -97,6 +97,11 @@ public sealed class GameData : Data
     public int PendingAnswererIndex { get; set; }
 
     /// <summary>
+    /// Current answerer candidate press duration (reaction) time in ms.
+    /// </summary>
+    public int AnswererPressDuration { get; set; }
+
+    /// <summary>
     /// Indicies of possible answerers.
     /// </summary>
     public List<int> PendingAnswererIndicies { get; } = new();
