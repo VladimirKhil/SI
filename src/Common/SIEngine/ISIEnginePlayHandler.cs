@@ -1,4 +1,5 @@
-﻿using SIPackages;
+﻿using SIEngine.Rules;
+using SIPackages;
 
 namespace SIEngine;
 
@@ -7,6 +8,13 @@ namespace SIEngine;
 /// </summary>
 public interface ISIEnginePlayHandler
 {
+    /// <summary>
+    /// Handles round start.
+    /// </summary>
+    /// <param name="round"></param>
+    /// <param name="strategyType">Round play type.</param>
+    void OnRound(Round round, QuestionSelectionStrategyType strategyType);
+
     /// <summary>
     /// Detects whether current game situation supports playing question for all (there is at least one player capable for that).
     /// </summary>

@@ -1,5 +1,6 @@
 ﻿using SIEngine;
 using SIEngine.Core;
+using SIEngine.Rules;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
 using SIPackages;
@@ -330,8 +331,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay) => GameViewModel?.OnFinalThemes(themes);
 
-    public void AskForThemeDelete(Action<int> deleteCallback) =>
-        PresentationController.DeletionCallback = deleteCallback;
+    public void AskForThemeDelete(Action<int> deleteCallback) => PresentationController.DeletionCallback = deleteCallback;
 
     public void OnThemeDeleted(int themeIndex) => GameViewModel?.OnThemeDeleted(themeIndex);
 
@@ -340,4 +340,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     public void OnTheme(Theme theme) => GameViewModel?.OnTheme(theme);
 
     public void OnQuestion(Question question) => GameViewModel?.OnQuestion(question);
+
+    public void OnRound(Round round, QuestionSelectionStrategyType strategyType) => GameViewModel?.OnRound(round);
 }

@@ -323,6 +323,11 @@ public static class Messages
     public const string Out = "OUT";
 
     /// <summary>
+    /// Package info.
+    /// </summary>
+    public const string Package = "PACKAGE";
+
+    /// <summary>
     /// Идентификатор пакета
     /// </summary>
     public const string PackageId = "PACKAGEID";

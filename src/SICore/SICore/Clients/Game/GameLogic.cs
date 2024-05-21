@@ -8,6 +8,7 @@ using SICore.Models;
 using SICore.Results;
 using SICore.Utils;
 using SIData;
+using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
 using SIPackages.Providers;
@@ -132,7 +133,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         Engine.Package += Engine_Package;
         Engine.GameThemes += Engine_GameThemes;
-        Engine.Round += Engine_Round;
         Engine.RoundSkip += Engine_RoundSkip;
 
         Engine.QuestionPostInfo += Engine_QuestionPostInfo;
@@ -243,7 +243,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, Math.Max(40, 10 + 10 * count));
     }
 
-    private void Engine_Round(Round round)
+    internal void OnRoundStart(Round round, QuestionSelectionStrategyType strategyType)
     {
         _data.AppellationOpened = false;
         _data.AllowAppellation = false;
@@ -253,6 +253,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.QuestionPlayState.Clear();
         _data.StakerIndex = -1;
         _data.ThemeDeleters = null;
+        _data.RoundStrategy = strategyType;
 
         OnRound(round, 1);
         SetRoundPrices(round);
@@ -2532,8 +2533,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         var roundName = LO.GetRoundName(_data.Round.Name);
-
-        _gameActions.InformStage(name: roundName, index: roundIndex);
+        
+        _gameActions.InformRound(roundName, roundIndex, _data.RoundStrategy);
         _gameActions.InformRoundContent();
 
         _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");
@@ -4142,12 +4143,25 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], packageName));
                 informed = true;
 
+                var messageBuilder = new MessageBuilder(Messages.Package).Add(packageName);
+
                 var logoItem = package.LogoItem;
 
                 if (logoItem != null)
                 {
+                    // Old
                     ShareMedia(logoItem);
+
+                    // New
+                    var (success, globalUri, _) = TryShareContent(logoItem);
+
+                    if (success && globalUri != null)
+                    {
+                        messageBuilder.Add(ContentTypes.Image).Add(globalUri);
+                    }
                 }
+
+                _gameActions.SendMessage(messageBuilder.ToString());
             }
             else
             {
@@ -4288,7 +4302,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
             }
 
-            _gameActions.InformStage(name: roundName, index: roundIndex);
+            _gameActions.InformRound(roundName, roundIndex, _data.RoundStrategy);
             _gameActions.InformRoundContent();
 
             _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");

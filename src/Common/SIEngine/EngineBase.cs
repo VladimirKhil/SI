@@ -169,7 +169,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action<Package>? Package;
     public event Action<IEnumerable<string>>? GameThemes;
     public event Action<bool>? NextRound;
-    public event Action<Round>? Round;
     public event Action? RoundSkip;
 
     public event Action? QuestionPostInfo;
@@ -216,8 +215,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnGameThemes(IEnumerable<string> gameThemes) => GameThemes?.Invoke(gameThemes);
 
     protected void OnNextRound(bool showSign = true) => NextRound?.Invoke(showSign);
-
-    protected void OnRound(Round round) => Round?.Invoke(round);
 
     protected void OnRoundSkip() => RoundSkip?.Invoke();
 

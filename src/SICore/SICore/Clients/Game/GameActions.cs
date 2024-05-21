@@ -8,6 +8,7 @@ using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Utils;
 using SIData;
+using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
 using System.Text;
@@ -146,18 +147,18 @@ public sealed class GameActions
     }
 
     /// <summary>
-    /// Выдача информации о состоянии игры
+    /// Informs about game stage change.
     /// </summary>
-    public void InformStage(string person = NetworkConstants.Everybody, string? name = null, int index = -1)
+    public void InformStage(string person = NetworkConstants.Everybody)
     {
-        if (index > -1)
-        {
-            SendMessage(string.Join(Message.ArgsSeparator, Messages.Stage, _gameData.Stage.ToString(), name ?? "", index), person);
-        }
-        else
-        {
-            SendMessage(string.Join(Message.ArgsSeparator, Messages.Stage, _gameData.Stage.ToString(), name ?? ""), person);
-        }
+        var messageBuilder = new MessageBuilder(Messages.Stage, _gameData.Stage);
+        SendMessage(messageBuilder.ToString(), person);
+    }
+
+    internal void InformRound(string roundName, int roundIndex, QuestionSelectionStrategyType roundStrategy)
+    {
+        var messageBuilder = new MessageBuilder(Messages.Stage, _gameData.Stage, roundName, roundIndex, roundStrategy);
+        SendMessage(messageBuilder.ToString());
     }
 
     public void InformStageInfo(string person, int stageIndex) =>

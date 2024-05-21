@@ -1,4 +1,5 @@
-﻿using SIPackages;
+﻿using SIEngine.Rules;
+using SIPackages;
 
 namespace SIEngine.Tests;
 
@@ -32,6 +33,11 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
     }
 
     public void OnQuestionSelected(int themeIndex, int questionIndex)
+    {
+        
+    }
+
+    public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
     {
         
     }

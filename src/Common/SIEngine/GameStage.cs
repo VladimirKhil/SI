@@ -25,8 +25,6 @@ public enum GameStage
     /// </summary>
     SelectingQuestion,
 
-    Theme,
-    NextQuestion,
     [Obsolete]
     Score,
     

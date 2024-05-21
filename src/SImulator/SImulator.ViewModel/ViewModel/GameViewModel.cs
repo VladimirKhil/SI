@@ -1,7 +1,6 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
-using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -545,7 +544,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _engine.Package += Engine_Package;
         _engine.GameThemes += Engine_GameThemes;
         _engine.NextRound += Engine_NextRound;
-        _engine.Round += Engine_Round;
         _engine.ShowScore += Engine_ShowScore;
         _engine.LogScore += LogScore;
         _engine.QuestionPostInfo += Engine_QuestionPostInfo;
@@ -1329,7 +1327,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         SetSound(Settings.Model.Sounds.GameThemes);
     }
 
-    private void Engine_Round(Round round)
+    internal void OnRound(Round round)
     {
         _activeRound = round ?? throw new ArgumentNullException(nameof(round));
         OnPropertyChanged(nameof(ActiveRound));

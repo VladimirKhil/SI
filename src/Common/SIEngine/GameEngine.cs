@@ -76,17 +76,19 @@ public sealed class GameEngine : EngineBase
                 CanMoveBack = false;
                 _timeout = false;
 
+                var strategyType = GameRules.GetRulesForRoundType(ActiveRound.Type).QuestionSelectionStrategyType;
+
                 _selectionStrategy = QuestionSelectionStrategyFactory.GetStrategy(
                     ActiveRound,
                     OptionsProvider(),
-                    GameRules.GetRulesForRoundType(ActiveRound.Type).QuestionSelectionStrategyType,
+                    strategyType,
                     PlayHandler,
                     SelectQuestion,
                     EndRound);
 
                 if (_selectionStrategy.ShouldPlayRound())
                 {
-                    OnRound(ActiveRound);
+                    PlayHandler.OnRound(ActiveRound, strategyType);
                     Stage = GameStage.SelectingQuestion;
                 }
                 else

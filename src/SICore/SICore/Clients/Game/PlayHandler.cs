@@ -1,5 +1,6 @@
 ﻿using SICore.Utils;
 using SIEngine;
+using SIEngine.Rules;
 using SIPackages;
 using SIUI.Model;
 
@@ -14,6 +15,9 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     public GameActions? GameActions { get; internal set; }
 
     public PlayHandler(GameData gameData) => _gameData = gameData;
+
+    public void OnRound(Round round, QuestionSelectionStrategyType strategyType) =>
+        GameLogic?.OnRoundStart(round, strategyType);
 
     public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController)
     {

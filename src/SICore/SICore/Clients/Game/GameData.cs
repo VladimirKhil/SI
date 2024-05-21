@@ -5,6 +5,7 @@ using SICore.Results;
 using SIData;
 using SIEngine;
 using SIEngine.Core;
+using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
 using SIPackages.Helpers;
@@ -109,7 +110,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Player having a turn.
     /// </summary>
-    internal GamePlayerAccount? Chooser { get; private set; }
+    internal GamePlayerAccount? Chooser => _chooserIndex == -1 ? null : Players[_chooserIndex];
 
     private int _chooserIndex = -1;
 
@@ -121,20 +122,12 @@ public sealed class GameData : Data
         get => _chooserIndex;
         set
         {
-            _chooserIndex = value;
-
-            if (value > -1 && value < Players.Count)
-            {
-                Chooser = Players[value];
-            }
-            else if (value == -1)
-            {
-                Chooser = null;
-            }
-            else
+            if (value < -1 || value >= Players.Count)
             {
                 throw new ArgumentException($"{nameof(value)} {value} must be greater or equal to -1 and less than {Players.Count}!");
             }
+
+            _chooserIndex = value;
         }
     }
 
@@ -645,6 +638,8 @@ public sealed class GameData : Data
     public int AnswerCount { get; internal set; }
 
     public string RightOptionLabel { get; internal set; }
+
+    public QuestionSelectionStrategyType RoundStrategy { get; internal set; }
 
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
