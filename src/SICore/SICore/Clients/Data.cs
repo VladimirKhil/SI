@@ -7,6 +7,8 @@ using System.Text;
 
 namespace SICore;
 
+// TODO: fully split between the game and the clients
+
 /// <summary>
 /// Represents common client data.
 /// </summary>
