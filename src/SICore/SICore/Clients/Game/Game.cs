@@ -1008,18 +1008,6 @@ public sealed class Game : Actor<GameData, GameLogic>
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
                     restoredPrice.Value));
         }
-
-        // TODO: remove after all clients upgrade to 7.9.5
-        ClientData.TableInformStageLock.WithLock(
-            () =>
-            {
-                if (ClientData.TableInformStage > 1)
-                {
-                    _gameActions.InformRoundThemes();
-                    _gameActions.InformTable();
-                }
-            },
-            5000);
     }
 
     private void OnKick(Message message, string[] args)
@@ -2529,7 +2517,7 @@ public sealed class Game : Actor<GameData, GameLogic>
     [Obsolete("Use Logic.PlanExecution()")]
     private void PlanExecution(Tasks task, double taskTime, int arg = 0)
     {
-        Logic.AddHistory($"PlanExecution {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
+        Logic.AddHistory($"PlanExecution old {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
 
         if (Logic.Runner.IsExecutionPaused)
         {

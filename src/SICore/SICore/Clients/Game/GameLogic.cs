@@ -1580,9 +1580,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         _tasksHistory.AddLogEntry($"PlanExecution {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
 
-        if (Runner.IsExecutionPaused)
+        if (_taskRunner.IsExecutionPaused)
         {
-            Runner.UpdatePausedTask(task, arg, (int)taskTime);
+            _taskRunner.UpdatePausedTask(task, arg, (int)taskTime);
         }
         else
         {
