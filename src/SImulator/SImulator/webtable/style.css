@@ -24,3 +24,43 @@ body {
 #table {
 	flex: 2.5 !important;
 }
+
+.gamePlayers {
+    flex-direction: row !important;
+    background-color: #c0cff4 !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+    .gamePlayers li {
+        flex: 1 !important;
+        height: auto !important;
+        margin: 0 !important;
+        max-width: initial !important;
+    }
+
+    .gamePlayers .playerCard {
+        padding: 0 !important;
+    }
+
+    .gamePlayers div.playerInfo {
+        background-color: transparent !important;
+        color: black !important;
+        display: flex !important;
+    }
+
+    .gamePlayers .playerInfo .name {
+        display: initial !important;
+    }
+
+    .gamePlayers li.me div.name, .gamePlayers li.me div.stakeHost, .gamePlayers li.me div.sum {
+        color: black !important;
+    }
+
+    .gamePlayers li .playerInfo div.stakeHost {
+        display: none !important;
+    }
+
+    .gamePlayers .playerAvatar {
+        display: none !important;
+    }

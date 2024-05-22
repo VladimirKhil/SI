@@ -54,11 +54,11 @@ public interface IPresentationController : IDisposable
 
     void AddPlayer();
 
-    void RemovePlayer(string playerName);
+    void RemovePlayer(int playerIndex);
 
     void ClearPlayers();
 
-    void UpdatePlayerInfo(int index, PlayerInfo player);
+    void UpdatePlayerInfo(int index, PlayerInfo player, string? propertyName = null);
 
     void UpdateSettings(Settings settings);
 
@@ -67,8 +67,6 @@ public interface IPresentationController : IDisposable
     void SetSound(string sound = "");
 
     void PlaySimpleSelection(int theme, int quest);
-
-    void PlayComplexSelection(int theme, int quest, bool setActive);
 
     void PlaySelection(int theme);
 
@@ -134,4 +132,6 @@ public interface IPresentationController : IDisposable
     void OnAnswerStart();
 
     void ClearState();
+
+    void OnQuestionEnd() { }
 }

@@ -409,7 +409,7 @@
                                             Width="Auto"
                                             HorizontalAlignment="Stretch"
                                             Height="23"
-                                            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                            Text="{Binding Name}" />
                                     </DockPanel>
                                     
                                     <ToggleButton
@@ -424,19 +424,19 @@
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
                                         Grid.Column="3"
-                                        Text="{Binding Sum, UpdateSourceTrigger=PropertyChanged}" />
+                                        Text="{Binding Sum}" />
                                     
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
                                         Grid.Column="4"
-                                        Text="{Binding Right, UpdateSourceTrigger=PropertyChanged}" />
+                                        Text="{Binding Right}" />
                                     
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
                                         Grid.Column="5"
-                                        Text="{Binding Wrong, UpdateSourceTrigger=PropertyChanged}" />
+                                        Text="{Binding Wrong}" />
                                     
                                     <Button
                                         Grid.Column="6"

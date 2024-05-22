@@ -285,9 +285,9 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         Players.Add(new SimplePlayerInfo());
     }
 
-    public void RemovePlayer(string playerName)
+    public void RemovePlayer(int playerIndex)
     {
-        var player = Players.FirstOrDefault(p => p.Name == playerName);
+        var player = Players[playerIndex];
 
         if (player != null)
         {
@@ -300,7 +300,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         Players.Clear();
     }
 
-    public void UpdatePlayerInfo(int index, PlayerInfo player)
+    public void UpdatePlayerInfo(int index, PlayerInfo player, string? propertyName = null)
     {
         if (index <= -1 || index >= Players.Count)
         {
@@ -308,6 +308,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
 
         var p = Players[index];
+        
         p.Sum = player.Sum;
         p.Name = player.Name;
         p.State = player.State;
@@ -380,8 +381,6 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     }
 
     public void PlaySimpleSelection(int theme, int quest) => TInfo.PlaySimpleSelectionAsync(theme, quest);
-
-    public void PlayComplexSelection(int theme, int quest, bool setActive) => TInfo.PlayComplexSelectionAsync(theme, quest, setActive);
 
     public void PlaySelection(int theme) => TInfo.PlaySelection(theme);
 

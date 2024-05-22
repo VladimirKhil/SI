@@ -350,18 +350,18 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
 
         InitQuestionState(_data.Question);
-        ProceedToThemeAndQuestion();
+        ProceedToThemeAndQuestion(20);
     }
 
-    private void ProceedToThemeAndQuestion()
+    private void ProceedToThemeAndQuestion(int delay = 10)
     {
         if (!_data.ThemeInfoShown.Contains(_data.Theme))
         {
-            ScheduleExecution(Tasks.Theme, 10, 1, true);
+            ScheduleExecution(Tasks.Theme, delay, 1, true);
         }
         else
         {
-            ScheduleExecution(Tasks.QuestionType, 10, 1, true);
+            ScheduleExecution(Tasks.QuestionType, delay, 1, true);
         }
     }
 
@@ -2707,7 +2707,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 case QuestionTypes.Stake:
                     _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
-                    s.Append(MakeCompatibleQuestionTypeName(typeName));
+                    s.Append(typeName);
                     delay = 16;
                     break;
 
@@ -2724,13 +2724,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     }
 
                     _gameActions.ShowmanReplic(replic.ToString());
-                    s.Append(MakeCompatibleQuestionTypeName(typeName));
+                    s.Append(typeName);
                     delay = 10;
                     break;
 
                 case QuestionTypes.NoRisk:
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
-                    s.Append(MakeCompatibleQuestionTypeName(typeName));
+                    s.Append(typeName);
                     delay = 16;
                     break;
 
@@ -2755,15 +2755,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         ScheduleExecution(Tasks.QuestionType, returnDelay, arg + 1);
     }
-
-    // TODO: remove after all clients upgrade to 7.11+
-    private static string MakeCompatibleQuestionTypeName(string typeName) => typeName switch
-    {
-        QuestionTypes.Stake => QuestionTypes.Auction,
-        QuestionTypes.Secret or QuestionTypes.SecretPublicPrice or QuestionTypes.SecretNoQuestion => QuestionTypes.Cat,
-        QuestionTypes.NoRisk => QuestionTypes.Sponsored,
-        _ => typeName,
-    };
 
     private void OnUnsupportedQuestionType(string typeName)
     {

@@ -5,6 +5,7 @@ using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
+using System.Diagnostics;
 using System.Text.Json;
 using Utils;
 using Utils.Web;
@@ -35,6 +36,10 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public event Action<Exception>? Error;
 
+    private ItemViewModel[]? _answerOptions;
+
+    private int _playerCount;
+
     public WebPresentationController(IDisplayDescriptor displayDescriptor, IPresentationListener presentationListener)
     {
         _displayDescriptor = displayDescriptor;
@@ -43,22 +48,38 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void AddLostButtonPlayerIndex(int playerIndex)
     {
-        throw new NotImplementedException();
+        // TODO
     }
 
     public void AddPlayer()
     {
-        throw new NotImplementedException();
+        SendMessage(new
+        {
+            Type = "addPlayerTable"
+        });
+
+        SendMessage(new
+        {
+            Type = "tableChangeType",
+            Role = "player",
+            Index = _playerCount,
+            IsHuman = false,
+            Name = "",
+            Sex = 0
+        });
+
+        _playerCount++;
     }
 
     public void ClearPlayers()
     {
-        // TODO
+        while (_playerCount > 0)
+        {
+            RemovePlayer(0);
+        }
     }
 
     public void ClearPlayersState() { }
-
-    public void Dispose() { }
 
     public void OnQuestionStart()
     {
@@ -66,24 +87,19 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         _isAnswer = false;
     }
 
-    public void PauseTimer(int currentTime)
+    public void PauseTimer(int currentTime) => SendMessage(new
     {
-        throw new NotImplementedException();
-    }
-
-    public void PlayComplexSelection(int theme, int quest, bool setActive) => SendMessage(new
-    {
-        Type = "questionSelected",
-        ThemeIndex = theme,
-        QuestionIndex = quest
+        Type = "timerPause",
+        TimerIndex = 1,
+        CurrentTime = currentTime
     });
 
-    public void PlaySelection(int theme)
+    public void PlaySelection(int themeIndex)
     {
         SendMessage(new
         {
             Type = "themeDeleted",
-            ThemeIndex = theme,
+            ThemeIndex = themeIndex,
         });
 
         // TODO: do not send when last theme left
@@ -93,26 +109,35 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         });
     }
 
-    public void PlaySimpleSelection(int theme, int quest) => SendMessage(new
+    public void PlaySimpleSelection(int themeIndex, int questionIndex) => SendMessage(new
     {
         Type = "questionSelected",
-        ThemeIndex = theme,
-        QuestionIndex = quest
+        ThemeIndex = themeIndex,
+        QuestionIndex = questionIndex
     });
 
-    public void RemovePlayer(string playerName)
+    public void RemovePlayer(int playerIndex)
     {
-        throw new NotImplementedException();
+        SendMessage(new
+        {
+            Type = "deletePlayerTable",
+            Index = playerIndex
+        });
+
+        _playerCount--;
     }
 
-    public void RestoreQuestion(int themeIndex, int questionIndex, int price)
+    public void RestoreQuestion(int themeIndex, int questionIndex, int price) => SendMessage(new
     {
-        // TODO
-    }
+        Type = "toggle",
+        ThemeIndex = themeIndex,
+        QuestionIndex = questionIndex,
+        Price = price
+    });
 
     public void RunMedia()
     {
-        throw new NotImplementedException();
+        // TODO
     }
 
     public void RunTimer() => SendMessage(new
@@ -123,7 +148,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SeekMedia(int position)
     {
-        throw new NotImplementedException();
+        // TODO
     }
 
     public void SetActivePlayerIndex(int playerIndex)
@@ -133,13 +158,23 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetAnswerOptions(ItemViewModel[] answerOptions)
     {
-        throw new NotImplementedException();
+        SendMessage(new
+        {
+            Type = "answerOptionsLayout",
+            QuestionHasScreenContent = true,
+            TypeNames = answerOptions.Select(o => o.Content.Type.ToString().ToLowerInvariant()).ToArray()
+        });
+
+        _answerOptions = answerOptions;
     }
 
-    public void SetAnswerState(int answerIndex, ItemState state)
+    public void SetAnswerState(int answerIndex, ItemState state) => SendMessage(new
     {
-        throw new NotImplementedException();
-    }
+        Type = "contentState",
+        Placement = "screen",
+        LayoutId = answerIndex + 1,
+        ItemState = (int)state
+    });
 
     public void SetCaption(string caption) => SendMessage(new
     {
@@ -155,15 +190,29 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetMedia(MediaSource media, bool background)
     {
-        throw new NotImplementedException();
+        if (background)
+        {
+            SendMessage(new
+            {
+                Type = "content",
+                Placement = "background",
+                Content = new[] { new { Type = "audio", Value = media.Uri } }
+            });
+        }
+        else
+        {
+            SendMessage(new
+            {
+                Type = "content",
+                Placement = "screen",
+                Content = new[] { new { Type = "image", Value = media.Uri } }
+            });
+        }
     }
 
     public void SetQuestionContentType(QuestionContentType questionContentType) { }
 
-    public void SetQuestionSound(bool sound)
-    {
-        // TODO
-    }
+    public void SetQuestionSound(bool sound) { }
 
     public void SetQuestionStyle(QuestionStyle questionStyle) { }
 
@@ -202,15 +251,9 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         }
     }
 
-    public void SetSound(string sound = "")
-    {
-        // TODO
-    }
+    public void SetSound(string sound = "") { }
 
-    public void SetStage(TableStage stage)
-    {
-        // TODO
-    }
+    public void SetStage(TableStage stage) { }
 
     public void SetRoundTable()
     {
@@ -245,9 +288,33 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Maximum = maxTime
     });
 
-    public void ShowAnswerOptions()
+    public async void ShowAnswerOptions()
     {
-        throw new NotImplementedException();
+        if (_answerOptions == null)
+        {
+            return;
+        }
+
+        try
+        {
+            for (var i = 0; i < _answerOptions.Length; i++)
+            {
+                SendMessage(new
+                {
+                    Type = "answerOption",
+                    Index = i,
+                    _answerOptions[i].Label,
+                    ContentType = _answerOptions[i].Content.Type.ToString().ToLowerInvariant(),
+                    ContentValue = _answerOptions[i].Content.Value,
+                });
+
+                await Task.Delay(1000);
+            }
+        }
+        catch (Exception exc)
+        {
+            Trace.TraceError("ShowAnswerOptions error: " + exc.Message);
+        }
     }
 
     public Task StartAsync() => Task.WhenAll(_loadTSC.Task, PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor));
@@ -256,7 +323,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void StopMedia()
     {
-        throw new NotImplementedException();
+        // TODO
     }
 
     public void StopTimer()
@@ -273,9 +340,21 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         });
     }
 
-    public void UpdatePlayerInfo(int index, PlayerInfo player)
+    public void UpdatePlayerInfo(int index, PlayerInfo player, string? propertyName = null)
     {
-        throw new NotImplementedException();
+        if (propertyName == null || propertyName == nameof(PlayerInfo.Name))
+        {
+            SendMessage(new
+            {
+                Type = "tableSet",
+                Role = "player",
+                Index = index,
+                Replacer = player.Name,
+                ReplacerSex = 0
+            });
+        }
+
+        // TODO
     }
 
     public void UpdateSettings(Settings settings)
@@ -412,15 +491,9 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Language = language
     });
 
-    public void SetSimpleAnswer()
-    {
-        _isAnswerSimple = true;
-    }
+    public void SetSimpleAnswer() => _isAnswerSimple = true;
 
-    public void OnAnswerStart()
-    {
-        _isAnswer = true;
-    }
+    public void OnAnswerStart() => _isAnswer = true;
 
     public void ClearState()
     {
@@ -432,6 +505,11 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             Type = "stop"
         });
     }
+
+    public void OnQuestionEnd() => SendMessage(new
+    {
+        Type = "questionEnd"
+    });
 
     public void OnMessage(string message)
     {
@@ -447,7 +525,10 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         switch (type)
         {
             case "loaded":
-                _loadTSC.SetResult();
+                if (!_loadTSC.Task.IsCompleted)
+                {
+                    _loadTSC.SetResult();
+                }
                 break;
 
             case "loadError":
@@ -470,6 +551,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                 break;
         }
     }
+
+    public void Dispose() { }
 
     private void SendMessage(object message) =>
         UI.Execute(

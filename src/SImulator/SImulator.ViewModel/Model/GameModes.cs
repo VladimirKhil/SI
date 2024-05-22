@@ -8,12 +8,13 @@ namespace SImulator.ViewModel.Model;
 public enum GameModes
 {
     /// <summary>
-    /// Classic mode (with final round and special questions support).
+    /// Classic mode.
     /// </summary>
     [Display(Description = "GameModes_Tv")]
     Tv,
+  
     /// <summary>
-    /// Simplified mode (without final round and special questions).
+    /// Simplified mode.
     /// </summary>
     [Display(Description = "GameModes_Sport")]
     Sport

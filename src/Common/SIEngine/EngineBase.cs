@@ -171,14 +171,16 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action<bool>? NextRound;
     public event Action? RoundSkip;
 
+    // TODO: investigate and eliminate duplicates
     public event Action? QuestionPostInfo;
+    public event Action<int, int>? EndQuestion;
+    public event Action? QuestionFinish;
+    public event Action? NextQuestion;
+    // TODO: end
 
     public event Action? ShowScore;
     public event Action? LogScore;
-    public event Action<int, int>? EndQuestion;
-    public event Action? QuestionFinish;
     public event Action? RoundEmpty;
-    public event Action? NextQuestion;
     public event Action? RoundTimeout;
 
     public event Action<string>? Error;

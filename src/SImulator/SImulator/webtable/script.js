@@ -13,7 +13,8 @@ try {
             return new Promise(function (resolve) {
                 resolve(true);
             });
-        }
+        },
+        mediaLoaded: function () { }
     });
 
     window.chrome.webview.postMessage({ type: 'loaded' });

@@ -217,8 +217,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    private bool _playingQuestionType = false;
-
     private int _price;
 
     public int Price
@@ -571,7 +569,13 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             case Tasks.MoveNext:
                 _engine.MoveNext();
                 break;
+
+            case Tasks.PlayQuestionType:
+                PlayQuestionType();
+                break;
         }
+
+        _taskRunner.ScheduleExecution(Tasks.NoTask, 0, runTimer: false);
     }
 
     private void LocalInfo_AnswerSelected(ItemViewModel answer)
@@ -664,6 +668,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         try
         {
+            PresentationController.OnQuestionEnd();
             _engine.MoveNext();
         }
         catch (Exception exc)
@@ -742,7 +747,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             return;
         }
 
-        PresentationController.UpdatePlayerInfo(Players.IndexOf(player), player);
+        PresentationController.UpdatePlayerInfo(Players.IndexOf(player), player, e.PropertyName);
     }
 
     private void QuestionTimer_Elapsed(object? state) =>
@@ -989,8 +994,9 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         player.PropertyChanged -= PlayerInfo_PropertyChanged;
+        var playerIndex = Players.IndexOf(player);
         Players.Remove(player);
-        PresentationController.RemovePlayer(player.Name);
+        PresentationController.RemovePlayer(playerIndex);
     }
 
     private void ClearPlayers_Executed(object? arg)
@@ -1118,6 +1124,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         UpdateNextCommand();
 
+        await PresentationController.StartAsync();
+
         PresentationController.ClearPlayers();
 
         for (int i = 0; i < Players.Count; i++)
@@ -1125,8 +1133,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             PresentationController.AddPlayer();
             PresentationController.UpdatePlayerInfo(i, Players[i]);
         }
-
-        await PresentationController.StartAsync();
 
         PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
         PresentationController.UpdateSettings(Settings.SIUISettings.Model);
@@ -1157,8 +1163,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         LocalInfo.Text = question.Price.ToString();
         LocalInfo.TStage = TableStage.QuestionPrice;
-
-        _playingQuestionType = true;
     }
 
     private void SetCaption(string caption) => PresentationController.SetCaption(Settings.Model.ShowTableCaption ? caption : "");
@@ -1213,15 +1217,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 return;
             }
 
-            if (_playingQuestionType)
+            if (_taskRunner.CurrentTask != Tasks.NoTask)
             {
-                _playingQuestionType = false;
-                var (played, _) = PlayQuestionType();
-
-                if (played)
-                {
-                    return;
-                }
+                _taskRunner.ExecuteImmediate();
+                return;
             }
 
             _engine.MoveNext();
@@ -1232,11 +1231,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    private (bool played, bool highlightTheme) PlayQuestionType()
+    private void PlayQuestionType()
     {
         if (_activeQuestion == null)
         {
-            return (false, false);
+            return;
         }
 
         var typeName = _activeQuestion.TypeName ?? QuestionTypes.Simple;
@@ -1250,10 +1249,9 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (typeName == QuestionTypes.Simple)
         {
-            return (false, false);
+            _engine.MoveNext();
+            return;
         }
-
-        var highlightTheme = true;
 
         switch (typeName)
         {
@@ -1262,7 +1260,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             case QuestionTypes.SecretNoQuestion:
                 SetSound(Settings.Model.Sounds.SecretQuestion);
                 PrintQuestionType(typeName, Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
-                highlightTheme = false;
                 break;
 
             case QuestionTypes.Stake:
@@ -1273,7 +1270,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             case QuestionTypes.NoRisk:
                 SetSound(Settings.Model.Sounds.NoRiskQuestion);
                 PrintQuestionType(typeName, Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
-                highlightTheme = false;
                 break;
 
             default:
@@ -1282,7 +1278,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         LocalInfo.TStage = TableStage.Special;
-        return (true, highlightTheme);
     }
 
     private void Engine_Package(Package package)
@@ -1460,6 +1455,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void Engine_RoundEmpty() => StopRoundTimer_Executed(0);
 
+    // TODO: remove
     private void Engine_NextQuestion()
     {
         if (Settings.Model.GameMode == GameModes.Tv)
@@ -1518,7 +1514,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         CurrentTheme = null;
         Price = 0;
 
-        _playingQuestionType = false;
         _selectedAnswerIndex = -1;
         LocalInfo.LayoutMode = LayoutMode.Simple;
         LocalInfo.AnswerOptions.Options = Array.Empty<ItemViewModel>();
@@ -1557,6 +1552,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (Settings.Model.GameMode == GameModes.Tv)
         {
+            // TODO: Replace with question selection strategy restore callback
             LocalInfo.RoundInfo[data.Item1].Questions[data.Item2].Price = data.Item3;
 
             PresentationController.RestoreQuestion(data.Item1, data.Item2, data.Item3);
@@ -1565,8 +1561,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
         else
         {
-            PresentationController.SetText(data.Item3.ToString());
-            PresentationController.SetStage(TableStage.QuestionPrice);
+            PresentationController.SetQuestion(data.Item3);
         }
 
         StopQuestionTimer_Executed(0);
@@ -1825,18 +1820,9 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             LogScore();
             _gameLogger.Write("\r\n{0}, {1}", CurrentTheme, Price);
 
-            var (played, highlightTheme) = PlayQuestionType();
-
-            if (!played)
-            {
-                SetSound(Settings.Model.Sounds.QuestionSelected);
-                PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
-                _taskRunner.ScheduleExecution(Tasks.MoveNext, 7);
-            }
-            else
-            {
-                PresentationController.PlayComplexSelection(themeIndex, questionIndex, highlightTheme);
-            }
+            SetSound(Settings.Model.Sounds.QuestionSelected);
+            PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
+            _taskRunner.ScheduleExecution(Tasks.PlayQuestionType, 17);
 
             _gameLogger.Write(ActiveQuestion.GetText());
         }

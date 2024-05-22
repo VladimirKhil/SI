@@ -3,5 +3,6 @@
 public enum Tasks
 {
     NoTask,
-    MoveNext
+    MoveNext,
+    PlayQuestionType
 }
