@@ -139,7 +139,6 @@ public static class PackageHelper
 
         // В пакете могут быть и свои комментарии; допишем туда
         doc.Package.Info.Comments.Text += packageComments.ToString();
-        doc.Upgrade();
 
         return doc;
     }

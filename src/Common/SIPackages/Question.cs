@@ -407,7 +407,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Upgrades the question to new format.
     /// </summary>
-    public void Upgrade()
+    internal void Upgrade()
     {
         if (Parameters != null)
         {

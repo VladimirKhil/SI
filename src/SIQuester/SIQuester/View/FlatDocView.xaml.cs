@@ -546,9 +546,6 @@ public partial class FlatDocView : UserControl
                     question.ReadXml(reader);
                 }
 
-                // Remove later
-                question.Upgrade();
-
                 var themeViewModel = _insertionPosition.Item1;
                 var index = _insertionPosition.Item2;
 

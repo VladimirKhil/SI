@@ -15,7 +15,7 @@
     MinHeight="400"
     MaxHeight="700"
     WindowStartupLocation="CenterOwner"
-    ResizeMode="CanResize"
+    ResizeMode="NoResize"
     Title="{x:Static lp:Resources.SetTags}"
     d:DataContext="{d:DesignInstance lvm:SelectTagsViewModel}">
     <Window.Resources>

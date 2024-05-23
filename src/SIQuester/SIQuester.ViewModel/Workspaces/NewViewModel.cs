@@ -156,7 +156,6 @@ public sealed class NewViewModel : WorkspaceViewModel
             if (_currentTemplate.FileName != null)
             {
                 siDocument = CreateFromCustomTemplate(_currentTemplate.FileName);
-                siDocument.Upgrade();
             }
             else
             {

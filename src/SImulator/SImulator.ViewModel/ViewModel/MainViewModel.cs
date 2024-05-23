@@ -449,8 +449,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             try
             {
-                document.Upgrade();
-
                 engine = EngineFactory.CreateEngine(
                     SettingsViewModel.Model.GameMode == GameModes.Tv,
                     document,

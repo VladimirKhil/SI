@@ -65,8 +65,6 @@ public sealed class GameRunner
 
     public (IViewerClient?, Game) Run(Func<ViewerData, ViewerActions, Localizer, IViewerLogic> hostLogicFactory)
     {
-        _document.Upgrade();
-
         var gameData = new GameData(_gameHost, new GamePersonAccount(_settings.Showman))
         {
             Settings = _settings,

@@ -414,7 +414,6 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
                 // Loads in read only mode to keep file LastUpdate time unmodified
                 var doc = SIDocument.Load(stream);
-                doc.Upgrade();
 
                 _logger.LogInformation("Document has been successfully opened. Path: {path}", path);
 
@@ -538,7 +537,6 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         {
             using var stream = File.OpenRead(file);
             var doc = SIDocument.LoadXml(stream);
-            doc.Upgrade();
 
             var docViewModel = _documentViewModelFactory.CreateViewModelFor(doc, Path.GetFileNameWithoutExtension(file));
 
@@ -579,7 +577,6 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
             }
 
             var doc = SIDocument.Create(package);
-            doc.Upgrade();
 
             var docViewModel = _documentViewModelFactory.CreateViewModelFor(doc, Path.GetFileNameWithoutExtension(file));
             docViewModel.Path = "";

@@ -72,7 +72,6 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
 
             ms.Position = 0;
             var doc = SIPackages.SIDocument.Load(ms);
-            doc.Upgrade();
 
             return _documentViewModelFactory.CreateViewModelFor(doc);
         };

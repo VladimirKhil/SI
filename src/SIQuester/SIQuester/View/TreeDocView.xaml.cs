@@ -311,31 +311,42 @@ public partial class TreeDocView : UserControl
                     round.ReadXml(reader);
                 }
 
-                // Remove later
-                foreach (var theme in round.Themes)
-                {
-                    foreach (var question in theme.Questions)
-                    {
-                        question.Upgrade();
-                    }
-                }
+                RoundViewModel? roundViewModel = null;
 
                 if (treeViewItem.DataContext is PackageViewModel package)
                 {
-                    package.Rounds.Add(new RoundViewModel(round) { IsSelected = true });
+                    roundViewModel = new RoundViewModel(round) { IsSelected = true };
+                    package.Rounds.Add(roundViewModel);
                     document.ApplyData(dragData);
 
                     package.IsExpanded = true;
                 }
                 else if (treeViewItem.DataContext is RoundViewModel)
                 {
+                    roundViewModel = new RoundViewModel(round) { IsSelected = true };
                     var docRound = treeViewItem.DataContext as RoundViewModel;
 
                     docRound.OwnerPackage.Rounds.Insert(
                         docRound.OwnerPackage.Rounds.IndexOf(docRound),
-                        new RoundViewModel(round) { IsSelected = true });
+                        roundViewModel);
 
                     document.ApplyData(dragData);
+                }
+
+                if (roundViewModel != null && AppSettings.Default.ChangePriceOnMove && roundViewModel.OwnerPackage != null)
+                {
+                    var roundIndex = roundViewModel.OwnerPackage.Rounds.IndexOf(roundViewModel);
+                    var basePrice = (roundIndex + 1) * AppSettings.Default.QuestionBase;
+
+                    for (int i = 0; i < roundViewModel.Themes.Count; i++)
+                    {
+                        var themeViewModel = roundViewModel.Themes[i];
+
+                        for (var j = 0; j < themeViewModel.Questions.Count; j++)
+                        {
+                            themeViewModel.Questions[i].Model.Price = basePrice * (j + 1);
+                        }
+                    }
                 }
             }
             else if (format == WellKnownDragFormats.Theme)
@@ -355,26 +366,37 @@ public partial class TreeDocView : UserControl
                     theme.ReadXml(reader);
                 }
 
-                // Remove later
-                foreach (var question in theme.Questions)
-                {
-                    question.Upgrade();
-                }
+                ThemeViewModel? themeViewModel = null;
 
                 if (treeViewItem.DataContext is RoundViewModel docRound)
                 {
-                    docRound.Themes.Add(new ThemeViewModel(theme) { IsSelected = true });
+                    themeViewModel = new ThemeViewModel(theme) { IsSelected = true };
+                    docRound.Themes.Add(themeViewModel);
                     document.ApplyData(dragData);
 
                     docRound.IsExpanded = true;
                 }
                 else if (treeViewItem.DataContext is ThemeViewModel docTheme)
                 {
+                    themeViewModel = new ThemeViewModel(theme) { IsSelected = true };
+                    
                     docTheme.OwnerRound.Themes.Insert(
                         docTheme.OwnerRound.Themes.IndexOf(docTheme),
-                        new ThemeViewModel(theme) { IsSelected = true });
+                        themeViewModel);
 
                     document.ApplyData(dragData);
+                }
+
+                if (themeViewModel != null && AppSettings.Default.ChangePriceOnMove && themeViewModel.OwnerRound?.OwnerPackage != null)
+                {
+                    var round = themeViewModel.OwnerRound;
+                    var roundIndex = round.OwnerPackage.Rounds.IndexOf(round);
+                    var basePrice = (roundIndex + 1) * AppSettings.Default.QuestionBase;
+
+                    for (var i = 0; i < themeViewModel.Questions.Count; i++)
+                    {
+                        themeViewModel.Questions[i].Model.Price = basePrice * (i + 1);
+                    }
                 }
             }
             else if (format == WellKnownDragFormats.Question)
@@ -393,9 +415,6 @@ public partial class TreeDocView : UserControl
                     question = new Question();
                     question.ReadXml(reader);
                 }
-
-                // Remove later
-                question.Upgrade();
 
                 if (treeViewItem.DataContext is ThemeViewModel targetTheme)
                 {

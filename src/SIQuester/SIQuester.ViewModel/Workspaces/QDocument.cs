@@ -1463,15 +1463,6 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 var round = (Round)itemData.GetItem();
 
-                // Remove later
-                foreach (var theme in round.Themes)
-                {
-                    foreach (var question in theme.Questions)
-                    {
-                        question.Upgrade();
-                    }
-                }
-
                 if (_activeNode is PackageViewModel myPackage)
                 {
                     myPackage.Rounds.Add(new RoundViewModel(round));
@@ -1491,12 +1482,6 @@ public sealed class QDocument : WorkspaceViewModel
             else if (level == InfoOwnerData.Level.Theme)
             {
                 var theme = (Theme)itemData.GetItem();
-
-                // Remove later
-                foreach (var question in theme.Questions)
-                {
-                    question.Upgrade();
-                }
 
                 if (_activeNode is RoundViewModel myRound)
                 {
@@ -1519,9 +1504,6 @@ public sealed class QDocument : WorkspaceViewModel
             else if (level == InfoOwnerData.Level.Question)
             {
                 var question = (Question)itemData.GetItem();
-
-                // Remove later
-                question.Upgrade();
 
                 if (_activeNode is ThemeViewModel myTheme)
                 {
@@ -1677,7 +1659,6 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 using var stream = File.OpenRead(file);
                 using var doc = SIDocument.Load(stream);
-                doc.Upgrade();
 
                 CopyAuthorsAndSources(doc, doc.Package);
 

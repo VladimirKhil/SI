@@ -160,6 +160,7 @@ public sealed class SIDocument : IDisposable
 
         var document = new SIDocument(packageContainer);
         document.CreateCore(package);
+        document.Upgrade();
 
         return document;
     }
@@ -241,6 +242,7 @@ public sealed class SIDocument : IDisposable
             }
         }
 
+        document.Upgrade();
         return document;
     }
 
@@ -253,6 +255,7 @@ public sealed class SIDocument : IDisposable
     {
         var document = new SIDocument(packageContainer);
         document.LoadData(limits);
+        document.Upgrade();
 
         return document;
     }
@@ -304,7 +307,7 @@ public sealed class SIDocument : IDisposable
     /// <summary>
     /// Upgrades document to new format.
     /// </summary>
-    public bool Upgrade()
+    internal bool Upgrade()
     {
         if (Package.Version >= 5.0)
         {
