@@ -101,6 +101,16 @@ public partial class FlatDocView : UserControl
                 showEditor = true;
                 break;
 
+            case RoundViewModel round:
+                itemViewModel = round;
+                showEditor = true;
+                break;
+
+            case PackageViewModel package:
+                itemViewModel = package;
+                showEditor = true;
+                break;
+
             default:
                 return;
         }

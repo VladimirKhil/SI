@@ -156,7 +156,31 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         ownerPackage.Document.Navigate.Execute(newQuestionViewModel);
     }
 
-    private void RemoveQuestion_Executed(object? arg) => OwnerTheme?.Questions.Remove(this);
+    private void RemoveQuestion_Executed(object? arg)
+    {
+        var ownerTheme = OwnerTheme;
+
+        if (ownerTheme == null)
+        {
+            return;
+        }
+
+        var ownerDocument = ownerTheme.OwnerRound?.OwnerPackage?.Document;
+
+        if (ownerDocument == null)
+        {
+            return;
+        }
+
+        using var change = ownerDocument.OperationsManager.BeginComplexChange();
+        ownerTheme.Questions.Remove(this);
+        change.Commit();
+
+        if (ownerDocument?.ActiveNode == this)
+        {
+            ownerDocument.ActiveNode = ownerTheme;
+        }
+    }
 
     private void SetQuestionType_Executed(object? arg)
     {

@@ -92,12 +92,23 @@ public sealed class RoundViewModel : ItemViewModel<Round>
 
     private void RemoveRound_Executed(object? arg)
     {
-        if (OwnerPackage == null)
+        var ownerPackage = OwnerPackage;
+
+        if (ownerPackage == null)
         {
             return;
         }
 
-        OwnerPackage.Rounds.Remove(this);
+        var ownerDocument = ownerPackage.Document;
+
+        using var change = ownerDocument.OperationsManager.BeginComplexChange();
+        ownerPackage.Rounds.Remove(this);
+        change.Commit();
+
+        if (ownerDocument?.ActiveNode == this)
+        {
+            ownerDocument.ActiveNode = ownerPackage;
+        }
     }
 
     private void AddTheme_Executed(object? arg)

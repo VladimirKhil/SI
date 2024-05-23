@@ -158,12 +158,28 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
 
     private void RemoveTheme_Executed(object? arg)
     {
-        if (OwnerRound == null)
+        var ownerRound = OwnerRound;
+
+        if (ownerRound == null)
         {
             return;
         }
 
-        OwnerRound.Themes.Remove(this);
+        var ownerDocument = ownerRound.OwnerPackage?.Document;
+
+        if (ownerDocument == null)
+        {
+            return;
+        }
+
+        using var change = ownerDocument.OperationsManager.BeginComplexChange();
+        ownerRound.Themes.Remove(this);
+        change.Commit();
+
+        if (ownerDocument?.ActiveNode == this)
+        {
+            ownerDocument.ActiveNode = ownerRound;
+        }
     }
 
     private void AddQuestion_Executed(object? arg)

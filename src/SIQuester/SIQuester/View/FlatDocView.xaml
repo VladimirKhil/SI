@@ -43,6 +43,24 @@
             <Setter Property="Foreground" Value="{Binding Model.Type, Converter={StaticResource RoundTypeToColorConverter}}" />
         </Style>
 
+        <Style x:Key="MenuButton" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <Image Source="{Binding}" Width="20" Height="20" Margin="3" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="Margin" Value="2" />
+
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <DataTemplate x:Key="CompactQuestionView">
             <Border
                 Name="bd"
@@ -174,81 +192,34 @@
 
         <lc:TemplateConverter x:Key="FlatContentItemSelector">
             <lc:TemplateConverter.DefaultTemplate>
-                <!-- pc:AtomTypes.Text -->
+                <!-- pc:ContentTypes.Text -->
                 <DataTemplate DataType="vm:ContentItemViewModel">
                     <TextBlock Text="{Binding Model.Value}" TextWrapping="WrapWithOverflow" Background="Transparent" />
                 </DataTemplate>
             </lc:TemplateConverter.DefaultTemplate>
 
             <lc:TemplateConverter.Templates>
-                <DataTemplate x:Key="{x:Static pc:AtomTypes.Image}">
+                <DataTemplate x:Key="{x:Static pc:ContentTypes.Image}">
                     <Image
                         MinWidth="20"
                         MinHeight="20"
                         MaxWidth="100"
                         MaxHeight="100"
                         Stretch="Uniform"
+                        HorizontalAlignment="Left"
                         Source="{Binding MediaSource.Uri, Converter={StaticResource ImageConverter}}" />
                 </DataTemplate>
 
-                <DataTemplate x:Key="{x:Static pc:AtomTypes.Audio}">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
-                        <ToggleButton Style="{StaticResource playButton}" Name="play" />
-                        <Slider Style="{StaticResource playSlider}" Name="progress" />
-
-                        <MediaElement
-                            lb:MediaController.Source="{Binding}"
-                            LoadedBehavior="Manual"
-                            UnloadedBehavior="Manual"
-                            ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
-                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
-                            lb:MediaController.Progress="{Binding ElementName=progress}" />
-                    </StackPanel>
+                <DataTemplate x:Key="{x:Static pc:ContentTypes.Audio}">
+                    <TextBlock Text="{x:Static lp:Resources.Audio}" FontStyle="Italic" />
                 </DataTemplate>
 
-                <DataTemplate x:Key="{x:Static pc:AtomTypes.AudioNew}">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
-                        <ToggleButton Style="{StaticResource playButton}" Name="play" />
-                        <Slider Style="{StaticResource playSlider}" Name="progress" />
-
-                        <MediaElement
-                            lb:MediaController.Source="{Binding}"
-                            LoadedBehavior="Manual"
-                            UnloadedBehavior="Manual"
-                            ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
-                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
-                            lb:MediaController.Progress="{Binding ElementName=progress}" />
-                    </StackPanel>
+                <DataTemplate x:Key="{x:Static pc:ContentTypes.Video}">
+                    <TextBlock Text="{x:Static lp:Resources.Video}" FontStyle="Italic" />
                 </DataTemplate>
 
-                <DataTemplate x:Key="{x:Static pc:AtomTypes.Video}">
-                    <Grid Margin="4">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-
-                        <Rectangle Fill="Lavender" />
-
-                        <MediaElement
-                            lb:MediaController.Source="{Binding}"
-                            LoadedBehavior="Manual"
-                            UnloadedBehavior="Manual"
-                            Width="200"
-                            Height="100"
-                            ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
-                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
-                            lb:MediaController.Progress="{Binding ElementName=progress}" />
-
-                        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
-                            <ToggleButton Style="{StaticResource playButton}" Name="play" />
-                            <Slider Style="{StaticResource playSlider}" Name="progress" />
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-
-                <DataTemplate x:Key="{x:Static pc:AtomTypes.Html}">
-                    <TextBlock Text="{Binding Model.Value}" TextWrapping="WrapWithOverflow" />
+                <DataTemplate x:Key="{x:Static pc:ContentTypes.Html}">
+                    <TextBlock Text="{Binding Model.Value}" TextWrapping="WrapWithOverflow" FontStyle="Italic" />
                 </DataTemplate>
             </lc:TemplateConverter.Templates>
         </lc:TemplateConverter>
@@ -342,11 +313,6 @@
                                     </DataTrigger>
 
                                     <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerType}">
-                                        <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
-                                        <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-
-                                    <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerOptions}">
                                         <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
                                         <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
@@ -527,11 +493,15 @@
                     <Setter TargetName="name" Property="HorizontalAlignment" Value="Center" />
                     <Setter TargetName="name" Property="TextAlignment" Value="Center" />
                 </DataTrigger>
+
+                <Trigger SourceName="bd" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="bd" Property="Background" Value="#FF6985FF" />
+                </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
 
         <DataTemplate x:Key="RoundView">
-            <StackPanel Margin="6" Background="#FFA1C2DE">
+            <StackPanel x:Name="bd" Margin="6" Background="#FFA1C2DE">
                 <TextBlock
                     Text="{Binding Model.Name}"
                     ToolTip="{Binding Model.Name}"
@@ -570,19 +540,25 @@
                     <Setter TargetName="themes" Property="ItemsControl.ItemsPanel" Value="{StaticResource Vertical}" />
                     <Setter TargetName="themes" Property="Margin" Value="1,0,2,2" />
                 </DataTrigger>
+
+                <Trigger SourceName="bd" Property="IsMouseDirectlyOver" Value="True">
+                    <Setter TargetName="bd" Property="Background" Value="#FF6985FF" />
+                </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
 
         <DataTemplate x:Key="ExpandedRoundView">
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock
-                        Name="header"
-                        Text="{Binding Model.Name}"
-                        FontSize="16"
-                        FontWeight="Bold"
-                        Margin="0,6,0,0"
-                        Style="{StaticResource RoundHeaderStyle}" />
+                    <Border x:Name="border">
+                        <TextBlock
+                            Name="header"
+                            Text="{Binding Model.Name}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Margin="0,6,0,0"
+                            Style="{StaticResource RoundHeaderStyle}" />
+                    </Border>
 
                     <Button
                         Command="{Binding AddTheme}"
@@ -610,6 +586,7 @@
                     <ItemsControl.Style>
                         <Style TargetType="ItemsControl">
                             <Setter Property="ItemTemplate" Value="{StaticResource ThemeView}" />
+
                             <Style.Triggers>
                                 <DataTrigger
                                     Binding="{Binding FlatScale, Source={x:Static m:AppSettings.Default}}"
@@ -631,6 +608,10 @@
                     <Setter TargetName="themes" Property="ItemsControl.ItemsPanel" Value="{StaticResource Vertical}" />
                     <Setter TargetName="themes" Property="Margin" Value="0,5,0,0" />
                 </DataTrigger>
+
+                <Trigger SourceName="border" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="border" Property="Background" Value="#FF6985FF" />
+                </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
         
@@ -651,7 +632,17 @@
                 
                 <DataTemplate x:Key="{x:Type vm:RoundViewModel}">
                     <StackPanel Margin="10">
-                        <TextBlock Text="{x:Static lp:Resources.Round}" FontSize="18" />
+                        <DockPanel>
+                            <Button
+                                DockPanel.Dock="Right"
+                                ToolTip="{x:Static lp:Resources.Delete}"
+                                Command="{Binding Remove}"
+                                Style="{StaticResource MenuButton}"
+                                Content="{StaticResource RemoveImage}" />
+
+                            <TextBlock Text="{x:Static lp:Resources.Round}" FontSize="18" />
+                        </DockPanel>
+
                         <TextBlock Text="{x:Static lp:Resources.Name}" Margin="0,5,0,0" />
 
                         <TextBox
@@ -664,7 +655,17 @@
 
                 <DataTemplate x:Key="{x:Type vm:ThemeViewModel}">
                     <StackPanel Margin="10">
-                        <TextBlock Text="{x:Static lp:Resources.Theme}" FontSize="18" />
+                        <DockPanel>
+                            <Button
+                                DockPanel.Dock="Right"
+                                ToolTip="{x:Static lp:Resources.Delete}"
+                                Command="{Binding Remove}"
+                                Style="{StaticResource MenuButton}"
+                                Content="{StaticResource RemoveImage}" />
+
+                            <TextBlock Text="{x:Static lp:Resources.Theme}" FontSize="18" />
+                        </DockPanel>
+
                         <TextBlock Text="{x:Static lp:Resources.Name}" Margin="0,5,0,0" />
 
                         <TextBox
@@ -678,7 +679,17 @@
                 <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="10">
-                            <TextBlock Text="{x:Static lp:Resources.Question}" FontSize="18" />
+                            <DockPanel>
+                                <Button
+                                    DockPanel.Dock="Right"
+                                    ToolTip="{x:Static lp:Resources.Delete}"
+                                    Command="{Binding Remove}"
+                                    Style="{StaticResource MenuButton}"
+                                    Content="{StaticResource RemoveImage}" />
+
+                                <TextBlock Text="{x:Static lp:Resources.Question}" FontSize="18" />
+                            </DockPanel>
+
                             <TextBlock Text="{x:Static lp:Resources.Price}" Margin="0,5,0,0" />
 
                             <l:NumericTextBox
@@ -883,7 +894,19 @@
             <Grid Name="grid">
                 <StackPanel DataContext="{Binding Package}" Margin="10">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Model.Name}" FontSize="24" FontWeight="Bold" />
+                        <Border>
+                            <TextBlock Text="{Binding Model.Name}" FontSize="24" FontWeight="Bold" />
+
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FF6985FF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
 
                         <Button
                             Command="{Binding AddRound}"
@@ -951,7 +974,7 @@
         </ScrollViewer>
         
         <Border
-            Width="300"
+            Width="400"
             Grid.Column="1"
             Background="#FFF1F1F1"
             Visibility="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}">
