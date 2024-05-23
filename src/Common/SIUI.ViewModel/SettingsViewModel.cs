@@ -112,9 +112,7 @@ public sealed class SettingsViewModel : ViewModelBase<Settings>
         }
     }
 
-    public string[] FontFamilies { get; } = new string[] { Settings.DefaultTableFontFamily }
-        .Concat(new string[] { "Arial", "Segoe UI" })
-        .ToArray();
+    public string[] FontFamilies { get; } = new string[] { Settings.DefaultTableFontFamily, "Arial", "Segoe UI" };
 
     public double[] LineSpaces { get; } = new double[] { 1.0, Settings.DefaultQuestionLineSpacing };
 
@@ -145,17 +143,5 @@ public sealed class SettingsViewModel : ViewModelBase<Settings>
         _model.BackgroundVideoUri = uiSettings.BackgroundVideoUri;
     }
 
-    public void Reset()
-    {
-        _model.TableColorString = Settings.DefaultTableColorString;
-        _model.TableBackColorString = Settings.DefaultTableBackColorString;
-        _model.TableGridColorString = Settings.DefaultTableGridColorString;
-        _model.AnswererColorString = Settings.DefaultAnswererColorString;
-        QuestionLineSpacing = Settings.DefaultQuestionLineSpacing;
-        TableFontFamily = Settings.DefaultTableFontFamily;
-        _model.Animate3D = true;
-        _model.LogoUri = "";
-        _model.BackgroundImageUri = Settings.DefaultBackgroundImageUri;
-        _model.BackgroundVideoUri = Settings.DefaultBackgroundVideoUri;
-    }
+    public void Reset() => Initialize(new Settings());
 }

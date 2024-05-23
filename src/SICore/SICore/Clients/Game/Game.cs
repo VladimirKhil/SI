@@ -991,22 +991,17 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else
         {
-            var restoredPrice = ClientData.TableController.RestoreQuestion(themeIndex, questionIndex);
-
-            if (!restoredPrice.HasValue)
+            if (!ClientData.TableController.RestoreQuestion(themeIndex, questionIndex))
             {
                 return;
             }
-
-            question.Price = restoredPrice.Value;
-            _gameActions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, restoredPrice.Value);
 
             _gameActions.SpecialReplic(
                 string.Format(
                     LO[nameof(R.QuestionRestored)],
                     message.Sender,
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
-                    restoredPrice.Value));
+                    question.Price));
         }
     }
 

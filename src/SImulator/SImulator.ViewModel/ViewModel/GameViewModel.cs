@@ -1455,20 +1455,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void Engine_RoundEmpty() => StopRoundTimer_Executed(0);
 
-    // TODO: remove
-    private void Engine_NextQuestion()
-    {
-        if (Settings.Model.GameMode == GameModes.Tv)
-        {
-            PresentationController.SetRoundTable();
-            LocalInfo.TStage = TableStage.RoundTable;
-            _engine.MoveNext();
-        }
-        else
-        {
-            Next_Executed();
-        }
-    }
+    private void Engine_NextQuestion() => _engine.MoveNext();
 
     private void Engine_RoundTimeout()
     {
@@ -1548,21 +1535,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     /// </summary>
     private void Back_Executed(object? arg = null)
     {
-        var data = _engine.MoveBack();
+        _engine.MoveBack();
+        _engine.MoveNext();
 
-        if (Settings.Model.GameMode == GameModes.Tv)
-        {
-            // TODO: Replace with question selection strategy restore callback
-            LocalInfo.RoundInfo[data.Item1].Questions[data.Item2].Price = data.Item3;
-
-            PresentationController.RestoreQuestion(data.Item1, data.Item2, data.Item3);
-            PresentationController.SetRoundTable();
-            LocalInfo.TStage = TableStage.RoundTable;
-        }
-        else
-        {
-            PresentationController.SetQuestion(data.Item3);
-        }
+        // Handle normal question ending for all of this
 
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);

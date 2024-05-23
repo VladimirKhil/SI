@@ -796,6 +796,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Missing link.
+        /// </summary>
+        public static string MissingLink {
+            get {
+                return ResourceManager.GetString("MissingLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Package logo: file {0} is missing!.
         /// </summary>
         public static string MissingLogoFile {

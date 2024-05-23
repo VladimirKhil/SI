@@ -322,10 +322,17 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController) => GameViewModel?.OnRoundThemes(themes);
 
-    public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback) =>
-        PresentationController.SelectionCallback = selectCallback;
+    public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback)
+    {
+        if (GameViewModel == null)
+        {
+            return;
+        }
 
-    public void CancelQuestionSelection() => PresentationController.SelectionCallback = null;
+        PresentationController.SelectionCallback = selectCallback;
+        PresentationController.SetRoundTable();
+        GameViewModel.LocalInfo.TStage = TableStage.RoundTable;
+    }
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel?.OnQuestionSelected(themeIndex, questionIndex);
 
@@ -342,4 +349,15 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     public void OnQuestion(Question question) => GameViewModel?.OnQuestion(question);
 
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType) => GameViewModel?.OnRound(round);
+
+    public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
+    {
+        if (GameViewModel == null)
+        {
+            return;
+        }
+
+        GameViewModel.LocalInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
+        PresentationController.RestoreQuestion(themeIndex, questionIndex, price);
+    }
 }

@@ -32,6 +32,11 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
+    public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
+    {
+        
+    }
+
     public void OnQuestionSelected(int themeIndex, int questionIndex)
     {
         

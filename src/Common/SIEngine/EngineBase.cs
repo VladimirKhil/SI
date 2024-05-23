@@ -208,7 +208,10 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     /// </summary>
     public abstract void MoveNext();
 
-    public abstract Tuple<int, int, int> MoveBack();
+    /// <summary>
+    /// Moves engine to the previous game state.
+    /// </summary>
+    public abstract void MoveBack();
 
     #region Fire events
 

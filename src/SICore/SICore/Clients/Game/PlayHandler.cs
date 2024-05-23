@@ -154,4 +154,11 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     }
 
     public void OnQuestion(Question question) => GameLogic?.OnQuestion(question);
+
+    public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
+    {
+        var question = _gameData.TInfo.RoundInfo[themeIndex].Questions[questionIndex];
+        question.Price = price;
+        GameActions?.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, price);
+    }
 }

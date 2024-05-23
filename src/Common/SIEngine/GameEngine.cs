@@ -144,16 +144,13 @@ public sealed class GameEngine : EngineBase
         UpdateCanNext();
     }
 
-    // TODO: restore price by callback; return nothing here
-    public override Tuple<int, int, int> MoveBack()
+    public override void MoveBack()
     {
-        var (themeIndex, questionIndex) = SelectionStrategy.MoveBack();
+        SelectionStrategy.MoveBack();
         Stage = GameStage.SelectingQuestion;
 
         UpdateCanNext();
         CanMoveBack = SelectionStrategy.CanMoveBack();
-
-        return Tuple.Create(themeIndex, questionIndex, ActiveRound.Themes[themeIndex].Questions[questionIndex].Price);
     }
 
     private void SelectQuestion(int themeIndex, int questionIndex)

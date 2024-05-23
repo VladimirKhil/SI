@@ -25,7 +25,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     private bool _isFinished;
     private AnswerOptionViewModel[]? _options;
 
-    public override string Header => Properties.Resources.QuestionPlay;
+    public override string Header => Resources.QuestionPlay;
 
     public Uri Source { get; } = new($"file:///{AppDomain.CurrentDomain.BaseDirectory}wwwroot/index.html");
 

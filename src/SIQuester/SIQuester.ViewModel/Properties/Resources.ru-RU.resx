@@ -732,4 +732,7 @@ theme - тема Кота</value>
   <data name="ThinkAll" xml:space="preserve">
     <value>Думайте!</value>
   </data>
+  <data name="MissingLink" xml:space="preserve">
+    <value>Отсутствует ссылка</value>
+  </data>
 </root>

@@ -28,5 +28,5 @@ internal interface ISelectionStrategy
     /// <summary>
     /// Moves the game backwards.
     /// </summary>
-    (int themeIndex, int questionIndex) MoveBack() => (-1, -1);
+    void MoveBack() { }
 }

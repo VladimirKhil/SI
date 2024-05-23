@@ -19,5 +19,5 @@ public interface IRoundTableController
     /// <param name="themeIndex">Question theme index.</param>
     /// <param name="questionIndex">Question index.</param>
     /// <returns>Restored question price.</returns>
-    int? RestoreQuestion(int themeIndex, int questionIndex);
+    bool RestoreQuestion(int themeIndex, int questionIndex);
 }

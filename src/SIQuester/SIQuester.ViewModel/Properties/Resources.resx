@@ -378,6 +378,9 @@ Humor</value>
   <data name="MissingFile" xml:space="preserve">
     <value>missing file</value>
   </data>
+  <data name="MissingLink" xml:space="preserve">
+    <value>Missing link</value>
+  </data>
   <data name="MissingLogoFile" xml:space="preserve">
     <value>Package logo: file {0} is missing!</value>
   </data>

@@ -104,36 +104,43 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         Create_Executed();
     }
 
-    private void Create_Executed(object? arg = null)
+    private async void Create_Executed(object? arg = null)
     {
-        var warnings = new List<WarningViewModel>();
-
-        var stats = new StringBuilder();
-        stats.Append(Resources.NumOfRounds);
-        stats.Append(": ");
-        stats.AppendLine(_document.Document.Package.Rounds.Count.ToString());
-
-        int themeCount = 0, questionCount = 0;
-
-        _document.Document.Package.Rounds.ForEach(round =>
+        try
         {
-            themeCount += round.Themes.Count;
-            round.Themes.ForEach(theme => questionCount += theme.Questions.Count);
-        });
+            var warnings = new List<WarningViewModel>();
 
-        stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfThemes, themeCount));
-        stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfQuests, questionCount));
-        stats.AppendLine();
+            var stats = new StringBuilder();
+            stats.Append(Resources.NumOfRounds);
+            stats.Append(": ");
+            stats.AppendLine(_document.Document.Package.Rounds.Count.ToString());
 
-        CheckText(stats);
+            int themeCount = 0, questionCount = 0;
 
-        var checkResult = _document.CheckLinks(true);
+            _document.Document.Package.Rounds.ForEach(round =>
+            {
+                themeCount += round.Themes.Count;
+                round.Themes.ForEach(theme => questionCount += theme.Questions.Count);
+            });
 
-        warnings.AddRange(checkResult.Item1);
-        stats.Append(checkResult.Item2);
+            stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfThemes, themeCount));
+            stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfQuests, questionCount));
+            stats.AppendLine();
 
-        Result = stats.ToString();
-        Warnings = warnings.ToArray();
+            CheckText(stats);
+
+            var checkResult = await _document.CheckLinksAsync();
+
+            warnings.AddRange(checkResult.Item1);
+            stats.Append(checkResult.Item2);
+
+            Result = stats.ToString();
+            Warnings = warnings.ToArray();
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
     }
 
     private void CheckText(StringBuilder stats)
@@ -290,5 +297,15 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         }
     }
 
-    private void RemoveUnusedFiles_Executed(object? arg) => _document.RemoveUnusedFiles();
+    private async void RemoveUnusedFiles_Executed(object? arg)
+    {
+        try
+        {
+            await _document.RemoveUnusedFilesAsync();
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
+    }
 }

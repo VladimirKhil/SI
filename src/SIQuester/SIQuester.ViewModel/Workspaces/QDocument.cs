@@ -383,8 +383,6 @@ public sealed class QDocument : WorkspaceViewModel
 
     public ICommand DownloadAllExternalMedia { get; private set; }
 
-    public SimpleCommand SendToGame { get; private set; }
-
     public ICommand Delete { get; private set; }
 
     public SimpleCommand NextSearchResult { get; private set; }
@@ -1174,8 +1172,6 @@ public sealed class QDocument : WorkspaceViewModel
         ExpandAllMedia = new SimpleCommand(ExpandAllMedia_Executed);
         DownloadAllExternalMedia = new SimpleCommand(DownloadAllExternalMedia_Executed);
 
-        SendToGame = new SimpleCommand(SendToGame_Executed);
-
         Delete = new SimpleCommand(Delete_Executed);
 
         Copy = new SimpleCommand(Copy_Executed);
@@ -1225,38 +1221,6 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void OperationsManager_Changed() => Changed = true; // TODO: delegate all change logic to OperationsManager
 
-    private async void SendToGame_Executed(object? arg)
-    {
-        try
-        {
-            await SaveIfNeededAsync();
-
-            var checkResult = Validate();
-
-            if (!string.IsNullOrWhiteSpace(checkResult.Item2))
-            {
-                PlatformManager.Instance.Inform(checkResult.Item2, true);
-                return;
-            }
-
-            Dialog = new SendToGameDialogViewModel(this);
-        }
-        catch (Exception exc)
-        {
-            OnError(exc);
-        }
-    }
-
-    public (IEnumerable<WarningViewModel>, string) Validate()
-    {
-        if (string.IsNullOrWhiteSpace(Package.Model.ID))
-        {
-            Package.Model.ID = Guid.NewGuid().ToString();
-        }
-
-        return CheckLinks();
-    }
-
     private ICollection<string> FillFiles(MediaStorageViewModel mediaStorage, int maxFileSize, List<WarningViewModel> warnings)
     {
         var files = new List<string>();
@@ -1291,8 +1255,7 @@ public sealed class QDocument : WorkspaceViewModel
     /// <summary>
     /// Checks missing and unused files in document.
     /// </summary>
-    /// <param name="allowExternal">Allow external files to be used.</param>
-    internal (IEnumerable<WarningViewModel>, string) CheckLinks(bool allowExternal = false)
+    internal async Task<(IEnumerable<WarningViewModel>, string)> CheckLinksAsync()
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
@@ -1304,7 +1267,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         CheckCommonFiles(images, audio, video, html, errors);
 
-        var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(allowExternal, images, errors);
+        var (usedImages, usedAudio, usedVideo, usedHtml) = await CollectUsedFilesAsync(images, errors);
 
         foreach (var item in images.Except(usedImages))
         {
@@ -1337,8 +1300,11 @@ public sealed class QDocument : WorkspaceViewModel
         return (warnings, string.Join(Environment.NewLine, errors));
     }
 
-    private (ICollection<string> usedImages, ICollection<string> usedAudio, ICollection<string> usedVideo, ICollection<string> usedHtml) CollectUsedFiles(
-        bool allowExternal,
+    private async Task<(ICollection<string> usedImages,
+        ICollection<string> usedAudio,
+        ICollection<string> usedVideo,
+        ICollection<string> usedHtml)>
+        CollectUsedFilesAsync(
         ICollection<string> images,
         List<string> errors)
     {
@@ -1399,15 +1365,33 @@ public sealed class QDocument : WorkspaceViewModel
                         {
                             usedFiles.Add(contentItem.Value);
                         }
-                        else if (allowExternal && !contentItem.IsRef)
+                        else if (!contentItem.IsRef)
                         {
+                            try
+                            {
+                                var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, contentItem.Value));
+
+                                if (!response.IsSuccessStatusCode)
+                                {
+                                    errors.Add(
+                                        $"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingLink} " +
+                                        $"\"{contentItem.Value}\" ({await response.Content.ReadAsStringAsync()})");
+                                }
+                            }
+                            catch (HttpRequestException exc)
+                            {
+                                errors.Add(
+                                    $"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingLink} " +
+                                    $"\"{contentItem.Value}\" ({exc.Message})");
+                            }
+
                             continue; // External file
                         }
                         else
                         {
                             errors.Add(
                                 $"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingFile} " +
-                                $"\"{contentItem.Value}\"! {(allowExternal ? "" : Resources.ExternalLinksAreForbidden)}");
+                                $"\"{contentItem.Value}\"");
                         }
                     }
                 }
@@ -3244,7 +3228,7 @@ public sealed class QDocument : WorkspaceViewModel
     /// <summary>
     /// Confirms and removes unused files from document.
     /// </summary>
-    internal void RemoveUnusedFiles()
+    internal async Task RemoveUnusedFilesAsync()
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
@@ -3256,7 +3240,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         CheckCommonFiles(images, audio, video, html, errors);
 
-        var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(true, images, errors);
+        var (usedImages, usedAudio, usedVideo, usedHtml) = await CollectUsedFilesAsync(images, errors);
 
         var unusedImages = images.Except(usedImages);
         var unusedAudio = audio.Except(usedAudio);

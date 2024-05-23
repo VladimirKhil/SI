@@ -82,4 +82,12 @@ public interface ISIEnginePlayHandler
     /// </summary>
     /// <param name="question">Question to play.</param>
     void OnQuestion(Question question);
+
+    /// <summary>
+    /// Handles question restore on round table.
+    /// </summary>
+    /// <param name="themeIndex">Question theme index.</param>
+    /// <param name="questionIndex">Question index.</param>
+    /// <param name="price">Question price.</param>
+    void OnQuestionRestored(int themeIndex, int questionIndex, int price);
 }

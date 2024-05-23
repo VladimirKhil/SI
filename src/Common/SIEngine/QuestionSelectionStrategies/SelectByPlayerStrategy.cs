@@ -71,13 +71,15 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
 
     public bool CanMoveBack() => _history.Any();
 
-    public (int themeIndex, int questionIndex) MoveBack()
+    public void MoveBack()
     {
         var (themeIndex, questionIndex) = _history.Pop();
-        _forward.Push((themeIndex, questionIndex));
-        _questionsTable.Add((themeIndex, questionIndex));
 
-        return (themeIndex, questionIndex);
+        if (RestoreQuestion(themeIndex, questionIndex))
+        {
+            _forward.Push((themeIndex, questionIndex));
+            _stage = Stage.RoundTable;
+        }
     }
 
     public bool RemoveQuestion(int themeIndex, int questionIndex)
@@ -93,25 +95,26 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
         return result;
     }
 
-    public int? RestoreQuestion(int themeIndex, int questionIndex)
+    public bool RestoreQuestion(int themeIndex, int questionIndex)
     {
         if (themeIndex < 0 || themeIndex >= _round.Themes.Count)
         {
-            return null;
+            return false;
         }
 
         if (questionIndex < 0 || questionIndex >= _round.Themes[themeIndex].Questions.Count)
         {
-            return null;
+            return false;
         }
 
         if (_round.Themes[themeIndex].Questions[questionIndex].Price == Question.InvalidPrice)
         {
-            return null;
+            return false;
         }
 
         _questionsTable.Add((themeIndex, questionIndex));
-        return _round.Themes[themeIndex].Questions[questionIndex].Price;
+        _playHandler.OnQuestionRestored(themeIndex, questionIndex, _round.Themes[themeIndex].Questions[questionIndex].Price);
+        return true;
     }
 
     private Stage OnRoundThemes()
