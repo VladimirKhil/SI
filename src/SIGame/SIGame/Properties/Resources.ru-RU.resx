@@ -1209,4 +1209,10 @@
   <data name="ButtonPressMode_FirstWinsClient" xml:space="preserve">
     <value>Кто первым нажал (по версии клиента)</value>
   </data>
+  <data name="DeleteVideoAvatar" xml:space="preserve">
+    <value>Удалить видео аватар</value>
+  </data>
+  <data name="SetVideoAvatar" xml:space="preserve">
+    <value>Задать видео аватар</value>
+  </data>
 </root>

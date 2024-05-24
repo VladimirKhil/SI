@@ -1060,6 +1060,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Set video avatar (vdo.ninja).
+        /// </summary>
+        public static string SetVideoAvatar {
+            get {
+                return ResourceManager.GetString("SetVideoAvatar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Showman&apos;s name is required.
         /// </summary>
         public static string ShomanNameRequired {

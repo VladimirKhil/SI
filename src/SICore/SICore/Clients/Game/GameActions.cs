@@ -155,10 +155,10 @@ public sealed class GameActions
         SendMessage(messageBuilder.ToString(), person);
     }
 
-    internal void InformRound(string roundName, int roundIndex, QuestionSelectionStrategyType roundStrategy)
+    internal void InformRound(string roundName, int roundIndex, QuestionSelectionStrategyType roundStrategy, string person = NetworkConstants.Everybody)
     {
         var messageBuilder = new MessageBuilder(Messages.Stage, _gameData.Stage, roundName, roundIndex, roundStrategy);
-        SendMessage(messageBuilder.ToString());
+        SendMessage(messageBuilder.ToString(), person);
     }
 
     public void InformStageInfo(string person, int stageIndex) =>

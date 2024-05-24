@@ -641,6 +641,8 @@ public sealed class GameData : Data
 
     public QuestionSelectionStrategyType RoundStrategy { get; internal set; }
 
+    public bool PendingApellation { get; internal set; }
+
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
         _showMan = showman;

@@ -528,4 +528,7 @@
   <data name="QuestionLibrary" xml:space="preserve">
     <value>Онлайн Библиотека вопросов</value>
   </data>
+  <data name="SetVideoAvatar" xml:space="preserve">
+    <value>Задать видео аватар (vdo.ninja)</value>
+  </data>
 </root>

@@ -531,4 +531,7 @@
   <data name="QuestionLibrary" xml:space="preserve">
     <value>Online question library</value>
   </data>
+  <data name="SetVideoAvatar" xml:space="preserve">
+    <value>Set video avatar (vdo.ninja)</value>
+  </data>
 </root>

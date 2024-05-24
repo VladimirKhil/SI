@@ -236,6 +236,59 @@
 
                     <Image Source="/SIGame;component/Resources/sound.png" Stretch="Uniform" />
                 </local:DropDownButton>
+
+                <local:DropDownButton
+                    Style="{StaticResource SIDropDownButton}"
+                    FontSize="20"
+                    Height="48"
+                    Width="48"
+                    Padding="13"
+                    ToolTip="{x:Static lp:Resources.GameManagement}">
+                    <local:DropDownButton.DropDown>
+                        <ContextMenu
+                            Placement="Right"
+                            Style="{StaticResource SIContextMenuStyle}">
+                            <ContextMenu.Template>
+                                <ControlTemplate TargetType="ContextMenu">
+                                    <Border
+                                        x:Name="Border"
+                                        Background="{StaticResource WindowBackground}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        TextBlock.FontSize="20">
+                                        <StackPanel>
+                                            <Button
+                                                BorderThickness="0"
+                                                Style="{StaticResource SIButton}"
+                                                FontWeight="Normal"
+                                                Padding="20,10"
+                                                Content="{x:Static lp:Resources.SetVideoAvatar}"
+                                                Command="{Binding SetVideoAvatar}" />
+
+                                            <Button
+                                                BorderThickness="0"
+                                                Style="{StaticResource SIButton}"
+                                                FontWeight="Normal"
+                                                Padding="20,10"
+                                                Margin="0,-1,0,0"
+                                                Content="{x:Static lp:Resources.DeleteVideoAvatar}"
+                                                Command="{Binding DeleteVideoAvatar}"
+                                                lb:Closeable.IsAttached="True" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="HasDropShadow" Value="true">
+                                            <Setter TargetName="Border" Property="Margin" Value="0,3,0,3" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ContextMenu.Template>
+                        </ContextMenu>
+                    </local:DropDownButton.DropDown>
+
+                    <Image Source="/SIGame;component/Resources/settings.png" Stretch="Uniform" />
+                </local:DropDownButton>
             </StackPanel>
 
             <Grid>

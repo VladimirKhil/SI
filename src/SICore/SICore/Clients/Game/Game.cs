@@ -1310,7 +1310,19 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }
 
-        _gameActions.InformStage(person); // deprecated
+        if (ClientData.Stage == GameStage.Round || ClientData.Stage == GameStage.Final)
+        {
+            _gameActions.InformRound(
+                ClientData.Round?.Name ?? "",
+                roundIndex, 
+                SIEngine.Rules.QuestionSelectionStrategyType.SelectByPlayer /* does not matter */,
+                person); // deprecated
+        }
+        else
+        {
+            _gameActions.InformStage(person); // deprecated
+        }
+
         _gameActions.InformStageInfo(person, roundIndex);
         _gameActions.InformSums(person);
 
@@ -1619,89 +1631,22 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnApellation(Message message, string[] args)
     {
+        ClientData.IsAppelationForRightAnswer = args.Length == 1 || args[1] == "+";
+        ClientData.AppellationSource = message.Sender;
+
         if (!ClientData.AllowAppellation)
         {
-            if (ClientData.AppellationOpened)
+            if (ClientData.AppellationOpened && !ClientData.PendingApellation)
             {
                 // TODO: save appellation request and return to it after question finish
                 // Merge AppellationOpened and AllowAppellation properties into triple-state property
+                ClientData.PendingApellation = true;
             }
 
             return;
         }
 
-        ClientData.IsAppelationForRightAnswer = args.Length == 1 || args[1] == "+";
-        ClientData.AppellationSource = message.Sender;
-
-        ClientData.AppellationCallerIndex = -1;
-        ClientData.AppelaerIndex = -1;
-
-        if (ClientData.IsAppelationForRightAnswer)
-        {
-            for (var i = 0; i < ClientData.Players.Count; i++)
-            {
-                if (ClientData.Players[i].Name == message.Sender)
-                {
-                    for (var j = 0; j < ClientData.QuestionHistory.Count; j++)
-                    {
-                        var index = ClientData.QuestionHistory[j].PlayerIndex;
-
-                        if (index == i)
-                        {
-                            if (!ClientData.QuestionHistory[j].IsRight)
-                            {
-                                ClientData.AppelaerIndex = index;
-                            }
-
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-            }
-        }
-        else
-        {
-            if (ClientData.Players.Count <= 3)
-            {
-                // If there are 2 or 3 players, there are already 2 positive votes for the answer
-                // from answered player and showman. And only 1 or 2 votes left.
-                // So there is no chance to win a vote against the answer
-                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], message.Sender));
-                return;
-            }
-
-            for (var i = 0; i < ClientData.Players.Count; i++)
-            {
-                if (ClientData.Players[i].Name == message.Sender)
-                {
-                    ClientData.AppellationCallerIndex = i;
-                    break;
-                }
-            }
-
-            if (ClientData.AppellationCallerIndex == -1)
-            {
-                // Only players can appellate
-                return;
-            }
-
-            // Last person has right answer and is responsible for appellation
-            var count = ClientData.QuestionHistory.Count;
-
-            if (count > 0 && ClientData.QuestionHistory[count - 1].IsRight)
-            {
-                ClientData.AppelaerIndex = ClientData.QuestionHistory[count - 1].PlayerIndex;
-            }
-        }
-
-        if (ClientData.AppelaerIndex != -1)
-        {
-            // Appellation started
-            ClientData.AllowAppellation = false;
-            _logic.Stop(StopReason.Appellation);
-        }
+        _logic.ProcessApellationRequest();
     }
 
     private void OnCatCost(Message message, string[] args)

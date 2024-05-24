@@ -203,16 +203,92 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.TimeThinking = 0.0;
     }
 
+    internal void ProcessApellationRequest()
+    {
+        ClientData.AppellationCallerIndex = -1;
+        ClientData.AppelaerIndex = -1;
+
+        if (ClientData.IsAppelationForRightAnswer)
+        {
+            for (var i = 0; i < ClientData.Players.Count; i++)
+            {
+                if (ClientData.Players[i].Name == ClientData.AppellationSource)
+                {
+                    for (var j = 0; j < ClientData.QuestionHistory.Count; j++)
+                    {
+                        var index = ClientData.QuestionHistory[j].PlayerIndex;
+
+                        if (index == i)
+                        {
+                            if (!ClientData.QuestionHistory[j].IsRight)
+                            {
+                                ClientData.AppelaerIndex = index;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (ClientData.Players.Count <= 3)
+            {
+                // If there are 2 or 3 players, there are already 2 positive votes for the answer
+                // from answered player and showman. And only 1 or 2 votes left.
+                // So there is no chance to win a vote against the answer
+                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], ClientData.AppellationSource));
+                return;
+            }
+
+            for (var i = 0; i < ClientData.Players.Count; i++)
+            {
+                if (ClientData.Players[i].Name == ClientData.AppellationSource)
+                {
+                    ClientData.AppellationCallerIndex = i;
+                    break;
+                }
+            }
+
+            if (ClientData.AppellationCallerIndex == -1)
+            {
+                // Only players can appellate
+                return;
+            }
+
+            // Last person has right answer and is responsible for appellation
+            var count = ClientData.QuestionHistory.Count;
+
+            if (count > 0 && ClientData.QuestionHistory[count - 1].IsRight)
+            {
+                ClientData.AppelaerIndex = ClientData.QuestionHistory[count - 1].PlayerIndex;
+            }
+        }
+
+        if (ClientData.AppelaerIndex != -1)
+        {
+            // Appellation started
+            ClientData.AllowAppellation = false;
+            Stop(StopReason.Appellation);
+        }
+    }
+
     private void Engine_QuestionPostInfo()
     {
         _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
 
         _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
         _data.IsPlayingMedia = false;
-
         _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
-
         ScheduleExecution(Tasks.QuestSourComm, 1, 1, force: true);
+
+        if (_data.AllowAppellation && _data.PendingApellation)
+        {
+            ProcessApellationRequest();
+        }
     }
 
     private void Engine_Package(Package package)

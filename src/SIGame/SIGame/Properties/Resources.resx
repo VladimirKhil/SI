@@ -1206,4 +1206,10 @@
   <data name="ButtonPressMode_FirstWinsClient" xml:space="preserve">
     <value>Who pressed first (according to client)</value>
   </data>
+  <data name="DeleteVideoAvatar" xml:space="preserve">
+    <value>Delete video avatar</value>
+  </data>
+  <data name="SetVideoAvatar" xml:space="preserve">
+    <value>Set video avatar</value>
+  </data>
 </root>

@@ -673,6 +673,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Delete video avatar.
+        /// </summary>
+        public static string DeleteVideoAvatar {
+            get {
+                return ResourceManager.GetString("DeleteVideoAvatar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на You cannot press the button during question reading.
         /// </summary>
         public static string DenyPressWhileReading {
@@ -2667,6 +2676,15 @@ namespace SIGame.Properties {
         public static string SettingsManagement {
             get {
                 return ResourceManager.GetString("SettingsManagement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Set video avatar.
+        /// </summary>
+        public static string SetVideoAvatar {
+            get {
+                return ResourceManager.GetString("SetVideoAvatar", resourceCulture);
             }
         }
         

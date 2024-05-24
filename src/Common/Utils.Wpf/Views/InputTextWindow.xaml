@@ -1,0 +1,40 @@
+﻿<Window
+    x:Class="Utils.Wpf.Views.InputTextWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:lvm="clr-namespace:Utils.Wpf.ViewModels"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance lvm:InputTextViewModel}"
+    Title="{Binding Title}"
+    SizeToContent="WidthAndHeight"
+    WindowStartupLocation="CenterOwner"
+    ResizeMode="NoResize">
+    <ContentControl Content="{Binding}">
+        <ContentControl.ContentTemplate>
+            <DataTemplate>
+                <StackPanel Name="panel" Orientation="Horizontal" Margin="10" FocusManager.FocusedElement="{Binding ElementName=tb}">
+                    <TextBox Name="tb" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" Width="350" VerticalContentAlignment="Center" />
+                    <Button Name="ok" Click="Button_Click" Content="OK" Margin="10,0,0,0" Padding="30,2" IsDefault="True" />
+                </StackPanel>
+
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsMultiline}" Value="True">
+                        <Setter TargetName="panel" Property="Orientation" Value="Vertical" />
+                        <Setter TargetName="tb" Property="Height" Value="250" />
+                        <Setter TargetName="tb" Property="TextWrapping" Value="Wrap" />
+                        <Setter TargetName="tb" Property="MaxLength" Value="500" />
+                        <Setter TargetName="tb" Property="VerticalContentAlignment" Value="Top" />
+                        <Setter TargetName="ok" Property="IsDefault" Value="False" />
+                        <Setter TargetName="ok" Property="Margin" Value="0,10,0,0" />
+                    </DataTrigger>
+
+                    <Trigger SourceName="tb" Property="Text" Value="">
+                        <Setter TargetName="ok" Property="IsEnabled" Value="False" />
+                    </Trigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ContentControl.ContentTemplate>
+    </ContentControl>
+</Window>

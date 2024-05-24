@@ -26,6 +26,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     protected readonly ViewerActions _viewerActions;
 
+    public ViewerActions Actions => _viewerActions;
+
     public event Action? IsHostChanged;
 
     private bool _isHost;
@@ -661,7 +663,10 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             switch (ClientData.Stage)
                             {
                                 case GameStage.Round:
-                                    _logic.SetText(mparams[2]);
+                                    if (mparams.Length > 2)
+                                    {
+                                        _logic.SetText(mparams[2]);
+                                    }
 
                                     for (int i = 0; i < ClientData.Players.Count; i++)
                                     {
@@ -672,8 +677,12 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                                     break;
 
                                 case GameStage.Final:
-                                    _logic.SetText(mparams[2]);
-                                    ClientData.AtomType = AtomTypes.Text;
+                                    if (mparams.Length > 2)
+                                    {
+                                        _logic.SetText(mparams[2]);
+                                    }
+                                    
+                                    ClientData.AtomType = ContentTypes.Text;
                                     break;
 
                                 case GameStage.After:

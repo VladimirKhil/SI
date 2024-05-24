@@ -15,6 +15,8 @@ using System.Windows.Media;
 using Utils;
 using Utils.Timers;
 using Utils.Wpf;
+using Utils.Wpf.ViewModels;
+using Utils.Wpf.Views;
 
 namespace SIGame.Implementation;
 
@@ -412,6 +414,13 @@ public sealed class DesktopManager : PlatformManager
 
     public override bool Ask(string text) =>
         MessageBox.Show(text, CommonSettings.AppName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+
+    public override string? AskText(string title)
+    {
+        var viewModel = new InputTextViewModel { Title = title, IsMultiline = false };
+        var view = new InputTextWindow { DataContext = viewModel, Owner = Application.Current.MainWindow };
+        return view.ShowDialog() == true ? viewModel.Text : null;
+    }
 
     public override void SendErrorReport(Exception exc, bool isWarning = false)
     {

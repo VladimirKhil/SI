@@ -81,6 +81,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
         GameData.IsAnswer = true;
         GameData.AppellationOpened = GameData.Settings.AppSettings.UseApellations;
+        GameData.PendingApellation = false;
         GameData.IsPlayingMedia = false;
     }
 

@@ -6,6 +6,7 @@ using SIData;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.ViewModel.Data;
+using SIPackages.Core;
 using SIUI.ViewModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -36,14 +37,14 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     /// <summary>
     /// Ends the game and returns to main menu/lobby.
     /// </summary>
-    public CustomCommand EndGame { get; }
+    public SimpleCommand EndGame { get; }
 
     /// <summary>
     /// Задать/убрать паузу в игре
     /// </summary>
-    public CustomCommand ChangePauseInGame { get; }
+    public SimpleCommand ChangePauseInGame { get; }
 
-    public CustomCommand Move { get; set; }
+    public SimpleCommand Move { get; set; }
 
     /// <summary>
     /// Open provided link.
@@ -69,6 +70,10 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     /// Changes table type.
     /// </summary>
     public SimpleCommand ChangeType { get; private set; }
+
+    public ICommand SetVideoAvatar { get; private set; }
+
+    public ICommand DeleteVideoAvatar { get; private set; }
 
     private bool _networkGame = false;
 
@@ -96,7 +101,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public event Action? GameEnded;
 
-    public CustomCommand Cancel { get; private set; }
+    public SimpleCommand Cancel { get; private set; }
 
     public ICommand Popup { get; private set; }
 
@@ -193,13 +198,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         UserSettings = userSettings;
 
-        ChangePauseInGame = new CustomCommand(ChangePauseInGame_Executed) { CanBeExecuted = false };
-        Move = new CustomCommand(Move_Executed) { CanBeExecuted = false };
-        EndGame = new CustomCommand(EndGame_Executed);
-        Cancel = new CustomCommand(Cancel_Executed);
-        Popup = new CustomCommand(arg => UseDialogWindow = true);
+        ChangePauseInGame = new SimpleCommand(ChangePauseInGame_Executed) { CanBeExecuted = false };
+        Move = new SimpleCommand(Move_Executed) { CanBeExecuted = false };
+        EndGame = new SimpleCommand(EndGame_Executed);
+        Cancel = new SimpleCommand(Cancel_Executed);
+        Popup = new SimpleCommand(arg => UseDialogWindow = true);
 
-        EnableExtrenalMediaLoad = new CustomCommand(EnableExtrenalMediaLoad_Executed);
+        EnableExtrenalMediaLoad = new SimpleCommand(EnableExtrenalMediaLoad_Executed);
         FreeTable = new SimpleCommand(FreeTable_Executed) { CanBeExecuted = false };
         DeleteTable = new SimpleCommand(DeleteTable_Executed) { CanBeExecuted = false };
         ChangeType = new SimpleCommand(ChangeType_Executed) { CanBeExecuted = false };
@@ -212,9 +217,24 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         Timers[1].TimeChanged += GameViewModel_TimeChanged;
 
-        OpenLink = new CustomCommand(OpenLink_Executed);
+        OpenLink = new SimpleCommand(OpenLink_Executed);
         Host.MyData.CurrentPlayerChanged += MyData_CurrentPlayerChanged;
+
+        SetVideoAvatar = new SimpleCommand(SetVideoAvatar_Executed);
+        DeleteVideoAvatar = new SimpleCommand(DeleteVideoAvatar_Executed);
     }
+
+    private void SetVideoAvatar_Executed(object? arg)
+    {
+        var avatarUri = PlatformManager.Instance.AskText(Resources.SetVideoAvatar);
+
+        if (avatarUri != null)
+        {
+            Host.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, avatarUri);
+        }
+    }
+
+    private void DeleteVideoAvatar_Executed(object? arg) => Host.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, "");
 
     private void MyData_CurrentPlayerChanged()
     {

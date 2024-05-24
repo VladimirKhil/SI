@@ -21,6 +21,8 @@ public abstract class PlatformManager : IUIThreadExecutor
 
     public abstract bool Ask(string text);
 
+    public virtual string? AskText(string title) => "";
+
     public abstract void ShowHelp(bool asDialog);
 
     public abstract string? SelectColor();
