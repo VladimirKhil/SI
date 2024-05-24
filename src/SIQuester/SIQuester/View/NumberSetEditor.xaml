@@ -66,6 +66,7 @@
     <StackPanel Orientation="Horizontal">
         <ComboBox
             Style="{StaticResource ComboBoxCommon}"
+            Margin="0,2,0,0"
             Padding="5,2,2,2"
             ItemsSource="{Binding Source={StaticResource Modes}}"
             SelectedValue="{Binding Mode}">

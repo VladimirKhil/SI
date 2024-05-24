@@ -120,7 +120,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
             Multiselect = true,
             Filter = mediaCategory switch
             {
-                CollectionNames.ImagesStorageName => $"{Resources.Images} (*.jpg, *.jpeg, *.png, *.gif, *.webp)|*.jpg;*.jpeg;*.png;*.gif;*.webp|{Resources.AllFiles} (*.*)|*.*",
+                CollectionNames.ImagesStorageName => $"{Resources.Images} (*.jpg, *.jpe, *.jpeg, *.png, *.gif, *.webp)|*.jpg;*.jpe;*.jpeg;*.png;*.gif;*.webp|{Resources.AllFiles} (*.*)|*.*",
                 CollectionNames.AudioStorageName => $"{Resources.Audio} (*.mp3)|*.mp3|{Resources.AllFiles} (*.*)|*.*",
                 CollectionNames.VideoStorageName => $"{Resources.Video} (*.mp4)|*.mp4|{Resources.AllFiles} (*.*)|*.*",
                 CollectionNames.HtmlStorageName => $"{ViewModel.Properties.Resources.HtmlFiles} (*.html)|*.html|{Resources.AllFiles} (*.*)|*.*",

@@ -15,6 +15,7 @@
     xmlns:pc="clr-namespace:SIPackages.Core;assembly=SIPackages"
     xmlns:lp="clr-namespace:SIQuester.Properties"
     xmlns:lb="clr-namespace:SIQuester.Behaviors"
+    xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -614,7 +615,53 @@
                 </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
-        
+
+        <DataTemplate x:Key="InfoTemplate" DataType="{x:Type vm:InfoViewModel}">
+            <StackPanel>
+                <Separator Margin="0,15,0,10" Height="10" />
+
+                <TextBlock
+                    Text="{x:Static lp:Resources.AuthorsHeader}"
+                    Margin="0,1,0,0"
+                    Padding="0,1" />
+
+                <TextBox
+                    Text="{Binding Authors, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                    Padding="0,1"
+                    Margin="0,1,0,0"
+                    IsReadOnly="True"
+                    BorderThickness="0"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center" />
+                
+                <TextBlock
+                    Text="{x:Static lp:Resources.SourcesHeader}"
+                    Margin="0,5,0,0"
+                    Padding="0,1" />
+
+                <TextBox
+                    Text="{Binding Sources, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                    Padding="0,1"
+                    Margin="0,1,0,0"
+                    IsReadOnly="True"
+                    BorderThickness="0"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center" />
+
+                <TextBlock
+                    Text="{x:Static lp:Resources.CommentsHeader}"
+                    Margin="0,5,0,0"
+                    Padding="0,1" />
+
+                <TextBox
+                    Text="{Binding Comments.Text}"
+                    AcceptsReturn="True"
+                    TextWrapping="Wrap"
+                    Margin="0,1,0,0"
+                    Padding="0,1" />
+            </StackPanel>
+        </DataTemplate>
+
         <ls:DictionaryTemplateSelector x:Key="CardSelector">
             <ls:DictionaryTemplateSelector.Templates>
                 <DataTemplate x:Key="{x:Type vm:PackageViewModel}">
@@ -623,10 +670,139 @@
                         <TextBlock Text="{x:Static lp:Resources.Name}" Margin="0,5,0,0" />
 
                         <TextBox
-                             x:Name="price"
+                             x:Name="name"
                              Text="{Binding Model.Name, Mode=TwoWay}"
                              Margin="0,1,0,0"
                              Padding="0,1" />
+
+                        <TextBlock
+                            Text="{x:Static lp:Resources.CreationDate}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Margin="0,5,0,0"
+                            Padding="0,2,0,0" />
+
+                        <TextBox
+                            MinWidth="90"
+                            Text="{Binding Model.Date}"
+                            Margin="0,1,0,0"
+                            Padding="0,1" />
+
+                        <TextBlock
+                            Text="{x:Static lp:Resources.Publisher}"
+                            Margin="0,5,0,0"
+                            Padding="0,2,0,0" />
+
+                        <ComboBox
+                            Style="{StaticResource ComboBoxCommon}"
+                            MinWidth="90"
+                            Margin="0,1,0,0"
+                            Padding="0,1"
+                            ItemsSource="{Binding DataContext.StorageContext.Publishers, RelativeSource={RelativeSource AncestorType=Grid}}"
+                            Text="{Binding Model.Publisher}"
+                            VerticalContentAlignment="Center"
+                            IsEditable="True" />
+
+                        <TextBlock
+                            Text="{x:Static lp:Resources.Tags}"
+                            Margin="0,5,0,0"
+                            Padding="0,2,0,0" />
+
+                        <DockPanel>
+                            <Button
+                                DockPanel.Dock="Right"
+                                ToolTip="{x:Static lp:Resources.SetTags}"
+                                Command="{Binding AddTags}"
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                Width="25"
+                                Cursor="Hand"
+                                HorizontalAlignment="Left"
+                                Padding="2">
+                                <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                            </Button>
+
+                            <TextBox
+                                Text="{Binding Tags, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                                Padding="0,1"
+                                IsReadOnly="True"
+                                BorderThickness="0"
+                                TextWrapping="Wrap"
+                                VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <TextBlock
+                            Text="{x:Static lp:Resources.Language}"
+                            Margin="0,5,0,0"
+                            Padding="0,2,0,0" />
+
+                        <ComboBox
+                            Style="{StaticResource ComboBoxCommon}"
+                            MinWidth="90"
+                            Padding="0,1"
+                            ItemsSource="{Binding DataContext.StorageContext.Languages, RelativeSource={RelativeSource AncestorType=Grid}}"
+                            SelectedItem="{Binding Model.Language}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource LanguageConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        
+                        <TextBlock
+                            Text="{x:Static lp:Resources.Restriction}"
+                            Margin="0,5,0,0"
+                            Padding="0,2,0,0" />
+
+                        <TextBox
+                            MinWidth="90"
+                            Padding="0,1"
+                            Text="{Binding Model.Restriction}" />
+
+                        <TextBlock
+                            Text="{x:Static lp:Resources.Difficulty}"
+                            Margin="0,5,0,0"
+                            Padding="0,2,0,0" />
+
+                        <metro:NumericUpDown
+                            Speedup="False"
+                            Minimum="1"
+                            Maximum="10"
+                            Value="{Binding Model.Difficulty}"
+                            HorizontalContentAlignment="Left"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            FontSize="15">
+                            <metro:NumericUpDown.Resources>
+                                <Style TargetType="RepeatButton">
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                </Style>
+                            </metro:NumericUpDown.Resources>
+
+                            <metro:NumericUpDown.Style>
+                                <Style TargetType="metro:NumericUpDown">
+                                    <Setter Property="HideUpDownButtons" Value="True" />
+
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="HideUpDownButtons" Value="False" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </metro:NumericUpDown.Style>
+                        </metro:NumericUpDown>
+                        
+                        <TextBlock
+                            Text="{x:Static lp:Resources.ContactUri}"
+                            Margin="0,5,0,0"
+                            Padding="0,2,0,0" />
+
+                        <TextBox
+                            MinWidth="90"
+                            Padding="0,1"
+                            Text="{Binding Model.ContactUri}" />
+
+                        <ContentControl Content="{Binding Info}" ContentTemplate="{StaticResource InfoTemplate}" />
                     </StackPanel>
                 </DataTemplate>
                 
@@ -646,10 +822,26 @@
                         <TextBlock Text="{x:Static lp:Resources.Name}" Margin="0,5,0,0" />
 
                         <TextBox
-                             x:Name="price"
+                             x:Name="name"
                              Text="{Binding Model.Name, Mode=TwoWay}"
                              Margin="0,1,0,0"
                              Padding="0,1" />
+
+                        <TextBlock
+                            Text="{x:Static lp:Resources.Type}"
+                            Margin="0,5,0,0"
+                            Padding="0,2,0,0" />
+
+                        <ComboBox
+                            Style="{StaticResource ComboBoxCommon}"
+                            Grid.Row="0"
+                            Grid.Column="3"
+                            IsEditable="True"
+                            ItemsSource="{Binding Source={StaticResource RTypes}, Path=Values, Mode=OneTime}"
+                            Text="{Binding Path=Model.Type, Converter={StaticResource RoundTypeConverter}}"
+                            VerticalAlignment="Center" />
+
+                        <ContentControl Content="{Binding Info}" ContentTemplate="{StaticResource InfoTemplate}" />
                     </StackPanel>
                 </DataTemplate>
 
@@ -669,10 +861,12 @@
                         <TextBlock Text="{x:Static lp:Resources.Name}" Margin="0,5,0,0" />
 
                         <TextBox
-                             x:Name="price"
+                             x:Name="name"
                              Text="{Binding Model.Name, Mode=TwoWay}"
                              Margin="0,1,0,0"
                              Padding="0,1" />
+
+                        <ContentControl Content="{Binding Info}" ContentTemplate="{StaticResource InfoTemplate}" />
                     </StackPanel>
                 </DataTemplate>
 
@@ -747,6 +941,36 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+
+                            <TextBlock
+                                Text="{x:Static lp:Resources.Answer}"
+                                Margin="0,5,0,0"
+                                Padding="0,1" />
+
+                            <TextBox
+                                Text="{Binding Right, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                                Margin="0,1,0,0"
+                                Padding="0,1"
+                                IsReadOnly="True"
+                                BorderThickness="0"
+                                TextWrapping="Wrap"
+                                VerticalAlignment="Center" />
+
+                            <TextBlock
+                                Text="{x:Static lp:Resources.WrongAnswers}"
+                                Margin="0,5,0,0"
+                                Padding="0,1" />
+
+                            <TextBox
+                                Text="{Binding Wrong, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                                Margin="0,1,0,0"
+                                Padding="0,1"
+                                IsReadOnly="True"
+                                BorderThickness="0"
+                                TextWrapping="Wrap"
+                                VerticalAlignment="Center" />
+
+                            <ContentControl Content="{Binding Info}" ContentTemplate="{StaticResource InfoTemplate}" />
                         </StackPanel>
                     </ScrollViewer>
 
@@ -978,7 +1202,9 @@
             Grid.Column="1"
             Background="#FFF1F1F1"
             Visibility="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}">
-            <ContentControl Content="{Binding ActiveNode}" ContentTemplateSelector="{StaticResource CardSelector}" />
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ContentControl Content="{Binding ActiveNode}" ContentTemplateSelector="{StaticResource CardSelector}" />
+            </ScrollViewer>
         </Border>
 
         <Popup

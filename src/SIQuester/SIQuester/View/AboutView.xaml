@@ -53,8 +53,16 @@
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">
                 <Run FontWeight="Bold" Text="{x:Static lp:Resources.Licences}" /><Bold>:</Bold>
             </TextBlock>
-            
-            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap" Text="{Binding Licenses}" />
+
+            <ItemsControl Margin="5,5,0,0" ItemsSource="{Binding Licenses}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Expander Header="{Binding Key}" IsExpanded="False" Margin="0,5,0,0">
+                            <TextBlock Text="{Binding Value}" TextWrapping="Wrap" />
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

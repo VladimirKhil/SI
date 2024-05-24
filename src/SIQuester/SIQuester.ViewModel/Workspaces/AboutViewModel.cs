@@ -1,6 +1,5 @@
 ﻿using SIQuester.ViewModel.Properties;
 using System.Reflection;
-using System.Text;
 using System.Windows.Input;
 using Utils;
 using Utils.Commands;
@@ -33,17 +32,9 @@ public sealed class AboutViewModel : WorkspaceViewModel
     /// </summary>
     public ICommand OpenSite { get; private set; }
 
-    private string _licenses;
+    private Dictionary<string, string> _licenses = new();
 
-    public string Licenses
-    {
-        get => _licenses;
-        set
-        {
-            _licenses = value;
-            OnPropertyChanged();
-        }
-    }
+    public Dictionary<string, string> Licenses => _licenses;
 
     public AboutViewModel()
     {
@@ -57,14 +48,11 @@ public sealed class AboutViewModel : WorkspaceViewModel
         try
         {
             var licensesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _LicensesFolder);
-            var licenseText = new StringBuilder();
 
             foreach (var file in new DirectoryInfo(licensesFolder).EnumerateFiles())
             {
-                licenseText.Append(file.Name).AppendLine(":").AppendLine().AppendLine(File.ReadAllText(file.FullName)).AppendLine();
+                _licenses[file.Name] = File.ReadAllText(file.FullName);
             }
-
-            Licenses = licenseText.ToString();
         }
         catch (Exception exc)
         {

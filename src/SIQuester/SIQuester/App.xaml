@@ -2065,7 +2065,6 @@
                         BorderThickness="0"
                         Background="Transparent"
                         FontSize="15">
-                        
                         <metro:NumericUpDown.Resources>
                             <Style TargetType="RepeatButton">
                                 <Setter Property="BorderThickness" Value="0" />
