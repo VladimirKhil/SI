@@ -184,12 +184,14 @@ public sealed class Game : Actor<GameData, GameLogic>
         _gameActions.SendMessageToWithArgs(person, Messages.ApellationEnabled, appSettings.UseApellations ? '+' : '-');
 
         var maxPressingTime = appSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
-        _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, "MAXTIME", maxPressingTime);
+        _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
 
         _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, ClientData.JoinMode);
 
         _gameActions.SendMessageToWithArgs(person, Messages.Options,
-            nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels);
+            nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels,
+            nameof(appSettings.PartialText), appSettings.PartialText,
+            nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime);
     }
 
     private void InformBanned(string person)

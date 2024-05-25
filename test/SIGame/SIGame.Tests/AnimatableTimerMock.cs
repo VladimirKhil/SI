@@ -10,7 +10,9 @@ internal sealed class AnimatableTimerMock : IAnimatableTimer
 
 	public TimerState State => throw new NotImplementedException();
 
-	public event Action<IAnimatableTimer> TimeChanged
+    public bool KeepFinalValue { get; set; }
+
+    public event Action<IAnimatableTimer> TimeChanged
 	{
 		add { }
 		remove { }

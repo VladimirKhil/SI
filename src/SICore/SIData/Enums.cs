@@ -45,5 +45,6 @@ public enum TimeSettingsTypes
     FinalThinking,
     ShowmanDecisions,
     RightAnswer,
-    MediaDelay
+    MediaDelay,
+    PartialImageTime
 }

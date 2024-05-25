@@ -45,12 +45,12 @@
                     <StackPanel />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-            
+
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Margin="0,5">
                         <TextBlock Style="{StaticResource Header}" Text="{Binding Name}" />
-                        
+
                         <DockPanel Margin="0,6,0,0">
                             <TextBlock
                                 DockPanel.Dock="Right"
@@ -60,7 +60,7 @@
                                 VerticalAlignment="Center"
                                 FontSize="20"
                                 Margin="5,0,0,0" />
-                            
+
                             <local:NumericTextBox
                                 DockPanel.Dock="Right"
                                 Style="{StaticResource {x:Type TextBox}}"
@@ -72,7 +72,7 @@
                                 FontSize="16"
                                 FontWeight="Light"
                                 VerticalAlignment="Center" />
-                            
+
                             <Slider
                                 Value="{Binding Value}"
                                 Margin="0,4"

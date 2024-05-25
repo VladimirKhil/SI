@@ -10,6 +10,8 @@ namespace SIData;
 [DataContract]
 public sealed class TimeSettings
 {
+    public const int DefaultPartialImageTime = 3;
+
     [XmlIgnore]
     [IgnoreDataMember]
     public Dictionary<TimeSettingsTypes, int> All { get; private set; } = new();
@@ -181,7 +183,25 @@ public sealed class TimeSettings
         }
         set { All[TimeSettingsTypes.MediaDelay] = value; }
     }
-    
+
+    /// <summary>
+    /// Partial image time in seconds.
+    /// </summary>
+    [DefaultValue(DefaultPartialImageTime)]
+    public int PartialImageTime
+    {
+        get
+        {
+            if (All.TryGetValue(TimeSettingsTypes.PartialImageTime, out int value))
+            {
+                return value;
+            }
+
+            return 0;
+        }
+        set { All[TimeSettingsTypes.PartialImageTime] = value; }
+    }
+
     [DefaultValue(3)]
     [DataMember]
     /// <summary>
@@ -203,6 +223,7 @@ public sealed class TimeSettings
         All[TimeSettingsTypes.ShowmanDecisions] = 30;
         All[TimeSettingsTypes.RightAnswer] = 2;
         All[TimeSettingsTypes.MediaDelay] = 0;
+        All[TimeSettingsTypes.PartialImageTime] = DefaultPartialImageTime;
     }
 
     [OnDeserializing]

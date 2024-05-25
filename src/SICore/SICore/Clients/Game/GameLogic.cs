@@ -687,12 +687,18 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPartial = false;
         ShareMedia(contentItem);
 
-        int atomTime = GetContentItemDuration(contentItem, DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
+        var renderTime = _data.Settings.AppSettings.PartialText ? _data.Settings.AppSettings.TimeSettings.PartialImageTime * 10 : 0;
+        
+        var waitTime = GetContentItemDuration(
+            contentItem,
+            DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
 
-        _data.AtomTime = atomTime;
+        var contentTime = renderTime + waitTime;
+
+        _data.AtomTime = contentTime;
         _data.AtomStart = DateTime.UtcNow;
 
-        ScheduleExecution(Tasks.MoveNext, atomTime);
+        ScheduleExecution(Tasks.MoveNext, contentTime);
 
         _data.TimeThinking = 0.0;
         _data.UseBackgroundAudio = !contentItem.WaitForFinish;
@@ -2666,7 +2672,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.TimerStartTime[1] = DateTime.UtcNow;
         _data.IsThinking = true;
-        _gameActions.SendMessageWithArgs(Messages.Timer, 1, "RESUME");
+        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Resume);
         _data.Decision = DecisionType.Pressing;
 
         ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _data.TimeThinking, 10), force: true);

@@ -551,7 +551,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                         if (mparams.Length > 4)
                         {
-                            var message = ClientData.TInfo.Pause ? MessageParams.Timer_UserPause : "USER_RESUME";
+                            var message = ClientData.TInfo.Pause ? MessageParams.Timer_UserPause : MessageParams.Timer_UserResume;
 
                             _logic.OnTimerChanged(0, message, mparams[2], null);
                             _logic.OnTimerChanged(1, message, mparams[3], null);

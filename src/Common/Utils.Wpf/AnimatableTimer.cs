@@ -11,7 +11,7 @@ public sealed class AnimatableTimer : Animatable, IAnimatableTimer
     public static readonly DependencyProperty TimeProperty =
         DependencyProperty.Register(nameof(Time), typeof(double), typeof(AnimatableTimer), new PropertyMetadata(0.0));
 
-    public static DependencyPropertyDescriptor TimeDescriptor = DependencyPropertyDescriptor.FromProperty(TimeProperty, typeof(AnimatableTimer));
+    public static readonly DependencyPropertyDescriptor TimeDescriptor = DependencyPropertyDescriptor.FromProperty(TimeProperty, typeof(AnimatableTimer));
 
     /// <summary>
     /// Current timer time, animated from 0.0 to 100.0.
@@ -30,6 +30,8 @@ public sealed class AnimatableTimer : Animatable, IAnimatableTimer
     /// Maximum running time, 0.1 s.
     /// </summary>
     public int MaxTime { get; set; }
+
+    public bool KeepFinalValue { get; set; }
 
     /// <summary>
     /// Current timer state.
@@ -88,9 +90,11 @@ public sealed class AnimatableTimer : Animatable, IAnimatableTimer
 
         State = TimerState.Running;
 
+        var fillBehavior = KeepFinalValue ? FillBehavior.HoldEnd : FillBehavior.Stop;
+
         var animation = fromValue.HasValue
-            ? new DoubleAnimation(fromValue.Value, 100.0, duration) { FillBehavior = FillBehavior.Stop }
-            : new DoubleAnimation(100.0, duration) { FillBehavior = FillBehavior.Stop };
+            ? new DoubleAnimation(fromValue.Value, 100.0, duration) { FillBehavior = fillBehavior }
+            : new DoubleAnimation(100.0, duration) { FillBehavior = fillBehavior };
 
         BeginAnimation(TimeProperty, animation);
     }

@@ -1186,6 +1186,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Partial image display.
+        /// </summary>
+        public static string TimeSettings_PartialImageTime {
+            get {
+                return ResourceManager.GetString("TimeSettings_PartialImageTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Entering the answer after pressing the button.
         /// </summary>
         public static string TimeSettings_PrintingAnswer {

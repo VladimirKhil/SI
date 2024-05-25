@@ -9,6 +9,8 @@ public interface IAnimatableTimer : IDisposable
 
     double Time { get; }
 
+    bool KeepFinalValue { get; set; }
+
     TimerState State { get; }
 
     event Action<IAnimatableTimer> TimeChanged;

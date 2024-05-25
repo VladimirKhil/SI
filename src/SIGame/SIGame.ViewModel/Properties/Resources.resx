@@ -534,4 +534,7 @@
   <data name="SetVideoAvatar" xml:space="preserve">
     <value>Set video avatar (vdo.ninja)</value>
   </data>
+  <data name="TimeSettings_PartialImageTime" xml:space="preserve">
+    <value>Partial image display</value>
+  </data>
 </root>

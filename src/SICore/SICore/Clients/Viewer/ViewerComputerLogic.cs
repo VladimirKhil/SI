@@ -213,7 +213,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
                 break;
 
-            case "RESUME":
+            case MessageParams.Timer_Resume:
                 _timersInfo[timerIndex].IsEnabled = true;
 
                 if (!_timersInfo[timerIndex].IsUserEnabled)
@@ -227,7 +227,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
                 
                 break;
 
-            case "USER_RESUME":
+            case MessageParams.Timer_UserResume:
                 _timersInfo[timerIndex].IsUserEnabled = true;
 
                 if (!_timersInfo[timerIndex].IsEnabled || _timersInfo[timerIndex].PauseTime == -1)
@@ -241,7 +241,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
                 
                 break;
 
-            case "MAXTIME":
+            case MessageParams.Timer_MaxTime:
                 var maxTime2 = int.Parse(arg);
                 _timersInfo[timerIndex].MaxTime = maxTime2;
                 break;

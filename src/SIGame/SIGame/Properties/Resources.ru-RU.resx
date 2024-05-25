@@ -1099,7 +1099,7 @@
     <value>Играть все вопросы в финальном раунде</value>
   </data>
   <data name="AllowEveryoneToPlayHiddenStakes" xml:space="preserve">
-    <value>Все могут играть Общий вопрос со ставками (финал)</value>
+    <value>Все могут играть Вопрос со ставками для всех (финал)</value>
   </data>
   <data name="TypeUsePingPenalty" xml:space="preserve">
     <value>замедление пинга</value>

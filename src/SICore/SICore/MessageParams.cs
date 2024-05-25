@@ -70,6 +70,8 @@ public static class MessageParams
     /// </summary>
     public const string Timer_Go = "GO";
 
+    public const string Timer_MaxTime = "MAXTIME";
+
     /// <summary>
     /// Timer pause.
     /// </summary>
@@ -84,6 +86,10 @@ public static class MessageParams
     /// Timer pause caused by user.
     /// </summary>
     public const string Timer_UserPause = "USER_PAUSE";
+
+    public const string Timer_Resume = "RESUME";
+
+    public const string Timer_UserResume = "USER_RESUME";
 
     /// <summary>
     /// Можно жать на кнопку, но вопрос ещё не окончен

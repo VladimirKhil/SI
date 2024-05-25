@@ -187,7 +187,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Everybody could play Common Stakes (final) question.
+        ///   Ищет локализованную строку, похожую на Everybody could play Stakes For All (final) question.
         /// </summary>
         public static string AllowEveryoneToPlayHiddenStakes {
             get {

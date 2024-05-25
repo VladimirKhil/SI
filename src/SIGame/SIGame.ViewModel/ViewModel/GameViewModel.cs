@@ -337,16 +337,16 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
                 timer.Pause(currentTime2, true);
                 break;
 
-            case "RESUME":
+            case MessageParams.Timer_Resume:
                 timer.Run(-1, false);
                 break;
 
-            case "USER_RESUME":
+            case MessageParams.Timer_UserResume:
                 double? fromValue = int.TryParse(arg, out var passedTime) ? 100.0 * passedTime / timer.MaxTime : null;
                 timer.Run(-1, true, fromValue);
                 break;
 
-            case "MAXTIME":
+            case MessageParams.Timer_MaxTime:
                 var maxTime2 = int.Parse(arg);
                 timer.MaxTime = maxTime2;
                 break;

@@ -554,6 +554,8 @@
                         <sys:String>http://localhost:</sys:String>
                     </x:Array>
 
+                    <localc:RectConverter x:Key="RectConverter" />
+
                     <localc:TemplateConverter x:Key="QuestionContentSelector2">
                         <localc:TemplateConverter.Templates>
                             <DataTemplate x:Key="{x:Static vm:ContentType.Void}" />
@@ -568,6 +570,29 @@
                                     Stretch="Uniform"
                                     Source="{Binding Value, Converter={StaticResource UriConverter}}"
                                     lb:ImageController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" />
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.PartialImage, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" Value="True">
+                                        <Setter TargetName="image" Property="Clip">
+                                            <Setter.Value>
+                                                <RectangleGeometry>
+                                                    <RectangleGeometry.Rect>
+                                                        <MultiBinding Converter="{StaticResource RectConverter}">
+                                                            <MultiBinding.Bindings>
+                                                                <Binding
+                                                                    Path="DataContext.PartialImageVisibility"
+                                                                    RelativeSource="{RelativeSource AncestorType=ItemsControl, AncestorLevel=2}" />
+                                                                
+                                                                <Binding Path="ActualWidth" ElementName="image" />
+                                                                <Binding Path="ActualHeight" ElementName="image" />
+                                                            </MultiBinding.Bindings>
+                                                        </MultiBinding>
+                                                    </RectangleGeometry.Rect>
+                                                </RectangleGeometry>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
 
                             <DataTemplate x:Key="{x:Static vm:ContentType.Video}">
@@ -611,6 +636,29 @@
                                     Stretch="Uniform"
                                     Source="{Binding MediaSource.Uri, Converter={StaticResource UriConverter}}"
                                     lb:ImageController.LoadHandler="{Binding}" />
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.PartialImage, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" Value="True">
+                                        <Setter TargetName="image" Property="Clip">
+                                            <Setter.Value>
+                                                <RectangleGeometry>
+                                                    <RectangleGeometry.Rect>
+                                                        <MultiBinding Converter="{StaticResource RectConverter}">
+                                                            <MultiBinding.Bindings>
+                                                                <Binding
+                                                                    Path="DataContext.PartialImageVisibility"
+                                                                    RelativeSource="{RelativeSource AncestorType=ItemsControl, AncestorLevel=2}" />
+                                                                
+                                                                <Binding Path="ActualWidth" ElementName="image" />
+                                                                <Binding Path="ActualHeight" ElementName="image" />
+                                                            </MultiBinding.Bindings>
+                                                        </MultiBinding>
+                                                    </RectangleGeometry.Rect>
+                                                </RectangleGeometry>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Video}">

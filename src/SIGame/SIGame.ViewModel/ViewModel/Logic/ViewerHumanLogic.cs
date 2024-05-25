@@ -2,6 +2,7 @@
 using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
 using SIData;
+using SIGame.ViewModel.PlatformSpecific;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
@@ -9,6 +10,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Xml;
 using Utils;
+using Utils.Timers;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -61,6 +63,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     private string? _prependTableText;
     private string? _appendTableText;
 
+    private readonly AppSettingsCore _appSettings = new();
+    private readonly IAnimatableTimer _timer = PlatformManager.Instance.GetAnimatableTimer();
+    private bool _runTimer = false;
+    private double? _initialTime = null;
+
     public ViewerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer, SettingsViewModel settings)
         : base(data)
     {
@@ -81,6 +88,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions);
 
         _localFileManager.Error += LocalFileManager_Error;
+
+        _timer.KeepFinalValue = true;
+        _timer.TimeChanged += Timer_TimeChanged;
+    }
+
+    private void Timer_TimeChanged(IAnimatableTimer timer)
+    {
+        TInfo.PartialImageVisibility = timer.Time / 100;
     }
 
     private void TInfo_QuestionSelected(QuestionInfoViewModel question)
@@ -668,6 +683,23 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     {
                         TInfo.Settings.Model.DisplayAnswerOptionsLabels = flag;
                     }
+
+                    break;
+
+                case nameof(AppSettingsCore.PartialText):
+                    if (bool.TryParse(optionValue, out var partialText))
+                    {
+                        _appSettings.PartialText = partialText;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
+                    if (int.TryParse(optionValue, out var value))
+                    {
+                        _appSettings.TimeSettings.PartialImageTime = value;
+                    }
+
                     break;
 
                 default:
@@ -902,6 +934,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                         : (contentType == ContentTypes.Video ? ContentType.Video : ContentType.Html);
 
                     currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
+
+                    if (contentType == ContentTypes.Image && _appSettings.PartialText && _appSettings.TimeSettings.PartialImageTime > 0)
+                    {
+                        _runTimer = true;
+                        _initialTime = 0;
+                    }
                     break;
             }
         }
@@ -930,6 +968,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         TInfo.Content = groups;
         TInfo.QuestionContentType = QuestionContentType.Collection;
+
+        if (_runTimer)
+        {
+            _timer.Run(_appSettings.TimeSettings.PartialImageTime * 10, false, _initialTime);
+        }
     }
 
     private void OnReplicText(string text) => OnReplic(ReplicCodes.Showman.ToString(), text.UnescapeNewLines());
@@ -1311,6 +1354,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     {
         TInfo.AnimateText = false;
         TInfo.PartialText = false;
+        TInfo.PartialImage = false;
         TInfo.Content = Array.Empty<ContentGroup>();
         TInfo.QuestionContentType = QuestionContentType.Void;
         TInfo.Sound = false;
@@ -1328,7 +1372,15 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _prependTableText = comments.UnescapeNewLines().LeaveFirst(MaxAdditionalTableTextLength);
     }
 
-    public void Try() => TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
+    public void Try()
+    {
+        TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
+
+        if (_runTimer)
+        {
+            _timer.Run(_appSettings.TimeSettings.PartialImageTime * 10, false, _initialTime);
+        }
+    }
 
     /// <summary>
     /// Нельзя жать на кнопку
@@ -1338,6 +1390,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     {
         TInfo.QuestionStyle = QuestionStyle.Normal;
         TInfo.IsMediaStopped = true;
+
+        if (_runTimer)
+        {
+            _initialTime = _timer.Time;
+            _timer.Pause((int)(_timer.Time * _timer.MaxTime / 100), false);
+        }
 
         if (!int.TryParse(text, out int number))
         {
@@ -1411,9 +1469,13 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.Sound = false;
         TInfo.LayoutMode = LayoutMode.Simple;
         TInfo.PartialText = false;
+        TInfo.PartialImage = _appSettings.PartialText;
         TInfo.IsMediaStopped = false;
         _data.EnableMediaLoadButton = false;
         _data.ExternalContent.Clear();
+
+        _runTimer = false;
+        _initialTime = 0;
 
         switch (_data.QuestionType)
         {
@@ -1515,6 +1577,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
 
         _disposed = true;
+
+        _timer.Dispose();
 
         if (_data.ProtocolWriter != null)
         {
@@ -1731,7 +1795,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person)
     {
-        if (timerIndex == 1 && timerCommand == "RESUME")
+        if (timerIndex == 1 && timerCommand == MessageParams.Timer_Resume)
         {
             TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
         }

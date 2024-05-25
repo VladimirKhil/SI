@@ -408,6 +408,22 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     /// </summary>
     public bool PartialText { get => _partialText; set { if (_partialText != value) { _partialText = value; OnPropertyChanged(); } } }
 
+    /// <summary>
+    /// Is image displayed partially.
+    /// </summary>
+    public bool PartialImage {  get; set; }
+
+    private double _partialImageVisibility = 1.0;
+
+    /// <summary>
+    /// Partial image visisbility (from 0.0 to 1.0).
+    /// </summary>
+    public double PartialImageVisibility
+    {
+        get => _partialImageVisibility;
+        set { if (_partialImageVisibility != value) { _partialImageVisibility = value; OnPropertyChanged(); } }
+    }
+
     private LayoutMode _layoutMode = LayoutMode.Simple;
 
     /// <summary>
