@@ -959,6 +959,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_data.Theme.Name}");
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _data.Theme.Name);
+        _gameActions.SendMessageWithArgs(Messages.Theme, _data.Theme.Name);
 
         ProceedToThemeAndQuestion();
     }

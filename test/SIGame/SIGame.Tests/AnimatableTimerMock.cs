@@ -18,17 +18,11 @@ internal sealed class AnimatableTimerMock : IAnimatableTimer
 		remove { }
 	}
 
-        public void Dispose()
-        {
+    public void Pause(int currentTime, bool byUser) => throw new NotImplementedException();
 
-        }
-
-        public void Pause(int currentTime, bool byUser)
-	{
-		throw new NotImplementedException();
-	}
-
-	public void Run(int maxTime, bool byUser, double? fromValue = null) { }
+    public void Run(int maxTime, bool byUser, double? fromValue = null) { }
 
 	public void Stop() { }
+
+    public void Dispose() { }
 }

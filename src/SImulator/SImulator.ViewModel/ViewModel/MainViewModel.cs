@@ -313,12 +313,15 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             case 0:
                 settings.TableColorString = color;
                 break;
+            
             case 1:
                 settings.TableBackColorString = color;
                 break;
+            
             case 2:
                 settings.TableGridColorString = color;
                 break;
+            
             case 3:
                 settings.AnswererColorString = color;
                 break;
