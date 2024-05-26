@@ -10,6 +10,8 @@ internal sealed class TestAnimatableTimer : IAnimatableTimer
 
     public TimerState State => throw new NotImplementedException();
 
+    public bool KeepFinalValue { get; set; }
+
     public event Action<IAnimatableTimer> TimeChanged;
 
     public void Dispose()
