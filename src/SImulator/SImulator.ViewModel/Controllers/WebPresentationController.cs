@@ -229,7 +229,9 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Type = "beginPressButton"
     });
 
-    public void FinishQuestion() => SendMessage(new
+    public void FinishQuestion() { }
+
+    public void NoAnswer() => SendMessage(new
     {
         Type = "endPressButtonByTimeout"
     });
@@ -362,11 +364,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             Type = "timerStop",
             TimerIndex = 1
         });
-
-        SendMessage(new
-        {
-            Type = "endPressButtonByTimeout"
-        });
     }
 
     public void UpdatePlayerInfo(int playerIndex, PlayerInfo player, string? propertyName = null)
@@ -393,6 +390,11 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             });
         }
     }
+
+    public void OnFinalThink() => SendMessage(new
+    {
+        Type = "finalThink"
+    });
 
     public void UpdateSettings(Settings settings)
     {
@@ -516,7 +518,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         return hasMedia;
     }
 
-    public void SetQuestionType(string typeName, string aliasName) => SendMessage(new
+    public void SetQuestionType(string typeName, string aliasName, int activeThemeIndex) => SendMessage(new
     {
         Type = "questionType",
         QuestionType = typeName

@@ -762,12 +762,13 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 }
 
                 SetSound(Settings.Model.Sounds.NoAnswer);
+                PresentationController.NoAnswer();
                 StopQuestionTimer_Executed(1);
                 ActiveQuestionCommand = null;
 
-                if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
+                if (!Settings.Model.SignalsAfterTimer)
                 {
-                    _buttonManager.Stop();
+                    StopButtons();
                 }
             },
             exc => OnError(exc.ToString()));
@@ -1263,17 +1264,17 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             case QuestionTypes.SecretPublicPrice:
             case QuestionTypes.SecretNoQuestion:
                 SetSound(Settings.Model.Sounds.SecretQuestion);
-                PrintQuestionType(typeName, Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
+                PrintQuestionType(typeName, Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias, -1);
                 break;
 
             case QuestionTypes.Stake:
                 SetSound(Settings.Model.Sounds.StakeQuestion);
-                PrintQuestionType(typeName, Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
+                PrintQuestionType(typeName, Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias, ActiveRound.Themes.IndexOf(ActiveTheme));
                 break;
 
             case QuestionTypes.NoRisk:
                 SetSound(Settings.Model.Sounds.NoRiskQuestion);
-                PrintQuestionType(typeName, Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
+                PrintQuestionType(typeName, Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias, -1);
                 break;
 
             default:
@@ -1426,6 +1427,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         if (ActiveRound?.Type == RoundTypes.Final)
         {
             SetSound(Settings.Model.Sounds.FinalThink);
+            PresentationController.OnFinalThink();
 
             var time = Settings.Model.FinalQuestionThinkingTime;
 
@@ -1453,7 +1455,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         StopQuestionTimer.Execute(0);
         StopThinkingTimer_Executed(0);
-        _buttonManager?.Stop();
+        StopButtons();
         ActiveMediaCommand = null;
     }
 
@@ -1485,7 +1487,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);
 
-        _buttonManager?.Stop();
+        StopButtons();
 
         UnselectPlayer();
         _selectedPlayers.Clear();
@@ -1547,7 +1549,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);
 
-        _buttonManager?.Stop();
+        StopButtons();
         State = QuestionState.Normal;
         _previousState = QuestionState.Normal;
 
@@ -1812,11 +1814,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    private void PrintQuestionType(string typeName, string originalTypeName, string? aliasName)
+    private void PrintQuestionType(string typeName, string originalTypeName, string? aliasName, int activeThemeIndex)
     {
         var actualName = string.IsNullOrWhiteSpace(aliasName) ? originalTypeName : aliasName;
 
-        PresentationController.SetQuestionType(typeName, actualName);
+        PresentationController.SetQuestionType(typeName, actualName, activeThemeIndex);
         _gameLogger.Write(actualName);
     }
 
@@ -2003,7 +2005,25 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     internal Task CloseMainViewAsync() => PresentationController.StopAsync();
 
-    internal void StartButtons() => _buttonManager?.Start();
+    internal void StartButtons()
+    {
+        if (_buttonManager == null)
+        {
+            return;
+        }
+
+        UI.Execute(() => _buttonManager.Start(), exc => OnError(exc.Message));
+    }
+
+    private void StopButtons()
+    {
+        if (_buttonManager == null)
+        {
+            return;
+        }
+
+        UI.Execute(() => _buttonManager.Stop(), exc => OnError(exc.Message));
+    }
 
     internal void AskAnswerButton()
     {

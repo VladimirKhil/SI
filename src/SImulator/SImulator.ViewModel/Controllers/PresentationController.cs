@@ -735,7 +735,17 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         return hasMedia;
     }
 
-    public void SetQuestionType(string typeName, string aliasName) => SetText(aliasName);
+    public void SetQuestionType(string typeName, string aliasName, int activeThemeIndex)
+    {
+        SetText(aliasName);
+
+        for (var k = 0; k < TInfo.RoundInfo.Count; k++)
+        {
+            TInfo.RoundInfo[k].Active = k == activeThemeIndex;
+        }
+
+        SetStage(TableStage.Special);
+    }
 
     public void SetSimpleAnswer()
     {

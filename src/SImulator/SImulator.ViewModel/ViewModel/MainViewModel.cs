@@ -878,7 +878,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         // Может быть не только при this.engine.stage == GameStage.Before, но и в процессе игры
         if (_activePlayerButtonCommand == _setPlayerButton)
         {
-            if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick)
+            if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick && _buttonManager != null)
             {
                 ProcessNewPlayerButton(key);
 

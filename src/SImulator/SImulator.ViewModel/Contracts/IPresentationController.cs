@@ -123,7 +123,7 @@ public interface IPresentationController : IDisposable
     
     void FinishQuestion() { }
 
-    void SetQuestionType(string typeName, string aliasName);
+    void SetQuestionType(string typeName, string aliasName, int activeThemeIndex);
     
     void SetLanguage(string language) { }
 
@@ -138,4 +138,8 @@ public interface IPresentationController : IDisposable
     void PlayerIsRight(int playerIndex) { }
 
     void PlayerIsWrong(int playerIndex) { }
+
+    void NoAnswer() { }
+
+    void OnFinalThink() { }
 }
