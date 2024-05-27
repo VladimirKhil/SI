@@ -386,6 +386,9 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   <data name="NavigateToSiteError" xml:space="preserve">
     <value>An error occurred while navigating to the program website ({0}). Make sure you have your default browser configured: {1}</value>
   </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>new version</value>
+  </data>
   <data name="Next" xml:space="preserve">
     <value>Next</value>
   </data>

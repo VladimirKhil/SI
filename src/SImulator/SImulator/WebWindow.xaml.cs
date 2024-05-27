@@ -7,7 +7,16 @@ namespace SImulator;
 /// </summary>
 public partial class WebWindow : Window
 {
-    public WebWindow() => InitializeComponent();
+    public WebWindow(bool fullScreen)
+    {
+        InitializeComponent();
+
+        if (!fullScreen)
+        {
+            WindowState = WindowState.Normal;
+            WindowStyle = WindowStyle.SingleBorderWindow;
+        }
+    }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {

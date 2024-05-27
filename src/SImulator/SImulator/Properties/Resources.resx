@@ -387,6 +387,9 @@
   <data name="NavigateToSiteError" xml:space="preserve">
     <value>Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}</value>
   </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>новая версия</value>
+  </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
   </data>

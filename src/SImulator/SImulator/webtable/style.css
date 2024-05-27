@@ -27,7 +27,7 @@ body {
 
 .gamePlayers {
     flex-direction: row !important;
-    background-color: #c0cff4 !important;
+    background: radial-gradient(#0009ad, #000451) !important;
     margin: 0 !important;
     width: 100% !important;
 }
@@ -45,7 +45,7 @@ body {
 
     .gamePlayers div.playerInfo {
         background-color: transparent !important;
-        color: black !important;
+        color: white !important;
         display: flex !important;
     }
 
@@ -54,7 +54,7 @@ body {
     }
 
     .gamePlayers li.me div.name, .gamePlayers li.me div.stakeHost, .gamePlayers li.me div.sum {
-        color: black !important;
+        color: white !important;
     }
 
     .gamePlayers li .playerInfo div.stakeHost {
@@ -64,3 +64,43 @@ body {
     .gamePlayers .playerAvatar {
         display: none !important;
     }
+
+    .gamePlayers .gamePlayer.state_press div.playerInfo {
+        color: darkblue !important;
+    }
+
+    .gamePlayers li.state_press.me div.name, .gamePlayers li.state_press.me div.stakeHost, .gamePlayers li.state_press.me div.sum {
+        color: darkblue !important;
+    }
+
+@media screen and (min-width: 1100px) and (min-height: 700px) {
+    .gamePlayer {
+    font-size: 35px !important;
+}
+
+        .gamePlayer:nth-last-child(n+6),
+        .gamePlayer:nth-last-child(n+6) ~ li {
+            font-size: 30px !important;
+        }
+
+        .gamePlayer:nth-last-child(n+9),
+        .gamePlayer:nth-last-child(n+9) ~ li {
+            font-size: 25px !important;
+        }
+}
+
+@media screen and (min-width: 1600px) and (min-height: 700px) {
+    .gamePlayer {
+        font-size: 50px !important;
+    }
+
+        .gamePlayer:nth-last-child(n+6),
+        .gamePlayer:nth-last-child(n+6) ~ li {
+            font-size: 45px !important;
+        }
+
+        .gamePlayer:nth-last-child(n+9),
+        .gamePlayer:nth-last-child(n+9) ~ li {
+            font-size: 40px !important;
+        }
+}

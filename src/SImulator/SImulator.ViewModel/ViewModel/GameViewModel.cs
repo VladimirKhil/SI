@@ -1067,6 +1067,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
             _answeringHistory.Push(Tuple.Create(player, Price, true));
 
+            PresentationController.PlayerIsRight(Players.IndexOf(player));
+
             if (Settings.Model.EndQuestionOnRightAnswer)
             {
                 _engine.MoveToAnswer();
@@ -1116,6 +1118,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _gameLogger.Write("{0} -{1}", player.Name, substract);
 
         _answeringHistory.Push(Tuple.Create(player, Price, false));
+
+        PresentationController.PlayerIsWrong(Players.IndexOf(player));
 
         ReturnToQuestion();
     }

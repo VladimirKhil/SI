@@ -134,4 +134,8 @@ public interface IPresentationController : IDisposable
     void ClearState();
 
     void OnQuestionEnd() { }
+
+    void PlayerIsRight(int playerIndex) { }
+
+    void PlayerIsWrong(int playerIndex) { }
 }

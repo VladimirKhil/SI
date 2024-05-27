@@ -965,7 +965,7 @@
                     
                     <ComboBox
                         Margin="0,2,0,0"
-                        Width="150"
+                        Width="230"
                         IsEnabled="{Binding CanSelectScreens}"
                         ItemsSource="{Binding Screens}"
                         SelectedIndex="{Binding Settings.ScreenNumber}">

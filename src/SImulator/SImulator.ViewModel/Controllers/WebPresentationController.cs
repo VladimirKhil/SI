@@ -153,7 +153,15 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetActivePlayerIndex(int playerIndex)
     {
-        // TODO
+        if (playerIndex > -1)
+        {
+            SendMessage(new
+            {
+                Type = "setChooser",
+                ChooserIndex = playerIndex,
+                SetAnswerer = true
+            });
+        }
     }
 
     public void SetAnswerOptions(ItemViewModel[] answerOptions)
@@ -317,7 +325,28 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         }
     }
 
-    public Task StartAsync() => Task.WhenAll(_loadTSC.Task, PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor));
+    public async Task StartAsync()
+    {
+        await Task.WhenAll(_loadTSC.Task, PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor));
+
+        SendMessage(new
+        {
+            Type = "setSoundMap",
+            SoundMap = new Dictionary<string, string>
+            {
+                ["final_delete"] = "../sounds/final_delete.mp3",
+                ["final_think"] = "../sounds/final_think.mp3",
+                ["round_begin"] = "../sounds/round_begin.mp3",
+                ["round_themes"] = "../sounds/round_themes.mp3",
+                ["round_timeout"] = "../sounds/round_timeout.mp3",
+                ["question_noanswers"] = "../sounds/question_noanswers.mp3",
+                ["question_norisk"] = "../sounds/question_norisk.mp3",
+                ["question_secret"] = "../sounds/question_secret.mp3",
+                ["question_stake"] = "../sounds/question_stake.mp3",
+                ["round_begin"] = "../sounds/round_begin.mp3"
+            }
+        });
+    }
 
     public Task StopAsync() => PlatformManager.Instance.CloseMainViewAsync();
 
@@ -340,7 +369,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         });
     }
 
-    public void UpdatePlayerInfo(int index, PlayerInfo player, string? propertyName = null)
+    public void UpdatePlayerInfo(int playerIndex, PlayerInfo player, string? propertyName = null)
     {
         if (propertyName == null || propertyName == nameof(PlayerInfo.Name))
         {
@@ -348,13 +377,21 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             {
                 Type = "tableSet",
                 Role = "player",
-                Index = index,
+                Index = playerIndex,
                 Replacer = player.Name,
                 ReplacerSex = 0
             });
         }
 
-        // TODO
+        if (propertyName == nameof(PlayerInfo.Sum))
+        {
+            SendMessage(new
+            {
+                Type = "sum",
+                PlayerIndex = playerIndex,
+                Value = player.Sum
+            });
+        }
     }
 
     public void UpdateSettings(Settings settings)
@@ -509,6 +546,20 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     public void OnQuestionEnd() => SendMessage(new
     {
         Type = "questionEnd"
+    });
+
+    public void PlayerIsRight(int playerIndex) => SendMessage(new
+    {
+        Type = "person",
+        PlayerIndex = playerIndex,
+        IsRight = true
+    });
+
+    public void PlayerIsWrong(int playerIndex) => SendMessage(new
+    {
+        Type = "person",
+        PlayerIndex = playerIndex,
+        IsRight = false
     });
 
     public void OnMessage(string message)

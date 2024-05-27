@@ -74,12 +74,20 @@ internal sealed class DesktopManager : PlatformManager
 
     public override Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen)
     {
-        _window = screen.IsWebView ? new WebWindow() : new MainWindow(screen.IsFullScreen);
+        _window = screen.IsWebView ? new WebWindow(screen.IsFullScreen) : new MainWindow(screen.IsFullScreen);
         _window.DataContext = dataContext;
 
-        if (screen.IsFullScreen && screen is ScreenDisplayDescriptor screenInfo)
+        if (screen.IsFullScreen && screen is ScreenDisplayDescriptor screenInfo) // Will be removed
         {
             var area = screenInfo.Screen.WorkingArea;
+            _window.Left = area.Left;
+            _window.Top = area.Top;
+            _window.Width = area.Width;
+            _window.Height = area.Height;
+        }
+        else if (screen.IsFullScreen && screen is WebScreenDisplayDescriptor webScreenInfo)
+        {
+            var area = webScreenInfo.Screen.WorkingArea;
             _window.Left = area.Left;
             _window.Top = area.Top;
             _window.Width = area.Width;
@@ -118,6 +126,7 @@ internal sealed class DesktopManager : PlatformManager
 
     public override IDisplayDescriptor[] GetScreens() =>
         Screen.AllScreens.Select(screen => new ScreenDisplayDescriptor(screen))
+            .Concat(Screen.AllScreens.Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen)))
             .Concat(new IDisplayDescriptor[] { WindowDisplayDescriptor.Instance, WebDisplayDescriptor.Instance })
             .ToArray();
 
