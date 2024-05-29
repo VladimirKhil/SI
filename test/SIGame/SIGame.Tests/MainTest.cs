@@ -6,6 +6,7 @@ using SICore;
 using SICore.PlatformSpecific;
 using SIData;
 using SIGame.ViewModel;
+using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Settings;
 using SIStatisticsService.Client;
@@ -77,10 +78,14 @@ public class MainTest
         gameSettings.NetworkGamePassword = "testpass";
         gameSettings.Role = gameRole;
 
-        await gameSettings.SelectPackage.ExecuteAsync(packageSourceType);
-
-        if (packageSourceType == PackageSourceTypes.SIStorage)
+        if (packageSourceType == PackageSourceTypes.RandomServer)
         {
+            await gameSettings.SelectPackage.ExecuteAsync(new SIStorageParameters { StorageIndex = 0, IsRandom = true });
+        }
+        else if (packageSourceType == PackageSourceTypes.SIStorage)
+        {
+            await gameSettings.SelectPackage.ExecuteAsync(new SIStorageParameters { StorageIndex = 0, IsRandom = false });
+
             var counter = 10;
 
             var storageInfo = (SIStorageViewModel)siOnline.Content.Content.Data;
@@ -108,6 +113,10 @@ public class MainTest
             var storage = storageInfo.Model.CurrentPackage = package;
 
             storageInfo.LoadStorePackage.Execute(null);
+        }
+        else
+        {
+            await gameSettings.SelectPackage.ExecuteAsync(packageSourceType);
         }
 
         await gameSettings.BeginGame.ExecuteAsync(null);

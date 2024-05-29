@@ -242,8 +242,8 @@
                     FontSize="20"
                     Height="48"
                     Width="48"
-                    Padding="13"
-                    ToolTip="{x:Static lp:Resources.GameManagement}">
+                    Padding="11"
+                    ToolTip="{x:Static lp:Resources.Avatar}">
                     <local:DropDownButton.DropDown>
                         <ContextMenu
                             Placement="Right"
@@ -286,8 +286,7 @@
                             </ContextMenu.Template>
                         </ContextMenu>
                     </local:DropDownButton.DropDown>
-
-                    <Image Source="/SIGame;component/Resources/settings.png" Stretch="Uniform" />
+                    📷
                 </local:DropDownButton>
             </StackPanel>
 
