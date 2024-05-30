@@ -1,5 +1,7 @@
-﻿using SImulator.ViewModel.Model;
+﻿using SIEngine.Rules;
+using SImulator.ViewModel.Model;
 using SIPackages;
+using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 
@@ -36,7 +38,9 @@ public interface IPresentationController : IDisposable
 
     void SetRoundTable();
 
-    void SetRound(string roundName);
+    void OnPackage(string packageName, MediaInfo? packageLogo);
+
+    void SetRound(string roundName, QuestionSelectionStrategyType selectionStrategyType);
 
     void SetTheme(string themeName);
 
@@ -120,8 +124,8 @@ public interface IPresentationController : IDisposable
         IReadOnlyCollection<ContentItem> content,
         Func<ContentItem, string?> tryGetMediaUri,
         string? textToShow);
-    
-    void FinishQuestion() { }
+
+    void FinishQuestion();
 
     void SetQuestionType(string typeName, string aliasName, int activeThemeIndex);
     

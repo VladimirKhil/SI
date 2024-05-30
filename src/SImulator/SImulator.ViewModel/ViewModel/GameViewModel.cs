@@ -1,4 +1,5 @@
 ﻿using SIEngine;
+using SIEngine.Rules;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
@@ -1300,18 +1301,9 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         else
         {
             var logo = package.LogoItem;
+            var media = logo != null ? _engine.Document.TryGetMedia(logo) : null;
 
-            if (logo != null)
-            {
-                var media = _engine.Document.TryGetMedia(logo);
-
-                if (media.HasValue && SetMedia(media.Value))
-                {
-                    PresentationController.SetStage(TableStage.Question);
-                    PresentationController.SetQuestionSound(false);
-                    PresentationController.SetQuestionContentType(QuestionContentType.Image);
-                }
-            }
+            PresentationController.OnPackage(package.Name, media);
 
             SetSound(Settings.Model.Sounds.BeginGame);
         }
@@ -1327,7 +1319,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         SetSound(Settings.Model.Sounds.GameThemes);
     }
 
-    internal void OnRound(Round round)
+    internal void OnRound(Round round, QuestionSelectionStrategyType selectionStrategyType)
     {
         _activeRound = round ?? throw new ArgumentNullException(nameof(round));
         OnPropertyChanged(nameof(ActiveRound));
@@ -1337,7 +1329,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             return;
         }
 
-        PresentationController.SetRound(round.Name);
+        PresentationController.SetRound(round.Name, selectionStrategyType);
         SetSound(Settings.Model.Sounds.RoundBegin);
         LocalInfo.TStage = TableStage.Round;
 
@@ -1500,8 +1492,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveQuestionCommand = null;
         ActiveMediaCommand = null;
 
-        PresentationController.SetText();
-        PresentationController.SetActivePlayerIndex(-1);
         PresentationController.FinishQuestion();
 
         CurrentTheme = null;
@@ -1699,6 +1689,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveTheme = theme;
         ActiveQuestion = theme.Questions[0];
 
+        PresentationController.SetTheme(theme.Name);
         PresentationController.SetSound();
         SetCaption(theme.Name);
     }

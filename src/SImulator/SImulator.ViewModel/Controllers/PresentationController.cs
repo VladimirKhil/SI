@@ -1,4 +1,5 @@
-﻿using SImulator.ViewModel.Contracts;
+﻿using SIEngine.Rules;
+using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -240,7 +241,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
     }
 
-    public void SetText(string text) => TInfo.Text = text;
+    public void SetText(string text = "") => TInfo.Text = text;
 
     private void SetScreenContent(IReadOnlyCollection<ContentGroup> content)
     {
@@ -585,7 +586,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void Dispose() => _animatableTimer.Dispose();
 
-    public void SetRound(string roundName)
+    public void SetRound(string roundName, QuestionSelectionStrategyType selectionStrategyType)
     {
         SetText(roundName);
         SetStage(TableStage.Round);
@@ -758,6 +759,25 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     public void OnAnswerStart() => SetSound();
 
     public void ClearState() => SetStage(TableStage.Sign);
+
+    public void OnPackage(string packageName, MediaInfo? packageLogo)
+    {
+        if (!packageLogo.HasValue || packageLogo.Value.Uri == null)
+        {
+            return;
+        }
+
+        SetMedia(new MediaSource(packageLogo.Value.Uri.OriginalString), false);
+        SetStage(TableStage.Question);
+        SetQuestionSound(false);
+        SetQuestionContentType(QuestionContentType.Image);
+    }
+
+    public void FinishQuestion()
+    {
+        SetText();
+        SetActivePlayerIndex(-1);
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }

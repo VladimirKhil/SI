@@ -348,7 +348,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnQuestion(Question question) => GameViewModel?.OnQuestion(question);
 
-    public void OnRound(Round round, QuestionSelectionStrategyType strategyType) => GameViewModel?.OnRound(round);
+    public void OnRound(Round round, QuestionSelectionStrategyType strategyType) => GameViewModel?.OnRound(round, strategyType);
 
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
     {

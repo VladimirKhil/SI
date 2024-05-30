@@ -1,4 +1,5 @@
-﻿using SImulator.ViewModel.Contracts;
+﻿using SIEngine.Rules;
+using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIPackages;
@@ -278,12 +279,20 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         });
     }
 
-    public void SetRound(string roundName) => SendMessage(new
+    public void OnPackage(string packageName, MediaInfo? packageLogo) => SendMessage(new
+    {
+        Type = "package",
+        PackageName = packageName,
+        PackageLogo = packageLogo?.Uri?.OriginalString
+    });
+
+    public void SetRound(string roundName, QuestionSelectionStrategyType selectionStrategyType) => SendMessage(new
     {
         Type = "stage",
         Stage = "Round",
         StageName = roundName,
-        StageIndex = -1
+        StageIndex = -1,
+        Rules = selectionStrategyType.ToString()
     });
 
     public void SetText(string text = "")
