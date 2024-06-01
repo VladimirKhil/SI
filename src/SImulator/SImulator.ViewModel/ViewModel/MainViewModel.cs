@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Utils;
 using Utils.Commands;
 
 namespace SImulator.ViewModel;
@@ -190,6 +191,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public int ButtonBlockTime => (int)(Settings.BlockingTime * 1000);
 
+    public LinkModel[] Links { get; }
+
+    private SimpleCommand _navigateTo;
+
+    public ICommand NavigateTo => _navigateTo;
+
     public MainViewModel(AppSettings settings)
     {
         Settings = settings;
@@ -242,6 +249,23 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 #endif
 
         Settings.PropertyChanged += MyDefault_PropertyChanged;
+
+        var links = new List<LinkModel>
+        {
+            new(new Uri("https://vladimirkhil.com/si/game"), "SIGame", "/SImulator;component/Images/sigame_logo.jpg")
+        };
+
+        if (Thread.CurrentThread.CurrentUICulture.Name == "ru-RU")
+        {
+            links.Add(new(new Uri("https://vk.com/si_game"), "VK", "/SImulator;component/Images/vk_logo.png"));
+            links.Add(new(new Uri("https://yoomoney.ru/to/410012283941753"), "Yoomoney", "/SImulator;component/Images/yoomoney_logo.png"));
+            links.Add(new(new Uri("https://boosty.to/vladimirkhil"), "Boosty", "/SImulator;component/Images/boosty_logo.png"));
+        }
+
+        links.Add(new(new Uri("https://patreon.com/vladimirkhil"), "Patreon", "/SImulator;component/Images/patreon_logo.png"));
+        Links = links.ToArray();
+
+        _navigateTo = new SimpleCommand(PerformNavigateTo);
     }
 
     private void AddPlayer_Executed(object? arg)
@@ -892,4 +916,23 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     }
 
     public bool OnPlayerPressed(PlayerInfo player) => throw new NotImplementedException();
+
+    private void PerformNavigateTo(object? commandParameter)
+    {
+        var url = commandParameter?.ToString();
+
+        if (url == null)
+        {
+            return;
+        }
+
+        try
+        {
+            Browser.Open(url);
+        }
+        catch (Exception exc)
+        {
+            ShowError(exc);
+        }
+    }
 }

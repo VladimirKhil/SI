@@ -691,7 +691,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Welcome to the SIGame! The rules: Game chat is indicated in this text window. Here you can send your messages. Type the message and press &quot;Enter&quot;. The game is in the middle of the screen. At the left side of the game board you can see bars indicating the time which has passed since the beginning of the round, the time for the answer and the time for taking decisions. When the bar is filled, the corresponding time interval will expire. Also you can see the names and the pictures of the host and the players,  [остаток строки не уместился]&quot;;.
+        ///   Ищет локализованную строку, похожую на Welcome to SIGame! The game will begin as soon as all the players and the showman press &quot;Ready&quot; button.
         /// </summary>
         public static string Greeting {
             get {

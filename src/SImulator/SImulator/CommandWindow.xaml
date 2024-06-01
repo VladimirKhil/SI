@@ -884,7 +884,6 @@
             Header="{x:Static lp:Resources.Start}"
             IsSelected="{Binding Transition, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:ModeTransition.ModeratorToStart}, Mode=OneWay}"
             Visibility="{Binding Mode, Converter={StaticResource StartView}}">
-            
             <Grid Margin="2,2,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -892,10 +891,45 @@
                     <RowDefinition />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                
+
+                <ItemsControl ItemsSource="{Binding Links}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <ItemsControl.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Width" Value="40" />
+                            <Setter Property="Height" Value="40" />
+                            <Setter Property="Padding" Value="8" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Background" Value="Transparent" />
+
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Resources>
+                    
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button
+                                Command="{Binding DataContext.NavigateTo, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding Uri}"
+                                ToolTip="{Binding Tooltip}">
+                                <Image Source="{Binding ImageSource}" />
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
                 <StackPanel Margin="0,0,4,0">
-                    <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.StartGame}" />
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GamePackage}" />
+                    <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.StartGame}" HorizontalAlignment="Left" />
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GamePackage}" HorizontalAlignment="Left" />
 
                     <TextBlock Margin="0,2,0,0" FontSize="14" TextTrimming="CharacterEllipsis">
                         <TextBlock.Style>

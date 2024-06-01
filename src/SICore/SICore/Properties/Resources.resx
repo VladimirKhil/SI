@@ -256,7 +256,7 @@
     <value>Good morning!</value>
   </data>
   <data name="Greeting" xml:space="preserve">
-    <value>Welcome to the SIGame! The rules: Game chat is indicated in this text window. Here you can send your messages. Type the message and press "Enter". The game is in the middle of the screen. At the left side of the game board you can see bars indicating the time which has passed since the beginning of the round, the time for the answer and the time for taking decisions. When the bar is filled, the corresponding time interval will expire. Also you can see the names and the pictures of the host and the players, and also the scores of the players. The game will begin as soon as all the players and the host press "Ready".</value>
+    <value>Welcome to SIGame! The game will begin as soon as all the players and the showman press "Ready" button</value>
   </data>
   <data name="GreetingNew" xml:space="preserve">
     <value>, greetings!</value>

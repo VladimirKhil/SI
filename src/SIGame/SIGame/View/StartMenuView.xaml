@@ -180,6 +180,16 @@
             VerticalAlignment="Bottom"
             Margin="0,0,15,15"
             Orientation="Horizontal">
+            <StackPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource SIToolButtonStyle}">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Resources>
+            
             <Button
                 Padding="5"
                 Width="48"
@@ -187,16 +197,6 @@
                 Command="{Binding NavigateToVK}"
                 ToolTip="{x:Static lp:Resources.VKHint}">
                 <Image Source="{Binding Source={x:Static lp:Resources.LinkLogo}}" />
-
-                <Button.Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource SIToolButtonStyle}">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
             </Button>
 
             <Button
@@ -206,16 +206,6 @@
                 Command="{Binding NavigateToDiscord}"
                 ToolTip="{x:Static lp:Resources.DiscordHint}">
                 <Image Source="/SIGame;component/Resources/discord_logo.png" />
-
-                <Button.Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource SIToolButtonStyle}">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
             </Button>
 
             <Button
@@ -236,6 +226,36 @@
                 Command="{Binding NavigateToSImulator}"
                 ToolTip="{x:Static lp:Resources.NavigateToSImulator}">
                 <Image Source="/SIGame;component/Resources/simulator-logo.png" />
+            </Button>
+
+            <Button
+                Style="{StaticResource SIToolButtonStyle}"
+                Padding="5"
+                Width="48"
+                Height="48"
+                Command="{Binding NavigateToYoomoney}"
+                ToolTip="Yoomoney">
+                <Image Source="/SIGame;component/Resources/yoomoney_logo.png" />
+            </Button>
+
+            <Button
+                Style="{StaticResource SIToolButtonStyle}"
+                Padding="5"
+                Width="48"
+                Height="48"
+                Command="{Binding NavigateToBoosty}"
+                ToolTip="Boosty" Cursor="Hand">
+                <Image Source="/SIGame;component/Resources/boosty_logo.png" />
+            </Button>
+
+            <Button
+                Style="{StaticResource SIToolButtonStyle}"
+                Padding="5"
+                Width="48"
+                Height="48"
+                Command="{Binding NavigateToPatreon}"
+                ToolTip="Patreon">
+                <Image Source="/SIGame;component/Resources/patreon_logo.png" />
             </Button>
         </StackPanel>
 

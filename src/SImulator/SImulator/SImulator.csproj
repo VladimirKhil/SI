@@ -37,6 +37,12 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Images\active_player.png" />
+    <None Remove="Images\boosty_logo.png" />
+    <None Remove="Images\game_small.jpg" />
+    <None Remove="Images\patreon_logo.png" />
+    <None Remove="Images\sigame_logo.jpg" />
+    <None Remove="Images\vk_logo.png" />
+    <None Remove="Images\yoomoney_logo.png" />
   </ItemGroup>
     <ItemGroup>
       <Content Update="ru-RU\SIUI.resources.dll">
@@ -46,7 +52,12 @@
     </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\active_player.png" />
+    <Resource Include="Images\boosty_logo.png" />
     <Resource Include="Images\logo.png" />
+    <Resource Include="Images\patreon_logo.png" />
+    <Resource Include="Images\sigame_logo.jpg" />
+    <Resource Include="Images\vk_logo.png" />
+    <Resource Include="Images\yoomoney_logo.png" />
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

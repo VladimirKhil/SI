@@ -15,6 +15,9 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
     private const string TwitchUri = @"https://www.twitch.tv/directory/category/sigame";
     private const string DiscordUri = @"https://discord.gg/pGXTE37gpv";
     private const string SImulatorUri = @"https://vladimirkhil.com/si/simulator";
+    private const string YoomoneyUri = @"https://yoomoney.ru/to/410012283941753";
+    private const string BoostyUri = @"https://boosty.to/vladimirkhil";
+    private const string PatreonUri = @"https://patreon.com/vladimirkhil";
 
     public UICommandCollection MainCommands { get; } = new();
 
@@ -29,6 +32,12 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
     public ICommand NavigateToDiscord { get; private set; }
 
     public ICommand NavigateToSImulator { get; private set; }
+
+    public ICommand NavigateToYoomoney { get; private set; }
+
+    public ICommand NavigateToBoosty { get; private set; }
+
+    public ICommand NavigateToPatreon { get; private set; }
 
     private ICommand? _update;
 
@@ -66,6 +75,18 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
         };
 
         NavigateToSImulator = new SimpleCommand(NavigateToSImulator_Executed);
+        
+        NavigateToYoomoney = new SimpleCommand(NavigateToYoomoney_Executed)
+        {
+            CanBeExecuted = Thread.CurrentThread.CurrentUICulture.Name == "ru-RU"
+        };
+
+        NavigateToBoosty = new SimpleCommand(NavigateToBoosty_Executed)
+        {
+            CanBeExecuted = Thread.CurrentThread.CurrentUICulture.Name == "ru-RU"
+        };
+
+        NavigateToPatreon = new SimpleCommand(NavigateToPatreon_Executed);
 
         CancelUpdate = new SimpleCommand(obj => Update = null);
     }
@@ -122,6 +143,48 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
         {
             PlatformSpecific.PlatformManager.Instance.ShowMessage(
                 string.Format(Resources.SiteNavigationError + "\r\n{1}", DiscordUri, exc.Message),
+                PlatformSpecific.MessageType.Error);
+        }
+    }
+
+    private void NavigateToYoomoney_Executed(object? arg)
+    {
+        try
+        {
+            Browser.Open(YoomoneyUri);
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.SiteNavigationError + "\r\n{1}", YoomoneyUri, exc.Message),
+                PlatformSpecific.MessageType.Error);
+        }
+    }
+
+    private void NavigateToBoosty_Executed(object? arg)
+    {
+        try
+        {
+            Browser.Open(BoostyUri);
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.SiteNavigationError + "\r\n{1}", BoostyUri, exc.Message),
+                PlatformSpecific.MessageType.Error);
+        }
+    }
+
+    private void NavigateToPatreon_Executed(object? arg)
+    {
+        try
+        {
+            Browser.Open(PatreonUri);
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.SiteNavigationError + "\r\n{1}", PatreonUri, exc.Message),
                 PlatformSpecific.MessageType.Error);
         }
     }

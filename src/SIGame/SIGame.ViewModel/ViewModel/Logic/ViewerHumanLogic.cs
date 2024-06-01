@@ -1468,6 +1468,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
         TInfo.LayoutMode = LayoutMode.Simple;
+        TInfo.AnimateText = true;
         TInfo.PartialText = false;
         TInfo.PartialImage = _appSettings.PartialText;
         TInfo.IsMediaStopped = false;

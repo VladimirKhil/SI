@@ -49,10 +49,13 @@
     <Resource Include="Fonts\Jost-Regular.ttf" />
     <Resource Include="Fonts\Jost-SemiBold.ttf" />
     <Resource Include="Fonts\Jost-Thin.ttf" />
+    <Resource Include="Resources\boosty_logo.png" />
     <Resource Include="Resources\discord_logo.png" />
     <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
+    <Resource Include="Resources\patreon_logo.png" />
     <Resource Include="Resources\simulator-logo.png" />
     <Resource Include="Resources\twitch_logo.png" />
+    <Resource Include="Resources\yoomoney_logo.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.ru-RU.resx">
@@ -172,7 +175,6 @@
     <Resource Include="Theme\main_background.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\fb_logo.png" />
     <Resource Include="Theme\studia.png" />
   </ItemGroup>
   <ItemGroup>
@@ -228,6 +230,7 @@
     <None Remove="Fonts\Jost-Thin.ttf" />
     <None Remove="Resources\active_player.png" />
     <None Remove="Resources\appellation.png" />
+    <None Remove="Resources\boosty_logo.png" />
     <None Remove="Resources\discord_logo.png" />
     <None Remove="Resources\edit.png" />
     <None Remove="Resources\exit.png" />
@@ -235,6 +238,7 @@
     <None Remove="Resources\load.png" />
     <None Remove="Resources\move_round.png" />
     <None Remove="Resources\next.png" />
+    <None Remove="Resources\patreon_logo.png" />
     <None Remove="Resources\pause.png" />
     <None Remove="Resources\protected.png" />
     <None Remove="Resources\search.png" />
@@ -243,6 +247,7 @@
     <None Remove="Resources\sound.png" />
     <None Remove="Resources\sums.png" />
     <None Remove="Resources\twitch_logo.png" />
+    <None Remove="Resources\yoomoney_logo.png" />
     <None Remove="Theme\main_background.png" />
     <None Remove="Theme\studia.png" />
   </ItemGroup>
