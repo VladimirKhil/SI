@@ -1212,4 +1212,7 @@
   <data name="SetVideoAvatar" xml:space="preserve">
     <value>Set video avatar</value>
   </data>
+  <data name="NavigateToSImulator" xml:space="preserve">
+    <value>SImulator</value>
+  </data>
 </root>

@@ -51,6 +51,7 @@
     <Resource Include="Fonts\Jost-Thin.ttf" />
     <Resource Include="Resources\discord_logo.png" />
     <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
+    <Resource Include="Resources\simulator-logo.png" />
     <Resource Include="Resources\twitch_logo.png" />
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +239,7 @@
     <None Remove="Resources\protected.png" />
     <None Remove="Resources\search.png" />
     <None Remove="Resources\settings.png" />
+    <None Remove="Resources\simulator-logo.png" />
     <None Remove="Resources\sound.png" />
     <None Remove="Resources\sums.png" />
     <None Remove="Resources\twitch_logo.png" />

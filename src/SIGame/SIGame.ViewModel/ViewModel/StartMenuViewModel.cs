@@ -14,6 +14,7 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
 {
     private const string TwitchUri = @"https://www.twitch.tv/directory/category/sigame";
     private const string DiscordUri = @"https://discord.gg/pGXTE37gpv";
+    private const string SImulatorUri = @"https://vladimirkhil.com/si/simulator";
 
     public UICommandCollection MainCommands { get; } = new();
 
@@ -26,6 +27,8 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
     public ICommand NavigateToTwitch { get; private set; }
 
     public ICommand NavigateToDiscord { get; private set; }
+
+    public ICommand NavigateToSImulator { get; private set; }
 
     private ICommand? _update;
 
@@ -62,7 +65,23 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
             CanBeExecuted = Thread.CurrentThread.CurrentUICulture.Name != "ru-RU"
         };
 
+        NavigateToSImulator = new SimpleCommand(NavigateToSImulator_Executed);
+
         CancelUpdate = new SimpleCommand(obj => Update = null);
+    }
+
+    private void NavigateToSImulator_Executed(object? arg)
+    {
+        try
+        {
+            Browser.Open(SImulatorUri);
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.SiteNavigationError + "\r\n{1}", Resources.GroupLink, exc.Message),
+                PlatformSpecific.MessageType.Error);
+        }
     }
 
     private void NavigateToVK_Executed(object? arg)

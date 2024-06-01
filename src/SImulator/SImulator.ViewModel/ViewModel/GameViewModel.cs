@@ -1682,12 +1682,12 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _isDisposed = true;
     }
 
-    internal void OnThemeSelected(int themeIndex)
+    internal void OnThemeSelected(int themeIndex, int questionIndex)
     {
         var theme = ActiveRound.Themes[themeIndex];
 
         ActiveTheme = theme;
-        ActiveQuestion = theme.Questions[0];
+        ActiveQuestion = theme.Questions[questionIndex];
 
         PresentationController.SetTheme(theme.Name);
         PresentationController.SetSound();

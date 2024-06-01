@@ -69,7 +69,8 @@ public interface ISIEnginePlayHandler
     /// Handles final theme selection (the theme that is left).
     /// </summary>
     /// <param name="themeIndex">Selected theme index.</param>
-    void OnThemeSelected(int themeIndex);
+    /// <param name="questionIndex">Question index.</param>
+    void OnThemeSelected(int themeIndex, int questionIndex);
 
     /// <summary>
     /// Handles theme play start.

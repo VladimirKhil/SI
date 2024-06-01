@@ -1726,6 +1726,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на SImulator.
+        /// </summary>
+        public static string NavigateToSImulator {
+            get {
+                return ResourceManager.GetString("NavigateToSImulator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на App runtime is corrupted! Try reinstall .NET Framework 4.6..
         /// </summary>
         public static string NETFrameworkCorrupted {

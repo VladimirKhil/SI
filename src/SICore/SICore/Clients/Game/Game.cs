@@ -3504,13 +3504,13 @@ public sealed class Game : Actor<GameData, GameLogic>
     {
         if (!string.IsNullOrEmpty(account.Picture))
         {
-            _gameActions.SendMessageToWithArgs(receiver, Messages.Avatar, account.Name, ContentTypes.Image, account.Picture);
-
-            // for backward compatibility
             var link = CreateUri(account.Name, account.Picture, receiver);
 
             if (link != null)
             {
+                _gameActions.SendMessageToWithArgs(receiver, Messages.Avatar, account.Name, ContentTypes.Image, link);
+
+                // for backward compatibility
                 _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Picture, account.Name, link), receiver);
             }
         }

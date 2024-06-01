@@ -17,11 +17,6 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
-    public void CancelQuestionSelection()
-    {
-        
-    }
-
     public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
         
@@ -62,7 +57,7 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
-    public void OnThemeSelected(int themeIndex)
+    public void OnThemeSelected(int themeIndex, int questionIndex)
     {
         
     }

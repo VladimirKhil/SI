@@ -227,6 +227,16 @@
                 ToolTip="{x:Static lp:Resources.TwitchHint}">
                 <Image Source="/SIGame;component/Resources/twitch_logo.png" />
             </Button>
+
+            <Button
+                Style="{StaticResource SIToolButtonStyle}"
+                Padding="5"
+                Width="48"
+                Height="48"
+                Command="{Binding NavigateToSImulator}"
+                ToolTip="{x:Static lp:Resources.NavigateToSImulator}">
+                <Image Source="/SIGame;component/Resources/simulator-logo.png" />
+            </Button>
         </StackPanel>
 
         <my:DropDownButton

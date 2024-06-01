@@ -105,10 +105,11 @@ internal sealed class RemoveOtherThemesStrategy : ISelectionStrategy
         var themeIndex = _leftFinalThemesIndicies.First();
         var theme = _finalThemes[themeIndex];
         var publicThemeIndex = _round.Themes.IndexOf(theme);
+        var questionIndex = 0;
 
         _finalThemes.RemoveAt(themeIndex);
-        _selectionCallback(publicThemeIndex, 0);
-        _playHandler.OnThemeSelected(publicThemeIndex);
+        _selectionCallback(publicThemeIndex, questionIndex);
+        _playHandler.OnThemeSelected(publicThemeIndex, questionIndex);
         
         if (_options.PlayAllQuestionsInFinalRound && _finalThemes.Any())
         {

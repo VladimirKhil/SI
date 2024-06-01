@@ -128,7 +128,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public void OnThemeDeleted(int themeIndex) => GameLogic?.OnThemeDeleted(themeIndex);
 
-    public void OnThemeSelected(int themeIndex)
+    public void OnThemeSelected(int themeIndex, int questionIndex)
     {
         if (_gameData.Round == null)
         {
@@ -139,8 +139,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         _gameData.ThemeIndex = themeIndex;
         _gameData.Theme = _gameData.Round.Themes[themeIndex];
 
-        var questionsCount = _gameData.Theme.Questions.Count;
-        _gameData.QuestionIndex = Random.Shared.Next(questionsCount);
+        _gameData.QuestionIndex = questionIndex;
         _gameData.Question = _gameData.Theme.Questions[_gameData.QuestionIndex];
 
         GameLogic?.AnnounceFinalTheme();

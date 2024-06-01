@@ -342,7 +342,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnThemeDeleted(int themeIndex) => GameViewModel?.OnThemeDeleted(themeIndex);
 
-    public void OnThemeSelected(int themeIndex) => GameViewModel?.OnThemeSelected(themeIndex);
+    public void OnThemeSelected(int themeIndex, int questionIndex) =>
+        GameViewModel?.OnThemeSelected(themeIndex, questionIndex);
 
     public void OnTheme(Theme theme) => GameViewModel?.OnTheme(theme);
 

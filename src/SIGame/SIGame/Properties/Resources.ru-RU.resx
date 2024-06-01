@@ -1215,4 +1215,7 @@
   <data name="SetVideoAvatar" xml:space="preserve">
     <value>Задать видео аватар</value>
   </data>
+  <data name="NavigateToSImulator" xml:space="preserve">
+    <value>СИмулятор</value>
+  </data>
 </root>
