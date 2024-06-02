@@ -1359,16 +1359,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _data.IsThinking = false;
                 _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Stop);
 
-                if (!ClientData.Settings.AppSettings.FalseStart && !ClientData.IsQuestionFinished)
-                {
-                    if (_data.QuestionPlayState.AnswerOptions != null)
-                    {
-                        _continuation = null; // Erase AskAnswer continuation
-                    }
-
-                    Engine.MoveToAnswer();
-                }
-
+                MoveToAnswer(); // Question is answered correctly
                 ScheduleExecution(Tasks.MoveNext, 1, force: true);
             }
             else
@@ -1468,12 +1459,32 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     }
 
     /// <summary>
-    /// Продолжить отыгрыш вопроса
+    /// Skips left question part and moves directly to answer.
+    /// </summary>
+    internal void MoveToAnswer()
+    {
+        if (ClientData.IsQuestionFinished)
+        {
+            return;
+        }
+
+        if (_data.QuestionPlayState.AnswerOptions != null)
+        {
+            _continuation = null; // Erase AskAnswer continuation (TODO: very difficult to track everywhere - can this be simplified?)
+        }
+
+        Engine.MoveToAnswer();
+    }
+
+    /// <summary>
+    /// Tries to continue question play.
     /// </summary>
     public void ContinueQuestion()
     {
         if (IsSpecialQuestion())
         {
+            // No need to move to answer as special questions could be different
+            // TODO: in the future there could be situations when special questions could be unfinished here
             ScheduleExecution(Tasks.WaitTry, 20);
             return;
         }
@@ -1482,6 +1493,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (!canAnybodyPress)
         {
+            MoveToAnswer();
             ScheduleExecution(Tasks.WaitTry, 20, force: true);
             return;
         }
@@ -1492,6 +1504,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             if (oneOptionLeft)
             {
+                MoveToAnswer();
                 ScheduleExecution(Tasks.WaitTry, 20, force: true);
                 return;
             }
@@ -1675,6 +1688,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
     {
+        if (_data.IsDeferringAnswer)
+        {
+            // AskAnswerDeferred task cannot be avoided
+            _tasksHistory.AddLogEntry($"AskAnswerDeferred task blocks scheduling ({_taskRunner.CurrentTask}): {task} {arg} {taskTime / 10}");
+            return;
+        }
+
         _tasksHistory.AddLogEntry($"Scheduled ({_taskRunner.CurrentTask}): {task} {arg} {taskTime / 10}");
         _taskRunner.ScheduleExecution(task, taskTime, arg, force || ShouldRunTimer());
     }
@@ -1915,6 +1935,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private void AskAnswerDeferred()
     {
         _data.Decision = DecisionType.None;
+        _data.IsDeferringAnswer = false;
 
         if (!PrepareForAskAnswer())
         {
@@ -2103,8 +2124,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 break;
 
             case StopReason.Wait:
-                _data.IsDeferringAnswer = true;
+                // TODO: if someone overrides Task after that (skipping AskAnswerDeferred execution), nobody could press the button during this question
+                // That's very fragile logic. Think about alternatives
+                // The order of calls is important here!
                 ScheduleExecution(Tasks.AskAnswerDeferred, _data.WaitInterval, force: true);
+                _data.IsDeferringAnswer = true;
                 break;
         }
 
@@ -3000,6 +3024,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             if (ClientData.PendingAnswererIndicies.Count == 0)
             {
+                DumpButtonPressError("ClientData.PendingAnswererIndicies.Count == 0");
                 return false;
             }
 
@@ -3009,6 +3034,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (ClientData.PendingAnswererIndex < 0 || ClientData.PendingAnswererIndex >= ClientData.Players.Count)
         {
+            DumpButtonPressError($"ClientData.PendingAnswererIndex = {ClientData.PendingAnswererIndex}; ClientData.Players.Count = {ClientData.Players.Count}");
             return false;
         }
 
@@ -3039,11 +3065,16 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Pause, (int)ClientData.TimeThinking);
 
-        _data.IsDeferringAnswer = false;
         _data.IsPlayingMediaPaused = _data.IsPlayingMedia;
         _data.IsPlayingMedia = false;
 
         return true;
+    }
+
+    internal void DumpButtonPressError(string reason)
+    {
+        var pressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+        _data.Host.SendError(new Exception($"{reason} {pressMode}"));
     }
 
     private void StartGame(int arg)

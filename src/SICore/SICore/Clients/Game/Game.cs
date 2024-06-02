@@ -1005,6 +1005,18 @@ public sealed class Game : Actor<GameData, GameLogic>
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
                     question.Price));
         }
+
+        // TODO: remove after all clients upgrade to 7.12.0
+        ClientData.TableInformStageLock.WithLock(
+            () =>
+            {
+                if (ClientData.TableInformStage > 1)
+                {
+                    _gameActions.InformRoundThemes(playMode: ThemesPlayMode.None);
+                    _gameActions.InformTable();
+                }
+            },
+            5000);
     }
 
     private void OnKick(Message message, string[] args)
@@ -1859,7 +1871,6 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (ClientData.HaveViewedAtom <= 0)
         {
             ClientData.IsPlayingMedia = false;
-
             _logic.ExecuteImmediate();
         }
         else
@@ -2157,14 +2168,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             && !ClientData.TInfo.Pause
             && !ClientData.IsAnswer)
         {
-            if (!ClientData.IsQuestionFinished)
-            {
-                _logic.Engine.MoveToAnswer();
-            }
-
-            _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All);
-            _logic.ClearContinuation();
-            _logic.ScheduleExecution(Tasks.MoveNext, 1, force: true);
+            _logic.MoveToAnswer();
+            _logic.ScheduleExecution(Tasks.WaitTry, 1, force: true);
         }
     }
 
@@ -2268,10 +2273,18 @@ public sealed class Game : Actor<GameData, GameLogic>
         {
             var player = ClientData.Players[i];
 
-            if (player.Name == playerName &&
-                player.CanPress &&
-                DateTime.UtcNow.Subtract(player.LastBadTryTime).TotalSeconds >= blockingButtonTime)
+            if (player.Name == playerName)
             {
+                if (!player.CanPress)
+                {
+                    break;
+                }
+
+                if (DateTime.UtcNow.Subtract(player.LastBadTryTime).TotalSeconds < blockingButtonTime)
+                {
+                    break;
+                }
+
                 answererIndex = i;
                 break;
             }
@@ -2741,7 +2754,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         // Drop answerer index
         ClientData.AnswererIndex = -1;
 
-        var nextTask = (Tasks)Logic.Runner.PendingTask;
+        var nextTask = Logic.Runner.PendingTask;
 
         Logic.AddHistory(
             $"AnswererIndex dropped; nextTask = {nextTask};" +
@@ -2758,29 +2771,29 @@ public sealed class Game : Actor<GameData, GameLogic>
                 _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
             }
 
-            PlanExecution(Tasks.ContinueQuestion, 1);
+            Logic.PlanExecution(Tasks.ContinueQuestion, 1);
         }
-        else if (nextTask == Tasks.AskRight)
+        else if (nextTask == Tasks.AskRight || nextTask == Tasks.WaitRight)
         {
             // Player has been removed after giving answer. But the answer has not been validated by showman yet
             if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0)
             {
-                PlanExecution(Tasks.ContinueQuestion, 1);
+                Logic.PlanExecution(Tasks.ContinueQuestion, 1);
             }
             else
             {
-                PlanExecution(Tasks.Announce, 15);
+                Logic.PlanExecution(Tasks.Announce, 15);
             }
         }
         else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0
             && ClientData.Question?.TypeName != QuestionTypes.Simple)
         {
             Logic.Engine.SkipQuestion();
-            PlanExecution(Tasks.MoveNext, 20, 1);
+            Logic.PlanExecution(Tasks.MoveNext, 20, 1);
         }
         else if (nextTask == Tasks.AnnounceStake)
         {
-            PlanExecution(Tasks.Announce, 15);
+            Logic.PlanExecution(Tasks.Announce, 15);
         }
     }
 

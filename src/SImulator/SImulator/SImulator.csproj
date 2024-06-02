@@ -35,6 +35,21 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+    <PropertyGroup>
+	    <WebView2LoaderPreference>Static</WebView2LoaderPreference>
+    </PropertyGroup>
+
+    <ItemGroup>
+	    <PublishFile Include="runtimes\win-x86\native\WebView2Loader.dll">
+		    <Visible>False</Visible>
+		    <Group>
+		    </Group>
+		    <TargetPath>WebView2Loader.dll</TargetPath>
+		    <PublishState>Include</PublishState>
+		    <IncludeHash>True</IncludeHash>
+		    <FileType>File</FileType>
+	    </PublishFile>
+    </ItemGroup>
   <ItemGroup>
     <None Remove="Images\active_player.png" />
     <None Remove="Images\boosty_logo.png" />

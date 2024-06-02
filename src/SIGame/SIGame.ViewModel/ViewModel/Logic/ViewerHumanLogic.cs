@@ -708,6 +708,19 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
+    public void OnToggle(int themeIndex, int questionIndex, int price)
+    {
+        if (themeIndex < 0
+            || themeIndex >= TInfo.RoundInfo.Count
+            || questionIndex < 0
+            || questionIndex >= TInfo.RoundInfo[themeIndex].Questions.Count)
+        {
+            return;
+        }
+
+        TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
+    }
+
     public void OnContent(string[] mparams)
     {
         if (mparams.Length < 5)

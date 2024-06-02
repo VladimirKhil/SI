@@ -349,7 +349,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
                 if (!_mediaProgressBlock)
                 {
-                    PresentationController?.SeekMedia(_mediaProgress);
+                    PresentationController.SeekMedia(_mediaProgress);
 
                     if (_presentationListener.IsMediaEnded)
                     {

@@ -137,7 +137,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         {
             if (_listener != null)
             {
-                UI.Execute(() => _listener.AskStop(), exc => Error?.Invoke(exc));
+                UI.Execute(_listener.AskStop, OnError);
             }
         });
 
@@ -178,7 +178,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
     }
 
-    public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound), exc => Error?.Invoke(exc));
+    public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound), OnError);
 
     public async Task StartAsync()
     {
@@ -516,7 +516,9 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
     }
 
-    public void SeekMedia(int position) => TInfo.OnMediaSeek(position);
+    public void SeekMedia(int position) => UI.Execute(() => TInfo.OnMediaSeek(position), OnError);
+
+    private void OnError(Exception exc) => Error?.Invoke(exc);
 
     public void RunMedia() => TInfo.OnMediaResume();
 

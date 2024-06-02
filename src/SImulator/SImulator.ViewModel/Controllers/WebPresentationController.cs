@@ -619,7 +619,9 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private void SendMessage(object message) =>
         UI.Execute(
             () => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions)),
-            exc => PlatformManager.Instance.ShowMessage(exc.Message));
+            OnError);
+
+    private void OnError(Exception exc) => Error?.Invoke(exc);
 
     /// <summary>
     /// Defines content info.

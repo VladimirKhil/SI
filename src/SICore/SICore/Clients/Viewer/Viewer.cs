@@ -915,7 +915,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     {
                         #region EndTry
 
-                        if (mparams[1] == "A")
+                        if (mparams[1] == MessageParams.EndTry_All)
                         {
                             _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "", null);
                             Timer?.Invoke(1, MessageParams.Timer_Stop, "");
@@ -1285,6 +1285,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
 
         theme.Questions[questionIndex].Price = price;
+        _logic.OnToggle(themeIndex, questionIndex, price);
     }
 
     private void OnUnbanned(string[] mparams)

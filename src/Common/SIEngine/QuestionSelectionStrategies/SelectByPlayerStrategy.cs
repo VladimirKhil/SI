@@ -86,11 +86,7 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
     {
         var result = _questionsTable.Remove((themeIndex, questionIndex));
 
-        if (result && _stage == Stage.WaitSelection && !_questionsTable.Any())
-        {
-            _stage = Stage.RoundTable;
-            _endRoundCallback();
-        }
+        InvalidateState();
 
         return result;
     }
@@ -115,6 +111,18 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
         _questionsTable.Add((themeIndex, questionIndex));
         _playHandler.OnQuestionRestored(themeIndex, questionIndex, _round.Themes[themeIndex].Questions[questionIndex].Price);
         return true;
+    }
+
+    // TODO: explicitly call this method on game resume through the GameEngine
+    private void InvalidateState()
+    {
+        if (_questionsTable.Any())
+        {
+            return;
+        }
+
+        _stage = Stage.RoundTable;
+        _endRoundCallback();
     }
 
     private Stage OnRoundThemes()

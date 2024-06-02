@@ -207,4 +207,6 @@ public interface IViewerLogic : ILogic
     void OnContentShape(string shape) { }
 
     void OnOptions(string[] mparams) { }
+
+    void OnToggle(int themeIndex, int questionIndex, int price) { }
 }

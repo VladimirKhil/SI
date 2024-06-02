@@ -63,13 +63,15 @@ public enum Tasks
     ShowNextAnswerOption,
 
     /// <summary>
-    /// Предложение жать на кнопку
+    /// Asking the players to press the button.
     /// </summary>
     AskToTry,
+    
     /// <summary>
-    /// Ожидание нажатия на кнопку
+    /// Waiting for the players to press the button.
     /// </summary>
     WaitTry,
+    
     /// <summary>
     /// Объявление источников и комментариев вопроса
     /// </summary>
