@@ -96,7 +96,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback)
     {
         GameLogic?.SetContinuation(() => selectCallback(_gameData.ThemeIndex, _gameData.QuestionIndex));
-        GameLogic?.ScheduleExecution(Tasks.AskToChoose, 20);
+        GameLogic?.ScheduleExecution(Tasks.AskToChoose, 1); // TODO: why not calling AskToChoose directly?
     }
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameLogic?.OnQuestionSelected(themeIndex, questionIndex);
