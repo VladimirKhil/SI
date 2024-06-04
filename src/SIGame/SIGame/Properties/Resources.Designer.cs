@@ -1879,6 +1879,24 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Partial images.
+        /// </summary>
+        public static string PartialImages {
+            get {
+                return ResourceManager.GetString("PartialImages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Images appear in portions if you play without false starts.
+        /// </summary>
+        public static string PartialImages_Hint {
+            get {
+                return ResourceManager.GetString("PartialImages_Hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Partial questions.
         /// </summary>
         public static string PartialQuestions {
@@ -1888,7 +1906,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на The text appears in portions if you play without false starts.
+        ///   Ищет локализованную строку, похожую на Text appears in portions if you play without false starts.
         /// </summary>
         public static string PartialQuestions_Hint {
             get {

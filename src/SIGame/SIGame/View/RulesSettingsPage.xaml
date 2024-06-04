@@ -125,6 +125,15 @@
 
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.PartialQuestions_Hint}" />
 
+        <CheckBox
+            IsChecked="{Binding Model.PartialImages}"
+            Style="{StaticResource HeaderBox}"
+            IsEnabled="{Binding Model.FalseStart, Converter={StaticResource NotToCheckedConverter}}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PartialImages}" />
+        </CheckBox>
+
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.PartialImages_Hint}" />
+
         <CheckBox Style="{StaticResource HeaderBox}" IsChecked="{Binding Model.PlayAllQuestionsInFinalRound}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PlayAllQuestionsInFinalRound}" />
         </CheckBox>

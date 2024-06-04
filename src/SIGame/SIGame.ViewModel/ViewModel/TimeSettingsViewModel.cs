@@ -35,7 +35,7 @@ public sealed class TimeSettingsViewModel : ViewModel<TimeSettings>
             [TimeSettingsTypes.FinalThinking] = new TimeSetting(Properties.Resources.TimeSettings_FinalThinking, _model, TimeSettingsTypes.FinalThinking, 45, 120),
             [TimeSettingsTypes.ShowmanDecisions] = new TimeSetting(Properties.Resources.TimeSettings_ShowmanDecisions, _model, TimeSettingsTypes.ShowmanDecisions, 30, 300),
             [TimeSettingsTypes.MediaDelay] = new TimeSetting(Properties.Resources.TimeSettings_MediaDelay, _model, TimeSettingsTypes.MediaDelay, 0, 10),
-            [TimeSettingsTypes.PartialImageTime] = new TimeSetting(Properties.Resources.TimeSettings_PartialImageTime, _model, TimeSettingsTypes.PartialImageTime, 0, 20)
+            [TimeSettingsTypes.PartialImageTime] = new TimeSetting(Properties.Resources.TimeSettings_PartialImageTime, _model, TimeSettingsTypes.PartialImageTime, 1, 20)
         };
     }
 }

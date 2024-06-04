@@ -1489,7 +1489,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return;
         }
 
-        var canAnybodyPress = _data.Players.Any(player => player.CanPress);
+        var canAnybodyPress = _data.Players.Any(player => player.CanPress && player.IsConnected);
 
         if (!canAnybodyPress)
         {

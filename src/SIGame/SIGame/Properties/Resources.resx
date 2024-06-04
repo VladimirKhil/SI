@@ -424,7 +424,7 @@
     <value>Partial questions</value>
   </data>
   <data name="PartialQuestions_Hint" xml:space="preserve">
-    <value>The text appears in portions if you play without false starts</value>
+    <value>Text appears in portions if you play without false starts</value>
   </data>
   <data name="PassOnQuestion1" xml:space="preserve">
     <value>Odds: passing on a question of the first category</value>
@@ -1214,5 +1214,11 @@
   </data>
   <data name="NavigateToSImulator" xml:space="preserve">
     <value>SImulator</value>
+  </data>
+  <data name="PartialImages" xml:space="preserve">
+    <value>Partial images</value>
+  </data>
+  <data name="PartialImages_Hint" xml:space="preserve">
+    <value>Images appear in portions if you play without false starts</value>
   </data>
 </root>

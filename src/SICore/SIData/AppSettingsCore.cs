@@ -13,6 +13,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultFalseStart = true;
     public const bool DefaultHintShowman = false;
     public const bool DefaultPartialText = false;
+    public const bool DefaultPartialImages = true;
     public const bool DefaultPlayAllQuestionsInFinalRound = false;
     public const bool DefaultAllowEveryoneToPlayHiddenStakes = true;
     public const bool DefaultOral = false;
@@ -112,6 +113,20 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     {
         get => _partialText;
         set { _partialText = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _partialImages = DefaultPartialImages;
+
+    /// <summary>
+    /// Partial images flag.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultPartialImages)]
+    public bool PartialImages
+    {
+        get => _partialImages;
+        set { _partialImages = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -364,6 +379,8 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         _readingSpeed = origin._readingSpeed;
         _multimediaPort = origin._multimediaPort;
         _falseStart = origin._falseStart;
+        PartialText = origin.PartialText;
+        PartialImages = origin.PartialImages;
         _hintShowman = origin._hintShowman;
         PlayAllQuestionsInFinalRound = origin.PlayAllQuestionsInFinalRound;
         AllowEveryoneToPlayHiddenStakes = origin.AllowEveryoneToPlayHiddenStakes;
@@ -391,6 +408,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         TimeSettings = settings.TimeSettings;
         FalseStart = settings._falseStart;
         PartialText = settings.PartialText;
+        PartialImages = settings.PartialImages;
         Managed = settings.Managed;
         HintShowman = settings._hintShowman;
         PlayAllQuestionsInFinalRound = settings.PlayAllQuestionsInFinalRound;

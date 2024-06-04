@@ -287,6 +287,7 @@ namespace SIQuester.ViewModel.Properties {
         
         /// <summary>
         ///   Ищет локализованную строку, похожую на Cars
+        ///Alphabet
         ///Anime
         ///Astronomy
         ///Biology
@@ -298,7 +299,7 @@ namespace SIQuester.ViewModel.Properties {
         ///Books: Comics
         ///Memes
         ///Mathematics
-        ///Music: Rock, Pop, Rap, Jazz, Metal, Electronic, Covers, Russian music, Classical music
+        ///Music: Rock, Pop, Rap, Jazz, Metal, Electronic, Covers, Classical music
         ///Cartoons
         ///Rebuses
         ///Comics

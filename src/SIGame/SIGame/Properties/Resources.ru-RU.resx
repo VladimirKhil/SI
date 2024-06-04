@@ -634,7 +634,7 @@
     <value>Если ведущий – человек. Хорошо подходит для стримов. Игроки делают выбор и дают ответ голосом</value>
   </data>
   <data name="PartialQuestions" xml:space="preserve">
-    <value>Частичный текст вопросов</value>
+    <value>Частичный вывод текста</value>
   </data>
   <data name="PartialQuestions_Hint" xml:space="preserve">
     <value>При игре без фальстартов текст выводится порционно</value>
@@ -1217,5 +1217,11 @@
   </data>
   <data name="NavigateToSImulator" xml:space="preserve">
     <value>СИмулятор</value>
+  </data>
+  <data name="PartialImages" xml:space="preserve">
+    <value>Частичный вывод изображений</value>
+  </data>
+  <data name="PartialImages_Hint" xml:space="preserve">
+    <value>При игре без фальстартов изображения выводятся порционно</value>
   </data>
 </root>

@@ -191,6 +191,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         _gameActions.SendMessageToWithArgs(person, Messages.Options,
             nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels,
             nameof(appSettings.PartialText), appSettings.PartialText,
+            nameof(appSettings.PartialImages), appSettings.PartialImages,
             nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime);
     }
 

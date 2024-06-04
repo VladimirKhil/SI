@@ -694,6 +694,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                     break;
 
+                case nameof(AppSettingsCore.PartialImages):
+                    if (bool.TryParse(optionValue, out var partialImages))
+                    {
+                        _appSettings.PartialImages = partialImages;
+                    }
+
+                    break;
+
                 case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
                     if (int.TryParse(optionValue, out var value))
                     {
@@ -948,11 +956,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                     currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
 
-                    if (contentType == ContentTypes.Image && _appSettings.PartialText && _appSettings.TimeSettings.PartialImageTime > 0)
+                    if (contentType == ContentTypes.Image && _appSettings.PartialImages && _appSettings.TimeSettings.PartialImageTime > 0)
                     {
                         _runTimer = true;
                         _initialTime = 0;
                     }
+
                     break;
             }
         }
@@ -1483,7 +1492,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.LayoutMode = LayoutMode.Simple;
         TInfo.AnimateText = true;
         TInfo.PartialText = false;
-        TInfo.PartialImage = _appSettings.PartialText;
+        TInfo.PartialImage = _appSettings.PartialImages;
         TInfo.IsMediaStopped = false;
         _data.EnableMediaLoadButton = false;
         _data.ExternalContent.Clear();
