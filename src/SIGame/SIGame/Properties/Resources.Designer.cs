@@ -1897,7 +1897,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Partial questions.
+        ///   Ищет локализованную строку, похожую на Partial questions text.
         /// </summary>
         public static string PartialQuestions {
             get {

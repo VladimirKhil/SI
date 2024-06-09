@@ -1582,6 +1582,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на requested appellation.
+        /// </summary>
+        public static string RequestedApellation {
+            get {
+                return ResourceManager.GetString("RequestedApellation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Restrictions.
         /// </summary>
         public static string Restrictions {

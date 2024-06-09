@@ -181,6 +181,7 @@ public static class Messages
     /// Фальстарты
     /// </summary>
     [IdempotencyRequired]
+    [Obsolete]
     public const string FalseStart = "FALSESTART";
 
     /// <summary>

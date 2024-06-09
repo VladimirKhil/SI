@@ -96,6 +96,14 @@ public sealed class AnimatableTimer : Animatable, IAnimatableTimer
             ? new DoubleAnimation(fromValue.Value, 100.0, duration) { FillBehavior = fillBehavior }
             : new DoubleAnimation(100.0, duration) { FillBehavior = fillBehavior };
 
+        animation.Completed += (s, e) =>
+        {
+            if (State == TimerState.Running)
+            {
+                State = TimerState.Completed;
+            }
+        };
+
         BeginAnimation(TimeProperty, animation);
     }
 

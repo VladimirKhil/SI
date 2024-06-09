@@ -532,6 +532,6 @@
     <value>Задать видео аватар (vdo.ninja)</value>
   </data>
   <data name="TimeSettings_PartialImageTime" xml:space="preserve">
-    <value>Вывод частичных изображенй</value>
+    <value>Вывод частичных изображений</value>
   </data>
 </root>

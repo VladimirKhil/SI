@@ -103,6 +103,18 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
+        InformActivePlayers();
+
+        _gameData.AnnounceAnswer = true; // initialization
+
+        GameLogic?.InitThemes(themes, willPlayAllThemes, isFirstPlay, Models.ThemesPlayMode.AllTogether);
+        _gameData.ThemeDeleters = new ThemeDeletersEnumerator(_gameData.Players, _gameData.TInfo.RoundInfo.Count(t => t.Name != null));
+        _gameData.ThemeDeleters.Reset(true);
+        GameLogic?.ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));
+    }
+
+    private void InformActivePlayers()
+    {
         var s = new MessageBuilder(Messages.FinalRound);
 
         for (var i = 0; i < _gameData.Players.Count; i++)
@@ -111,13 +123,6 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         }
 
         GameActions?.SendMessage(s.ToString());
-
-        _gameData.AnnounceAnswer = true; // initialization
-
-        GameLogic?.InitThemes(themes, willPlayAllThemes, isFirstPlay, Models.ThemesPlayMode.AllTogether);
-        _gameData.ThemeDeleters = new ThemeDeletersEnumerator(_gameData.Players, _gameData.TInfo.RoundInfo.Count(t => t.Name != null));
-        _gameData.ThemeDeleters.Reset(true);
-        GameLogic?.ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));
     }
 
     public void AskForThemeDelete(Action<int> deleteCallback)

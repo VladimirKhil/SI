@@ -190,6 +190,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         _gameActions.SendMessageToWithArgs(person, Messages.Options,
             nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels,
+            nameof(appSettings.FalseStart), appSettings.FalseStart,
             nameof(appSettings.PartialText), appSettings.PartialText,
             nameof(appSettings.PartialImages), appSettings.PartialImages,
             nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime);
@@ -1656,6 +1657,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 // TODO: save appellation request and return to it after question finish
                 // Merge AppellationOpened and AllowAppellation properties into triple-state property
                 ClientData.PendingApellation = true;
+                _gameActions.SpecialReplic($"{ClientData.AppellationSource} {LO[nameof(R.RequestedApellation)]}");
             }
 
             return;
@@ -1798,7 +1800,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        _logic.AddHistory($"Move started: {ClientData.MoveDirection}");
+        _logic.AddHistory($"Move started: {moveDirection}");
 
         ClientData.MoveDirection = moveDirection;
         _logic.Stop(StopReason.Move);
@@ -3076,7 +3078,8 @@ public sealed class Game : Actor<GameData, GameLogic>
                         {
                             Ready = account.Ready,
                             IsConnected = account.IsConnected,
-                            IsMoveable = account.IsMoveable
+                            IsMoveable = account.IsMoveable,
+                            Flag = ClientData.Players[i].Flag
                         };
 
                         otherIndex = i;
@@ -3123,7 +3126,12 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             if (isPlayer)
             {
-                ClientData.Players[index] = new GamePlayerAccount(otherAccount) { IsConnected = otherAccount.IsConnected, IsMoveable = otherAccount.IsMoveable };
+                ClientData.Players[index] = new GamePlayerAccount(otherAccount)
+                {
+                    IsConnected = otherAccount.IsConnected,
+                    IsMoveable = otherAccount.IsMoveable,
+                    Flag = ClientData.Players[index].Flag
+                };
 
                 if (otherPerson != null)
                 {
@@ -3132,7 +3140,11 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             else
             {
-                ClientData.ShowMan = new GamePersonAccount(otherAccount) { IsConnected = otherAccount.IsConnected, IsMoveable = otherAccount.IsMoveable };
+                ClientData.ShowMan = new GamePersonAccount(otherAccount)
+                {
+                    IsConnected = otherAccount.IsConnected,
+                    IsMoveable = otherAccount.IsMoveable
+                };
 
                 if (otherPerson != null)
                 {
@@ -3313,7 +3325,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             Name = account.Name,
             IsMale = account.IsMale,
             Picture = account.Picture,
-            IsConnected = true
+            IsConnected = true,
+            Flag = ClientData.Players[index].Flag
         };
 
         ClientData.Players[index] = newAccount;

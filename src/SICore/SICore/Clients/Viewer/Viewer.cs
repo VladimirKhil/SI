@@ -833,7 +833,10 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     break;
 
                 case Messages.ContentShape:
-                    if (mparams.Length > 4)
+                    if (mparams.Length > 4
+                        && mparams[1] == ContentPlacements.Screen
+                        && mparams[2] == "0"
+                        && mparams[3] == ContentTypes.Text)
                     {
                         _logic.OnContentShape(mparams[4].UnescapeNewLines());
                     }

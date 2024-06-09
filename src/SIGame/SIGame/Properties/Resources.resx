@@ -421,7 +421,7 @@
     <value>Pack</value>
   </data>
   <data name="PartialQuestions" xml:space="preserve">
-    <value>Partial questions</value>
+    <value>Partial questions text</value>
   </data>
   <data name="PartialQuestions_Hint" xml:space="preserve">
     <value>Text appears in portions if you play without false starts</value>

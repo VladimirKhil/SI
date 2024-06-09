@@ -686,6 +686,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                     break;
 
+                case nameof(AppSettingsCore.FalseStart):
+                    if (bool.TryParse(optionValue, out var falseStart))
+                    {
+                        _appSettings.FalseStart = falseStart;
+                    }
+
+                    break;
+
                 case nameof(AppSettingsCore.PartialText):
                     if (bool.TryParse(optionValue, out var partialText))
                     {
@@ -956,7 +964,10 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                     currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
 
-                    if (contentType == ContentTypes.Image && _appSettings.PartialImages && _appSettings.TimeSettings.PartialImageTime > 0)
+                    if (contentType == ContentTypes.Image
+                        && !_appSettings.FalseStart
+                        && _appSettings.PartialImages
+                        && _appSettings.TimeSettings.PartialImageTime > 0)
                     {
                         _runTimer = true;
                         _initialTime = 0;

@@ -69,6 +69,7 @@ public sealed class RandomStoragePackageSource : PackageSource
                 new RandomPackageParameters
                 {
                     RestrictionIds = new int[] { -1 },
+                    TagIds = new int[] { -1 },
                     LanguageId = language?.Id
                 },
                 cancellationToken);
