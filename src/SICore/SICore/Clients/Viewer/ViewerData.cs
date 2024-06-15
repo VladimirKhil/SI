@@ -7,6 +7,8 @@ using System.Text;
 
 namespace SICore;
 
+// TODO: move all UI-related stuff to GameViewModel class
+
 /// <summary>
 /// Defines viewer data.
 /// </summary>
@@ -251,7 +253,20 @@ public sealed class ViewerData : Data
 
     public bool IsInfoInitialized { get; set; }
 
-    public bool IsChatOpened { get; set; } = true;
+    private bool _isChatOpened = true;
+
+    public bool IsChatOpened
+    {
+        get => _isChatOpened;
+        set
+        {
+            if (_isChatOpened != value)
+            {
+                _isChatOpened = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     /// <summary>
     /// Адрес изображения участника

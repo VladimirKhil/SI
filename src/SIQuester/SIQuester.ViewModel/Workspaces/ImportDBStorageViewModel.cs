@@ -418,7 +418,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
         }
         finally
         {
-            _loadLock.Release();
+            try { _loadLock.Release(); } catch (ObjectDisposedException) { }
             IsProgress = false;
         }
 

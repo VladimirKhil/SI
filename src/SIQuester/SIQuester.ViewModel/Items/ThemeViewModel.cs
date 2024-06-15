@@ -145,9 +145,9 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
 
     private void CloneTheme_Executed(object? arg)
     {
-        if (OwnerRound == null)
+        if (OwnerRound == null || OwnerRound.OwnerPackage == null)
         {
-            throw new InvalidOperationException("OwnerRound == null");
+            return;
         }
 
         var newTheme = Model.Clone();
@@ -186,8 +186,8 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     {
         try
         {
-            var document = OwnerRound.OwnerPackage.Document;
-            var price = DetectNextQuestionPrice();
+            var document = (OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("document not found");
+            var price = DetectNextQuestionPrice(OwnerRound);
 
             var question = PackageItemsHelper.CreateQuestion(price);
 
@@ -204,7 +204,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         }
     }
 
-    private int DetectNextQuestionPrice()
+    private int DetectNextQuestionPrice(RoundViewModel round)
     {
         var validQuestions = Questions.Where(q => q.Model.Price != Question.InvalidPrice).ToList();
         var questionCount = validQuestions.Count;
@@ -220,7 +220,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             return validQuestions[0].Model.Price * 2;
         }
 
-        return OwnerRound.Model.Type == RoundTypes.Final ? 0 : AppSettings.Default.QuestionBase;
+        return round.Model.Type == RoundTypes.Final ? 0 : AppSettings.Default.QuestionBase;
     }
 
     private void AddEmptyQuestion_Executed(object? arg)
@@ -234,7 +234,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     {
         try
         {
-            var document = OwnerRound.OwnerPackage.Document;
+            var document = (OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("document not found");
             using var change = document.OperationsManager.BeginComplexChange();
 
             for (int i = 1; i < Questions.Count; i++)
@@ -261,13 +261,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     {
         try
         {
-            var document = OwnerRound?.OwnerPackage?.Document;
-
-            if (document == null)
-            {
-                throw new InvalidOperationException("document not found");
-            }
-
+            var document = (OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("document not found");
             using var change = document.OperationsManager.BeginComplexChange();
 
             for (int i = 0; i < Questions.Count - 1; i++)
@@ -293,16 +287,23 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
 
     protected override void UpdateCosts(CostSetter costSetter)
     {
-        var document = OwnerRound.OwnerPackage.Document;
-        using var change = document.OperationsManager.BeginComplexChange();
+        try
+        {
+            var document = (OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("document not found");
+            using var change = document.OperationsManager.BeginComplexChange();
 
-        UpdateCostsCore(costSetter);
-        change.Commit();
+            UpdateCostsCore(costSetter);
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+        }
     }
 
     public void UpdateCostsCore(CostSetter costSetter)
     {
-        for (int i = 0; i < Questions.Count; i++)
+        for (var i = 0; i < Questions.Count; i++)
         {
             Questions[i].Model.Price = costSetter.BaseValue + costSetter.Increment * i;
         }

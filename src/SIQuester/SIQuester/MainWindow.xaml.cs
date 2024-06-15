@@ -5,6 +5,7 @@ using SIQuester.ViewModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Automation.Peers;
@@ -122,15 +123,13 @@ public partial class MainWindow : MetroWindow
 
     private void TabItem_Loaded(object sender, RoutedEventArgs e)
     {
-        var tabItem = sender as TabItem;
+        var tabItem = (TabItem)sender;
         tabItem.Loaded -= TabItem_Loaded;
 
         if (TaskbarManager.IsPlatformSupported)
         {
             var data = (WorkspaceViewModel)((TabItem)sender).DataContext;
-
             var point = tabItem.TranslatePoint(new Point(), this);
-
             var preview = new TabbedThumbnail(this, tabItem, new Vector(0, point.Y)) { Title = data.Header };
 
             if (data is QDocument doc && doc.Document != null)
@@ -144,7 +143,14 @@ public partial class MainWindow : MetroWindow
             preview.TabbedThumbnailClosed += Preview_TabbedThumbnailClosed;
             preview.TabbedThumbnailBitmapRequested += Preview_TabbedThumbnailBitmapRequested;
 
-            preview.SetWindowIcon(Properties.Resources.Icon.GetHicon());
+            try
+            {
+                preview.SetWindowIcon(Properties.Resources.Icon.GetHicon());
+            }
+            catch (FileLoadException exc)
+            {
+                Trace.TraceError(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
 
             try
             {

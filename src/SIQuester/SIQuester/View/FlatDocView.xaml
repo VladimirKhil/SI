@@ -502,39 +502,41 @@
         </DataTemplate>
 
         <DataTemplate x:Key="RoundView">
-            <StackPanel x:Name="bd" Margin="6" Background="#FFA1C2DE">
-                <TextBlock
-                    Text="{Binding Model.Name}"
-                    ToolTip="{Binding Model.Name}"
-                    FontSize="14"
-                    HorizontalAlignment="Center"
-                    Margin="6,6,6,0"
-                    TextTrimming="CharacterEllipsis"
-                    Style="{StaticResource RoundHeaderStyle}" />
+            <Border>
+                <StackPanel x:Name="bd" Margin="6" Background="#FFA1C2DE">
+                    <TextBlock
+                        Text="{Binding Model.Name}"
+                        ToolTip="{Binding Model.Name}"
+                        FontSize="14"
+                        HorizontalAlignment="Center"
+                        Margin="6,6,6,0"
+                        TextTrimming="CharacterEllipsis"
+                        Style="{StaticResource RoundHeaderStyle}" />
 
-                <ItemsControl Name="themes" Margin="6,0,0,6" ItemsSource="{Binding Themes}" ItemTemplate="{StaticResource CompactThemeView}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
+                    <ItemsControl Name="themes" Margin="6,0,0,6" ItemsSource="{Binding Themes}" ItemTemplate="{StaticResource CompactThemeView}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
 
-                <Button
-                    Command="{Binding AddTheme}"
-                    ToolTip="{Binding AddHeader}"
-                    Style="{StaticResource ToolButton}"
-                    VerticalAlignment="Stretch"
-                    Width="30"
-                    Height="30"
-                    Margin="5,3,0,0">
-                    <Path
-                        Stretch="Uniform"
-                        Fill="Green"
-                        Margin="1"
-                        Data="{Binding Source={StaticResource app_add},Path=Data}" />
-                </Button>
-            </StackPanel>
+                    <Button
+                        Command="{Binding AddTheme}"
+                        ToolTip="{Binding AddHeader}"
+                        Style="{StaticResource ToolButton}"
+                        VerticalAlignment="Stretch"
+                        Width="30"
+                        Height="30"
+                        Margin="5,3,0,0">
+                        <Path
+                            Stretch="Uniform"
+                            Fill="Green"
+                            Margin="1"
+                            Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                    </Button>
+                </StackPanel>
+            </Border>
 
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
@@ -661,6 +663,44 @@
                     Padding="0,1" />
             </StackPanel>
         </DataTemplate>
+
+        <lc:TemplateConverter x:Key="ParameterNameSelector2">
+            <lc:TemplateConverter.DefaultTemplate>
+                <!-- pc:StepParameterTypes.Simple -->
+                <DataTemplate DataType="vm:StepParameterViewModel">
+                    <TextBlock
+                        Text="{Binding}"
+                        FontWeight="Bold"
+                        Foreground="Black" />
+                </DataTemplate>
+            </lc:TemplateConverter.DefaultTemplate>
+
+            <lc:TemplateConverter.Templates>
+                <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="vm:StepParameterViewModel">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            DockPanel.Dock="Left"
+                            Text="{Binding}"
+                            FontWeight="Bold"
+                            Foreground="Black"
+                            Margin="0,3,0,0" />
+
+                        <Button
+                            VerticalAlignment="Top"
+                            DockPanel.Dock="Left"
+                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            ToolTip="{x:Static lp:Resources.AddOption}"
+                            Command="{Binding DataContext.Value.GroupValue.AddItem, RelativeSource={RelativeSource AncestorType=StackPanel,AncestorLevel=2}}"
+                            CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            Width="25"
+                            Height="25"
+                            Margin="5,0,0,0" >
+                            <Path Stretch="Uniform" Fill="#FF989898" Margin="1" Data="{Binding Source={StaticResource app_add}, Path=Data}" />
+                        </Button>
+                    </StackPanel>
+                </DataTemplate>
+            </lc:TemplateConverter.Templates>
+        </lc:TemplateConverter>
 
         <ls:DictionaryTemplateSelector x:Key="CardSelector">
             <ls:DictionaryTemplateSelector.Templates>
@@ -908,7 +948,7 @@
                                             <ContentControl
                                                 x:Name="name"
                                                 Content="{Binding Key, Converter={StaticResource QuestionParameterNamesConverter}}"
-                                                ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource ParameterNameSelector}}"
+                                                ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource ParameterNameSelector2}}"
                                                 Margin="0,5,0,0" />
 
                                             <ContentControl

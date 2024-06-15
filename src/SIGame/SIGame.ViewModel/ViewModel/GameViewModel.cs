@@ -75,6 +75,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public ICommand DeleteVideoAvatar { get; private set; }
 
+    public ICommand ManageTables { get; private set; }
+
     private bool _networkGame = false;
 
     public bool NetworkGame
@@ -167,6 +169,21 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
+    private int _seletedTabIndex;
+
+    public int SeletedTabIndex
+    {
+        get => _seletedTabIndex;
+        set
+        {
+            if (_seletedTabIndex != value)
+            {
+                _seletedTabIndex = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public GameViewModel(
         Node node,
         IViewerClient host,
@@ -222,6 +239,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         SetVideoAvatar = new SimpleCommand(SetVideoAvatar_Executed);
         DeleteVideoAvatar = new SimpleCommand(DeleteVideoAvatar_Executed);
+        ManageTables = new SimpleCommand(ManageTables_Executed);
+    }
+
+    private void ManageTables_Executed(object? arg)
+    {
+        Data.IsChatOpened = true;
+        SeletedTabIndex = 2;
     }
 
     private void SetVideoAvatar_Executed(object? arg)

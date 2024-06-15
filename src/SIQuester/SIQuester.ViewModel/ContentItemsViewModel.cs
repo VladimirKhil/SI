@@ -232,17 +232,32 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     private void SetTime_Executed(object? arg)
     {
+        if (CurrentItem == null)
+        {
+            return;
+        }
+
         QDocument.ActivatedObject = CurrentItem;
         CurrentItem.Model.Duration = TimeSpan.FromSeconds(5);
     }
 
     private void JoinWithNext_Executed(object? arg)
     {
+        if (CurrentItem == null)
+        {
+            return;
+        }
+
         CurrentItem.Model.WaitForFinish = !CurrentItem.Model.WaitForFinish;
     }
 
     private void CollapseMedia_Executed(object? arg)
     {
+        if (CurrentItem == null)
+        {
+            return;
+        }
+
         CurrentItem.IsExpanded = false;
         CollapseMedia.CanBeExecuted = false;
         ExpandMedia.CanBeExecuted = true;
@@ -250,6 +265,11 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     private void ExpandMedia_Executed(object? arg)
     {
+        if (CurrentItem == null)
+        {
+            return;
+        }
+
         CurrentItem.IsExpanded = true;
         CollapseMedia.CanBeExecuted = true;
         ExpandMedia.CanBeExecuted = false;
@@ -326,24 +346,32 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
             contentType = ContentTypes.Audio;
         }
 
-        if (media is MediaItemViewModel file)
+        try
         {
-            LinkExistingContentFile(contentType, file);
-            return false;
-        }
+            if (media is MediaItemViewModel file)
+            {
+                LinkExistingContentFile(contentType, file);
+                return false;
+            }
 
-        if (media is not string text)
-        {
-            return false;
-        }
+            if (media is not string text)
+            {
+                return false;
+            }
 
-        if (text == Resources.File) // TODO: do not rely business logic on resource strings
-        {
-            return AddContentFile(contentType);
+            if (text == Resources.File) // TODO: do not rely business logic on resource strings
+            {
+                return AddContentFile(contentType);
+            }
+            else
+            {
+                return LinkContentUri(contentType);
+            }
         }
-        else
+        catch (Exception exc)
         {
-            return LinkContentUri(contentType);
+            PlatformManager.Instance.ShowExclamationMessage(exc.Message);
+            return false;
         }
     }
 

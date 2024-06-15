@@ -3078,12 +3078,26 @@
             </DataTemplate>
 
             <DataTemplate x:Key="AnswerOptionsTemplate">
-                <ItemsControl
-                    DataContext="{Binding AnswerOptions}"
-                    ItemsSource="{Binding GroupValue}"                    
-                    ItemTemplate="{StaticResource GroupItemTemplate}"
-                    Background="Honeydew"
-                    MaxWidth="800" />
+                <StackPanel DataContext="{Binding AnswerOptions}" Orientation="Horizontal">
+                    <Button
+                        VerticalAlignment="Top"
+                        DockPanel.Dock="Left"
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        ToolTip="{x:Static lp:Resources.AddOption}"
+                        Command="{Binding GroupValue.AddItem}"
+                        CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        Width="25"
+                        Height="25"
+                        Margin="2">
+                        <Path Stretch="Uniform" Fill="#FF989898" Margin="1" Data="{Binding Source={StaticResource app_add}, Path=Data}" />
+                    </Button>
+                    
+                    <ItemsControl
+                        ItemsSource="{Binding GroupValue}"
+                        ItemTemplate="{StaticResource GroupItemTemplate}"
+                        Background="Honeydew"
+                        MaxWidth="800" />
+                </StackPanel>
             </DataTemplate>
 
             <Style x:Key="AnswerBlockStyle" TargetType="ContentControl">

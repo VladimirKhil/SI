@@ -31,7 +31,7 @@
         <lc:EnumConverter x:Key="JoinModeConverter" EnumType="{x:Type scm:JoinMode}" />
     </UserControl.Resources>
     
-    <TabControl Padding="0" BorderThickness="0" FontSize="19">
+    <TabControl Padding="0" BorderThickness="0" FontSize="19" SelectedIndex="{Binding SeletedTabIndex}">
         <TabItem Header="💬" ToolTip="{x:Static lp:Resources.Messages}" Style="{StaticResource StudiaTab}">
             <DockPanel>
                 <Button
