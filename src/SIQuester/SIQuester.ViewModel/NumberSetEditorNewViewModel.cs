@@ -86,7 +86,7 @@ public sealed class NumberSetEditorNewViewModel : ModelViewBase
             ? _model.Minimum == 0
                 ? NumberSetMode.MinimumOrMaximumInRound
                 : NumberSetMode.FixedValue
-            : _model.Step == _model.Maximum - _model.Minimum
+            : _model.Step == _model.Maximum - _model.Minimum || _model.Step == 0
                 ? NumberSetMode.Range
                 : NumberSetMode.RangeWithStep;
     }

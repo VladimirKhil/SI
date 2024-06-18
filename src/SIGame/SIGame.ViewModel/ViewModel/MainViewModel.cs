@@ -12,7 +12,6 @@ using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Settings;
 using SIStatisticsService.Contract;
 using SIStorage.Service.Client;
-using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -60,7 +59,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                     }
                     catch (Exception exc)
                     {
-                        PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.Message, PlatformSpecific.MessageType.Warning, true);
+                        PlatformManager.Instance.ShowMessage(exc.Message, MessageType.Warning, true);
                     }
                 }
                 else if (_activeView is IAsyncDisposable asyncDisposable)
@@ -83,7 +82,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         }
         catch (Exception exc)
         {
-            PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.Message, PlatformSpecific.MessageType.Warning, true);
+            PlatformManager.Instance.ShowMessage(exc.Message, MessageType.Warning, true);
         }
     }
 
@@ -151,7 +150,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_NetworkGame.ToUpper(), Command = NetworkGame });
         _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_BestPlayers.ToUpper(), Command = BestPlayers });
         _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_About.ToUpper(), Command = About });
-        _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_Exit.ToUpper(), Command = PlatformSpecific.PlatformManager.Instance.Close });
+        _startMenu.MainCommands.Add(new UICommand { Header = Resources.MainMenu_Exit.ToUpper(), Command = PlatformManager.Instance.Close });
 
         ShowMenu();
 
@@ -245,7 +244,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         Settings.IsEditable = false;
         ActiveView = game;
 
-        PlatformSpecific.PlatformManager.Instance.PlaySound();
+        PlatformManager.Instance.PlaySound();
 
         game.Init();
 
@@ -418,7 +417,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     {
         if (_userSettings.MainMenuSound)
         {
-            PlatformSpecific.PlatformManager.Instance.PlaySound(MainMenuSound, loop: true);
+            PlatformManager.Instance.PlaySound(MainMenuSound, loop: true);
         }
     }
 

@@ -700,7 +700,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Network game.
+        ///   Ищет локализованную строку, похожую на Local game.
         /// </summary>
         public static string MainMenu_NetworkGame {
             get {

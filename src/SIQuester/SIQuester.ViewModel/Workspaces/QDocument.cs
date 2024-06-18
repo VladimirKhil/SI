@@ -886,6 +886,7 @@ public sealed class QDocument : WorkspaceViewModel
                     break;
 
                 case NumberSetMode.Range:
+                    numberSetViewModel.Step = 0;
                     break;
 
                 case NumberSetMode.RangeWithStep:

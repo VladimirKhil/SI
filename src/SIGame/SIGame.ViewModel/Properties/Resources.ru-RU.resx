@@ -199,7 +199,7 @@
     <value>Выход</value>
   </data>
   <data name="MainMenu_NetworkGame" xml:space="preserve">
-    <value>Игра по сети</value>
+    <value>Локальная игра</value>
   </data>
   <data name="MainMenu_OnlineGame" xml:space="preserve">
     <value>Игра онлайн</value>

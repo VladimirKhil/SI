@@ -8,8 +8,13 @@ namespace SImulator.Converters;
 
 public sealed class RestrictionConverter : IValueConverter
 {
-    public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
+        if (value == null)
+        {
+            return null;
+        }
+
         var restriction = (Restriction)value;
         return restriction.Id == -2 ? Resources.All : (restriction.Id == -1 ? Resources.NotSet : restriction.Value);
     }

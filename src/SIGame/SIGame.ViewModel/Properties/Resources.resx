@@ -247,7 +247,7 @@
     <value>Exit</value>
   </data>
   <data name="MainMenu_NetworkGame" xml:space="preserve">
-    <value>Network game</value>
+    <value>Local game</value>
   </data>
   <data name="MainMenu_OnlineGame" xml:space="preserve">
     <value>Online game</value>
