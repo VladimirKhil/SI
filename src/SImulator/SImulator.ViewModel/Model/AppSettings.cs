@@ -683,7 +683,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         get => _language;
         set
         {
-            if (_language != value && _language != null)
+            if (_language != value && value != null)
             {
                 _language = value;
                 OnPropertyChanged();
