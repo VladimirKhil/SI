@@ -724,6 +724,8 @@ public sealed class ViewerData : Data
         }
     }
 
+    public bool IsAnswer { get; set; }
+
     internal event Action? AutoReadyChanged;
 
     private void OnAutoReadyChanged() => AutoReadyChanged?.Invoke();

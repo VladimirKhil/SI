@@ -13,7 +13,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultFalseStart = true;
     public const bool DefaultHintShowman = false;
     public const bool DefaultPartialText = false;
-    public const bool DefaultPartialImages = true;
+    public const bool DefaultPartialImages = false;
     public const bool DefaultPlayAllQuestionsInFinalRound = false;
     public const bool DefaultAllowEveryoneToPlayHiddenStakes = true;
     public const bool DefaultOral = false;

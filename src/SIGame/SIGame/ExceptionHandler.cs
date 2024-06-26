@@ -5,6 +5,7 @@ using System.Windows;
 using System;
 using SIGame.Helpers;
 using System.Security.Cryptography;
+using System.ComponentModel;
 
 namespace SIGame;
 
@@ -69,7 +70,8 @@ internal sealed class ExceptionHandler
                 || inner is SEHException
                 || inner is CryptographicException
                 || inner is InvalidCastException
-                || inner is DivideByZeroException)
+                || inner is DivideByZeroException
+                || inner is BadImageFormatException)
             {
                 MessageBox.Show(
                     $"{Properties.Resources.Error_RuntimeBroken}: {inner.Message}",
@@ -104,6 +106,7 @@ internal sealed class ExceptionHandler
 
             if (inner is FileLoadException
                 || inner is IOException
+                || inner is Win32Exception
                 || inner is ArgumentOutOfRangeException && inner.Message.Contains("capacity"))
             {
                 MessageBox.Show(inner.Message, CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);

@@ -157,37 +157,6 @@ public static class StringExtensions
         return res.ToString();
     }
 
-    public static string DigitPart(this string s)
-    {
-        var res = new StringBuilder();
-        int length = s.Length;
-        for (var i = 0; i < length; i++)
-        {
-            if (char.IsDigit(s[i]))
-            {
-                res.Append(s[i]);
-            }
-        }
-
-        return res.ToString();
-    }
-
-    public static string NotDigitPart(this string s)
-    {
-        var res = new StringBuilder();
-        int length = s.Length;
-
-        for (int i = 0; i < length; i++)
-        {
-            if (!char.IsDigit(s[i]))
-            {
-                res.Append(s[i]);
-            }
-        }
-
-        return res.ToString();
-    }
-
     /// <summary>
     /// Упрощение строки
     /// </summary>

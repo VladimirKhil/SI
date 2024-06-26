@@ -964,11 +964,15 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                     currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
 
+                    // TODO: this logic should be moved to server; client shoul receive just boolean flag
                     if (contentType == ContentTypes.Image
+                        && ClientData.QuestionType == QuestionTypes.Simple
+                        && !_data.IsAnswer
                         && !_appSettings.FalseStart
                         && _appSettings.PartialImages
                         && _appSettings.TimeSettings.PartialImageTime > 0)
                     {
+                        TInfo.PartialImage = true;
                         _runTimer = true;
                         _initialTime = 0;
                     }
@@ -1338,6 +1342,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void OnRightAnswer(string answer)
     {
+        _data.IsAnswer = true;
+
         if (TInfo.LayoutMode == LayoutMode.Simple)
         {
             try
@@ -1385,9 +1391,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void OnRightAnswerStart(string answer)
     {
+        _data.IsAnswer = true;
         TInfo.AnimateText = false;
         TInfo.PartialText = false;
-        TInfo.PartialImage = false;
         TInfo.Content = Array.Empty<ContentGroup>();
         TInfo.QuestionContentType = QuestionContentType.Void;
         TInfo.Sound = false;
@@ -1501,9 +1507,10 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
         TInfo.LayoutMode = LayoutMode.Simple;
+        _data.IsAnswer = false;
         TInfo.AnimateText = true;
         TInfo.PartialText = false;
-        TInfo.PartialImage = _appSettings.PartialImages;
+        TInfo.PartialImage = false;
         TInfo.IsMediaStopped = false;
         _data.EnableMediaLoadButton = false;
         _data.ExternalContent.Clear();

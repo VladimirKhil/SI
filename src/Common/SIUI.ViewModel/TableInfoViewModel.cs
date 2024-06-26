@@ -411,7 +411,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     /// <summary>
     /// Is image displayed partially.
     /// </summary>
-    public bool PartialImage {  get; set; }
+    public bool PartialImage { get; set; }
 
     private double _partialImageVisibility = 1.0;
 

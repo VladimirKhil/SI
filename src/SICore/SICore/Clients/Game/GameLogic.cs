@@ -687,11 +687,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPartial = false;
         ShareMedia(contentItem);
 
-        var renderTime = _data.Settings.AppSettings.PartialText ? _data.Settings.AppSettings.TimeSettings.PartialImageTime * 10 : 0;
+        var appSettings = _data.Settings.AppSettings;
+        // TODO: provide this flag to client as part of the CONTENT message
+        var partialImage = appSettings.PartialImages && !appSettings.FalseStart && _data.Question?.TypeName == QuestionTypes.Simple && !_data.IsAnswer;
+
+        var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
         
         var waitTime = GetContentItemDuration(
             contentItem,
-            DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
+            DefaultImageTime + appSettings.TimeSettings.TimeForMediaDelay * 10);
 
         var contentTime = renderTime + waitTime;
 
@@ -2195,17 +2199,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return;
         }
 
-        var isRight = false;
-
-        foreach (var s in _data.Question.Right)
+        if (_data.Question == null)
         {
-            isRight = AnswerChecker.IsAnswerRight(_data.Answerer.Answer, s);
-
-            if (isRight)
-            {
-                break;
-            }
+            throw new ArgumentException("_data.Question == null");
         }
+
+        var answer = _data.Answerer.Answer;
+        var isRight = answer != null && AnswerChecker.IsAnswerRight(answer, _data.Question.Right);
 
         _data.Answerer.AnswerIsRight = isRight;
         _data.Answerer.AnswerIsRightFactor = 1.0;

@@ -50,7 +50,7 @@ public sealed class GamePlayerAccount : GamePersonAccount
     /// <summary>
     /// Ответ игрока
     /// </summary>
-    internal string? Answer { get; set; }
+    internal string? Answer { get; set; } // TODO: try to make non-nullable but check problems with accepting answers in questions for all
 
     // TODO: Will be moved to QuestionPlayState
     /// <summary>

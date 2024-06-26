@@ -82,18 +82,8 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
 
     private void AnswerRight()
     {
-        bool right = false;
-
-        foreach (var s in _data.PersonDataExtensions.Right)
-        {
-            right = AnswerChecker.IsAnswerRight(_data.PersonDataExtensions.Answer, s);
-            if (right)
-            {
-                break;
-            }
-        }
-
-        _viewerActions.SendMessage(Messages.IsRight, right ? "+" : "-");
+        var isRight = AnswerChecker.IsAnswerRight(_data.PersonDataExtensions.Answer, _data.PersonDataExtensions.Right);
+        _viewerActions.SendMessage(Messages.IsRight, isRight ? "+" : "-");
     }
 
     public void StarterChoose() => ScheduleExecution(ShowmanTasks.AnswerFirst, 10 + Random.Shared.Next(10));
