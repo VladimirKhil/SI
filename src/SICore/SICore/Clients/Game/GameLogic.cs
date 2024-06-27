@@ -3434,6 +3434,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             _gameActions.SendMessageWithArgs(Messages.EndTry, _data.AnswererIndex);
         }
+        else
+        {
+            _gameActions.SendMessageWithArgs(Messages.StopPlay);
+        }
 
         var waitAnswerTime = _data.Question?.TypeName != QuestionTypes.Simple
             ? timeSettings.TimeForThinkingOnSpecial * 10

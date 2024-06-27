@@ -150,7 +150,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
 
         Remove(item.Value);
 
-        for (int i = 0; i < Count; i++)
+        for (var i = 0; i < Count; i++)
         {
             this[i] = new StepParameterRecord(IndexLabelHelper.GetIndexLabel(i), this[i].Value);
         }

@@ -929,6 +929,11 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         #endregion
                         break;
                     }
+
+                case Messages.StopPlay:
+                    _logic.OnStopPlay();
+                    break;
+
                 case Messages.WrongTry:
                     {
                         OnWrongTry(mparams);

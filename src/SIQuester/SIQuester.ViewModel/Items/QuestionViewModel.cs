@@ -118,15 +118,24 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     private void Wrong_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;
 
-    private void AddComplexAnswer_Executed(object? arg) =>
-        Parameters?.AddAnswer(new StepParameterViewModel(this, new StepParameter
+    private void AddComplexAnswer_Executed(object? arg)
+    {
+        try
         {
-            Type = StepParameterTypes.Content,
-            ContentValue = new List<ContentItem>(new[]
-                {
+            Parameters?.AddAnswer(new StepParameterViewModel(this, new StepParameter
+            {
+                Type = StepParameterTypes.Content,
+                ContentValue = new List<ContentItem>(new[]
+                    {
                     new ContentItem { Type = ContentTypes.Text, Placement = ContentPlacements.Screen, Value = "" }
                 })
-        }));
+            }));
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+        }
+    }
 
     private void RemoveComplexAnswer_Executed(object? arg) => Parameters?.RemoveAnswer();
 
@@ -172,13 +181,20 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             return;
         }
 
-        using var change = ownerDocument.OperationsManager.BeginComplexChange();
-        ownerTheme.Questions.Remove(this);
-        change.Commit();
-
-        if (ownerDocument?.ActiveNode == this)
+        try
         {
-            ownerDocument.ActiveNode = ownerTheme;
+            using var change = ownerDocument.OperationsManager.BeginComplexChange();
+            ownerTheme.Questions.Remove(this);
+            change.Commit();
+
+            if (ownerDocument?.ActiveNode == this)
+            {
+                ownerDocument.ActiveNode = ownerTheme;
+            }
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
         }
     }
 

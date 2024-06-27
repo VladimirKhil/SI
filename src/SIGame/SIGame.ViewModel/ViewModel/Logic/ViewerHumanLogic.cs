@@ -1450,6 +1450,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _data.Players[number].State = PlayerState.Press;
     }
 
+    public void OnStopPlay()
+    {
+        TInfo.IsMediaStopped = true;
+    }
+
     public void ShowTablo() => TInfo.TStage = SIUI.ViewModel.TableStage.RoundTable;
 
     /// <summary>

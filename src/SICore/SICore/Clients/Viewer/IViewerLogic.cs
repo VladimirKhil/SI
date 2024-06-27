@@ -209,4 +209,6 @@ public interface IViewerLogic : ILogic
     void OnOptions(string[] mparams) { }
 
     void OnToggle(int themeIndex, int questionIndex, int price) { }
+
+    void OnStopPlay() { }
 }

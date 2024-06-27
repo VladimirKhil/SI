@@ -511,6 +511,11 @@ public static class Messages
     public const string Stop = "STOP";
 
     /// <summary>
+    /// Stops question play.
+    /// </summary>
+    public const string StopPlay = "STOP_PLAY";
+
+    /// <summary>
     /// Фоновая картинка студии
     /// </summary>
     public const string Studia = "STUDIA";
