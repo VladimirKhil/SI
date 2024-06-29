@@ -1,6 +1,6 @@
 ﻿namespace SICore.Models;
 
-internal enum ThemesPlayMode
+public enum ThemesPlayMode
 {
     None,
     OneByOne,

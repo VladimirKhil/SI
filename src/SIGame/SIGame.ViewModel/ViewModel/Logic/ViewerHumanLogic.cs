@@ -552,9 +552,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _data.EnableMediaLoadButton = false;
     }
 
-    public void RoundThemes(bool print) => UI.Execute(() => RoundThemesUI(print), exc => _data.Host.SendError(exc));
+    public void RoundThemes(Models.ThemesPlayMode playMode) => UI.Execute(() => RoundThemesUI(playMode), exc => _data.Host.SendError(exc));
 
-    private void RoundThemesUI(bool print)
+    private void RoundThemesUI(Models.ThemesPlayMode playMode)
     {
         lock (_data.TInfoLock)
         lock (TInfo.RoundInfoLock)
@@ -567,17 +567,16 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             }
         }
 
-        if (print)
+        switch (playMode)
         {
-            if (_data.Stage == GameStage.Round)
-            {
+            case Models.ThemesPlayMode.OneByOne:
                 TInfo.TStage = TableStage.RoundThemes;
                 _data.Host.PlaySound(Sounds.RoundThemes);
-            }
-            else
-            {
+                break;
+            
+            case Models.ThemesPlayMode.AllTogether:
                 TInfo.TStage = TableStage.Final;
-            }
+                break;
         }
 
         ClearQuestionState();

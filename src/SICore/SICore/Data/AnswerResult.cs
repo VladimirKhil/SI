@@ -1,8 +1,3 @@
 ﻿namespace SICore;
 
-internal sealed class AnswerResult
-{
-    public int PlayerIndex { get; set; }
-
-    public bool IsRight { get; set; }
-}
+internal sealed record AnswerResult(int PlayerIndex, bool IsRight, int Sum);

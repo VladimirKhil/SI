@@ -452,6 +452,7 @@ public static class Messages
     /// Round themes names.
     /// </summary>
     [IdempotencyRequired]
+    [Obsolete]
     public const string RoundThemes = "ROUNDTHEMES";
 
     /// <summary>

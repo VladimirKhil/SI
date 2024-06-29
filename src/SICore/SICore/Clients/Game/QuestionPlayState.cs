@@ -14,6 +14,11 @@ internal sealed class QuestionPlayState
     internal HashSet<int> AnswererIndicies { get; } = new();
 
     /// <summary>
+    /// Are multiple persons answering this question.
+    /// </summary>
+    internal bool AreMultipleAnswerers { get; private set; } // => AnswererIndicies.Count > 1; - in the future
+
+    /// <summary>
     /// Answer options.
     /// </summary>
     internal AnswerOption[]? AnswerOptions { get; set; }
@@ -78,6 +83,7 @@ internal sealed class QuestionPlayState
     {
         AnswererIndicies.Clear();
         AnswererIndicies.Add(index);
+        AreMultipleAnswerers = false;
     }
 
     internal void SetMultipleAnswerers(IEnumerable<int> answerers)
@@ -88,5 +94,7 @@ internal sealed class QuestionPlayState
         {
             AnswererIndicies.Add(item);
         }
+
+        AreMultipleAnswerers = true;
     }
 }

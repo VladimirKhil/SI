@@ -36,7 +36,6 @@ internal sealed class RandomPackageSource : PackageSource
             new PackageProvider(Global.PackagesUri),
             Resources.RandomThemes,
             Resources.Mixed,
-            Resources.RoundTrailing,
             Resources.GameStage_Final,
             settings.RandomRoundsCount,
             settings.RandomThemesCount,

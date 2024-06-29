@@ -16,9 +16,9 @@ public interface ISIEnginePlayHandler
     void OnRound(Round round, QuestionSelectionStrategyType strategyType);
 
     /// <summary>
-    /// Detects whether current game situation supports playing question for all (there is at least one player capable for that).
+    /// Detects whether current game situation supports playing round with removable themes (there is at least one player capable for that).
     /// </summary>
-    bool ShouldPlayQuestionForAll();
+    bool ShouldPlayRoundWithRemovableThemes();
 
     /// <summary>
     /// Handles round themes list.

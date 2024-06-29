@@ -4,11 +4,9 @@ using SICore.Models;
 using SICore.Results;
 using SIData;
 using SIEngine;
-using SIEngine.Core;
 using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
-using SIPackages.Helpers;
 using System.Text;
 using Utils;
 
@@ -642,6 +640,16 @@ public sealed class GameData : Data
     public QuestionSelectionStrategyType RoundStrategy { get; internal set; }
 
     public bool PendingApellation { get; internal set; }
+
+    /// <summary>
+    /// Will be removed later.
+    /// </summary>
+    public GameStages LegacyStage { get; internal set; }
+
+    /// <summary>
+    /// Validates players state for current round.
+    /// </summary>
+    public Func<bool>? PlayersValidator { get; internal set; }
 
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {

@@ -37,7 +37,7 @@ internal sealed class RemoveOtherThemesStrategy : ISelectionStrategy
         }
     }
 
-    public bool ShouldPlayRound() => _finalThemes.Any() && _playHandler.ShouldPlayQuestionForAll();
+    public bool ShouldPlayRound() => _finalThemes.Any() && _playHandler.ShouldPlayRoundWithRemovableThemes();
 
     public bool CanMoveNext() => _stage switch
     {

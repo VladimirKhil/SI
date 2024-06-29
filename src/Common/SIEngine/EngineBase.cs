@@ -253,35 +253,34 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     /// <param name="showSign">Should the logo be shown.</param>
     public virtual bool MoveNextRound(bool showSign = true)
     {
-        var moved = true;
+        if (!CanMoveNextRound)
+        {
+            return false;
+        }
 
-        if (_roundIndex + 1 < _document.Package.Rounds.Count)
-        {
-            _roundIndex++;
-            SetActiveRound();
-            Stage = GameStage.Round;
-        }
-        else
-        {
-            Stage = GameStage.End;
-            OnEndGame();
-            moved = false;
-        }
+        _roundIndex++;
+        SetActiveRound();
 
         CanMoveBack = false;
         UpdateCanMoveNextRound();
         UpdateCanMoveBackRound();
         UpdateCanNext();
 
-        if (moved)
+        if (_roundIndex < _document.Package.Rounds.Count)
         {
+            Stage = GameStage.Round;
             OnNextRound(showSign);
         }
+        else
+        {
+            Stage = GameStage.End;
+            OnEndGame();
+        }
 
-        return moved;
+        return true;
     }
 
-    protected void UpdateCanMoveNextRound() => CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
+    protected void UpdateCanMoveNextRound() => CanMoveNextRound = _roundIndex < _document.Package.Rounds.Count;
 
     protected void UpdateCanMoveBackRound() => CanMoveBackRound = _roundIndex > 0 || CanMoveBack;
 
@@ -377,13 +376,13 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void EndRound()
     {
         OnRoundEmpty();
-        DoFinishRound();
+        FinishRound();
     }
 
     /// <summary>
     /// Ends round and optionally shows current score.
     /// </summary>
-    protected void DoFinishRound()
+    protected void FinishRound()
     {
         OnLogScore();
 
@@ -416,7 +415,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
                 ShowSimpleRightAnswers = options.ShowRight,
 
-                DefaultTypeName = GameRules.GetRulesForRoundType(_activeRound!.Type).DefaultQuestionType,
+                DefaultTypeName = GameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType,
                 ForceDefaultTypeName = isFinal
             });
     }

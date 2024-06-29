@@ -318,7 +318,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return true;
     }
 
-    public bool ShouldPlayQuestionForAll() => true;
+    public bool ShouldPlayRoundWithRemovableThemes() => true;
 
     public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController) => GameViewModel?.OnRoundThemes(themes);
 

@@ -177,13 +177,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var roundDuration = DateTime.UtcNow.Subtract(_data.TimerStartTime[0]).TotalMilliseconds / 100;
 
-        if (_data.Stage == GameStage.Round &&
-            _data.Round.Type != RoundTypes.Final &&
-            roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
+        if (_data.Stage == GameStage.Round && roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
         {
-            // Завершение раунда по времени
+            // Round timeout
             _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
-
             Engine.SetTimeout();
         }
     }
@@ -509,9 +506,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     /// Should the question be displayed partially.
     /// </summary>
     private bool IsPartial() =>
-        _data.Round != null
-            && _data.Round.Type != RoundTypes.Final
-            && _data.Question?.TypeName == QuestionTypes.Simple
+        !IsSpecialQuestion()
             && _data.Settings != null
             && !_data.Settings.AppSettings.FalseStart
             && _data.Settings.AppSettings.PartialText
@@ -785,7 +780,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void AskDirectAnswer()
     {
-        if (IsFinalRound())
+        if (_data.Question?.TypeName == QuestionTypes.StakeAll)
         {
             _gameActions.SendMessageWithArgs(Messages.FinalThink, _data.Settings.AppSettings.TimeSettings.TimeForFinalThinking);
         }
@@ -1089,7 +1084,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private bool OnQuestionSelection()
     {
-        if (_data.ThemeIndex == -1 || _data.QuestionIndex == -1)
+        if (_data.ThemeIndex == -1
+            || _data.ThemeIndex >= ClientData.TInfo.RoundInfo.Count
+            || _data.QuestionIndex == -1
+            || _data.QuestionIndex >= ClientData.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count
+            || !ClientData.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].IsActive())
         {
             return false;
         }
@@ -1308,20 +1307,18 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         StopWaiting();
 
-        var answerResult = new AnswerResult { PlayerIndex = _data.AnswererIndex };
-        _data.QuestionHistory.Add(answerResult);
+        int updateSum;
 
         if (_data.Answerer.AnswerIsRight)
         {
-            answerResult.IsRight = true;
-            var showmanReplic = IsFinalRound() || _data.Question?.TypeName == QuestionTypes.Stake ? nameof(R.Bravo) : nameof(R.Right);
+            var showmanReplic = IsSpecialQuestion() ? nameof(R.Bravo) : nameof(R.Right);
             
             var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
             var canonicalAnswer = _data.Question?.Right.FirstOrDefault();
             var isAnswerCanonical = canonicalAnswer != null && (_data.Answerer.Answer ?? "").Simplify().Contains(canonicalAnswer.Simplify());
 
-            if (!IsFinalRound())
+            if (!HaveMultipleAnswerers())
             {
                 if (canonicalAnswer != null && !isAnswerCanonical)
                 {
@@ -1352,7 +1349,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 _gameActions.SendMessage(s.ToString());
 
-                _data.Answerer.AddRightSum((int)(_data.CurPriceRight * _data.Answerer.AnswerIsRightFactor));
+                updateSum = (int)(_data.CurPriceRight * _data.Answerer.AnswerIsRightFactor);
+                _data.Answerer.AddRightSum(updateSum);
                 _data.ChooserIndex = _data.AnswererIndex;
                 _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
                 _gameActions.InformSums();
@@ -1376,6 +1374,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
 
                 _data.PlayerIsRight = true;
+                updateSum = _data.Answerer.FinalStake;
                 ScheduleExecution(Tasks.AnnounceStake, 15);
             }
         }
@@ -1402,13 +1401,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Wrong);
                 }
 
-                if (!IsFinalRound())
+                if (!HaveMultipleAnswerers())
                 {
                     _data.QuestionPlayState.UsedAnswerOptions.Add(_data.Answerer.Answer);
                 }
             }
 
-            if (!IsFinalRound())
+            if (!HaveMultipleAnswerers())
             {
                 s.AppendFormat(
                     " (-{0}{1})",
@@ -1420,6 +1419,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 if (_data.Answerer.AnswerIsRightFactor == 0)
                 {
                     _gameActions.SendMessageWithArgs(Messages.Pass, _data.AnswererIndex);
+                    updateSum = -1;
                 }
                 else
                 {
@@ -1433,7 +1433,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                     _gameActions.SendMessage(s.ToString());
 
-                    _data.Answerer.SubtractWrongSum((int)(_data.CurPriceWrong * _data.Answerer.AnswerIsRightFactor));
+                    updateSum = (int)(_data.CurPriceWrong * _data.Answerer.AnswerIsRightFactor);
+                    _data.Answerer.SubtractWrongSum(updateSum);
                     _gameActions.InformSums();
 
                     if (_data.Answerer.IsHuman)
@@ -1454,9 +1455,16 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 _gameActions.ShowmanReplic(s.ToString());
                 _data.PlayerIsRight = false;
+                updateSum = _data.Answerer.FinalStake;
 
                 ScheduleExecution(Tasks.AnnounceStake, 15);
             }
+        }
+
+        if (updateSum >= 0)
+        {
+            var answerResult = new AnswerResult(_data.AnswererIndex, _data.Answerer.AnswerIsRight, updateSum);
+            _data.QuestionHistory.Add(answerResult);
         }
 
         return true;
@@ -1609,7 +1617,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private bool OnDecisionAnswering()
     {
-        if (!IsFinalRound())
+        if (!HaveMultipleAnswerers())
         {
             if (_data.Answerer == null || string.IsNullOrEmpty(_data.Answerer.Answer))
             {
@@ -1652,19 +1660,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var s = GetRandomString(LO[nameof(R.LetsSee)]);
         _gameActions.ShowmanReplic(s);
 
-        var answerers = _data.Players
-            .Select((player, index) => (player, index))
-            .Where((player, index) => _data.QuestionPlayState.AnswererIndicies.Contains(index))
-            .OrderBy(pair => pair.player.Sum)
-            .Select(pair => pair.index);
-
-        _data.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answerers);
+        var answererIndicies = _data.QuestionPlayState.AnswererIndicies.OrderBy(index => _data.Players[index].Sum);
+        _data.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
         ScheduleExecution(Tasks.Announce, 15);
         return true;
     }
 
-    // TODO: remove dependency on round type entirely
-    public bool IsFinalRound() => _data.Round?.Type == RoundTypes.Final;
+    public bool HaveMultipleAnswerers() => _data.QuestionPlayState.AreMultipleAnswerers;
 
     public void StopWaiting()
     {
@@ -1880,10 +1882,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         CheckAppellation();
                         break;
 
-                    case Tasks.PrintFinal:
-                        PrintFinal(arg);
-                        break;
-
                     case Tasks.AskToDelete:
                         AskToDelete();
                         break;
@@ -2064,7 +2062,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                             var subText = _data.Text[_data.TextLength..];
 
                             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
-                            _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
+                            _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText); // deprecated
                             _gameActions.SystemReplic(subText);
 
                             newTask = Tasks.MoveNext;
@@ -2076,6 +2074,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         if (Engine.CanMoveNextRound)
                         {
                             stop = Engine.MoveNextRound();
+                            
                             if (stop)
                             {
                                 FinishRound(false);
@@ -2407,7 +2406,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             throw new ArgumentNullException(nameof(_data.Round));
         }
 
-        if (!IsFinalRound())
+        if (!HaveMultipleAnswerers())
         {
             if (_data.Answerer == null)
             {
@@ -2570,13 +2569,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AskFinalStake()
     {
-        // TODO: replace with custom players enumerator
-        if (_data.ThemeDeleters == null)
-        {
-            _data.ThemeDeleters = new ThemeDeletersEnumerator(_data.Players, 1);
-            _data.ThemeDeleters.Reset(true);
-        }
-
         var s = GetRandomString(LO[nameof(R.MakeStake)]);
         _gameActions.ShowmanReplic(s);
 
@@ -2624,29 +2616,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.ThemeIndexToDelete = SelectRandom(_data.TInfo.RoundInfo, item => item.Name != null);
 
         OnDecision();
-    }
-
-    private void PrintFinal(int arg)
-    {
-        var roundIndex = -1;
-
-        for (int i = 0; i < _data.Rounds.Length; i++)
-        {
-            if (_data.Rounds[i].Index == Engine.RoundIndex)
-            {
-                roundIndex = i;
-                break;
-            }
-        }
-
-        var roundName = LO.GetRoundName(_data.Round.Name);
-        
-        _gameActions.InformRound(roundName, roundIndex, _data.RoundStrategy);
-        _gameActions.InformRoundContent();
-
-        _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");
-
-        ScheduleExecution(Tasks.Round, 20, 2);
     }
 
     private void Winner()
@@ -2802,7 +2771,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             // Only StakeAll type is supported in final for now
             // This will be removed when full question type support will be implemented
-            if (IsFinalRound())
+            if (HaveMultipleAnswerers())
             {
                 typeName = QuestionTypes.StakeAll;
             }
@@ -3347,7 +3316,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            if (!_data.IsOralNow || IsFinalRound())
+            if (!_data.IsOralNow || HaveMultipleAnswerers())
             {
                 SendAnswersInfoToShowman(_data.Answerer.Answer ?? "");
             }
@@ -3404,7 +3373,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         var timeSettings = _data.Settings.AppSettings.TimeSettings;
 
-        if (IsFinalRound())
+        if (HaveMultipleAnswerers())
         {
             _gameActions.ShowmanReplic(LO[nameof(R.StartThink)]);
 
@@ -4103,45 +4072,47 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private void UpdatePlayersSumsAfterAppellation(bool isVotingForRightAnswer)
     {
         var change = false;
+        var singleAnswerer = !HaveMultipleAnswerers();
 
         for (var i = 0; i < _data.QuestionHistory.Count; i++)
         {
-            var index = _data.QuestionHistory[i].PlayerIndex;
+            var historyItem = _data.QuestionHistory[i];
+            var index = historyItem.PlayerIndex;
+            var player = _data.Players[index];
 
-            if (isVotingForRightAnswer && _data.Stage == GameStage.Round && index != _data.AppelaerIndex)
+            if (isVotingForRightAnswer && singleAnswerer && index != _data.AppelaerIndex)
             {
                 if (!change)
                 {
                     continue;
                 }
+
+                if (historyItem.IsRight)
+                {
+                    player.UndoRightSum(historyItem.Sum);
+                }
                 else
                 {
-                    if (_data.QuestionHistory[i].IsRight)
-                    {
-                        _data.Players[index].UndoRightSum(_data.CurPriceRight);
-                    }
-                    else
-                    {
-                        _data.Players[index].UndoWrongSum(_data.CurPriceWrong);
-                    }
+                    player.UndoWrongSum(historyItem.Sum);
                 }
             }
             else if (index == _data.AppelaerIndex)
             {
-                if (_data.Stage == GameStage.Round)
+                if (singleAnswerer)
                 {
                     change = true;
 
-                    if (_data.QuestionHistory[i].IsRight)
+                    if (historyItem.IsRight)
                     {
-                        _data.Players[index].UndoRightSum(_data.CurPriceRight);
-                        _data.Players[index].SubtractWrongSum(_data.CurPriceWrong);
+                        player.UndoRightSum(historyItem.Sum);
+                        player.SubtractWrongSum(_data.CurPriceWrong);
                     }
                     else
                     {
-                        _data.Players[index].UndoWrongSum(_data.CurPriceWrong);
-                        _data.Players[index].AddRightSum(_data.CurPriceRight);
+                        player.UndoWrongSum(historyItem.Sum);
+                        player.AddRightSum(_data.CurPriceRight);
 
+                        // TODO: that should be handled by question selection strategy
                         if (Engine.CanMoveBack) // Not the beginning of a round
                         {
                             _data.ChooserIndex = index;
@@ -4151,17 +4122,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
                 else
                 {
-                    var stake = _data.Players[index].FinalStake;
+                    var stake = player.FinalStake;
 
-                    if (_data.QuestionHistory[i].IsRight)
+                    if (historyItem.IsRight)
                     {
-                        _data.Players[index].UndoRightSum(stake);
-                        _data.Players[index].SubtractWrongSum(stake);
+                        player.UndoRightSum(historyItem.Sum);
+                        player.SubtractWrongSum(stake);
                     }
                     else
                     {
-                        _data.Players[index].UndoWrongSum(stake);
-                        _data.Players[index].AddRightSum(stake);
+                        player.UndoWrongSum(historyItem.Sum);
+                        player.AddRightSum(stake);
                     }
                 }
             }
@@ -4385,31 +4356,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.TableInformStage = 0;
             _data.IsRoundEnding = false;
 
-            var roundIndex = -1;
-
-            for (var i = 0; i < _data.Rounds.Length; i++)
-            {
-                if (_data.Rounds[i].Index == Engine.RoundIndex) // this logic skips empty rounds
-                {
-                    roundIndex = i;
-                    break;
-                }
-            }
-
+            var roundIndex = Engine.RoundIndex;
             var roundName = LO.GetRoundName(round.Name);
 
-            if (round.Type == RoundTypes.Final)
-            {
-                _data.Stage = GameStage.Final;
-                OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
-                ScheduleExecution(Tasks.PrintFinal, 1, 1, true);
-                return;
-            }
-            else
-            {
-                _data.Stage = GameStage.Round;
-                OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
-            }
+            _data.Stage = GameStage.Round;
+            _data.LegacyStage = round.Type == RoundTypes.Final ? GameStages.Final : GameStages.Round;
+            OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
 
             _gameActions.InformRound(roundName, roundIndex, _data.RoundStrategy);
             _gameActions.InformRoundContent();
@@ -4650,7 +4602,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
         var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
 
-        if (IsFinalRound() && _data.AnnouncedAnswerersEnumerator != null)
+        if (HaveMultipleAnswerers() && _data.AnnouncedAnswerersEnumerator != null)
         {
             _data.AnnouncedAnswerersEnumerator.Reset();
             ScheduleExecution(Tasks.AnnouncePostStake, (answerTime == 0 ? 2 : answerTime) * 10);

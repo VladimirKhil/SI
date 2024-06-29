@@ -1326,7 +1326,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }
 
-        if (ClientData.Stage == GameStage.Round || ClientData.Stage == GameStage.Final)
+        if (ClientData.Stage == GameStage.Round)
         {
             _gameActions.InformRound(
                 ClientData.Round?.Name ?? "",
@@ -2538,13 +2538,14 @@ public sealed class Game : Actor<GameData, GameLogic>
             DropPlayerFromStakes(playerIndex);
         }
 
-        if (Logic.IsFinalRound())
+        if (Logic.HaveMultipleAnswerers())
         {
             DropPlayerFromAnnouncing(playerIndex);
-            DropPlayerFromFinalRound(playerIndex);
         }
 
+        DropPlayerFromThemeDeleters(playerIndex);
         DropPlayerFromQuestionHistory(playerIndex);
+        ValidatePlayers();
 
         if (!ClientData.IsWaiting)
         {
@@ -2557,8 +2558,37 @@ public sealed class Game : Actor<GameData, GameLogic>
                 // Asking again
                 _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                 _logic.StopWaiting();
-                PlanExecution(Tasks.AskFirst, 20);
+                _logic.PlanExecution(Tasks.AskFirst, 20);
                 break;
+        }
+    }
+
+    private void DropPlayerFromThemeDeleters(int playerIndex)
+    {
+        var themeDeleters = ClientData.ThemeDeleters;
+
+        if (themeDeleters == null)
+        {
+            return;
+        }
+
+        themeDeleters.RemoveAt(playerIndex);
+        
+        if (ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting && !themeDeleters.IsEmpty())
+        {
+            var indicies = themeDeleters.Current.PossibleIndicies;
+            var hasAnyFlag = false;
+
+            for (var i = 0; i < ClientData.Players.Count; i++)
+            {
+                ClientData.Players[i].Flag = indicies.Contains(i);
+                hasAnyFlag = true;
+            }
+
+            if (!hasAnyFlag)
+            {
+                _logic.PlanExecution(Tasks.AskToDelete, 10);
+            }
         }
     }
 
@@ -2575,61 +2605,36 @@ public sealed class Game : Actor<GameData, GameLogic>
                 continue;
             }
 
-            newHistory.Add(new AnswerResult
-            {
-                IsRight = answerResult.IsRight,
-                PlayerIndex = answerResult.PlayerIndex - (answerResult.PlayerIndex > playerIndex ? 1 : 0)
-            });
+            var newPlayerIndex = answerResult.PlayerIndex - (answerResult.PlayerIndex > playerIndex ? 1 : 0);
+            newHistory.Add(new AnswerResult(newPlayerIndex, answerResult.IsRight, answerResult.Sum));
         }
 
         ClientData.QuestionHistory.Clear();
         ClientData.QuestionHistory.AddRange(newHistory);
     }
 
-    private void DropPlayerFromFinalRound(int playerIndex)
+    private void ValidatePlayers()
     {
-        bool noPlayersLeft;
+        var playersAreValid = ClientData.PlayersValidator != null && ClientData.PlayersValidator();
 
-        if (ClientData.ThemeDeleters != null)
+        if (playersAreValid)
         {
-            ClientData.ThemeDeleters.RemoveAt(playerIndex);
-            noPlayersLeft = ClientData.ThemeDeleters.IsEmpty();
+            return;
+        }
+
+        _logic.StopWaiting();
+        // TODO: switch to this approach later
+        // ClientData.MoveDirection = MoveDirections.RoundNext;
+        // _logic.Stop(StopReason.Move);
+
+        if (_logic.Engine.CanMoveNextRound)
+        {
+            _logic.Engine.MoveNextRound(); // Finishing current round
+            _logic.PlanExecution(Tasks.MoveNext, 10);
         }
         else
         {
-            noPlayersLeft = ClientData.Players.All(p => !p.InGame);
-        }
-
-        if (noPlayersLeft)
-        {
-            ClientData.Decision = DecisionType.None;
-
-            // All players that could play are removed
-            if (Logic.Engine.CanMoveNextRound)
-            {
-                Logic.Engine.MoveNextRound(); // Finishing current round
-            }
-            else
-            {
-                // TODO: it is better to provide a correct command to game engine
-                PlanExecution(Tasks.Winner, 10); // This is the last round. Finishing game
-            }
-        }
-        else if (ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting && ClientData.ThemeDeleters != null)
-        {
-            var indicies = ClientData.ThemeDeleters.Current.PossibleIndicies;
-            var hasAnyFlag = false;
-
-            for (var i = 0; i < ClientData.Players.Count; i++)
-            {
-                ClientData.Players[i].Flag = indicies.Contains(i);
-                hasAnyFlag = true;
-            }
-
-            if (!hasAnyFlag)
-            {
-                PlanExecution(Tasks.AskToDelete, 10);
-            }
+            _logic.PlanExecution(Tasks.Winner, 10); // This is the last round. Finishing game
         }
     }
 
@@ -2761,10 +2766,10 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         Logic.AddHistory(
             $"AnswererIndex dropped; nextTask = {nextTask};" +
-            $" ClientData.Decision = {ClientData.Decision}; Logic.IsFinalRound() = {Logic.IsFinalRound()}");
+            $" ClientData.Decision = {ClientData.Decision}");
 
         if ((ClientData.Decision == DecisionType.Answering ||
-            ClientData.Decision == DecisionType.AnswerValidating) && !Logic.IsFinalRound())
+            ClientData.Decision == DecisionType.AnswerValidating) && !Logic.HaveMultipleAnswerers())
         {
             // Answerer has been dropped. The game should be moved forward
             Logic.StopWaiting();

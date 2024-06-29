@@ -139,10 +139,6 @@ public enum Tasks
     /// </summary>
     PrintAuctPlayer,
     /// <summary>
-    /// Объявление финального состава
-    /// </summary>
-    PrintFinal,
-    /// <summary>
     /// Просьба к игроку удалить тему в финале
     /// </summary>
     AskToDelete,

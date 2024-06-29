@@ -17,7 +17,6 @@ public static class PackageHelper
         IPackagesProvider provider,
         string name,
         string author,
-        string roundNameFormat,
         string finalName,
         int roundsCount = 3,
         int themesCount = 6,
@@ -26,7 +25,7 @@ public static class PackageHelper
         CancellationToken cancellationToken = default)
     {
         var doc = SIDocument.Create(name, author, stream);
-        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, "", int.MaxValue, cancellationToken);
+        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, finalName, "", int.MaxValue, cancellationToken);
     }
 
     public static Task<SIDocument> GenerateRandomPackageAsync(
@@ -34,7 +33,6 @@ public static class PackageHelper
         string folder,
         string name,
         string author,
-        string roundNameFormat,
         string finalName,
         string culture,
         int roundsCount = 3,
@@ -51,7 +49,6 @@ public static class PackageHelper
             themesCount,
             baseCost,
             doc,
-            roundNameFormat, 
             finalName,
             culture,
             maxPackageCount,
@@ -64,7 +61,6 @@ public static class PackageHelper
         int themeCount,
         int baseCost,
         SIDocument doc,
-        string roundNameFormat,
         string finalName,
         string culture,
         int maxPackageCount = int.MaxValue,
@@ -81,7 +77,7 @@ public static class PackageHelper
 
         for (var i = 0; i < roundCount; i++)
         {
-            doc.Package.Rounds.Add(new Round { Type = RoundTypes.Standart, Name = string.Format(roundNameFormat, i + 1) });
+            doc.Package.Rounds.Add(new Round { Type = RoundTypes.Standart, Name = (i + 1).ToString() });
 
             for (int j = 0; j < themeCount; j++)
             {
