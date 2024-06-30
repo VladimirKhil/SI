@@ -188,6 +188,7 @@ public sealed class TimeSettings
     /// Partial image time in seconds.
     /// </summary>
     [DefaultValue(DefaultPartialImageTime)]
+    [DataMember]
     public int PartialImageTime
     {
         get
