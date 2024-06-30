@@ -166,6 +166,7 @@ public sealed class OperationsManager
     {
         if (_changeGroup != null)
         {
+            _changeGroup = null;
             throw new Exception(Resources.ChangeGroupIsActivated);
         }
 

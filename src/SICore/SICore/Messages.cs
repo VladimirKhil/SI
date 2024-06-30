@@ -452,6 +452,7 @@ public static class Messages
     /// Round themes names.
     /// </summary>
     [IdempotencyRequired]
+    [Obsolete]
     public const string RoundThemes = "ROUNDTHEMES";
 
     /// <summary>
@@ -509,6 +510,11 @@ public static class Messages
     /// Остановить раунд
     /// </summary>
     public const string Stop = "STOP";
+
+    /// <summary>
+    /// Stops question play.
+    /// </summary>
+    public const string StopPlay = "STOP_PLAY";
 
     /// <summary>
     /// Фоновая картинка студии

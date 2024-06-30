@@ -313,23 +313,16 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
                 .Append(_data.PlayerDataExtensions.KnowsAnswer ? MessageParams.Answer_Right : MessageParams.Answer_Wrong)
                 .Append(Message.ArgsSeparatorChar);
 
-            if (_data.Stage == GameStage.Round)
+            if (_data.PlayerDataExtensions.IsSure)
             {
-                if (_data.PlayerDataExtensions.IsSure)
-                {
-                    ans.Append(
-                        string.Format(
-                            Random.Shared.GetRandomString(_viewerActions.LO[nameof(R.Sure)]),
-                            _data.Me.IsMale ? "" : _viewerActions.LO[nameof(R.SureFemaleEnding)]));
-                }
-                else
-                {
-                    ans.Append(Random.Shared.GetRandomString(_viewerActions.LO[nameof(R.NotSure)]));
-                }
+                ans.Append(
+                    string.Format(
+                        Random.Shared.GetRandomString(_viewerActions.LO[nameof(R.Sure)]),
+                        _data.Me.IsMale ? "" : _viewerActions.LO[nameof(R.SureFemaleEnding)]));
             }
             else
             {
-                ans.Append(Constants.AnswerPlaceholder);
+                ans.Append(Random.Shared.GetRandomString(_viewerActions.LO[nameof(R.NotSure)]));
             }
 
             _viewerActions.SendMessage(ans.ToString());
@@ -1698,15 +1691,15 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
         if (playerData.IsQuestionInProgress)
         {
             playerData.IsQuestionInProgress = false;
-
             CalculateAnsweringStrategy(playerData);
         }
     }
 
     private void CalculateAnsweringStrategy(PlayerData playerData)
     {
-        var shortThink = _data.Stage == GameStage.Round && _data.QuestionType == QuestionTypes.Simple;
-        var difficulty = _data.Stage == GameStage.Round ? _data.QuestionIndex + 1 : 3 /* final question get 3rd degree of complexity */;
+        var shortThink = _data.QuestionType == QuestionTypes.Simple;
+        var questionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;
+        var difficulty = questionCount > 1 ? _data.QuestionIndex + 1 : 3 /* average difficulty */;
         var playerLag = _account.S * 10;
 
         var playerStrength = (double)_account.F;

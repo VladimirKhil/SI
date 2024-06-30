@@ -663,6 +663,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             switch (ClientData.Stage)
                             {
                                 case GameStage.Round:
+                                case GameStage.Final:
                                     if (mparams.Length > 2)
                                     {
                                         _logic.SetText(mparams[2]);
@@ -674,15 +675,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                                         ClientData.Players[i].IsChooser = false;
                                     }
 
-                                    break;
-
-                                case GameStage.Final:
-                                    if (mparams.Length > 2)
-                                    {
-                                        _logic.SetText(mparams[2]);
-                                    }
-                                    
-                                    ClientData.AtomType = ContentTypes.Text;
                                     break;
 
                                 case GameStage.After:
@@ -726,7 +718,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         break;
                     }
 
-                case Messages.RoundThemes:
+                case Messages.RoundThemes2:
                     OnRoundThemes(mparams);
                     break;
 
@@ -929,6 +921,11 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         #endregion
                         break;
                     }
+
+                case Messages.StopPlay:
+                    _logic.OnStopPlay();
+                    break;
+
                 case Messages.WrongTry:
                     {
                         OnWrongTry(mparams);
@@ -1396,7 +1393,10 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     private void OnRoundThemes(string[] mparams)
     {
-        var print = mparams[1] == "+";
+        if (mparams.Length < 2 || !Enum.TryParse<ThemesPlayMode>(mparams[1], out var playMode))
+        {
+            return;
+        }
 
         lock (ClientData.TInfoLock)
         {
@@ -1406,7 +1406,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             {
                 ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
 
-                if (print)
+                if (playMode != ThemesPlayMode.None)
                 {
                     _logic.Print(ReplicManager.System(mparams[i]));
                 }
@@ -1415,7 +1415,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         try
         {
-            _logic.RoundThemes(print);
+            _logic.RoundThemes(playMode);
         }
         catch (InvalidProgramException exc)
         {
@@ -2210,7 +2210,9 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             return;
         }
 
-        ClientData.DeleteTable.CanBeExecuted = IsHost && ClientData.Players.Count > 2 && (ClientData.Stage == GameStage.Before || ClientData.Players.Any(p => !p.IsConnected || !p.IsHuman));
+        ClientData.DeleteTable.CanBeExecuted = IsHost
+            && ClientData.Players.Count > 2
+            && (ClientData.Stage == GameStage.Before || ClientData.Players.Any(p => !p.IsConnected || !p.IsHuman));
     }
 
     private void UpdateAddTableCommand()

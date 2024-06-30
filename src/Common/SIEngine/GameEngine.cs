@@ -42,6 +42,7 @@ public sealed class GameEngine : EngineBase
             case GameStage.Begin:
                 #region Begin
                 OnPackage(_document.Package);
+                UpdateCanMoveNextRound();
 
                 if (GameRules.ShowGameThemes)
                 {
@@ -120,7 +121,7 @@ public sealed class GameEngine : EngineBase
                 if (_timeout) // Round timeout
                 {
                     OnRoundTimeout();
-                    DoFinishRound();
+                    FinishRound();
                 }
                 else if (SelectionStrategy.CanMoveNext())
                 {

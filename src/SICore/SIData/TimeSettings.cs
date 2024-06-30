@@ -115,7 +115,7 @@ public sealed class TimeSettings
     }
 
     /// <summary>
-    /// Время на обдумывание в финале
+    /// Time for thinking on question for all.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(45)]

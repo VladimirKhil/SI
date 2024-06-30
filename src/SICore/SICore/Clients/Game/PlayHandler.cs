@@ -16,8 +16,16 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public PlayHandler(GameData gameData) => _gameData = gameData;
 
-    public void OnRound(Round round, QuestionSelectionStrategyType strategyType) =>
+    public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
+    {
         GameLogic?.OnRoundStart(round, strategyType);
+        // TODO: I do not like ANY logic dependency on strategyType outside the strategy factory but do not have any better idea for now
+        _gameData.PlayersValidator = strategyType == QuestionSelectionStrategyType.RemoveOtherThemes ? ThemeRemovalPlayersValidator : DefaultPlayersValidator;
+    }
+
+    public static bool DefaultPlayersValidator() => true;
+
+    public bool ThemeRemovalPlayersValidator() => _gameData.Players.Any(player => player.InGame);
 
     public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController)
     {
@@ -62,7 +70,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         GameLogic?.ScheduleExecution(Tasks.AskFirst, 19 * _gameData.TInfo.RoundInfo.Count + Random.Shared.Next(10));
     }
 
-    public bool ShouldPlayQuestionForAll()
+    public bool ShouldPlayRoundWithRemovableThemes()
     {
         var playRound = false;
 

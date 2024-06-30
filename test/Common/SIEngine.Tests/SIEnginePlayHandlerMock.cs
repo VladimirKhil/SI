@@ -62,7 +62,7 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
-    public bool ShouldPlayQuestionForAll()
+    public bool ShouldPlayRoundWithRemovableThemes()
     {
         return true;
     }

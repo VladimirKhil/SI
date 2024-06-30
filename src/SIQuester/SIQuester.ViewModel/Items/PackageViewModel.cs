@@ -320,7 +320,7 @@ public sealed class PackageViewModel : ItemViewModel<Package>
     {
         var round = new Round
         { 
-            Name = string.Format(Resources.RoundNameTemplate, Rounds.Count + 1),
+            Name = (Rounds.Count + 1).ToString(),
             Type = RoundTypes.Standart
         };
 

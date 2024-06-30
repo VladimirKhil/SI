@@ -37,9 +37,10 @@ public interface IViewerLogic : ILogic
     void GameThemes();
 
     /// <summary>
-    /// Получены темы раунда
+    /// Handles round themes.
     /// </summary>
-    void RoundThemes(bool print);
+    /// <param name="playMode">Themes play mode.</param>
+    void RoundThemes(ThemesPlayMode playMode) { }
 
     /// <summary>
     /// Игрок выбрал вопрос
@@ -209,4 +210,6 @@ public interface IViewerLogic : ILogic
     void OnOptions(string[] mparams) { }
 
     void OnToggle(int themeIndex, int questionIndex, int price) { }
+
+    void OnStopPlay() { }
 }

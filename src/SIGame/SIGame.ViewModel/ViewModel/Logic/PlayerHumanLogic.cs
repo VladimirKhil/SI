@@ -47,7 +47,7 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 
     public void PersonAnswered(int playerIndex, bool isRight)
     {
-        if ((_data.Stage == GameStage.Final || _data.QuestionType != QuestionTypes.Simple)
+        if (_data.QuestionType != QuestionTypes.Simple
             && _data.Players[playerIndex].Name == _viewerActions.Client.Name
             || isRight)
         {
