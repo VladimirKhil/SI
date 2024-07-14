@@ -211,7 +211,14 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
     /// <summary>
     /// Initializes a new instance of <see cref="Viewer" /> class.
     /// </summary>
-    public Viewer(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
+    public Viewer(
+        Client client,
+        Account personData,
+        bool isHost,
+        IViewerLogic logic,
+        ViewerActions viewerActions,
+        ILocalizer localizer,
+        ViewerData data)
         : base(client, localizer, data)
     {
         if (personData == null)

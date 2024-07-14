@@ -861,7 +861,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         gameSettings.CreateGame += CreateGameAsync;
     }
 
-    private async Task<(SecondaryNode, IViewerClient)?> CreateGameAsync(GameSettings settings, PackageSource packageSource)
+    private async Task<(SecondaryNode, IViewerClient, GameViewModel)?> CreateGameAsync(GameSettings settings, PackageSource packageSource)
     {
         GameSettings.Message = Resources.PackageCheck;
 
@@ -879,7 +879,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         return await CreateGameWithContentServiceAsync(settings, packageKey, packageSource, cancellationTokenSource.Token);
     }
 
-    private async Task<(SecondaryNode, IViewerClient)?> CreateGameWithContentServiceAsync(
+    private async Task<(SecondaryNode, IViewerClient, GameViewModel)?> CreateGameWithContentServiceAsync(
         GameSettings settings,
         PackageKey packageKey,
         PackageSource packageSource,
@@ -947,16 +947,16 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             Owner = name
         };
 
-        await JoinGameAsync(game, settings.Role, runGameResponse.IsHost, cancellationToken);
+        var gameViewModel = await JoinGameAsync(game, settings.Role, runGameResponse.IsHost, cancellationToken);
 
-        if (_host == null)
+        if (_host == null || gameViewModel == null)
         {
             return null;
         }
 
         _host.Connector?.SetGameID(runGameResponse.GameId);
 
-        return (_node, _host);
+        return (_node, _host, gameViewModel);
     }
 
     private static bool IsCustomPackage(PackageKey packageKey) => packageKey.Hash.Length > 0; // Does not look nice, but will work for now
@@ -1153,7 +1153,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     protected override string GetExtraCredentials() => !string.IsNullOrEmpty(_password) ? $"\n{_password}" : "";
 
-    public override async Task JoinGameCoreAsync(
+    public override async Task<GameViewModel?> JoinGameCoreAsync(
         GameInfo? gameInfo,
         GameRole role,
         bool isHost = false,
@@ -1164,12 +1164,12 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         if (gameInfo != null && gameInfo.MinimumClientProtocolVersion > SupportedProtocolVersion)
         {
             Error = Resources.YouNeedToUpgradeClientToJoinGame;
-            return;
+            return null;
         }
 
         if (gameInfo == null)
         {
-            return;
+            return null;
         }
 
         if (!isHost)
@@ -1181,7 +1181,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                 if (passwordRequired && string.IsNullOrEmpty(_password))
                 {
                     IsProgress = false;
-                    return;
+                    return null;
                 }
             }
         }
@@ -1219,16 +1219,18 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
                 await siHostClient.DisposeAsync();
 
-                return;
+                return null;
             }
 
             await InitNodeAndClientNewAsync(siHostClient, cancellationToken);
-            await JoinGameCompletedAsync(role, isHost, cancellationToken);
+            var gameViewModel = await JoinGameCompletedAsync(role, isHost, cancellationToken);
 
             await _gameServerClient.DisposeAsync();
 
             _host.Connector.SetGameID(gameInfo.GameID);
             _host.Connector.SetHostUri(gameInfo.HostUri);
+
+            return gameViewModel;
         }
         catch (TaskCanceledException exc)
         {
@@ -1240,6 +1242,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             Error = exc.Message;
             FullError = exc.ToString();
         }
+
+        return null;
     }
 
     public void Say(string message, bool system = false)

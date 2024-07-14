@@ -337,6 +337,7 @@ public sealed class ViewerData : Data
         }
     }
 
+    // TODO: move to GameViewModel
     /// <summary>
     /// Observable version of <see cref="Players" />.
     /// </summary>
@@ -344,6 +345,7 @@ public sealed class ViewerData : Data
 
     private PersonAccount? _currentPerson;
 
+    // TODO: move to GameViewModel
     /// <summary>
     /// Currently selected person.
     /// </summary>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SI.GameServer.Contract;
 using SICore;
 using SICore.BusinessLogic;
@@ -358,7 +359,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
     private readonly CommonSettings _commonSettings;
 
-    internal event Func<GameSettings, PackageSource, Task<(SecondaryNode, IViewerClient)?>> CreateGame;
+    internal event Func<GameSettings, PackageSource, Task<(SecondaryNode, IViewerClient, GameViewModel)?>> CreateGame;
 
     public event Action<ContentBox> Navigate;
 
@@ -385,6 +386,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
     private readonly UserSettings _userSettings;
     private readonly ISIStorageClientFactory _siStorageClientFactory;
+    private readonly ILoggerFactory _loggerFactory;
 
     public GameSettingsViewModel(
         GameSettings gameSettings,
@@ -393,6 +395,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         SettingsViewModel settingsViewModel,
         ISIStorageClientFactory siStorageClientFactory,
         SIStorageInfo[] libraries,
+        ILoggerFactory loggerFactory,
         bool isNetworkGame = false,
         long? maxPackageSize = null)
         : base(gameSettings)
@@ -403,6 +406,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _settingsViewModel = settingsViewModel;
         _siStorageClientFactory = siStorageClientFactory;
         _libraries = libraries;
+        _loggerFactory = loggerFactory;
 
         UpdateComputerPlayers();
         UpdateComputerShowmans();
@@ -655,7 +659,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                     return;
                 }
 
-                MoveToGame(info.Value.Item1, info.Value.Item2, (ViewerHumanLogic)info.Value.Item2.MyLogic, null, null);
+                MoveToGame(info.Value.Item3, (ViewerHumanLogic)info.Value.Item2.MyLogic);
             }
             else
             {
@@ -744,6 +748,8 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         var avatarHelper = new AvatarHelper(Path.Combine(documentPath, "avatars"));
 
+        GameViewModel? gameViewModel = null;
+
         var (host, _) = new GameRunner(
             node,
             _model,
@@ -754,8 +760,26 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             _computerShowmans.ToArray(),
             documentPath,
             avatarHelper)
-            .Run((data, actions, localizer) => new ViewerHumanLogic(data, actions, localizer, _settingsViewModel));
+            .Run((data, actions, localizer) =>
+            {
+                // TODO: (refactor) quite ugly way to create GameViewModel but it's the only way to pass all the required parameters
+                gameViewModel = new GameViewModel(data, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
+                {
+                    NetworkGame = NetworkGame,
+                    NetworkGamePort = NetworkPort,
+                    IsOnline = false,
+                    TempDocFolder = documentPath
+                };
 
+                return new ViewerHumanLogic(gameViewModel, data, actions, localizer);
+            });
+
+        if (gameViewModel == null)
+        {
+            return;
+        }
+
+        gameViewModel.Host = host;
         host!.MyData.IsNetworkGame = NetworkGame;
 
         if (!NetworkGame)
@@ -766,20 +790,15 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         host.MyData.ServerAddress = "http://localhost";
 
-        MoveToGame(node, host, (ViewerHumanLogic)host.MyLogic, documentPath, fileShare);
+        MoveToGame(gameViewModel, (ViewerHumanLogic)host.MyLogic);
     }
 
-    private void MoveToGame(Node server, IViewerClient host, ViewerHumanLogic logic, string tempDocFolder, IFileShare? fileShare)
+    private void MoveToGame(GameViewModel gameViewModel, ViewerHumanLogic logic)
     {
-        if (host == null)
-        {
-            throw new ArgumentNullException(nameof(host));
-        }
-
         _model.ShowmanType = Showman.AccountType;
         _model.PlayersTypes = Players.Select(p => p.AccountType).ToArray();
 
-        OnStartGame(server, host, logic, NetworkGame, false, tempDocFolder, fileShare, NetworkPort);
+        OnStartGame(gameViewModel, logic);
     }
 
     private void Server_Error(Exception exc, bool isWarning) =>

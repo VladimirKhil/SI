@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SICore;
 using SICore.BusinessLogic;
-using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Configuration;
@@ -13,7 +13,6 @@ using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIStorage.Service.Client;
 using SIUI.ViewModel;
-using System.Diagnostics;
 using System.Windows.Input;
 using Utils.Commands;
 
@@ -155,6 +154,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         var siStorageClientFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageClientFactory>();
         var siStorageClientOptions = PlatformManager.Instance.ServiceProvider!.GetRequiredService<IOptions<SIStorageClientOptions>>().Value;
+        var loggerFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ILoggerFactory>();
 
         var libraries = new SI.GameServer.Contract.SIStorageInfo[]
         {
@@ -174,6 +174,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             _settingsViewModel,
             siStorageClientFactory,
             libraries,
+            loggerFactory,
             true,
             MaxPackageSize)
         {
@@ -198,17 +199,6 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             Cancel = _closeContent
         };
     }
-
-    protected override void OnStartGame(
-        Node node,
-        IViewerClient host,
-        ViewerHumanLogic logic,
-        bool networkGame,
-        bool isOnline,
-        string tempDocFolder,
-        IFileShare? fileShare,
-        int networkGamePort) =>
-        base.OnStartGame(node, host, logic, networkGame, IsOnline, tempDocFolder, fileShare, networkGamePort);
 
     protected virtual void Prepare(GameSettingsViewModel gameSettings)
     {
@@ -252,13 +242,13 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     private async void Join_Executed(object? arg) => await JoinGameAsync(null, (GameRole)arg);
 
-    protected virtual async Task JoinGameAsync(GameInfo? gameInfo, GameRole role, bool host = false, CancellationToken cancellationToken = default)
+    protected virtual async Task<GameViewModel?> JoinGameAsync(GameInfo? gameInfo, GameRole role, bool host = false, CancellationToken cancellationToken = default)
     {
         IsProgress = true;
 
         try
         {
-            await JoinGameCoreAsync(gameInfo, role, host, cancellationToken);
+            return await JoinGameCoreAsync(gameInfo, role, host, cancellationToken);
         }
         catch (Exception exc)
         {
@@ -274,9 +264,11 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         {
             IsProgress = false;
         }
+
+        return null;
     }
 
-    public virtual async Task JoinGameCoreAsync(
+    public virtual async Task<GameViewModel?> JoinGameCoreAsync(
         GameInfo? gameInfo,
         GameRole role,
         bool isHost = false,
@@ -288,14 +280,14 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         var command = $"{Messages.Connect}\n{role.ToString().ToLowerInvariant()}\n{name}\n{sex}\n{-1}{GetExtraCredentials()}";
 
         _ = await _connector.JoinGameAsync(command);
-        await JoinGameCompletedAsync(role, isHost, cancellationToken);
+        return await JoinGameCompletedAsync(role, isHost, cancellationToken);
     }
 
     protected virtual string GetExtraCredentials() => "";
 
     protected Task<(string? AvatarUrl, FileKey? FileKey)>? _avatarLoadingTask;
 
-    protected async Task JoinGameCompletedAsync(GameRole role, bool isHost, CancellationToken cancellationToken = default)
+    protected async Task<GameViewModel> JoinGameCompletedAsync(GameRole role, bool isHost, CancellationToken cancellationToken = default)
     {
         await _node.ConnectionsLock.WithLockAsync(
             () =>
@@ -329,9 +321,16 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             IsNetworkGame = true
         };
 
+        var loggerFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ILoggerFactory>();
+
+        var gameViewModel = new GameViewModel(data, _node, _userSettings, _settingsViewModel, null, loggerFactory.CreateLogger<GameViewModel>())
+        {
+            IsOnline = IsOnline
+        };
+
         var localizer = new Localizer(Thread.CurrentThread.CurrentUICulture.Name);
         var actions = new ViewerActions(_client, localizer);
-        var logic = new ViewerHumanLogic(data, actions, localizer, _settingsViewModel);
+        var logic = new ViewerHumanLogic(gameViewModel, data, actions, localizer);
 
         try
         {
@@ -341,6 +340,8 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
                 GameRole.Player => new Player(_client, humanPlayer, isHost, logic, actions, localizer, data),
                 _ => new Viewer(_client, humanPlayer, isHost, logic, actions, localizer, data),
             };
+
+            gameViewModel.Host = _host;
 
             _host.Avatar = _avatarLoadingTask != null ? (await _avatarLoadingTask).AvatarUrl : null;
 
@@ -355,7 +356,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
             if (!isHost && Ready != null)
             {
-                Ready(_node, _host, logic, IsOnline); // Здесь происходит переход к игре
+                Ready(gameViewModel, logic); // Here is happening moving to game view
             }
 
             if (_connector != null)
@@ -368,11 +369,11 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
             _host.GetInfo();
 
-            Trace.TraceInformation("INFO request sent");
-
             Error = null;
 
             _node.Error += Server_Error;
+
+            return gameViewModel;
         }
         catch (Exception exc)
         {
@@ -389,7 +390,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     protected virtual Task ClearConnectionAsync() => Task.CompletedTask;
 
-    public event Action<Node, IViewerClient, ViewerHumanLogic, bool> Ready;
+    public event Action<GameViewModel, ViewerHumanLogic> Ready;
 
     #endregion
 

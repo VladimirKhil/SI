@@ -26,13 +26,60 @@ namespace SIGame.ViewModel;
 public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 {
     private readonly Node _node;
-    private readonly ViewerHumanLogic _logic;
+    public ViewerHumanLogic? Logic { get; set; }
 
-    public IViewerClient Host { get; private set; }
+    private IViewerClient? _host;
 
-    public ViewerData Data => Host.MyData;
+    public IViewerClient? Host
+    {
+        get => _host;
+        set
+        {
+            if (_host != null)
+            {
+                _host.Switch -= Host_Switch;
+                _host.StageChanged -= Host_StageChanged;
+                _host.PersonConnected -= UpdateMoveCommand;
+                _host.PersonDisconnected -= UpdateMoveCommand;
+                _host.IsHostChanged -= UpdateMoveCommand;
+                _host.Timer -= Host_Timer;
+                _host.Ad -= Host_Ad;
+                _host.IsPausedChanged -= Host_IsPausedChanged;
+            }
 
-    public TableInfoViewModel TInfo => _logic.TInfo;
+            _host = value;
+
+            if (_host != null)
+            {
+                _host.Switch += Host_Switch;
+                _host.StageChanged += Host_StageChanged;
+                _host.PersonConnected += UpdateMoveCommand;
+                _host.PersonDisconnected += UpdateMoveCommand;
+                _host.IsHostChanged += UpdateMoveCommand;
+                _host.Timer += Host_Timer;
+                _host.Ad += Host_Ad;
+                _host.IsPausedChanged += Host_IsPausedChanged;
+            }
+        }
+    }
+
+    private ViewerData _data;
+
+    public ViewerData Data
+    {
+        get => _data;
+        private set
+        {
+            _data = value;
+
+            if (_data != null)
+            {
+                _data.CurrentPlayerChanged -= MyData_CurrentPlayerChanged;
+            }
+        }
+    }
+
+    public TableInfoViewModel TInfo { get; private set; }
 
     /// <summary>
     /// Ends the game and returns to main menu/lobby.
@@ -184,34 +231,31 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
+    public event Action? Disposed;
+
     public GameViewModel(
+        ViewerData viewerData,
         Node node,
-        IViewerClient host,
-        ViewerHumanLogic logic,
         UserSettings userSettings,
+        SettingsViewModel settings,
         IFileShare? fileShare,
         ILogger<GameViewModel> logger)
     {
         _node = node;
-        _logic = logic;
         _fileShare = fileShare;
         _logger = logger;
 
+        Data = viewerData;
+
+        TInfo = new TableInfoViewModel(Data.TInfo, settings)
+        {
+            AnimateText = true,
+            Enabled = true,
+            Volume = PlatformManager.Instance.Volume
+        };
+
         _node.Reconnecting += Server_Reconnecting;
         _node.Reconnected += Server_Reconnected;
-
-        Host = host;
-
-        Host.Switch += Host_Switch;
-        Host.StageChanged += Host_StageChanged;
-        Host.PersonConnected += UpdateMoveCommand;
-        Host.PersonDisconnected += UpdateMoveCommand;
-        Host.IsHostChanged += UpdateMoveCommand;
-        Host.Timer += Host_Timer;
-        Host.Ad += Host_Ad;
-        Host.IsPausedChanged += Host_IsPausedChanged;
-
-        TInfo.Volume = PlatformManager.Instance.Volume;
 
         UserSettings = userSettings;
 
@@ -235,7 +279,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Timers[1].TimeChanged += GameViewModel_TimeChanged;
 
         OpenLink = new SimpleCommand(OpenLink_Executed);
-        Host.MyData.CurrentPlayerChanged += MyData_CurrentPlayerChanged;
 
         SetVideoAvatar = new SimpleCommand(SetVideoAvatar_Executed);
         DeleteVideoAvatar = new SimpleCommand(DeleteVideoAvatar_Executed);
@@ -388,25 +431,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         newHost.Connector = Host.Connector;
         newHost.Connector?.SetHost(newHost);
 
-        Host.Switch -= Host_Switch;
-        Host.StageChanged -= Host_StageChanged;
-        Host.PersonConnected -= UpdateMoveCommand;
-        Host.PersonDisconnected -= UpdateMoveCommand;
-        Host.IsHostChanged -= UpdateMoveCommand;
-        Host.Timer -= Host_Timer;
-        Host.Ad -= Host_Ad;
-        Host.IsPausedChanged -= Host_IsPausedChanged;
-
         Host = newHost;
-
-        Host.Switch += Host_Switch;
-        Host.StageChanged += Host_StageChanged;
-        Host.PersonConnected += UpdateMoveCommand;
-        Host.PersonDisconnected += UpdateMoveCommand;
-        Host.IsHostChanged += UpdateMoveCommand;
-        Host.Timer += Host_Timer;
-        Host.Ad += Host_Ad;
-        Host.IsPausedChanged += Host_IsPausedChanged;
 
         UpdateMoveCommand();
 
@@ -508,7 +533,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         TInfo.TStage = TableStage.Void;
 
         await _node.DisposeAsync();
-        await _logic.DisposeAsync();
 
         if (_fileShare != null)
         {
@@ -530,7 +554,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             }
             catch (IOException exc)
             {
-                Trace.TraceWarning($"Temp folder delete error: {exc}");
+                _logger.LogWarning(exc, "Temp folder delete error");
             }
         }
 
@@ -538,5 +562,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         {
             PlatformManager.Instance.CloseDialogWindow();
         }
+
+        Disposed?.Invoke();
     }
 }

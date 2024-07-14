@@ -210,52 +210,19 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 })
         };
 
-    private void StartGame(
-        Node node,
-        IViewerClient host,
-        ViewerHumanLogic logic,
-        bool isNetworkGame,
-        bool isOnline,
-        string? tempDocFolder,
-        IFileShare? fileShare,
-        int networkGamePort = -1)
+    private void StartGame(GameViewModel gameViewModel, ViewerHumanLogic logic)
     {
-        if (host == null)
-        {
-            throw new ArgumentNullException(nameof(host));
-        }
-
-        var game = new GameViewModel(
-            node,
-            host,
-            logic,
-            _userSettings,
-            fileShare,
-            _serviceProvider.GetRequiredService<ILogger<GameViewModel>>())
-        {
-            NetworkGame = isNetworkGame && node.IsMain,
-            NetworkGamePort = networkGamePort,
-            IsOnline = isOnline,
-            TempDocFolder = tempDocFolder
-        };
-
-        game.GameEnded += EndGame_Executed;
+        gameViewModel.GameEnded += EndGame_Executed;
 
         Settings.IsEditable = false;
-        ActiveView = game;
+        ActiveView = gameViewModel;
 
         PlatformManager.Instance.PlaySound();
 
-        game.Init();
+        gameViewModel.Init();
 
-        host.MyLogic.PrintGreeting();
+        logic.PrintGreeting();
     }
-
-    private void JoinGame(
-        Node server,
-        IViewerClient host,
-        ViewerHumanLogic logic,
-        bool isOnline) => StartGame(server, host, logic, false, isOnline, null, null);
 
     private async void EndGame_Executed()
     {
@@ -278,6 +245,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         var siStorageClientFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageClientFactory>();
         var siStorageClientOptions = PlatformManager.Instance.ServiceProvider!.GetRequiredService<IOptions<SIStorageClientOptions>>().Value;
+        var loggerFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ILoggerFactory>();
 
         var libraries = new SIStorageInfo[]
         {
@@ -296,7 +264,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             _userSettings,
             Settings.ThemeSettings.SIUISettings,
             siStorageClientFactory,
-            libraries)
+            libraries,
+            loggerFactory)
         {
             Human = Human.HumanPlayer,
             ChangeSettings = ShowSlideMenu
@@ -351,7 +320,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 ChangeSettings = ShowSlideMenu
             };
 
-            onlineViewModel.Ready += JoinGame;
+            onlineViewModel.Ready += StartGame;
             onlineViewModel.StartGame += StartGame;
 
             ActiveView = onlineViewModel;
@@ -376,7 +345,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             Cancel = Cancel
         };
         
-        networkConnection.Ready += JoinGame;
+        networkConnection.Ready += StartGame;
         networkConnection.StartGame += StartGame;
 
         await Task.Delay(500);

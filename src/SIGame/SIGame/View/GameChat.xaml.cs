@@ -97,7 +97,7 @@ public partial class GameChat : UserControl
 
     private void Label_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        this.playerTables.SelectedItem = null;
+        playerTables.SelectedItem = null;
         var label = (Label)sender;
         var data = ((GameViewModel)label.DataContext).Data;
         data.CurrentPerson = data.ShowMan;

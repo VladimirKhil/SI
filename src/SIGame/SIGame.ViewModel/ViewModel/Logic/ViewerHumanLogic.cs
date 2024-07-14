@@ -2,6 +2,7 @@
 using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
 using SIData;
+using SIGame.ViewModel;
 using SIGame.ViewModel.PlatformSpecific;
 using SIPackages.Core;
 using SIUI.ViewModel;
@@ -68,13 +69,23 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     private bool _runTimer = false;
     private double? _initialTime = null;
 
-    public ViewerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer, SettingsViewModel settings)
+    private readonly GameViewModel _gameViewModel;
+
+    public ViewerHumanLogic(
+        GameViewModel gameViewModel,
+        ViewerData data,
+        ViewerActions viewerActions,
+        ILocalizer localizer)
         : base(data)
     {
+        _gameViewModel = gameViewModel;
         _viewerActions = viewerActions;
         _localizer = localizer;
 
-        TInfo = new TableInfoViewModel(_data.TInfo, settings) { AnimateText = true, Enabled = true };
+        _gameViewModel.Logic = this;
+        _gameViewModel.Disposed += GameViewModel_Disposed;
+
+        TInfo = _gameViewModel.TInfo;
 
         TInfo.PropertyChanged += TInfo_PropertyChanged;
         TInfo.MediaLoad += TInfo_MediaLoad;
@@ -92,6 +103,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _timer.KeepFinalValue = true;
         _timer.TimeChanged += Timer_TimeChanged;
     }
+
+    private async void GameViewModel_Disposed() => await DisposeAsync();
 
     private void Timer_TimeChanged(IAnimatableTimer timer)
     {
@@ -963,7 +976,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                     currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
 
-                    // TODO: this logic should be moved to server; client shoul receive just boolean flag
+                    // TODO: this logic should be moved to server; client should receive just boolean flag
                     if (contentType == ContentTypes.Image
                         && ClientData.QuestionType == QuestionTypes.Simple
                         && !_data.IsAnswer

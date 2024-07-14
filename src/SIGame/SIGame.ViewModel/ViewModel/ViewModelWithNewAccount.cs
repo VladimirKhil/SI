@@ -47,18 +47,9 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
 
     public ICommand ChangeSettings { get; internal set; }
 
-    public event Action<Node, IViewerClient, ViewerHumanLogic, bool, bool, string, IFileShare?, int> StartGame;
+    public event Action<GameViewModel, ViewerHumanLogic> StartGame;
 
-    protected virtual void OnStartGame(
-        Node server,
-        IViewerClient host,
-        ViewerHumanLogic logic,
-        bool networkGame,
-        bool isOnline,
-        string tempDocFolder,
-        IFileShare? fileShare,
-        int networkGamePort) =>
-        StartGame?.Invoke(server, host, logic, networkGame, isOnline, tempDocFolder, fileShare, networkGamePort);
+    protected virtual void OnStartGame(GameViewModel gameViewModel, ViewerHumanLogic logic) => StartGame?.Invoke(gameViewModel, logic);
 
     protected ViewModelWithNewAccount()
     {
