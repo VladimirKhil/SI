@@ -766,7 +766,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.Mark:
-                        if (!ClientData.CanMarkQuestion)
+                        if (!ClientData.CanMarkQuestion || args.Length < 3)
                         {
                             break;
                         }
@@ -775,7 +775,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         {
                             ThemeName = ClientData.Theme.Name,
                             QuestionText = ClientData.Question?.GetText(),
-                            ReportText = args.Length > 1 ? args[1] : ""
+                            ReportText = args[2]
                         });
                         break;
                 }

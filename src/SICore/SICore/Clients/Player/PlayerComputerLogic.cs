@@ -1698,7 +1698,11 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
     private void CalculateAnsweringStrategy(PlayerData playerData)
     {
         var shortThink = _data.QuestionType == QuestionTypes.Simple;
-        var questionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;
+
+        var questionCount = _data.ThemeIndex > -1 && _data.ThemeIndex < _data.TInfo.RoundInfo.Count
+            ? _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count
+            : 5;
+
         var difficulty = questionCount > 1 ? _data.QuestionIndex + 1 : 3 /* average difficulty */;
         var playerLag = _account.S * 10;
 

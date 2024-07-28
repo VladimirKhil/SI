@@ -21,6 +21,8 @@ public sealed class SIHostClient : IGameClient
 
     public event Action<Message>? IncomingMessage;
 
+    public event Action<int, ConnectionPersonData[]>? PersonChanged;
+
     public event Func<Exception?, Task>? Reconnecting;
     public event Func<string?, Task>? Reconnected;
     public event Func<Exception?, Task>? Closed;
@@ -34,14 +36,18 @@ public sealed class SIHostClient : IGameClient
         _connection.Reconnected += OnReconnected;
         _connection.Closed += OnConnectionClosedAsync;
 
-        _connection.On<Message>("Receive", (message) => IncomingMessage?.Invoke(message));
+        _connection.On<Message>(nameof(ISIHostClient.Receive), (message) => IncomingMessage?.Invoke(message));
 
-        _connection.On("Disconnect", async () =>
+        _connection.On(nameof(ISIHostClient.Disconnect), async () =>
         {
             IncomingMessage?.Invoke(new Message(Resources.YourWereKicked, "@", isSystem: false));
 
             await _connection.StopAsync();
         });
+
+        _connection.On<int, ConnectionPersonData[]>(
+            nameof(ISIHostClient.GamePersonsChanged),
+            (gameId, persons) => PersonChanged?.Invoke(gameId, persons));
     }
 
     private async Task OnReconnecting(Exception? ex)
