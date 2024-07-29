@@ -35,4 +35,6 @@ public interface IShowmanLogic : IPersonLogic
     /// Reacts to sending answer request.
     /// </summary>
     void Answer() { }
+
+    void SelectPlayer() { }
 }

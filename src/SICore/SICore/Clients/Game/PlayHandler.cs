@@ -161,7 +161,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     public void OnTheme(Theme theme)
     {
         _gameData.Theme = theme;
-        GameActions?.SendMessageWithArgs(Messages.Theme, theme.Name);
+        GameActions?.SendMessageWithArgs(Messages.Theme, theme.Name, theme.Questions.Count);
         GameLogic?.ScheduleExecution(Tasks.ThemeInfo, 20, 1);
     }
 

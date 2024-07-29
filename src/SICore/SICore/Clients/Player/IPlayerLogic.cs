@@ -33,4 +33,10 @@ public interface IPlayerLogic : IPersonLogic
     /// Получена часть вопроса
     /// </summary>
     void OnPlayerAtom(string[] mparams);
+
+    void OnTheme(string[] mparams) { }
+
+    void OnChoice(string[] mparams) { }
+
+    void SelectPlayer() { }
 }

@@ -12,5 +12,6 @@ internal enum PlayerTasks
     FinalStake,
     AnswerRight,
     AnswerWrong,
-    PressButton
+    PressButton,
+    SelectPlayer,
 }

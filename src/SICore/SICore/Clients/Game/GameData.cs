@@ -144,6 +144,8 @@ public sealed class GameData : Data
     /// </summary>
     internal Question? Question { get; set; }
 
+    internal List<string> PlayerSelectors { get; } = new();
+
     private NumberSet? _catInfo = null;
 
     public NumberSet? CatInfo

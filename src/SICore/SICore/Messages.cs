@@ -47,6 +47,11 @@ public static class Messages
     public const string ApellationEnabled = "APELLATION_ENABLES";
 
     /// <summary>
+    /// Asks to select a player.
+    /// </summary>
+    public const string AskSelectPlayer = "ASK_SELECT_PLAYER";
+
+    /// <summary>
     /// Единица сценария вопроса
     /// </summary>
     [Obsolete("Use Content")]
@@ -99,6 +104,7 @@ public static class Messages
     /// <summary>
     /// Вопрос с секретом
     /// </summary>
+    [Obsolete("Use AskSelectPlayer")]
     public const string Cat = "CAT";
 
     /// <summary>
@@ -202,16 +208,19 @@ public static class Messages
     /// <summary>
     /// Showman should give a move to a player.
     /// </summary>
+    [Obsolete("Use AskSelectPlayer")]
     public const string First = "FIRST";
 
     /// <summary>
     /// Информация о том, кто будет первым удалять тему в финале
     /// </summary>
+    [Obsolete("Use AskSelectPlayer")]
     public const string FirstDelete = "FIRSTDELETE";
 
     /// <summary>
     /// Информация о том, кто будет первым делать ставку
     /// </summary>
+    [Obsolete("Use AskSelectPlayer")]
     public const string FirstStake = "FIRSTSTAKE";
 
     /// <summary>
@@ -462,6 +471,11 @@ public static class Messages
     public const string RoundThemes2 = "ROUND_THEMES2";
 
     /// <summary>
+    /// Select player.
+    /// </summary>
+    public const string SelectPlayer = "SELECT_PLAYER";
+
+    /// <summary>
     /// Gives move to player.
     /// </summary>
     public const string SetChooser = "SETCHOOSER";
@@ -539,7 +553,7 @@ public static class Messages
     public const string TextShape = "TEXTSHAPE";
 
     /// <summary>
-    /// Тема
+    /// Current theme.
     /// </summary>
     public const string Theme = "THEME";
 

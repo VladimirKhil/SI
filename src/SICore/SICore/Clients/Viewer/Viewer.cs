@@ -2501,6 +2501,38 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     public virtual void Init() => ClientData.IsPlayer = false;
 
+    protected void OnAskSelectPlayer(string[] mparams)
+    {
+        for (var i = 0; i < ClientData.Players.Count; i++)
+        {
+            ClientData.Players[i].CanBeSelected = i + 2 < mparams.Length && mparams[i + 2] == "+";
+            var num = i;
+            ClientData.Players[i].SelectionCallback = player => 
+            {
+                _viewerActions.SendMessageWithArgs(Messages.SelectPlayer, num);
+                ClearSelections(true);
+            };
+        }
+
+        if (ClientData.Speaker != null)
+        {
+            ClientData.Speaker.Replic = "";
+        }
+
+        ClientData.Hint = LO[GetSelectHint(mparams[1])];
+    }
+
+    private void ClearSelections(bool full = false) => _logic.ClearSelections(full);
+
+    private static string GetSelectHint(string selectionMode) => selectionMode switch
+    {
+        MessageParams.AskSelectPlayerReason_Answerer => nameof(R.HintSelectCatPlayer),
+        MessageParams.AskSelectPlayerReason_Chooser => nameof(R.HintSelectStarter),
+        MessageParams.AskSelectPlayerReason_Deleter => nameof(R.HintThemeDeleter),
+        MessageParams.AskSelectPlayerReason_Staker => nameof(R.HintSelectStaker),
+        _ => string.Empty,
+    };
+
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

@@ -6,5 +6,6 @@ internal enum ShowmanTasks
     AnswerFirst,
     AnswerNextStake,
     AnswerRight,
-    AnswerNextToDelete
+    AnswerNextToDelete,
+    SelectPlayer,
 }

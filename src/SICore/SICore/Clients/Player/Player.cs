@@ -247,10 +247,12 @@ public sealed class Player : Viewer
                 case Messages.Choice:
                     ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
                     ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = false;
+                    _logic.PlayerLogic.OnChoice(mparams);
                     break;
 
                 case Messages.Theme:
                     ClientData.QuestionIndex = -1;
+                    _logic.PlayerLogic.OnTheme(mparams);
                     break;
 
                 case Messages.Question:
@@ -313,6 +315,11 @@ public sealed class Player : Viewer
                 case Messages.Answer:
                     ClientData.PersonDataExtensions.Answer = "";
                     _logic.PlayerLogic.Answer();
+                    break;
+
+                case Messages.AskSelectPlayer: // Uncomment later
+                    //OnAskSelectPlayer(mparams);
+                    //_logic.PlayerLogic.SelectPlayer();
                     break;
 
                 case Messages.Cat:

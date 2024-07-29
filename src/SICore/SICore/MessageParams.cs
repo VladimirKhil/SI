@@ -15,6 +15,14 @@ public static class MessageParams
     /// </summary>
     public const string Answer_Wrong = "WRONG";
 
+    public const string AskSelectPlayerReason_Chooser = "CHOOSER";
+
+    public const string AskSelectPlayerReason_Staker = "STAKER";
+
+    public const string AskSelectPlayerReason_Deleter = "DELETER";
+
+    public const string AskSelectPlayerReason_Answerer = "ANSWERER";
+
     /// <summary>
     /// Question fragment uri.
     /// </summary>

@@ -14,6 +14,7 @@ using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
+using System;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -659,10 +660,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.Cat:
-                        if (ClientData.IsWaiting &&
-                            ClientData.Decision == DecisionType.QuestionAnswererSelection &&
-                            (ClientData.Chooser != null && message.Sender == ClientData.Chooser.Name ||
-                            ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
+                        if (ClientData.IsWaiting
+                            && ClientData.Decision == DecisionType.QuestionAnswererSelection
+                            && (ClientData.Chooser != null && message.Sender == ClientData.Chooser.Name
+                                || ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
                         {
                             #region Cat
 
@@ -683,9 +684,27 @@ public sealed class Game : Actor<GameData, GameLogic>
                                     _logic.Stop(StopReason.Decision);
                                 }
                             }
-                            catch (Exception) { }
+                            catch (Exception ex)
+                            {
+                                ClientData.Host.OnError(ex);
+                            }
 
                             #endregion
+                        }
+                        break;
+
+                    case Messages.SelectPlayer:
+                        {
+                            if (ClientData.IsWaiting
+                                && ClientData.PlayerSelectors.Contains(message.Sender)
+                                && args.Length > 1
+                                && int.TryParse(args[1], out var playerIndex)
+                                && playerIndex > -1
+                                && playerIndex < ClientData.Players.Count
+                                && ClientData.Players[playerIndex].Flag)
+                            {
+                                OnSelectedPlayer(playerIndex, message.Sender);
+                            }
                         }
                         break;
 
@@ -785,6 +804,45 @@ public sealed class Game : Actor<GameData, GameLogic>
                 _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
+
+    private void OnSelectedPlayer(int playerIndex, string messageSender)
+    {
+        switch (ClientData.Decision)
+        {
+            case DecisionType.StarterChoosing:
+                ClientData.ChooserIndex = playerIndex;
+                _logic.Stop(StopReason.Decision);
+                break;
+
+            case DecisionType.NextPersonStakeMaking:
+                ClientData.Order[ClientData.OrderIndex] = playerIndex;
+                Logic.CheckOrder(ClientData.OrderIndex);
+                _logic.Stop(StopReason.Decision);
+                break;
+
+            case DecisionType.NextPersonFinalThemeDeleting:
+                ClientData.ThemeDeleters?.Current.SetIndex(playerIndex);
+                _logic.Stop(StopReason.Decision);
+                break;
+
+            case DecisionType.QuestionAnswererSelection:
+                ClientData.AnswererIndex = playerIndex;
+                ClientData.QuestionPlayState.SetSingleAnswerer(playerIndex);
+
+                if (ClientData.IsOralNow)
+                {
+                    _gameActions.SendMessage(
+                        Messages.Cancel,
+                        messageSender == ClientData.ShowMan.Name ? ClientData.Chooser.Name : ClientData.ShowMan.Name);
+                }
+
+                _logic.Stop(StopReason.Decision);
+                break;
+
+            default:
+                return;
+        }
+    }
 
     private void OnChoice(Message message, string[] args)
     {

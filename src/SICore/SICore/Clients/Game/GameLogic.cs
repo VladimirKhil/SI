@@ -958,7 +958,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_data.Theme.Name}");
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _data.Theme.Name);
-        _gameActions.SendMessageWithArgs(Messages.Theme, _data.Theme.Name);
+        _gameActions.SendMessageWithArgs(Messages.Theme, _data.Theme.Name, 1);
 
         ProceedToThemeAndQuestion();
     }
@@ -2776,14 +2776,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 typeName = QuestionTypes.StakeAll;
             }
 
-            var s = new StringBuilder(Messages.QType).Append(Message.ArgsSeparatorChar);
             var delay = 1;
 
             switch (typeName)
             {
                 case QuestionTypes.Stake:
                     _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
-                    s.Append(typeName);
                     delay = 16;
                     break;
 
@@ -2800,18 +2798,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     }
 
                     _gameActions.ShowmanReplic(replic.ToString());
-                    s.Append(typeName);
                     delay = 10;
                     break;
 
                 case QuestionTypes.NoRisk:
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
-                    s.Append(typeName);
                     delay = 16;
                     break;
 
                 case QuestionTypes.Simple:
-                    s.Append(typeName);
                     break;
 
                 case QuestionTypes.StakeAll:
@@ -2823,7 +2818,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     return;
             }
 
-            _gameActions.SendMessage(s.ToString());
+            var msg = new MessageBuilder(Messages.QType, typeName);
+            _gameActions.SendMessage(msg.ToString());
 
             ScheduleExecution(Tasks.MoveNext, delay, force: true);
             return;
@@ -3193,6 +3189,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AskToSelectQuestionAnswerer()
     {
+        // -- Deprecated
         var msg = new StringBuilder(Messages.Cat);
 
         for (var i = 0; i < _data.Players.Count; i++)
@@ -3205,9 +3202,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForGivingACat * 10;
 
         _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;
+        var playerSelectors = new List<string>();
 
         if (_data.IsOralNow)
         {
+            playerSelectors.Add(_data.ShowMan.Name);
             _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
         }
         else if (!_data.Chooser.IsConnected)
@@ -3215,11 +3214,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             waitTime = 20;
         }
 
-        if (CanPlayerAct())
+        if (CanPlayerAct() && _data.Chooser != null)
         {
+            playerSelectors.Add(_data.Chooser.Name);
             _gameActions.SendMessage(msg.ToString(), _data.Chooser.Name);
         }
 
+        AskToSelectPlayer(MessageParams.AskSelectPlayerReason_Answerer, playerSelectors.ToArray());
         ScheduleExecution(Tasks.WaitQuestionAnswererSelection, waitTime);
         WaitFor(DecisionType.QuestionAnswererSelection, waitTime, _data.ChooserIndex);
     }
@@ -3266,6 +3267,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             _data.ChooserIndex = -1;
 
+            // -- Deprecated
             var msg = new StringBuilder(Messages.First);
 
             for (var i = 0; i < _data.Players.Count; i++)
@@ -3274,11 +3276,31 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
 
             _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
+            // -- end
+            AskToSelectPlayer(MessageParams.AskSelectPlayerReason_Chooser, _data.ShowMan.Name);
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
             ScheduleExecution(Tasks.WaitFirst, waitTime);
             WaitFor(DecisionType.StarterChoosing, waitTime, -1);
         }
+    }
+
+    private void AskToSelectPlayer(string reason, params string[] selectors)
+    {
+        var msg = new MessageBuilder(Messages.AskSelectPlayer, reason);
+
+        for (var i = 0; i < _data.Players.Count; i++)
+        {
+            msg.Add(_data.Players[i].Flag ? '+' : '-');
+        }
+
+        foreach (var selector in selectors)
+        {
+            _gameActions.SendMessage(msg.ToString(), selector);
+        }
+
+        _data.PlayerSelectors.Clear();
+        _data.PlayerSelectors.AddRange(selectors);
     }
 
     private void AskRight()
@@ -3550,15 +3572,22 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void RequestForCurrentDeleter(ICollection<int> indicies)
     {
+        for (var i = 0; i < _data.Players.Count; i++)
+        {
+            _data.Players[i].Flag = indicies.Contains(i);
+        }
+
+        // -- deprecated
         var msg = new StringBuilder(Messages.FirstDelete);
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
-            var good = _data.Players[i].Flag = indicies.Contains(i);
-            msg.Append(Message.ArgsSeparatorChar).Append(good ? '+' : '-');
+            msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
         }
 
         _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
+        // -- end
+        AskToSelectPlayer(MessageParams.AskSelectPlayerReason_Deleter, _data.ShowMan.Name);
 
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
         ScheduleExecution(Tasks.WaitNext, waitTime, 1);
@@ -3667,17 +3696,24 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
                 else
                 {
-                    // Без ведущего не обойтись
+                    // Showman should choose the next staker
+                    for (var i = 0; i < _data.Players.Count; i++)
+                    {
+                        _data.Players[i].Flag = candidates.Contains(i);
+                    }
+
+                    // -- deprecated
                     var msg = new StringBuilder(Messages.FirstStake);
 
                     for (var i = 0; i < _data.Players.Count; i++)
                     {
-                        _data.Players[i].Flag = candidates.Contains(i);
                         msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
                     }
 
-                    _data.OrderHistory.AppendLine("Queuring showman for the next staker");
                     _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
+                    // -- end
+                    AskToSelectPlayer(MessageParams.AskSelectPlayerReason_Staker, _data.ShowMan.Name);
+                    _data.OrderHistory.AppendLine("Asking showman for the next staker");
 
                     var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
                     ScheduleExecution(Tasks.WaitNext, time);

@@ -74,7 +74,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
             if (_data != null)
             {
-                _data.CurrentPlayerChanged -= MyData_CurrentPlayerChanged;
+                _data.CurrentPlayerChanged += MyData_CurrentPlayerChanged;
             }
         }
     }

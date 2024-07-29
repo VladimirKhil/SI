@@ -1,5 +1,6 @@
 ﻿using SICore.Clients.Player;
 using SICore.Extensions;
+using SICore.Helpers;
 using SICore.Models;
 using SICore.Utils;
 using SIData;
@@ -14,11 +15,15 @@ namespace SICore;
 /// </summary>
 internal sealed class PlayerComputerLogic : IPlayerLogic
 {
+    private const int DefaultThemeQuestionCount = 5;
+
     private ComputerAccount _account;
     private readonly ViewerActions _viewerActions;
     private readonly ViewerData _data;
 
     private readonly TimerInfo[] _timersInfo;
+
+    private int _themeQuestionCount = -1;
 
     /// <summary>
     /// Создание логики
@@ -71,7 +76,11 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
                 break;
 
             case PlayerTasks.Cat:
-                CatTask();
+                OnSecretQuestionAnswererSelect(Messages.Cat);
+                break;
+
+            case PlayerTasks.SelectPlayer:
+                OnSelectPlayer();
                 break;
 
             case PlayerTasks.CatCost:
@@ -250,7 +259,9 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
         }
     }
 
-    private void CatTask()
+    private void OnSelectPlayer() => OnSecretQuestionAnswererSelect(Messages.SelectPlayer);
+
+    private void OnSecretQuestionAnswererSelect(string messageType)
     {
         try
         {
@@ -296,7 +307,7 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
                 }
             }
 
-            _viewerActions.SendMessageWithArgs(Messages.Cat, choice);
+            _viewerActions.SendMessageWithArgs(messageType, choice);
         }
         catch (Exception exc)
         {
@@ -1699,11 +1710,8 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
     {
         var shortThink = _data.QuestionType == QuestionTypes.Simple;
 
-        var questionCount = _data.ThemeIndex > -1 && _data.ThemeIndex < _data.TInfo.RoundInfo.Count
-            ? _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count
-            : 5;
-
-        var difficulty = questionCount > 1 ? _data.QuestionIndex + 1 : 3 /* average difficulty */;
+        // Difficulty: 3 for middle question, 1 and 5 for easiest and hardest questions
+        var difficulty = 1.0 + 4.0 * DifficultyHelper.GetDifficulty(_data.QuestionIndex, _themeQuestionCount);
         var playerLag = _account.S * 10;
 
         var playerStrength = (double)_account.F;
@@ -1772,6 +1780,8 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
     /// </summary>
     public void Cat() => ScheduleExecution(PlayerTasks.Cat, 10 + Random.Shared.Next(10));
 
+    public void SelectPlayer() => ScheduleExecution(PlayerTasks.SelectPlayer, 10 + Random.Shared.Next(10));
+
     /// <summary>
     /// Необходимо сделать ставку
     /// </summary>
@@ -1825,6 +1835,26 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
         }
         
         ScheduleExecution(PlayerTasks.Ready, 10);
+    }
+
+    public void OnTheme(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            _themeQuestionCount = DefaultThemeQuestionCount;
+            return;
+        }
+
+        if (!int.TryParse(mparams[2], out _themeQuestionCount))
+        {
+            _themeQuestionCount = -1;
+        }
+    }
+
+
+    public void OnChoice(string[] mparams)
+    {
+        _themeQuestionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;
     }
 
     private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);

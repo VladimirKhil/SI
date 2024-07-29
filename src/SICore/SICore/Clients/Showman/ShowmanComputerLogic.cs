@@ -39,6 +39,10 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
                 Ready();
                 break;
 
+            case ShowmanTasks.SelectPlayer:
+                OnSelectPlayer();
+                break;
+
             case ShowmanTasks.AnswerFirst:
                 AnswerFirst();
                 break;
@@ -80,11 +84,15 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
 
     private void AnswerFirst() => SelectPlayer(Messages.First);
 
+    private void OnSelectPlayer() => SelectPlayer(Messages.SelectPlayer);
+
     private void AnswerRight()
     {
         var isRight = AnswerChecker.IsAnswerRight(_data.PersonDataExtensions.Answer, _data.PersonDataExtensions.Right);
         _viewerActions.SendMessage(Messages.IsRight, isRight ? "+" : "-");
     }
+
+    public void SelectPlayer() => ScheduleExecution(ShowmanTasks.SelectPlayer, 10 + Random.Shared.Next(10));
 
     public void StarterChoose() => ScheduleExecution(ShowmanTasks.AnswerFirst, 10 + Random.Shared.Next(10));
 

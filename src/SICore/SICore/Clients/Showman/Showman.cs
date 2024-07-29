@@ -187,6 +187,11 @@ public sealed class Showman : Viewer
                     ClearSelections(true);
                     break;
 
+                case Messages.AskSelectPlayer: // Uncomment later
+                    //OnAskSelectPlayer(mparams);
+                    //_logic.ShowmanLogic.SelectPlayer();
+                    break;
+
                 case Messages.First:
                     {
                         #region First
@@ -223,7 +228,7 @@ public sealed class Showman : Viewer
 
                         if (ClientData.Speaker != null)
                             ClientData.Speaker.Replic = "";
-                        
+
                         ClientData.Hint = LO[nameof(R.HintSelectStaker)];
 
                         _logic.ShowmanLogic.FirstStake();
