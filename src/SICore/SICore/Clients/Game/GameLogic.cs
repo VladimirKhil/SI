@@ -2812,7 +2812,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 case QuestionTypes.NoRisk:
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
-                    delay = 16;
+                    delay = 22;
                     break;
 
                 case QuestionTypes.Simple:
@@ -4819,6 +4819,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             if (ClientData.Players[i].Sum > 0 || ClientData.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes)
             {
                 answerers.Add(i);
+                _gameActions.SendMessageWithArgs(Messages.PlayerState, i, PlayerState.Answering);
             }
         }
 

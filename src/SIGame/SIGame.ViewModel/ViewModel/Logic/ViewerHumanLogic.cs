@@ -1459,7 +1459,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             return;
         }
 
-        _data.Players[number].State = PlayerState.Press;
+        _data.Players[number].State = PlayerState.Answering;
     }
 
     public void OnStopPlay()
@@ -1467,7 +1467,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.IsMediaStopped = true;
     }
 
-    public void ShowTablo() => TInfo.TStage = SIUI.ViewModel.TableStage.RoundTable;
+    public void ShowTablo() => TInfo.TStage = TableStage.RoundTable;
 
     /// <summary>
     /// Игрок получил или потерял деньги

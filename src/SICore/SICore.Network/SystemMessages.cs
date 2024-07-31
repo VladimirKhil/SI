@@ -5,6 +5,7 @@ public static class SystemMessages
     /// <summary>
     /// Разрыв соединения с игрой
     /// </summary>
+    [Obsolete("Remove after switching to SIGame 8")]
     public const string Disconnect = "DISCONNECT";
 
     /// <summary>

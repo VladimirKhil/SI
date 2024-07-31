@@ -133,7 +133,7 @@
             <Setter Property="Template" Value="{StaticResource PersonArea}" />
 
             <Style.Triggers>
-                <DataTrigger Binding="{Binding State}" Value="Press">
+                <DataTrigger Binding="{Binding State}" Value="Answering">
                     <Setter Property="BorderBrush" Value="Yellow" />
                 </DataTrigger>
 

@@ -996,6 +996,19 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         break;
                     }
 
+                case Messages.PlayerState:
+                    {
+                        if (mparams.Length > 2
+                            && int.TryParse(mparams[1], out int playerIndex)
+                            && playerIndex >= 0
+                            && playerIndex <= ClientData.Players.Count
+                            && Enum.TryParse<PlayerState>(mparams[2], out var state))
+                        {
+                            ClientData.Players[playerIndex].State = state;
+                        }
+                        break;
+                    }
+
                 case Messages.PersonStake:
                     OnPersonStake(mparams);
                     break;
@@ -1106,7 +1119,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                             if (i == index && mparams.Length > 2)
                             {
-                                ClientData.Players[i].State = PlayerState.Press;
+                                ClientData.Players[i].State = PlayerState.Answering;
                             }
                         }
 

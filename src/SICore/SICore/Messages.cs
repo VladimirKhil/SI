@@ -147,6 +147,7 @@ public static class Messages
     /// <summary>
     /// Подключение к серверу
     /// </summary>
+    [Obsolete("Remove after switching to SIGame 8")]
     public const string Connect = "CONNECT";
 
     /// <summary>
@@ -238,6 +239,7 @@ public static class Messages
     /// <summary>
     /// Информация об игре для внешнего наблюдателя
     /// </summary>
+    [Obsolete("Remove after switching to SIGame 8")]
     public const string GameInfo = "GAMEINFO";
 
     /// <summary>
@@ -360,6 +362,7 @@ public static class Messages
     /// <summary>
     /// Пас на вопросе
     /// </summary>
+    [Obsolete("Use PlayerState instead")]
     public const string Pass = "PASS";
 
     /// <summary>
@@ -375,11 +378,13 @@ public static class Messages
     /// <summary>
     /// Игрок принял решение по апелляции
     /// </summary>
+    [Obsolete("Use PlayerState instead")]
     public const string PersonApellated = "PERSONAPELLATED";
 
     /// <summary>
     /// Игрок ответил в финале
     /// </summary>
+    [Obsolete("Use PlayerState instead")]
     public const string PersonFinalAnswer = "PERSONFINALANSWER";
 
     /// <summary>
@@ -398,6 +403,11 @@ public static class Messages
     [IdempotencyRequired]
     [Obsolete]
     public const string Picture = "PICTURE";
+
+    /// <summary>
+    /// Sets player state.
+    /// </summary>
+    public const string PlayerState = "PLAYER_STATE";
 
     /// <summary>
     /// Скорость чтения вопроса
@@ -632,6 +642,7 @@ public static class Messages
     /// <summary>
     /// Проиграл кнопку
     /// </summary>
+    [Obsolete("Use PlayerState instead")]
     public const string WrongTry = "WRONGTRY";
 
     /// <summary>

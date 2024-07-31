@@ -354,7 +354,7 @@ public enum DecisionType
 }
 
 /// <summary>
-/// Состояние игрока
+/// Defines player states.
 /// </summary>
 public enum PlayerState
 {
@@ -362,10 +362,12 @@ public enum PlayerState
     /// Обычное
     /// </summary>
     None,
+
     /// <summary>
-    /// Выиграл кнопку
+    /// Player is answering.
     /// </summary>
-    Press,
+    Answering,
+
     /// <summary>
     /// Проиграл кнопку
     /// </summary>
@@ -385,7 +387,7 @@ public enum PlayerState
     /// <summary>
     /// Спасовал
     /// </summary>
-    Pass
+    Pass,
 }
 
 /// <summary>
