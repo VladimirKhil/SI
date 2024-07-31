@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SICore;
 
@@ -16,6 +17,12 @@ public sealed class PersonData : INotifyPropertyChanged
     public CustomCommand SendVabank { get; set; }
 
     public CustomCommand SendNominal { get; set; }
+
+    public SimpleCommand? SendPassNew { get; set; }
+
+    public SimpleCommand? SendStakeNew { get; set; }
+
+    public SimpleCommand? SendAllInNew { get; set; }
 
     public ICommand SendCatCost { get; set; }
 

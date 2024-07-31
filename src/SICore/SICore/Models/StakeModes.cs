@@ -1,29 +1,23 @@
 ﻿namespace SICore.Models;
 
 /// <summary>
-/// Defines stake types.
+/// Defines stake modes.
 /// </summary>
 [Flags]
-[Obsolete("Use StakeModes instead")]
-public enum StakeTypes
+public enum StakeModes
 {
-    /// <summary>
-    /// Nominal.
-    /// </summary>
-    Nominal = 1,
-
     /// <summary>
     /// Fixed stake.
     /// </summary>
-    Stake = 2,
+    Stake = 1,
 
     /// <summary>
     /// Pass.
     /// </summary>
-    Pass = 4,
+    Pass = 2,
 
     /// <summary>
     /// All-in.
     /// </summary>
-    AllIn = 8
+    AllIn = 4
 }

@@ -8,6 +8,7 @@ internal enum PlayerTasks
     Cat,
     CatCost,
     Stake,
+    StakeNew,
     ChooseFinal,
     FinalStake,
     AnswerRight,

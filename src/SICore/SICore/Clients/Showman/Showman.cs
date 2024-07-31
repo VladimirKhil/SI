@@ -2,6 +2,7 @@
 using SICore.Models;
 using SICore.Network.Clients;
 using SIData;
+using Utils.Commands;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -114,6 +115,24 @@ public sealed class Showman : Viewer
         ClientData.PersonDataExtensions.SendVabank = new CustomCommand(arg =>
         {
             _viewerActions.SendMessageWithArgs(Messages.Stake, 3);
+            ClearSelections();
+        });
+
+        ClientData.PersonDataExtensions.SendPassNew = new SimpleCommand(arg =>
+        {
+            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Pass);
+            ClearSelections();
+        });
+
+        ClientData.PersonDataExtensions.SendStakeNew = new SimpleCommand(arg =>
+        {
+            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, ClientData.PersonDataExtensions.StakeInfo.Stake);
+            ClearSelections();
+        });
+
+        ClientData.PersonDataExtensions.SendAllInNew = new SimpleCommand(arg =>
+        {
+            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.AllIn);
             ClearSelections();
         });
     }
@@ -309,6 +328,11 @@ public sealed class Showman : Viewer
                     ClientData.Hint = LO[nameof(R.HintSelectCatPlayerForPlayer)];
 
                     _logic.ShowmanLogic.Cat();
+                    break;
+
+                case Messages.AskStake: // Uncomment later
+                    //OnAskStake(mparams);
+                    //_logic.ShowmanLogic.StakeNew();
                     break;
 
                 case Messages.CatCost:

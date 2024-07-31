@@ -68,6 +68,18 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
         }
     }
 
+    public void StakeNew()
+    {
+        _data.DialogMode = DialogModes.StakeNew;
+        _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
+        _data.Host.OnFlash();
+
+        foreach (var player in _data.Players)
+        {
+            player.IsDeciding = false;
+        }
+    }
+
     public void ChooseFinalTheme()
     {
         _data.ThemeIndex = -1;

@@ -14,7 +14,6 @@ using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
-using System;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -696,7 +695,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                     case Messages.SelectPlayer:
                         {
                             if (ClientData.IsWaiting
-                                && ClientData.PlayerSelectors.Contains(message.Sender)
+                                && ClientData.DecisionMakers.Contains(message.Sender)
                                 && args.Length > 1
                                 && int.TryParse(args[1], out var playerIndex)
                                 && playerIndex > -1
@@ -714,6 +713,10 @@ public sealed class Game : Actor<GameData, GameLogic>
 
                     case Messages.Stake:
                         OnStake(message, args);
+                        break;
+
+                    case Messages.SetStake:
+                        OnSetStake(message, args);
                         break;
 
                     case Messages.NextDelete:
@@ -1297,6 +1300,102 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
     }
 
+    private void OnSetStake(Message message, string[] args)
+    {
+        if (!ClientData.IsWaiting
+            || !ClientData.DecisionMakers.Contains(message.Sender)
+            || args.Length <= 1
+            || !Enum.TryParse<StakeModes>(args[1], out var stakeMode)
+            || (ClientData.StakeModes & stakeMode) <= 0)
+        {
+            return;
+        }
+
+        var stakerName = message.Sender == ClientData.ShowMan.Name ? ClientData.DecisionMakers.First() : message.Sender;
+
+        if (!ClientData.StakeLimits.TryGetValue(stakerName, out var stakeLimit))
+        {
+            return;
+        }
+
+        var stakeSum = 0;
+
+        if (stakeMode == StakeModes.Stake)
+        {
+            if (args.Length < 2 || !int.TryParse(args[2], out stakeSum))
+            {
+                return;
+            }
+
+            if (stakeSum < stakeLimit.Minimum
+                || stakeSum > stakeLimit.Maximum
+                || stakeLimit.Step != 0 && stakeSum != stakeLimit.Maximum && (stakeSum - stakeLimit.Minimum) % stakeLimit.Step != 0)
+            {
+                return;
+            }
+        }
+
+        switch (ClientData.Decision)
+        {
+            case DecisionType.StakeMaking:
+                ClientData.StakeType = FromStakeMode(stakeMode);
+                ClientData.StakeSum = stakeSum;
+                _logic.Stop(StopReason.Decision);
+                break;
+
+            case DecisionType.QuestionPriceSelection:
+                ClientData.CurPriceRight = stakeSum;
+                _logic.Stop(StopReason.Decision);
+                break;
+
+            case DecisionType.FinalStakeMaking:
+                for (var i = 0; i < ClientData.Players.Count; i++)
+                {
+                    var player = ClientData.Players[i];
+
+                    if (stakerName == player.Name)
+                    {
+                        player.FinalStake = stakeSum;
+                        ClientData.NumOfStakers--;
+                        ClientData.StakeLimits.Remove(stakerName);
+
+                        _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
+                        break;
+                    }
+                }
+
+                if (ClientData.NumOfStakers == 0)
+                {
+                    _logic.Stop(StopReason.Decision);
+                }
+
+                break;
+        }
+
+        if (ClientData.IsOralNow)
+        {
+            if (message.Sender == ClientData.ShowMan.Name)
+            {
+                if (Logic.CanPlayerAct())
+                {
+                    _gameActions.SendMessage(Messages.Cancel, stakerName);
+                }
+            }
+            else
+            {
+                _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+            }
+        }
+    }
+
+    private static StakeMode? FromStakeMode(StakeModes stakeMode) =>
+        stakeMode switch
+        {
+            StakeModes.AllIn => StakeMode.AllIn,
+            StakeModes.Pass => StakeMode.Pass,
+            _ => StakeMode.Sum
+        };
+
     private void OnStake(Message message, string[] args)
     {
         if (!ClientData.IsWaiting ||
@@ -1734,10 +1833,10 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        if (int.TryParse(args[1], out int sum)
+        if (int.TryParse(args[1], out var sum)
             && sum >= ClientData.CatInfo.Minimum
             && sum <= ClientData.CatInfo.Maximum
-            && (sum - ClientData.CatInfo.Minimum) % ClientData.CatInfo.Step == 0)
+            && (ClientData.CatInfo.Step == 0 || (sum - ClientData.CatInfo.Minimum) % ClientData.CatInfo.Step == 0))
         {
             ClientData.CurPriceRight = sum;
         }

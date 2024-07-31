@@ -253,6 +253,11 @@ public enum DialogModes
     Stake,
 
     /// <summary>
+    /// Question stake selection.
+    /// </summary>
+    StakeNew,
+
+    /// <summary>
     /// Question final stake selection.
     /// </summary>
     FinalStake,

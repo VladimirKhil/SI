@@ -4,6 +4,7 @@ using SICore.Network.Clients;
 using SIData;
 using SIPackages.Core;
 using System.Text;
+using Utils.Commands;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -76,6 +77,24 @@ public sealed class Player : Viewer
         ClientData.PersonDataExtensions.SendFinalStake = new CustomCommand(arg =>
         {
             _viewerActions.SendMessageWithArgs(Messages.FinalStake, ClientData.PersonDataExtensions.StakeInfo.Stake);
+            Clear();
+        });
+
+        ClientData.PersonDataExtensions.SendPassNew = new SimpleCommand(arg =>
+        {
+            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Pass);
+            Clear();
+        });
+
+        ClientData.PersonDataExtensions.SendStakeNew = new SimpleCommand(arg =>
+        {
+            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, ClientData.PersonDataExtensions.StakeInfo.Stake);
+            Clear();
+        });
+
+        ClientData.PersonDataExtensions.SendAllInNew = new SimpleCommand(arg =>
+        {
+            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.AllIn);
             Clear();
         });
 
@@ -338,6 +357,11 @@ public sealed class Player : Viewer
                     ClientData.Hint = LO[nameof(R.HintSelectCatPlayer)];
 
                     _logic.PlayerLogic.Cat();
+                    break;
+
+                case Messages.AskStake: // Uncomment later
+                    //OnAskStake(mparams);
+                    //_logic.PlayerLogic.StakeNew();
                     break;
 
                 case Messages.CatCost:

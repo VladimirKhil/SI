@@ -1,4 +1,5 @@
-﻿using SIPackages.Core;
+﻿using SICore.Models;
+using SIPackages.Core;
 
 namespace SICore;
 
@@ -16,4 +17,9 @@ public sealed class StakeInfo : NumberSet
     /// Name of player making stake.
     /// </summary>
     public string? PlayerName { get; set; }
+
+    /// <summary>
+    /// Stake reason.
+    /// </summary>
+    public StakeReason Reason { get; internal set; }
 }

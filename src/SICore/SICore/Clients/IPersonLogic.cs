@@ -7,8 +7,6 @@ public interface IPersonLogic
 {
     void OnInitialized();
 
-    // Далее - для устной игры
-
     /// <summary>
     /// Выбор темы и вопроса
     /// </summary>
@@ -23,6 +21,11 @@ public interface IPersonLogic
     /// Нужно сделать ставку
     /// </summary>
     void Stake();
+
+    /// <summary>
+    /// Makes stake.
+    /// </summary>
+    void StakeNew() { }
 
     /// <summary>
     /// Убирает финальную тему

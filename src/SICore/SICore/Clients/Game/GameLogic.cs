@@ -2361,7 +2361,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         var answerer = _data.Answerer ?? throw new InvalidOperationException("Answerer not defined");
 
-        _gameActions.ShowmanReplic($"{answerer.Name}, {LO[nameof(R.SelectQuestionPrice)]}");
         var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.CatInfo.Minimum, _data.CatInfo.Maximum, _data.CatInfo.Step);
 
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
@@ -2382,6 +2381,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 waitTime = 20;
             }
         }
+
+        _data.StakeModes = StakeModes.Stake;
+        AskToMakeStake(StakeReason.Simple, answerer.Name, new (_data.CatInfo.Minimum, _data.CatInfo.Maximum, _data.CatInfo.Step));
 
         ScheduleExecution(Tasks.WaitSelectQuestionPrice, waitTime);
         WaitFor(DecisionType.QuestionPriceSelection, waitTime, _data.AnswererIndex);
@@ -2573,6 +2575,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.ShowmanReplic(s);
 
         _data.NumOfStakers = 0;
+        var stakers = new List<(string, StakeSettings)>();
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
@@ -2588,6 +2591,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _data.Players[i].FinalStake = -1;
                 _data.NumOfStakers++;
                 _gameActions.SendMessage(Messages.FinalStake, _data.Players[i].Name);
+
+                stakers.Add((_data.Players[i].Name, new(1, _data.Players[i].Sum, 1)));
             }
         }
 
@@ -2596,6 +2601,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             ProceedToFinalQuestion();
             return;
         }
+
+        _data.IsOralNow = false;
+        _data.StakeModes = StakeModes.Stake;
+        AskToMakeStake(StakeReason.Hidden, stakers);
 
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
         ScheduleExecution(Tasks.WaitFinalStake, waitTime);
@@ -3220,7 +3229,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessage(msg.ToString(), _data.Chooser.Name);
         }
 
-        AskToSelectPlayer(MessageParams.AskSelectPlayerReason_Answerer, playerSelectors.ToArray());
+        AskToSelectPlayer(SelectPlayerReason.Answerer, playerSelectors.ToArray());
         ScheduleExecution(Tasks.WaitQuestionAnswererSelection, waitTime);
         WaitFor(DecisionType.QuestionAnswererSelection, waitTime, _data.ChooserIndex);
     }
@@ -3277,7 +3286,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
             // -- end
-            AskToSelectPlayer(MessageParams.AskSelectPlayerReason_Chooser, _data.ShowMan.Name);
+            AskToSelectPlayer(SelectPlayerReason.Chooser, _data.ShowMan.Name);
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
             ScheduleExecution(Tasks.WaitFirst, waitTime);
@@ -3285,7 +3294,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
-    private void AskToSelectPlayer(string reason, params string[] selectors)
+    private void AskToSelectPlayer(SelectPlayerReason reason, params string[] selectors)
     {
         var msg = new MessageBuilder(Messages.AskSelectPlayer, reason);
 
@@ -3299,8 +3308,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessage(msg.ToString(), selector);
         }
 
-        _data.PlayerSelectors.Clear();
-        _data.PlayerSelectors.AddRange(selectors);
+        _data.DecisionMakers.Clear();
+        _data.DecisionMakers.AddRange(selectors);
     }
 
     private void AskRight()
@@ -3587,7 +3596,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
         // -- end
-        AskToSelectPlayer(MessageParams.AskSelectPlayerReason_Deleter, _data.ShowMan.Name);
+        AskToSelectPlayer(SelectPlayerReason.Deleter, _data.ShowMan.Name);
 
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
         ScheduleExecution(Tasks.WaitNext, waitTime, 1);
@@ -3712,7 +3721,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                     _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
                     // -- end
-                    AskToSelectPlayer(MessageParams.AskSelectPlayerReason_Staker, _data.ShowMan.Name);
+                    AskToSelectPlayer(SelectPlayerReason.Staker, _data.ShowMan.Name);
                     _data.OrderHistory.AppendLine("Asking showman for the next staker");
 
                     var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
@@ -3865,10 +3874,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / ClientData.StakeStep) * ClientData.StakeStep;
 
             _data.StakeTypes = StakeTypes.AllIn | (_data.StakerIndex == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
+            _data.StakeModes = StakeModes.AllIn;
+
+            if (_data.StakerIndex != -1)
+            {
+                _data.StakeModes |= StakeModes.Pass;
+            }
 
             if (!_data.AllIn && playerMoney >= minimumStakeAligned)
             {
                 _data.StakeTypes |= StakeTypes.Stake;
+                _data.StakeModes |= StakeModes.Stake;
             }
 
             _data.StakeVariants[0] = _data.StakerIndex == -1;
@@ -3877,12 +3893,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.StakeVariants[3] = true;
 
             _data.ActivePlayer = activePlayer;
-
-            var stakeReplic = new StringBuilder(_data.ActivePlayer.Name)
-                .Append(", ")
-                .Append(GetRandomString(LO[nameof(R.YourStake)]));
-
-            _gameActions.ShowmanReplic(stakeReplic.ToString());
 
             _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
 
@@ -3924,6 +3934,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _gameActions.SendMessage(stakeMsg2.Build(), _data.ShowMan.Name);
             }
 
+            var stakeLimit = new StakeSettings(minimumStakeAligned - ClientData.StakeStep, _data.ActivePlayer.Sum, _data.StakeStep);
+            AskToMakeStake(StakeReason.HighestPlays, _data.ActivePlayer.Name, stakeLimit);
+
             _data.StakeType = null;
             _data.StakeSum = -1;
             ScheduleExecution(Tasks.WaitStake, waitTime);
@@ -3935,6 +3948,44 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var sums = string.Join(",", _data.Players.Select(p => p.Sum));
             var stakeMaking = string.Join(",", _data.Players.Select(p => p.StakeMaking));
             throw new Exception($"AskStake error {sums} {stakeMaking} {orders} {_data.Stake} {_data.OrderIndex} {_data.Players.Count} {_data.OrderHistory}", exc);
+        }
+    }
+
+    private void AskToMakeStake(StakeReason reason, string name, StakeSettings limit)
+    {
+        var stakeReplic = new StringBuilder(name).Append(", ").Append(GetRandomString(LO[nameof(R.YourStake)]));
+        _gameActions.ShowmanReplic(stakeReplic.ToString());
+
+        AskToMakeStake(reason, new[] { (name, limit) });
+    }
+
+    private void AskToMakeStake(StakeReason reason, IEnumerable<(string name, StakeSettings limit)> persons)
+    {
+        _data.DecisionMakers.Clear();
+        _data.StakeLimits.Clear();
+
+        foreach (var (name, limit) in persons)
+        {
+            var stakeMessage = new MessageBuilder(Messages.AskStake, _data.StakeModes, limit.Minimum, limit.Maximum, limit.Step, reason);
+
+            if (CanPlayerAct())
+            {
+                _gameActions.SendMessage(stakeMessage.Build(), name);
+            }
+
+            if (_data.IsOralNow)
+            {
+                stakeMessage.Add(name);
+                _gameActions.SendMessage(stakeMessage.Build(), _data.ShowMan.Name);
+            }
+
+            _data.DecisionMakers.Add(name);
+            _data.StakeLimits[name] = limit;
+        }
+
+        if (_data.IsOralNow)
+        {
+            _data.DecisionMakers.Add(_data.ShowMan.Name);
         }
     }
 
@@ -4662,22 +4713,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            if (availableRange.Step == 0)
+            if (availableRange.Step > 0 && availableRange.Step < availableRange.Maximum - availableRange.Minimum)
             {
-                s.Append(availableRange.Maximum);
+                s.Append(
+                    $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Maximum)} " +
+                    $"{LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(availableRange.Step)} ({LO[nameof(R.YourChoice)]})");
             }
             else
             {
-                if (availableRange.Step < availableRange.Maximum - availableRange.Minimum)
-                {
-                    s.Append(
-                        $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Maximum)} " +
-                        $"{LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(availableRange.Step)} ({LO[nameof(R.YourChoice)]})");
-                }
-                else
-                {
-                    s.Append($"{Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.Or)]} {Notion.FormatNumber(availableRange.Maximum)} ({LO[nameof(R.YourChoice)]})");
-                }
+                s.Append($"{Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.Or)]} {Notion.FormatNumber(availableRange.Maximum)} ({LO[nameof(R.YourChoice)]})");
             }
         }
 
@@ -4718,18 +4762,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            if (availableRange.Step == 0)
-            {
-                _data.CurPriceRight = availableRange.Maximum;
-                _data.CurPriceWrong = _data.CurPriceRight;
-                _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
-                ScheduleExecution(Tasks.MoveNext, 1);
-            }
-            else
-            {
-                _data.CurPriceRight = -1;
-                ScheduleExecution(Tasks.AskToSelectQuestionPrice, 1, force: true);
-            }
+            _data.CurPriceRight = -1;
+            ScheduleExecution(Tasks.AskToSelectQuestionPrice, 1, force: true);
         }
     }
 

@@ -52,6 +52,11 @@ public static class Messages
     public const string AskSelectPlayer = "ASK_SELECT_PLAYER";
 
     /// <summary>
+    /// Asks to make a stake.
+    /// </summary>
+    public const string AskStake = "ASK_STAKE";
+
+    /// <summary>
     /// Единица сценария вопроса
     /// </summary>
     [Obsolete("Use Content")]
@@ -110,6 +115,7 @@ public static class Messages
     /// <summary>
     /// Стоимость Вопроса с секретом
     /// </summary>
+    [Obsolete("Use AskStake")]
     public const string CatCost = "CATCOST";
 
     /// <summary>
@@ -198,6 +204,7 @@ public static class Messages
     /// <summary>
     /// Ставка в финале
     /// </summary>
+    [Obsolete("Use AskStake")]
     public const string FinalStake = "FINALSTAKE";
 
     /// <summary>
@@ -309,11 +316,13 @@ public static class Messages
     /// <summary>
     /// Выбрать следующего игрока
     /// </summary>
+    [Obsolete("Use SelectPlayer")]
     public const string Next = "NEXT";
 
     /// <summary>
     /// Выбрать следующего игрока, убирающего тему
     /// </summary>
+    [Obsolete("Use SelectPlayer")]
     public const string NextDelete = "NEXTDELETE";
 
     /// <summary>
@@ -491,6 +500,11 @@ public static class Messages
     public const string SetJoinMode = "SETJOINMODE";
 
     /// <summary>
+    /// Sets stake.
+    /// </summary>
+    public const string SetStake = "SET_STAKE";
+
+    /// <summary>
     /// Показать табло
     /// </summary>
     public const string ShowTable = "SHOWTABLO";
@@ -508,11 +522,13 @@ public static class Messages
     /// <summary>
     /// Ставка
     /// </summary>
+    [Obsolete("Use AskStake, SetStake")]
     public const string Stake = "STAKE";
 
     /// <summary>
     /// Stake info.
     /// </summary>
+    [Obsolete("Use AskStake")]
     public const string Stake2 = "STAKE2";
 
     /// <summary>

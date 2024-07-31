@@ -99,6 +99,10 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
                 StakeTask();
                 break;
 
+            case PlayerTasks.StakeNew:
+                StakeTaskNew();
+                break;
+
             case PlayerTasks.PressButton:
                 PressButton();
                 break;
@@ -166,6 +170,124 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
         }
     }
 
+    private void StakeTaskNew()
+    {
+        var myIndex = _data.Players.IndexOf((PlayerAccount)_data.Me);
+        var isCritical = IsCritical();
+
+        try
+        {
+            var stakeSum = -1;
+            var stakeDecision = StakeModes.Stake;
+
+            switch (_data.PersonDataExtensions.StakeInfo.Reason)
+            {
+                case StakeReason.HighestPlays:
+                    {
+                        var stakeMode = MakeStake(
+                            _data.QuestionIndex,
+                            _data.Players.Select(p => p.Sum).ToArray(),
+                            myIndex,
+                            _data.LastStakerIndex,
+                            _account.Style,
+                            _data.PersonDataExtensions.Var,
+                            _account.N1,
+                            _account.N5,
+                            _account.B1,
+                            _account.B5,
+                            isCritical,
+                            _data.PersonDataExtensions.StakeInfo.Minimum,
+                            _data.PersonDataExtensions.StakeInfo.Step,
+                            out stakeSum);
+
+                        if (stakeMode == StakeMode.Nominal)
+                        {
+                            stakeMode = StakeMode.Sum;
+                            stakeSum = _data.PersonDataExtensions.StakeInfo.Minimum;
+                        }
+
+                        stakeDecision = FromStakeMode(stakeMode);
+                        break;
+                    }
+
+                case StakeReason.Hidden:
+                    {
+                        var myIndex2 = _data.Players.IndexOf((PlayerAccount)_data.Me);
+                        var sums = _data.Players.Select(p => p.Sum).ToArray();
+                        stakeSum = MakeFinalStake(sums, myIndex2, _account.Style);
+                        break;
+                    }
+
+                default:
+                    {
+                        var maxVars = (_data.PersonDataExtensions.StakeInfo.Maximum - _data.PersonDataExtensions.StakeInfo.Minimum) / _data.PersonDataExtensions.StakeInfo.Step + 1;
+                        var var = 0;
+
+                        switch (_account.Style)
+                        {
+                            case PlayerStyle.Careful:
+                                var = 0;
+                                break;
+
+                            case PlayerStyle.Normal:
+                                var = Random.Shared.Next(maxVars);
+                                break;
+
+                            case PlayerStyle.Agressive:
+                                var = maxVars - 1;
+                                break;
+                        }
+
+                        stakeSum = _data.PersonDataExtensions.StakeInfo.Minimum + var * _data.PersonDataExtensions.StakeInfo.Step;
+                        break;
+                    }
+            }
+
+            var msg = new MessageBuilder(Messages.SetStake).Add(stakeDecision);
+
+            if (stakeDecision == StakeModes.Stake)
+            {
+                msg.Add(stakeSum);
+            }
+
+            _viewerActions.SendMessage(msg.ToString());
+        }
+        catch (Exception exc)
+        {
+            _data.SystemLog.AppendFormat(
+                "Stake task error: {0}\r\n" +
+                "this.data.choiceQuest = {1}. Sums = {2}. " +
+                "MyIndex = {3}.lastStakerNum = {4}. Style = {5} Vars = {6}:{7}:{8}:{9}. " +
+                "N1 = {10}, N5 = {11}, B1 = {12}, B5 = {13}, Critical = {14}. MinCost = {15}",
+                exc,
+                _data.QuestionIndex,
+                string.Join(", ", _data.Players.Select(p => p.Sum)),
+                myIndex,
+                _data.LastStakerIndex,
+                _account.Style,
+                _data.PersonDataExtensions.Var[0],
+                _data.PersonDataExtensions.Var[1],
+                _data.PersonDataExtensions.Var[2],
+                _data.PersonDataExtensions.Var[3],
+                _account.N1,
+                _account.N5,
+                _account.B1,
+                _account.B5,
+                isCritical,
+                _data.PersonDataExtensions.StakeInfo.Minimum)
+                .AppendLine();
+        }
+    }
+
+    private static StakeModes FromStakeMode(StakeMode stakeMode) =>
+        stakeMode switch
+        {
+            StakeMode.Sum => StakeModes.Stake,
+            StakeMode.AllIn => StakeModes.AllIn,
+            _ => StakeModes.Pass,
+        };
+
+    [Obsolete]
     private void StakeTask()
     {
         var myIndex = _data.Players.IndexOf((PlayerAccount)_data.Me);
@@ -192,7 +314,7 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
                 out stakeSum);
 
             var msg = new StringBuilder(Messages.Stake).Append(Message.ArgsSeparatorChar).Append((int)stakeMode);
-            
+
             if (stakeMode == StakeMode.Sum)
             {
                 msg.Append(Message.ArgsSeparatorChar).Append(stakeSum);
@@ -1786,6 +1908,8 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
     /// Необходимо сделать ставку
     /// </summary>
     public void Stake() => ScheduleExecution(PlayerTasks.Stake, 10 + Random.Shared.Next(10));
+
+    public void StakeNew() => ScheduleExecution(PlayerTasks.StakeNew, 10 + Random.Shared.Next(10));
 
     /// <summary>
     /// Необходимо выбрать финальную тему

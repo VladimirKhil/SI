@@ -2062,6 +2062,9 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             ClientData.PlayerDataExtensions.Apellate =
             ClientData.PlayerDataExtensions.PressGameButton = null;
 
+        var person = ClientData.PersonDataExtensions;
+        person.SendStakeNew = person.SendPassNew = person.SendAllInNew = null;
+
         ClientData.PlayerDataExtensions.Report.SendReport = ClientData.PlayerDataExtensions.Report.SendNoReport = null;
 
         ClientData.Kick = ClientData.AtomViewed = ClientData.Ban = ClientData.SetHost = ClientData.Unban = ClientData.ForceStart = ClientData.AddTable = null;
@@ -2399,6 +2402,53 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
     }
 
+    protected void OnAskStake(string[] mparams)
+    {
+        if (mparams.Length < 6
+            || !Enum.TryParse<StakeModes>(mparams[1], out var stakeModes)
+            || !int.TryParse(mparams[2], out var minimumStake)
+            || !int.TryParse(mparams[3], out var maximumStake)
+            || !int.TryParse(mparams[4], out var step)
+            || !Enum.TryParse<StakeReason>(mparams[5], out var reason))
+        {
+            return;
+        }
+
+        var playerName = mparams.Length > 6 ? mparams[6] : null;
+
+        var personData = ClientData.PersonDataExtensions;
+
+        if (personData.SendStakeNew != null)
+        {
+            personData.SendStakeNew.CanBeExecuted = stakeModes.HasFlag(StakeModes.Stake);
+        }
+
+        if (personData.SendPassNew != null)
+        {
+            personData.SendPassNew.CanBeExecuted = stakeModes.HasFlag(StakeModes.Pass);
+        }
+
+        if (personData.SendAllInNew != null)
+        {
+            personData.SendAllInNew.CanBeExecuted = stakeModes.HasFlag(StakeModes.AllIn);
+        }
+
+        personData.Var[0] = false;
+        personData.Var[1] = stakeModes.HasFlag(StakeModes.Stake);
+        personData.Var[2] = stakeModes.HasFlag(StakeModes.Pass);
+        personData.Var[3] = stakeModes.HasFlag(StakeModes.AllIn);
+
+        personData.StakeInfo = new StakeInfo
+        {
+            Minimum = minimumStake,
+            Maximum = maximumStake,
+            Step = step,
+            Stake = minimumStake,
+            PlayerName = playerName,
+            Reason = reason,
+        };
+    }
+
     /// <summary>
     /// Получение сообщения
     /// </summary>
@@ -2503,6 +2553,11 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     protected void OnAskSelectPlayer(string[] mparams)
     {
+        if (mparams.Length < 3)
+        {
+            return;
+        }
+
         for (var i = 0; i < ClientData.Players.Count; i++)
         {
             ClientData.Players[i].CanBeSelected = i + 2 < mparams.Length && mparams[i + 2] == "+";
@@ -2519,17 +2574,18 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             ClientData.Speaker.Replic = "";
         }
 
-        ClientData.Hint = LO[GetSelectHint(mparams[1])];
+        _ = Enum.TryParse<SelectPlayerReason>(mparams[1], out var reason);
+        ClientData.Hint = LO[GetSelectHint(reason)];
     }
 
     private void ClearSelections(bool full = false) => _logic.ClearSelections(full);
 
-    private static string GetSelectHint(string selectionMode) => selectionMode switch
+    private static string GetSelectHint(SelectPlayerReason selectionMode) => selectionMode switch
     {
-        MessageParams.AskSelectPlayerReason_Answerer => nameof(R.HintSelectCatPlayer),
-        MessageParams.AskSelectPlayerReason_Chooser => nameof(R.HintSelectStarter),
-        MessageParams.AskSelectPlayerReason_Deleter => nameof(R.HintThemeDeleter),
-        MessageParams.AskSelectPlayerReason_Staker => nameof(R.HintSelectStaker),
+        SelectPlayerReason.Answerer => nameof(R.HintSelectCatPlayer),
+        SelectPlayerReason.Chooser => nameof(R.HintSelectStarter),
+        SelectPlayerReason.Deleter => nameof(R.HintThemeDeleter),
+        SelectPlayerReason.Staker => nameof(R.HintSelectStaker),
         _ => string.Empty,
     };
 

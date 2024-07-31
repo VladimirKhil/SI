@@ -144,7 +144,7 @@ public sealed class GameData : Data
     /// </summary>
     internal Question? Question { get; set; }
 
-    internal List<string> PlayerSelectors { get; } = new();
+    internal List<string> DecisionMakers { get; } = new();
 
     private NumberSet? _catInfo = null;
 
@@ -325,7 +325,18 @@ public sealed class GameData : Data
     /// <summary>
     /// Possible stake types.
     /// </summary>
+    [Obsolete]
     internal StakeTypes StakeTypes { get; set; }
+
+    /// <summary>
+    /// Possible stake modes.
+    /// </summary>
+    internal StakeModes StakeModes { get; set; }
+
+    /// <summary>
+    /// Current stake limits by name.
+    /// </summary>
+    internal Dictionary<string, StakeSettings> StakeLimits { get; } = new();
 
     /// <summary>
     /// Minimum stake step value in current round.

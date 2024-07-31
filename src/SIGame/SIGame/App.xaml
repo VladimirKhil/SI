@@ -1302,6 +1302,14 @@
                         </ContentControl>
                     </DataTemplate>
 
+                    <DataTemplate x:Key="{x:Static sc:DialogModes.StakeNew}">
+                        <ContentControl
+                            Style="{StaticResource windowStyleWithProgress}"
+                            Tag="{Binding Data.PersonDataExtensions.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
+                            <l:StakeNewView DataContext="{Binding Data.PersonDataExtensions}" />
+                        </ContentControl>
+                    </DataTemplate>
+
                     <DataTemplate x:Key="{x:Static sc:DialogModes.FinalStake}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.Stake}">
                             <l:SimpleStakeView DataContext="{Binding Data.PersonDataExtensions}" />

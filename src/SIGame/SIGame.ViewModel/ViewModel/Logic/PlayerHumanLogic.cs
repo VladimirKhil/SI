@@ -112,6 +112,14 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
         _data.Host.OnFlash();
     }
 
+    public void StakeNew()
+    {
+        _data.DialogMode = DialogModes.StakeNew;
+        _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
+        ((PlayerAccount)_data.Me).IsDeciding = false;
+        _data.Host.OnFlash();
+    }
+
     public void ChooseFinalTheme()
     {
         _data.ThemeIndex = -1;
