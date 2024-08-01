@@ -1,4 +1,5 @@
-﻿using SIEngine.Rules;
+﻿using SIEngine.Models;
+using SIEngine.Rules;
 using SIPackages;
 
 namespace SIEngine.Tests;
@@ -38,6 +39,16 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
     }
 
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
+    {
+        
+    }
+
+    public void OnRoundEnd(RoundEndReason reason)
+    {
+        
+    }
+
+    public void OnRoundSkip(QuestionSelectionStrategyType strategyType)
     {
         
     }

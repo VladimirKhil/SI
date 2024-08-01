@@ -1,5 +1,6 @@
 ﻿using SIEngine;
 using SIEngine.Core;
+using SIEngine.Models;
 using SIEngine.Rules;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
@@ -342,14 +343,41 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnThemeDeleted(int themeIndex) => GameViewModel?.OnThemeDeleted(themeIndex);
 
-    public void OnThemeSelected(int themeIndex, int questionIndex) =>
-        GameViewModel?.OnThemeSelected(themeIndex, questionIndex);
+    public void OnThemeSelected(int themeIndex, int questionIndex) => GameViewModel?.OnThemeSelected(themeIndex, questionIndex);
 
     public void OnTheme(Theme theme) => GameViewModel?.OnTheme(theme);
 
     public void OnQuestion(Question question) => GameViewModel?.OnQuestion(question);
 
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType) => GameViewModel?.OnRound(round, strategyType);
+
+    public void OnRoundEnd(RoundEndReason reason)
+    {
+        if (GameViewModel == null)
+        {
+            return;
+        }
+
+        GameViewModel.LogScore();
+
+        switch (reason)
+        {
+            case RoundEndReason.Timeout:
+                GameViewModel.OnEndRoundTimeout();
+                break;
+
+            default:
+                PresentationController.SetSound();
+                break;
+        }
+
+        GameViewModel.OnEndRound();
+    }
+
+    public void OnRoundSkip(QuestionSelectionStrategyType strategyType)
+    {
+        
+    }
 
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
     {

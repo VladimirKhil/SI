@@ -1,4 +1,5 @@
-﻿using SIEngine.Rules;
+﻿using SIEngine.Models;
+using SIEngine.Rules;
 using SIPackages;
 
 namespace SIEngine;
@@ -14,6 +15,18 @@ public interface ISIEnginePlayHandler
     /// <param name="round"></param>
     /// <param name="strategyType">Round play type.</param>
     void OnRound(Round round, QuestionSelectionStrategyType strategyType);
+
+    /// <summary>
+    /// Handles round finish.
+    /// </summary>
+    /// <param name="reason">Round end reason.</param>
+    void OnRoundEnd(RoundEndReason reason);
+
+    /// <summary>
+    /// Handles round skip.
+    /// </summary>
+    /// <param name="strategyType">Round play type.</param>
+    void OnRoundSkip(QuestionSelectionStrategyType strategyType);
 
     /// <summary>
     /// Detects whether current game situation supports playing round with removable themes (there is at least one player capable for that).

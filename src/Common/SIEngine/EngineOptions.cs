@@ -21,11 +21,6 @@ public sealed class EngineOptions
     public bool ShowRight { get; init; }
 
     /// <summary>
-    /// Show players score.
-    /// </summary>
-    public bool ShowScore { get; init; }
-
-    /// <summary>
     /// Play special questions.
     /// </summary>
     public bool PlaySpecials { get; init; }

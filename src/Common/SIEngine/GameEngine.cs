@@ -1,4 +1,5 @@
-﻿using SIEngine.QuestionSelectionStrategies;
+﻿using SIEngine.Models;
+using SIEngine.QuestionSelectionStrategies;
 using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
@@ -50,7 +51,7 @@ public sealed class GameEngine : EngineBase
                 }
                 else
                 {
-                    MoveNextRound(false);
+                    MoveNextRoundInternal();
                 }
                 break;
                 #endregion
@@ -68,7 +69,7 @@ public sealed class GameEngine : EngineBase
                 }
 
                 OnGameThemes(themes);
-                MoveNextRound(false);
+                MoveNextRoundInternal();
                 break;
                 #endregion
 
@@ -85,7 +86,7 @@ public sealed class GameEngine : EngineBase
                     strategyType,
                     PlayHandler,
                     SelectQuestion,
-                    EndRound);
+                    () => EndRoundAndMoveNext(RoundEndReason.Manual));
 
                 if (_selectionStrategy.ShouldPlayRound())
                 {
@@ -94,8 +95,8 @@ public sealed class GameEngine : EngineBase
                 }
                 else
                 {
-                    OnRoundSkip();
-                    MoveNextRound();
+                    PlayHandler.OnRoundSkip(strategyType); // TODO: think about providing skip reason instead of strategy here
+                    MoveNextRoundInternal();
                 }
 
                 break;
@@ -103,10 +104,6 @@ public sealed class GameEngine : EngineBase
 
             case GameStage.SelectingQuestion:
                 OnSelectingQuestion();
-                break;
-
-            case GameStage.Score:
-                MoveNextRound();
                 break;
 
             case GameStage.Question:
@@ -120,8 +117,7 @@ public sealed class GameEngine : EngineBase
 
                 if (_timeout) // Round timeout
                 {
-                    OnRoundTimeout();
-                    FinishRound();
+                    EndRoundAndMoveNext(RoundEndReason.Timeout);
                 }
                 else if (SelectionStrategy.CanMoveNext())
                 {
@@ -131,11 +127,16 @@ public sealed class GameEngine : EngineBase
                 }
                 else
                 {
-                    EndRound();
+                    EndRoundAndMoveNext(RoundEndReason.Completed);
                 }
 
                 break;
-                #endregion
+            #endregion
+
+            case GameStage.EndGame:
+                OnEndGame();
+                Stage = GameStage.None;
+                break;
         }
     }
 
@@ -171,5 +172,14 @@ public sealed class GameEngine : EngineBase
         CanMoveBack = SelectionStrategy.CanMoveBack();
     }
 
-    public override bool CanNext() => _stage != GameStage.End && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
+    public override bool CanNext() => _stage != GameStage.None && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
+
+    /// <summary>
+    /// Ends round and moves to the next one.
+    /// </summary>
+    private void EndRoundAndMoveNext(RoundEndReason reason)
+    {
+        PlayHandler.OnRoundEnd(reason);
+        MoveNextRoundInternal();
+    }
 }

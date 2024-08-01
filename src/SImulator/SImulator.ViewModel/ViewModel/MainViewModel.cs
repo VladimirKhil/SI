@@ -405,7 +405,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsPressMode = options.FalseStart && options.UsePlayersKeys != PlayerKeysModes.None,
             IsMultimediaPressMode = options.FalseStart && options.FalseStartMultimedia && options.UsePlayersKeys != PlayerKeysModes.None,
             ShowRight = options.ShowRight,
-            ShowScore = false,
             PlaySpecials = options.PlaySpecials
         };
     }
@@ -470,7 +469,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 throw new Exception(Resources.PackagePreparationError, exc);
             }
 
-            ISIEngine engine;
+            GameEngine engine;
 
             var gameEngineController = new GameEngineController(document);
 

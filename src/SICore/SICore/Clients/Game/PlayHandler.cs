@@ -1,5 +1,6 @@
 ﻿using SICore.Utils;
 using SIEngine;
+using SIEngine.Models;
 using SIEngine.Rules;
 using SIPackages;
 using SIUI.Model;
@@ -21,6 +22,37 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         GameLogic?.OnRoundStart(round, strategyType);
         // TODO: I do not like ANY logic dependency on strategyType outside the strategy factory but do not have any better idea for now
         _gameData.PlayersValidator = strategyType == QuestionSelectionStrategyType.RemoveOtherThemes ? ThemeRemovalPlayersValidator : DefaultPlayersValidator;
+    }
+
+    public void OnRoundEnd(RoundEndReason reason)
+    {
+        switch (reason)
+        {
+            case RoundEndReason.Completed:
+                GameLogic?.OnRoundEmpty();
+                break;
+            
+            case RoundEndReason.Timeout:
+                GameLogic?.OnRoundTimeout();
+                break;
+            
+            case RoundEndReason.Manual:
+                GameLogic?.OnRoundEndedManually();
+                break;
+            
+            default:
+                break;
+        }
+
+        GameLogic?.OnRoundEnded();
+    }
+
+    public void OnRoundSkip(QuestionSelectionStrategyType strategyType)
+    {
+        if (strategyType == QuestionSelectionStrategyType.RemoveOtherThemes)
+        {
+            GameLogic?.OnFinalRoundSkip();
+        }
     }
 
     public static bool DefaultPlayersValidator() => true;

@@ -17,13 +17,13 @@ public static class EngineFactory
     /// <param name="optionsProvider">Options provider.</param>
     /// <param name="questionPlayHandler">Question engine play handler.</param>
     /// <returns>Created engine.</returns>
-    public static ISIEngine CreateEngine(
+    public static GameEngine CreateEngine(
         bool classical,
         SIDocument document,
         Func<EngineOptions> optionsProvider,
         ISIEnginePlayHandler playHandler,
         IQuestionEnginePlayHandler questionPlayHandler) =>
-        new GameEngine(
+        new(
             document,
             classical ? WellKnownGameRules.Classic : WellKnownGameRules.Simple,
             optionsProvider,

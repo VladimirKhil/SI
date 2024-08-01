@@ -2780,19 +2780,8 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
 
         _logic.StopWaiting();
-        // TODO: switch to this approach later
-        // ClientData.MoveDirection = MoveDirections.RoundNext;
-        // _logic.Stop(StopReason.Move);
-
-        if (_logic.Engine.CanMoveNextRound)
-        {
-            _logic.Engine.MoveNextRound(); // Finishing current round
-            _logic.PlanExecution(Tasks.MoveNext, 10);
-        }
-        else
-        {
-            _logic.PlanExecution(Tasks.Winner, 10); // This is the last round. Finishing game
-        }
+        ClientData.MoveDirection = MoveDirections.RoundNext;
+        _logic.Stop(StopReason.Move);
     }
 
     private void DropPlayerFromStakes(int playerIndex)

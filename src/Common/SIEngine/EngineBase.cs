@@ -1,4 +1,5 @@
 ﻿using SIEngine.Core;
+using SIEngine.Models;
 using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
@@ -168,8 +169,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     public event Action<Package>? Package;
     public event Action<IEnumerable<string>>? GameThemes;
-    public event Action<bool>? NextRound;
-    public event Action? RoundSkip;
 
     // TODO: investigate and eliminate duplicates
     public event Action? QuestionPostInfo;
@@ -177,13 +176,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action? QuestionFinish;
     public event Action? NextQuestion;
     // TODO: end
-
-    public event Action? ShowScore;
-    public event Action? LogScore;
-    public event Action? RoundEmpty;
-    public event Action? RoundTimeout;
-
-    public event Action<string>? Error;
 
     public event Action? EndGame;
 
@@ -219,45 +211,36 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected void OnGameThemes(IEnumerable<string> gameThemes) => GameThemes?.Invoke(gameThemes);
 
-    protected void OnNextRound(bool showSign = true) => NextRound?.Invoke(showSign);
-
-    protected void OnRoundSkip() => RoundSkip?.Invoke();
-
     protected void OnQuestionPostInfo() => QuestionPostInfo?.Invoke();
-
-    protected void OnShowScore() => ShowScore?.Invoke();
-
-    protected void OnLogScore() => LogScore?.Invoke();
 
     protected void OnQuestionFinish() => QuestionFinish?.Invoke();
 
     protected void OnEndQuestion(int themeIndex, int questionIndex) => EndQuestion?.Invoke(themeIndex, questionIndex);
 
-    protected void OnRoundEmpty() => RoundEmpty?.Invoke();
-
     protected void OnNextQuestion() => NextQuestion?.Invoke();
-
-    protected void OnRoundTimeout() => RoundTimeout?.Invoke();
-
-    protected void OnError(string error) => Error?.Invoke(error);
 
     protected void OnEndGame() => EndGame?.Invoke();
 
     #endregion
 
-    public object SyncRoot { get; } = new object();
-
     /// <summary>
     /// Moves to the next round.
     /// </summary>
     /// <param name="showSign">Should the logo be shown.</param>
-    public virtual bool MoveNextRound(bool showSign = true)
+    public bool MoveNextRound()
     {
         if (!CanMoveNextRound)
         {
             return false;
         }
 
+        PlayHandler.OnRoundEnd(RoundEndReason.Manual);
+        MoveNextRoundInternal();
+        return true;
+    }
+
+    protected void MoveNextRoundInternal()
+    {
         _roundIndex++;
         SetActiveRound();
 
@@ -269,22 +252,18 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         if (_roundIndex < _document.Package.Rounds.Count)
         {
             Stage = GameStage.Round;
-            OnNextRound(showSign);
         }
         else
         {
-            Stage = GameStage.End;
-            OnEndGame();
+            Stage = GameStage.EndGame;
         }
-
-        return true;
     }
 
     protected void UpdateCanMoveNextRound() => CanMoveNextRound = _roundIndex < _document.Package.Rounds.Count;
 
     protected void UpdateCanMoveBackRound() => CanMoveBackRound = _roundIndex > 0 || CanMoveBack;
 
-    public virtual bool MoveToRound(int roundIndex, bool showSign = true)
+    public bool MoveToRound(int roundIndex)
     {
         if (_roundIndex == roundIndex)
         {
@@ -301,6 +280,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             return false;
         }
 
+        PlayHandler.OnRoundEnd(RoundEndReason.Manual);
+
         _roundIndex = roundIndex;
         SetActiveRound();
         Stage = GameStage.Round;
@@ -309,44 +290,38 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         UpdateCanMoveNextRound();
         UpdateCanMoveBackRound();
         UpdateCanNext();
-        OnNextRound(showSign);
-
         return true;
     }
 
-    public virtual bool MoveBackRound()
+    public bool MoveBackRound()
     {
         if (!CanMoveBackRound)
         {
             return false;
         }
 
-        var moved = true;
-
         if (CanMoveBack)
         {
             Stage = GameStage.Round;
         }
+        else if (_roundIndex == 0)
+        {
+            return false;
+        }
         else
         {
-            if (_roundIndex == 0)
-            {
-                // Cannot find suitable round while moving back. So returning forward to the first matching round
-                return MoveNextRound();
-            }
-
             _roundIndex--;
             SetActiveRound();
-
             Stage = GameStage.Round;
         }
+
+        PlayHandler.OnRoundEnd(RoundEndReason.Manual);
 
         CanMoveBack = false;
         UpdateCanNext();
         UpdateCanMoveNextRound();
         UpdateCanMoveBackRound();
-
-        return moved;
+        return true;
     }
 
     public abstract bool CanNext();
@@ -370,31 +345,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         {
             OnQuestionPostInfo();
             Stage = GameStage.EndQuestion;
-        }
-    }
-
-    protected void EndRound()
-    {
-        OnRoundEmpty();
-        FinishRound();
-    }
-
-    /// <summary>
-    /// Ends round and optionally shows current score.
-    /// </summary>
-    protected void FinishRound()
-    {
-        OnLogScore();
-
-        if (OptionsProvider().ShowScore)
-        {
-            Stage = GameStage.Score;
-            OnShowScore();
-            UpdateCanNext();
-        }
-        else
-        {
-            MoveNextRound();
         }
     }
 

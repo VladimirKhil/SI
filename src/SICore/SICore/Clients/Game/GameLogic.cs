@@ -133,13 +133,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         Engine.Package += Engine_Package;
         Engine.GameThemes += Engine_GameThemes;
-        Engine.RoundSkip += Engine_RoundSkip;
 
         Engine.QuestionPostInfo += Engine_QuestionPostInfo;
         Engine.QuestionFinish += Engine_QuestionFinish;
         Engine.NextQuestion += Engine_NextQuestion;
-        Engine.RoundEmpty += Engine_RoundEmpty;
-        Engine.RoundTimeout += Engine_RoundTimeout;
 
         Engine.EndGame += Engine_EndGame;
 
@@ -162,7 +159,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
-    private void Engine_RoundSkip()
+    internal void OnFinalRoundSkip()
     {
         _gameActions.ShowmanReplic(LO[nameof(R.NobodyInFinal)]);
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10), 1);
@@ -798,7 +795,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, 1, force: true);
     }
 
-    private void FinishRound(bool move = true)
+    internal void OnRoundEnded()
     {
         _data.IsQuestionPlaying = false;
 
@@ -817,20 +814,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         // (or we could replace it with a normal move)
         ClearContinuation();
 
-        if (move)
+        if (ClientData.TInfo.Pause)
         {
-            PlanExecution(Tasks.MoveNext, 40);
+            OnPauseCore(false);
+        }
 
-            if (ClientData.TInfo.Pause)
-            {
-                OnPauseCore(false);
-            }
-        }
-        else
-        {
-            // Round was finished manually. We need to cancel current waiting tasks in a safe way
-            _taskRunner.ClearOldTasks();
-        }
+        _taskRunner.ClearOldTasks();
+
+        PlanExecution(Tasks.MoveNext, 40);
     }
 
     internal void OnPauseCore(bool isPauseEnabled)
@@ -912,18 +903,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
     }
 
-    private void Engine_RoundEmpty()
-    {
-        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)]));
-        FinishRound();
-    }
+    internal void OnRoundEmpty() => _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)]));
 
-    private void Engine_RoundTimeout()
+    internal void OnRoundTimeout()
     {
         _gameActions.SendMessage(Messages.Timeout);
         _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllTime)]));
-        FinishRound();
     }
+
+    internal void OnRoundEndedManually() => _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToOtherRound)]);
 
     internal void OnThemeDeleted(int themeIndex)
     {
@@ -2024,12 +2012,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         {
                             stop = Engine.MoveBackRound();
 
-                            if (stop)
-                            {
-                                FinishRound(false);
-                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToPreviousRound)]);
-                            }
-                            else
+                            if (!stop)
                             {
                                 _stopReason = StopReason.None;
                                 return (true, task);
@@ -2075,12 +2058,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         {
                             stop = Engine.MoveNextRound();
                             
-                            if (stop)
-                            {
-                                FinishRound(false);
-                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToNextRound)]);
-                            }
-                            else
+                            if (!stop)
                             {
                                 _stopReason = StopReason.None;
                                 return (true, task);
@@ -2097,12 +2075,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         {
                             stop = Engine.MoveToRound(ClientData.TargetRoundIndex);
 
-                            if (stop)
-                            {
-                                FinishRound(false);
-                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToOtherRound)]);
-                            }
-                            else
+                            if (!stop)
                             {
                                 _stopReason = StopReason.None;
                                 return (true, task);
@@ -4819,10 +4792,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             if (ClientData.Players[i].Sum > 0 || ClientData.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes)
             {
                 answerers.Add(i);
-                _gameActions.SendMessageWithArgs(Messages.PlayerState, i, PlayerState.Answering);
             }
         }
 
+        var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(answerers.Select(i => (object)i));
+        _gameActions.SendMessage(msg.ToString());
         ClientData.QuestionPlayState.SetMultipleAnswerers(answerers);
         AskFinalStake();
     }

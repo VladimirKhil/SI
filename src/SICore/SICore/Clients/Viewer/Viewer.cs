@@ -997,17 +997,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     }
 
                 case Messages.PlayerState:
-                    {
-                        if (mparams.Length > 2
-                            && int.TryParse(mparams[1], out int playerIndex)
-                            && playerIndex >= 0
-                            && playerIndex <= ClientData.Players.Count
-                            && Enum.TryParse<PlayerState>(mparams[2], out var state))
-                        {
-                            ClientData.Players[playerIndex].State = state;
-                        }
-                        break;
-                    }
+                    OnPlayerState(mparams);
+                    break;
 
                 case Messages.PersonStake:
                     OnPersonStake(mparams);
@@ -1137,6 +1128,24 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         catch (Exception exc)
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
+        }
+    }
+
+    private void OnPlayerState(string[] mparams)
+    {
+        if (mparams.Length <= 2 || !Enum.TryParse<PlayerState>(mparams[1], out var state))
+        {
+            return;
+        }
+
+        for (var i = 2; i < mparams.Length; i++)
+        {
+            if (int.TryParse(mparams[i], out int playerIndex)
+                && playerIndex >= 0
+                && playerIndex < ClientData.Players.Count)
+            {
+                ClientData.Players[playerIndex].State = state;
+            }
         }
     }
 

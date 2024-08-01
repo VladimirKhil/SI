@@ -19,7 +19,6 @@ internal sealed class TvEngineTests
             () => new EngineOptions
             {
                 ShowRight = true,
-                ShowScore = false,
                 PlaySpecials = true,
                 IsPressMode = true,
                 IsMultimediaPressMode = true,
@@ -61,7 +60,8 @@ internal sealed class TvEngineTests
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.EndQuestion);
 
-        AssertMove(engine, GameStage.End);
+        AssertMove(engine, GameStage.EndGame);
+        AssertMove(engine, GameStage.None);
     }
 
     private static SIDocument CreateDocument()

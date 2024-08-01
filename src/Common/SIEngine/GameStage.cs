@@ -24,9 +24,6 @@ public enum GameStage
     /// Question to play selection.
     /// </summary>
     SelectingQuestion,
-
-    [Obsolete]
-    Score,
     
     /// <summary>
     /// Question is played.
@@ -41,5 +38,10 @@ public enum GameStage
     /// <summary>
     /// Final stage.
     /// </summary>
-    End
+    EndGame,
+
+    /// <summary>
+    /// Empty stage.
+    /// </summary>
+    None,
 }

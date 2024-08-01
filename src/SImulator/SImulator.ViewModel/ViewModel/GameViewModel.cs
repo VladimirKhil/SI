@@ -34,7 +34,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private readonly Stack<Tuple<PlayerInfo, int, bool>?> _answeringHistory = new();
 
-    private readonly EngineBase _engine;
+    private readonly GameEngine _engine;
 
     /// <summary>
     /// Game buttons manager.
@@ -478,14 +478,14 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     public GameViewModel(
         AppSettingsViewModel settings,
-        ISIEngine engine,
+        GameEngine engine,
         IExtendedListener presentationListener,
         IPresentationController presentationController,
         IList<SimplePlayerInfo> players,
         IGameLogger gameLogger)
     {
         Settings = settings;
-        _engine = (EngineBase)engine;
+        _engine = engine;
         _presentationListener = presentationListener;
         _gameLogger = gameLogger;
         PresentationController = presentationController;
@@ -542,16 +542,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         _engine.Package += Engine_Package;
         _engine.GameThemes += Engine_GameThemes;
-        _engine.NextRound += Engine_NextRound;
-        _engine.ShowScore += Engine_ShowScore;
-        _engine.LogScore += LogScore;
         _engine.QuestionPostInfo += Engine_QuestionPostInfo;
         _engine.QuestionFinish += Engine_QuestionFinish;
         _engine.EndQuestion += Engine_EndQuestion;
-        _engine.RoundTimeout += Engine_RoundTimeout;
         _engine.NextQuestion += Engine_NextQuestion;
-        _engine.RoundEmpty += Engine_RoundEmpty;
-        _engine.Error += OnError;
         _engine.EndGame += Engine_EndGame;
 
         _engine.PropertyChanged += Engine_PropertyChanged;
@@ -1451,14 +1445,19 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveMediaCommand = null;
     }
 
-    private void Engine_RoundEmpty() => StopRoundTimer_Executed(0);
-
     private void Engine_NextQuestion() => _engine.MoveNext();
 
-    private void Engine_RoundTimeout()
+    internal void OnEndRoundTimeout()
     {
         SetSound(Settings.Model.Sounds.RoundTimeout);
         _gameLogger.Write(Resources.RoundTimeout);
+    }
+
+    internal void OnEndRound()
+    {
+        StopRoundTimer_Executed(0);
+        ActiveRoundCommand = null;
+        PresentationController.ClearState();
     }
 
     private void Engine_EndQuestion(int themeIndex, int questionIndex)
@@ -1595,12 +1594,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void UpdateNextCommand() => _next.CanBeExecuted = _continuation != null || _engine != null && _engine.CanMoveNext;
 
-    private void Engine_ShowScore()
-    {
-        PresentationController.SetStage(TableStage.Score);
-        LocalInfo.TStage = TableStage.Score;
-    }
-
     private void ReturnToQuestion()
     {
         State = _previousState;
@@ -1654,25 +1647,22 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 _buttonManager = null;
             }
 
-            lock (_engine.SyncRoot)
+            _engine.PropertyChanged -= Engine_PropertyChanged;
+
+            try
             {
-                _engine.PropertyChanged -= Engine_PropertyChanged;
-                
-                try
-                {
-                    _engine.Dispose();
-                }
-                catch (IOException exc)
-                {
-                    _gameLogger.Write($"Engine dispose error: {exc}");
-                }
-
-                _gameLogger.Dispose();
-
-                PresentationController.SetSound();
-
-                PlatformManager.Instance.ClearMedia();
+                _engine.Dispose();
             }
+            catch (IOException exc)
+            {
+                _gameLogger.Write($"Engine dispose error: {exc}");
+            }
+
+            _gameLogger.Dispose();
+
+            PresentationController.SetSound();
+
+            PlatformManager.Instance.ClearMedia();
         }
         catch (Exception exc)
         {
@@ -1697,7 +1687,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     /// <summary>
     /// Writes players scores to log.
     /// </summary>
-    private void LogScore()
+    internal void LogScore()
     {
         if (!Settings.Model.SaveLogs || Players.Count <= 0)
         {
@@ -1719,17 +1709,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         _gameLogger.Write(sb.ToString());
-    }
-
-    private void Engine_NextRound(bool showSign)
-    {
-        ActiveRoundCommand = null;
-        PresentationController.SetSound();
-
-        if (showSign)
-        {
-            PresentationController.ClearState();
-        }
     }
 
     internal void InitMedia()

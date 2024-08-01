@@ -20,7 +20,6 @@ public sealed class GameRunner
         IsMultimediaPressMode = appSettingsCore.FalseStart,
         IsPressMode = appSettingsCore.FalseStart,
         ShowRight = true,
-        ShowScore = false,
         PlaySpecials = true,
         PlayAllQuestionsInFinalRound = appSettingsCore.PlayAllQuestionsInFinalRound,
     };
@@ -152,7 +151,7 @@ public sealed class GameRunner
         var playHandler = new PlayHandler(gameData);
         var questionPlayHandler = new QuestionPlayHandler();
 
-        var engine = (EngineBase)EngineFactory.CreateEngine(
+        var engine = EngineFactory.CreateEngine(
             gameData.Settings.AppSettings.GameMode == GameModes.Tv,
             _document,
             () => CreateEngineOptions(gameData.Settings.AppSettings),
