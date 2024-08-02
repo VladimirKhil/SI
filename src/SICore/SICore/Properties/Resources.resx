@@ -267,9 +267,6 @@
   <data name="Hint" xml:space="preserve">
     <value>Hint: you can press the answer button at any point of the screen using right mouse button or {0} key</value>
   </data>
-  <data name="HintChangeSum" xml:space="preserve">
-    <value>Change the sum</value>
-  </data>
   <data name="HintCheckAnswer" xml:space="preserve">
     <value>Define if the answer is correct</value>
   </data>
@@ -287,9 +284,6 @@
   </data>
   <data name="HintSelectCatPlayerForPlayer" xml:space="preserve">
     <value>Select a player who the question will be given to</value>
-  </data>
-  <data name="HintSelectPlayerForSumChange" xml:space="preserve">
-    <value>Select a player to change his score</value>
   </data>
   <data name="HintSelectQuestion" xml:space="preserve">
     <value>Select a question on the board</value>
@@ -812,9 +806,6 @@
   </data>
   <data name="TypeAllowEveryoneToPlayStakes" xml:space="preserve">
     <value>everyone can play hiden stakes question</value>
-  </data>
-  <data name="HintSelectActivePlayer" xml:space="preserve">
-    <value>Select new active player</value>
   </data>
   <data name="JoinModeSwitchedToAny" xml:space="preserve">
     <value>{0} allowed to join as any role</value>

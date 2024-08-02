@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace SICore;
 
 /// <summary>
-/// Common viewer account.
+/// Defines common viewer account.
 /// </summary>
 public class ViewerAccount : Account
 {

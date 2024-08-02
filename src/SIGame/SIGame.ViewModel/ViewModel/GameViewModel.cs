@@ -39,9 +39,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             {
                 _host.Switch -= Host_Switch;
                 _host.StageChanged -= Host_StageChanged;
-                _host.PersonConnected -= UpdateMoveCommand;
-                _host.PersonDisconnected -= UpdateMoveCommand;
-                _host.IsHostChanged -= UpdateMoveCommand;
+                _host.PersonConnected -= UpdateCommands;
+                _host.PersonDisconnected -= UpdateCommands;
+                _host.IsHostChanged -= UpdateCommands;
                 _host.Timer -= Host_Timer;
                 _host.Ad -= Host_Ad;
                 _host.IsPausedChanged -= Host_IsPausedChanged;
@@ -53,9 +53,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             {
                 _host.Switch += Host_Switch;
                 _host.StageChanged += Host_StageChanged;
-                _host.PersonConnected += UpdateMoveCommand;
-                _host.PersonDisconnected += UpdateMoveCommand;
-                _host.IsHostChanged += UpdateMoveCommand;
+                _host.PersonConnected += UpdateCommands;
+                _host.PersonDisconnected += UpdateCommands;
+                _host.IsHostChanged += UpdateCommands;
                 _host.Timer += Host_Timer;
                 _host.Ad += Host_Ad;
                 _host.IsPausedChanged += Host_IsPausedChanged;
@@ -63,21 +63,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private ViewerData _data;
+    private readonly ViewerData _data;
 
-    public ViewerData Data
-    {
-        get => _data;
-        private set
-        {
-            _data = value;
-
-            if (_data != null)
-            {
-                _data.CurrentPlayerChanged += MyData_CurrentPlayerChanged;
-            }
-        }
-    }
+    public ViewerData Data => _data;
 
     public TableInfoViewModel TInfo { get; private set; }
 
@@ -233,6 +221,88 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public event Action? Disposed;
 
+    private DialogModes _dialogMode = DialogModes.None;
+
+    public DialogModes DialogMode
+    {
+        get => _dialogMode;
+        set { _dialogMode = value; OnPropertyChanged(); }
+    }
+
+    private string _hint = "";
+
+    public string Hint
+    {
+        get => _hint;
+        set { _hint = value; OnPropertyChanged(); }
+    }
+
+    public ICommand SendAnswer { get; set; }
+
+    public ICommand SendAnswerVersion { get; set; }
+
+    private string _answer = "";
+
+    /// <summary>
+    /// Player answer.
+    /// </summary>
+    public string Answer
+    {
+        get => _answer;
+        set { _answer = value; OnPropertyChanged(); }
+    }
+
+    private SimpleCommand _changeSums;
+
+    /// <summary>
+    /// Change players score.
+    /// </summary>
+    public SimpleCommand ChangeSums
+    {
+        get => _changeSums;
+        set
+        {
+            if (_changeSums != value)
+            {
+                _changeSums = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private SimpleCommand _changeActivePlayer;
+
+    /// <summary>
+    /// Change active player.
+    /// </summary>
+    public SimpleCommand ChangeActivePlayer
+    {
+        get => _changeActivePlayer;
+        set
+        {
+            if (_changeActivePlayer != value)
+            {
+                _changeActivePlayer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _isShowman;
+
+    public bool IsShowman
+    {
+        get => _isShowman;
+        set
+        {
+            if (_isShowman != value )
+            {
+                _isShowman = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -245,7 +315,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _fileShare = fileShare;
         _logger = logger;
 
-        Data = viewerData;
+        _data = viewerData;
+        _data.CurrentPlayerChanged += MyData_CurrentPlayerChanged;
 
         TInfo = new TableInfoViewModel(Data.TInfo, settings)
         {
@@ -283,7 +354,84 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         SetVideoAvatar = new SimpleCommand(SetVideoAvatar_Executed);
         DeleteVideoAvatar = new SimpleCommand(DeleteVideoAvatar_Executed);
         ManageTables = new SimpleCommand(ManageTables_Executed);
+
+        SendAnswer = new SimpleCommand(SendAnswer_Executed);
+        SendAnswerVersion = new SimpleCommand(SendAnswerVersion_Executed);
+        IsShowman = Host?.Role == GameRole.Showman;
+        _changeSums = new SimpleCommand(ChangeSums_Executed) { CanBeExecuted = IsShowman };
+        _changeActivePlayer = new SimpleCommand(ChangeActivePlayer_Executed) { CanBeExecuted = IsShowman };
     }
+
+    private void ChangeActivePlayer_Executed(object? arg)
+    {
+        for (int i = 0; i < Data.Players.Count; i++)
+        {
+            Data.Players[i].CanBeSelected = true;
+            int num = i;
+
+            Data.Players[i].SelectionCallback = player =>
+            {
+                Host?.Actions.SendMessageWithArgs(Messages.SetChooser, num);
+                ClearSelections();
+            };
+        }
+
+        Hint = Resources.HintSelectActivePlayer;
+    }
+
+    private void ClearSelections(bool full = false)
+    {
+        if (full)
+        {
+            TInfo.Selectable = false;
+            TInfo.SelectQuestion.CanBeExecuted = false;
+            TInfo.SelectTheme.CanBeExecuted = false;
+            TInfo.SelectAnswer.CanBeExecuted = false;
+        }
+
+        Hint = "";
+        DialogMode = DialogModes.None;
+
+        for (int i = 0; i < _data.Players.Count; i++)
+        {
+            _data.Players[i].CanBeSelected = false;
+        }
+
+        _data.Host.OnFlash(false);
+    }
+
+    private void ChangeSums_Executed(object? arg)
+    {
+        for (int i = 0; i < Data.Players.Count; i++)
+        {
+            Data.Players[i].CanBeSelected = true;
+            int num = i;
+
+            Data.Players[i].SelectionCallback = player =>
+            {
+                Data.ShowmanDataExtensions.SelectedPlayer = new Pair { First = num + 1, Second = player.Sum };
+                DialogMode = DialogModes.ChangeSum;
+
+                for (int j = 0; j < Data.Players.Count; j++)
+                {
+                    Data.Players[j].CanBeSelected = false;
+                }
+
+                Hint = Resources.HintChangeSum;
+            };
+        }
+
+        Hint = Resources.HintSelectPlayerForSumChange;
+    }
+
+    private void SendAnswer_Executed(object? arg)
+    {
+        _host?.Actions.SendMessage(Messages.Answer, (string?)arg ?? Answer);
+        Hint = "";
+        DialogMode = DialogModes.None;
+    }
+
+    private void SendAnswerVersion_Executed(object? arg) => _host?.Actions.SendMessage(Messages.AnswerVersion, Answer);
 
     private void ManageTables_Executed(object? arg)
     {
@@ -345,7 +493,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private void Host_StageChanged(GameStage gameStage) => UpdateMoveCommand();
+    private void Host_StageChanged(GameStage gameStage) => UpdateCommands();
 
     private void EnableExtrenalMediaLoad_Executed(object? arg)
     {
@@ -420,10 +568,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private void UpdateMoveCommand()
+    private void UpdateCommands()
     {
-        Move.CanBeExecuted = Data.Stage != GameStage.Before && (Host.IsHost || Host is Showman);
+        IsShowman = Host?.Role == GameRole.Showman;
+        Move.CanBeExecuted = Data.Stage != GameStage.Before && (Host != null && Host.IsHost || IsShowman);
         ChangePauseInGame.CanBeExecuted = Move.CanBeExecuted;
+        _changeSums.CanBeExecuted = _changeActivePlayer.CanBeExecuted = IsShowman;
     }
 
     private void Host_Switch(IViewerClient newHost)
@@ -433,7 +583,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         Host = newHost;
 
-        UpdateMoveCommand();
+        UpdateCommands();
 
         OnPropertyChanged(nameof(TInfo));
     }
@@ -442,11 +592,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void Cancel_Executed(object? arg)
     {
-        if (Host.MyLogic is IViewerLogic logic)
-        {
-            ((ViewerData)logic.Data).DialogMode = DialogModes.None;
-            ((ViewerData)logic.Data).Hint = "";
-        }
+        DialogMode = DialogModes.None;
+        Hint = "";
     }
 
     private void ChangePauseInGame_Executed(object? arg) => Host.Pause();

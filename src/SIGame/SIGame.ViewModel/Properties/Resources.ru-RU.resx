@@ -534,4 +534,13 @@
   <data name="TimeSettings_PartialImageTime" xml:space="preserve">
     <value>Вывод частичных изображений</value>
   </data>
+  <data name="HintSelectPlayerForSumChange" xml:space="preserve">
+    <value>Выберите игрока для изменения суммы</value>
+  </data>
+  <data name="HintChangeSum" xml:space="preserve">
+    <value>Измените сумму</value>
+  </data>
+  <data name="HintSelectActivePlayer" xml:space="preserve">
+    <value>Выберите, кому передать ход</value>
+  </data>
 </root>

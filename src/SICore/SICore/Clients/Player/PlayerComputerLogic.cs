@@ -1926,7 +1926,8 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
     /// </summary>
     public void CatCost() => ScheduleExecution(PlayerTasks.CatCost, 15);
 
-    public void IsRight(bool voteForRight) => ScheduleExecution(voteForRight ? PlayerTasks.AnswerRight : PlayerTasks.AnswerWrong, 10 + Random.Shared.Next(10));
+    public void IsRight(bool voteForRight, string answer) =>
+        ScheduleExecution(voteForRight ? PlayerTasks.AnswerRight : PlayerTasks.AnswerWrong, 10 + Random.Shared.Next(10));
 
     #endregion
 

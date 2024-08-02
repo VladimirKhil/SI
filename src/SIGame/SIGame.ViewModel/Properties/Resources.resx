@@ -537,4 +537,13 @@
   <data name="TimeSettings_PartialImageTime" xml:space="preserve">
     <value>Partial image display</value>
   </data>
+  <data name="HintSelectPlayerForSumChange" xml:space="preserve">
+    <value>Select a player to change his score</value>
+  </data>
+  <data name="HintChangeSum" xml:space="preserve">
+    <value>Change the sum</value>
+  </data>
+  <data name="HintSelectActivePlayer" xml:space="preserve">
+    <value>Select new active player</value>
+  </data>
 </root>

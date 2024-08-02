@@ -384,7 +384,7 @@
         <TextBlock
             Grid.Row="1"
             Grid.ColumnSpan="3"
-            Text="{Binding Data.Hint}"
+            Text="{Binding Hint}"
             FontSize="17"
             Style="{StaticResource HiddenTextBlock}"
             Foreground="Black"
@@ -400,7 +400,7 @@
         <ContentControl
             Grid.Row="1"
             Content="{Binding}"
-            ContentTemplate="{Binding Data.DialogMode, Converter={StaticResource DialogSelector}}"
+            ContentTemplate="{Binding DialogMode, Converter={StaticResource DialogSelector}}"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Center"
             VerticalContentAlignment="Center">

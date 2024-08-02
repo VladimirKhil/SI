@@ -2772,7 +2772,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void ValidatePlayers()
     {
-        var playersAreValid = ClientData.PlayersValidator != null && ClientData.PlayersValidator();
+        var playersAreValid = ClientData.PlayersValidator == null || ClientData.PlayersValidator();
 
         if (playersAreValid)
         {

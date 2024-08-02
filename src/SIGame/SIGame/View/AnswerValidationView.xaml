@@ -7,10 +7,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:lc="clr-namespace:SIGame.Converters"
     xmlns:lp="clr-namespace:SIGame.Properties"
-    xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     mc:Ignorable="d"
     Width="544"
-    d:DataContext="{d:DesignInstance sc:PersonData}">
+    d:DataContext="{d:DesignInstance vm:GameViewModel}">
     <UserControl.Resources>
         <Style x:Key="{x:Type GroupBox}" TargetType="{x:Type GroupBox}">
             <Setter Property="Template">
@@ -54,7 +54,7 @@
                 <TextBlock Margin="5,5,0,0" FontSize="18">
                     <Run Text="{x:Static lp:Resources.Validate_IsTrue}" />
                     <Run Text=" " />
-                    <Run FontWeight="Bold" Text="{Binding ValidatorName}" />
+                    <Run FontWeight="Bold" Text="{Binding Data.PersonDataExtensions.ValidatorName}" />
                     <Run Text="?" />
                 </TextBlock>
             </GroupBox.Header>
@@ -71,7 +71,7 @@
             Background="#FFA1C2DE"
             Grid.Row="1"
             Grid.ColumnSpan="2"
-            Visibility="{Binding AreAnswersShown, Converter={StaticResource BooleanToVisibilityConverter1}}">
+            Visibility="{Binding Data.PersonDataExtensions.AreAnswersShown, Converter={StaticResource BooleanToVisibilityConverter1}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -86,7 +86,7 @@
             
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <ItemsControl
-                    ItemsSource="{Binding Right}"
+                    ItemsSource="{Binding Data.PersonDataExtensions.Right}"
                     VerticalAlignment="Stretch"
                     Height="Auto"
                     Margin="5"
@@ -101,7 +101,7 @@
             
             <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto">
                 <ItemsControl
-                    ItemsSource="{Binding Wrong}"
+                    ItemsSource="{Binding Data.PersonDataExtensions.Wrong}"
                     VerticalAlignment="Stretch"
                     Height="Auto"
                     Margin="5"
@@ -115,9 +115,9 @@
             Grid.ColumnSpan="2"
             Orientation="Horizontal">
             <Button
-                Visibility="{Binding ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsWrong}" 
+                Command="{Binding Data.PersonDataExtensions.IsWrong}" 
                 CommandParameter="0"
                 Content="−0"
                 Foreground="DarkRed"
@@ -128,7 +128,7 @@
                 Background="#22000000" />
 
             <ToggleButton
-                IsChecked="{Binding AreAnswersShown}"
+                IsChecked="{Binding Data.PersonDataExtensions.AreAnswersShown}"
                 Width="40"
                 Height="40"
                 Margin="0,0,0,0"
@@ -150,7 +150,7 @@
 
             <Button
                 Grid.ColumnSpan="3"
-                Command="{Binding IsRight}"
+                Command="{Binding Data.PersonDataExtensions.IsRight}"
                 CommandParameter="1"
                 Content="{x:Static lp:Resources.Yes}"
                 FontSize="25"
@@ -160,7 +160,7 @@
                     <Style TargetType="Button" BasedOn="{StaticResource SIButton}">
                         <Setter Property="BorderThickness" Value="1.5" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShowExtraRightButtons}" Value="True">
+                            <DataTrigger Binding="{Binding Data.PersonDataExtensions.ShowExtraRightButtons}" Value="True">
                                 <Setter Property="BorderThickness" Value="0,1.5" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -169,9 +169,9 @@
             </Button>
             
             <Button
-                Visibility="{Binding ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsRight}" 
+                Command="{Binding Data.PersonDataExtensions.IsRight}" 
                 CommandParameter="0.5"
                 Content="×0.5"
                 Width="50"
@@ -180,9 +180,9 @@
 
             <Button
                 Grid.Column="2"
-                Visibility="{Binding ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsRight}" 
+                Command="{Binding Data.PersonDataExtensions.IsRight}" 
                 CommandParameter="2.0"
                 Content="×2"
                 Width="50"
@@ -199,7 +199,7 @@
 
             <Button
                 Grid.ColumnSpan="3"
-                Command="{Binding IsWrong}"
+                Command="{Binding Data.PersonDataExtensions.IsWrong}"
                 Content="{x:Static lp:Resources.No}"
                 FontSize="25"
                 FontWeight="SemiBold"
@@ -209,7 +209,7 @@
                         <Setter Property="BorderThickness" Value="1.5" />
                         
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShowExtraRightButtons}" Value="True">
+                            <DataTrigger Binding="{Binding Data.PersonDataExtensions.ShowExtraRightButtons}" Value="True">
                                 <Setter Property="BorderThickness" Value="0,1.5" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -218,9 +218,9 @@
             </Button>
 
             <Button
-                Visibility="{Binding ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsWrong}" 
+                Command="{Binding Data.PersonDataExtensions.IsWrong}" 
                 CommandParameter="0.5"
                 Content="×0.5"
                 Width="50"
@@ -229,9 +229,9 @@
 
             <Button
                 Grid.Column="2"
-                Visibility="{Binding ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsWrong}" 
+                Command="{Binding Data.PersonDataExtensions.IsWrong}" 
                 CommandParameter="2.0"
                 Content="×2"
                 Width="50"

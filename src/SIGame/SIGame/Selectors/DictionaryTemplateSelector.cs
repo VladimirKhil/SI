@@ -16,7 +16,7 @@ public sealed class DictionaryTemplateSelector : DataTemplateSelector
             return null;
         }
 
-        if (Views.TryGetValue(game.Data.DialogMode.ToString(), out var result))
+        if (Views.TryGetValue(game.DialogMode.ToString(), out var result))
         {
             return result;
         }

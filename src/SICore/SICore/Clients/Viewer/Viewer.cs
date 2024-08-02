@@ -30,6 +30,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     public event Action? IsHostChanged;
 
+    public virtual GameRole Role => GameRole.Viewer;
+
     private bool _isHost;
 
     /// <summary>
@@ -77,7 +79,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 }
 
                 UpdateAddTableCommand();
-                UpdateDeleteTableCommand();
                 OnPropertyChanged();
             }
         }
@@ -119,14 +120,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         ClientData.ForceStart = new CustomCommand(ForceStart_Executed) { CanBeExecuted = IsHost && ClientData.Stage == GameStage.Before };
         ClientData.AddTable = new CustomCommand(AddTable_Executed) { CanBeExecuted = IsHost };
-        ClientData.DeleteTable = new CustomCommand(DeleteTable_Executed) { CanBeExecuted = IsHost };
 
         ClientData.AtomViewed = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Atom));
-
-        ClientData.PersonDataExtensions.SendAnswer = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessage(Messages.Answer, (string?)arg ?? ClientData.PersonDataExtensions.Answer); Clear();
-        });
     }
 
     private void ClientData_JoinModeChanged(JoinMode joinMode) =>
@@ -316,37 +311,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     private void AddTable_Executed(object? arg) => _viewerActions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
 
-    private void DeleteTable_Executed(object? arg)
-    {
-        for (var i = 0; i < ClientData.Players.Count; i++)
-        {
-            var player = ClientData.Players[i];
-            player.CanBeSelected = ClientData.Stage == GameStage.Before || !player.IsConnected || !player.IsHuman;
-            int num = i;
-
-            player.SelectionCallback = p =>
-            {
-                _viewerActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, num);
-                Clear();
-            };
-        }
-
-        ClientData.Hint = LO[nameof(R.DeleteTableHint)];
-    }
-
-    private void Clear()
-    {
-        ClientData.Hint = "";
-        ClientData.DialogMode = DialogModes.None;
-
-        for (int i = 0; i < ClientData.Players.Count; i++)
-        {
-            ClientData.Players[i].CanBeSelected = false;
-        }
-
-        ClientData.Host.OnFlash(false);
-    }
-
     /// <summary>
     /// Processes received system message.
     /// </summary>
@@ -394,8 +358,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         InsertPerson(role, account, index);
 
                         PersonConnected?.Invoke();
-
-                        UpdateDeleteTableCommand();
 
                         break;
                     }
@@ -603,17 +565,13 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                         var ready = mparams.Length == 2 || mparams[2] == "+";
 
-                        if (mparams[1] == _client.Name)
-                        {
-                            ClientData.IReady = ready;
-                        }
-
                         if (ClientData.ShowMan == null)
                         {
                             return;
                         }
 
                         var person = ClientData.MainPersons.FirstOrDefault(item => item.Name == mparams[1]);
+                        
                         if (person != null)
                         {
                             person.Ready = ready;
@@ -1414,8 +1372,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
 
         PersonDisconnected?.Invoke();
-
-        UpdateDeleteTableCommand();
     }
 
     private void OnAd(string? text = null) => Ad?.Invoke(text);
@@ -1576,7 +1532,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             ClientData.Players.Add(account);
 
             UpdateAddTableCommand();
-            UpdateDeleteTableCommand();
 
             UpdatePlayerCommands(account);
 
@@ -1651,8 +1606,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             // Should move to viewers itself
             SwitchToNewType(GameRole.Viewer, newAccount, me);
         }
-
-        UpdateDeleteTableCommand();
     }
 
     private void OnConfigChangeType(string[] mparams)
@@ -1752,8 +1705,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 // Необходимо самого себя перевести в зрители
                 SwitchToNewType(GameRole.Viewer, newAccount, me);
             }
-
-            UpdateDeleteTableCommand();
         }
     }
 
@@ -1825,8 +1776,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             // Необходимо самого себя перевести в зрители
             SwitchToNewType(GameRole.Viewer, newAccount, me);
         }
-
-        UpdateDeleteTableCommand();
     }
 
     private PersonAccount GetAccountByType(bool isPlayer, string indexString)
@@ -2036,8 +1985,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 }
             }
         }
-
-        UpdateDeleteTableCommand();
     }
 
     /// <summary>
@@ -2071,11 +2018,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             ClientData.PersonDataExtensions.IsWrong =
             ClientData.PersonDataExtensions.SendCatCost =
             ClientData.PersonDataExtensions.SendFinalStake =
-            ClientData.PlayerDataExtensions.SendAnswerVersion =
-            ClientData.ShowmanDataExtensions.ChangeSums =
-            ClientData.ShowmanDataExtensions.ChangeActivePlayer =
             ClientData.ShowmanDataExtensions.ChangeSums2 =
-            ClientData.ShowmanDataExtensions.Manage =
             ClientData.ShowmanDataExtensions.ManageTable =
             ClientData.PersonDataExtensions.SendNominal =
             ClientData.PersonDataExtensions.SendPass =
@@ -2229,22 +2172,9 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
 
         UpdateAddTableCommand();
-        UpdateDeleteTableCommand();
 
         SendPicture();
         _viewerActions.SendMessage(Messages.Moveable);
-    }
-
-    private void UpdateDeleteTableCommand()
-    {
-        if (ClientData.DeleteTable == null)
-        {
-            return;
-        }
-
-        ClientData.DeleteTable.CanBeExecuted = IsHost
-            && ClientData.Players.Count > 2
-            && (ClientData.Stage == GameStage.Before || ClientData.Players.Any(p => !p.IsConnected || !p.IsHuman));
     }
 
     private void UpdateAddTableCommand()
@@ -2597,19 +2527,10 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
 
         _ = Enum.TryParse<SelectPlayerReason>(mparams[1], out var reason);
-        ClientData.Hint = LO[GetSelectHint(reason)];
+        _logic.OnSelectPlayer(reason);
     }
 
     private void ClearSelections(bool full = false) => _logic.ClearSelections(full);
-
-    private static string GetSelectHint(SelectPlayerReason selectionMode) => selectionMode switch
-    {
-        SelectPlayerReason.Answerer => nameof(R.HintSelectCatPlayer),
-        SelectPlayerReason.Chooser => nameof(R.HintSelectStarter),
-        SelectPlayerReason.Deleter => nameof(R.HintThemeDeleter),
-        SelectPlayerReason.Staker => nameof(R.HintSelectStaker),
-        _ => string.Empty,
-    };
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

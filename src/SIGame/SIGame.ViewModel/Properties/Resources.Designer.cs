@@ -583,6 +583,33 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Change the sum.
+        /// </summary>
+        public static string HintChangeSum {
+            get {
+                return ResourceManager.GetString("HintChangeSum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select new active player.
+        /// </summary>
+        public static string HintSelectActivePlayer {
+            get {
+                return ResourceManager.GetString("HintSelectActivePlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select a player to change his score.
+        /// </summary>
+        public static string HintSelectPlayerForSumChange {
+            get {
+                return ResourceManager.GetString("HintSelectPlayerForSumChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Import successfully completed.
         /// </summary>
         public static string ImportOk {

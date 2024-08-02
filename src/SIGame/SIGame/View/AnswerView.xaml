@@ -4,15 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:lp="clr-namespace:SIGame.Properties" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance sc:ViewerData}"
+    d:DataContext="{d:DesignInstance vm:GameViewModel}"
     Loaded="UserControl_Loaded">
     <StackPanel Orientation="Horizontal">
         <TextBox
             Margin="10"
-            Text="{Binding PersonDataExtensions.Answer, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding Answer, UpdateSourceTrigger=PropertyChanged}"
             Width="450"
             Name="input"
             FontSize="20"
@@ -22,7 +22,7 @@
             CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
             ContextMenu="{x:Null}">
             <TextBox.InputBindings>
-                <KeyBinding Key="Enter" Command="{Binding PersonDataExtensions.SendAnswer}" />
+                <KeyBinding Key="Enter" Command="{Binding SendAnswer}" />
             </TextBox.InputBindings>
         </TextBox>
         
@@ -32,6 +32,6 @@
             Padding="10,5"
             Margin="0,5,10,5"
             FontSize="25"
-            Command="{Binding PersonDataExtensions.SendAnswer}" />
+            Command="{Binding SendAnswer}" />
     </StackPanel>
 </UserControl>

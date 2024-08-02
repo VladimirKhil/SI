@@ -18,7 +18,7 @@ public interface IShowmanLogic : IPersonLogic
     /// <summary>
     /// Validates the answer.
     /// </summary>
-    void IsRight();
+    void IsRight(string answer);
 
     /// <summary>
     /// Selects next person to delete a theme.
@@ -37,4 +37,6 @@ public interface IShowmanLogic : IPersonLogic
     void Answer() { }
 
     void SelectPlayer() { }
+
+    void OnHint(string hint) { }
 }

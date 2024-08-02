@@ -266,11 +266,6 @@ public enum DialogModes
     /// Game report.
     /// </summary>
     Report,
-
-    /// <summary>
-    /// Game management.
-    /// </summary>
-    Manage
 }
 
 /// <summary>

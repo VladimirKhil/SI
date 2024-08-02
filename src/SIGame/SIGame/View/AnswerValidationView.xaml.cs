@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace SIGame
+namespace SIGame;
+
+/// <summary>
+/// Provides interaction logic for AnswerValidationView.xaml.
+/// </summary>
+public partial class AnswerValidationView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для AnswerValidationView.xaml
-    /// </summary>
-    public partial class AnswerValidationView : UserControl
+    public AnswerValidationView()
     {
-        public AnswerValidationView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -85,7 +85,7 @@ public sealed class PlayerAccount : PersonAccount
 
     public CustomCommand Select { get; private set; }
 
-    internal Action<PlayerAccount>? SelectionCallback { get; set; }
+    public Action<PlayerAccount>? SelectionCallback { get; set; }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private CustomCommand delete = null;

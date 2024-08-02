@@ -36,6 +36,8 @@ namespace SIGame.ViewModel;
 
 public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings>, INavigatable, IPackageSelector, IDisposable
 {
+    private const string LocalAddress = "http://localhost";
+    
     private readonly Random _random = new();
 
     private string _duplicatingName = null;
@@ -771,7 +773,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                     TempDocFolder = documentPath
                 };
 
-                return new ViewerHumanLogic(gameViewModel, data, actions, localizer);
+                return new ViewerHumanLogic(gameViewModel, data, actions, localizer, LocalAddress);
             });
 
         if (gameViewModel == null)
@@ -787,8 +789,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             host.MyData.IsChatOpened = false;
             host.MyData.AutoReady = true;
         }
-
-        host.MyData.ServerAddress = "http://localhost";
 
         MoveToGame(gameViewModel, (ViewerHumanLogic)host.MyLogic);
     }

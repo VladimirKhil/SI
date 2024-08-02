@@ -28,8 +28,6 @@ public sealed class PersonData : INotifyPropertyChanged
 
     public ICommand SendFinalStake { get; set; }
 
-    public ICommand SendAnswer { get; set; }
-
     private StakeInfo _stakeInfo = null;
 
     public StakeInfo StakeInfo
@@ -80,17 +78,6 @@ public sealed class PersonData : INotifyPropertyChanged
     /// Имя игрока, чей ответ валидируется
     /// </summary>
     public string ValidatorName { get; set; }
-
-    private string _answer = "";
-
-    /// <summary>
-    /// Ответ игрока
-    /// </summary>
-    public string Answer
-    {
-        get => _answer;
-        set { _answer = value; OnPropertyChanged(); }
-    }
 
     private bool _areAnswersShown = true;
 

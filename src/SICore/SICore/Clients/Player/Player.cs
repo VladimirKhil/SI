@@ -19,6 +19,8 @@ public sealed class Player : Viewer
     private bool _buttonDisabledByGame = false;
     private bool _buttonDisabledByTimer = false;
 
+    public override GameRole Role => GameRole.Player;
+
     /// <summary>
     /// Initializes a new instance of <see cref="Player" /> class.
     /// </summary>
@@ -41,8 +43,6 @@ public sealed class Player : Viewer
             DisableGameButton(false);
             ReleaseGameButton();
         }) { CanBeExecuted = true };
-
-        ClientData.PlayerDataExtensions.SendAnswerVersion = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.AnswerVersion, ClientData.PersonDataExtensions.Answer); });
         
         ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
         {
@@ -192,10 +192,6 @@ public sealed class Player : Viewer
                     readyCommand.Execute(null);
                 }
             }
-            else
-            {
-                ClientData.Hint = LO[nameof(R.HintInitError)];
-            }
         }
     }
 
@@ -252,12 +248,10 @@ public sealed class Player : Viewer
                     if (mparams[1] == "1")
                     {
                         _logic.PlayerLogic.ChooseQuest();
-                        ClientData.Hint = LO[nameof(R.HintSelectQuestion)];
                     }
                     else
                     {
                         _logic.PlayerLogic.ChooseFinalTheme();
-                        ClientData.Hint = LO[nameof(R.HintSelectTheme)];
                     }
 
                     #endregion
@@ -332,7 +326,6 @@ public sealed class Player : Viewer
                     break;
 
                 case Messages.Answer:
-                    ClientData.PersonDataExtensions.Answer = "";
                     _logic.PlayerLogic.Answer();
                     break;
 
@@ -353,8 +346,6 @@ public sealed class Player : Viewer
                             Clear();
                         };
                     }
-
-                    ClientData.Hint = LO[nameof(R.HintSelectCatPlayer)];
 
                     _logic.PlayerLogic.Cat();
                     break;
@@ -437,8 +428,6 @@ public sealed class Player : Viewer
                         Stake = 1
                     };
 
-                    ClientData.Hint = LO[nameof(R.HintMakeAStake)];
-                    ClientData.DialogMode = DialogModes.FinalStake;
                     ((PlayerAccount)ClientData.Me).IsDeciding = false;
 
                     _logic.PlayerLogic.FinalStake();
@@ -481,7 +470,6 @@ public sealed class Player : Viewer
                     }
 
                     ClientData.PlayerDataExtensions.Report.Report = report.ToString();
-                    ClientData.DialogMode = DialogModes.Report;
                     ((PlayerAccount)ClientData.Me).IsDeciding = false;
                     _logic.PlayerLogic.Report();
                     break;
@@ -496,8 +484,6 @@ public sealed class Player : Viewer
     private void OnValidation2(string[] mparams)
     {
         ClientData.PersonDataExtensions.ValidatorName = mparams[1];
-        ClientData.PersonDataExtensions.Answer = mparams[2];
-        _logic.PlayerLogic.IsRight(mparams[3] == "+");
         _ = int.TryParse(mparams[5], out var rightAnswersCount);
         rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 6);
 
@@ -519,9 +505,8 @@ public sealed class Player : Viewer
         ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
         ClientData.PersonDataExtensions.ShowExtraRightButtons = mparams[4] == "+";
 
-        ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
-        ClientData.DialogMode = DialogModes.AnswerValidation;
         ((PersonAccount)ClientData.Me).IsDeciding = false;
+        _logic.PlayerLogic.IsRight(mparams[3] == "+", mparams[2]);
     }
 
     private void DisableGameButton(bool byGame = true)

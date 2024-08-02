@@ -6,8 +6,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     mc:Ignorable="d"
     Title="{x:Static lp:Resources.DialogWindow}"
+    d:DataContext="{d:DesignInstance vm:GameViewModel}"
     Height="400"
     Width="500"
     Background="{StaticResource WindowBackground}"
@@ -32,7 +34,7 @@
                     <Setter Property="Visibility" Value="Hidden" />
                     
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Data.DialogMode}" Value="{x:Static sc:DialogModes.None}">
+                        <DataTrigger Binding="{Binding DialogMode}" Value="{x:Static sc:DialogModes.None}">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -42,11 +44,11 @@
 
         <ContentControl
             Content="{Binding}"
-            ContentTemplate="{Binding Data.DialogMode, Converter={StaticResource DialogSelector}}" />
+            ContentTemplate="{Binding DialogMode, Converter={StaticResource DialogSelector}}" />
 
         <TextBlock
             Grid.Row="1"
-            Text="{Binding Data.Hint}"
+            Text="{Binding Hint}"
             FontSize="17"
             Foreground="{StaticResource MainColor}"
             TextAlignment="Center"

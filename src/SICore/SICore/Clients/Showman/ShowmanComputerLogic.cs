@@ -17,13 +17,13 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
         _data = data;
     }
 
-    private async void ScheduleExecution(ShowmanTasks task, double taskTime)
+    private async void ScheduleExecution(ShowmanTasks task, double taskTime, object? arg = null)
     {
         await Task.Delay((int)taskTime * 100);
 
         try
         {
-            ExecuteTask(task);
+            ExecuteTask(task, arg);
         }
         catch (Exception exc)
         {
@@ -31,7 +31,7 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
         }
     }
 
-    private void ExecuteTask(ShowmanTasks task)
+    private void ExecuteTask(ShowmanTasks task, object? arg)
     {
         switch (task)
         {
@@ -52,7 +52,7 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
                 break;
 
             case ShowmanTasks.AnswerRight:
-                AnswerRight();
+                AnswerRight((string?)arg);
                 break;
 
             case ShowmanTasks.AnswerNextToDelete:
@@ -86,9 +86,9 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
 
     private void OnSelectPlayer() => SelectPlayer(Messages.SelectPlayer);
 
-    private void AnswerRight()
+    private void AnswerRight(string? answer)
     {
-        var isRight = AnswerChecker.IsAnswerRight(_data.PersonDataExtensions.Answer, _data.PersonDataExtensions.Right);
+        var isRight = AnswerChecker.IsAnswerRight(answer ?? "", _data.PersonDataExtensions.Right);
         _viewerActions.SendMessage(Messages.IsRight, isRight ? "+" : "-");
     }
 
@@ -98,7 +98,7 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
 
     public void FirstStake() => ScheduleExecution(ShowmanTasks.AnswerNextStake, 10 + Random.Shared.Next(10));
 
-    public void IsRight() => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Random.Shared.Next(10));
+    public void IsRight(string answer) => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Random.Shared.Next(10));
 
     public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + Random.Shared.Next(10));
 

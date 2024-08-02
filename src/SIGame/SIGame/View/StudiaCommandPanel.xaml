@@ -427,7 +427,7 @@
                 Width="70"
                 BorderBrush="{StaticResource MainColor}"
                 ToolTip="{x:Static lp:Resources.Manage_Hint}"
-                Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
+                Visibility="{Binding IsShowman, Converter={StaticResource BooleanToVisibilityConverter1}}">
                 <local:DropDownButton.Resources>
                     <ControlTemplate x:Key="ItemTemplate" TargetType="{x:Type MenuItem}">
                         <Border x:Name="Border" BorderThickness="1" Padding="30,10">
@@ -574,7 +574,7 @@
             <Button
                 Width="70"
                 Cursor="Hand"
-                Command="{Binding Data.ShowmanDataExtensions.ChangeActivePlayer}"
+                Command="{Binding ChangeActivePlayer}"
                 ToolTip="{x:Static lp:Resources.ChangeActivePlayer_Hint}">
                 <Image Source="/SIGame;component/Resources/active_player.png" RenderOptions.BitmapScalingMode="Fant" Height="24" />
             </Button>
@@ -582,7 +582,7 @@
             <Button
                 Width="70"
                 Cursor="Hand"
-                Command="{Binding Data.ShowmanDataExtensions.ChangeSums}"
+                Command="{Binding ChangeSums}"
                 FontSize="20"
                 ToolTip="{x:Static lp:Resources.Sums_Hint}">
                 <Image Source="/SIGame;component/Resources/sums.png" RenderOptions.BitmapScalingMode="Fant" Height="24" />

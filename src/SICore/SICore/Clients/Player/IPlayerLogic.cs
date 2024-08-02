@@ -16,9 +16,9 @@ public interface IPlayerLogic : IPersonLogic
     void Answer();
 
     /// <summary>
-    /// Проверка правильности ответа
+    /// Validates other player's ansswer.
     /// </summary>
-    void IsRight(bool voteForRight);
+    void IsRight(bool voteForRight, string answer);
 
     void Report();
 

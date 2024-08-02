@@ -14,6 +14,8 @@ public interface IViewerClient : IActor
     /// </summary>
     bool IsHost { get; }
 
+    GameRole Role { get; }
+
     ViewerData MyData { get; }
 
     IViewerLogic MyLogic { get; }

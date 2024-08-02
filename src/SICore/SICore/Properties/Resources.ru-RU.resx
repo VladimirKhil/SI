@@ -465,9 +465,6 @@
   <data name="YouCanKeepCat" xml:space="preserve">
     <value>Этот вопрос можно оставить себе</value>
   </data>
-  <data name="HintChangeSum" xml:space="preserve">
-    <value>Измените сумму</value>
-  </data>
   <data name="HintCheckAnswer" xml:space="preserve">
     <value>Определите правильность ответа игрока</value>
   </data>
@@ -485,9 +482,6 @@
   </data>
   <data name="HintSelectCatPlayerForPlayer" xml:space="preserve">
     <value>Выберите игрока, которому игрок отдаёт вопрос</value>
-  </data>
-  <data name="HintSelectPlayerForSumChange" xml:space="preserve">
-    <value>Выберите игрока для изменения суммы</value>
   </data>
   <data name="HintSelectQuestion" xml:space="preserve">
     <value>Выберите вопрос на табло</value>
@@ -809,9 +803,6 @@
   </data>
   <data name="TypeAllowEveryoneToPlayStakes" xml:space="preserve">
     <value>вопрос с закрытыми ставками играют все</value>
-  </data>
-  <data name="HintSelectActivePlayer" xml:space="preserve">
-    <value>Выберите, кому передать ход</value>
   </data>
   <data name="JoinModeSwitchedToAny" xml:space="preserve">
     <value>{0} разрешил(а) входить под любой ролью</value>

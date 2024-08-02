@@ -14,43 +14,6 @@ namespace SICore;
 /// </summary>
 public sealed class ViewerData : Data
 {
-    private string? _serverAddress = null;
-
-    public string? ServerAddress
-    {
-        get => _serverAddress;
-        set
-        {
-            if (_serverAddress != value)
-            {
-                _serverAddress = value;
-                OnPropertyChanged();
-
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    if (Uri.TryCreate(value, UriKind.Absolute, out var hostUri))
-                    {
-                        ServerHostUri = "http://" + hostUri.Host;
-                    }
-                }
-            }
-        }
-    }
-
-    public string ServerHostUri { get; private set; } = "";
-
-    public string ServerPublicUrl { get; set; }
-
-    public string[] ContentPublicUrls { get; set; }
-
-    private DialogModes _dialogMode = DialogModes.None;
-
-    public DialogModes DialogMode
-    {
-        get => _dialogMode;
-        set { _dialogMode = value; OnPropertyChanged(); }
-    }
-
     private CustomCommand _atomViewed;
 
     public CustomCommand AtomViewed
@@ -65,8 +28,6 @@ public sealed class ViewerData : Data
             }
         }
     }
-
-    public string? ProtocolPath { get; set; }
 
     private CustomCommand _kick;
 
@@ -159,38 +120,6 @@ public sealed class ViewerData : Data
         }
     }
 
-    private CustomCommand _deleteTable;
-
-    public CustomCommand DeleteTable
-    {
-        get => _deleteTable;
-        set
-        {
-            if (_deleteTable != value)
-            {
-                _deleteTable = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private string _studia;
-
-    public string Studia
-    {
-        get => _studia;
-        set
-        {
-            _studia = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// Файл протокола (логов)
-    /// </summary>
-    public StreamWriter? ProtocolWriter;
-
     public PersonAccount? Speaker { get; set; }
 
     private string _printedText = "";
@@ -208,14 +137,6 @@ public sealed class ViewerData : Data
                 SendMessageCommand.CanBeExecuted = value.Length > 0;
             }
         }
-    }
-
-    private string _hint = "";
-
-    public string Hint
-    {
-        get => _hint;
-        set { _hint = value; OnPropertyChanged(); }
     }
 
     private string _stageName = "";
@@ -286,17 +207,6 @@ public sealed class ViewerData : Data
                 OnPropertyChanged();
             }
         }
-    }
-
-    private bool _iReady = false;
-
-    /// <summary>
-    /// Готов ли участник к игре
-    /// </summary>
-    public bool IReady
-    {
-        get => _iReady;
-        set { _iReady = value; OnPropertyChanged(); }
     }
 
     public string Sound { set => Host.PlaySound(value); }

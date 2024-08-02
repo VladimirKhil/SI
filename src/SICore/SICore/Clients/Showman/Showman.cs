@@ -3,7 +3,6 @@ using SICore.Models;
 using SICore.Network.Clients;
 using SIData;
 using Utils.Commands;
-using R = SICore.Properties.Resources;
 
 namespace SICore;
 
@@ -13,6 +12,8 @@ namespace SICore;
 public sealed class Showman : Viewer
 {
     private readonly object _readyLock = new();
+
+    public override GameRole Role => GameRole.Showman;
 
     public Showman(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
@@ -29,47 +30,6 @@ public sealed class Showman : Viewer
             ClearSelections();
         });
 
-        ClientData.ShowmanDataExtensions.ChangeSums = new CustomCommand(arg =>
-        {
-            for (int i = 0; i < ClientData.Players.Count; i++)
-            {
-                ClientData.Players[i].CanBeSelected = true;
-                int num = i;
-
-                ClientData.Players[i].SelectionCallback = player =>
-                {
-                    ClientData.ShowmanDataExtensions.SelectedPlayer = new Pair { First = num + 1, Second = player.Sum };
-                    ClientData.DialogMode = DialogModes.ChangeSum;
-
-                    for (int j = 0; j < ClientData.Players.Count; j++)
-                    {
-                        ClientData.Players[j].CanBeSelected = false;
-                    }
-
-                    ClientData.Hint = LO[nameof(R.HintChangeSum)];
-                };
-            }
-
-            ClientData.Hint = LO[nameof(R.HintSelectPlayerForSumChange)];
-        });
-
-        ClientData.ShowmanDataExtensions.ChangeActivePlayer = new CustomCommand(arg =>
-        {
-            for (int i = 0; i < ClientData.Players.Count; i++)
-            {
-                ClientData.Players[i].CanBeSelected = true;
-                int num = i;
-
-                ClientData.Players[i].SelectionCallback = player =>
-                {
-                    _viewerActions.SendMessageWithArgs(Messages.SetChooser, num);
-                    ClearSelections();
-                };
-            }
-
-            ClientData.Hint = LO[nameof(R.HintSelectActivePlayer)];
-        });
-
         ClientData.ShowmanDataExtensions.ChangeSums2 = new CustomCommand(arg =>
         {
             _viewerActions.SendMessageWithArgs(
@@ -80,7 +40,6 @@ public sealed class Showman : Viewer
             ClearSelections();
         });
 
-        ClientData.ShowmanDataExtensions.Manage = new CustomCommand(Manage_Executed);
         ClientData.ShowmanDataExtensions.ManageTable = new CustomCommand(ManageTable_Executed) { CanBeExecuted = ClientData.TInfo.Pause };
 
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
@@ -143,11 +102,6 @@ public sealed class Showman : Viewer
         {
             ClientData.Host.AreAnswersShown = ClientData.PersonDataExtensions.AreAnswersShown;
         }
-    }
-
-    private void Manage_Executed(object? arg)
-    {
-        ClientData.DialogMode = DialogModes.Manage;
     }
 
     private void ManageTable_Executed(object? arg) => _logic.ShowmanLogic.ManageTable();
@@ -227,8 +181,6 @@ public sealed class Showman : Viewer
                             ClientData.Speaker.Replic = "";
                         }
 
-                        ClientData.Hint = LO[nameof(R.HintSelectStarter)];
-
                         _logic.ShowmanLogic.StarterChoose();
                         break;
 
@@ -247,8 +199,6 @@ public sealed class Showman : Viewer
 
                         if (ClientData.Speaker != null)
                             ClientData.Speaker.Replic = "";
-
-                        ClientData.Hint = LO[nameof(R.HintSelectStaker)];
 
                         _logic.ShowmanLogic.FirstStake();
                         break;
@@ -276,8 +226,6 @@ public sealed class Showman : Viewer
                             ClientData.Speaker.Replic = "";
                         }
 
-                        ClientData.Hint = LO[nameof(R.HintThemeDeleter)];
-
                         _logic.ShowmanLogic.FirstDelete();
                         break;
 
@@ -285,13 +233,16 @@ public sealed class Showman : Viewer
                     }
                 case Messages.Hint:
                     {
-                        ClientData.Hint = $"{LO[nameof(R.RightAnswer)].ToUpperInvariant()} : {mparams[1]}";
+                        if (mparams.Length < 2)
+                        {
+                            break;
+                        }
+
+                        _logic.ShowmanLogic.OnHint(mparams[1]);
                         break;
                     }
                 case Messages.Stage:
                     {
-                        ClientData.Hint = "";
-
                         for (int i = 0; i < ClientData.Players.Count; i++)
                         {
                             ClientData.Players[i].CanBeSelected = false;
@@ -306,12 +257,10 @@ public sealed class Showman : Viewer
                     if (mparams[1] == "1")
                     {
                         _logic.ShowmanLogic.ChooseQuest();
-                        ClientData.Hint = LO[nameof(R.HintSelectQuestion)];
                     }
                     else
                     {
                         _logic.ShowmanLogic.ChooseFinalTheme();
-                        ClientData.Hint = LO[nameof(R.HintSelectTheme)];
                     }
 
                     #endregion
@@ -324,8 +273,6 @@ public sealed class Showman : Viewer
                         int num = i;
                         ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Cat, num); ClearSelections(); };
                     }
-
-                    ClientData.Hint = LO[nameof(R.HintSelectCatPlayerForPlayer)];
 
                     _logic.ShowmanLogic.Cat();
                     break;
@@ -436,7 +383,6 @@ public sealed class Showman : Viewer
     private void OnValidation2(string[] mparams)
     {
         ClientData.PersonDataExtensions.ValidatorName = mparams[1];
-        ClientData.PersonDataExtensions.Answer = mparams[2];
         _ = int.TryParse(mparams[5], out var rightAnswersCount);
         rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 6);
 
@@ -458,11 +404,9 @@ public sealed class Showman : Viewer
         ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
         ClientData.PersonDataExtensions.ShowExtraRightButtons = mparams[4] == "+";
 
-        ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
-        ClientData.DialogMode = DialogModes.AnswerValidation;
         ((PersonAccount)ClientData.Me).IsDeciding = false;
 
-        _logic.ShowmanLogic.IsRight();
+        _logic.ShowmanLogic.IsRight(mparams[2]);
     }
 
     private void ClearSelections(bool full = false) => _logic.ClearSelections(full);

@@ -727,15 +727,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Change the sum.
-        /// </summary>
-        public static string HintChangeSum {
-            get {
-                return ResourceManager.GetString("HintChangeSum", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Define if the answer is correct.
         /// </summary>
         public static string HintCheckAnswer {
@@ -772,15 +763,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Select new active player.
-        /// </summary>
-        public static string HintSelectActivePlayer {
-            get {
-                return ResourceManager.GetString("HintSelectActivePlayer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Select a player to give the question to.
         /// </summary>
         public static string HintSelectCatPlayer {
@@ -795,15 +777,6 @@ namespace SICore.Properties {
         public static string HintSelectCatPlayerForPlayer {
             get {
                 return ResourceManager.GetString("HintSelectCatPlayerForPlayer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Select a player to change his score.
-        /// </summary>
-        public static string HintSelectPlayerForSumChange {
-            get {
-                return ResourceManager.GetString("HintSelectPlayerForSumChange", resourceCulture);
             }
         }
         

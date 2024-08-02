@@ -315,9 +315,6 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         var data = new ViewerData(BackLink.Default)
         {
-            ServerPublicUrl = ContentPublicBaseUrls?.FirstOrDefault(),
-            ContentPublicUrls = ContentPublicBaseUrls,
-            ServerAddress = ServerAddress,
             IsNetworkGame = true
         };
 
@@ -330,7 +327,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         var localizer = new Localizer(Thread.CurrentThread.CurrentUICulture.Name);
         var actions = new ViewerActions(_client, localizer);
-        var logic = new ViewerHumanLogic(gameViewModel, data, actions, localizer);
+        var logic = new ViewerHumanLogic(gameViewModel, data, actions, localizer, ServerAddress, ContentPublicBaseUrls?.FirstOrDefault(), ContentPublicBaseUrls);
 
         try
         {

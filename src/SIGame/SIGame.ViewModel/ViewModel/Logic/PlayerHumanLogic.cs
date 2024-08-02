@@ -1,4 +1,5 @@
-﻿using SIData;
+﻿using SICore.BusinessLogic;
+using SIGame.ViewModel;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using System.Diagnostics;
@@ -18,14 +19,21 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
+    private readonly GameViewModel _gameViewModel;
+    private readonly ILocalizer _localizer;
+
     public PlayerHumanLogic(
         ViewerData data,
         TableInfoViewModel tableInfoViewModel,
-        ViewerActions viewerActions)
+        ViewerActions viewerActions,
+        GameViewModel gameViewModel,
+        ILocalizer localizer)
     {
         _viewerActions = viewerActions;
         _data = data;
         TInfo = tableInfoViewModel;
+        _gameViewModel = gameViewModel;
+        _localizer = localizer;
 
         TInfo.SelectQuestion.CanBeExecuted = false;
         TInfo.SelectTheme.CanBeExecuted = false;
@@ -40,6 +48,7 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
             _data.ThemeIndex = _data.QuestionIndex = -1;
         }
 
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectQuestion)];
         TInfo.Selectable = true;
         TInfo.SelectQuestion.CanBeExecuted = true;
         _data.Host.OnFlash();
@@ -60,11 +69,12 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 
     public void Answer()
     {
+        _gameViewModel.Answer = "";
         _data.Host.OnFlash();
 
         if (TInfo.LayoutMode == LayoutMode.Simple)
         {
-            _data.DialogMode = DialogModes.Answer;
+            _gameViewModel.DialogMode = DialogModes.Answer;
             ((PlayerAccount)_data.Me).IsDeciding = false;
 
             StartSendingVersion(_cancellationTokenSource.Token);
@@ -83,18 +93,18 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
     {
         try
         {
-            var version = _data.PersonDataExtensions.Answer;
+            var version = _gameViewModel.Answer;
 
             do
             {
                 await Task.Delay(3000, cancellationToken);
 
-                if (_data.PersonDataExtensions.Answer != version)
+                if (_gameViewModel.Answer != version)
                 {
-                    _data.PlayerDataExtensions.SendAnswerVersion.Execute(null);
-                    version = _data.PersonDataExtensions.Answer;
+                    _gameViewModel.SendAnswerVersion.Execute(null);
+                    version = _gameViewModel.Answer;
                 }
-            } while (_data.DialogMode == DialogModes.Answer && !cancellationToken.IsCancellationRequested);
+            } while (_gameViewModel.DialogMode == DialogModes.Answer && !cancellationToken.IsCancellationRequested);
         }
         catch
         {
@@ -102,20 +112,24 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
         }
     }
 
-    public void Cat() => _data.Host.OnFlash();
+    public void Cat()
+    {
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectCatPlayer)];
+        _data.Host.OnFlash();
+    }
 
     public void Stake()
     {
-        _data.DialogMode = DialogModes.Stake;
-        _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
+        _gameViewModel.DialogMode = DialogModes.Stake;
+        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         ((PlayerAccount)_data.Me).IsDeciding = false;
         _data.Host.OnFlash();
     }
 
     public void StakeNew()
     {
-        _data.DialogMode = DialogModes.StakeNew;
-        _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
+        _gameViewModel.DialogMode = DialogModes.StakeNew;
+        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         ((PlayerAccount)_data.Me).IsDeciding = false;
         _data.Host.OnFlash();
     }
@@ -126,26 +140,32 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 
         TInfo.Selectable = true;
         TInfo.SelectTheme.CanBeExecuted = true;
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectTheme)];
 
         _data.Host.OnFlash();
     }
 
     public void FinalStake()
     {
+        _gameViewModel.Hint = _localizer[nameof(R.HintMakeAStake)];
+        _gameViewModel.DialogMode = DialogModes.FinalStake;
         _data.Host.OnFlash();
     }
 
     public void CatCost()
     {
-        _data.Hint = _viewerActions.LO[nameof(R.HintChooseCatPrice)];
-        _data.DialogMode = DialogModes.CatCost;
+        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintChooseCatPrice)];
+        _gameViewModel.DialogMode = DialogModes.CatCost;
         ((PlayerAccount)_data.Me).IsDeciding = false;
 
         _data.Host.OnFlash();
     }
 
-    public void IsRight(bool voteForRight)
+    public void IsRight(bool voteForRight, string answer)
     {
+        _gameViewModel.Hint = _localizer[nameof(R.HintCheckAnswer)];
+        _gameViewModel.DialogMode = DialogModes.AnswerValidation;
+        _gameViewModel.Answer = answer;
         _data.Host.OnFlash();
     }
 
@@ -153,6 +173,7 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 
     public void Report()
     {
+        _gameViewModel.DialogMode = DialogModes.Report;
         _data.Host.OnFlash();
     }
 

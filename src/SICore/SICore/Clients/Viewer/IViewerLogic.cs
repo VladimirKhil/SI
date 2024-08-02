@@ -212,4 +212,6 @@ public interface IViewerLogic : ILogic
     void OnToggle(int themeIndex, int questionIndex, int price) { }
 
     void OnStopPlay() { }
+
+    void OnSelectPlayer(SelectPlayerReason reason) { }
 }

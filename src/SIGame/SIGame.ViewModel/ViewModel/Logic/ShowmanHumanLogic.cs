@@ -1,4 +1,5 @@
 ﻿using SICore.BusinessLogic;
+using SIGame.ViewModel;
 using SIUI.ViewModel;
 using R = SICore.Properties.Resources;
 
@@ -14,14 +15,22 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
     public TableInfoViewModel TInfo { get; }
 
+
+    private readonly GameViewModel _gameViewModel;
+    private readonly ILocalizer _localizer;
+
     public ShowmanHumanLogic(
         ViewerData data,
         TableInfoViewModel tableInfoViewModel,
-        ViewerActions viewerActions)
+        ViewerActions viewerActions,
+        GameViewModel gameViewModel,
+        ILocalizer localizer)
     {
         _viewerActions = viewerActions;
         _data = data;
         TInfo = tableInfoViewModel;
+        _gameViewModel = gameViewModel;
+        _localizer = localizer;
 
         TInfo.QuestionToggled += TInfo_QuestionToggled;
 
@@ -29,13 +38,31 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
         TInfo.SelectTheme.CanBeExecuted = false;
     }
 
-    public void StarterChoose() => _data.Host.OnFlash();
+    public void StarterChoose()
+    {
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectStarter)];
+        _data.Host.OnFlash();
+    }
 
-    public void FirstStake() => _data.Host.OnFlash();
+    public void FirstStake()
+    {
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectStaker)];
+        _data.Host.OnFlash();
+    }
 
-    public void IsRight() => _data.Host.OnFlash();
+    public void IsRight(string answer)
+    {
+        _gameViewModel.Hint = _localizer[nameof(R.HintCheckAnswer)];
+        _gameViewModel.DialogMode = DialogModes.AnswerValidation;
+        _gameViewModel.Answer = answer;
+        _data.Host.OnFlash();
+    }
 
-    public void FirstDelete() => _data.Host.OnFlash();
+    public void FirstDelete()
+    {
+        _gameViewModel.Hint = _localizer[nameof(R.HintThemeDeleter)];
+        _data.Host.OnFlash();
+    }
 
     public void OnInitialized()
     {
@@ -49,17 +76,22 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
             _data.ThemeIndex = _data.QuestionIndex = -1;
         }
 
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectQuestion)];
         TInfo.Selectable = true;
         TInfo.SelectQuestion.CanBeExecuted = true;
         _data.Host.OnFlash();
     }
 
-    public void Cat() => _data.Host.OnFlash();
+    public void Cat()
+    {
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectCatPlayerForPlayer)];
+        _data.Host.OnFlash();
+    }
 
     public void Stake()
     {
-        _data.DialogMode = DialogModes.Stake;
-        _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
+        _gameViewModel.DialogMode = DialogModes.Stake;
+        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         _data.Host.OnFlash();
 
         foreach (var player in _data.Players)
@@ -70,8 +102,8 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
     public void StakeNew()
     {
-        _data.DialogMode = DialogModes.StakeNew;
-        _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
+        _gameViewModel.DialogMode = DialogModes.StakeNew;
+        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         _data.Host.OnFlash();
 
         foreach (var player in _data.Players)
@@ -86,6 +118,7 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
         TInfo.Selectable = true;
         TInfo.SelectTheme.CanBeExecuted = true;
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectTheme)];
 
         _data.Host.OnFlash();
     }
@@ -97,8 +130,8 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
     public void CatCost()
     {
-        _data.Hint = _viewerActions.LO[nameof(R.HintChooseCatPrice)];
-        _data.DialogMode = DialogModes.CatCost;
+        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintChooseCatPrice)];
+        _gameViewModel.DialogMode = DialogModes.CatCost;
 
         foreach (var player in _data.Players)
         {
@@ -143,4 +176,6 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
             TInfo.SelectAnswer.CanBeExecuted = true;
         }
     }
+
+    public void OnHint(string hint) => _gameViewModel.Hint = $"{_localizer[nameof(R.RightAnswer)].ToUpperInvariant()} : {hint}";
 }

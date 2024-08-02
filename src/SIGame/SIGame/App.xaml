@@ -1272,7 +1272,7 @@
                 <localc:ViewConverter.Views>
                     <DataTemplate x:Key="{x:Static sc:DialogModes.AnswerValidation}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.AnswerCheck}">
-                            <l:AnswerValidationView DataContext="{Binding Data.PersonDataExtensions}" />
+                            <l:AnswerValidationView />
                         </ContentControl>
                     </DataTemplate>
 
@@ -1284,7 +1284,7 @@
 
                     <DataTemplate x:Key="{x:Static sc:DialogModes.Answer}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.YourAnswer}">
-                            <l:AnswerView DataContext="{Binding Data}" />
+                            <l:AnswerView />
                         </ContentControl>
                     </DataTemplate>
 

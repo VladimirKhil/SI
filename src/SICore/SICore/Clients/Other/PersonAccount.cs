@@ -138,7 +138,7 @@ public class PersonAccount : ViewerAccount
 
     public bool IsDeciding
     {
-        get { return _isDeciding; }
+        get => _isDeciding;
         set
         {
             if (_isDeciding != value)
@@ -148,7 +148,7 @@ public class PersonAccount : ViewerAccount
             }
         }
     }
-    
+
     public PersonAccount(string name, bool isMale, bool connected, bool gameStarted)
         : base(name, isMale, connected)
     {

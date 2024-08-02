@@ -71,11 +71,22 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     private readonly GameViewModel _gameViewModel;
 
+    private readonly string _serverHostUri = "";
+    private readonly string? _serverAddress;
+    private readonly string? _serverPublicUrl;
+    private readonly string[]? _contentPublicUrls;
+
+    public string? _protocolPath = null;
+    private StreamWriter? _protocolWriter = null;
+
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
         ViewerData data,
         ViewerActions viewerActions,
-        ILocalizer localizer)
+        ILocalizer localizer,
+        string serverAddress,
+        string? serverPublicUrl = null,
+        string[]? contentPublicUrls = null)
         : base(data)
     {
         _gameViewModel = gameViewModel;
@@ -95,13 +106,25 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.ThemeSelected += TInfo_ThemeSelected;
         TInfo.AnswerSelected += TInfo_AnswerSelected;
 
-        PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions);
-        ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions);
+        PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, gameViewModel, localizer);
+        ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, gameViewModel, localizer);
 
         _localFileManager.Error += LocalFileManager_Error;
 
         _timer.KeepFinalValue = true;
         _timer.TimeChanged += Timer_TimeChanged;
+        _serverAddress = serverAddress;
+        _serverPublicUrl = serverPublicUrl ?? serverAddress;
+
+        if (!string.IsNullOrWhiteSpace(serverAddress))
+        {
+            if (Uri.TryCreate(serverAddress, UriKind.Absolute, out var hostUri))
+            {
+                _serverHostUri = "http://" + hostUri.Host;
+            }
+        }
+
+        _contentPublicUrls = contentPublicUrls;
     }
 
     private async void GameViewModel_Disposed() => await DisposeAsync();
@@ -160,8 +183,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             TInfo.SelectAnswer.CanBeExecuted = false;
         }
 
-        _data.Hint = "";
-        _data.DialogMode = DialogModes.None;
+        _gameViewModel.Hint = "";
+        _gameViewModel.DialogMode = DialogModes.None;
 
         for (int i = 0; i < _data.Players.Count; i++)
         {
@@ -171,9 +194,23 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _data.Host.OnFlash(false);
     }
 
+    public void OnSelectPlayer(Models.SelectPlayerReason reason)
+    {
+        _gameViewModel.Hint = _localizer[GetSelectHint(reason)];
+    }
+
+    private static string GetSelectHint(Models.SelectPlayerReason selectionMode) => selectionMode switch
+    {
+        Models.SelectPlayerReason.Answerer => nameof(R.HintSelectCatPlayer),
+        Models.SelectPlayerReason.Chooser => nameof(R.HintSelectStarter),
+        Models.SelectPlayerReason.Deleter => nameof(R.HintThemeDeleter),
+        Models.SelectPlayerReason.Staker => nameof(R.HintSelectStaker),
+        _ => string.Empty,
+    };
+
     private void TInfo_AnswerSelected(ItemViewModel item)
     {
-        _data.PersonDataExtensions.SendAnswer.Execute(item.Label);
+        _gameViewModel.SendAnswer.Execute(item.Label);
         ClearSelections(true);
     }
 
@@ -377,16 +414,16 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     internal void AddToFileLog(string text)
     {
-        if (_data.ProtocolWriter == null)
+        if (_protocolWriter == null)
         {
-            if (_data.ProtocolPath != null)
+            if (_protocolPath != null)
             {
                 try
                 {
                     var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out var path);
-                    _data.ProtocolPath = path;
-                    _data.ProtocolWriter = new StreamWriter(stream);
-                    _data.ProtocolWriter.Write(text);
+                    _protocolPath = path;
+                    _protocolWriter = new StreamWriter(stream);
+                    _protocolWriter.Write(text);
                 }
                 catch (IOException)
                 {
@@ -397,22 +434,23 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         {
             try
             {
-                _data.ProtocolWriter.Write(text);
+                _protocolWriter.Write(text);
             }
             catch (IOException exc)
             {
                 _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                
                 try
                 {
-                    _data.ProtocolWriter.Dispose();
+                    _protocolWriter.Dispose();
                 }
                 catch
                 {
-                    // Из-за недостатка места на диске плохо закрывается
+                    // Can be problems when there is not enough space on disk
                 }
 
-                _data.ProtocolPath = null;
-                _data.ProtocolWriter = null;
+                _protocolPath = null;
+                _protocolWriter = null;
             }
             catch (EncoderFallbackException exc)
             {
@@ -493,16 +531,16 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             case GameStage.Begin:
                 TInfo.TStage = TableStage.Sign;
 
-                if (_data.Host.MakeLogs && _data.ProtocolWriter == null)
+                if (_data.Host.MakeLogs && _protocolWriter == null)
                 {
                     try
                     {
                         var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out string path);
-                        _data.ProtocolPath = path;
-                        _data.ProtocolWriter = new StreamWriter(stream);
-                        _data.ProtocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title>");
-                        _data.ProtocolWriter.Write("<style>.sr { font-weight:bold; color: #00FFFF; } .n0 { color: #EF21A9; } .n1 { color: #0BE6CF; } .n2 { color: #EF9F21; } .n3 { color: #FF0000; } .n4 { color: #00FF00; } .n5 { color: #0000FF; } .sp, .sl { font-style: italic; font-weight: bold; } .sh { color: #0AEA2A; font-weight: bold; } .l { color: #646464; font-weight: bold; } .r { font-weight: bold; } .s { font-style: italic; } </style>");
-                        _data.ProtocolWriter.Write("</head><body>");
+                        _protocolPath = path;
+                        _protocolWriter = new StreamWriter(stream);
+                        _protocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title>");
+                        _protocolWriter.Write("<style>.sr { font-weight:bold; color: #00FFFF; } .n0 { color: #EF21A9; } .n1 { color: #0BE6CF; } .n2 { color: #EF9F21; } .n3 { color: #FF0000; } .n4 { color: #00FF00; } .n5 { color: #0000FF; } .sp, .sl { font-style: italic; font-weight: bold; } .sh { color: #0AEA2A; font-weight: bold; } .l { color: #646464; font-weight: bold; } .r { font-weight: bold; } .s { font-style: italic; } </style>");
+                        _protocolWriter.Write("</head><body>");
                     }
                     catch (IOException)
                     {
@@ -543,20 +581,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 break;
 
             case GameStage.After:
-                if (_data.ProtocolWriter != null)
-                {
-                    _data.ProtocolWriter.Write("</body></html>");
-                }
-                else
-                {
-                    _data.OnAddString(null, _localizer[nameof(R.ErrorWritingLogs)], LogMode.Chat);
-                }
+                _protocolWriter?.Write("</body></html>");
                 break;
 
             default:
                 break;
         }
 
+        _gameViewModel.Hint = "";
     }
 
     public void GameThemes()
@@ -842,12 +874,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         if (contentValue.StartsWith(Constants.GameHostUri))
         {
-            return string.Concat(ClientData.ServerHostUri, contentValue.AsSpan(Constants.GameHostUri.Length));
+            return string.Concat(_serverHostUri, contentValue.AsSpan(Constants.GameHostUri.Length));
         }
 
         if (contentValue.StartsWith(Constants.ServerHost))
         {
-            return string.Concat(ClientData.ServerPublicUrl ?? ClientData.ServerAddress, contentValue.AsSpan(Constants.ServerHost.Length));
+            return string.Concat(_serverPublicUrl, contentValue.AsSpan(Constants.ServerHost.Length));
         }
 
         return contentValue;
@@ -1153,11 +1185,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                         if (uri.Contains(Constants.GameHost))
                         {
-                            var address = ClientData.ServerAddress;
-
-                            if (!string.IsNullOrWhiteSpace(address))
+                            if (!string.IsNullOrWhiteSpace(_serverAddress))
                             {
-                                if (Uri.TryCreate(address, UriKind.Absolute, out var hostUri))
+                                if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
                                 {
                                     uri = uri.Replace(Constants.GameHost, hostUri.Host);
                                 }
@@ -1165,7 +1195,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                         }
                         else if (uri.Contains(Constants.ServerHost))
                         {
-                            uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
+                            uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
                         }
                         else if (_data.AtomType != AtomTypes.Html
                             && !uri.StartsWith("http://localhost")
@@ -1257,8 +1287,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
-    private bool ExternalUrlOk(string uri) =>
-        ClientData.ContentPublicUrls != null && ClientData.ContentPublicUrls.Any(publicUrl => uri.StartsWith(publicUrl));
+    private bool ExternalUrlOk(string uri) => _contentPublicUrls != null && _contentPublicUrls.Any(publicUrl => uri.StartsWith(publicUrl));
 
     public void OnBackgroundContent(string[] mparams)
     {
@@ -1283,11 +1312,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                         if (uri.Contains(Constants.GameHost))
                         {
-                            var address = ClientData.ServerAddress;
-
-                            if (!string.IsNullOrWhiteSpace(address))
+                            if (!string.IsNullOrWhiteSpace(_serverAddress))
                             {
-                                if (Uri.TryCreate(address, UriKind.Absolute, out var hostUri))
+                                if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
                                 {
                                     uri = uri.Replace(Constants.GameHost, hostUri.Host);
                                 }
@@ -1295,7 +1322,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                         }
                         else if (uri.Contains(Constants.ServerHost))
                         {
-                            uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
+                            uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
                         }
                         else if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
                         {
@@ -1638,11 +1665,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         _timer.Dispose();
 
-        if (_data.ProtocolWriter != null)
-        {
-            _data.ProtocolWriter.Dispose();
-            _data.ProtocolWriter = null;
-        }
+        _protocolWriter?.Dispose();
 
         await _localFileManager.DisposeAsync();
     }
@@ -1653,26 +1676,23 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     {
         if (path.Contains(Constants.GameHost))
         {
-            if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
+            if (!string.IsNullOrWhiteSpace(_serverAddress))
             {
-                var remoteUri = ClientData.ServerAddress;
-
-                if (Uri.TryCreate(remoteUri, UriKind.Absolute, out var hostUri))
+                if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
                 {
                     account.Picture = path.Replace(Constants.GameHost, hostUri.Host);
                 }
                 else
                 {
-                    // Блок для отлавливания специфической ошибки
-                    _data.Host.OnPictureError(remoteUri);
+                    _data.Host.OnPictureError(_serverAddress);
                 }
             }
         }
         else if (path.Contains(Constants.ServerHost))
         {
-            if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
+            if (!string.IsNullOrWhiteSpace(_serverAddress))
             {
-                account.Picture = path.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
+                account.Picture = path.Replace(Constants.ServerHost, _serverPublicUrl);
             }
         }
         else
@@ -1709,25 +1729,23 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     {
         if (uri.Contains(Constants.GameHost))
         {
-            if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
+            if (!string.IsNullOrWhiteSpace(_serverAddress))
             {
-                var remoteUri = ClientData.ServerAddress;
-
-                if (Uri.TryCreate(remoteUri, UriKind.Absolute, out var hostUri))
+                if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
                 {
                     return uri.Replace(Constants.GameHost, hostUri.Host);
                 }
                 else
                 {
-                    _data.Host.OnPictureError(remoteUri);
+                    _data.Host.OnPictureError(_serverAddress);
                 }
             }
         }
         else if (uri.Contains(Constants.ServerHost))
         {
-            if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
+            if (!string.IsNullOrWhiteSpace(_serverAddress))
             {
-                return uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
+                return uri.Replace(Constants.ServerHost, _serverPublicUrl);
             }
         }
         else
@@ -1869,9 +1887,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 {
                     if (person != null && int.TryParse(person, out int personIndex))
                     {
-                        if (_data.DialogMode == DialogModes.ChangeSum
-                            || _data.DialogMode == DialogModes.Manage
-                            || _data.DialogMode == DialogModes.None)
+                        if (_gameViewModel.DialogMode == DialogModes.ChangeSum || _gameViewModel.DialogMode == DialogModes.None)
                         {
                             if (personIndex == -1)
                             {
@@ -1919,11 +1935,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         if (uri.Contains(Constants.GameHost))
         {
-            var address = ClientData.ServerAddress;
-
-            if (!string.IsNullOrWhiteSpace(address))
+            if (!string.IsNullOrWhiteSpace(_serverAddress))
             {
-                if (Uri.TryCreate(address, UriKind.Absolute, out var hostUri))
+                if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
                 {
                     uri = uri.Replace(Constants.GameHost, hostUri.Host);
                 }
@@ -1931,7 +1945,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
         else if (uri.Contains(Constants.ServerHost))
         {
-            uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
+            uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
         }
 
         if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out _))
@@ -1962,11 +1976,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
             if (uri.Contains(Constants.GameHost))
             {
-                var address = ClientData.ServerAddress;
-
-                if (!string.IsNullOrWhiteSpace(address))
+                if (!string.IsNullOrWhiteSpace(_serverAddress))
                 {
-                    if (Uri.TryCreate(address, UriKind.Absolute, out var hostUri))
+                    if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
                     {
                         uri = uri.Replace(Constants.GameHost, hostUri.Host);
                     }
@@ -1974,7 +1986,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             }
             else if (uri.Contains(Constants.ServerHost))
             {
-                uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
+                uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
             }
             else if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
             {
