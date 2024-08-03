@@ -98,7 +98,7 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
 
     public void FirstStake() => ScheduleExecution(ShowmanTasks.AnswerNextStake, 10 + Random.Shared.Next(10));
 
-    public void IsRight(string answer) => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Random.Shared.Next(10));
+    public void IsRight(string answer) => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Random.Shared.Next(10), answer);
 
     public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + Random.Shared.Next(10));
 
