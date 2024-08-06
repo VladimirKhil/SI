@@ -49,16 +49,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HyperlinkTheme.xml" />
-    <Content Include="License.rtf" />
+    <Content Include="Resources\HyperlinkTheme.xml" />
     <Content Include="Resources\logo.ico" />
     <Content Include="Resources\logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HyperlinkTheme_ru-ru.wxl" />
+    <None Include="Resources\1049\HyperlinkTheme.wxl" />
+    <EmbeddedResource Include="Resources\HyperlinkTheme.wxl" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources" />
+    <Folder Include="Resources\1049" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

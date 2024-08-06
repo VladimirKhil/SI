@@ -15,10 +15,12 @@
 			
             <bal:WixStandardBootstrapperApplication
 				LicenseUrl=""
-                LocalizationFile="HyperlinkTheme_ru-ru.wxl" 
+                LocalizationFile="Resources\HyperlinkTheme.wxl" 
                 LogoFile="Resources\logo.png"
-                ThemeFile="HyperlinkTheme.xml"
+                ThemeFile="Resources\HyperlinkTheme.xml"
                 SuppressOptionsUI="yes" />
+
+			<Payload Id="thm_ru" Name="1049\thm.wxl" Compressed="yes" SourceFile="Resources\1049\HyperlinkTheme.wxl" />
 			
         </BootstrapperApplicationRef>
       
