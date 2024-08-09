@@ -389,4 +389,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         GameViewModel.LocalInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
         PresentationController.RestoreQuestion(themeIndex, questionIndex, price);
     }
+
+    public void OnQuestionType(string typeName, bool isDefault) => GameViewModel?.PlayQuestionType(typeName, isDefault);
 }

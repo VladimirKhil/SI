@@ -41,9 +41,7 @@ public sealed class QuestionEngine
 
         if (_script == null)
         {
-            var typeName = options.ForceDefaultTypeName || _question.TypeName == QuestionTypes.Default
-                ? options.DefaultTypeName
-                : _question.TypeName;
+            var typeName = _question.TypeName == QuestionTypes.Default ? options.DefaultTypeName : _question.TypeName;
 
             // TODO: do not update package objects; they should be read only
             question.TypeName = typeName;
@@ -54,7 +52,7 @@ public sealed class QuestionEngine
 
     public bool PlayNext()
     {
-        if (_script == null)
+        if (_script == null) // Unsupported question type
         {
             return false;
         }

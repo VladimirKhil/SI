@@ -24,6 +24,11 @@ public enum GameStage
     /// Question to play selection.
     /// </summary>
     SelectingQuestion,
+
+    /// <summary>
+    /// Question type is announced.
+    /// </summary>
+    QuestionType,
     
     /// <summary>
     /// Question is played.

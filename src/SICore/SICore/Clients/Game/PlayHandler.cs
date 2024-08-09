@@ -199,6 +199,12 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public void OnQuestion(Question question) => GameLogic?.OnQuestion(question);
 
+    public void OnQuestionType(string typeName, bool isDefault)
+    {
+        _gameData.QuestionTypeName = typeName;
+        GameLogic?.OnQuestionType(isDefault);
+    }
+
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
     {
         var question = _gameData.TInfo.RoundInfo[themeIndex].Questions[questionIndex];

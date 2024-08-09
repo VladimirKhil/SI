@@ -431,7 +431,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            ScheduleExecution(Tasks.QuestionType, delay, 1, true);
+            ScheduleExecution(Tasks.QuestionStartInfo, delay, 1, true);
         }
     }
 
@@ -681,7 +681,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var appSettings = _data.Settings.AppSettings;
         // TODO: provide this flag to client as part of the CONTENT message
-        var partialImage = appSettings.PartialImages && !appSettings.FalseStart && _data.Question?.TypeName == QuestionTypes.Simple && !_data.IsAnswer;
+        var partialImage = appSettings.PartialImages && !appSettings.FalseStart && !IsSpecialQuestion() && !_data.IsAnswer;
 
         var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
         
@@ -777,7 +777,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void AskDirectAnswer()
     {
-        if (_data.Question?.TypeName == QuestionTypes.StakeAll)
+        if (_data.QuestionTypeName == QuestionTypes.StakeAll)
         {
             _gameActions.SendMessageWithArgs(Messages.FinalThink, _data.Settings.AppSettings.TimeSettings.TimeForFinalThinking);
         }
@@ -1554,7 +1554,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Decision = DecisionType.Pressing;
     }
 
-    private bool IsSpecialQuestion() => _data.Question?.TypeName != QuestionTypes.Simple;
+    internal bool IsSpecialQuestion() => _data.QuestionTypeName != QuestionTypes.Simple;
 
     private bool OnDecisionNextPersonStakeMaking()
     {
@@ -1778,8 +1778,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         OnTheme(_data.Theme, arg, task == Tasks.Theme);
                         break;
 
-                    case Tasks.QuestionType:
-                        OnQuestionType(arg);
+                    case Tasks.QuestionStartInfo:
+                        OnQuestionStartInfo(arg);
                         break;
 
                     case Tasks.AskStake:
@@ -2706,17 +2706,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         OnDecision();
     }
 
-    private void OnQuestionType(int arg)
+    private void OnQuestionStartInfo(int arg)
     {
         var returnDelay = 20;
 
+        if (_data.Question == null)
+        {
+            throw new Exception(string.Format(LO[nameof(R.StrangeError)] + " {0} {1}", _data.Round?.Type, _data.Settings.AppSettings.GameMode));
+        }
+
         if (arg == 1)
         {
-            if (_data.Question == null)
-            {
-                throw new Exception(string.Format(LO[nameof(R.StrangeError)] + " {0} {1}", _data.Round.Type, _data.Settings.AppSettings.GameMode));
-            }
-
             var authors = _data.PackageDoc.GetRealAuthors(_data.Question.Info.Authors);
 
             if (authors.Length > 0)
@@ -2747,31 +2747,29 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
-        if (arg == 3)
+        if (arg >= 2)
         {
-            var typeName = _data.Question?.TypeName;
+            ScheduleExecution(Tasks.MoveNext, returnDelay, arg + 1);
+            return;
+        }
 
-            // Only StakeAll type is supported in final for now
-            // This will be removed when full question type support will be implemented
-            if (HaveMultipleAnswerers())
-            {
-                typeName = QuestionTypes.StakeAll;
-            }
+        ScheduleExecution(Tasks.QuestionStartInfo, returnDelay, arg + 1);
+    }
 
-            var delay = 1;
-
-            switch (typeName)
+    internal void OnQuestionType(bool isDefault)
+    {
+        if (!isDefault) // TODO: This announcement should be handled by the client in the future
+        {
+            switch (_data.QuestionTypeName)
             {
                 case QuestionTypes.Stake:
                     _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
-                    delay = 16;
                     break;
 
                 case QuestionTypes.Secret:
                 case QuestionTypes.SecretPublicPrice:
                 case QuestionTypes.SecretNoQuestion:
                     var replic = new StringBuilder(LO[nameof(R.YouReceiveCat)]);
-
                     var selectionMode = _data.Question?.Parameters?.FirstOrDefault(p => p.Key == QuestionParameterNames.SelectionMode);
 
                     if (selectionMode?.Value?.SimpleValue == StepParameterValues.SetAnswererSelect_Any)
@@ -2780,34 +2778,28 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     }
 
                     _gameActions.ShowmanReplic(replic.ToString());
-                    delay = 10;
                     break;
 
                 case QuestionTypes.NoRisk:
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
-                    delay = 22;
                     break;
 
                 case QuestionTypes.Simple:
+                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeSimple)]);
                     break;
 
                 case QuestionTypes.StakeAll:
-                    delay = 16;
+                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeStakeAll)]);
                     break;
 
                 default:
-                    OnUnsupportedQuestionType(typeName ?? "");
+                    OnUnsupportedQuestionType(_data.QuestionTypeName); // TODO: emit this by Game Engine
                     return;
             }
-
-            var msg = new MessageBuilder(Messages.QType, typeName);
-            _gameActions.SendMessage(msg.ToString());
-
-            ScheduleExecution(Tasks.MoveNext, delay, force: true);
-            return;
         }
 
-        ScheduleExecution(Tasks.QuestionType, returnDelay, arg + 1);
+        _gameActions.SendMessageWithArgs(Messages.QType, _data.QuestionTypeName, isDefault);
+        ScheduleExecution(Tasks.MoveNext, isDefault ? 1 : 22, force: true);
     }
 
     private void OnUnsupportedQuestionType(string typeName)
@@ -3403,7 +3395,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return;
         }
 
-        if (_data.Question?.TypeName == QuestionTypes.Simple)
+        if (!IsSpecialQuestion())
         {
             _gameActions.SendMessageWithArgs(Messages.EndTry, _data.AnswererIndex);
         }
@@ -3412,7 +3404,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessageWithArgs(Messages.StopPlay);
         }
 
-        var waitAnswerTime = _data.Question?.TypeName != QuestionTypes.Simple
+        var waitAnswerTime = IsSpecialQuestion()
             ? timeSettings.TimeForThinkingOnSpecial * 10
             : timeSettings.TimeForPrintingAnswer * 10;
 
@@ -4248,7 +4240,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             if (isFull)
             {
-                ScheduleExecution(Tasks.QuestionType, delay, 1, force: !informed);
+                ScheduleExecution(Tasks.QuestionStartInfo, delay, 1, force: !informed);
             }
             else
             {

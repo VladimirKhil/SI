@@ -106,6 +106,10 @@ public sealed class GameEngine : EngineBase
                 OnSelectingQuestion();
                 break;
 
+            case GameStage.QuestionType:
+                OnQuestionType();
+                break;
+
             case GameStage.Question:
                 OnQuestion();
                 break;
@@ -138,6 +142,13 @@ public sealed class GameEngine : EngineBase
                 Stage = GameStage.None;
                 break;
         }
+    }
+
+    private void OnQuestionType()
+    {
+        var isDefault = ActiveQuestion.TypeName == GameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType;        
+        PlayHandler.OnQuestionType(ActiveQuestion.TypeName, isDefault);
+        Stage = GameStage.Question;
     }
 
     private void OnSelectingQuestion()

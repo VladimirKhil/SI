@@ -21,9 +21,4 @@ public sealed class QuestionEngineOptions
     /// Default type name.
     /// </summary>
     public string DefaultTypeName { get; set; } = QuestionTypes.Simple;
-
-    /// <summary>
-    /// Show all the type names be treated as default.
-    /// </summary>
-    public bool ForceDefaultTypeName { get; set; }
 }

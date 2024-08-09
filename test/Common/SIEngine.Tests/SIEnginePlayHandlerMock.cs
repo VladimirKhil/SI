@@ -38,6 +38,11 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
+    public void OnQuestionType(string typeName, bool isDefault)
+    {
+        
+    }
+
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
     {
         

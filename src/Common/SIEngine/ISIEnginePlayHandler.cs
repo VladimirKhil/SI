@@ -98,6 +98,13 @@ public interface ISIEnginePlayHandler
     void OnQuestion(Question question);
 
     /// <summary>
+    /// Handles question type information.
+    /// </summary>
+    /// <param name="typeName">Question type name.</param>
+    /// <param name="isDefault">Is this is a default type for the current round.</param>
+    void OnQuestionType(string typeName, bool isDefault);
+
+    /// <summary>
     /// Handles question restore on round table.
     /// </summary>
     /// <param name="themeIndex">Question theme index.</param>

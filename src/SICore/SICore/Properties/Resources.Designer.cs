@@ -1492,6 +1492,24 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на You got Question with Button! Press button to answer the question.
+        /// </summary>
+        public static string QuestionTypeSimple {
+            get {
+                return ResourceManager.GetString("QuestionTypeSimple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на You got Question for All with Stake! Everybody makes stake and plays.
+        /// </summary>
+        public static string QuestionTypeStakeAll {
+            get {
+                return ResourceManager.GetString("QuestionTypeStakeAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на A question with a special theme.
         /// </summary>
         public static string QuestionWithSpecialTheme {

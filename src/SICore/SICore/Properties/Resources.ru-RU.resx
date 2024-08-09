@@ -858,4 +858,10 @@
   <data name="RequestedApellation" xml:space="preserve">
     <value>запросил(а) апелляцию</value>
   </data>
+  <data name="QuestionTypeSimple" xml:space="preserve">
+    <value>Вам достаётся Вопрос с кнопкой! Нажмите на кнопку, чтобы ответить на вопрос</value>
+  </data>
+  <data name="QuestionTypeStakeAll" xml:space="preserve">
+    <value>Вам достаётся Вопрос для всех со ставкой! Каждый делает ставку и играет</value>
+  </data>
 </root>

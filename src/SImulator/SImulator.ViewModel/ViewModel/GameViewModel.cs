@@ -559,18 +559,14 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     public void ExecuteTask(Tasks taskId, int arg)
     {
+        _taskRunner.ScheduleExecution(Tasks.NoTask, 0, runTimer: false);
+
         switch (taskId)
         {
             case Tasks.MoveNext:
                 _engine.MoveNext();
                 break;
-
-            case Tasks.PlayQuestionType:
-                PlayQuestionType();
-                break;
         }
-
-        _taskRunner.ScheduleExecution(Tasks.NoTask, 0, runTimer: false);
     }
 
     private void LocalInfo_AnswerSelected(ItemViewModel answer)
@@ -1231,25 +1227,16 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    private void PlayQuestionType()
+    internal void PlayQuestionType(string typeName, bool isDefault)
     {
         if (_activeQuestion == null)
         {
             return;
         }
 
-        var typeName = _activeQuestion.TypeName ?? QuestionTypes.Simple;
-
-        // Only StakeAll type is supported in final for now
-        // This will be removed when full question type support will have been implemented
-        if (_activeRound?.Type == RoundTypes.Final)
+        if (isDefault)
         {
-            typeName = QuestionTypes.StakeAll;
-        }
-
-        if (typeName == QuestionTypes.Simple)
-        {
-            _engine.MoveNext();
+            _taskRunner.ScheduleExecution(Tasks.MoveNext, 1);
             return;
         }
 
@@ -1774,7 +1761,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
             SetSound(Settings.Model.Sounds.QuestionSelected);
             PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
-            _taskRunner.ScheduleExecution(Tasks.PlayQuestionType, 17);
+            _taskRunner.ScheduleExecution(Tasks.MoveNext, 17);
 
             _gameLogger.Write(ActiveQuestion.GetText());
         }

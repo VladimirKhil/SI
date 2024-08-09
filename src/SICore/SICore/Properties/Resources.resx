@@ -858,4 +858,10 @@
   <data name="RequestedApellation" xml:space="preserve">
     <value>requested appellation</value>
   </data>
+  <data name="QuestionTypeSimple" xml:space="preserve">
+    <value>You got Question with Button! Press button to answer the question</value>
+  </data>
+  <data name="QuestionTypeStakeAll" xml:space="preserve">
+    <value>You got Question for All with Stake! Everybody makes stake and plays</value>
+  </data>
 </root>

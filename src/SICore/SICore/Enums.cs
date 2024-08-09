@@ -53,9 +53,9 @@ public enum Tasks
     ThemeInfo,
     
     /// <summary>
-    /// Объявление типа вопроса
+    /// Question start information.
     /// </summary>
-    QuestionType,
+    QuestionStartInfo,
 
     /// <summary>
     /// Show next answer option.

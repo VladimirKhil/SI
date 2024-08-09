@@ -350,9 +350,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected void OnMoveToQuestion()
     {
-        var isFinal = ActiveRound.Type == RoundTypes.Final;
-        Stage = GameStage.Question;
-
         var options = OptionsProvider();
 
         _questionEngine = _questionEngineFactory.CreateEngine(
@@ -365,9 +362,10 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
                 ShowSimpleRightAnswers = options.ShowRight,
 
-                DefaultTypeName = GameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType,
-                ForceDefaultTypeName = isFinal
+                DefaultTypeName = GameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType
             });
+
+        Stage = GameStage.QuestionType;
     }
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

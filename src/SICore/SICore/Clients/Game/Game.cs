@@ -2047,7 +2047,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        if (ClientData.Round != null && ClientData.Round.Type == RoundTypes.Final)
+        if (Logic.HaveMultipleAnswerers())
         {
             ClientData.AnswererIndex = -1;
 
@@ -2085,7 +2085,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        if (ClientData.Round != null && ClientData.Round.Type == RoundTypes.Final)
+        if (Logic.HaveMultipleAnswerers())
         {
             ClientData.AnswererIndex = -1;
 
@@ -2186,7 +2186,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
                 var wrongIndex = Random.Shared.Next(wrongCount);
 
-                if (ClientData.Round.Type != RoundTypes.Final)
+                if (!Logic.HaveMultipleAnswerers())
                 {
                     ClientData.UsedWrongVersions.Add(restwrong[wrongIndex]);
                 }
@@ -2689,7 +2689,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
 
         if (ClientData.Question != null
-            && ClientData.Question.TypeName == QuestionTypes.Stake
+            && ClientData.QuestionTypeName == QuestionTypes.Stake
             && ClientData.Order.Length > 0)
         {
             DropPlayerFromStakes(playerIndex);
@@ -2939,8 +2939,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 Logic.PlanExecution(Tasks.Announce, 15);
             }
         }
-        else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0
-            && ClientData.Question?.TypeName != QuestionTypes.Simple)
+        else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0 && Logic.IsSpecialQuestion())
         {
             Logic.Engine.SkipQuestion();
             Logic.PlanExecution(Tasks.MoveNext, 20, 1);

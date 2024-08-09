@@ -664,6 +664,11 @@ public sealed class GameData : Data
     /// </summary>
     public Func<bool>? PlayersValidator { get; internal set; }
 
+    /// <summary>
+    /// Question type name.
+    /// </summary>
+    public string QuestionTypeName { get; internal set; } = QuestionTypes.Default;
+
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
         _showMan = showman;
