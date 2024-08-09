@@ -51,7 +51,6 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             {
                 FalseStarts = FalseStartMode.Enabled,
                 ShowSimpleRightAnswers = true,
-                ForceDefaultTypeName = true,
                 DefaultTypeName = question.OwnerTheme?.OwnerRound?.Model.Type == RoundTypes.Final ? QuestionTypes.StakeAll : QuestionTypes.Simple
             },
             this);
