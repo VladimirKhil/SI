@@ -1,46 +1,20 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project>
+  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="5.0.1" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.9</ProductVersion>
-    <ProjectGuid>aa17f85b-338e-40f1-a199-1d471be5535c</ProjectGuid>
-    <SchemaVersion>2.0</SchemaVersion>
     <OutputName>SIGame.$(Platform)</OutputName>
-    <OutputType>Package</OutputType>
-    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
-    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
-	<DefineConstants>ProductVersion=$(MsiProductVersion)</DefineConstants>
+    <DefineConstants>ProductVersion=$(MsiProductVersion)</DefineConstants>
+	<SuppressIces>ICE38;ICE57;ICE91</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug</DefineConstants>
+	  <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <SuppressIces>ICE38;ICE57</SuppressIces>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Product.wxs" />
-  </ItemGroup>
-  <ItemGroup>
-    <WixExtension Include="WixUtilExtension">
-      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
-      <Name>WixUtilExtension</Name>
-    </WixExtension>
-    <WixExtension Include="WixUIExtension">
-      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
-      <Name>WixUIExtension</Name>
-    </WixExtension>
-    <WixExtension Include="WixNetFxExtension">
-      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
-      <Name>WixNetFxExtension</Name>
-    </WixExtension>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="WixUI_ru-ru.wxl" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.1" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.1" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="5.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SIGame\SIGame\SIGame.csproj">
@@ -52,7 +26,6 @@
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(WixTargetsPath)" />
-  <Target Name="AfterBuild">
-  </Target>
+  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="5.0.1" />
+  <Target Name="AfterBuild"></Target>
 </Project>

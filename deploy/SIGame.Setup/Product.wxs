@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   
   <?define Manufacturer="Khil-soft" ?>
   <?define ProductName="SIGame" ?>
@@ -12,20 +11,8 @@
     <?define SolutionDir = "$(var.SIGame.ProjectDir)..\..\..\" ?>
     <?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIGame\net6.0-windows\win-$(var.Platform)\publish\" ?>
     
-    <Product
-		Id="*"
-		Name="$(var.ProductName)"
-		Language="1049"
-		Version="$(var.ProductVersion)"
-		Manufacturer="$(var.Manufacturer)"
-		UpgradeCode="$(var.UpgradeCode)">
-		
-        <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
-
-        <MajorUpgrade
-			DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled."
-		    Schedule="afterInstallInitialize"
-		    IgnoreRemoveFailure="yes" />
+    <Package Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)" InstallerVersion="200" Scope="perUser">
+        <MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
 		
         <MediaTemplate EmbedCab="yes" />
     
@@ -33,13 +20,13 @@
         <Property Id="ARPPRODUCTICON" Value="AppIcon" />
     
         <Property Id="WixShellExecTarget" Value="[#SIGame.exe]" />
-        <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+        <CustomAction Id="LaunchApplication" DllEntry="WixShellExec" Impersonate="yes" BinaryRef="Wix4UtilCA_X86" />
       
         <InstallExecuteSequence>
             <LaunchConditions After="AppSearch" />
             <FindRelatedProducts After="LaunchConditions" />
 
-            <Custom Action="LaunchApplication" After="InstallFinalize">Not Installed OR WIX_UPGRADE_DETECTED</Custom>
+            <Custom Action="LaunchApplication" After="InstallFinalize" Condition="Not Installed OR WIX_UPGRADE_DETECTED" />
         </InstallExecuteSequence>
 
         <InstallUISequence>
@@ -60,11 +47,10 @@
             <ComponentGroupRef Id="ManufacturerProgramMenu" />
             <ComponentGroupRef Id="ApplicationProgramMenu" />
         </Feature>
-    </Product>
+    </Package>
 
     <Fragment>
-        <Directory Id="TARGETDIR" Name="SourceDir">
-          <Directory Id="LocalAppDataFolder">
+          <StandardDirectory Id="LocalAppDataFolder">
             <Directory Id="ManufacturerFolder" Name="$(var.ManufacturerEn)">
               <Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
                 <Directory Id="DataFolder" Name="Data" />
@@ -78,14 +64,13 @@
 				</Directory>
               </Directory>
             </Directory>
-          </Directory>
-          <Directory Id="ProgramMenuFolder">
+          </StandardDirectory>
+          <StandardDirectory Id="ProgramMenuFolder">
             <Directory Id="ManufacturerProgramMenuFolder" Name="$(var.Manufacturer)">
               <Directory Id="ApplicationProgramMenuFolder" Name="$(var.ProductName)" />
             </Directory>
-          </Directory>
-        </Directory>
-    </Fragment>
+          </StandardDirectory>
+        </Fragment>
   
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
@@ -93,47 +78,40 @@
 		<File Id="SIGame.exe" Source="$(var.PublishFolder)SIGame.exe" KeyPath="yes" Checksum="yes" Vital="yes" />
       </Component>
       <Component Guid="{167EE7C2-7628-4983-8E15-C1CFEE780BE7}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)D3DCompiler_47_cor3.dll" />
+        <File Id="___var.PublishFolder_D3DCompiler_47_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)D3DCompiler_47_cor3.dll" />
       </Component>
       <Component Guid="{87AED8E4-25E6-4429-8304-D3AB3CAFB32C}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)PenImc_cor3.dll" />
+        <File Id="___var.PublishFolder_PenImc_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)PenImc_cor3.dll" />
       </Component>
       <Component Guid="{C119C5BD-BB1D-4B1D-84F1-FF73F81943BA}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)PresentationNative_cor3.dll" />
+        <File Id="___var.PublishFolder_PresentationNative_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)PresentationNative_cor3.dll" />
       </Component>
       <Component Guid="{500F1B75-BE85-40B2-8B3F-F5F4CB33F6D7}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)vcruntime140_cor3.dll" />
+        <File Id="___var.PublishFolder_vcruntime140_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)vcruntime140_cor3.dll" />
       </Component>
       <Component Guid="{F3FD3383-ADCA-4F68-BCA5-14028689F515}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)wpfgfx_cor3.dll" />
+        <File Id="___var.PublishFolder_wpfgfx_cor3.dll" KeyPath="yes" Source="$(var.PublishFolder)wpfgfx_cor3.dll" />
       </Component>
       <Component Guid="{1627896d-65da-47fa-9802-a3cfe67cb0aa}">
-        <File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
+        <File Id="api_ms_win_core_winrt_l1_1_0.dll" KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
       </Component>
       <Component Guid="{4687DB8D-2AA3-46AD-8B85-A8469390E198}">
-		<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
+		<File Id="WebView2Loader.dll" KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
 	  </Component>
 	  <Component Guid="{B6AFAEC8-30A0-4BD9-836A-920D1190DAF9}">
-		<File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
+		<File Id="___var.PublishFolder_aspnetcorev2_inprocess.dll" KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
 	  </Component>
 	  <Component Guid="{9E128CD4-80CB-4268-832B-C2D07E36E03D}">
-		<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
+		<File Id="___var.PublishFolder_appsettings.json" KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
 	  </Component>
       <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)Help_ru.pdf" />
+        <File Id="___var.PublishFolder_Help_ru.pdf" KeyPath="yes" Source="$(var.PublishFolder)Help_ru.pdf" />
       </Component>
       <Component Guid="{ADDF321D-6B06-412B-8096-3911FF966799}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)Help_en.pdf" />
+        <File Id="___var.PublishFolder_Help_en.pdf" KeyPath="yes" Source="$(var.PublishFolder)Help_en.pdf" />
       </Component>
       <Component Id="RegistryPath" Guid="{b8ad70bb-c94c-4e11-af70-c6eaf427fb1c}">
-        <RegistryValue
-            Id="InstallFolder"
-            Root="HKMU"
-            Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
-            Name="InstallDir"
-            Action="write"
-            Type="string"
-            Value="[INSTALLLOCATION]" />
+        <RegistryValue Id="InstallFolder" Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="InstallDir" Action="write" Type="string" Value="[INSTALLLOCATION]" />
       
         <RemoveFolder Id="INSTALLLOCATION" On="uninstall" />
       </Component>
@@ -143,46 +121,46 @@
   <Fragment>
     <ComponentGroup Id="Sounds" Directory="SoundsFolder">
       <Component Guid="{EF9D30F5-E0D1-4FA3-804D-457DE26A50D9}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\answer_wrong.mp3" />
+        <File Id="answer_wrong.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\answer_wrong.mp3" />
       </Component>
       <Component Guid="{A873406C-CA1E-4CA1-B0FC-7A72641D734E}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_big.mp3" />
+        <File Id="applause_big.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_big.mp3" />
       </Component>
       <Component Guid="{1721D402-43DB-41D2-A2CA-2F7B16170FDB}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_final.mp3" />
+        <File Id="applause_final.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_final.mp3" />
       </Component>
       <Component Guid="{E46DD86B-CF44-48F5-88A9-0E14DD9AEBBF}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_small.mp3" />
+        <File Id="applause_small.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_small.mp3" />
       </Component>
       <Component Guid="{96B1C9DD-4EAA-4FCD-B4D9-85193171BDBC}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\final_delete.mp3" />
+        <File Id="final_delete.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\final_delete.mp3" />
       </Component>
       <Component Guid="{178DE808-AD34-4904-B111-8A95249ADC15}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\final_think.mp3" />
+        <File Id="final_think.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\final_think.mp3" />
       </Component>
       <Component Guid="{33C45400-75EA-4F12-9EB0-D7ABB5C0241E}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\main_menu.mp3" />
+        <File Id="main_menu.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\main_menu.mp3" />
       </Component>
       <Component Guid="{10714BC6-FC21-4B52-8D26-F6F0813451EE}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_noanswers.mp3" />
+        <File Id="question_noanswers.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_noanswers.mp3" />
       </Component>
       <Component Guid="{5EB5004F-78C9-45B4-85F1-28E6CDE8D5E7}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_norisk.mp3" />
+        <File Id="question_norisk.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_norisk.mp3" />
       </Component>
       <Component Guid="{AC36F52B-5E1D-4D5E-B0A3-43F2C2696710}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_secret.mp3" />
+        <File Id="question_secret.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_secret.mp3" />
       </Component>
       <Component Guid="{E4DAA723-5B4D-45AC-9C9A-226F627B78A1}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_stake.mp3" />
+        <File Id="question_stake.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_stake.mp3" />
       </Component>
       <Component Guid="{06D59D9F-73E5-4C3D-84E9-9EE629C58ECD}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_begin.mp3" />
+        <File Id="round_begin.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_begin.mp3" />
       </Component>
       <Component Guid="{32FE94AC-C41B-4308-9935-520F731F4B14}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_themes.mp3" />
+        <File Id="round_themes.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_themes.mp3" />
       </Component>
       <Component Guid="{7A1DF457-3427-4E4E-9C8A-AB1E25A65AFA}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_timeout.mp3" />
+        <File Id="round_timeout.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_timeout.mp3" />
       </Component>
       <Component Id="SoundsReg" Guid="{3A0CEBB8-61F3-48B1-A071-25C7300F0F3A}">
         <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="sounds" Type="integer" Value="1" KeyPath="yes" />
@@ -194,16 +172,16 @@
   <Fragment>
     <ComponentGroup Id="Data" Directory="DataFolder">
       <Component Guid="{A9734969-7E81-4631-830E-925288919228}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\1.siq" />
+        <File Id="_1.siq" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\1.siq" />
       </Component>
       <Component Guid="{A61A3EE2-6862-4DC5-96E6-662F19FAD1CD}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Package4_1.siq" />
+        <File Id="Package4_1.siq" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Package4_1.siq" />
       </Component>
       <Component Guid="{7BACD631-74EE-4505-BEBB-B98B3958A3C2}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Package4_4.siq" />
+        <File Id="Package4_4.siq" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Package4_4.siq" />
       </Component>
       <Component Guid="{1784a44d-2095-4efd-8eda-3b6c6048f15b}">
-        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Petrov_questions.siq" />
+        <File Id="Petrov_questions.siq" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Petrov_questions.siq" />
       </Component>
       <Component Id="DataReg" Guid="{6B5B8AF7-A7D7-4879-AB0D-55EC9E4B9B63}">
         <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="data" Type="integer" Value="1" KeyPath="yes" />
@@ -215,121 +193,121 @@
   <Fragment>
     <ComponentGroup Id="Photo" Directory="PhotoFolder">
       <Component Guid="{57610553-951D-4D96-BB2B-B67BD427D352}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Ada_Lovelace.jpg" />
+        <File Id="___var.PhotoPath_Ada_Lovelace.jpg" KeyPath="yes" Source="$(var.PhotoPath)Ada_Lovelace.jpg" />
       </Component>
       <Component Guid="{DABB6B40-88C4-4F7E-9857-B36D0E353B2B}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Agatha_Christie.jpg" />
+        <File Id="___var.PhotoPath_Agatha_Christie.jpg" KeyPath="yes" Source="$(var.PhotoPath)Agatha_Christie.jpg" />
       </Component>
       <Component Guid="{A997AE24-C347-4A5B-9690-CA2B3E7EDF9E}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Albert_Einstein.jpg" />
+        <File Id="___var.PhotoPath_Albert_Einstein.jpg" KeyPath="yes" Source="$(var.PhotoPath)Albert_Einstein.jpg" />
       </Component>
       <Component Guid="{FEC06960-101F-4C55-ABF5-39B0D1CDEFF0}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Aristotle.jpg" />
+        <File Id="___var.PhotoPath_Aristotle.jpg" KeyPath="yes" Source="$(var.PhotoPath)Aristotle.jpg" />
       </Component>
       <Component Guid="{039C624E-5FCB-4A01-944B-DF33865F7591}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Carl_Gustav_Jung.jpg" />
+        <File Id="___var.PhotoPath_Carl_Gustav_Jung.jpg" KeyPath="yes" Source="$(var.PhotoPath)Carl_Gustav_Jung.jpg" />
       </Component>
       <Component Guid="{0D14E7D7-9AA3-4DB4-9BAE-7AFB0475BB33}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Dmitriy_Mendeleev.jpg" />
+        <File Id="___var.PhotoPath_Dmitriy_Mendeleev.jpg" KeyPath="yes" Source="$(var.PhotoPath)Dmitriy_Mendeleev.jpg" />
       </Component>
       <Component Guid="{20B86AD8-C20F-4CB8-9A5A-3DB60EF37DE0}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Fedor_Dostoevskiy.jpg" />
+        <File Id="___var.PhotoPath_Fedor_Dostoevskiy.jpg" KeyPath="yes" Source="$(var.PhotoPath)Fedor_Dostoevskiy.jpg" />
       </Component>
       <Component Guid="{E1F7AB32-A2DD-4512-8C9C-B5467ACD4C04}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Francis_Bacon.jpg" />
+        <File Id="___var.PhotoPath_Francis_Bacon.jpg" KeyPath="yes" Source="$(var.PhotoPath)Francis_Bacon.jpg" />
       </Component>
       <Component Guid="{9656B804-FC84-45FA-997C-48144E46215A}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Franz_Kafka.jpg" />
+        <File Id="___var.PhotoPath_Franz_Kafka.jpg" KeyPath="yes" Source="$(var.PhotoPath)Franz_Kafka.jpg" />
       </Component>
       <Component Guid="{FCE8B57B-60F9-4C52-AF2D-FCF09AC8EB2B}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Galileo.jpg" />
+        <File Id="___var.PhotoPath_Galileo.jpg" KeyPath="yes" Source="$(var.PhotoPath)Galileo.jpg" />
       </Component>
       <Component Guid="{A2A43D07-6832-44E0-A048-D93B49D0C8CF}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Giordano_Bruno.jpg" />
+        <File Id="___var.PhotoPath_Giordano_Bruno.jpg" KeyPath="yes" Source="$(var.PhotoPath)Giordano_Bruno.jpg" />
       </Component>
       <Component Guid="{077494F5-1BF5-4170-AF93-C822B30603A6}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Goethe.jpg" />
+        <File Id="___var.PhotoPath_Goethe.jpg" KeyPath="yes" Source="$(var.PhotoPath)Goethe.jpg" />
       </Component>
       <Component Guid="{D36A0121-500A-4583-BAEE-93B527EBF8D0}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Heisenberg.jpg" />
+        <File Id="___var.PhotoPath_Heisenberg.jpg" KeyPath="yes" Source="$(var.PhotoPath)Heisenberg.jpg" />
       </Component>
       <Component Guid="{116B53ED-E24E-4834-8EF1-FD0B85709B03}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Heraclite.JPG" />
+        <File Id="___var.PhotoPath_Heraclite.JPG" KeyPath="yes" Source="$(var.PhotoPath)Heraclite.JPG" />
       </Component>
       <Component Guid="{76875170-DBC2-4467-835A-EDCFA2D00C54}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Hypatia_Alexandria.jpg" />
+        <File Id="___var.PhotoPath_Hypatia_Alexandria.jpg" KeyPath="yes" Source="$(var.PhotoPath)Hypatia_Alexandria.jpg" />
       </Component>
       <Component Guid="{6254515D-87BD-4FE5-8E79-699D45128A4F}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)IsaacNewton.jpg" />
+        <File Id="___var.PhotoPath_IsaacNewton.jpg" KeyPath="yes" Source="$(var.PhotoPath)IsaacNewton.jpg" />
       </Component>
       <Component Guid="{b1bc338e-5e3e-44fc-af86-ac7cb5e9584a}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Johannes_Kepler.jpg" />
+        <File Id="___var.PhotoPath_Johannes_Kepler.jpg" KeyPath="yes" Source="$(var.PhotoPath)Johannes_Kepler.jpg" />
       </Component>
       <Component Guid="{D873FB66-3BEE-47D3-9DE7-06596A0732F7}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Kant.jpg" />
+        <File Id="___var.PhotoPath_Kant.jpg" KeyPath="yes" Source="$(var.PhotoPath)Kant.jpg" />
       </Component>
       <Component Guid="{60DBEB11-BCF6-4C4C-B748-766C525FD512}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Konfuzius.jpg" />
+        <File Id="___var.PhotoPath_Konfuzius.jpg" KeyPath="yes" Source="$(var.PhotoPath)Konfuzius.jpg" />
       </Component>
       <Component Guid="{9A3065CB-D07B-40A2-A103-AEE08E707455}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Lao_Tzu.jpg" />
+        <File Id="___var.PhotoPath_Lao_Tzu.jpg" KeyPath="yes" Source="$(var.PhotoPath)Lao_Tzu.jpg" />
       </Component>
       <Component Guid="{B9FAFCEB-7E42-4022-81AF-3D35AC725D97}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Leo_Tolstoy.jpg" />
+        <File Id="___var.PhotoPath_Leo_Tolstoy.jpg" KeyPath="yes" Source="$(var.PhotoPath)Leo_Tolstoy.jpg" />
       </Component>
       <Component Guid="{48819E5B-71DB-46AB-B130-AFBEADC69D09}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Leonardo.jpg" />
+        <File Id="___var.PhotoPath_Leonardo.jpg" KeyPath="yes" Source="$(var.PhotoPath)Leonardo.jpg" />
       </Component>
       <Component Guid="{8FA80B29-A084-49B7-A61C-8B3B3E7EF0C7}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Lise_Meitner.jpg" />
+        <File Id="___var.PhotoPath_Lise_Meitner.jpg" KeyPath="yes" Source="$(var.PhotoPath)Lise_Meitner.jpg" />
       </Component>
       <Component Guid="{5625CA05-090A-4DD2-A5B2-D84CEEFC40CD}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Marie_Curie.jpg" />
+        <File Id="___var.PhotoPath_Marie_Curie.jpg" KeyPath="yes" Source="$(var.PhotoPath)Marie_Curie.jpg" />
       </Component>
       <Component Guid="{BF6DFEB7-2A83-4ECE-822C-6700A4A41B95}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Mikhail_Lomonosov.jpg" />
+        <File Id="___var.PhotoPath_Mikhail_Lomonosov.jpg" KeyPath="yes" Source="$(var.PhotoPath)Mikhail_Lomonosov.jpg" />
       </Component>
       <Component Guid="{4FB91D8D-4EEC-4E32-80AE-D1B8FE24711E}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Nicholas_of_Cusa.jpg" />
+        <File Id="___var.PhotoPath_Nicholas_of_Cusa.jpg" KeyPath="yes" Source="$(var.PhotoPath)Nicholas_of_Cusa.jpg" />
       </Component>
       <Component Guid="{EB3A0016-746E-4D16-BDAE-DA56AE0D1180}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Niels_Bohr.jpg" />
+        <File Id="___var.PhotoPath_Niels_Bohr.jpg" KeyPath="yes" Source="$(var.PhotoPath)Niels_Bohr.jpg" />
       </Component>
       <Component Guid="{F36C3DCE-2C02-4176-A50D-05E7A7B44509}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Nietzsche.jpg" />
+        <File Id="___var.PhotoPath_Nietzsche.jpg" KeyPath="yes" Source="$(var.PhotoPath)Nietzsche.jpg" />
       </Component>
       <Component Guid="{9CECA5F5-6D54-4B66-8A22-6F276CFF7C58}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Nikolaus_Kopernikus.jpg" />
+        <File Id="___var.PhotoPath_Nikolaus_Kopernikus.jpg" KeyPath="yes" Source="$(var.PhotoPath)Nikolaus_Kopernikus.jpg" />
       </Component>
       <Component Guid="{CC0B9528-1FE9-450E-B14E-E69CB41091CA}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Paracelsus.jpg" />
+        <File Id="___var.PhotoPath_Paracelsus.jpg" KeyPath="yes" Source="$(var.PhotoPath)Paracelsus.jpg" />
       </Component>
       <Component Guid="{724F15FD-EB63-4B83-A0EE-7F0D6B487C23}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Pierre_de_Fermat.jpg" />
+        <File Id="___var.PhotoPath_Pierre_de_Fermat.jpg" KeyPath="yes" Source="$(var.PhotoPath)Pierre_de_Fermat.jpg" />
       </Component>
       <Component Guid="{E18DE7A2-056C-4A92-9E3E-7E036D1BC036}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Platon.jpg" />
+        <File Id="___var.PhotoPath_Platon.jpg" KeyPath="yes" Source="$(var.PhotoPath)Platon.jpg" />
       </Component>
       <Component Guid="{88CF0D33-8854-4AC7-851B-E0059FE8AB75}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Pythagoras.jpg" />
+        <File Id="___var.PhotoPath_Pythagoras.jpg" KeyPath="yes" Source="$(var.PhotoPath)Pythagoras.jpg" />
       </Component>
       <Component Guid="{47984D92-0415-405E-A9CB-9953917402CE}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Rene_Descartes.jpg" />
+        <File Id="___var.PhotoPath_Rene_Descartes.jpg" KeyPath="yes" Source="$(var.PhotoPath)Rene_Descartes.jpg" />
       </Component>
       <Component Guid="{99b23839-d723-4ead-9c92-a07d14e731d5}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Sofja_Kovalevskaja.jpg" />
+        <File Id="___var.PhotoPath_Sofja_Kovalevskaja.jpg" KeyPath="yes" Source="$(var.PhotoPath)Sofja_Kovalevskaja.jpg" />
       </Component>
       <Component Guid="{9de09681-1222-486a-ba3f-247c3e2f2d49}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Stephen_Hawking.jpg" />
+        <File Id="___var.PhotoPath_Stephen_Hawking.jpg" KeyPath="yes" Source="$(var.PhotoPath)Stephen_Hawking.jpg" />
       </Component>
       <Component Guid="{f02cf796-6a86-41ab-a0aa-affad26920f3}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Tesla.jpg" />
+        <File Id="___var.PhotoPath_Tesla.jpg" KeyPath="yes" Source="$(var.PhotoPath)Tesla.jpg" />
       </Component>
       <Component Guid="{c8b61361-c65d-4525-b2de-403f7fa4d384}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Thomas-Aquinas.jpg" />
+        <File Id="___var.PhotoPath_Thomas_Aquinas.jpg" KeyPath="yes" Source="$(var.PhotoPath)Thomas-Aquinas.jpg" />
       </Component>
       <Component Guid="{48f921b0-a835-4e9d-ac38-72da6e5ce61c}">
-        <File KeyPath="yes" Source="$(var.PhotoPath)Thomas_Edison.jpg" />
+        <File Id="___var.PhotoPath_Thomas_Edison.jpg" KeyPath="yes" Source="$(var.PhotoPath)Thomas_Edison.jpg" />
       </Component>
       <Component Id="PhotoReg" Guid="{BD55FEB7-998C-4AAE-A511-A2F8DEA4685C}">
         <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="photo" Type="integer" Value="1" KeyPath="yes" />
@@ -341,13 +319,13 @@
   <Fragment>
     <ComponentGroup Id="licenses" Directory="LicensesFolder">
         <Component Guid="{214E3004-1EFF-4FC5-881A-4832D0FD7980}">
-            <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Ben.Demystifier.LICENSE.txt" />
+            <File Id="Ben.Demystifier.LICENSE.txt" KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Ben.Demystifier.LICENSE.txt" />
         </Component>
 		<Component Guid="{FCD1B58A-5BA3-4258-8A72-A1423D9A79EF}">
-			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Polly.LICENSE.txt" />
+			<File Id="Polly.LICENSE.txt" KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Polly.LICENSE.txt" />
 		</Component>
 		<Component Guid="{9F4DDFD8-2EF0-44BF-A991-5F0D19A787A9}">
-			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Jost.OFL.txt" />
+			<File Id="Jost.OFL.txt" KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Jost.OFL.txt" />
 		</Component>
         <Component Id="LicensesReg" Guid="{4C7D3CA0-40F4-437A-8ED2-9C037D2B607C}">
             <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="licenses" Type="integer" Value="1" KeyPath="yes" />
