@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 
 namespace SICore;
 
@@ -9,21 +8,6 @@ namespace SICore;
 /// </summary>
 public sealed class PlayerData : INotifyPropertyChanged
 {
-    private CustomCommand _pressGameButton;
-
-    public CustomCommand PressGameButton
-    {
-        get => _pressGameButton;
-        set
-        {
-            if (_pressGameButton != value)
-            {
-                _pressGameButton = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     private CustomCommand _apellate;
 
     public CustomCommand Apellate

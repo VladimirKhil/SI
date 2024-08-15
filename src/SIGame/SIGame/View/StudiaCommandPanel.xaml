@@ -397,7 +397,7 @@
             x:Name="gameButton"
             Style="{StaticResource GameButton}"
             Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}"
-            Command="{Binding Data.PlayerDataExtensions.PressGameButton}" />
+            Command="{Binding PressGameButton}" />
 
         <Border Grid.Row="2" Grid.ColumnSpan="3" Margin="6" Name="gameBorder" Visibility="Hidden" CornerRadius="20" Opacity="0">
             <Border.Background>
@@ -499,7 +499,7 @@
                 Cursor="Hand"
                 Width="70"
                 ToolTip="{x:Static lp:Resources.ForceStartGame_Hint}"
-                Command="{Binding Data.ForceStart}"
+                Command="{Binding ForceStart}"
                 FontSize="35"
                 Foreground="Orange">
                 <Button.Style>

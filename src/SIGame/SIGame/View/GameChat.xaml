@@ -53,10 +53,10 @@
                     BorderThickness="0,1,0,0"
                     Name="input"
                     Padding="0,2"
-                    Text="{Binding Data.PrintedText, UpdateSourceTrigger=PropertyChanged}"
+                    Text="{Binding PrintedText, UpdateSourceTrigger=PropertyChanged}"
                     Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding Data.SendMessageCommand}" />
+                        <KeyBinding Key="Enter" Command="{Binding SendMessage}" />
                     </TextBox.InputBindings>
                 </TextBox>
                 
@@ -85,7 +85,7 @@
                             Background="{StaticResource WindowBackground}"
                             Margin="-1,-1,0,-1"
                             Padding="20,4"
-                            Command="{Binding Data.Kick}"
+                            Command="{Binding Kick}"
                             CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
                             FontSize="18"
                             TextBlock.LineHeight="18"
@@ -96,7 +96,7 @@
                             Background="{StaticResource WindowBackground}"
                             Margin="-1,-1,-1,-1"
                             Padding="20,4"
-                            Command="{Binding Data.Ban}"
+                            Command="{Binding Ban}"
                             CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
                             FontSize="18"
                             TextBlock.LineHeight="18"
@@ -109,7 +109,7 @@
                         Background="{StaticResource WindowBackground}"
                         Margin="-1,-1,-1,-1"
                         Padding="20,4"
-                        Command="{Binding Data.SetHost}"
+                        Command="{Binding SetHost}"
                         CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
                         FontSize="18"
                         TextBlock.LineHeight="18"
@@ -289,7 +289,7 @@
                     <TextBlock Text="{x:Static lp:Resources.Players}" Margin="10,4,0,4" />
                     
                     <Button
-                        Command="{Binding Data.AddTable}"
+                        Command="{Binding AddTable}"
                         ToolTip="{x:Static lp:Resources.AddTable}"
                         Style="{StaticResource SIButtonSimple}"
                         BorderThickness="0"
@@ -332,7 +332,7 @@
                     Background="{StaticResource WindowBackground}"
                     Margin="-1,-1,-1,-1"
                     Padding="20,4"
-                    Command="{Binding Data.Unban}"
+                    Command="{Binding Unban}"
                     CommandParameter="{Binding Source={StaticResource Banned},Path=CurrentItem}"
                     FontSize="18"
                     TextBlock.LineHeight="18"
@@ -359,7 +359,7 @@
 
         <TabItem Header="ℹ" ToolTip="{x:Static lp:Resources.GameInfo}" Style="{StaticResource StudiaTab}">
             <TextBox
-                Text="{Binding Data.GameMetadata}"
+                Text="{Binding GameMetadata}"
                 Padding="10"
                 IsReadOnly="True"
                 Foreground="Black"

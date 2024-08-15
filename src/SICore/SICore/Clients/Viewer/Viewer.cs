@@ -48,37 +48,11 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 _isHost = value;
                 IsHostChanged?.Invoke();
 
-                if (ClientData.Kick != null)
-                {
-                    ClientData.Kick.CanBeExecuted = IsHost;
-                }
-
-                if (ClientData.Ban != null)
-                {
-                    ClientData.Ban.CanBeExecuted = IsHost;
-                }
-
-                if (ClientData.SetHost != null)
-                {
-                    ClientData.SetHost.CanBeExecuted = IsHost;
-                }
-
-                if (ClientData.Unban != null)
-                {
-                    ClientData.Unban.CanBeExecuted = IsHost;
-                }
-
-                if (ClientData.ForceStart != null)
-                {
-                    ClientData.ForceStart.CanBeExecuted = IsHost && ClientData.Stage == GameStage.Before;
-                }
-
                 foreach (var account in MyData.MainPersons)
                 {
                     account.IsExtendedMode = IsHost;
                 }
 
-                UpdateAddTableCommand();
                 OnPropertyChanged();
             }
         }
@@ -110,18 +84,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         ClientData.EventLog.Append($"Initial name {ClientData.Name}");
 
-        ClientData.MessageSending = msg => Say(msg);
         ClientData.JoinModeChanged += ClientData_JoinModeChanged;
-
-        ClientData.Kick = new CustomCommand(Kick_Executed) { CanBeExecuted = IsHost };
-        ClientData.Ban = new CustomCommand(Ban_Executed) { CanBeExecuted = IsHost };
-        ClientData.SetHost = new CustomCommand(SetHost_Executed) { CanBeExecuted = IsHost };
-        ClientData.Unban = new CustomCommand(Unban_Executed) { CanBeExecuted = IsHost };
-
-        ClientData.ForceStart = new CustomCommand(ForceStart_Executed) { CanBeExecuted = IsHost && ClientData.Stage == GameStage.Before };
-        ClientData.AddTable = new CustomCommand(AddTable_Executed) { CanBeExecuted = IsHost };
-
-        ClientData.AtomViewed = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Atom));
     }
 
     private void ClientData_JoinModeChanged(JoinMode joinMode) =>
@@ -230,86 +193,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
     }
 
     public void Move(object arg) => _viewerActions.SendMessageWithArgs(Messages.Move, arg);
-
-    private void Kick_Executed(object? arg)
-    {
-        if (arg is not ViewerAccount person)
-        {
-            return;
-        }
-
-        if (person == ClientData.Me)
-        {
-            AddLog(LO[nameof(R.CannotKickYouself)] + Environment.NewLine);
-            return;
-        }
-
-        if (!person.IsHuman)
-        {
-            AddLog(LO[nameof(R.CannotKickBots)] + Environment.NewLine);
-            return;
-        }
-
-        _viewerActions.SendMessage(Messages.Kick, person.Name);
-    }
-
-    private void Ban_Executed(object? arg)
-    {
-        if (arg is not ViewerAccount person)
-        {
-            return;
-        }
-
-        if (person == ClientData.Me)
-        {
-            AddLog(LO[nameof(R.CannotBanYourself)] + Environment.NewLine);
-            return;
-        }
-
-        if (!person.IsHuman)
-        {
-            AddLog(LO[nameof(R.CannotBanBots)] + Environment.NewLine);
-            return;
-        }
-
-        _viewerActions.SendMessage(Messages.Ban, person.Name);
-    }
-
-    private void SetHost_Executed(object? arg)
-    {
-        if (arg is not ViewerAccount person)
-        {
-            return;
-        }
-
-        if (person == ClientData.Me)
-        {
-            AddLog(LO[nameof(R.CannotSetHostToYourself)] + Environment.NewLine);
-            return;
-        }
-
-        if (!person.IsHuman)
-        {
-            AddLog(LO[nameof(R.CannotSetHostToBot)] + Environment.NewLine);
-            return;
-        }
-
-        _viewerActions.SendMessage(Messages.SetHost, person.Name);
-    }
-
-    private void Unban_Executed(object? arg)
-    {
-        if (arg is not BannedInfo bannedInfo)
-        {
-            return;
-        }
-
-        _viewerActions.SendMessage(Messages.Unban, bannedInfo.Ip);
-    }
-
-    private void ForceStart_Executed(object? arg) => _viewerActions.SendMessage(Messages.Start);
-
-    private void AddTable_Executed(object? arg) => _viewerActions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
 
     /// <summary>
     /// Processes received system message.
@@ -603,8 +486,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             {
                                 ClientData.ShowMan.GameStarted = true;
                             }
-
-                            ClientData.ForceStart.CanBeExecuted = false;
                         }
 
                         if (mparams.Length > 3)
@@ -1016,15 +897,12 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         break;
                     }
                 case Messages.Winner:
+                    if (mparams.Length > 1 && int.TryParse(mparams[1], out int winnerIndex))
                     {
-                        #region Winner
-
-                        ClientData.Winner = int.Parse(mparams[1]);
-                        _logic.Winner();
-
-                        #endregion
-                        break;
+                        _logic.OnWinner(winnerIndex);
                     }
+                    break;
+
                 case Messages.Timeout:
                     {
                         #region Timeout
@@ -1531,8 +1409,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             CreatePlayerCommands(account);
             ClientData.Players.Add(account);
 
-            UpdateAddTableCommand();
-
             UpdatePlayerCommands(account);
 
             var canDelete = ClientData.Players.Count > 2;
@@ -1737,8 +1613,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             account = ClientData.Players[index];
 
             ClientData.Players.RemoveAt(index);
-
-            UpdateAddTableCommand();
 
             if (!account.IsHuman && account.Name == ClientData.Name /* for computer accounts being deleted */)
             {
@@ -2024,17 +1898,13 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             ClientData.PersonDataExtensions.SendPass =
             ClientData.PersonDataExtensions.SendStake =
             ClientData.PersonDataExtensions.SendVabank =
-            ClientData.PlayerDataExtensions.Apellate =
-            ClientData.PlayerDataExtensions.PressGameButton = null;
+            ClientData.PlayerDataExtensions.Apellate = null;
 
         var person = ClientData.PersonDataExtensions;
         person.SendStakeNew = person.SendPassNew = person.SendAllInNew = null;
 
         ClientData.PlayerDataExtensions.Report.SendReport = ClientData.PlayerDataExtensions.Report.SendNoReport = null;
 
-        ClientData.Kick = ClientData.AtomViewed = ClientData.Ban = ClientData.SetHost = ClientData.Unban = ClientData.ForceStart = ClientData.AddTable = null;
-
-        ClientData.MessageSending = null;
         ClientData.JoinModeChanged -= ClientData_JoinModeChanged;
 
         IViewerClient viewer = role switch
@@ -2171,20 +2041,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             }
         }
 
-        UpdateAddTableCommand();
-
         SendPicture();
         _viewerActions.SendMessage(Messages.Moveable);
-    }
-
-    private void UpdateAddTableCommand()
-    {
-        if (ClientData.AddTable == null)
-        {
-            return;
-        }
-
-        ClientData.AddTable.CanBeExecuted = IsHost && ClientData.Players.Count < Constants.MaxPlayers;
     }
 
     public void RecreateCommands()
@@ -2422,7 +2280,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
     /// <param name="text">Текст сообщения</param>
     /// <param name="whom">Кому</param>
     /// <param name="isPrivate">Приватно ли</param>
-    internal void Say(string text, string whom = NetworkConstants.Everybody, bool isPrivate = false)
+    public void Say(string text, string whom = NetworkConstants.Everybody, bool isPrivate = false)
     {
         if (whom != NetworkConstants.Everybody)
         {

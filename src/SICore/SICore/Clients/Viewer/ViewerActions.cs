@@ -28,4 +28,10 @@ public sealed class ViewerActions
 
     public void SendMessageWithArgs(params object[] args) =>
         Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
+
+    public void PressButton(DateTimeOffset? tryStartTime)
+    {
+        var pressDuration = tryStartTime.HasValue ? (int)DateTimeOffset.UtcNow.Subtract(tryStartTime.Value).TotalMilliseconds : -1;
+        SendMessageWithArgs(Messages.I, pressDuration);
+    }
 }

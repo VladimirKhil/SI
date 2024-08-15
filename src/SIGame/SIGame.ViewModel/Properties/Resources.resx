@@ -546,4 +546,22 @@
   <data name="HintSelectActivePlayer" xml:space="preserve">
     <value>Select new active player</value>
   </data>
+  <data name="CannotKickBots" xml:space="preserve">
+    <value>You can't kick bots</value>
+  </data>
+  <data name="CannotKickYouself" xml:space="preserve">
+    <value>You can't kick yourself</value>
+  </data>
+  <data name="CannotBanBots" xml:space="preserve">
+    <value>You can't ban bots</value>
+  </data>
+  <data name="CannotBanYourself" xml:space="preserve">
+    <value>You can't ban yourself</value>
+  </data>
+  <data name="CannotSetHostToBot" xml:space="preserve">
+    <value>Cannot set bot as host</value>
+  </data>
+  <data name="CannotSetHostToYourself" xml:space="preserve">
+    <value>Your are host already!</value>
+  </data>
 </root>

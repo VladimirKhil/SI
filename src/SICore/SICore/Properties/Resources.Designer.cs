@@ -205,65 +205,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на You can&apos;t ban bots.
-        /// </summary>
-        public static string CannotBanBots {
-            get {
-                return ResourceManager.GetString("CannotBanBots", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на You can&apos;t ban yourself.
-        /// </summary>
-        public static string CannotBanYourself {
-            get {
-                return ResourceManager.GetString("CannotBanYourself", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Cannot connect to server.
         /// </summary>
         public static string CannotConnectToServer {
             get {
                 return ResourceManager.GetString("CannotConnectToServer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на You can&apos;t kick bots.
-        /// </summary>
-        public static string CannotKickBots {
-            get {
-                return ResourceManager.GetString("CannotKickBots", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на You can&apos;t kick yourself.
-        /// </summary>
-        public static string CannotKickYouself {
-            get {
-                return ResourceManager.GetString("CannotKickYouself", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Cannot set bot as host.
-        /// </summary>
-        public static string CannotSetHostToBot {
-            get {
-                return ResourceManager.GetString("CannotSetHostToBot", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Your are host already!.
-        /// </summary>
-        public static string CannotSetHostToYourself {
-            get {
-                return ResourceManager.GetString("CannotSetHostToYourself", resourceCulture);
             }
         }
         

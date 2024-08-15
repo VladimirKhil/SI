@@ -125,7 +125,7 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
         return (int)(100 * (now - timer.StartTime).TotalMilliseconds / (timer.EndTime - timer.StartTime).TotalMilliseconds);
     }
 
-    private void PressButton() => _data.PlayerDataExtensions.PressGameButton.Execute(null);
+    private void PressButton() => _viewerActions.PressButton(_data.PlayerDataExtensions.TryStartTime);
 
     private void AnswerRight() => _viewerActions.SendMessage(Messages.IsRight, "+");
 
@@ -1809,9 +1809,6 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
 
     #region PlayerInterface Members
 
-    /// <summary>
-    /// Выбор вопроса
-    /// </summary>
     public void ChooseQuest() => ScheduleExecution(PlayerTasks.Choose, 20 + Random.Shared.Next(10));
 
     /// <summary>

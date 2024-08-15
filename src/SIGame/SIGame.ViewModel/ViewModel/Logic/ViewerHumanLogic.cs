@@ -1639,11 +1639,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _data.Sound = Sounds.FinalDelete;
     }
 
-    public void Winner() => UI.Execute(WinnerUI, exc => _data.Host.SendError(exc));
+    public void OnWinner(int winnerIndex) => UI.Execute(() => WinnerUI(winnerIndex), exc => _data.Host.SendError(exc));
 
-    private void WinnerUI()
+    private void WinnerUI(int winnerIndex)
     {
-        if (_data.Winner > -1)
+        if (winnerIndex > -1)
         {
             _data.Sound = Sounds.ApplauseFinal;
         }
@@ -2051,7 +2051,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         gameInfo.AppendFormat(R.ContactUri).Append(": ").Append(contactUri).AppendLine();
         gameInfo.AppendFormat(R.VoiceChatLink).Append(": ").Append(voiceChatUri).AppendLine();
 
-        ClientData.GameMetadata = gameInfo.ToString();
+        _gameViewModel.GameMetadata = gameInfo.ToString();
 
         if (!string.IsNullOrEmpty(voiceChatUri) && Uri.IsWellFormedUriString(voiceChatUri, UriKind.Absolute))
         {
@@ -2063,6 +2063,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         () =>
         {
             ClientData.PlayersObservable.Add(account);
+            _gameViewModel.UpdateAddTableCommand();
         },
         ClientData.Host.OnError);
 
@@ -2070,6 +2071,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         () =>
         {
             ClientData.PlayersObservable.RemoveAt(index);
+            _gameViewModel.UpdateAddTableCommand();
         },
         ClientData.Host.OnError);
 
@@ -2082,6 +2084,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             {
                 ClientData.PlayersObservable.Add(player);
             }
+
+            _gameViewModel.UpdateAddTableCommand();
         },
         ClientData.Host.OnError);
 
@@ -2092,4 +2096,21 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.TStage = TableStage.Question;
         TInfo.Text = "";
     }
+
+    public void SelectQuestion()
+    {
+        lock (_data.ChoiceLock)
+        {
+            _data.ThemeIndex = _data.QuestionIndex = -1;
+        }
+
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectQuestion)];
+        TInfo.Selectable = true;
+        TInfo.SelectQuestion.CanBeExecuted = true;
+        _data.Host.OnFlash();
+    }
+
+    public void OnEnableButton() => _gameViewModel.EnableGameButton(true);
+
+    public void OnDisableButton() => _gameViewModel.DisableGameButton(true);
 }

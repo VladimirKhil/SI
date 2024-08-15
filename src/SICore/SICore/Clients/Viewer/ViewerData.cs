@@ -14,130 +14,7 @@ namespace SICore;
 /// </summary>
 public sealed class ViewerData : Data
 {
-    private CustomCommand _atomViewed;
-
-    public CustomCommand AtomViewed
-    {
-        get => _atomViewed;
-        set
-        {
-            if (_atomViewed != value)
-            {
-                _atomViewed = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private CustomCommand _kick;
-
-    public CustomCommand Kick
-    {
-        get => _kick;
-        set
-        {
-            if (_kick != value)
-            {
-                _kick = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private CustomCommand _ban;
-
-    public CustomCommand Ban
-    {
-        get => _ban;
-        set
-        {
-            if (_ban != value)
-            {
-                _ban = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private CustomCommand _setHost;
-
-    public CustomCommand SetHost
-    {
-        get => _setHost;
-        set
-        {
-            if (_setHost != value)
-            {
-                _setHost = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-
-    private CustomCommand _unban;
-
-    public CustomCommand Unban
-    {
-        get => _unban;
-        set
-        {
-            if (_unban != value)
-            {
-                _unban = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private CustomCommand _forceStart;
-
-    public CustomCommand ForceStart
-    {
-        get => _forceStart;
-        set
-        {
-            if (_forceStart != value)
-            {
-                _forceStart = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private CustomCommand _addTable;
-
-    public CustomCommand AddTable
-    {
-        get => _addTable;
-        set
-        {
-            if (_addTable != value)
-            {
-                _addTable = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     public PersonAccount? Speaker { get; set; }
-
-    private string _printedText = "";
-
-    public string PrintedText
-    {
-        get => _printedText;
-        set
-        {
-            if (_printedText != value)
-            {
-                _printedText = value;
-                OnPropertyChanged();
-
-                SendMessageCommand.CanBeExecuted = value.Length > 0;
-            }
-        }
-    }
 
     private string _stageName = "";
 
@@ -156,8 +33,6 @@ public sealed class ViewerData : Data
     public string QuestionType { get; set; }
 
     public string AtomType { get; set; } = "";
-
-    public int Winner { get; set; }
 
     internal int LastStakerIndex { get; set; } = -1;
 
@@ -213,18 +88,11 @@ public sealed class ViewerData : Data
 
     internal bool FalseStart { get; set; } = true;
 
-    public CustomCommand SendMessageCommand { get; set; }
-
     public PersonData PersonDataExtensions { get; private set; } = new();
 
     public PlayerData PlayerDataExtensions { get; private set; } = new();
 
     public ShowmanData ShowmanDataExtensions { get; private set; } = new();
-
-    /// <summary>
-    /// Делегат, организующий отправку сообщения
-    /// </summary>
-    public Action<string> MessageSending { get; set; }
 
     public event Action<string?, string, LogMode> StringAdding;
 
@@ -413,17 +281,6 @@ public sealed class ViewerData : Data
     /// </summary>
     public ObservableCollection<BannedInfo> Banned { get; } = new();
 
-    private string _gameMetadata = "";
-
-    /// <summary>
-    /// Game metadata.
-    /// </summary>
-    public string GameMetadata
-    {
-        get => _gameMetadata;
-        set { if (_gameMetadata != value) { _gameMetadata = value; OnPropertyChanged(); } }
-    }
-
     /// <summary>
     /// Default computer players known by server.
     /// </summary>
@@ -481,17 +338,7 @@ public sealed class ViewerData : Data
 
     public ViewerData(IGameHost gameHost) : base(gameHost)
     {
-        Winner = -1;
 
-        SendMessageCommand = new CustomCommand(
-            item =>
-            {
-                MessageSending?.Invoke(PrintedText);
-                PrintedText = "";
-            })
-        {
-            CanBeExecuted = false
-        };
     }
 
     private readonly List<string> _chatTable = new();

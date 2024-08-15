@@ -256,7 +256,7 @@ public sealed class Showman : Viewer
 
                     if (mparams[1] == "1")
                     {
-                        _logic.ShowmanLogic.ChooseQuest();
+                        _logic.SelectQuestion();
                     }
                     else
                     {

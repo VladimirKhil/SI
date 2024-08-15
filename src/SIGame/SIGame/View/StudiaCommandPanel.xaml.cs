@@ -8,7 +8,7 @@ using System.Windows.Media.Animation;
 namespace SIGame;
 
 /// <summary>
-/// Логика взаимодействия для StudiaCommandPanel.xaml
+/// Provides interaction logic for StudiaCommandPanel.xaml.
 /// </summary>
 public partial class StudiaCommandPanel : UserControl
 {
@@ -51,12 +51,9 @@ public partial class StudiaCommandPanel : UserControl
 
     private void Studia_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (DataContext is not GameViewModel game)
-        {
-            return;
-        }
+        var logic = ((GameViewModel)DataContext)?.Host?.MyLogic;
 
-        if (game.Host.MyLogic is IViewerLogic logic)
+        if (logic != null)
         {
             ((ViewerData)logic.Data).PlayerDataExtensions.PressButton += RaiseButtonClick;
             ((ViewerData)logic.Data).PlayerDataExtensions.PressNextButton += RaiseNextClick;
@@ -65,12 +62,7 @@ public partial class StudiaCommandPanel : UserControl
 
     public void OnMouseRightButtonDown()
     {
-        if (((GameViewModel)DataContext)?.Host?.MyLogic is not IViewerLogic logic)
-        {
-            return;
-        }
-
-        var pressCmd = ((ViewerData)logic.Data).PlayerDataExtensions.PressGameButton;
+        var pressCmd = ((GameViewModel)DataContext).PressGameButton;
 
         if (pressCmd != null && pressCmd.CanBeExecuted)
         {

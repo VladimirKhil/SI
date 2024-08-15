@@ -8,11 +8,6 @@ public interface IPersonLogic
     void OnInitialized();
 
     /// <summary>
-    /// Выбор темы и вопроса
-    /// </summary>
-    void ChooseQuest();
-
-    /// <summary>
     /// Отдать вопрос с секретом
     /// </summary>
     void Cat();

@@ -558,18 +558,6 @@
   <data name="Banned" xml:space="preserve">
     <value>{0} выгнал(а) из игры и забанил {1}</value>
   </data>
-  <data name="CannotBanBots" xml:space="preserve">
-    <value>Компьютерных участников нельзя забанить!</value>
-  </data>
-  <data name="CannotBanYourself" xml:space="preserve">
-    <value>Себя забанить нельзя!</value>
-  </data>
-  <data name="CannotKickBots" xml:space="preserve">
-    <value>Компьютерных участников нельзя выгнать!</value>
-  </data>
-  <data name="CannotKickYouself" xml:space="preserve">
-    <value>Себя выгнать нельзя!</value>
-  </data>
   <data name="Connected_Female" xml:space="preserve">
     <value>Подключилась {0}</value>
   </data>
@@ -785,12 +773,6 @@
   </data>
   <data name="Cost2" xml:space="preserve">
     <value>Стоимость</value>
-  </data>
-  <data name="CannotSetHostToBot" xml:space="preserve">
-    <value>Ботов нельзя сделать хостом</value>
-  </data>
-  <data name="CannotSetHostToYourself" xml:space="preserve">
-    <value>Вы уже хост!</value>
   </data>
   <data name="VoiceChatLink" xml:space="preserve">
     <value>Голосовой чат (Discord)</value>

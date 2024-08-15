@@ -13,7 +13,9 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public bool CanSwitchType => false;
 
-    public IPlayerLogic PlayerLogic { get; }
+    private readonly PlayerComputerLogic _player;
+
+    public IPlayerLogic PlayerLogic => _player;
 
     public IShowmanLogic ShowmanLogic { get; }
 
@@ -26,7 +28,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     {
         _viewerActions = viewerActions;
 
-        PlayerLogic = new PlayerComputerLogic(data, computerAccount, viewerActions, _timersInfo);
+        _player = new PlayerComputerLogic(data, computerAccount, viewerActions, _timersInfo);
         ShowmanLogic = new ShowmanComputerLogic(data, viewerActions, computerAccount);
     }
 
@@ -115,11 +117,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         {
             _data.TInfo.RoundInfo[themeIndex].Name = null;
         }
-    }
-
-    public void Winner()
-    {
-
     }
 
     public void TimeOut()
@@ -275,6 +272,8 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public void OnReplic(string personCode, string text)
     {
-        
+
     }
+
+    public void SelectQuestion() => _player.ChooseQuest();
 }

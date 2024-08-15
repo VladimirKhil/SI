@@ -19,13 +19,6 @@ using R = SICore.Properties.Resources;
 
 namespace SICore;
 
-// TODO: Global refactoring plan:
-// extract different script steps implementations (stake making, question selecting and giving etc.)
-// to separate classes (strategies)
-// Extract corresponding state from GameData class
-
-// Remove Final round logic; use only StakeAll question type which can also appear in standard round
-
 /// <summary>
 /// Defines a game actor. Responds to all game-related messages.
 /// </summary>
@@ -1098,13 +1091,13 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (per.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.CannotKickYouself)]);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickYouself);
             return;
         }
 
         if (!per.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.CannotKickBots)]);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickBots);
             return;
         }
 
@@ -1135,13 +1128,13 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.CannotBanYourself)]);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanYourself);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.CannotBanBots)]);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanBots);
             return;
         }
 
@@ -1172,13 +1165,13 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.CannotSetHostToYourself)]);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToYourself);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.CannotSetHostToBot)]);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToBots);
             return;
         }
 

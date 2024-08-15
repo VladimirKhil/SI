@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using SICore;
+using SICore.Clients.Viewer;
 using SICore.Contracts;
+using SICore.Network.Clients;
 using SICore.Network.Servers;
 using SIData;
 using SIGame.ViewModel.PlatformSpecific;
@@ -303,6 +305,159 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
+    private SimpleCommand _atomViewed;
+
+    public SimpleCommand AtomViewed
+    {
+        get => _atomViewed;
+        set
+        {
+            if (_atomViewed != value)
+            {
+                _atomViewed = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    private SimpleCommand _kick;
+
+    public SimpleCommand Kick
+    {
+        get => _kick;
+        set
+        {
+            if (_kick != value)
+            {
+                _kick = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private SimpleCommand _ban;
+
+    public SimpleCommand Ban
+    {
+        get => _ban;
+        set
+        {
+            if (_ban != value)
+            {
+                _ban = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public SimpleCommand SendMessage { get; set; }
+
+    private string _printedText = "";
+
+    public string PrintedText
+    {
+        get => _printedText;
+        set
+        {
+            if (_printedText != value)
+            {
+                _printedText = value;
+                OnPropertyChanged();
+
+                SendMessage.CanBeExecuted = value.Length > 0;
+            }
+        }
+    }
+
+    private SimpleCommand _setHost;
+
+    public SimpleCommand SetHost
+    {
+        get => _setHost;
+        set
+        {
+            if (_setHost != value)
+            {
+                _setHost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private SimpleCommand _unban;
+
+    public SimpleCommand Unban
+    {
+        get => _unban;
+        set
+        {
+            if (_unban != value)
+            {
+                _unban = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private SimpleCommand _forceStart;
+
+    public SimpleCommand ForceStart
+    {
+        get => _forceStart;
+        set
+        {
+            if (_forceStart != value)
+            {
+                _forceStart = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private SimpleCommand _addTable;
+
+    public SimpleCommand AddTable
+    {
+        get => _addTable;
+        set
+        {
+            if (_addTable != value)
+            {
+                _addTable = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private SimpleCommand _pressGameButton;
+
+    public SimpleCommand PressGameButton
+    {
+        get => _pressGameButton;
+        set
+        {
+            if (_pressGameButton != value)
+            {
+                _pressGameButton = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _buttonDisabledByGame = false;
+    private bool _buttonDisabledByTimer = false;
+
+    private string _gameMetadata = "";
+
+    /// <summary>
+    /// Game metadata.
+    /// </summary>
+    public string GameMetadata
+    {
+        get => _gameMetadata;
+        set { if (_gameMetadata != value) { _gameMetadata = value; OnPropertyChanged(); } }
+    }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -316,7 +471,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _logger = logger;
 
         _data = viewerData;
-        _data.CurrentPlayerChanged += MyData_CurrentPlayerChanged;
+        _data.CurrentPlayerChanged += UpdateCurrentPlayerCommands;
 
         TInfo = new TableInfoViewModel(Data.TInfo, settings)
         {
@@ -360,7 +515,172 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         IsShowman = Host?.Role == GameRole.Showman;
         _changeSums = new SimpleCommand(ChangeSums_Executed) { CanBeExecuted = IsShowman };
         _changeActivePlayer = new SimpleCommand(ChangeActivePlayer_Executed) { CanBeExecuted = IsShowman };
+
+        _atomViewed = new SimpleCommand(AtomViewed_Executed);
+        _kick = new SimpleCommand(Kick_Executed);
+        _ban = new SimpleCommand(Ban_Executed);
+        _setHost = new SimpleCommand(SetHost_Executed);
+        _unban = new SimpleCommand(Unban_Executed);
+
+        SendMessage = new SimpleCommand(SendMessage_Executed) { CanBeExecuted = false };
+        _forceStart = new SimpleCommand(ForceStart_Executed);
+
+        _addTable = new SimpleCommand(AddTable_Executed);
+        
+        _pressGameButton = new SimpleCommand(PressGameButton_Execute) { CanBeExecuted = Host?.Role == GameRole.Player };
     }
+
+    private void PressGameButton_Execute(object? arg)
+    {
+        if (Host == null)
+        {
+            return;
+        }
+
+        Host.Actions.PressButton(Host.MyData.PlayerDataExtensions.TryStartTime);
+        DisableGameButton(false);
+        ReleaseGameButton();
+    }
+
+    internal void DisableGameButton(bool byGame)
+    {
+        PressGameButton.CanBeExecuted = false;
+
+        if (byGame)
+        {
+            _buttonDisabledByGame = true;
+        }
+        else
+        {
+            _buttonDisabledByTimer = true;
+        }
+    }
+
+    internal void EnableGameButton(bool byGame)
+    {
+        if (byGame)
+        {
+            _buttonDisabledByGame = false;
+        }
+        else
+        {
+            _buttonDisabledByTimer = false;
+        }
+
+        if (!_buttonDisabledByGame && !_buttonDisabledByTimer)
+        {
+            PressGameButton.CanBeExecuted = true;
+        }
+    }
+
+    internal async void ReleaseGameButton()
+    {
+        if (Host == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await Task.Delay(Host.MyData.ButtonBlockingTime * 1000);
+            EnableGameButton(false);
+        }
+        catch (Exception exc)
+        {
+            _logger.LogWarning(exc, "ReleaseGameButton error: {error}", exc.Message);
+        }
+    }
+
+    private void AddTable_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
+
+    internal void UpdateAddTableCommand() =>
+        AddTable.CanBeExecuted = Host != null && Host.IsHost && Host.MyData.Players.Count < Constants.MaxPlayers;
+
+    private void ForceStart_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Start);
+
+    private void Unban_Executed(object? arg)
+    {
+        if (arg is not BannedInfo bannedInfo)
+        {
+            return;
+        }
+
+        Host?.Actions.SendMessage(Messages.Unban, bannedInfo.Ip);
+    }
+
+    private void SetHost_Executed(object? arg)
+    {
+        if (arg is not ViewerAccount person)
+        {
+            return;
+        }
+
+        if (person.Name == Data.Name)
+        {
+            Host?.AddLog(Resources.CannotSetHostToYourself);
+            return;
+        }
+
+        if (!person.IsHuman)
+        {
+            Host?.AddLog(Resources.CannotSetHostToBot);
+            return;
+        }
+
+        Host?.Actions.SendMessage(Messages.SetHost, person.Name);
+    }
+
+    private void SendMessage_Executed(object? arg)
+    {
+        Host?.Say(PrintedText);
+        PrintedText = "";
+    }
+
+    private void Ban_Executed(object? arg)
+    {
+        if (arg is not ViewerAccount person)
+        {
+            return;
+        }
+
+        if (person.Name == Data.Name)
+        {
+            Host?.AddLog(Resources.CannotBanYourself);
+            return;
+        }
+
+        if (!person.IsHuman)
+        {
+            Host?.AddLog(Resources.CannotBanBots);
+            return;
+        }
+
+        Host?.Actions.SendMessage(Messages.Ban, person.Name);
+    }
+
+    private void Kick_Executed(object? arg)
+    {
+        if (arg is not ViewerAccount person)
+        {
+            return;
+        }
+
+        if (person.Name == Data.Name)
+        {
+            Host?.AddLog(Resources.CannotKickYouself);
+            return;
+        }
+
+        if (!person.IsHuman)
+        {
+            Host?.AddLog(Resources.CannotKickBots);
+            return;
+        }
+
+        Host?.Actions.SendMessage(Messages.Kick, person.Name);
+    }
+
+    private void AtomViewed_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Atom);
 
     private void ChangeActivePlayer_Executed(object? arg)
     {
@@ -451,12 +771,18 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void DeleteVideoAvatar_Executed(object? arg) => Host.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, "");
 
-    private void MyData_CurrentPlayerChanged()
+    private void UpdateCurrentPlayerCommands()
     {
+        if (Host == null)
+        {
+            return;
+        }
+
         FreeTable.CanBeExecuted = Host.IsHost && Host.MyData.CurrentPerson != null && Host.MyData.CurrentPerson.IsHuman && Host.MyData.CurrentPerson.IsConnected;
         DeleteTable.CanBeExecuted = Host.IsHost && Host.MyData.Players.Count > 2 && Host.MyData.CurrentPerson is PlayerAccount;
         ChangeType.CanBeExecuted = Host.IsHost;
         Replace.CanBeExecuted = Host.IsHost && Host.MyData.CurrentPerson != null && Host.MyData.CurrentPerson.Others != null && Host.MyData.CurrentPerson.Others.Any();
+        Kick.CanBeExecuted = Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = Host.IsHost;
     }
 
     private void FreeTable_Executed(object? arg) => Host.MyData.CurrentPerson?.Free.Execute(arg);
@@ -498,18 +824,18 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     private void EnableExtrenalMediaLoad_Executed(object? arg)
     {
         UserSettings.LoadExternalMedia = true;
-        Host.MyLogic.ReloadMedia();
+        Host?.MyLogic.ReloadMedia();
     }
 
     private void Host_IsPausedChanged(bool isPaused) => IsPaused = isPaused;
 
     private void Server_Reconnected()
     {
-        Host.AddLog(Resources.ReconnectedMessage);
-        Host.GetInfo(); // Invalidate game state
+        Host?.AddLog(Resources.ReconnectedMessage);
+        Host?.GetInfo(); // Invalidate game state
     }
 
-    private void Server_Reconnecting() => Host.AddLog(Resources.ReconnectingMessage);
+    private void Server_Reconnecting() => Host?.AddLog(Resources.ReconnectingMessage);
 
     private void Host_Ad(string? text)
     {
@@ -574,6 +900,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Move.CanBeExecuted = Data.Stage != GameStage.Before && (Host != null && Host.IsHost || IsShowman);
         ChangePauseInGame.CanBeExecuted = Move.CanBeExecuted;
         _changeSums.CanBeExecuted = _changeActivePlayer.CanBeExecuted = IsShowman;
+        ForceStart.CanBeExecuted = Host != null && Host.IsHost && Host.MyData.Stage == GameStage.Before;
+        _pressGameButton.CanBeExecuted = Host?.Role == GameRole.Player;
+
+        UpdateAddTableCommand();
+        UpdateCurrentPlayerCommands();
     }
 
     private void Host_Switch(IViewerClient newHost)

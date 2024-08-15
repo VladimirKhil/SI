@@ -113,15 +113,11 @@ public partial class MainWindow : Window
 
         var data = game.Data;
 
-        if (data.IsPlayer)
+        if (game.PressGameButton != null && game.PressGameButton.CanExecute(null))
         {
             data.PlayerDataExtensions.OnPressButton();
-
-            if (data.PlayerDataExtensions.PressGameButton != null && data.PlayerDataExtensions.PressGameButton.CanExecute(null))
-            {
-                data.PlayerDataExtensions.PressGameButton.Execute(null);
-                return true;
-            }
+            game.PressGameButton.Execute(null);
+            return true;
         }
 
         return false;

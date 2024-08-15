@@ -41,19 +41,6 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 
     #region PlayerInterface Members
 
-    public void ChooseQuest()
-    {
-        lock (_data.ChoiceLock)
-        {
-            _data.ThemeIndex = _data.QuestionIndex = -1;
-        }
-
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectQuestion)];
-        TInfo.Selectable = true;
-        TInfo.SelectQuestion.CanBeExecuted = true;
-        _data.Host.OnFlash();
-    }
-
     public void PersonAnswered(int playerIndex, bool isRight)
     {
         if (_data.QuestionType != QuestionTypes.Simple

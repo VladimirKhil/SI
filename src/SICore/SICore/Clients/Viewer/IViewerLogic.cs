@@ -109,9 +109,9 @@ public interface IViewerLogic : ILogic
     void Out(int themeIndex);
 
     /// <summary>
-    /// Победитель игры
+    /// Winner is defined.
     /// </summary>
-    void Winner();
+    void OnWinner(int winnerIndex) { }
 
     /// <summary>
     /// Время вышло
@@ -214,4 +214,13 @@ public interface IViewerLogic : ILogic
     void OnStopPlay() { }
 
     void OnSelectPlayer(SelectPlayerReason reason) { }
+
+    /// <summary>
+    /// Selects question on game table.
+    /// </summary>
+    void SelectQuestion();
+
+    void OnEnableButton() { }
+
+    void OnDisableButton() { }
 }

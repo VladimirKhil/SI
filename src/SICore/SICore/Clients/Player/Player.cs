@@ -16,9 +16,6 @@ public sealed class Player : Viewer
 {
     private readonly object _readyLock = new();
 
-    private bool _buttonDisabledByGame = false;
-    private bool _buttonDisabledByTimer = false;
-
     public override GameRole Role => GameRole.Player;
 
     /// <summary>
@@ -33,17 +30,7 @@ public sealed class Player : Viewer
     /// <param name="data">Player game data.</param>
     public Player(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
-    {
-        ClientData.PlayerDataExtensions.PressGameButton = new CustomCommand(arg =>
-        {
-            var tryStartTime = ClientData.PlayerDataExtensions.TryStartTime;
-            var pressDuration = tryStartTime.HasValue ? (int)DateTimeOffset.UtcNow.Subtract(tryStartTime.Value).TotalMilliseconds : -1;
-
-            _viewerActions.SendMessageWithArgs(Messages.I, pressDuration);
-            DisableGameButton(false);
-            ReleaseGameButton();
-        }) { CanBeExecuted = true };
-        
+    {       
         ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
         {
             _viewerActions.SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
@@ -157,20 +144,6 @@ public sealed class Player : Viewer
         }
     }
 
-    private async void ReleaseGameButton()
-    {
-        try
-        {
-            await Task.Delay(ClientData.ButtonBlockingTime * 1000);
-            _buttonDisabledByTimer = false;
-            EnableGameButton();
-        }
-        catch (Exception exc)
-        {
-            Client.CurrentServer.OnError(exc, true);
-        }
-    }
-
     private void Clear() => _logic.ClearSelections(true);
 
     public override void Init()
@@ -247,7 +220,7 @@ public sealed class Player : Viewer
 
                     if (mparams[1] == "1")
                     {
-                        _logic.PlayerLogic.ChooseQuest();
+                        _logic.SelectQuestion();
                     }
                     else
                     {
@@ -278,8 +251,7 @@ public sealed class Player : Viewer
 
                     if (ClientData.QuestionType == QuestionTypes.Simple)
                     {
-                        _buttonDisabledByGame = false;
-                        EnableGameButton();
+                        _logic.OnEnableButton();
 
                         if (!ClientData.FalseStart)
                             ClientData.PlayerDataExtensions.MyTry = true;
@@ -291,8 +263,7 @@ public sealed class Player : Viewer
 
                     if (ClientData.QuestionType == QuestionTypes.Simple)
                     {
-                        _buttonDisabledByGame = false;
-                        EnableGameButton();
+                        _logic.OnEnableButton();
 
                         if (!ClientData.FalseStart)
                             ClientData.PlayerDataExtensions.MyTry = true;
@@ -307,14 +278,13 @@ public sealed class Player : Viewer
 
                 case Messages.YouTry:
                     ClientData.PlayerDataExtensions.MyTry = true;
-                    _buttonDisabledByGame = false;
-                    EnableGameButton();
+                    _logic.OnEnableButton();
                     _logic.PlayerLogic.StartThink();
                     break;
 
                 case Messages.EndTry:
                     ClientData.PlayerDataExtensions.MyTry = false;
-                    DisableGameButton();
+                    _logic.OnDisableButton();
 
                     if (mparams[1] == MessageParams.EndTry_All)
                     {
@@ -507,27 +477,5 @@ public sealed class Player : Viewer
 
         ((PersonAccount)ClientData.Me).IsDeciding = false;
         _logic.PlayerLogic.IsRight(mparams[3] == "+", mparams[2]);
-    }
-
-    private void DisableGameButton(bool byGame = true)
-    {
-        ClientData.PlayerDataExtensions.PressGameButton.CanBeExecuted = false;
-
-        if (byGame)
-        {
-            _buttonDisabledByGame = true;
-        }
-        else
-        {
-            _buttonDisabledByTimer = true;
-        }
-    }
-
-    private void EnableGameButton()
-    {
-        if (!_buttonDisabledByGame && !_buttonDisabledByTimer)
-        {
-            ClientData.PlayerDataExtensions.PressGameButton.CanBeExecuted = true;
-        }
     }
 }

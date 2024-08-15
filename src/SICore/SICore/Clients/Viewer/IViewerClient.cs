@@ -1,4 +1,5 @@
-﻿using SIData;
+﻿using SICore.Network;
+using SIData;
 
 namespace SICore;
 
@@ -47,6 +48,8 @@ public interface IViewerClient : IActor
     event Action IsHostChanged;
 
     void RecreateCommands();
+
+    void Say(string text, string whom = NetworkConstants.Everybody, bool isPrivate = false);
 
     void Move(object arg);
 }

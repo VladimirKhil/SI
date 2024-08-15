@@ -69,19 +69,6 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
     }
 
-    public void ChooseQuest()
-    {
-        lock (_data.ChoiceLock)
-        {
-            _data.ThemeIndex = _data.QuestionIndex = -1;
-        }
-
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectQuestion)];
-        TInfo.Selectable = true;
-        TInfo.SelectQuestion.CanBeExecuted = true;
-        _data.Host.OnFlash();
-    }
-
     public void Cat()
     {
         _gameViewModel.Hint = _localizer[nameof(R.HintSelectCatPlayerForPlayer)];

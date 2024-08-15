@@ -1,5 +1,4 @@
-﻿using SICore;
-using SIGame.ViewModel;
+﻿using SIGame.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,21 +12,17 @@ public partial class Studia : UserControl
 {
     public Studia() => InitializeComponent();
 
+    // TODO: can Table call the command directly?
     private void Table_MediaEnded(object sender, RoutedEventArgs e)
     {
-        var logic = ((GameViewModel)DataContext).Host.MyLogic;
-        if (logic == null)
-        {
-            return;
-        }
-
-        var viewed = ((ViewerData)logic.Data).AtomViewed;
+        var viewed = ((GameViewModel)DataContext).AtomViewed;
+        
         if (viewed != null && viewed.CanExecute(null))
         {
             viewed.Execute(null);
         }
     }
 
-    private void UserControl_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        => studiaCommandPanel.OnMouseRightButtonDown();
+    private void UserControl_MouseRightButtonDown(object sender, MouseButtonEventArgs e) =>
+        studiaCommandPanel.OnMouseRightButtonDown();
 }

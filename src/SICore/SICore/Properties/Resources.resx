@@ -150,18 +150,6 @@
   <data name="Bravo" xml:space="preserve">
     <value>Bravo!!!;Excellent!!!;Absolutely right!!!;That's right, congratulation!!!;You have given the correct answer!!!; You're absolutely right!</value>
   </data>
-  <data name="CannotBanBots" xml:space="preserve">
-    <value>You can't ban bots</value>
-  </data>
-  <data name="CannotBanYourself" xml:space="preserve">
-    <value>You can't ban yourself</value>
-  </data>
-  <data name="CannotKickBots" xml:space="preserve">
-    <value>You can't kick bots</value>
-  </data>
-  <data name="CannotKickYouself" xml:space="preserve">
-    <value>You can't kick yourself</value>
-  </data>
   <data name="CatIsYours" xml:space="preserve">
     <value>You are getting this question</value>
   </data>
@@ -785,12 +773,6 @@
   </data>
   <data name="Cost2" xml:space="preserve">
     <value>Cost</value>
-  </data>
-  <data name="CannotSetHostToBot" xml:space="preserve">
-    <value>Cannot set bot as host</value>
-  </data>
-  <data name="CannotSetHostToYourself" xml:space="preserve">
-    <value>Your are host already!</value>
   </data>
   <data name="VoiceChatLink" xml:space="preserve">
     <value>Voice chat (Discord)</value>
