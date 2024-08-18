@@ -13,7 +13,6 @@ public sealed class Connector : IDisposable
     private readonly Client _client;
 
     private TaskCompletionSource<string[]> _tcs;
-    private TaskCompletionSource<bool> _tcs2;
 
     public Connector(SecondaryNode server, Client client)
     {
@@ -70,20 +69,6 @@ public sealed class Connector : IDisposable
             return default;
         }
 
-        if (_tcs2 != null)
-        {
-            switch (text[0])
-            {
-                case Messages.Game:
-                    _tcs2.TrySetResult(true);
-                    break;
-
-                case Messages.NoGame:
-                    _tcs2.TrySetResult(false);
-                    break;
-            }
-        }
-
         if (_tcs != null)
         {
             switch (text[0])
@@ -107,25 +92,4 @@ public sealed class Connector : IDisposable
     }
 
     public void Dispose() => _client.MessageReceived -= ProcessMessageAsync;
-
-    internal Task<bool> SetGameIdAsync(int gameId)
-    {
-        _tcs2 = new TaskCompletionSource<bool>();
-
-        var ct = new CancellationTokenSource(10000);
-        ct.Token.Register(() => _tcs2.TrySetCanceled(), useSynchronizationContext: false);
-
-        _server.ConnectionsLock.WithLock(async () =>
-        {
-            if (_server.HostServer == null)
-            {
-                Trace.TraceError("SetGameIdAsync: _server.HostServer == null");
-                return;
-            }
-
-            await _server.HostServer.SendMessageAsync(new Message($"{Messages.Game}{Message.ArgsSeparatorChar}{gameId}", "", ""));
-        });
-
-        return _tcs2.Task;
-    }
 }

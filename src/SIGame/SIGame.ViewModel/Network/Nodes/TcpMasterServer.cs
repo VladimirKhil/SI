@@ -1,9 +1,9 @@
 ﻿using SICore.Connections;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
+using SIGame.ViewModel.Properties;
 using System.Net;
 using System.Net.Sockets;
-using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers;
 
@@ -50,7 +50,7 @@ public sealed class TcpMasterServer : PrimaryNode
         }
         catch (Exception e)
         {
-            throw new Exception(string.Format(_localizer[nameof(R.NetworkOpeningError)], e.Message));
+            throw new Exception(string.Format(Resources.NetworkOpeningError, e.Message));
         }
 
         Listening();

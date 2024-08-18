@@ -1,7 +1,15 @@
 ﻿using SICore;
+using SICore.Network.Clients;
+using SICore.Network.Configuration;
+using SICore.Network.Servers;
+using SICore.Network;
+using SIData;
+using SIGame.ViewModel.Models;
 using SIGame.ViewModel.Properties;
 using SIUI.ViewModel;
 using System.Text.RegularExpressions;
+using Utils.Commands;
+using System.Windows.Input;
 
 namespace SIGame.ViewModel;
 
@@ -12,11 +20,13 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
 {
     private static readonly Regex AddressRegex = new(@"^(?<host>(\d{1,3}\.){3}\d{1,3})\:(?<port>\d+)$");
 
+    private Connector? _connector;
+
     protected override bool IsOnline => false;
 
-    private ConnectionGameData _gameData = null;
+    private ConnectionGameData? _gameData = null;
 
-    public ConnectionGameData GameData
+    public ConnectionGameData? GameData
     {
         get => _gameData;
         set
@@ -66,7 +76,7 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
     /// <summary>
     /// Connect to the host specified by the direct address.
     /// </summary>
-    public CustomCommand Connect { get; private set; }
+    public SimpleCommand Connect { get; private set; }
 
     private bool _connected = false;
 
@@ -76,7 +86,7 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
         set { if (_connected != value) { _connected = value; OnPropertyChanged(); } }
     }
 
-    public CustomCommand Cancel { get; set; }
+    public ICommand Cancel { get; set; }
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -90,10 +100,29 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
     {
         base.Initialize();
 
-        Connect = new CustomCommand(Connect_Executed);
+        Connect = new SimpleCommand(Connect_Executed);
 
         var match = AddressRegex.Match(Address);
         Connect.CanBeExecuted = match.Success && int.TryParse(match.Groups["port"].Value, out int val);
+    }
+
+    private async Task InitServerAndClientAsync(string address, int port)
+    {
+        if (_node != null)
+        {
+            await _node.DisposeAsync();
+            _node = null;
+        }
+
+        _client = new Client(Human.Name);
+
+        _node = new TcpSlaveServer(
+            port,
+            address,
+            NodeConfiguration.Default,
+            new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
+
+        _client.ConnectTo(_node);
     }
 
     protected override void Prepare(GameSettingsViewModel gameSettings)
@@ -103,7 +132,7 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
         gameSettings.NetworkGameType = NetworkGameType.DirectConnection;
     }
 
-    private async void Connect_Executed(object arg)
+    private async void Connect_Executed(object? arg)
     {
         var match = AddressRegex.Match(_model.Address);
 
@@ -116,6 +145,15 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
         ServerAddress = "http://" + _model.Address;
 
         await ConnectToServerAsync(match.Groups["host"].Value, port);
+    }
+
+    private async Task ConnectCoreAsync(bool upgrade)
+    {
+        await _node.ConnectAsync(upgrade);
+
+        _connector?.Dispose();
+
+        _connector = new Connector(_node, _client);
     }
 
     private async Task ConnectToServerAsync(string address, int port)
@@ -170,10 +208,31 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
         }
     }
 
+    public override async Task<GameViewModel?> JoinGameCoreAsync(
+        GameInfo? gameInfo,
+        GameRole role,
+        bool isHost = false,
+        CancellationToken cancellationToken = default)
+    {
+        var name = Human.Name;
+
+        var sex = Human.IsMale ? 'm' : 'f';
+        var command = $"{Messages.Connect}\n{role.ToString().ToLowerInvariant()}\n{name}\n{sex}\n{-1}";
+
+        _ = await _connector.JoinGameAsync(command);
+
+        _connector.Dispose();
+        _connector = null;
+
+        return await JoinGameCompletedAsync(role, isHost, cancellationToken);
+    }
+
     public override ValueTask DisposeAsync()
     {
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
+
+        _connector?.Dispose();
 
         return base.DisposeAsync();
     }

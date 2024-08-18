@@ -117,17 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CannotConnectToServer" xml:space="preserve">
-    <value>Cannot connect to server</value>
-  </data>
   <data name="ClientWithThisNameAlreadyExists" xml:space="preserve">
     <value>A client with this name already exists!</value>
   </data>
   <data name="ConnectionDenied" xml:space="preserve">
     <value>You are denied to connect to this game</value>
-  </data>
-  <data name="NetworkOpeningError" xml:space="preserve">
-    <value>Error while starting listening network: {0}. Network connections are unavailable.</value>
   </data>
   <data name="UnknownSenderMessage" xml:space="preserve">
     <value>Message from unknown sender</value>

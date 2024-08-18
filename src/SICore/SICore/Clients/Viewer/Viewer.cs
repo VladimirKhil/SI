@@ -58,8 +58,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
     }
 
-    public IConnector? Connector { get; set; }
-
     public IViewerLogic MyLogic => _logic;
 
     public event Action<IViewerClient>? Switch;
@@ -247,20 +245,10 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     #endregion
 
                 case SystemMessages.Disconnect:
-                    #region Disconnect
                     {
-                        // TODO: Viewer should do nothing for reconnection; that should be handled by underlying connection
-                        // For SignalR the reconnection logic is automatic
-
                         _logic.Print(ReplicManager.Special(LO[nameof(R.DisconnectMessage)]));
-
-                        if (Connector != null && !Connector.IsReconnecting)
-                        {
-                            _logic.TryConnect(Connector);
-                        }
                         break;
                     }
-                    #endregion
 
                 case Messages.Disconnected:
                     await OnDisconnectedAsync(mparams);

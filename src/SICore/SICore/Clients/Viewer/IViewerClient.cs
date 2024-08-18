@@ -8,8 +8,6 @@ namespace SICore;
 /// </summary>
 public interface IViewerClient : IActor
 {
-    IConnector? Connector { get; set; }
-
     /// <summary>
     /// Является ли владельцем сервера
     /// </summary>

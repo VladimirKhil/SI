@@ -69,7 +69,7 @@ public sealed class Connection : TcpReadConnection
         }
     }
 
-    public async Task<string> UpgradeAsync(string serverAddress, string connectionId)
+    public async Task<string> UpgradeAsync(string serverAddress, string? connectionId)
     {
         var connectionIdHeader = connectionId != null ? $"\nConnectionId: {connectionId}" : "";
 

@@ -458,6 +458,10 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         set { if (_gameMetadata != value) { _gameMetadata = value; OnPropertyChanged(); } }
     }
 
+    public int GameId { get; set; }
+
+    public Uri? HostUri { get; set; }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -909,9 +913,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void Host_Switch(IViewerClient newHost)
     {
-        newHost.Connector = Host.Connector;
-        newHost.Connector?.SetHost(newHost);
-
         Host = newHost;
 
         UpdateCommands();
@@ -954,13 +955,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         try
         {
-            var hostUri = Host.Connector?.HostUri;
-            var hostInfo = hostUri != null ? "&host=" + Uri.EscapeDataString(hostUri.ToString()) : "";
-            Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.NewOnlineGameUrl}{Host.Connector?.GameId}{hostInfo}&invite=true");
+            var hostInfo = HostUri != null ? "&host=" + Uri.EscapeDataString(HostUri.ToString()) : "";
+            Host?.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.NewOnlineGameUrl}{GameId}{hostInfo}&invite=true");
         }
         catch (Exception exc)
         {
-            Trace.TraceError("PrintOnlineInformation error: " + exc.ToString());
+            _logger.LogError(exc, "PrintOnlineInformation error");
         }
     }
 

@@ -50,7 +50,6 @@ public sealed class GameServerClient : IGameServerClient
     public event Action<string>? Joined;
     public event Action<string>? Leaved;
     public event Action<string, string>? Receieve;
-    public event Action<Message>? IncomingMessage;
 
     public event Func<Exception?, Task>? Closed;
     public event Func<Exception?, Task>? Reconnecting;
@@ -191,12 +190,9 @@ public sealed class GameServerClient : IGameServerClient
         _connection.On<GameInfo>("GameChanged", (gameInfo) => OnUI(() => GameChanged?.Invoke(gameInfo)));
         _connection.On<string>("Joined", (user) => OnUI(() => Joined?.Invoke(user)));
         _connection.On<string>("Leaved", (user) => OnUI(() => Leaved?.Invoke(user)));
-        _connection.On<Message>("Receive", (message) => IncomingMessage?.Invoke(message));
 
         _connection.On("Disconnect", async () =>
         {
-            IncomingMessage?.Invoke(new Message(Resources.YourWereKicked, "@", isSystem: false));
-
             await _connection.StopAsync();
         });
 

@@ -19,7 +19,7 @@ namespace SICore.Network.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,15 +61,6 @@ namespace SICore.Network.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось подключиться к серверу.
-        /// </summary>
-        internal static string CannotConnectToServer {
-            get {
-                return ResourceManager.GetString("CannotConnectToServer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Клиент с таким именем уже существует!.
         /// </summary>
         internal static string ClientWithThisNameAlreadyExists {
@@ -84,15 +75,6 @@ namespace SICore.Network.Properties {
         internal static string ConnectionDenied {
             get {
                 return ResourceManager.GetString("ConnectionDenied", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при открытии сетевого подключения: {0}. Сетевые подключения невозможны..
-        /// </summary>
-        internal static string NetworkOpeningError {
-            get {
-                return ResourceManager.GetString("NetworkOpeningError", resourceCulture);
             }
         }
         

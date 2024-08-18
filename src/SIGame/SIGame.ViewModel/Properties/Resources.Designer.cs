@@ -142,6 +142,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cannot connect to server.
+        /// </summary>
+        public static string CannotConnectToServer {
+            get {
+                return ResourceManager.GetString("CannotConnectToServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cannot join game.
         /// </summary>
         public static string CannotJoinGame {
@@ -831,6 +840,15 @@ namespace SIGame.ViewModel.Properties {
         public static string NameRequired {
             get {
                 return ResourceManager.GetString("NameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error while starting listening network: {0}. Network connections are unavailable..
+        /// </summary>
+        public static string NetworkOpeningError {
+            get {
+                return ResourceManager.GetString("NetworkOpeningError", resourceCulture);
             }
         }
         

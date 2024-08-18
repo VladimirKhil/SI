@@ -1,5 +1,4 @@
 ﻿using SICore.Models;
-using SICore.PlatformSpecific;
 
 namespace SICore.Contracts;
 

@@ -117,17 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CannotConnectToServer" xml:space="preserve">
-    <value>Не удалось подключиться к серверу</value>
-  </data>
   <data name="ClientWithThisNameAlreadyExists" xml:space="preserve">
     <value>Клиент с таким именем уже существует!</value>
   </data>
   <data name="ConnectionDenied" xml:space="preserve">
     <value>Подключение к данной игре вам запрещено</value>
-  </data>
-  <data name="NetworkOpeningError" xml:space="preserve">
-    <value>Ошибка при открытии сетевого подключения: {0}. Сетевые подключения невозможны.</value>
   </data>
   <data name="UnknownSenderMessage" xml:space="preserve">
     <value>Сообщение от неизвестного отправителя</value>

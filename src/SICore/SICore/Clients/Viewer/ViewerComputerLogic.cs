@@ -134,11 +134,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    public void TryConnect(IConnector connector)
-    {
-
-    }
-
     public void UpdatePicture(Account account, string path)
     {
 

@@ -564,4 +564,10 @@
   <data name="CannotSetHostToYourself" xml:space="preserve">
     <value>Your are host already!</value>
   </data>
+  <data name="CannotConnectToServer" xml:space="preserve">
+    <value>Cannot connect to server</value>
+  </data>
+  <data name="NetworkOpeningError" xml:space="preserve">
+    <value>Error while starting listening network: {0}. Network connections are unavailable.</value>
+  </data>
 </root>

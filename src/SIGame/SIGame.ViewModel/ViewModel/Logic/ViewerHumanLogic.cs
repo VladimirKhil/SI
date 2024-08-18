@@ -1756,67 +1756,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         return null;
     }
 
-    /// <summary>
-    /// Попытка осуществить повторное подключение к серверу
-    /// </summary>
-    public async void TryConnect(IConnector connector)
-    {
-        try
-        {
-            OnReplic(ReplicCodes.Special.ToString(), _localizer[nameof(R.TryReconnect)]);
-
-            var result = await connector.ReconnectToServer();
-
-            if (!result)
-            {
-                AnotherTry(connector);
-                return;
-            }
-
-            OnReplic(ReplicCodes.Special.ToString(), _localizer[nameof(R.ReconnectOK)]);
-            await connector.RejoinGame();
-
-            if (!string.IsNullOrEmpty(connector.Error))
-            {
-                if (connector.CanRetry)
-                {
-                    AnotherTry(connector);
-                }
-                else
-                {
-                    OnReplic(ReplicCodes.Special.ToString(), connector.Error);
-                }
-            }
-            else
-            {
-                OnReplic(ReplicCodes.Special.ToString(), _localizer[nameof(R.ReconnectEntered)]);
-            }
-        }
-        catch (Exception exc)
-        {
-            try { _data.Host.OnError(exc); }
-            catch { }
-        }
-    }
-
-    private async void AnotherTry(IConnector connector)
-    {
-        try
-        {
-            OnReplic(ReplicCodes.Special.ToString(), connector.Error);
-
-            if (!_disposed)
-            {
-                await Task.Delay(10000);
-                TryConnect(connector);
-            }
-        }
-        catch (Exception exc)
-        {
-            Trace.TraceError("AnotherTry error: " + exc);
-        }
-    }
-
     public void OnTextSpeed(double speed) => TInfo.TextSpeed = speed;
 
     public void SetText(string text, Models.TableStage stage)

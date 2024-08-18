@@ -5,7 +5,6 @@ using SICore;
 using SICore.BusinessLogic;
 using SICore.Network;
 using SICore.Network.Clients;
-using SICore.Network.Configuration;
 using SICore.Network.Servers;
 using SIData;
 using SIGame.ViewModel.Models;
@@ -13,6 +12,7 @@ using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIStorage.Service.Client;
 using SIUI.ViewModel;
+using System.Data;
 using System.Windows.Input;
 using Utils.Commands;
 
@@ -48,7 +48,6 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     protected SecondaryNode _node;
     protected Client _client;
     protected IViewerClient _host;
-    protected Connector? _connector;
 
     protected virtual string[] ContentPublicBaseUrls { get; } = Array.Empty<string>();
 
@@ -207,42 +206,11 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     #endregion
 
-    #region Начальное подключение к серверу
-
-    protected async Task InitServerAndClientAsync(string address, int port)
-    {
-        if (_node != null)
-        {
-            await _node.DisposeAsync();
-            _node = null;
-        }
-
-        _node = new TcpSlaveServer(
-            port,
-            address,
-            NodeConfiguration.Default,
-            new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
-
-        _client = new Client(Human.Name);
-        _client.ConnectTo(_node);
-    }
-
-    protected async Task ConnectCoreAsync(bool upgrade)
-    {
-        await _node.ConnectAsync(upgrade);
-
-        _connector?.Dispose();
-
-        _connector = new Connector(_node, _client);
-    }
-
-    #endregion
-
     #region Вход в игру
 
     private async void Join_Executed(object? arg) => await JoinGameAsync(null, (GameRole)arg);
 
-    protected virtual async Task<GameViewModel?> JoinGameAsync(GameInfo? gameInfo, GameRole role, bool host = false, CancellationToken cancellationToken = default)
+    protected async Task<GameViewModel?> JoinGameAsync(GameInfo? gameInfo, GameRole role, bool host = false, CancellationToken cancellationToken = default)
     {
         IsProgress = true;
 
@@ -268,22 +236,11 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         return null;
     }
 
-    public virtual async Task<GameViewModel?> JoinGameCoreAsync(
+    public abstract Task<GameViewModel?> JoinGameCoreAsync(
         GameInfo? gameInfo,
         GameRole role,
         bool isHost = false,
-        CancellationToken cancellationToken = default)
-    {
-        var name = Human.Name;
-
-        var sex = Human.IsMale ? 'm' : 'f';
-        var command = $"{Messages.Connect}\n{role.ToString().ToLowerInvariant()}\n{name}\n{sex}\n{-1}{GetExtraCredentials()}";
-
-        _ = await _connector.JoinGameAsync(command);
-        return await JoinGameCompletedAsync(role, isHost, cancellationToken);
-    }
-
-    protected virtual string GetExtraCredentials() => "";
+        CancellationToken cancellationToken = default);
 
     protected Task<(string? AvatarUrl, FileKey? FileKey)>? _avatarLoadingTask;
 
@@ -341,12 +298,6 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             gameViewModel.Host = _host;
 
             _host.Avatar = _avatarLoadingTask != null ? (await _avatarLoadingTask).AvatarUrl : null;
-
-            _host.Connector = new ReconnectManager(_node, _client, _host, humanPlayer, role, GetExtraCredentials(), IsOnline)
-            {
-                ServerAddress = ServerAddress
-            };
-
             _host.Client.ConnectTo(_node);
 
             _releaseServer = false;
@@ -354,12 +305,6 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             if (!isHost && Ready != null)
             {
                 Ready(gameViewModel, logic); // Here is happening moving to game view
-            }
-
-            if (_connector != null)
-            {
-                _connector.Dispose();
-                _connector = null;
             }
 
             await ClearConnectionAsync();
@@ -394,12 +339,6 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     public virtual async ValueTask DisposeAsync()
     {
         await ClearConnectionAsync();
-
-        if (_connector != null)
-        {
-            _connector.Dispose();
-            _connector = null;
-        }
 
         if (_releaseServer && _node != null)
         {

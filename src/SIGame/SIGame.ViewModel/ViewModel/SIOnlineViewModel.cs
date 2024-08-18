@@ -954,8 +954,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             return null;
         }
 
-        _host.Connector?.SetGameID(runGameResponse.GameId);
-
         return (_node, _host, gameViewModel);
     }
 
@@ -1151,8 +1149,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         return (avatarServerUri?.ToString(), avatarKey);
     }
 
-    protected override string GetExtraCredentials() => !string.IsNullOrEmpty(_password) ? $"\n{_password}" : "";
-
     public override async Task<GameViewModel?> JoinGameCoreAsync(
         GameInfo? gameInfo,
         GameRole role,
@@ -1227,8 +1223,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
             await _gameServerClient.DisposeAsync();
 
-            _host.Connector.SetGameID(gameInfo.GameID);
-            _host.Connector.SetHostUri(gameInfo.HostUri);
+            gameViewModel.GameId = gameInfo.GameID;
+            gameViewModel.HostUri = gameInfo.HostUri;
 
             return gameViewModel;
         }

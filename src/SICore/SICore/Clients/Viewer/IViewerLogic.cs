@@ -130,11 +130,6 @@ public interface IViewerLogic : ILogic
     /// <param name="path"></param>
     void UpdatePicture(Account account, string path);
 
-    /// <summary>
-    /// Попытка подключения
-    /// </summary>
-    void TryConnect(IConnector connector);
-
     void OnTextSpeed(double speed);
 
     void SetText(string text, TableStage stage = TableStage.Round);

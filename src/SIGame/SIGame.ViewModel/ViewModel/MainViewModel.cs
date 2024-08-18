@@ -5,8 +5,6 @@ using SI.GameServer.Client;
 using SI.GameServer.Contract;
 using SIContentService.Client;
 using SICore;
-using SICore.Contracts;
-using SICore.Network.Servers;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Settings;

@@ -2,8 +2,8 @@
 using SICore.Connections.Errors;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
+using SIGame.ViewModel.Properties;
 using System.Net.Sockets;
-using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers;
 
@@ -12,7 +12,7 @@ public sealed class TcpSlaveServer : SecondaryNode
     private readonly string _serverAddress;
     private readonly int _port = -1;
 
-    private string _connectionId;
+    private string? _connectionId;
 
     /// <summary>
     /// Создание зависимого сервера, подключающегося к главному
@@ -39,7 +39,7 @@ public sealed class TcpSlaveServer : SecondaryNode
 
         if (result != task)
         {
-            throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!");
+            throw new Exception($"{Resources.CannotConnectToServer} {_serverAddress}:{_port}");
         }
 
         if (result.IsFaulted)
@@ -57,7 +57,7 @@ public sealed class TcpSlaveServer : SecondaryNode
             }
             catch (ConnectionException exc)
             {
-                throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!!!!!", exc);
+                throw new Exception($"{Resources.CannotConnectToServer} {_serverAddress}:{_port}=", exc);
             }
         }
 

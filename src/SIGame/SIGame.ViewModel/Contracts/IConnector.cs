@@ -1,5 +1,6 @@
-﻿
-namespace SICore;
+﻿using SICore;
+
+namespace SIGame.ViewModel.Contracts;
 
 public interface IConnector
 {
