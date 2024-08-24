@@ -347,10 +347,14 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Новый
+    /// Allows to create new document.
     /// </summary>
     private void New_Executed(object? arg) =>
-        DocList.Add(new NewViewModel(_serviceProvider.GetRequiredService<IPackageTemplatesRepository>(), _appOptions, _documentViewModelFactory, _loggerFactory));
+        DocList.Add(new NewViewModel(
+            Settings,
+            _serviceProvider.GetRequiredService<IPackageTemplatesRepository>(),
+            _documentViewModelFactory,
+            _loggerFactory));
 
     /// <summary>
     /// Открыть существующий пакет

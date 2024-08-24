@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:siq="clr-namespace:SIQuester"
     xmlns:siqcv="clr-namespace:SIQuester.Converters"
+    xmlns:lc="clr-namespace:SIQuester.Converters"
     xmlns:lv="clr-namespace:SIQuester.View"
     xmlns:ls="clr-namespace:SIQuester.Selectors"
     xmlns:lb="clr-namespace:SIQuester.Behaviors"
@@ -44,6 +45,7 @@
             <siqcv:NotNullConverter x:Key="NotNullConverter" />
             <siqcv:FalseToVisiblityConverter x:Key="FalseToVisiblityConverter" />
             <siqcv:EqualsMultiConverter x:Key="EqualsMultiConverter" />
+            <lc:ContentCommandsConverter x:Key="ContentCommandsConverter" />
 
             <Style x:Key="WarningBox" TargetType="ContentControl">
                 <Setter Property="Content" Value="{Binding ErrorMessage}" />
@@ -1369,19 +1371,10 @@
                                         <ContentControl.Resources>
                                             <siqcv:MediaArgsConverter x:Key="MediaArgsConverter" />
 
-                                            <Style x:Key="SubMenuItem" TargetType="MenuItem">
-                                                <Setter
-                                                    Property="Command"
-                                                    Value="{Binding DataContext.SelectAtomObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
-                                                
-                                                <Setter Property="Header">
-                                                    <Setter.Value>
-                                                        <PriorityBinding>
-                                                            <Binding Path="Model.Name" />
-                                                            <Binding />
-                                                        </PriorityBinding>
-                                                    </Setter.Value>
-                                                </Setter>
+                                            <Style x:Key="ContentCommands" TargetType="MenuItem">
+                                                <Setter Property="Command" Value="{Binding Command}" />
+                                                <Setter Property="Header" Value="{Binding Name}" />
+                                                <Setter Property="CommandParameter" Value="{Binding Parameter}" />
                                             </Style>
 
                                             <Style x:Key="SubMenuItemLink" TargetType="MenuItem">
@@ -1483,21 +1476,15 @@
                                                         <MenuItem
                                                             ToolTip="{x:Static lp:Resources.AddImage}"
                                                             Header="{StaticResource AddImageImage}"
-                                                            Style="{StaticResource MenuMenuHeader}">
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource ContentCommands}">
                                                             <MenuItem.ItemsSource>
-                                                                <MultiBinding Converter="{StaticResource ListJoinConverter}">
-                                                                    <Binding Source="{StaticResource Additional}" />
+                                                                <MultiBinding Converter="{StaticResource ContentCommandsConverter}">
+                                                                    <Binding />
                                                                     <Binding Path="OwnerDocument.Images.Files" />
+                                                                    <Binding Source="{x:Static pc:ContentTypes.Image}" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
-
-                                                            <MenuItem.ItemContainerStyle>
-                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
-                                                                    <Setter
-                                                                        Property="CommandParameter"
-                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Image}}" />
-                                                                </Style>
-                                                            </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
 
@@ -1506,21 +1493,15 @@
                                                             ToolTip="{x:Static lp:Resources.AddAudio}"
                                                             Header="{StaticResource AddAudioImage}"
                                                             Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource ContentCommands}"
                                                             Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}">
                                                             <MenuItem.ItemsSource>
-                                                                <MultiBinding Converter="{StaticResource ListJoinConverter}">
-                                                                    <Binding Source="{StaticResource Additional}" />
+                                                                <MultiBinding Converter="{StaticResource ContentCommandsConverter}">
+                                                                    <Binding />
                                                                     <Binding Path="OwnerDocument.Audio.Files" />
+                                                                    <Binding Source="{x:Static pc:ContentTypes.Audio}" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
-
-                                                            <MenuItem.ItemContainerStyle>
-                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
-                                                                    <Setter
-                                                                        Property="CommandParameter"
-                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.AudioNew}}" />
-                                                                </Style>
-                                                            </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
 
@@ -1529,21 +1510,15 @@
                                                             ToolTip="{x:Static lp:Resources.AddVideo}"
                                                             Header="{StaticResource AddVideoImage}"
                                                             Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource ContentCommands}"
                                                             Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}">
                                                             <MenuItem.ItemsSource>
-                                                                <MultiBinding Converter="{StaticResource ListJoinConverter}">
-                                                                    <Binding Source="{StaticResource Additional}" />
+                                                                <MultiBinding Converter="{StaticResource ContentCommandsConverter}">
+                                                                    <Binding />
                                                                     <Binding Path="OwnerDocument.Video.Files" />
+                                                                    <Binding Source="{x:Static pc:ContentTypes.Video}" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
-
-                                                            <MenuItem.ItemContainerStyle>
-                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
-                                                                    <Setter
-                                                                        Property="CommandParameter"
-                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
-                                                                </Style>
-                                                            </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
 
@@ -1552,21 +1527,16 @@
                                                             x:Name="addHtml"
                                                             ToolTip="{x:Static lp:Resources.AddHtml}"
                                                             Header="{StaticResource AddHtmlImage}"
-                                                            Style="{StaticResource MenuMenuHeader}">
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource ContentCommands}"
+                                                            Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}">
                                                             <MenuItem.ItemsSource>
-                                                                <MultiBinding Converter="{StaticResource ListJoinConverter}">
-                                                                    <Binding Source="{StaticResource Additional}" />
+                                                                <MultiBinding Converter="{StaticResource ContentCommandsConverter}">
+                                                                    <Binding />
                                                                     <Binding Path="OwnerDocument.Html.Files" />
+                                                                    <Binding Source="{x:Static pc:ContentTypes.Html}" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
-
-                                                            <MenuItem.ItemContainerStyle>
-                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
-                                                                    <Setter
-                                                                        Property="CommandParameter"
-                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Html}}" />
-                                                                </Style>
-                                                            </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
 
@@ -1673,22 +1643,15 @@
                                                             <MenuItem
                                                                 ToolTip="{x:Static lp:Resources.AddImage}"
                                                                 Header="{StaticResource AddImageImage}"
-                                                                Style="{StaticResource MenuMenuHeader}">
-
+                                                                Style="{StaticResource MenuMenuHeader}"
+                                                                ItemContainerStyle="{StaticResource ContentCommands}">
                                                                 <MenuItem.ItemsSource>
-                                                                    <MultiBinding Converter="{StaticResource ListJoinConverter}">
-                                                                        <Binding Source="{StaticResource Additional}" />
+                                                                    <MultiBinding Converter="{StaticResource ContentCommandsConverter}">
+                                                                        <Binding />
                                                                         <Binding Path="OwnerDocument.Images.Files" />
+                                                                        <Binding Source="{x:Static pc:ContentTypes.Image}" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
-
-                                                                <MenuItem.ItemContainerStyle>
-                                                                    <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
-                                                                        <Setter
-                                                                            Property="CommandParameter"
-                                                                            Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Image}}" />
-                                                                    </Style>
-                                                                </MenuItem.ItemContainerStyle>
                                                             </MenuItem>
                                                         </Menu>
 
@@ -1698,35 +1661,15 @@
                                                             <MenuItem
                                                                 ToolTip="{x:Static lp:Resources.AddAudio}"
                                                                 Header="{StaticResource AddAudioImage}"
-                                                                Style="{StaticResource MenuMenuHeader}">
-
+                                                                Style="{StaticResource MenuMenuHeader}"
+                                                                ItemContainerStyle="{StaticResource ContentCommands}">
                                                                 <MenuItem.ItemsSource>
-                                                                    <MultiBinding Converter="{StaticResource ListJoinConverter}">
-                                                                        <Binding Source="{StaticResource Additional}" />
+                                                                    <MultiBinding Converter="{StaticResource ContentCommandsConverter}">
+                                                                        <Binding />
                                                                         <Binding Path="OwnerDocument.Audio.Files" />
+                                                                        <Binding Source="{x:Static pc:ContentTypes.Audio}" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
-
-                                                                <MenuItem.ItemContainerStyle>
-                                                                    <Style TargetType="MenuItem">
-                                                                        <Setter
-                                                                            Property="Command"
-                                                                            Value="{Binding DataContext.SelectAtomObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
-                                                                        
-                                                                        <Setter
-                                                                            Property="CommandParameter"
-                                                                            Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Audio}}" />
-                                                                        
-                                                                        <Setter Property="Header">
-                                                                            <Setter.Value>
-                                                                                <PriorityBinding>
-                                                                                    <Binding Path="Model.Name" />
-                                                                                    <Binding />
-                                                                                </PriorityBinding>
-                                                                            </Setter.Value>
-                                                                        </Setter>
-                                                                    </Style>
-                                                                </MenuItem.ItemContainerStyle>
                                                             </MenuItem>
                                                         </Menu>
 
@@ -1736,34 +1679,33 @@
                                                             <MenuItem
                                                                 ToolTip="{x:Static lp:Resources.AddVideo}"
                                                                 Header="{StaticResource AddVideoImage}"
-                                                                Style="{StaticResource MenuMenuHeader}">
+                                                                Style="{StaticResource MenuMenuHeader}"
+                                                                ItemContainerStyle="{StaticResource ContentCommands}">
                                                                 <MenuItem.ItemsSource>
-                                                                    <MultiBinding Converter="{StaticResource ListJoinConverter}">
-                                                                        <Binding Source="{StaticResource Additional}" />
+                                                                    <MultiBinding Converter="{StaticResource ContentCommandsConverter}">
+                                                                        <Binding />
                                                                         <Binding Path="OwnerDocument.Video.Files" />
+                                                                        <Binding Source="{x:Static pc:ContentTypes.Video}" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
-
-                                                                <MenuItem.ItemContainerStyle>
-                                                                    <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
-                                                                        <Setter
-                                                                            Property="CommandParameter"
-                                                                            Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
-                                                                    </Style>
-                                                                </MenuItem.ItemContainerStyle>
                                                             </MenuItem>
                                                         </Menu>
 
                                                         <Menu
                                                             Style="{StaticResource MenuMenu}"
-                                                            Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
-                                                            
+                                                            Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">                                                            
                                                             <MenuItem
-                                                                Command="{Binding SelectAtomObject}"
-                                                                CommandParameter="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Html}}"
                                                                 ToolTip="{x:Static lp:Resources.AddHtml}"
                                                                 Header="{StaticResource AddHtmlImage}"
-                                                                Style="{StaticResource MenuMenuHeader}">
+                                                                Style="{StaticResource MenuMenuHeader}"
+                                                                ItemContainerStyle="{StaticResource ContentCommands}">
+                                                                <MenuItem.ItemsSource>
+                                                                    <MultiBinding Converter="{StaticResource ContentCommandsConverter}">
+                                                                        <Binding />
+                                                                        <Binding Path="OwnerDocument.Html.Files" />
+                                                                        <Binding Source="{x:Static pc:ContentTypes.Html}" />
+                                                                    </MultiBinding>
+                                                                </MenuItem.ItemsSource>
                                                             </MenuItem>
                                                         </Menu>
                                                     </StackPanel>
@@ -1963,6 +1905,26 @@
 
             <Style x:Key="TagsStyle" TargetType="{x:Type ContentControl}">
                 <Setter Property="ContentTemplate" Value="{StaticResource Tags}" />
+            </Style>
+
+            <DataTemplate x:Key="Quality">
+                <DockPanel>
+                    <TextBlock
+                        Text="{x:Static lp:Resources.QualityControl}"
+                        Style="{StaticResource BlockStyleKey}"
+                        VerticalAlignment="Center"
+                        Width="150"
+                        Height="25"
+                        Padding="0,2,0,0" />
+
+                    <CheckBox
+                        IsChecked="{Binding HasQualityControl}"
+                        VerticalAlignment="Center" />
+                </DockPanel>
+            </DataTemplate>
+
+            <Style x:Key="QualityStyle" TargetType="{x:Type ContentControl}">
+                <Setter Property="ContentTemplate" Value="{StaticResource Quality}" />
             </Style>
 
             <DataTemplate x:Key="Publisher">
@@ -2211,7 +2173,8 @@
 
                     <ContentControl Grid.Column="1" Grid.Row="2" ContentTemplate="{StaticResource Publisher}" Content="{Binding}" />
                     <ContentControl Grid.Column="1" Grid.Row="3" Style="{StaticResource TagsStyle}" Content="{Binding}" />
-                    <ContentControl Grid.Column="1" Grid.Row="4" Style="{StaticResource LanguageStyle}" Content="{Binding}" />
+                    <ContentControl Grid.Column="1" Grid.Row="4" Style="{StaticResource QualityStyle}" Content="{Binding}" />
+                    <ContentControl Grid.Column="2" Grid.Row="4" Style="{StaticResource LanguageStyle}" Content="{Binding}" />
                     <ContentControl Grid.Column="2" Grid.Row="1" Margin="15,0,0,0" ContentTemplate="{StaticResource Restrictions}" Content="{Binding}" />
                     <ContentControl Grid.Column="2" Grid.Row="2" Margin="15,0,0,0" ContentTemplate="{StaticResource Difficulty}" Content="{Binding}" />
                     <ContentControl Grid.Column="2" Grid.Row="3" Margin="15,0,0,0" Style="{StaticResource ContactUrlStyle}" Content="{Binding}" />

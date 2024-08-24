@@ -18,10 +18,10 @@ public static class PackageHelper
         string name,
         string author,
         string finalName,
-        int roundsCount = 3,
-        int themesCount = 6,
-        int baseCost = 100,
-        Stream? stream = null,
+        int roundsCount,
+        int themesCount,
+        int baseCost,
+        Stream stream,
         CancellationToken cancellationToken = default)
     {
         var doc = SIDocument.Create(name, author, stream);
@@ -242,42 +242,21 @@ public static class PackageHelper
     {
         foreach (var contentItem in question.GetContent())
         {
-            if (contentItem.Type == AtomTypes.Text)
+            if (contentItem.Type == ContentTypes.Text)
             {
                 continue;
             }
 
-            var link = doc2.GetLink(contentItem);
+            var link = doc2.TryGetMedia(contentItem);
 
-            if (link.GetStream != null)
+            if (link.HasValue && link.Value.Uri != null && link.Value.HasStream)
             {
                 var collection = doc.TryGetCollection(contentItem.Type);
 
                 if (collection != null)
                 {
-                    using var stream = link.GetStream().Stream;
-                    await collection.AddFileAsync(link.Uri, stream, cancellationToken);
-                }
-            }
-        }
-
-        foreach (var atom in question.Scenario)
-        {
-            if (atom.Type == AtomTypes.Text || atom.Type == AtomTypes.Oral)
-            {
-                continue;
-            }
-
-            var link = doc2.GetLink(atom);
-
-            if (link.GetStream != null)
-            {
-                var collection = doc.TryGetCollection(atom.Type);
-
-                if (collection != null)
-                {
-                    using var stream = link.GetStream().Stream;
-                    await collection.AddFileAsync(link.Uri, stream, cancellationToken);
+                    using var stream = link.Value.Stream!;
+                    await collection.AddFileAsync(link.Value.Uri.ToString(), stream, cancellationToken);
                 }
             }
         }

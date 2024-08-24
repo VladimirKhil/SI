@@ -51,6 +51,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     private const int DefaultSelectOptionCount = 4;
     private const bool DefaultUseImageDuration = false;
     private const int DefaultImageDurationSeconds = 5;
+    private const bool DefaultUseQualityControl = true;
 
     /// <summary>
     /// Auto-save interval.
@@ -557,6 +558,12 @@ public sealed class AppSettings : INotifyPropertyChanged
             }
         }
     }
+
+    /// <summary>
+    /// Use quality control.
+    /// </summary>
+    [DefaultValue(DefaultUseQualityControl)]
+    public bool UseQualityControl { get; set; } = DefaultUseQualityControl;
 
     /// <summary>
     /// Maximum recommended image size.

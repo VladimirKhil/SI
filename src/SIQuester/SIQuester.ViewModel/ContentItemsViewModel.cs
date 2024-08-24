@@ -1,6 +1,7 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System.Collections.Specialized;
@@ -13,7 +14,7 @@ namespace SIQuester.ViewModel;
 /// <summary>
 /// Defines a content item list view model.
 /// </summary>
-public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
+public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>, IContentCollection
 {
     private List<ContentItem> Model { get; }
 
@@ -45,7 +46,11 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
     /// </summary>
     public SimpleCommand NavigateToFile { get; private set; }
 
-    public ICommand SelectAtomObject { get; private set; }
+    public ICommand LinkFile { get; private set; }
+
+    public SimpleCommand LinkUri { get; private set; }
+
+    public ICommand AddFile { get; private set; }
 
     public bool IsTopLevel { get; private set; }
 
@@ -75,8 +80,18 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         ExportMedia = new SimpleCommand(ExportMedia_Executed);
         NavigateToFile = new SimpleCommand(NavigateToFile_Executed);
 
-        SelectAtomObject = new SimpleCommand(SelectAtomObject_Executed);
+        LinkFile = new SimpleCommand(LinkFile_Executed);
+        LinkUri = new SimpleCommand(LinkUri_Executed);
+        AddFile = new SimpleCommand(AddFile_Executed);
         IsTopLevel = isTopLevel;
+
+        UpdateQualityCommands();
+    }
+
+    public void UpdateQualityCommands()
+    {
+        var package = Owner.OwnerTheme?.OwnerRound?.OwnerPackage;
+        LinkUri.CanBeExecuted = package != null && !package.HasQualityControl;
     }
 
     internal void AddScreenText_Executed(object? arg) => QDocument.ActivatedObject = Add(ContentTypes.Text, "", ContentPlacements.Screen);
@@ -217,7 +232,6 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         var contentType = contentItem?.Model.Type;
 
         var isMedia = contentType == ContentTypes.Image
-            || contentType == AtomTypes.Audio
             || contentType == ContentTypes.Audio
             || contentType == ContentTypes.Video
             || contentType == ContentTypes.Html;
@@ -333,7 +347,60 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         }
     }
 
-    private void SelectAtomObject_Executed(object? arg) => SelectAtomObjectCore(arg);
+    private void AddFile_Executed(object? arg)
+    {
+        var contentType = arg?.ToString();
+
+        if (contentType == null)
+        {
+            return;
+        }
+
+        try
+        {
+            AddContentFile(contentType);
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowExclamationMessage(exc.Message);
+        }
+    }
+
+    private void LinkUri_Executed(object? arg)
+    {
+        var contentType = arg?.ToString();
+
+        if (contentType == null)
+        {
+            return;
+        }
+
+        try
+        {
+            LinkContentUri(contentType);
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowExclamationMessage(exc.Message);
+        }
+    }
+
+    private void LinkFile_Executed(object? arg)
+    {
+        if (arg is not (MediaItemViewModel file, string contentType))
+        {
+            return;
+        }
+
+        try
+        {
+            LinkExistingContentFile(contentType, file);
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowExclamationMessage(exc.Message);
+        }
+    }
 
     public bool SelectAtomObjectCore(object? arg)
     {

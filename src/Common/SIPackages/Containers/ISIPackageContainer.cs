@@ -52,26 +52,30 @@ public interface ISIPackageContainer : IDisposable
     /// Creates a stream.
     /// </summary>
     /// <param name="name">Stream name.</param>
-    /// <param name="contentType">Stream content type.</param>
-    void CreateStream(string name, string contentType);
+    void CreateStream(string name);
 
     /// <summary>
     /// Creates a stream.
     /// </summary>
     /// <param name="category"></param>
     /// <param name="name">Stream name.</param>
-    /// <param name="contentType">Stream content type.</param>
-    void CreateStream(string category, string name, string contentType);
+    void CreateStream(string category, string name);
 
     /// <summary>
     /// Creates a stream.
     /// </summary>
     /// <param name="category">Stream category.</param>
     /// <param name="name">Stream name.</param>
-    /// <param name="contentType">Stream content type.</param>
     /// <param name="stream">Stream data.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task CreateStreamAsync(string category, string name, string contentType, Stream stream, CancellationToken cancellationToken = default);
+    Task CreateStreamAsync(string category, string name, Stream stream, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a stream.
+    /// </summary>
+    /// <param name="name">Stream name.</param>
+    /// <returns>Has the stream been deleted.</returns>
+    bool DeleteStream(string name);
 
     /// <summary>
     /// Deletes a stream.

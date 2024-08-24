@@ -21,19 +21,21 @@ public sealed class EmptySIPackageContainer : ISIPackageContainer
     }
 
     /// <inheritdoc />
-    public void CreateStream(string name, string contentType) => throw new NotImplementedException();
+    public void CreateStream(string name) => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void CreateStream(string category, string name, string contentType) => throw new NotImplementedException();
+    public void CreateStream(string category, string name) => throw new NotImplementedException();
 
     /// <inheritdoc />
     public Task CreateStreamAsync(
         string category,
         string name,
-        string contentType,
         Stream stream,
         CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
+    
+    /// <inheritdoc />
+    public bool DeleteStream(string name) => throw new NotImplementedException();
 
     /// <inheritdoc />
     public bool DeleteStream(string category, string name) => throw new NotImplementedException();

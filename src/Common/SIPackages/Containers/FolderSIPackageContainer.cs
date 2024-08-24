@@ -29,12 +29,12 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
 
     internal static ISIPackageContainer Create(string folder) => new FolderSIPackageContainer(folder, new Dictionary<string, ExtractedFileInfo>(), false);
 
-    public void CreateStream(string name, string contentType)
+    public void CreateStream(string name)
     {
         using (File.Create(Path.Combine(_folder, name))) { }
     }
 
-    public void CreateStream(string category, string name, string contentType)
+    public void CreateStream(string category, string name)
     {
         Directory.CreateDirectory(Path.Combine(_folder, category));
         using (File.Create(Path.Combine(_folder, category, name))) { }
@@ -43,7 +43,6 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
     public async Task CreateStreamAsync(
         string category,
         string name,
-        string contentType,
         Stream stream,
         CancellationToken cancellationToken = default)
     {
@@ -51,6 +50,8 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
         using var fs = File.Create(Path.Combine(_folder, category, name));
         await stream.CopyToAsync(fs, cancellationToken);
     }
+
+    public bool DeleteStream(string name) => throw new NotImplementedException();
 
     public bool DeleteStream(string category, string name) => throw new NotImplementedException();
 

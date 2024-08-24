@@ -81,6 +81,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             
@@ -145,9 +147,25 @@
             <TextBlock Grid.Row="5" Margin="4" Text="{x:Static lp:Resources.PackageAuthor}" />
             <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding PackageAuthor}" Margin="4" />
 
+            <CheckBox
+                Grid.Row="6"
+                IsChecked="{Binding QualityControl}"
+                Margin="0,15,0,0"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center">
+                <TextBlock Text="{x:Static lp:Resources.QualityControl}" VerticalAlignment="Center" Margin="1,0,0,0" />
+            </CheckBox>
+
+            <TextBlock
+                Grid.Row="7"
+                Grid.ColumnSpan="2"
+                Text="{x:Static lp:Resources.QualityControlHint}"
+                Margin="5,5,0,0"
+                FontSize="12" />
+
             <Button
                 HorizontalAlignment="Right"
-                Grid.Row="6"
+                Grid.Row="8"
                 Grid.ColumnSpan="2"
                 Command="{Binding Create}"
                 Margin="4"
@@ -155,7 +173,7 @@
                 Name="bCreate"
                 Content="{x:Static lp:Resources.Create}" />
 
-            <ContentControl Grid.Row="7" Grid.ColumnSpan="2" Style="{StaticResource NonStandartArea}" />
+            <ContentControl Grid.Row="9" Grid.ColumnSpan="2" Style="{StaticResource NonStandartArea}" />
         </Grid>
     </ScrollViewer>
 </UserControl>

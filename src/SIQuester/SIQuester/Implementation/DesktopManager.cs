@@ -113,19 +113,26 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         return result.HasValue && result.Value ? openDialog.FileNames : null;
     }
 
-    public override string[]? ShowMediaOpenUI(string mediaCategory)
+    public override string[]? ShowMediaOpenUI(string mediaCategory, bool allowAnyFile)
     {
+        var filter = mediaCategory switch
+        {
+            CollectionNames.ImagesStorageName => $"{Resources.Images} (*.jpg, *.jpe, *.jpeg, *.png, *.gif, *.webp)|*.jpg;*.jpe;*.jpeg;*.png;*.gif;*.webp",
+            CollectionNames.AudioStorageName => $"{Resources.Audio} (*.mp3)|*.mp3",
+            CollectionNames.VideoStorageName => $"{Resources.Video} (*.mp4)|*.mp4",
+            CollectionNames.HtmlStorageName => $"{ViewModel.Properties.Resources.HtmlFiles} (*.html)|*.html",
+            _ => throw new ArgumentException($"Invalid category {mediaCategory}", nameof(mediaCategory))
+        };
+
+        if (allowAnyFile)
+        {
+            filter += $"|{Resources.AllFiles} (*.*)|*.*";
+        }
+
         var dialog = new OpenFileDialog
         {
             Multiselect = true,
-            Filter = mediaCategory switch
-            {
-                CollectionNames.ImagesStorageName => $"{Resources.Images} (*.jpg, *.jpe, *.jpeg, *.png, *.gif, *.webp)|*.jpg;*.jpe;*.jpeg;*.png;*.gif;*.webp|{Resources.AllFiles} (*.*)|*.*",
-                CollectionNames.AudioStorageName => $"{Resources.Audio} (*.mp3)|*.mp3|{Resources.AllFiles} (*.*)|*.*",
-                CollectionNames.VideoStorageName => $"{Resources.Video} (*.mp4)|*.mp4|{Resources.AllFiles} (*.*)|*.*",
-                CollectionNames.HtmlStorageName => $"{ViewModel.Properties.Resources.HtmlFiles} (*.html)|*.html|{Resources.AllFiles} (*.*)|*.*",
-                _ => throw new ArgumentException($"Invalid category {mediaCategory}", nameof(mediaCategory))
-            }
+            Filter = filter
         };
 
         var result = dialog.ShowDialog();

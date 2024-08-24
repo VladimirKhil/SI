@@ -1,6 +1,7 @@
 ﻿using Notions;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System.Text;
@@ -12,7 +13,7 @@ namespace SIQuester.ViewModel;
 /// <summary>
 /// Represents a right/wrong simple answers view model.
 /// </summary>
-public sealed class AnswersViewModel : ItemsViewModel<string>
+public sealed class AnswersViewModel : ItemsViewModel<string>, IContentCollection
 {
     public QuestionViewModel Owner { get; private set; }
 
@@ -28,7 +29,11 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
 
     public ICommand ToNewComment { get; private set; }
 
-    public ICommand SelectAtomObject { get; private set; }
+    public ICommand LinkFile { get; private set; }
+
+    public SimpleCommand LinkUri { get; private set; }
+
+    public ICommand AddFile { get; private set; }
 
     public override QDocument OwnerDocument => Owner.OwnerTheme.OwnerRound.OwnerPackage.Document;
 
@@ -48,13 +53,22 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
         ToNewSource = new SimpleCommand(ToNewSource_Executed);
         ToNewComment = new SimpleCommand(ToNewComment_Executed);
 
-        SelectAtomObject = new SimpleCommand(SelectAtomObject_Executed);
+        LinkFile = new SimpleCommand(LinkFile_Executed);
+        LinkUri = new SimpleCommand(LinkUri_Executed);
+        AddFile = new SimpleCommand(AddFile_Executed);
 
         UpdateCommands();
         UpdateAnswersCommands();
+        UpdateQualityCommands();
     }
 
-    protected override void OnCurrentItemChanged(string oldValue, string newValue)
+    public void UpdateQualityCommands()
+    {
+        var package = Owner.OwnerTheme?.OwnerRound?.OwnerPackage;
+        LinkUri.CanBeExecuted = package != null && !package.HasQualityControl;
+    }
+
+    protected override void OnCurrentItemChanged(string? oldValue, string? newValue)
     {
         base.OnCurrentItemChanged(oldValue, newValue);
         UpdateAnswersCommands();
@@ -234,7 +248,13 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
 
     protected override bool CanRemove() => Count > 1 || Owner == null || Owner.Wrong == this;
 
-    private void SelectAtomObject_Executed(object? arg)
+    private void LinkFile_Executed(object? arg) => AddAnswerFile(arg, content => content.LinkFile);
+
+    private void LinkUri_Executed(object? arg) => AddAnswerFile(arg, content => content.LinkUri);
+
+    private void AddFile_Executed(object? arg) => AddAnswerFile(arg, content => content.AddFile);
+
+    private void AddAnswerFile(object? arg, Func<ContentItemsViewModel, ICommand> commandSelector)
     {
         if (Owner.Parameters == null)
         {
@@ -249,12 +269,17 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
         var answer = new StepParameterViewModel(Owner, new StepParameter
         {
             Type = StepParameterTypes.Content,
-            ContentValue = new List<ContentItem>()
+            ContentValue = new List<ContentItem>(new[] { new ContentItem() })
         });
 
-        if (answer.ContentValue != null && answer.ContentValue.SelectAtomObjectCore(arg))
+        if (answer.ContentValue != null)
         {
-            Owner.Parameters.AddAnswer(answer);
+            commandSelector(answer.ContentValue).Execute(arg);
+
+            if (answer.ContentValue.Count > 0)
+            {
+                Owner.Parameters.AddAnswer(answer);
+            }
         }
     }
 }

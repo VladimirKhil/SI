@@ -302,7 +302,7 @@ Humor</value>
     <value>File search</value>
   </data>
   <data name="FileSizeLimitExceed" xml:space="preserve">
-    <value>The file size exceeds the allowable value for playing through the Game server ({0} bytes)!</value>
+    <value>The file size exceeds the allowable value for playing through the Game server ({0} MB)!</value>
   </data>
   <data name="Final" xml:space="preserve">
     <value>FINAL</value>
@@ -345,6 +345,12 @@ Humor</value>
   </data>
   <data name="InstallError" xml:space="preserve">
     <value>An error occurred</value>
+  </data>
+  <data name="InvalidFileExtension" xml:space="preserve">
+    <value>File {0} has invalid extension {1}. Expected one of {2}</value>
+  </data>
+  <data name="InvalidFileSize" xml:space="preserve">
+    <value>File {0} exceeds maximum size {1} MB</value>
   </data>
   <data name="Left" xml:space="preserve">
     <value>REMAINDER</value>

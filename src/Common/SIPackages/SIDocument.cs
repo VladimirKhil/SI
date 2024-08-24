@@ -1,9 +1,7 @@
 ﻿using EnsureThat;
 using SIPackages.Containers;
 using SIPackages.Core;
-using SIPackages.Helpers;
 using SIPackages.Models;
-using SIPackages.Properties;
 using System.Diagnostics;
 using System.Xml;
 using ZipUtils;
@@ -18,6 +16,7 @@ public sealed class SIDocument : IDisposable
     internal const string ContentFileName = "content.xml";
     internal const string AuthorsFileName = "authors.xml";
     internal const string SourcesFileName = "sources.xml";
+    internal const string QualityMarkerName = "quality.marker";
 
     private bool _disposed;
 
@@ -86,6 +85,14 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     public DataCollection Html => _html;
 
+    /// <summary>
+    /// Does this document have additional quality control:
+    /// - maximum size: 150 MB;
+    /// - limited media files size and extensions;
+    /// - forbidden external links.
+    /// </summary>
+    public bool HasQualityControl { get; set; }
+
     #region Document Functions
 
     private SIDocument(ISIPackageContainer packageContainer)
@@ -94,10 +101,10 @@ public sealed class SIDocument : IDisposable
 
         _packageContainer = packageContainer;
 
-        _images = new DataCollection(_packageContainer, CollectionNames.ImagesStorageName, "si/image");
-        _audio = new DataCollection(_packageContainer, CollectionNames.AudioStorageName, "si/audio");
-        _video = new DataCollection(_packageContainer, CollectionNames.VideoStorageName, "si/video");
-        _html = new DataCollection(_packageContainer, CollectionNames.HtmlStorageName, "si/html");
+        _images = new DataCollection(_packageContainer, CollectionNames.ImagesStorageName);
+        _audio = new DataCollection(_packageContainer, CollectionNames.AudioStorageName);
+        _video = new DataCollection(_packageContainer, CollectionNames.VideoStorageName);
+        _html = new DataCollection(_packageContainer, CollectionNames.HtmlStorageName);
     }
 
     /// <summary>
@@ -302,6 +309,13 @@ public sealed class SIDocument : IDisposable
                 _sources.ReadXml(reader);
             }
         }
+
+        var qualityStreamLength = _packageContainer.GetStreamLength(QualityMarkerName);
+
+        if (qualityStreamLength > -1) // 0 is OK
+        {
+            HasQualityControl = true;
+        }
     }
 
     /// <summary>
@@ -370,6 +384,17 @@ public sealed class SIDocument : IDisposable
             _sources.WriteXml(writer);
         }
 
+        var qualityStreamLength = packageContainer.GetStreamLength(QualityMarkerName);
+
+        if (HasQualityControl && qualityStreamLength == -1)
+        {
+            packageContainer.CreateStream(QualityMarkerName);
+        }
+        else if (!HasQualityControl && qualityStreamLength != -1)
+        {
+            packageContainer.DeleteStream(QualityMarkerName);
+        }
+
         packageContainer.Flush();
     }
 
@@ -379,7 +404,7 @@ public sealed class SIDocument : IDisposable
 
         if (streamInfo == null)
         {
-            packageContainer.CreateStream(streamName, "si/xml");
+            packageContainer.CreateStream(streamName);
             streamInfo = packageContainer.GetStream(streamName, false);
 
             if (streamInfo == null)
@@ -397,7 +422,7 @@ public sealed class SIDocument : IDisposable
 
         if (streamInfo == null)
         {
-            packageContainer.CreateStream(categoryName, streamName, "si/xml");
+            packageContainer.CreateStream(categoryName, streamName);
             streamInfo = packageContainer.GetStream(categoryName, streamName, false);
 
             if (streamInfo == null)
@@ -430,16 +455,21 @@ public sealed class SIDocument : IDisposable
 
         if (isNew)
         {
-            newContainer.CreateStream(ContentFileName, "si/xml");
+            newContainer.CreateStream(ContentFileName);
 
             if (_authors.Any())
             {
-                newContainer.CreateStream(CollectionNames.TextsStorageName, AuthorsFileName, "si/xml");
+                newContainer.CreateStream(CollectionNames.TextsStorageName, AuthorsFileName);
             }
 
             if (_sources.Any())
             {
-                newContainer.CreateStream(CollectionNames.TextsStorageName, SourcesFileName, "si/xml");
+                newContainer.CreateStream(CollectionNames.TextsStorageName, SourcesFileName);
+            }
+
+            if (HasQualityControl)
+            {
+                newContainer.CreateStream(QualityMarkerName);
             }
         }
         
@@ -475,17 +505,9 @@ public sealed class SIDocument : IDisposable
             {
                 InsertLinkValue(theme);
 
-                foreach (var quest in theme.Questions)
+                foreach (var question in theme.Questions)
                 {
-                    InsertLinkValue(quest);
-
-                    foreach (var atom in quest.Scenario)
-                    {
-                        if (atom.Text.ExtractLink().Length > 0)
-                        {
-                            atom.Text = string.Format("{0} {1}", Resources.LinkMissed, atom.Text);
-                        }
-                    }
+                    InsertLinkValue(question);
                 }
             }
         }
@@ -614,44 +636,6 @@ public sealed class SIDocument : IDisposable
     }
 
     /// <summary>
-    /// Gets link from atom text.
-    /// </summary>
-    /// <param name="atom">Atom containing the link.</param>
-    /// <returns>Linked resource.</returns>
-    [Obsolete]
-    public IMedia GetLink(Atom atom)
-    {
-        var link = atom.Text.ExtractLink();
-
-        if (string.IsNullOrEmpty(link))
-        {
-            return new Media(atom.Text);
-        }
-
-        var collection = GetCollection(atom.Type);
-        return GetLinkFromCollection(link, collection);
-    }
-
-    /// <summary>
-    /// Gets link from content item.
-    /// </summary>
-    /// <param name="contentItem">Content item.</param>
-    /// <returns>Linked resource.</returns>
-    [Obsolete("Use TryGetMedia")]
-    public IMedia GetLink(ContentItem contentItem)
-    {
-        var link = contentItem.Value;
-
-        if (!contentItem.IsRef)
-        {
-            return new Media(link);
-        }
-
-        var collection = GetCollection(contentItem.Type);
-        return GetLinkFromCollection(link, collection);
-    }
-
-    /// <summary>
     /// Tries to get media from content item.
     /// </summary>
     /// <param name="contentItem">Content item.</param>
@@ -690,41 +674,6 @@ public sealed class SIDocument : IDisposable
     /// <exception cref="ArgumentException">Invalid media type has been provided.</exception>
     public DataCollection GetCollection(string mediaType) => TryGetCollection(mediaType)
         ?? throw new ArgumentException($"Invalid media type {mediaType}", nameof(mediaType));
-
-    [Obsolete]
-    private static IMedia GetLinkFromCollection(string link, DataCollection collection)
-    {
-        // TODO: make deterministic choice
-
-        if (collection.Contains(link))
-        {
-            return new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), link);
-        }
-
-        var escapedLink = Uri.EscapeUriString(link);
-
-        if (collection.Contains(escapedLink))
-        {
-            return new Media(() => collection.GetFile(escapedLink), () => collection.GetFileLength(escapedLink), escapedLink);
-        }
-
-        var hash = ZipHelper.CalculateHash(link);
-
-        if (collection.Contains(hash))
-        {
-            return new Media(() => collection.GetFile(hash), () => collection.GetFileLength(hash), hash);
-        }
-
-        var escapedHash = ZipHelper.CalculateHash(escapedLink);
-
-        if (collection.Contains(escapedHash))
-        {
-            return new Media(() => collection.GetFile(escapedHash), () => collection.GetFileLength(escapedHash), escapedHash);
-        }
-
-        // This is a link to an external resource
-        return new Media(link);
-    }
 
     private MediaInfo? TryGetMedia(string category, string link)
     {
@@ -839,31 +788,9 @@ public sealed class SIDocument : IDisposable
     {
         CopyAuthorsAndSources(newDocument, question);
 
-        foreach (var atom in question.Scenario)
-        {
-            await CopyMediaAsync(newDocument, atom, cancellationToken);
-        }
-
         foreach (var contentItem in question.GetContent())
         {
             await CopyMediaAsync(newDocument, contentItem, cancellationToken);
-        }
-    }
-
-    private async Task CopyMediaAsync(SIDocument newDocument, Atom atom, CancellationToken cancellationToken = default)
-    {
-        var link = atom.Text.ExtractLink();
-
-        var collection = GetCollection(atom.Type);
-        var newCollection = newDocument.GetCollection(atom.Type);
-
-        if (!newCollection.Contains(link))
-        {
-            if (collection.Contains(link))
-            {
-                using var stream = collection.GetFile(link).Stream;
-                await newCollection.AddFileAsync(link, stream, cancellationToken);
-            }
         }
     }
 

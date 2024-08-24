@@ -807,6 +807,14 @@
   <data name="PublishersNotSet" xml:space="preserve">
     <value>(не задано)</value>
   </data>
+  <data name="QualityControl" xml:space="preserve">
+    <value>Контроль качества</value>
+  </data>
+  <data name="QualityControlHint" xml:space="preserve">
+    <value>- максимальный размер пакета - 150 МБ
+- ограничение расширений и размера мультимедиа файлов
+- внешние ссылки запрещены</value>
+  </data>
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
   </data>

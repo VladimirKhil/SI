@@ -45,7 +45,12 @@ public sealed class QDocument : WorkspaceViewModel
     /// <summary>
     /// Maximum file size allowed by game server.
     /// </summary>
-    private const int GameServerFileSizeLimit = 100 * 1024 * 1024;
+    private const int GameServerFileSizeLimitMB = 100;
+
+    /// <summary>
+    /// Maximum file size allowed by game server for packages with quality control.
+    /// </summary>
+    private const int GameServerFileSizeQualityLimitMB = 150;
 
     private const string ContentFileName = "content.xml";
 
@@ -2206,14 +2211,16 @@ public sealed class QDocument : WorkspaceViewModel
 
     private string? GetFileSizeErrorMessage()
     {
-        if (!AppSettings.Default.CheckFileSize)
+        if (!AppSettings.Default.CheckFileSize && !Document.HasQualityControl)
         {
             return null;
         }
 
-        if (!string.IsNullOrEmpty(_path) && new FileInfo(_path).Length > GameServerFileSizeLimit)
+        var sizeLimit = Document.HasQualityControl ? GameServerFileSizeQualityLimitMB : GameServerFileSizeLimitMB;
+
+        if (!string.IsNullOrEmpty(_path) && new FileInfo(_path).Length > sizeLimit * 1024 * 1024)
         {
-            return string.Format(Resources.FileSizeLimitExceed, GameServerFileSizeLimit);
+            return string.Format(Resources.FileSizeLimitExceed, sizeLimit);
         }
 
         return null;

@@ -37,7 +37,7 @@ public abstract class PlatformManager
 
     public abstract string[]? ShowOpenUI();
 
-    public abstract string[]? ShowMediaOpenUI(string mediaCategory);
+    public abstract string[]? ShowMediaOpenUI(string mediaCategory, bool allowAnyFile);
 
     public abstract bool ShowSaveUI(
         string? title,

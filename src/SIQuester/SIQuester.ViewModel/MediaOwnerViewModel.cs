@@ -15,7 +15,7 @@ namespace SIQuester.ViewModel;
 /// <inheritdoc cref="ModelViewBase" />
 public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
 {
-    private static readonly Dictionary<string, int> RecommenedSizeMb = new()
+    public static readonly Dictionary<string, int> RecommenedSizeMb = new()
     {
         [CollectionNames.ImagesStorageName] = 1,
         [CollectionNames.AudioStorageName] = 5,

@@ -69,15 +69,14 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
 
     public StreamInfo? GetStream(string category, string name, bool read = true) => GetStream($"{category}/{Uri.EscapeUriString(name)}", read);
 
-    public void CreateStream(string name, string contentType) => _zipArchive.CreateEntry(Uri.EscapeUriString(name), CompressionLevel.Optimal);
+    public void CreateStream(string name) => _zipArchive.CreateEntry(Uri.EscapeUriString(name), CompressionLevel.Optimal);
 
-    public void CreateStream(string category, string name, string contentType) =>
+    public void CreateStream(string category, string name) =>
         _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.NoCompression);
 
     public async Task CreateStreamAsync(
         string category,
         string name,
-        string contentType,
         Stream stream,
         CancellationToken cancellationToken = default)
     {
@@ -87,10 +86,9 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
         await stream.CopyToAsync(writeStream, cancellationToken);
     }
 
-    public bool DeleteStream(string category, string name)
+    public bool DeleteStream(string name)
     {
-        var entryName = $"{category}/{Uri.EscapeUriString(name)}";
-        var entry = _zipArchive.GetEntry(entryName);
+        var entry = _zipArchive.GetEntry(name);
 
         if (entry == null)
         {
@@ -100,6 +98,8 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
         entry.Delete();
         return true;
     }
+
+    public bool DeleteStream(string category, string name) => DeleteStream($"{category}/{Uri.EscapeUriString(name)}");
 
     public ISIPackageContainer CopyTo(Stream stream, bool closeCurrent, out bool isNew)
     {
@@ -119,7 +119,7 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
         // Reopening current package
         if (closeCurrent)
         {
-            _stream.Dispose(); // what about _zipPackage?
+            _stream.Dispose(); // what about _zipArchive?
         }
 
         return Open(stream, false);

@@ -563,7 +563,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на The file size exceeds the allowable value for playing through the Game server ({0} bytes)!.
+        ///   Ищет локализованную строку, похожую на The file size exceeds the allowable value for playing through the Game server ({0} MB)!.
         /// </summary>
         public static string FileSizeLimitExceed {
             get {
@@ -694,6 +694,24 @@ namespace SIQuester.ViewModel.Properties {
         public static string InstallError {
             get {
                 return ResourceManager.GetString("InstallError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на File {0} has invalid extension {1}. Expected one of {2}.
+        /// </summary>
+        public static string InvalidFileExtension {
+            get {
+                return ResourceManager.GetString("InvalidFileExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на File {0} exceeds maximum size {1} MB.
+        /// </summary>
+        public static string InvalidFileSize {
+            get {
+                return ResourceManager.GetString("InvalidFileSize", resourceCulture);
             }
         }
         

@@ -2141,6 +2141,26 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Quality control.
+        /// </summary>
+        public static string QualityControl {
+            get {
+                return ResourceManager.GetString("QualityControl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на - maximum package size is 150 MB
+        ///- limited media size and extensions
+        ///- external links are forbidden.
+        /// </summary>
+        public static string QualityControlHint {
+            get {
+                return ResourceManager.GetString("QualityControlHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Question.
         /// </summary>
         public static string Question {

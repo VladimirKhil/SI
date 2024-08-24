@@ -9,8 +9,6 @@ namespace SIPackages;
 /// <inheritdoc cref="IEnumerable{T}" />
 public sealed class DataCollection : IEnumerable<string>
 {
-    private readonly string _mediaType;
-
     private ISIPackageContainer _packageContainer;
 
     /// <summary>
@@ -33,11 +31,9 @@ public sealed class DataCollection : IEnumerable<string>
     /// </summary>
     /// <param name="package">Package that owns the collection.</param>
     /// <param name="name">Collection name.</param>
-    /// <param name="mediaType">Collection media type.</param>
-    internal DataCollection(ISIPackageContainer package, string name, string mediaType)
+    internal DataCollection(ISIPackageContainer package, string name)
     {
         Name = name;
-        _mediaType = mediaType;
         _packageContainer = package;
 
         _files = new List<string>(_packageContainer.GetEntries(Name));
@@ -74,7 +70,7 @@ public sealed class DataCollection : IEnumerable<string>
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task AddFileAsync(string fileName, Stream stream, CancellationToken cancellationToken = default)
     {
-        await _packageContainer.CreateStreamAsync(Name, fileName, _mediaType, stream, cancellationToken);
+        await _packageContainer.CreateStreamAsync(Name, fileName, stream, cancellationToken);
         _files.Add(fileName);
     }
 
@@ -96,16 +92,12 @@ public sealed class DataCollection : IEnumerable<string>
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task RenameFileAsync(string oldName, string newName, CancellationToken cancellationToken = default)
     {
-        var streamInfo = _packageContainer.GetStream(Name, oldName);
-
-        if (streamInfo == null)
-        {
-            throw new InvalidOperationException($"Cannot rename file {oldName}: file does not exist");
-        }
-
+        var streamInfo = _packageContainer.GetStream(Name, oldName)
+            ?? throw new InvalidOperationException($"Cannot rename file {oldName}: file does not exist");
+        
         using (var stream = streamInfo.Stream)
         {
-            await _packageContainer.CreateStreamAsync(Name, newName, _mediaType, stream, cancellationToken);
+            await _packageContainer.CreateStreamAsync(Name, newName, stream, cancellationToken);
         }
 
         _files.Add(newName);

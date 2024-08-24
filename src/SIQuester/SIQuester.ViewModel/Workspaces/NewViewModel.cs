@@ -2,7 +2,6 @@
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
-using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -21,6 +20,7 @@ public sealed class NewViewModel : WorkspaceViewModel
     private PackageTemplate _currentTemplate;
     private string _packageName = Resources.SIGameQuestions;
     private string _packageAuthor = Environment.UserName;
+    private readonly AppSettings _appSettings;
 
     /// <summary>
     /// Creates a new package.
@@ -81,6 +81,21 @@ public sealed class NewViewModel : WorkspaceViewModel
         }
     }
 
+    private bool _qualityControl;
+
+    public bool QualityControl
+    {
+        get => _qualityControl;
+        set
+        {
+            if (_qualityControl != value)
+            {
+                _qualityControl = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public CustomPackageOptions CustomPackageOptions { get; } = new();
 
     /// <summary>
@@ -89,19 +104,19 @@ public sealed class NewViewModel : WorkspaceViewModel
     public List<string> Errors { get; } = new();
 
     private readonly IPackageTemplatesRepository _packageTemplatesRepository;
-    private readonly AppOptions _appOptions;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IDocumentViewModelFactory _documentViewModelFactory;
     private readonly ILogger<NewViewModel> _logger;
 
     public NewViewModel(
+        AppSettings appSettings,
         IPackageTemplatesRepository packageTemplatesRepository,
-        AppOptions appOptions,
         IDocumentViewModelFactory documentViewModelFactory,
         ILoggerFactory loggerFactory)
     {
+        _appSettings = appSettings;
+        _qualityControl = appSettings.UseQualityControl;
         _packageTemplatesRepository = packageTemplatesRepository;
-        _appOptions = appOptions;
         _documentViewModelFactory = documentViewModelFactory;
         _loggerFactory = loggerFactory;
         _logger = _loggerFactory.CreateLogger<NewViewModel>();
@@ -162,6 +177,7 @@ public sealed class NewViewModel : WorkspaceViewModel
                 siDocument = CreateFromStandardTemplate();
             }
 
+            _appSettings.UseQualityControl = _qualityControl;
             OnNewItem(_documentViewModelFactory.CreateViewModelFor(siDocument));
             _logger.LogInformation("New document created. Name: {name}", siDocument.Package.Name);
             OnClosed();
@@ -215,6 +231,7 @@ public sealed class NewViewModel : WorkspaceViewModel
                 break;
         }
 
+        doc.HasQualityControl = _qualityControl;
         return doc;
     }
 

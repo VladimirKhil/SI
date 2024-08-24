@@ -436,7 +436,7 @@ theme - тема Кота</value>
     <value>Вопросы СИ</value>
   </data>
   <data name="FileSizeLimitExceed" xml:space="preserve">
-    <value>Размер файла превышает допустимое значение для игры через Игровой сервер ({0} байт)!</value>
+    <value>Размер файла превышает допустимое значение для игры через Игровой сервер ({0} МБ)!</value>
   </data>
   <data name="HowToUseApp" xml:space="preserve">
     <value>Как использовать программу</value>
@@ -735,5 +735,11 @@ theme - тема Кота</value>
   </data>
   <data name="MissingLink" xml:space="preserve">
     <value>Отсутствует ссылка</value>
+  </data>
+  <data name="InvalidFileExtension" xml:space="preserve">
+    <value>Расширение файла {0} ({1}) недопустимо. Допустимые расширения: {2}</value>
+  </data>
+  <data name="InvalidFileSize" xml:space="preserve">
+    <value>Размер файла {0} превышает допустимое значение {1} МБ</value>
   </data>
 </root>

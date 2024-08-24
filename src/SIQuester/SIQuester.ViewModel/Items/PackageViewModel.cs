@@ -80,6 +80,51 @@ public sealed class PackageViewModel : ItemViewModel<Package>
 
     public ICommand PasteInfo { get; private set; }
 
+    /// <summary>
+    /// Has quality control.
+    /// </summary>
+    public bool HasQualityControl
+    {
+        get => Document.Document.HasQualityControl;
+        set
+        {
+            if (Document.Document.HasQualityControl != value)
+            {
+                Document.Document.HasQualityControl = value;
+                OnPropertyChanged();
+                UpdateQualityCommands();
+            }
+        }
+    }
+
+    private void UpdateQualityCommands()
+    {
+        foreach (var round in Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    foreach (var parameter in question.Parameters!)
+                    {
+                        parameter.Value.ContentValue?.UpdateQualityCommands();
+
+                        if (parameter.Value.GroupValue != null)
+                        {
+                            foreach (var item in parameter.Value.GroupValue)
+                            {
+                                item.Value.ContentValue?.UpdateQualityCommands();
+                            }
+                        }
+                    }
+
+                    question.Right.UpdateQualityCommands();
+                    question.Wrong.UpdateQualityCommands();
+                }
+            }
+        }
+    }
+
     public PackageViewModel(Package package, QDocument document)
         : base(package)
     {

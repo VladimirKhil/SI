@@ -811,6 +811,14 @@
   <data name="PublishersNotSet" xml:space="preserve">
     <value>(not set)</value>
   </data>
+  <data name="QualityControl" xml:space="preserve">
+    <value>Quality control</value>
+  </data>
+  <data name="QualityControlHint" xml:space="preserve">
+    <value>- maximum package size is 150 MB
+- limited media size and extensions
+- external links are forbidden</value>
+  </data>
   <data name="Question" xml:space="preserve">
     <value>Question</value>
   </data>

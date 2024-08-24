@@ -3,6 +3,7 @@ using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
+using SIQuester.ViewModel.Properties;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -221,7 +222,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             {
                 SafeRename(item, newValue);
 
-                if (renamedExisting)
+                if (renamedExisting && tuple != null)
                 {
                     var last = _renamed.LastOrDefault();
 
@@ -259,6 +260,11 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     private void Delete_Executed(object? arg)
     {
+        if (arg == null)
+        {
+            return;
+        }
+
         try
         {
             var item = (MediaItemViewModel)arg;
@@ -508,7 +514,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     private void AddItem_Executed(object? arg)
     {
-        var files = PlatformManager.Instance.ShowMediaOpenUI(_name);
+        var files = PlatformManager.Instance.ShowMediaOpenUI(_name, !_document.Package.HasQualityControl);
 
         if (files == null)
         {
@@ -525,6 +531,11 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     public MediaItemViewModel AddFile(string file, string? name = null)
     {
+        if (_document.Package.HasQualityControl)
+        {
+            ValidateFileExtensionAndSize(file);
+        }
+
         var localName = name ?? Path.GetFileName(file).Replace("%", "");
 
         if (Files.Any(named => named.Model.Name == localName))
@@ -565,6 +576,33 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             }));
 
         return item;
+    }
+
+    private void ValidateFileExtensionAndSize(string fileName)
+    {
+        var fileExtensions = MediaOwnerViewModel.RecommenedExtensions[_name];
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+        if (!fileExtensions.Contains(extension))
+        {
+            throw new InvalidOperationException(
+                string.Format(
+                    Resources.InvalidFileExtension,
+                    fileName,
+                    extension,
+                    string.Join(", ", fileExtensions)));
+        }
+
+        var maximumSize = MediaOwnerViewModel.RecommenedSizeMb[_name] * 1024 * 1024;
+
+        if (new FileInfo(fileName).Length > maximumSize)
+        {
+            throw new InvalidOperationException(
+                string.Format(
+                    Resources.InvalidFileSize,
+                    fileName,
+                    MediaOwnerViewModel.RecommenedSizeMb[_name]));
+        }
     }
 
     private void PreviewAdd(MediaItemViewModel item, string path, int index = -1)
