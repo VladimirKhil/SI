@@ -3899,7 +3899,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _gameActions.SendMessage(stakeMsg2.Build(), _data.ShowMan.Name);
             }
 
-            var stakeLimit = new StakeSettings(minimumStakeAligned - ClientData.StakeStep, _data.ActivePlayer.Sum, _data.StakeStep);
+            var minimumStakeNew = (_data.Stake != -1 ? _data.Stake + ClientData.StakeStep : cost);
+            var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStake / ClientData.StakeStep) * ClientData.StakeStep;
+
+            var stakeLimit = new StakeSettings(minimumStakeAlignedNew, _data.ActivePlayer.Sum, _data.StakeStep);
             AskToMakeStake(StakeReason.HighestPlays, _data.ActivePlayer.Name, stakeLimit);
 
             _data.StakeType = null;

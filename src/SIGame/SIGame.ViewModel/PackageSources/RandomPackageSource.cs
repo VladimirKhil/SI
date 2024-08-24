@@ -28,7 +28,7 @@ internal sealed class RandomPackageSource : PackageSource
         return (fileName, true);
     }
 
-    private static Task<SIDocument> GetPackageCore(Stream? stream = null)
+    private static Task<SIDocument> GetPackageCore(Stream stream)
     {
         var settings = UserSettings.Default.GameSettings.AppSettings;
 

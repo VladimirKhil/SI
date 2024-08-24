@@ -3222,7 +3222,8 @@ public sealed class Game : Actor<GameData, GameLogic>
                             Ready = account.Ready,
                             IsConnected = account.IsConnected,
                             IsMoveable = account.IsMoveable,
-                            Flag = ClientData.Players[i].Flag
+                            Flag = ClientData.Players[i].Flag,
+                            Sum = ClientData.Players[i].Sum
                         };
 
                         otherIndex = i;
@@ -3273,7 +3274,8 @@ public sealed class Game : Actor<GameData, GameLogic>
                 {
                     IsConnected = otherAccount.IsConnected,
                     IsMoveable = otherAccount.IsMoveable,
-                    Flag = ClientData.Players[index].Flag
+                    Flag = ClientData.Players[index].Flag,
+                    Sum = ClientData.Players[index].Sum
                 };
 
                 if (otherPerson != null)

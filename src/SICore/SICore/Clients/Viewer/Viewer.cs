@@ -2050,6 +2050,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         showman.Free = new CustomCommand(Free_Executed) { CanBeExecuted = showman.IsHuman && showman.IsConnected };
         showman.Replace = new CustomCommand(arg => Replace_Executed(showman, arg)) { CanBeExecuted = showman.IsHuman };
         showman.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
+
+        UpdateOthers(showman);
     }
 
     private void CreatePlayerCommands(PlayerAccount player)
@@ -2094,12 +2096,16 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
 
         showman.Free.CanBeExecuted = showman.IsHuman && showman.IsConnected;
-
-        showman.Others = showman.IsHuman ?
-                MyData.AllPersons.Values.Where(p => p.IsHuman).Except(new ViewerAccount[] { showman }).ToArray()
-                : Array.Empty<ViewerAccount>();
-
         showman.Replace.CanBeExecuted = showman.Others.Any();
+
+        UpdateOthers(showman);
+    }
+
+    private void UpdateOthers(PersonAccount showman)
+    {
+        showman.Others = showman.IsHuman ?
+            MyData.AllPersons.Values.Where(p => p.IsHuman).Except(new ViewerAccount[] { showman }).ToArray()
+            : Array.Empty<ViewerAccount>();
     }
 
     private void InsertPerson(string role, Account account, int index)
