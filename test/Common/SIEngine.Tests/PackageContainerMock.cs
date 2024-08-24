@@ -12,9 +12,9 @@ internal sealed class PackageContainerMock : ISIPackageContainer
 
     public ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
-    public void CreateStream(string name, string contentType) => CreateStream("", name, contentType);
+    public void CreateStream(string name) => CreateStream("", name);
 
-    public void CreateStream(string category, string name, string contentType)
+    public void CreateStream(string category, string name)
     {
         if (!_streams.TryGetValue(category, out var categoryStreams))
         {
@@ -27,10 +27,11 @@ internal sealed class PackageContainerMock : ISIPackageContainer
     public Task CreateStreamAsync(
         string category,
         string name,
-        string contentType,
         Stream stream,
         CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
+
+    public bool DeleteStream(string name) => throw new NotImplementedException();
 
     public bool DeleteStream(string category, string name) => throw new NotImplementedException();
 
