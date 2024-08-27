@@ -2708,7 +2708,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void OnQuestionStartInfo(int arg)
     {
-        var returnDelay = 20;
+        var informed = false;
 
         if (_data.Question == null)
         {
@@ -2721,6 +2721,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             if (authors.Length > 0)
             {
+                informed = true;
                 var res = new StringBuilder();
                 res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfQuestion)], string.Join(", ", authors));
                 _gameActions.ShowmanReplic(res.ToString());
@@ -2737,9 +2738,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             if (themeComments.Length > 0)
             {
+                informed = true;
                 _gameActions.ShowmanReplic(themeComments);
                 _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines());
-                returnDelay = 10;
             }
             else
             {
@@ -2747,13 +2748,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
+        var delay = informed ? 20 : 1;
+
         if (arg >= 2)
         {
-            ScheduleExecution(Tasks.MoveNext, returnDelay, arg + 1);
+            ScheduleExecution(Tasks.MoveNext, delay, arg + 1);
             return;
         }
 
-        ScheduleExecution(Tasks.QuestionStartInfo, returnDelay, arg + 1);
+        ScheduleExecution(Tasks.QuestionStartInfo, delay, arg + 1);
     }
 
     internal void OnQuestionType(bool isDefault)
