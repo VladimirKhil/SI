@@ -376,7 +376,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// </summary>
     public Question Clone()
     {
-        var question = new Question { _price = _price };
+        var question = new Question { _price = _price, TypeName = _typeName };
         question.Type.Name = Type.Name;
 
         question.SetInfoFromOwner(this);

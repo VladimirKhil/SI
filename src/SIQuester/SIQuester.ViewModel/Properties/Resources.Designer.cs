@@ -1229,6 +1229,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question for all.
+        /// </summary>
+        public static string QuestionForAll {
+            get {
+                return ResourceManager.GetString("QuestionForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Question playback.
         /// </summary>
         public static string QuestionPlay {
@@ -1490,7 +1499,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Question with stakes for everyone.
+        ///   Ищет локализованную строку, похожую на Stake question for all.
         /// </summary>
         public static string StakeAllQuestion {
             get {
@@ -1805,6 +1814,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string YamlFilesFilter {
             get {
                 return ResourceManager.GetString("YamlFilesFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Your answer?.
+        /// </summary>
+        public static string YourAnswer {
+            get {
+                return ResourceManager.GetString("YourAnswer", resourceCulture);
             }
         }
         

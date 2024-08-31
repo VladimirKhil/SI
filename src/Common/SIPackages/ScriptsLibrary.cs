@@ -22,7 +22,8 @@ public static class ScriptsLibrary
         [QuestionTypes.Secret] = CreateSecretScript(),
         [QuestionTypes.SecretPublicPrice] = CreateSecretPublicPriceScript(),
         [QuestionTypes.SecretNoQuestion] = CreateSecretNoQuestionScript(),
-        [QuestionTypes.NoRisk] = CreateNoRiskScript()
+        [QuestionTypes.NoRisk] = CreateNoRiskScript(),
+        [QuestionTypes.ForAll] = CreateForAllScript()
     };
 
     private static Script CreateSimpleScript()
@@ -42,7 +43,7 @@ public static class ScriptsLibrary
         var stakeScript = new Script();
 
         stakeScript.Steps.Add(CreateSetAnswerTypeStep());
-        stakeScript.Steps.Add(CreateSetAnswererStep());
+        stakeScript.Steps.Add(CreateSetAnswererHighestStakeStep());
         stakeScript.Steps.Add(CreateQuestionStep());
         stakeScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
         stakeScript.Steps.Add(CreateAnswerStep());
@@ -55,7 +56,7 @@ public static class ScriptsLibrary
         var stakeScript = new Script();
 
         stakeScript.Steps.Add(CreateSetAnswerTypeStep());
-        stakeScript.Steps.Add(CreateSetAnswererAllStep());
+        stakeScript.Steps.Add(CreateSetAnswererStakeAllStep());
         stakeScript.Steps.Add(CreateQuestionStep());
         stakeScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
         stakeScript.Steps.Add(CreateAnswerStep());
@@ -120,6 +121,19 @@ public static class ScriptsLibrary
         noRiskScript.Steps.Add(CreateAnswerStep());
 
         return noRiskScript;
+    }
+
+    private static Script CreateForAllScript()
+    {
+        var forAllScript = new Script();
+
+        forAllScript.Steps.Add(CreateSetAnswerTypeStep());
+        forAllScript.Steps.Add(CreateSetAnswererAllStep());
+        forAllScript.Steps.Add(CreateQuestionStep());
+        forAllScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
+        forAllScript.Steps.Add(CreateAnswerStep());
+
+        return forAllScript;
     }
 
     private static Step CreateSetAnswerTypeStep()
@@ -215,7 +229,7 @@ public static class ScriptsLibrary
         return setAnswererStep;
     }
 
-    private static Step CreateSetAnswererStep()
+    private static Step CreateSetAnswererHighestStakeStep()
     {
         var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
 
@@ -226,7 +240,7 @@ public static class ScriptsLibrary
         return setAnswererStep;
     }
 
-    private static Step CreateSetAnswererAllStep()
+    private static Step CreateSetAnswererStakeAllStep()
     {
         var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
 
@@ -249,6 +263,14 @@ public static class ScriptsLibrary
     {
         var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
         setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_Current);
+
+        return setAnswererStep;
+    }
+
+    private static Step CreateSetAnswererAllStep()
+    {
+        var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
+        setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_All);
 
         return setAnswererStep;
     }

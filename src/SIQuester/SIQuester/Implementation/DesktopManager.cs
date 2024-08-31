@@ -47,7 +47,9 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         { QuestionTypes.Stake, ViewModel.Properties.Resources.StakeQuestion.ToUpper() },
         { QuestionTypes.Secret, ViewModel.Properties.Resources.SecretQuestion.ToUpper() },
         { QuestionTypes.SecretPublicPrice, ViewModel.Properties.Resources.SecretQuestion.ToUpper() },
-        { QuestionTypes.SecretNoQuestion, Resources.SecretNoQuestion.ToUpper() }
+        { QuestionTypes.SecretNoQuestion, Resources.SecretNoQuestion.ToUpper() },
+        { QuestionTypes.ForAll, ViewModel.Properties.Resources.QuestionForAll.ToUpper() },
+        { QuestionTypes.StakeAll, ViewModel.Properties.Resources.StakeAllQuestion.ToUpper() }
     };
 
     public override Tuple<int, int, int>? GetCurrentItemSelectionArea() =>

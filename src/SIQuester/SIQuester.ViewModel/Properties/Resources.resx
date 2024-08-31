@@ -523,6 +523,9 @@ Humor</value>
   <data name="Question" xml:space="preserve">
     <value>Question</value>
   </data>
+  <data name="QuestionForAll" xml:space="preserve">
+    <value>Question for all</value>
+  </data>
   <data name="QuestionPlay" xml:space="preserve">
     <value>Question playback</value>
   </data>
@@ -611,7 +614,7 @@ Humor</value>
     <value>Error searching for questions</value>
   </data>
   <data name="StakeAllQuestion" xml:space="preserve">
-    <value>Question with stakes for everyone</value>
+    <value>Stake question for all</value>
   </data>
   <data name="StakeQuestion" xml:space="preserve">
     <value>Stake question</value>
@@ -736,6 +739,9 @@ theme - Cat's theme</value>
   </data>
   <data name="YamlFilesFilter" xml:space="preserve">
     <value>YAML files (.yaml) | *.yaml</value>
+  </data>
+  <data name="YourAnswer" xml:space="preserve">
+    <value>Your answer?</value>
   </data>
   <data name="YourThemes" xml:space="preserve">
     <value>Your themes:</value>

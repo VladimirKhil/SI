@@ -8,10 +8,10 @@
     xmlns:lc="clr-namespace:SIQuester.Converters"
     xmlns:ls="clr-namespace:SIQuester.Selectors"
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
-    xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"             
+    xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:util="clr-namespace:SIQuester.Utilities"
     xmlns:lm="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
-    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"    
+    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
     xmlns:pc="clr-namespace:SIPackages.Core;assembly=SIPackages"
     xmlns:lp="clr-namespace:SIQuester.Properties"
     xmlns:lb="clr-namespace:SIQuester.Behaviors"
@@ -24,9 +24,11 @@
         <lc:QTypeToColorConverter
             x:Key="QTypeToColorConverter"
             CommonBrush="Black"
-            AuctionBrush="#FFFF3A00"
-            CatBrush="#FFB900FF"
-            SponsoredBrush="#FF00B900" />
+            StakeBrush="#FFFF3A00"
+            SecretBrush="#FFB900FF"
+            NoRiskBrush="#FF00B900"
+            StakeAllBrush="MediumTurquoise"
+            ForAllBrush="Orange" />
 
         <lc:RoundTypeToColorConverter
             x:Key="RoundTypeToColorConverter"

@@ -68,4 +68,9 @@ public static class QuestionTypes
     /// No-risk question.
     /// </summary>
     public const string NoRisk = "noRisk";
+
+    /// <summary>
+    /// Question for all players.
+    /// </summary>
+    public const string ForAll = "forAll";
 }

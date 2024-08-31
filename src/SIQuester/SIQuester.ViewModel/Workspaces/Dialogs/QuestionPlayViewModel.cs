@@ -22,6 +22,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     private readonly QuestionEngine _questionEngine;
     private readonly QDocument _qDocument;
 
+    private bool _singleAnswerer = true;
     private bool _isFinished;
     private AnswerOptionViewModel[]? _options;
 
@@ -177,14 +178,21 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             {
                 Type = "replic",
                 PersonCode = "s",
-                Text = Resources.ThinkAll
+                Text = _singleAnswerer ? Resources.YourAnswer : Resources.ThinkAll
             });
         }
     }
 
     public bool OnButtonPressStart() => false;
 
-    public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility) => false;
+    public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility)
+    {
+        var multipleAnswerers = mode == StepParameterValues.SetAnswererMode_All 
+            || mode == StepParameterValues.SetAnswererMode_Stake && select == StepParameterValues.SetAnswererSelect_AllPossible;
+        
+        _singleAnswerer = !multipleAnswerers;
+        return false;
+    }
 
     public bool OnSetPrice(string mode, NumberSet? availableRange) => false;
 
@@ -192,25 +200,13 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public bool OnAccept() => false;
 
-    public void OnQuestionStart(bool buttonsRequired)
-    {
-        
-    }
+    public void OnQuestionStart(bool buttonsRequired) { }
 
-    public void OnContentStart(IEnumerable<ContentItem> contentItems)
-    {
-        
-    }
+    public void OnContentStart(IEnumerable<ContentItem> contentItems) { }
 
-    public void OnSimpleRightAnswerStart()
-    {
-        
-    }
+    public void OnSimpleRightAnswerStart() { }
 
-    public void OnAnswerStart()
-    {
-        
-    }
+    public void OnAnswerStart() => OnMessage(new { Type = "replic", PersonCode = "s", Text = "" });
 
     public bool OnAnnouncePrice(NumberSet? availableRange) => false;
 

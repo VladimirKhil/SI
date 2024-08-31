@@ -538,7 +538,7 @@ theme - тема Кота</value>
     <value>Вопрос с секретом и объявленной стоимостью</value>
   </data>
   <data name="StakeAllQuestion" xml:space="preserve">
-    <value>Вопрос со ставками для всех</value>
+    <value>Вопрос со ставкой для всех</value>
   </data>
   <data name="FileOpenError" xml:space="preserve">
     <value>Ошибка открытия файла</value>
@@ -741,5 +741,11 @@ theme - тема Кота</value>
   </data>
   <data name="InvalidFileSize" xml:space="preserve">
     <value>Размер файла {0} превышает допустимое значение {1} МБ</value>
+  </data>
+  <data name="QuestionForAll" xml:space="preserve">
+    <value>Вопрос для всех</value>
+  </data>
+  <data name="YourAnswer" xml:space="preserve">
+    <value>Ваш ответ?</value>
   </data>
 </root>

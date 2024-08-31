@@ -10,18 +10,24 @@ public sealed class QTypeToColorConverter : IValueConverter
 {
     public Brush? CommonBrush { get; set; }
 
-    public Brush? AuctionBrush { get; set; }
+    public Brush? StakeBrush { get; set; }
 
-    public Brush? CatBrush { get; set; }
+    public Brush? SecretBrush { get; set; }
 
-    public Brush? SponsoredBrush { get; set; }
+    public Brush? NoRiskBrush { get; set; }
+
+    public Brush? StakeAllBrush { get; set; }
+
+    public Brush? ForAllBrush { get; set; }
 
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
         (string)value switch
         {
-            QuestionTypes.Auction or QuestionTypes.Stake => AuctionBrush,
-            QuestionTypes.BagCat or QuestionTypes.Cat or QuestionTypes.Secret or QuestionTypes.SecretPublicPrice or QuestionTypes.SecretNoQuestion => CatBrush,
-            QuestionTypes.Sponsored or QuestionTypes.NoRisk => SponsoredBrush,
+            QuestionTypes.Stake => StakeBrush,
+            QuestionTypes.Secret or QuestionTypes.SecretPublicPrice or QuestionTypes.SecretNoQuestion => SecretBrush,
+            QuestionTypes.NoRisk => NoRiskBrush,
+            QuestionTypes.StakeAll => StakeAllBrush,
+            QuestionTypes.ForAll => ForAllBrush,
             _ => CommonBrush
         };
 

@@ -40,6 +40,11 @@ public static class StepParameterValues
     public const string SetAnswererMode_ByCurrent = "byCurrent";
 
     /// <summary>
+    /// All SetAnswerer mode.
+    /// </summary>
+    public const string SetAnswererMode_All = "all";
+
+    /// <summary>
     /// All possible SetAnswerer selector (everybody who can make stake will play).
     /// </summary>
     public const string SetAnswererSelect_AllPossible = "allPossible";
