@@ -12,13 +12,14 @@
     Loaded="UserControl_Loaded"
     d:DesignHeight="50"
     d:DesignWidth="240"
-    d:DataContext="{d:DesignInstance sc:ShowmanData}">
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    d:DataContext="{d:DesignInstance vm:GameViewModel}">
     <StackPanel Orientation="Horizontal" Margin="5" Width="Auto">
         <TextBlock VerticalAlignment="Center" Text="{x:Static lp:Resources.PlayerSum}" Foreground="{StaticResource MainColor}" />
         
         <local:NumericTextBox
             Style="{StaticResource {x:Type TextBox}}"
-            Text="{Binding SelectedPlayer.Second, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding SelectedPlayer.PlayerScore, UpdateSourceTrigger=PropertyChanged}"
             Maximum="100000"
             Margin="20,15"
             Width="100"

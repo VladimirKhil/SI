@@ -48,18 +48,6 @@ public interface IViewerLogic : ILogic
     void Choice();
 
     /// <summary>
-    /// Question fragment received.
-    /// </summary>
-    [Obsolete]
-    void OnScreenContent(string[] mparams);
-
-    /// <summary>
-    /// Question background fragment received.
-    /// </summary>
-    [Obsolete]
-    void OnBackgroundContent(string[] mparams);
-
-    /// <summary>
     /// Handles right answer or label.
     /// </summary>
     /// <param name="answer">Right answer or label.</param>
@@ -218,4 +206,6 @@ public interface IViewerLogic : ILogic
     void OnEnableButton() { }
 
     void OnDisableButton() { }
+
+    void OnSetJoinMode(JoinMode joinMode) { }
 }

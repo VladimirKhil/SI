@@ -196,6 +196,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void OnSelectPlayer(Models.SelectPlayerReason reason)
     {
+        _gameViewModel.ClearReplic();
         _gameViewModel.Hint = _localizer[GetSelectHint(reason)];
     }
 
@@ -303,16 +304,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             var pair = toFormStr.Split(':');
             var speech = (pair.Length > 1 && pair[0].Length + 2 < toFormStr.Length) ? toFormStr[(pair[0].Length + 2)..] : toFormStr;
 
-            if (_data.Speaker != null)
-            {
-                _data.Speaker.Replic = "";
-            }
+            _gameViewModel.ClearReplic();
+            var speaker = _gameViewModel.Speaker = _data.MainPersons.FirstOrDefault(item => item.Name == pair[0]);
 
-            _data.Speaker = _data.MainPersons.FirstOrDefault(item => item.Name == pair[0]);
-
-            if (_data.Speaker != null)
+            if (speaker != null)
             {
-                _data.Speaker.Replic = speech.Trim();
+                speaker.Replic = speech.Trim();
             }
         }
 
@@ -343,21 +340,15 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 return;
             }
 
-            // reset old speaker's replic
-            if (_data.Speaker != null)
-            {
-                _data.Speaker.Replic = "";
-            }
+            _gameViewModel.ClearReplic();
+            _gameViewModel.Speaker = _data.ShowMan;
+            _gameViewModel.Speaker.Replic = TrimReplic(text);
 
-            // add new replic to the current speaker
-            _data.Speaker = _data.ShowMan;
-            _data.Speaker.Replic = TrimReplic(text);
-
-            logString = $"<span class=\"sh\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
+            logString = $"<span class=\"sh\">{_gameViewModel.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
             if (_data.Host.TranslateGameToChat)
             {
-                _data.AddToChat(new Message(text, _data.Speaker.Name));
+                _data.AddToChat(new Message(text, _gameViewModel.Speaker.Name));
             }
         }
         else if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
@@ -366,19 +357,15 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
             if (int.TryParse(indexString, out var index) && index >= 0 && index < _data.Players.Count)
             {
-                if (_data.Speaker != null)
-                {
-                    _data.Speaker.Replic = "";
-                }
+                _gameViewModel.ClearReplic();
+                _gameViewModel.Speaker = _data.Players[index];
+                _gameViewModel.Speaker.Replic = TrimReplic(text);
 
-                _data.Speaker = _data.Players[index];
-                _data.Speaker.Replic = TrimReplic(text);
-
-                logString = $"<span class=\"sr n{index}\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
+                logString = $"<span class=\"sr n{index}\">{_gameViewModel.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
                 if (_data.Host.TranslateGameToChat)
                 {
-                    _data.AddToChat(new Message(text, _data.Speaker.Name));
+                    _data.AddToChat(new Message(text, _gameViewModel.Speaker.Name));
                 }
             }
         }
@@ -902,9 +889,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             return;
         }
 
-        if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
+        if (TInfo.TStage != TableStage.Answer && _gameViewModel.Speaker != null && !_gameViewModel.Speaker.IsShowman)
         {
-            _data.Speaker.Replic = "";
+            _gameViewModel.Speaker.Replic = "";
         }
 
         _data.AtomType = contentType;
@@ -945,9 +932,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     private void OnScreenContent(IEnumerable<ContentInfo> contentInfo)
     {
-        if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
+        if (TInfo.TStage != TableStage.Answer && _gameViewModel.Speaker != null && !_gameViewModel.Speaker.IsShowman)
         {
-            _data.Speaker.Replic = "";
+            _gameViewModel.Speaker.Replic = "";
         }
 
         TInfo.TStage = TableStage.Question;
@@ -1105,155 +1092,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
-    [Obsolete]
-    public void OnScreenContent(string[] mparams)
-    {
-        if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
-        {
-            _data.Speaker.Replic = "";
-        }
-
-        _data.AtomType = mparams[1];
-
-        var isPartial = _data.AtomType == Constants.PartialText;
-
-        if (!isPartial)
-        {
-            if (_data.AtomType != AtomTypes.Oral)
-            {
-                TInfo.Text = "";
-            }
-
-            TInfo.PartialText = false;
-        }
-
-        TInfo.TStage = TableStage.Question;
-        TInfo.IsMediaStopped = false;
-
-        _data.EnableMediaLoadButton = false;
-
-        switch (_data.AtomType)
-        {
-            case AtomTypes.Text:
-            case Constants.PartialText:
-                var text = new StringBuilder();
-
-                for (var i = 2; i < mparams.Length; i++)
-                {
-                    text.Append(mparams[i]);
-
-                    if (i < mparams.Length - 1)
-                    {
-                        text.Append('\n');
-                    }
-                }
-
-                if (isPartial)
-                {
-                    var currentText = TInfo.Text ?? "";
-                    var newTextLength = text.Length;
-
-                    var tailIndex = TInfo.TextLength + newTextLength;
-
-                    TInfo.Text = currentText[..TInfo.TextLength]
-                        + text
-                        + (currentText.Length > tailIndex ? currentText[tailIndex..] : "");
-
-                    TInfo.TextLength += newTextLength;
-                }
-                else
-                {
-                    TInfo.Text = text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…");
-                }
-
-                TInfo.QuestionContentType = QuestionContentType.Text;
-                TInfo.Sound = false;
-                _data.EnableMediaLoadButton = false;
-                break;
-
-            case AtomTypes.Video:
-            case AtomTypes.Audio:
-            case AtomTypes.AudioNew:
-            case AtomTypes.Image:
-            case AtomTypes.Html:
-                string uri;
-
-                switch (mparams[2])
-                {
-                    case MessageParams.Atom_Uri:
-                        uri = mparams[3];
-
-                        if (uri.Contains(Constants.GameHost))
-                        {
-                            if (!string.IsNullOrWhiteSpace(_serverAddress))
-                            {
-                                if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
-                                {
-                                    uri = uri.Replace(Constants.GameHost, hostUri.Host);
-                                }
-                            }
-                        }
-                        else if (uri.Contains(Constants.ServerHost))
-                        {
-                            uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
-                        }
-                        else if (_data.AtomType != AtomTypes.Html
-                            && !uri.StartsWith("http://localhost")
-                            && !Data.Host.LoadExternalMedia
-                            && !ExternalUrlOk(uri))
-                        {
-                            TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
-                            TInfo.QuestionContentType = QuestionContentType.SpecialText;
-                            TInfo.Sound = false;
-
-                            _data.EnableMediaLoadButton = true;
-                            _data.ExternalContent.Add((_data.AtomType, uri));
-                            return;
-                        }
-
-                        break;
-
-                    default:
-                        return;
-                }
-
-                if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
-                {
-                    return;
-                }
-
-                uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
-
-                if (_data.AtomType == AtomTypes.Image)
-                {
-                    TInfo.MediaSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.Image;
-                    TInfo.Sound = false;
-                }
-                else if (_data.AtomType == AtomTypes.Audio || _data.AtomType == AtomTypes.AudioNew)
-                {
-                    TInfo.SoundSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.Clef;
-                    TInfo.Sound = true;
-                }
-                else if (_data.AtomType == AtomTypes.Video)
-                {
-                    TInfo.MediaSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.Video;
-                    TInfo.Sound = false;
-                }
-                else
-                {
-                    TInfo.MediaSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.Html;
-                    TInfo.Sound = false;
-                }
-
-                _data.EnableMediaLoadButton = false;
-                break;
-        }
-    }
-
     public void ReloadMedia()
     {
         _data.EnableMediaLoadButton = false;
@@ -1289,77 +1127,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     private bool ExternalUrlOk(string uri) => _contentPublicUrls != null && _contentPublicUrls.Any(publicUrl => uri.StartsWith(publicUrl));
 
-    public void OnBackgroundContent(string[] mparams)
-    {
-        if (TInfo.TStage != TableStage.Question)
-        {
-            TInfo.TStage = TableStage.Question;
-            TInfo.QuestionContentType = QuestionContentType.Clef;
-        }
-
-        var atomType = mparams[1];
-
-        switch (atomType)
-        {
-            case AtomTypes.Audio:
-            case AtomTypes.AudioNew:
-                string uri;
-
-                switch (mparams[2])
-                {
-                    case MessageParams.Atom_Uri:
-                        uri = mparams[3];
-
-                        if (uri.Contains(Constants.GameHost))
-                        {
-                            if (!string.IsNullOrWhiteSpace(_serverAddress))
-                            {
-                                if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
-                                {
-                                    uri = uri.Replace(Constants.GameHost, hostUri.Host);
-                                }
-                            }
-                        }
-                        else if (uri.Contains(Constants.ServerHost))
-                        {
-                            uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
-                        }
-                        else if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
-                        {
-                            TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
-                            TInfo.QuestionContentType = QuestionContentType.SpecialText;
-                            TInfo.Sound = false;
-
-                            _data.EnableMediaLoadButton = true;
-                            _data.ExternalContent.Add((atomType, uri));
-                        }
-
-                        break;
-
-                    default:
-                        return;
-                }
-
-                Uri? mediaUri;
-
-                if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out mediaUri))
-                {
-                    return;
-                }
-
-                uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
-
-                TInfo.SoundSource = new MediaSource(uri);
-                TInfo.Sound = true;
-
-                if (TInfo.QuestionContentType == QuestionContentType.Void)
-                {
-                    TInfo.QuestionContentType = QuestionContentType.Clef;
-                }
-
-                break;
-        }
-    }
+    public void OnSetJoinMode(Models.JoinMode joinMode) => _gameViewModel.JoinMode = joinMode;
 
     public void OnAtomHint(string hint)
     {
@@ -2001,7 +1769,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void AddPlayer(PlayerAccount account) => UI.Execute(
         () =>
         {
-            ClientData.PlayersObservable.Add(account);
+            _gameViewModel.Players.Add(account);
             _gameViewModel.UpdateAddTableCommand();
         },
         ClientData.Host.OnError);
@@ -2009,7 +1777,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void RemovePlayerAt(int index) => UI.Execute(
         () =>
         {
-            ClientData.PlayersObservable.RemoveAt(index);
+            _gameViewModel.Players.RemoveAt(index);
             _gameViewModel.UpdateAddTableCommand();
         },
         ClientData.Host.OnError);
@@ -2017,11 +1785,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void ResetPlayers() => UI.Execute(
         () =>
         {
-            ClientData.PlayersObservable.Clear();
+            _gameViewModel.Players.Clear();
 
             foreach (var player in ClientData.Players)
             {
-                ClientData.PlayersObservable.Add(player);
+                _gameViewModel.Players.Add(player);
             }
 
             _gameViewModel.UpdateAddTableCommand();

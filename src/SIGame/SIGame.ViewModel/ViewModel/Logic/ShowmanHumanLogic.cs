@@ -40,12 +40,14 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
     public void StarterChoose()
     {
+        _gameViewModel.ClearReplic();
         _gameViewModel.Hint = _localizer[nameof(R.HintSelectStarter)];
         _data.Host.OnFlash();
     }
 
     public void FirstStake()
     {
+        _gameViewModel.ClearReplic();
         _gameViewModel.Hint = _localizer[nameof(R.HintSelectStaker)];
         _data.Host.OnFlash();
     }
@@ -60,6 +62,7 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
     public void FirstDelete()
     {
+        _gameViewModel.ClearReplic();
         _gameViewModel.Hint = _localizer[nameof(R.HintThemeDeleter)];
         _data.Host.OnFlash();
     }
@@ -77,6 +80,11 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
     public void Stake()
     {
+        _gameViewModel.SendNominal.CanBeExecuted = _data.PersonDataExtensions.Var[0];
+        _gameViewModel.SendStake.CanBeExecuted = _data.PersonDataExtensions.Var[1];
+        _gameViewModel.SendPass.CanBeExecuted = _data.PersonDataExtensions.Var[2];
+        _gameViewModel.SendVabank.CanBeExecuted = _data.PersonDataExtensions.Var[3];
+
         _gameViewModel.DialogMode = DialogModes.Stake;
         _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         _data.Host.OnFlash();
@@ -89,6 +97,10 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
     public void StakeNew()
     {
+        _gameViewModel.SendStakeNew.CanBeExecuted = _data.PersonDataExtensions.Var[1];
+        _gameViewModel.SendPassNew.CanBeExecuted = _data.PersonDataExtensions.Var[2];
+        _gameViewModel.SendAllInNew.CanBeExecuted = _data.PersonDataExtensions.Var[3];
+
         _gameViewModel.DialogMode = DialogModes.StakeNew;
         _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         _data.Host.OnFlash();

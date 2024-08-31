@@ -2,16 +2,16 @@
 using SICore;
 using SICore.Clients.Viewer;
 using SICore.Contracts;
-using SICore.Network.Clients;
 using SICore.Network.Servers;
 using SIData;
+using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.ViewModel.Data;
 using SIPackages.Core;
 using SIUI.ViewModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
@@ -462,6 +462,64 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public Uri? HostUri { get; set; }
 
+    private SICore.Models.JoinMode _joinMode = SICore.Models.JoinMode.AnyRole;
+
+    /// <summary>
+    /// Allowed join mode.
+    /// </summary>
+    public SICore.Models.JoinMode JoinMode
+    {
+        get => _joinMode;
+        set
+        {
+            if (_joinMode != value)
+            {
+                _joinMode = value;
+                OnPropertyChanged();
+                OnJoinModeChanged(value);
+            }
+        }
+    }
+
+    // TODO: move to ViewerHumanLogic after merging with other logis
+    public PersonAccount? Speaker { get; set; }
+
+    public ObservableCollection<PlayerAccount> Players { get; } = new();
+    
+    public SimpleCommand SendPass { get; set; }
+
+    public SimpleCommand SendStake { get; set; }
+
+    public SimpleCommand SendVabank { get; set; }
+
+    public SimpleCommand SendNominal { get; set; }
+
+    public SimpleCommand SendPassNew { get; set; }
+
+    public SimpleCommand SendStakeNew { get; set; }
+
+    public SimpleCommand SendAllInNew { get; set; }
+
+    private PlayerSumInfo? _selectedPlayer = null;
+
+    /// <summary>
+    /// Currently selected player.
+    /// </summary>
+    public PlayerSumInfo? SelectedPlayer
+    {
+        get => _selectedPlayer;
+        set
+        {
+            if (_selectedPlayer != value)
+            {
+                _selectedPlayer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public ICommand ChangeSums2 { get; set; }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -532,7 +590,82 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _addTable = new SimpleCommand(AddTable_Executed);
         
         _pressGameButton = new SimpleCommand(PressGameButton_Execute) { CanBeExecuted = Host?.Role == GameRole.Player };
+
+        SendPass = new SimpleCommand(SendPass_Executed);
+        SendStake = new SimpleCommand(SendStake_Executed);
+        SendVabank = new SimpleCommand(SendVabank_Executed);
+        SendNominal = new SimpleCommand(SendNominal_Executed);
+
+        SendPassNew = new SimpleCommand(SendPassNew_Executed);
+        SendStakeNew = new SimpleCommand(SendStakeNew_Executed);
+        SendAllInNew = new SimpleCommand(SendAllInNew_Executed);
+
+        ChangeSums2 = new SimpleCommand(ChangeSums2_Executed);
     }
+
+    private void ChangeSums2_Executed(object? arg)
+    {
+        if (SelectedPlayer == null)
+        {
+            return;
+        }
+
+        Host?.Actions.SendMessageWithArgs(Messages.Change, SelectedPlayer.PlayerIndex, SelectedPlayer.PlayerScore);
+        ClearSelections();
+    }
+
+    private void SendPass_Executed(object? arg)
+    {
+        Host?.Actions.SendMessageWithArgs(Messages.Stake, 2);
+        ClearSelections();
+    }
+
+    private void SendStake_Executed(object? arg)
+    {
+        Host?.Actions.SendMessageWithArgs(Messages.Stake, 1, Host.MyData.PersonDataExtensions.StakeInfo.Stake);
+        ClearSelections();
+    }
+
+    private void SendVabank_Executed(object? arg)
+    {
+        Host?.Actions.SendMessageWithArgs(Messages.Stake, 3);
+        ClearSelections();
+    }
+
+    private void SendNominal_Executed(object? arg)
+    {
+        Host?.Actions.SendMessageWithArgs(Messages.Stake, 0);
+        ClearSelections();
+    }
+
+    private void SendPassNew_Executed(object? arg)
+    {
+        Host?.Actions.SendMessageWithArgs(Messages.SetStake, SICore.Models.StakeModes.Pass);
+        ClearSelections();
+    }
+
+    private void SendStakeNew_Executed(object? arg)
+    {
+        Host?.Actions.SendMessageWithArgs(Messages.SetStake, SICore.Models.StakeModes.Stake, Host.MyData.PersonDataExtensions.StakeInfo.Stake);
+        ClearSelections();
+    }
+
+    private void SendAllInNew_Executed(object? arg)
+    {
+        Host?.Actions.SendMessageWithArgs(Messages.SetStake, SICore.Models.StakeModes.AllIn);
+        ClearSelections();
+    }
+
+    internal void ClearReplic()
+    {
+        if (Speaker != null)
+        {
+            Speaker.Replic = "";
+        }
+    }
+
+    private void OnJoinModeChanged(SICore.Models.JoinMode joinMode) =>
+        Host?.Actions.SendMessage(Messages.SetJoinMode, joinMode.ToString());
 
     private void PressGameButton_Execute(object? arg)
     {
@@ -733,7 +866,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
             Data.Players[i].SelectionCallback = player =>
             {
-                Data.ShowmanDataExtensions.SelectedPlayer = new Pair { First = num + 1, Second = player.Sum };
+                SelectedPlayer = new PlayerSumInfo { PlayerIndex = num + 1, PlayerScore = player.Sum };
                 DialogMode = DialogModes.ChangeSum;
 
                 for (int j = 0; j < Data.Players.Count; j++)

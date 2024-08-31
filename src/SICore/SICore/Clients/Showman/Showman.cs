@@ -2,7 +2,6 @@
 using SICore.Models;
 using SICore.Network.Clients;
 using SIData;
-using Utils.Commands;
 
 namespace SICore;
 
@@ -30,16 +29,6 @@ public sealed class Showman : Viewer
             ClearSelections();
         });
 
-        ClientData.ShowmanDataExtensions.ChangeSums2 = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(
-                Messages.Change,
-                ClientData.ShowmanDataExtensions.SelectedPlayer.First,
-                ClientData.ShowmanDataExtensions.SelectedPlayer.Second);
-
-            ClearSelections();
-        });
-
         ClientData.ShowmanDataExtensions.ManageTable = new CustomCommand(ManageTable_Executed) { CanBeExecuted = ClientData.TInfo.Pause };
 
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
@@ -50,48 +39,6 @@ public sealed class Showman : Viewer
         ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
         {
             _viewerActions.SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
-            ClearSelections();
-        });
-
-        ClientData.PersonDataExtensions.SendNominal = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.Stake, 0);
-            ClearSelections();
-        });
-
-        ClientData.PersonDataExtensions.SendStake = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.Stake, 1, ClientData.PersonDataExtensions.StakeInfo.Stake);
-            ClearSelections();
-        });
-
-        ClientData.PersonDataExtensions.SendPass = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.Stake, 2);
-            ClearSelections();
-        });
-
-        ClientData.PersonDataExtensions.SendVabank = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.Stake, 3);
-            ClearSelections();
-        });
-
-        ClientData.PersonDataExtensions.SendPassNew = new SimpleCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Pass);
-            ClearSelections();
-        });
-
-        ClientData.PersonDataExtensions.SendStakeNew = new SimpleCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, ClientData.PersonDataExtensions.StakeInfo.Stake);
-            ClearSelections();
-        });
-
-        ClientData.PersonDataExtensions.SendAllInNew = new SimpleCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.AllIn);
             ClearSelections();
         });
     }
@@ -176,11 +123,6 @@ public sealed class Showman : Viewer
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.First, num); ClearSelections(); };
                         }
 
-                        if (ClientData.Speaker != null)
-                        {
-                            ClientData.Speaker.Replic = "";
-                        }
-
                         _logic.ShowmanLogic.StarterChoose();
                         break;
 
@@ -196,9 +138,6 @@ public sealed class Showman : Viewer
                             int num = i;
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Next, num); ClearSelections(); };
                         }
-
-                        if (ClientData.Speaker != null)
-                            ClientData.Speaker.Replic = "";
 
                         _logic.ShowmanLogic.FirstStake();
                         break;
@@ -219,11 +158,6 @@ public sealed class Showman : Viewer
                             ClientData.Players[i].CanBeSelected = i + 1 < mparams.Length && mparams[i + 1] == "+";
                             int num = i;
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.NextDelete, num); ClearSelections(); };
-                        }
-
-                        if (ClientData.Speaker != null)
-                        {
-                            ClientData.Speaker.Replic = "";
                         }
 
                         _logic.ShowmanLogic.FirstDelete();
@@ -295,11 +229,6 @@ public sealed class Showman : Viewer
                     break;
 
                 case Messages.Stake:
-                    ClientData.PersonDataExtensions.SendNominal.CanBeExecuted = mparams[1] == "+";
-                    ClientData.PersonDataExtensions.SendStake.CanBeExecuted = mparams[2] == "+";
-                    ClientData.PersonDataExtensions.SendPass.CanBeExecuted = mparams[3] == "+";
-                    ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = mparams[4] == "+";
-
                     for (var i = 0; i < 4; i++)
                     {
                         ClientData.PersonDataExtensions.Var[i] = mparams[i + 1] == "+";
@@ -326,11 +255,6 @@ public sealed class Showman : Viewer
                     {
                         break;
                     }
-
-                    ClientData.PersonDataExtensions.SendNominal.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Nominal);
-                    ClientData.PersonDataExtensions.SendStake.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Stake);
-                    ClientData.PersonDataExtensions.SendPass.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Pass);
-                    ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.AllIn);
 
                     ClientData.PersonDataExtensions.Var[0] = stakeTypes.HasFlag(StakeTypes.Nominal);
                     ClientData.PersonDataExtensions.Var[1] = stakeTypes.HasFlag(StakeTypes.Stake);

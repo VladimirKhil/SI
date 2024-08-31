@@ -1,6 +1,5 @@
 ﻿using SICore.Clients.Viewer;
 using SICore.Contracts;
-using SICore.Models;
 using SIData;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -14,8 +13,6 @@ namespace SICore;
 /// </summary>
 public sealed class ViewerData : Data
 {
-    public PersonAccount? Speaker { get; set; }
-
     private string _stageName = "";
 
     /// <summary>
@@ -27,10 +24,11 @@ public sealed class ViewerData : Data
         set { if (_stageName != value) { _stageName = value; OnPropertyChanged(); } }
     }
 
+    // TODO: maybe client logic should not rely on this property
     /// <summary>
-    /// Тип вопроса
+    /// Current question type.
     /// </summary>
-    public string QuestionType { get; set; }
+    public string? QuestionType { get; set; }
 
     public string AtomType { get; set; } = "";
 
@@ -114,12 +112,6 @@ public sealed class ViewerData : Data
             }
         }
     }
-
-    // TODO: move to GameViewModel
-    /// <summary>
-    /// Observable version of <see cref="Players" />.
-    /// </summary>
-    public ObservableCollection<PlayerAccount> PlayersObservable { get; } = new();
 
     private PersonAccount? _currentPerson;
 
@@ -308,33 +300,10 @@ public sealed class ViewerData : Data
         .Append("Viewers: ").Append(string.Join(", ", Viewers.Select(PrintAccount))).AppendLine()
         .ToString();
 
-    private JoinMode _joinMode = JoinMode.AnyRole;
-
-    /// <summary>
-    /// Allowed join mode.
-    /// </summary>
-    public JoinMode JoinMode
-    {
-        get => _joinMode;
-        set
-        {
-            if (_joinMode != value)
-            {
-                _joinMode = value;
-                OnPropertyChanged();
-                OnJoinModeChanged(value);
-            }
-        }
-    }
-
     /// <summary>
     /// Contains information about system errors in the game, which would be good to send to the author, but do not lead to a system crash.
     /// </summary>
     public StringBuilder SystemLog { get; } = new();
-
-    public event Action<JoinMode>? JoinModeChanged;
-
-    private void OnJoinModeChanged(JoinMode joinMode) => JoinModeChanged?.Invoke(joinMode);
 
     public ViewerData(IGameHost gameHost) : base(gameHost)
     {

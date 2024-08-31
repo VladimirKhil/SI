@@ -107,6 +107,11 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 
     public void Stake()
     {
+        _gameViewModel.SendNominal.CanBeExecuted = _data.PersonDataExtensions.Var[0];
+        _gameViewModel.SendStake.CanBeExecuted = _data.PersonDataExtensions.Var[1];
+        _gameViewModel.SendPass.CanBeExecuted = _data.PersonDataExtensions.Var[2];
+        _gameViewModel.SendVabank.CanBeExecuted = _data.PersonDataExtensions.Var[3];
+
         _gameViewModel.DialogMode = DialogModes.Stake;
         _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         ((PlayerAccount)_data.Me).IsDeciding = false;
@@ -115,6 +120,10 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 
     public void StakeNew()
     {
+        _gameViewModel.SendStakeNew.CanBeExecuted = _data.PersonDataExtensions.Var[1];
+        _gameViewModel.SendPassNew.CanBeExecuted = _data.PersonDataExtensions.Var[2];
+        _gameViewModel.SendAllInNew.CanBeExecuted = _data.PersonDataExtensions.Var[3];
+
         _gameViewModel.DialogMode = DialogModes.StakeNew;
         _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         ((PlayerAccount)_data.Me).IsDeciding = false;

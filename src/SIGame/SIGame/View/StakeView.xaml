@@ -6,7 +6,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:SIGame"
     xmlns:scp="clr-namespace:SICore.Properties;assembly=SICore"
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance vm:GameViewModel}"
     Height="94"
     Width="550"
     FontSize="25">
@@ -58,7 +60,7 @@
             Command="{Binding SendStake}" />
         
         <Slider
-            DataContext="{Binding StakeInfo}"
+            DataContext="{Binding Data.PersonDataExtensions.StakeInfo}"
             Name="slider1"
             Margin="5,0"
             Grid.ColumnSpan="2"
@@ -74,7 +76,7 @@
             IsMoveToPointEnabled="True" />
         
         <local:NumericTextBox
-            DataContext="{Binding StakeInfo}"
+            DataContext="{Binding Data.PersonDataExtensions.StakeInfo}"
             Style="{StaticResource {x:Type TextBox}}"
             Grid.Column="2"
             Minimum="{Binding Minimum}"

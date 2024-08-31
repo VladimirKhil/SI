@@ -37,51 +37,9 @@ public sealed class Player : Viewer
             Clear();
         });
 
-        ClientData.PersonDataExtensions.SendNominal = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.Stake, 0);
-            Clear();
-        });
-
-        ClientData.PersonDataExtensions.SendStake = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.Stake, 1, ClientData.PersonDataExtensions.StakeInfo.Stake);
-            Clear();
-        });
-
-        ClientData.PersonDataExtensions.SendPass = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.Stake, 2);
-            Clear();
-        });
-
-        ClientData.PersonDataExtensions.SendVabank = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.Stake, 3);
-            Clear();
-        });
-
         ClientData.PersonDataExtensions.SendFinalStake = new CustomCommand(arg =>
         {
             _viewerActions.SendMessageWithArgs(Messages.FinalStake, ClientData.PersonDataExtensions.StakeInfo.Stake);
-            Clear();
-        });
-
-        ClientData.PersonDataExtensions.SendPassNew = new SimpleCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Pass);
-            Clear();
-        });
-
-        ClientData.PersonDataExtensions.SendStakeNew = new SimpleCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, ClientData.PersonDataExtensions.StakeInfo.Stake);
-            Clear();
-        });
-
-        ClientData.PersonDataExtensions.SendAllInNew = new SimpleCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.AllIn);
             Clear();
         });
 
@@ -338,11 +296,6 @@ public sealed class Player : Viewer
                     break;
 
                 case Messages.Stake:
-                    ClientData.PersonDataExtensions.SendNominal.CanBeExecuted = mparams[1] == "+";
-                    ClientData.PersonDataExtensions.SendStake.CanBeExecuted = mparams[2] == "+";
-                    ClientData.PersonDataExtensions.SendPass.CanBeExecuted = mparams[3] == "+";
-                    ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = mparams[4] == "+";
-
                     for (int i = 0; i < 4; i++)
                     {
                         ClientData.PersonDataExtensions.Var[i] = mparams[i + 1] == "+";
@@ -367,11 +320,6 @@ public sealed class Player : Viewer
                     {
                         break;
                     }
-
-                    ClientData.PersonDataExtensions.SendNominal.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Nominal);
-                    ClientData.PersonDataExtensions.SendStake.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Stake);
-                    ClientData.PersonDataExtensions.SendPass.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Pass);
-                    ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.AllIn);
 
                     ClientData.PersonDataExtensions.Var[0] = stakeTypes.HasFlag(StakeTypes.Nominal);
                     ClientData.PersonDataExtensions.Var[1] = stakeTypes.HasFlag(StakeTypes.Stake);

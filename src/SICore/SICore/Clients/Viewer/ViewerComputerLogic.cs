@@ -66,16 +66,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
-    virtual public void OnScreenContent(string[] mparams)
-    {
-        // Do nothing
-    }
-
-    virtual public void OnBackgroundContent(string[] mparams)
-    {
-
-    }
-
     public void OnRightAnswer(string answer) { }
 
     public void Resume() { }

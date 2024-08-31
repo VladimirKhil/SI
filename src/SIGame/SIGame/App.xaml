@@ -1278,7 +1278,7 @@
 
                     <DataTemplate x:Key="{x:Static sc:DialogModes.ChangeSum}">
                         <ContentControl Style="{StaticResource windowStyle}" Tag="{x:Static lp:Resources.SumChange}">
-                            <l:ChangeSumView DataContext="{Binding Data.ShowmanDataExtensions}" />
+                            <l:ChangeSumView />
                         </ContentControl>
                     </DataTemplate>
 
@@ -1298,7 +1298,7 @@
                         <ContentControl
                             Style="{StaticResource windowStyleWithProgress}"
                             Tag="{Binding Data.PersonDataExtensions.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
-                            <l:StakeView DataContext="{Binding Data.PersonDataExtensions}" />
+                            <l:StakeView />
                         </ContentControl>
                     </DataTemplate>
 
@@ -1306,7 +1306,7 @@
                         <ContentControl
                             Style="{StaticResource windowStyleWithProgress}"
                             Tag="{Binding Data.PersonDataExtensions.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
-                            <l:StakeNewView DataContext="{Binding Data.PersonDataExtensions}" />
+                            <l:StakeNewView />
                         </ContentControl>
                     </DataTemplate>
 

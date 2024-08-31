@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Utils.Commands;
 
 namespace SICore;
 
@@ -10,20 +9,6 @@ namespace SICore;
 /// </summary>
 public sealed class PersonData : INotifyPropertyChanged
 {
-    public CustomCommand SendPass { get; set; }
-
-    public CustomCommand SendStake { get; set; }
-
-    public CustomCommand SendVabank { get; set; }
-
-    public CustomCommand SendNominal { get; set; }
-
-    public SimpleCommand? SendPassNew { get; set; }
-
-    public SimpleCommand? SendStakeNew { get; set; }
-
-    public SimpleCommand? SendAllInNew { get; set; }
-
     public ICommand SendCatCost { get; set; }
 
     public ICommand SendFinalStake { get; set; }
@@ -43,7 +28,8 @@ public sealed class PersonData : INotifyPropertyChanged
         }
     }
 
-    internal bool[] Var { get; set; } = new bool[4] { false, false, false, false };
+    // TODO: remove this property
+    public bool[] Var { get; set; } = new bool[4] { false, false, false, false };
 
     private string[] _right = Array.Empty<string>();
 

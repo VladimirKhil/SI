@@ -22,8 +22,6 @@ namespace SICore;
 /// </summary>
 public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPropertyChanged
 {
-    private bool _ignoreAtoms = false;
-
     protected readonly ViewerActions _viewerActions;
 
     public ViewerActions Actions => _viewerActions;
@@ -81,12 +79,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         ClientData.Name = _client.Name;
 
         ClientData.EventLog.Append($"Initial name {ClientData.Name}");
-
-        ClientData.JoinModeChanged += ClientData_JoinModeChanged;
     }
-
-    private void ClientData_JoinModeChanged(JoinMode joinMode) =>
-        _viewerActions.SendMessage(Messages.SetJoinMode, joinMode.ToString());
 
     private void ChangeType_Executed(object arg)
     {
@@ -352,7 +345,12 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     }
 
                 case Messages.SetJoinMode:
-                    OnSetJoinMode(mparams);
+                    if (mparams.Length < 2 || !Enum.TryParse<JoinMode>(mparams[1], out var joinMode))
+                    {
+                        break;
+                    }
+
+                    _logic.OnSetJoinMode(joinMode);
                     break;
 
                 case Messages.PackageId:
@@ -668,20 +666,11 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     }
                     break;
 
-                case Messages.Atom: // deprecated
-                    if (!_ignoreAtoms)
-                    {
-                        _logic.OnScreenContent(mparams);
-                    }
-                    break;
-
                 case Messages.Content:
-                    _ignoreAtoms = true;
                     _logic.OnContent(mparams);
                     break;
 
                 case Messages.ContentAppend:
-                    _ignoreAtoms = true;
                     _logic.OnContentAppend(mparams);
                     break;
 
@@ -693,13 +682,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     if (mparams.Length > 1)
                     {
                         _logic.OnAtomHint(mparams[1]);
-                    }
-                    break;
-
-                case Messages.Atom_Second: // deprecated
-                    if (!_ignoreAtoms)
-                    {
-                        _logic.OnBackgroundContent(mparams);
                     }
                     break;
 
@@ -1047,19 +1029,9 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         Logic.OnAnswerOptions(questionHasScreenContent, optionsTypes);
     }
 
-    private void OnSetJoinMode(string[] mparams)
-    {
-        if (mparams.Length < 2 || !Enum.TryParse<JoinMode>(mparams[1], out var joinMode))
-        {
-            return;
-        }
-
-        MyData.JoinMode = joinMode;
-    }
-
     private void OnQuestionType(string[] mparams)
     {
-        ClientData.AtomType = AtomTypes.Text;
+        ClientData.AtomType = ContentTypes.Text;
         ClientData.QuestionType = mparams[1];
 
         _logic.OnQuestionStart();
@@ -1880,20 +1852,12 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             ClientData.PersonDataExtensions.IsWrong =
             ClientData.PersonDataExtensions.SendCatCost =
             ClientData.PersonDataExtensions.SendFinalStake =
-            ClientData.ShowmanDataExtensions.ChangeSums2 =
             ClientData.ShowmanDataExtensions.ManageTable =
-            ClientData.PersonDataExtensions.SendNominal =
-            ClientData.PersonDataExtensions.SendPass =
-            ClientData.PersonDataExtensions.SendStake =
-            ClientData.PersonDataExtensions.SendVabank =
             ClientData.PlayerDataExtensions.Apellate = null;
 
         var person = ClientData.PersonDataExtensions;
-        person.SendStakeNew = person.SendPassNew = person.SendAllInNew = null;
 
         ClientData.PlayerDataExtensions.Report.SendReport = ClientData.PlayerDataExtensions.Report.SendNoReport = null;
-
-        ClientData.JoinModeChanged -= ClientData_JoinModeChanged;
 
         IViewerClient viewer = role switch
         {
@@ -2222,21 +2186,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         var personData = ClientData.PersonDataExtensions;
 
-        if (personData.SendStakeNew != null)
-        {
-            personData.SendStakeNew.CanBeExecuted = stakeModes.HasFlag(StakeModes.Stake);
-        }
-
-        if (personData.SendPassNew != null)
-        {
-            personData.SendPassNew.CanBeExecuted = stakeModes.HasFlag(StakeModes.Pass);
-        }
-
-        if (personData.SendAllInNew != null)
-        {
-            personData.SendAllInNew.CanBeExecuted = stakeModes.HasFlag(StakeModes.AllIn);
-        }
-
         personData.Var[0] = false;
         personData.Var[1] = stakeModes.HasFlag(StakeModes.Stake);
         personData.Var[2] = stakeModes.HasFlag(StakeModes.Pass);
@@ -2371,11 +2320,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 _viewerActions.SendMessageWithArgs(Messages.SelectPlayer, num);
                 ClearSelections(true);
             };
-        }
-
-        if (ClientData.Speaker != null)
-        {
-            ClientData.Speaker.Replic = "";
         }
 
         _ = Enum.TryParse<SelectPlayerReason>(mparams[1], out var reason);

@@ -181,7 +181,7 @@
                 </Border>
             </ContentControl>
 
-            <ItemsControl ItemsSource="{Binding Data.PlayersObservable}" Grid.Row="1" Grid.Column="2" Margin="3,15,3,30" Grid.ZIndex="10">
+            <ItemsControl ItemsSource="{Binding Players}" Grid.Row="1" Grid.Column="2" Margin="3,15,3,30" Grid.ZIndex="10">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Rows="1" />

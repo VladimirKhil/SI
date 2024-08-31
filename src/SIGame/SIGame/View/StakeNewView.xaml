@@ -7,7 +7,8 @@
     xmlns:local="clr-namespace:SIGame"
     xmlns:scp="clr-namespace:SICore.Properties;assembly=SICore"    
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
-    d:DataContext="{d:DesignInstance sc:PersonData}"
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    d:DataContext="{d:DesignInstance vm:GameViewModel}"
     mc:Ignorable="d"
     Height="94"
     Width="550"
@@ -54,7 +55,7 @@
             Command="{Binding SendStakeNew}" />
 
         <Slider
-            DataContext="{Binding StakeInfo}"
+            DataContext="{Binding Data.PersonDataExtensions.StakeInfo}"
             Name="slider1"
             Margin="5,0"
             Grid.ColumnSpan="2"
@@ -70,7 +71,7 @@
             IsMoveToPointEnabled="True" />
 
         <local:NumericTextBox
-            DataContext="{Binding StakeInfo}"
+            DataContext="{Binding Data.PersonDataExtensions.StakeInfo}"
             Style="{StaticResource {x:Type TextBox}}"
             Grid.Column="2"
             Minimum="{Binding Minimum}"

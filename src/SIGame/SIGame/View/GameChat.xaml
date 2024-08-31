@@ -130,7 +130,7 @@
 
                         <ComboBox
                             ItemsSource="{Binding Source={StaticResource JoinModes}, Mode=OneTime}"
-                            SelectedItem="{Binding Data.JoinMode}"
+                            SelectedItem="{Binding JoinMode}"
                             VerticalAlignment="Stretch"
                             VerticalContentAlignment="Center"
                             IsEnabled="{Binding Host.IsHost}">
@@ -301,7 +301,7 @@
                 
                 <ListBox
                     IsSynchronizedWithCurrentItem="True"
-                    ItemsSource="{Binding Data.PlayersObservable}"
+                    ItemsSource="{Binding Players}"
                     SelectedItem="{Binding Data.CurrentPerson}"
                     Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}"
                     FontSize="16"

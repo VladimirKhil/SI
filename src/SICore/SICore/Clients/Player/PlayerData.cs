@@ -100,7 +100,7 @@ public sealed class PlayerData : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Defines time stamp when game buttons havebeen activated.
+    /// Defines time stamp when game buttons have been activated.
     /// </summary>
     public DateTimeOffset? TryStartTime { get; set; }
 
