@@ -1,5 +1,5 @@
-﻿using SICore;
-using SIGame.ViewModel;
+﻿using SIGame.ViewModel;
+using SIGame.ViewModel.Models;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;

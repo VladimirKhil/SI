@@ -1,5 +1,6 @@
 ﻿using SICore.BusinessLogic;
 using SIGame.ViewModel;
+using SIGame.ViewModel.Models;
 using SIUI.ViewModel;
 using R = SICore.Properties.Resources;
 

@@ -567,4 +567,13 @@
   <data name="NetworkOpeningError" xml:space="preserve">
     <value>Ошибка при открытии сетевого подключения: {0}. Сетевые подключения невозможны.</value>
   </data>
+  <data name="QuestionTypeForAll" xml:space="preserve">
+    <value>Вопрос для всех</value>
+  </data>
+  <data name="QuestionTypeStakeForAll" xml:space="preserve">
+    <value>Вопрос со ставкой для всех</value>
+  </data>
+  <data name="QuestionTypeWithButton" xml:space="preserve">
+    <value>Вопрос с кнопкой</value>
+  </data>
 </root>

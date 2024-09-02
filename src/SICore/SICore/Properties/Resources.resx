@@ -844,6 +844,9 @@
     <value>You got Question with Button! Press button to answer the question</value>
   </data>
   <data name="QuestionTypeStakeAll" xml:space="preserve">
-    <value>You got Question for All with Stake! Everybody makes stake and plays</value>
+    <value>You got Question with Stake for All! Everybody makes stake and plays</value>
+  </data>
+  <data name="QuestionTypeForAll" xml:space="preserve">
+    <value>You got Question for all!</value>
   </data>
 </root>

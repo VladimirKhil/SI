@@ -570,4 +570,13 @@
   <data name="NetworkOpeningError" xml:space="preserve">
     <value>Error while starting listening network: {0}. Network connections are unavailable.</value>
   </data>
+  <data name="QuestionTypeForAll" xml:space="preserve">
+    <value>Question for all</value>
+  </data>
+  <data name="QuestionTypeStakeForAll" xml:space="preserve">
+    <value>Stake question for all</value>
+  </data>
+  <data name="QuestionTypeWithButton" xml:space="preserve">
+    <value>Question with button</value>
+  </data>
 </root>

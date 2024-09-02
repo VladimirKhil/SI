@@ -5,6 +5,7 @@
     xmlns:l="clr-namespace:SIGame"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:local="clr-namespace:SIGame;assembly=SIGame.ViewModel"
+    xmlns:vmm="clr-namespace:SIGame.ViewModel.Models;assembly=SIGame.ViewModel"
     xmlns:localc="clr-namespace:SIGame.Converters"
     xmlns:lb="clr-namespace:SIGame.Behaviors"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
@@ -1270,31 +1271,31 @@
                 </localc:ViewConverter.DefaultView>
 
                 <localc:ViewConverter.Views>
-                    <DataTemplate x:Key="{x:Static sc:DialogModes.AnswerValidation}">
+                    <DataTemplate x:Key="{x:Static vmm:DialogModes.AnswerValidation}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.AnswerCheck}">
                             <l:AnswerValidationView />
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static sc:DialogModes.ChangeSum}">
+                    <DataTemplate x:Key="{x:Static vmm:DialogModes.ChangeSum}">
                         <ContentControl Style="{StaticResource windowStyle}" Tag="{x:Static lp:Resources.SumChange}">
                             <l:ChangeSumView />
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static sc:DialogModes.Answer}">
+                    <DataTemplate x:Key="{x:Static vmm:DialogModes.Answer}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.YourAnswer}">
                             <l:AnswerView />
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static sc:DialogModes.CatCost}">
+                    <DataTemplate x:Key="{x:Static vmm:DialogModes.CatCost}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.CatCost}">
                             <l:SimpleStakeView DataContext="{Binding Data.PersonDataExtensions}" />
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static sc:DialogModes.Stake}">
+                    <DataTemplate x:Key="{x:Static vmm:DialogModes.Stake}">
                         <ContentControl
                             Style="{StaticResource windowStyleWithProgress}"
                             Tag="{Binding Data.PersonDataExtensions.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
@@ -1302,7 +1303,7 @@
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static sc:DialogModes.StakeNew}">
+                    <DataTemplate x:Key="{x:Static vmm:DialogModes.StakeNew}">
                         <ContentControl
                             Style="{StaticResource windowStyleWithProgress}"
                             Tag="{Binding Data.PersonDataExtensions.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
@@ -1310,13 +1311,13 @@
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static sc:DialogModes.FinalStake}">
+                    <DataTemplate x:Key="{x:Static vmm:DialogModes.FinalStake}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.Stake}">
                             <l:SimpleStakeView DataContext="{Binding Data.PersonDataExtensions}" />
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static sc:DialogModes.Report}">
+                    <DataTemplate x:Key="{x:Static vmm:DialogModes.Report}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.ReportTitle}">
                             <l:GameReportView DataContext="{Binding Data.PlayerDataExtensions.Report}" />
                         </ContentControl>

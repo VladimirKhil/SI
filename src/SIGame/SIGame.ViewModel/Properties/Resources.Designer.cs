@@ -1060,6 +1060,33 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question for all.
+        /// </summary>
+        public static string QuestionTypeForAll {
+            get {
+                return ResourceManager.GetString("QuestionTypeForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Stake question for all.
+        /// </summary>
+        public static string QuestionTypeStakeForAll {
+            get {
+                return ResourceManager.GetString("QuestionTypeStakeForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Question with button.
+        /// </summary>
+        public static string QuestionTypeWithButton {
+            get {
+                return ResourceManager.GetString("QuestionTypeWithButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Random server themes.
         /// </summary>
         public static string RandomServerThemes {

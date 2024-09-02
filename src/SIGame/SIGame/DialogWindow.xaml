@@ -7,6 +7,7 @@
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
     xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    xmlns:vmm="clr-namespace:SIGame.ViewModel.Models;assembly=SIGame.ViewModel"
     mc:Ignorable="d"
     Title="{x:Static lp:Resources.DialogWindow}"
     d:DataContext="{d:DesignInstance vm:GameViewModel}"
@@ -34,7 +35,7 @@
                     <Setter Property="Visibility" Value="Hidden" />
                     
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding DialogMode}" Value="{x:Static sc:DialogModes.None}">
+                        <DataTrigger Binding="{Binding DialogMode}" Value="{x:Static vmm:DialogModes.None}">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </Style.Triggers>

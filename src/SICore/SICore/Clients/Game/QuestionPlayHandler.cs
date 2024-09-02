@@ -304,6 +304,10 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                 GameLogic?.SetAnswererAsActive();
                 return true;
 
+            case StepParameterValues.SetAnswererMode_All:
+                GameLogic?.SetAnswerersAll();
+                return true;
+
             case StepParameterValues.SetAnswererMode_Stake:
                 switch (select)
                 {

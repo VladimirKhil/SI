@@ -1438,6 +1438,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на You got Question for all!.
+        /// </summary>
+        public static string QuestionTypeForAll {
+            get {
+                return ResourceManager.GetString("QuestionTypeForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на You got Question with Button! Press button to answer the question.
         /// </summary>
         public static string QuestionTypeSimple {
@@ -1447,7 +1456,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на You got Question for All with Stake! Everybody makes stake and plays.
+        ///   Ищет локализованную строку, похожую на You got Question with Stake for All! Everybody makes stake and plays.
         /// </summary>
         public static string QuestionTypeStakeAll {
             get {

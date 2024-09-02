@@ -43,6 +43,11 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal IReadOnlyList<ContentItem[]>? ScreenContentSequence { get; set; }
 
+    /// <summary>
+    /// Does the question have hidden stakes.
+    /// </summary>
+    internal bool HiddenStakes { get; set; }
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -50,6 +55,8 @@ internal sealed class QuestionPlayState
         UsedAnswerOptions.Clear();
         LayoutShown = false;
         AnswerOptionsShown = false;
+        ScreenContentSequence = null;
+        HiddenStakes = false;
     }
 
     internal void RemovePlayer(int playerIndex)

@@ -1,5 +1,6 @@
 ﻿using SICore.BusinessLogic;
 using SIGame.ViewModel;
+using SIGame.ViewModel.Models;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using System.Diagnostics;

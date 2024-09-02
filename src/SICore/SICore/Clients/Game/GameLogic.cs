@@ -1296,73 +1296,62 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         StopWaiting();
 
         int updateSum;
+        var multipleAnswerers = HaveMultipleAnswerers();
 
         if (_data.Answerer.AnswerIsRight)
         {
-            var showmanReplic = IsSpecialQuestion() ? nameof(R.Bravo) : nameof(R.Right);
-            
+            var showmanReplic = IsSpecialQuestion() ? nameof(R.Bravo) : nameof(R.Right);            
             var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
             var canonicalAnswer = _data.Question?.Right.FirstOrDefault();
             var isAnswerCanonical = canonicalAnswer != null && (_data.Answerer.Answer ?? "").Simplify().Contains(canonicalAnswer.Simplify());
 
-            if (!HaveMultipleAnswerers())
+            if (canonicalAnswer != null && !isAnswerCanonical)
             {
-                if (canonicalAnswer != null && !isAnswerCanonical)
+                _data.GameResultInfo.AcceptedAnswers.Add(new QuestionReport
                 {
-                    s.AppendFormat(" [{0}]", canonicalAnswer);
+                    ThemeName = _data.Theme.Name,
+                    QuestionText = _data.Question?.GetText(),
+                    ReportText = _data.Answerer.Answer
+                });
+            }
 
-                    _data.GameResultInfo.AcceptedAnswers.Add(new QuestionReport
-                    {
-                        ThemeName = _data.Theme.Name,
-                        QuestionText = _data.Question?.GetText(),
-                        ReportText = _data.Answerer.Answer
-                    });
-                }
+            if (!_data.QuestionPlayState.HiddenStakes)
+            {
+                var outcome = _data.CurPriceRight;
+                updateSum = (int)(outcome * _data.Answerer.AnswerIsRightFactor);
 
-                s.AppendFormat(
-                    " (+{0}{1})",
-                    _data.CurPriceRight.ToString().FormatNumber(),
-                    Math.Abs(_data.Answerer.AnswerIsRightFactor - 1.0) < double.Epsilon ? "" : " * " + _data.Answerer.AnswerIsRightFactor);
+                s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerIsRightFactor)})");
 
                 _gameActions.ShowmanReplic(s.ToString());
-
-                s = new StringBuilder(Messages.Person)
-                    .Append(Message.ArgsSeparatorChar)
-                    .Append('+')
-                    .Append(Message.ArgsSeparatorChar)
-                    .Append(_data.AnswererIndex)
-                    .Append(Message.ArgsSeparatorChar)
-                    .Append(_data.CurPriceRight);
-
-                _gameActions.SendMessage(s.ToString());
-
-                updateSum = (int)(_data.CurPriceRight * _data.Answerer.AnswerIsRightFactor);
+                _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, updateSum);
                 _data.Answerer.AddRightSum(updateSum);
-                _data.ChooserIndex = _data.AnswererIndex;
-                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
                 _gameActions.InformSums();
 
-                _data.IsQuestionPlaying = false;
-                _data.AnnounceAnswer = false;
+                if (multipleAnswerers)
+                {
+                    ScheduleExecution(Tasks.Announce, 15);
+                }
+                else
+                {
+                    // TODO: many of these lines are redundand in Special questions
+                    _data.ChooserIndex = _data.AnswererIndex;
+                    _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
 
-                _data.IsThinking = false;
-                _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Stop);
+                    _data.IsQuestionPlaying = false;
 
-                MoveToAnswer(); // Question is answered correctly
-                ScheduleExecution(Tasks.MoveNext, 1, force: true);
+                    _data.IsThinking = false;
+                    _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Stop);
+
+                    MoveToAnswer(); // Question is answered correctly
+                    ScheduleExecution(Tasks.MoveNext, 1, force: true);
+                }
             }
             else
             {
                 _gameActions.ShowmanReplic(s.ToString());
-
-                if (isAnswerCanonical)
-                {
-                    _data.AnnounceAnswer = false;
-                }
-
                 _data.PlayerIsRight = true;
-                updateSum = _data.Answerer.FinalStake;
+                updateSum = _data.Answerer.PersonalStake;
                 ScheduleExecution(Tasks.AnnounceStake, 15);
             }
         }
@@ -1372,13 +1361,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             if (_data.Answerer.Answer != LO[nameof(R.IDontKnow)])
             {
-                s.Append(GetRandomString(LO[nameof(R.Wrong)]));
+                s.Append(GetRandomString(LO[nameof(R.Wrong)])).Append(' ');
             }
 
-            if (_data.Settings.AppSettings.IgnoreWrong)
-            {
-                _data.CurPriceWrong = 0;
-            }
+            var outcome = _data.Settings.AppSettings.IgnoreWrong ? 0 : _data.CurPriceWrong;
 
             if (_data.QuestionPlayState.AnswerOptions != null && _data.Answerer.Answer != null)
             {
@@ -1395,13 +1381,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
             }
 
-            if (!HaveMultipleAnswerers())
+            if (!_data.QuestionPlayState.HiddenStakes)
             {
-                s.AppendFormat(
-                    " (-{0}{1})",
-                    _data.CurPriceWrong.ToString().FormatNumber(),
-                    Math.Abs(_data.Answerer.AnswerIsRightFactor - 1.0) < double.Epsilon ? "" : " * " + _data.Answerer.AnswerIsRightFactor);
-                
+                s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerIsRightFactor)})");                
                 _gameActions.ShowmanReplic(s.ToString());
 
                 if (_data.Answerer.AnswerIsRightFactor == 0)
@@ -1411,17 +1393,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
                 else
                 {
-                    s = new StringBuilder(Messages.Person)
-                        .Append(Message.ArgsSeparatorChar)
-                        .Append('-')
-                        .Append(Message.ArgsSeparatorChar)
-                        .Append(_data.AnswererIndex)
-                        .Append(Message.ArgsSeparatorChar)
-                        .Append(_data.CurPriceWrong);
-
-                    _gameActions.SendMessage(s.ToString());
-
-                    updateSum = (int)(_data.CurPriceWrong * _data.Answerer.AnswerIsRightFactor);
+                    updateSum = (int)(outcome * _data.Answerer.AnswerIsRightFactor);
+                    _gameActions.SendMessageWithArgs(Messages.Person, '-', _data.AnswererIndex, updateSum);
                     _data.Answerer.SubtractWrongSum(updateSum);
                     _gameActions.InformSums();
 
@@ -1436,14 +1409,21 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     }
                 }
 
-                _data.Answerer.CanPress = false;
-                ScheduleExecution(Tasks.ContinueQuestion, 1);
+                if (multipleAnswerers)
+                {
+                    ScheduleExecution(Tasks.Announce, 15);
+                }
+                else
+                {
+                    _data.Answerer.CanPress = false;
+                    ScheduleExecution(Tasks.ContinueQuestion, 1);
+                }
             }
             else
             {
                 _gameActions.ShowmanReplic(s.ToString());
                 _data.PlayerIsRight = false;
-                updateSum = _data.Answerer.FinalStake;
+                updateSum = _data.Answerer.PersonalStake;
 
                 ScheduleExecution(Tasks.AnnounceStake, 15);
             }
@@ -1457,6 +1437,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         return true;
     }
+
+    private static string PrintRightFactor(double factor) => Math.Abs(factor - 1.0) < double.Epsilon ? "" : " * " + factor;
 
     /// <summary>
     /// Skips left question part and moves directly to answer.
@@ -2443,8 +2425,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All); // Timer 1 STOP
         }
 
-        _data.AnnounceAnswer = true;
-
         ScheduleExecution(Tasks.MoveNext, 1, force: true);
 
         _data.IsQuestionPlaying = false;
@@ -2456,10 +2436,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
-            if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && _data.Players[i].FinalStake == -1)
+            if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && _data.Players[i].PersonalStake == -1)
             {
                 _gameActions.SendMessage(Messages.Cancel, _data.Players[i].Name);
-                _data.Players[i].FinalStake = 1;
+                _data.Players[i].PersonalStake = 1;
 
                 _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
             }
@@ -2511,35 +2491,35 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AnnounceStakeCore()
     {
-        if (_data.Answerer == null)
+        var answerer = _data.Answerer;
+
+        if (answerer == null)
         {
-            throw new ArgumentException($"{nameof(_data.Answerer)} == null", nameof(_data.Answerer));
+            throw new ArgumentException($"{nameof(answerer)} == null", nameof(answerer));
         }
 
-        var msg = new StringBuilder();
-        msg.AppendFormat("{0} {1}: {2}", LO[nameof(R.Stake)], _data.Answerer.Name, Notion.FormatNumber(_data.Answerer.FinalStake));
-        _gameActions.ShowmanReplic(msg.ToString());
+        var stake = answerer.PersonalStake;
+        _gameActions.ShowmanReplic($"{LO[nameof(R.Stake)]} {answerer.Name}: {Notion.FormatNumber(stake)}");
 
-        msg = new StringBuilder(Messages.Person).Append(Message.ArgsSeparatorChar);
+        var message = new MessageBuilder(Messages.Person);
 
         if (_data.PlayerIsRight)
         {
-            msg.Append('+');
-            _data.Answerer.AddRightSum(_data.Answerer.FinalStake);
+            message.Add('+');
+            answerer.AddRightSum(stake);
         }
         else
         {
-            msg.Append('-');
-            _data.Answerer.SubtractWrongSum(_data.Answerer.FinalStake);
+            message.Add('-');
+            answerer.SubtractWrongSum(stake);
         }
 
-        msg.Append(Message.ArgsSeparatorChar).Append(_data.AnswererIndex);
-        msg.Append(Message.ArgsSeparatorChar).Append(_data.Answerer.FinalStake);
+        message.Add(_data.AnswererIndex).Add(stake);
 
-        _gameActions.SendMessage(msg.ToString());
+        _gameActions.SendMessage(message.ToString());
         _gameActions.InformSums();
 
-        _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.Answerer.FinalStake);
+        _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, stake);
     }
 
     private void AskFinalStake()
@@ -2556,12 +2536,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 if (_data.Players[i].Sum <= 1)
                 {
-                    _data.Players[i].FinalStake = 1; // only one choice
+                    _data.Players[i].PersonalStake = 1; // only one choice
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                     continue;
                 }
 
-                _data.Players[i].FinalStake = -1;
+                _data.Players[i].PersonalStake = -1;
                 _data.NumOfStakers++;
                 _gameActions.SendMessage(Messages.FinalStake, _data.Players[i].Name);
 
@@ -2793,6 +2773,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 case QuestionTypes.StakeAll:
                     _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeStakeAll)]);
+                    break;
+
+                case QuestionTypes.ForAll:
+                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeForAll)]);
                     break;
 
                 default:
@@ -4180,7 +4164,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
                 else
                 {
-                    var stake = player.FinalStake;
+                    var stake = player.PersonalStake;
 
                     if (historyItem.IsRight)
                     {
@@ -4588,6 +4572,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
+    internal void SetAnswerersAll()
+    {
+        var allIndicies = Enumerable.Range(0, _data.Players.Count).ToArray();
+        _data.QuestionPlayState.SetMultipleAnswerers(allIndicies);
+        
+        var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(allIndicies.Select(i => (object)i));
+        _gameActions.SendMessage(msg.ToString());
+
+        ScheduleExecution(Tasks.MoveNext, 5);
+    }
+
     internal void OnButtonPressStart()
     {
         foreach (var player in _data.Players)
@@ -4796,6 +4791,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(answerers.Select(i => (object)i));
         _gameActions.SendMessage(msg.ToString());
         ClientData.QuestionPlayState.SetMultipleAnswerers(answerers);
+        ClientData.QuestionPlayState.HiddenStakes = true;
         AskFinalStake();
     }
 

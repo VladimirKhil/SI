@@ -72,9 +72,9 @@ public sealed class GamePlayerAccount : GamePersonAccount
 
     // TODO: Will be moved to QuestionPlayState
     /// <summary>
-    /// Ставка в финале
+    /// Personal player stake.
     /// </summary>
-    internal int FinalStake { get; set; }
+    internal int PersonalStake { get; set; }
 
     /// <summary>
     /// Marks that player is selectable for the current decision.

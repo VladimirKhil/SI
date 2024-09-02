@@ -145,8 +145,6 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     {
         InformActivePlayers();
 
-        _gameData.AnnounceAnswer = true; // initialization
-
         GameLogic?.InitThemes(themes, willPlayAllThemes, isFirstPlay, Models.ThemesPlayMode.AllTogether);
         _gameData.ThemeDeleters = new ThemeDeletersEnumerator(_gameData.Players, _gameData.TInfo.RoundInfo.Count(t => t.Name != null));
         _gameData.ThemeDeleters.Reset(true);

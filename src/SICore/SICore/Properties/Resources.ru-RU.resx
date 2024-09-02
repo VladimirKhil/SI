@@ -846,4 +846,7 @@
   <data name="QuestionTypeStakeAll" xml:space="preserve">
     <value>Вам достаётся Вопрос для всех со ставкой! Каждый делает ставку и играет</value>
   </data>
+  <data name="QuestionTypeForAll" xml:space="preserve">
+    <value>Вам достаётся Вопрос для Всех!</value>
+  </data>
 </root>

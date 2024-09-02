@@ -758,7 +758,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                         var isRight = mparams[1] == "+";
                         if (!int.TryParse(mparams[2], out var playerIndex)
-                            || playerIndex < 0 || playerIndex >= ClientData.Players.Count)
+                            || playerIndex < 0
+                            || playerIndex >= ClientData.Players.Count)
                         {
                             break;
                         }
@@ -768,9 +769,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             break;
                         }
 
-                        ClientData.CurPriceWrong = ClientData.CurPriceRight = price;
-
-                        _logic.Person(playerIndex, isRight);
+                        _logic.OnPersonScoreChanged(playerIndex, isRight, price);
 
                         #endregion
                         break;
@@ -1034,7 +1033,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         ClientData.AtomType = ContentTypes.Text;
         ClientData.QuestionType = mparams[1];
 
-        _logic.OnQuestionStart();
+        _logic.OnQuestionStart(mparams.Length > 2 && bool.TryParse(mparams[2], out var isDefault) && isDefault);
     }
 
     private void OnChoice(string[] mparams)
@@ -1052,7 +1051,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             {
                 var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
                 var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
-                ClientData.CurPriceRight = ClientData.CurPriceWrong = selectedQuestion.Price;
                 _logic.SetCaption($"{selectedTheme.Name}, {selectedQuestion.Price}");
             }
         }

@@ -52,10 +52,6 @@ public abstract class Data : INotifyPropertyChanged
         set { _stage = value; OnPropertyChanged(); }
     }
 
-    public int CurPriceRight { get; set; }
-
-    public int CurPriceWrong { get; set; }
-
     public StringBuilder EventLog { get; } = new();
 
     public StringBuilder PersonsUpdateHistory { get; } = new();

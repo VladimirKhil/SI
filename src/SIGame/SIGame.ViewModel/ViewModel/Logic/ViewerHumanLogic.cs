@@ -3,7 +3,9 @@ using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
 using SIData;
 using SIGame.ViewModel;
+using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
+using SIGame.ViewModel.Properties;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
@@ -1264,14 +1266,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void ShowTablo() => TInfo.TStage = TableStage.RoundTable;
 
-    /// <summary>
-    /// Игрок получил или потерял деньги
-    /// </summary>
-    public void Person(int playerIndex, bool isRight)
+    public void OnPersonScoreChanged(int playerIndex, bool isRight, int sum)
     {
         if (isRight)
         {
-            _data.Sound = _data.CurPriceRight >= 2000 ? Sounds.ApplauseBig : Sounds.ApplauseSmall;
+            _data.Sound = sum >= 2000 ? Sounds.ApplauseBig : Sounds.ApplauseSmall;
             _data.Players[playerIndex].State = PlayerState.Right;
         }
         else
@@ -1281,7 +1280,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             _data.Players[playerIndex].State = PlayerState.Wrong;
         }
 
-        AddToFileLog($"<span data-tag=\"sumChange\" data-playerIndex=\"{playerIndex}\" data-change=\"{(isRight ? 1 : -1) * ClientData.CurPriceRight}\"></span>");
+        AddToFileLog($"<span data-tag=\"sumChange\" data-playerIndex=\"{playerIndex}\" data-change=\"{(isRight ? 1 : -1) * sum}\"></span>");
     }
 
     public void OnPersonFinalStake(int playerIndex)
@@ -1314,7 +1313,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _data.Players[playerIndex].State = PlayerState.HasAnswered;
     }
 
-    public void OnQuestionStart()
+    public void OnQuestionStart(bool isDefaultType)
     {
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
@@ -1335,15 +1334,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             case QuestionTypes.Stake:
                 {
                     TInfo.Text = _localizer[nameof(R.Label_Auction)];
-
-                    lock (TInfo.RoundInfoLock)
-                    {
-                        for (int i = 0; i < TInfo.RoundInfo.Count; i++)
-                        {
-                            TInfo.RoundInfo[i].Active = i == _data.ThemeIndex;
-                        }
-                    }
-
+                    HighlightCurrentTheme();
                     TInfo.TStage = TableStage.Special;
                     _data.Sound = Sounds.QuestionStake;
                     break;
@@ -1354,15 +1345,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             case QuestionTypes.SecretPublicPrice:
                 {
                     TInfo.Text = _localizer[nameof(R.Label_CatInBag)];
-
-                    lock (TInfo.RoundInfoLock)
-                    {
-                        foreach (var item in TInfo.RoundInfo)
-                        {
-                            item.Active = false;
-                        }
-                    }
-
+                    HideAllThemes();
                     TInfo.TStage = TableStage.Special;
                     _data.Sound = Sounds.QuestionSecret;
                     _prependTableText = null;
@@ -1372,15 +1355,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             case QuestionTypes.NoRisk:
                 {
                     TInfo.Text = _localizer[nameof(R.Label_Sponsored)];
-
-                    lock (TInfo.RoundInfoLock)
-                    {
-                        foreach (var item in TInfo.RoundInfo)
-                        {
-                            item.Active = false;
-                        }
-                    }
-
+                    HighlightCurrentTheme();
                     TInfo.TStage = TableStage.Special;
                     _data.Sound = Sounds.QuestionNoRisk;
                     break;
@@ -1388,6 +1363,30 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
             case QuestionTypes.Simple:
                 TInfo.TimeLeft = 1.0;
+
+                //if (!isDefaultType)
+                //{
+                //    TInfo.Text = Resources.QuestionTypeWithButton.ToUpper();
+                //    TInfo.TStage = TableStage.Special;
+                //}
+                break;
+
+            case QuestionTypes.StakeAll:
+                if (!isDefaultType)
+                {
+                    HighlightCurrentTheme();
+                    TInfo.Text = Resources.QuestionTypeStakeForAll.ToUpper();
+                    TInfo.TStage = TableStage.Special;
+                }
+                break;
+
+            case QuestionTypes.ForAll:
+                if (!isDefaultType)
+                {
+                    HighlightCurrentTheme();
+                    TInfo.Text = Resources.QuestionTypeForAll.ToUpper();
+                    TInfo.TStage = TableStage.Special;
+                }
                 break;
 
             default:
@@ -1396,6 +1395,28 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     item.Active = false;
                 }
                 break;
+        }
+    }
+
+    private void HideAllThemes()
+    {
+        lock (TInfo.RoundInfoLock)
+        {
+            foreach (var item in TInfo.RoundInfo)
+            {
+                item.Active = false;
+            }
+        }
+    }
+
+    private void HighlightCurrentTheme()
+    {
+        lock (TInfo.RoundInfoLock)
+        {
+            for (int i = 0; i < TInfo.RoundInfo.Count; i++)
+            {
+                TInfo.RoundInfo[i].Active = i == _data.ThemeIndex;
+            }
         }
     }
 

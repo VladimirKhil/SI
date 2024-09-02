@@ -77,14 +77,15 @@ public interface IViewerLogic : ILogic
     void ShowTablo();
 
     /// <summary>
-    /// Игрок получил или потерял деньги
+    /// Person score changed.
     /// </summary>
-    void Person(int playerIndex, bool isRight);
+    void OnPersonScoreChanged(int playerIndex, bool isRight, int sum) { }
 
     /// <summary>
     /// Handles question start.
     /// </summary>
-    void OnQuestionStart();
+    /// <param name="isDefaultType">Does the question have a default type for the current round.</param>
+    void OnQuestionStart(bool isDefaultType) { }
 
     /// <summary>
     /// Завершение раунда

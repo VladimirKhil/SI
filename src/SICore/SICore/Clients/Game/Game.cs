@@ -729,11 +729,11 @@ public sealed class Game : Actor<GameData, GameLogic>
                             {
                                 var player = ClientData.Players[i];
 
-                                if (ClientData.QuestionPlayState.AnswererIndicies.Contains(i) && player.FinalStake == -1 && message.Sender == player.Name)
+                                if (ClientData.QuestionPlayState.AnswererIndicies.Contains(i) && player.PersonalStake == -1 && message.Sender == player.Name)
                                 {
                                     if (int.TryParse(args[1], out int finalStake) && finalStake >= 1 && finalStake <= player.Sum)
                                     {
-                                        player.FinalStake = finalStake;
+                                        player.PersonalStake = finalStake;
                                         ClientData.NumOfStakers--;
 
                                         _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
@@ -1348,7 +1348,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
                     if (stakerName == player.Name)
                     {
-                        player.FinalStake = stakeSum;
+                        player.PersonalStake = stakeSum;
                         ClientData.NumOfStakers--;
                         ClientData.StakeLimits.Remove(stakerName);
 

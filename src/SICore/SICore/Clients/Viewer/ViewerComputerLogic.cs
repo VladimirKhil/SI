@@ -85,16 +85,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         // Do nothing
     }
 
-    public virtual void Person(int playerIndex, bool isRight)
-    {
-
-    }
-
-    public void OnQuestionStart()
-    {
-
-    }
-
     public void StopRound()
     {
 

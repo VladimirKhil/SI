@@ -353,6 +353,11 @@ public sealed class GameData : Data
     /// </summary>
     internal int StakeSum { get; set; } = -1;
 
+    // TODO: move these two properties to QuestionPlayState
+    public int CurPriceRight { get; set; }
+
+    public int CurPriceWrong { get; set; }
+
     /// <summary>
     /// Получено ли решение ведущего
     /// </summary>
@@ -495,8 +500,6 @@ public sealed class GameData : Data
     }
 
     public int ReportsCount { get; set; }
-
-    public bool AnnounceAnswer { get; set; }
 
     /// <summary>
     /// Could appellation messages be collected.

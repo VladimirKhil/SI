@@ -218,57 +218,6 @@ public enum LogMode
 }
 
 /// <summary>
-/// Dialog modes.
-/// </summary>
-public enum DialogModes
-{
-    /// <summary>
-    /// No dialog.
-    /// </summary>
-    None,
-
-    /// <summary>
-    /// Answer validation.
-    /// </summary>
-    AnswerValidation,
-
-    /// <summary>
-    /// Person score update.
-    /// </summary>
-    ChangeSum,
-
-    /// <summary>
-    /// Player answer.
-    /// </summary>
-    Answer,
-
-    /// <summary>
-    /// Setting question price.
-    /// </summary>
-    CatCost,
-
-    /// <summary>
-    /// Question stake selection.
-    /// </summary>
-    Stake,
-
-    /// <summary>
-    /// Question stake selection.
-    /// </summary>
-    StakeNew,
-
-    /// <summary>
-    /// Question final stake selection.
-    /// </summary>
-    FinalStake,
-
-    /// <summary>
-    /// Game report.
-    /// </summary>
-    Report,
-}
-
-/// <summary>
 /// Defines game decision types.
 /// </summary>
 public enum DecisionType
@@ -441,17 +390,6 @@ public enum StopReason
     /// Throttling on button hit was started.
     /// </summary>
     Wait
-}
-
-[Flags]
-public enum GamesFilter
-{
-    NoFilter = 0,
-    New = 1,
-    Sport = 2,
-    Tv = 4,
-    NoPassword = 8,
-    All = 15
 }
 
 public enum MessageTypes
