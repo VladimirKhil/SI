@@ -187,6 +187,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cannot enable package quality control because of the errors:.
+        /// </summary>
+        public static string CannotEnableQuality {
+            get {
+                return ResourceManager.GetString("CannotEnableQuality", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Championship.
         /// </summary>
         public static string Championship {
@@ -754,27 +763,18 @@ namespace SIQuester.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Multimedia file extension is not among recommended ones ({0})!.
         /// </summary>
-        public static string MediaFileExtensionIsNotRecommened {
+        public static string MediaFileExtensionIsNotRecommended {
             get {
-                return ResourceManager.GetString("MediaFileExtensionIsNotRecommened", resourceCulture);
+                return ResourceManager.GetString("MediaFileExtensionIsNotRecommended", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Ищет локализованную строку, похожую на Multimedia file size exceeds recommended value ({0} MB)!.
         /// </summary>
-        public static string MediaFileSizeExceedsRecommenedValue {
+        public static string MediaFileSizeExceedsRecommendedValue {
             get {
-                return ResourceManager.GetString("MediaFileSizeExceedsRecommenedValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на File {0} exceeds recommended size of {1} KB.
-        /// </summary>
-        public static string MediaFileTooLarge {
-            get {
-                return ResourceManager.GetString("MediaFileTooLarge", resourceCulture);
+                return ResourceManager.GetString("MediaFileSizeExceedsRecommendedValue", resourceCulture);
             }
         }
         

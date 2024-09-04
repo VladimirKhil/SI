@@ -159,6 +159,9 @@
   <data name="CannotCreateTemporaryFile" xml:space="preserve">
     <value>Cannot create temporary file. Try to turn off antivirus software</value>
   </data>
+  <data name="CannotEnableQuality" xml:space="preserve">
+    <value>Cannot enable package quality control because of the errors:</value>
+  </data>
   <data name="Championship" xml:space="preserve">
     <value>Championship</value>
   </data>
@@ -364,14 +367,11 @@ Humor</value>
   <data name="LostFile" xml:space="preserve">
     <value>Save the unprocessed part of the file to:</value>
   </data>
-  <data name="MediaFileExtensionIsNotRecommened" xml:space="preserve">
+  <data name="MediaFileExtensionIsNotRecommended" xml:space="preserve">
     <value>Multimedia file extension is not among recommended ones ({0})!</value>
   </data>
-  <data name="MediaFileSizeExceedsRecommenedValue" xml:space="preserve">
+  <data name="MediaFileSizeExceedsRecommendedValue" xml:space="preserve">
     <value>Multimedia file size exceeds recommended value ({0} MB)!</value>
-  </data>
-  <data name="MediaFileTooLarge" xml:space="preserve">
-    <value>File {0} exceeds recommended size of {1} KB</value>
   </data>
   <data name="MircAudio" xml:space="preserve">
     <value>audio</value>

@@ -107,12 +107,12 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
 
         var sizeWarning = AppSettings.Default.CheckFileSize && RecommenedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
             && media.StreamLength > recommendedMaxSize * 1024 * 1024
-                ? string.Format(Resources.MediaFileSizeExceedsRecommenedValue, recommendedMaxSize)
+                ? string.Format(Resources.MediaFileSizeExceedsRecommendedValue, recommendedMaxSize)
                 : null;
 
         var extensionWarning = RecommenedExtensions.TryGetValue(Type, out var recommendedExtensions)
             && !recommendedExtensions.Contains(extension)
-                ? string.Format(Resources.MediaFileExtensionIsNotRecommened, string.Join(',', recommendedExtensions))
+                ? string.Format(Resources.MediaFileExtensionIsNotRecommended, string.Join(',', recommendedExtensions))
                 : null;
 
         return sizeWarning == null ? extensionWarning : (extensionWarning == null ? sizeWarning : $"{sizeWarning} {extensionWarning}");

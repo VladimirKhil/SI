@@ -566,26 +566,6 @@ public sealed class AppSettings : INotifyPropertyChanged
     public bool UseQualityControl { get; set; } = DefaultUseQualityControl;
 
     /// <summary>
-    /// Maximum recommended image size.
-    /// </summary>
-    public int MaxImageSizeKb { get; } = 1 * 1024;
-
-    /// <summary>
-    /// Maximum recommended audio size.
-    /// </summary>
-    public int MaxAudioSizeKb { get; } = 5 * 1024;
-
-    /// <summary>
-    /// Maximum recommended video size.
-    /// </summary>
-    public int MaxVideoSizeKb { get; } = 10 * 1024;
-
-    /// <summary>
-    /// Maximum recommended html size.
-    /// </summary>
-    public int MaxHtmlSizeKb { get; } = 1 * 1024;
-
-    /// <summary>
     /// Loads settings from stream.
     /// </summary>
     public static AppSettings Load(Stream stream)

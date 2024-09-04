@@ -844,6 +844,15 @@
                             Padding="0,1"
                             Text="{Binding Model.ContactUri}" />
 
+                        <TextBlock
+                            Text="{x:Static lp:Resources.QualityControl}"
+                            Margin="0,5,0,0"
+                            Padding="0,1" />
+
+                        <CheckBox
+                            IsChecked="{Binding HasQualityControl}"
+                            Margin="0,5,0,0" />
+
                         <ContentControl Content="{Binding Info}" ContentTemplate="{StaticResource InfoTemplate}" />
                     </StackPanel>
                 </DataTemplate>

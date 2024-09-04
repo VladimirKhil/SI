@@ -450,9 +450,6 @@ theme - тема Кота</value>
   <data name="AddTheme" xml:space="preserve">
     <value>Добавить тему</value>
   </data>
-  <data name="MediaFileTooLarge" xml:space="preserve">
-    <value>Файл {0} превышает рекомендуемый размер в {1} КБ</value>
-  </data>
   <data name="QuestionPlay" xml:space="preserve">
     <value>Проигрывание вопроса</value>
   </data>
@@ -462,10 +459,10 @@ theme - тема Кота</value>
   <data name="FileSearch" xml:space="preserve">
     <value>Поиск файлов</value>
   </data>
-  <data name="MediaFileExtensionIsNotRecommened" xml:space="preserve">
+  <data name="MediaFileExtensionIsNotRecommended" xml:space="preserve">
     <value>Расширение мультимедиа файла не относится к рекомендуемым ({0})!</value>
   </data>
-  <data name="MediaFileSizeExceedsRecommenedValue" xml:space="preserve">
+  <data name="MediaFileSizeExceedsRecommendedValue" xml:space="preserve">
     <value>Размер мультимедиа файла превышает рекомендуемое значение ({0} МБ)!</value>
   </data>
   <data name="YamlFiles" xml:space="preserve">
@@ -747,5 +744,8 @@ theme - тема Кота</value>
   </data>
   <data name="YourAnswer" xml:space="preserve">
     <value>Ваш ответ?</value>
+  </data>
+  <data name="CannotEnableQuality" xml:space="preserve">
+    <value>Невозможно включить контроль качества из-за ошибок:</value>
   </data>
 </root>

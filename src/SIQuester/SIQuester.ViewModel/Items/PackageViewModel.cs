@@ -90,6 +90,14 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         {
             if (Document.Document.HasQualityControl != value)
             {
+                if (value)
+                {
+                    if (!Document.CheckPackageQuality())
+                    {
+                        return;
+                    }
+                }
+
                 Document.Document.HasQualityControl = value;
                 OnPropertyChanged();
                 UpdateQualityCommands();

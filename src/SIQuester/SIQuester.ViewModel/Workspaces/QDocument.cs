@@ -1240,9 +1240,9 @@ public sealed class QDocument : WorkspaceViewModel
                 warnings.Add(new WarningViewModel(string.Format(Resources.FileIsDuplicated, name), () => NavigateToStorageItem(mediaStorage, item)));
             }
 
-            if (AppSettings.Default.CheckFileSize && mediaStorage.GetLength(item.Model.Name) > maxFileSize * 1024)
+            if (AppSettings.Default.CheckFileSize && mediaStorage.GetLength(item.Model.Name) > maxFileSize * 1024 * 1024)
             {
-                warnings.Add(new WarningViewModel(string.Format(Resources.MediaFileTooLarge, name, maxFileSize), () => NavigateToStorageItem(mediaStorage, item)));
+                warnings.Add(new WarningViewModel(string.Format(Resources.InvalidFileSize, name, maxFileSize), () => NavigateToStorageItem(mediaStorage, item)));
             }
 
             files.Add(name);
@@ -1265,11 +1265,12 @@ public sealed class QDocument : WorkspaceViewModel
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
+        var recommendedSize = MediaOwnerViewModel.RecommenedSizeMb;
 
-        var images = FillFiles(Images, AppSettings.Default.MaxImageSizeKb, warnings);
-        var audio = FillFiles(Audio, AppSettings.Default.MaxAudioSizeKb, warnings);
-        var video = FillFiles(Video, AppSettings.Default.MaxVideoSizeKb, warnings);
-        var html = FillFiles(Html, AppSettings.Default.MaxHtmlSizeKb, warnings);
+        var images = FillFiles(Images, recommendedSize[CollectionNames.ImagesStorageName], warnings);
+        var audio = FillFiles(Audio, recommendedSize[CollectionNames.AudioStorageName], warnings);
+        var video = FillFiles(Video, recommendedSize[CollectionNames.VideoStorageName], warnings);
+        var html = FillFiles(Html, recommendedSize[CollectionNames.HtmlStorageName], warnings);
 
         CheckCommonFiles(images, audio, video, html, errors);
 
@@ -2847,6 +2848,59 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void PlayQuestion_Executed(object? arg) => Dialog = new QuestionPlayViewModel((QuestionViewModel)arg, this);
 
+    internal bool CheckPackageQuality()
+    {
+        var errors = new List<string>();
+
+        foreach (var round in Package.Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    foreach (var contentItem in question.Model.GetContent())
+                    {
+                        if (contentItem.Type != ContentTypes.Text)
+                        {
+                            if (!contentItem.IsRef)
+                            {
+                                errors.Add($"{round.Model.Name}:{theme.Model.Name}:{question.Model.Price}:{contentItem.Value}: {Resources.ExternalLinksAreForbidden}");
+                            }
+                            else
+                            {
+                                var collectionName = CollectionNames.TryGetCollectionName(contentItem.Type);
+
+                                if (collectionName != null)
+                                {
+                                    var media = Wrap(contentItem);
+                                    var maxFileSize = MediaOwnerViewModel.RecommenedSizeMb[collectionName];
+
+                                    if (media.StreamLength > maxFileSize * 1024 * 1024)
+                                    {
+                                        var errorMessage = string.Format(Resources.InvalidFileSize, contentItem.Value, maxFileSize).LeaveFirst(2000);
+                                        errors.Add($"{round.Model.Name}:{theme.Model.Name}:{question.Model.Price}: {errorMessage}");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (errors.Count > 0)
+        {
+            PlatformManager.Instance.ShowExclamationMessage(
+                Resources.CannotEnableQuality + Environment.NewLine + Environment.NewLine + string.Join(Environment.NewLine + Environment.NewLine, errors));
+            
+            IsSideOpened = true;
+            SideIndex = 6;
+            return false;
+        }
+
+        return true;
+    }
+
     private async void ExpandAll_Executed(object? arg)
     {
         var expand = Convert.ToBoolean(arg);
@@ -3221,11 +3275,12 @@ public sealed class QDocument : WorkspaceViewModel
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
+        var recommendedSize = MediaOwnerViewModel.RecommenedSizeMb;
 
-        var images = FillFiles(Images, AppSettings.Default.MaxImageSizeKb, warnings);
-        var audio = FillFiles(Audio, AppSettings.Default.MaxAudioSizeKb, warnings);
-        var video = FillFiles(Video, AppSettings.Default.MaxVideoSizeKb, warnings);
-        var html = FillFiles(Html, AppSettings.Default.MaxHtmlSizeKb, warnings);
+        var images = FillFiles(Images, recommendedSize[CollectionNames.ImagesStorageName], warnings);
+        var audio = FillFiles(Audio, recommendedSize[CollectionNames.AudioStorageName], warnings);
+        var video = FillFiles(Video, recommendedSize[CollectionNames.VideoStorageName], warnings);
+        var html = FillFiles(Html, recommendedSize[CollectionNames.HtmlStorageName], warnings);
 
         CheckCommonFiles(images, audio, video, html, errors);
 
