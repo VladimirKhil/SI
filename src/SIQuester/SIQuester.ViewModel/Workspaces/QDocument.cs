@@ -1265,7 +1265,7 @@ public sealed class QDocument : WorkspaceViewModel
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
-        var recommendedSize = MediaOwnerViewModel.RecommenedSizeMb;
+        var recommendedSize = MediaOwnerViewModel.RecommendedSizeMb;
 
         var images = FillFiles(Images, recommendedSize[CollectionNames.ImagesStorageName], warnings);
         var audio = FillFiles(Audio, recommendedSize[CollectionNames.AudioStorageName], warnings);
@@ -2873,11 +2873,25 @@ public sealed class QDocument : WorkspaceViewModel
                                 if (collectionName != null)
                                 {
                                     var media = Wrap(contentItem);
-                                    var maxFileSize = MediaOwnerViewModel.RecommenedSizeMb[collectionName];
+                                    var maxFileSize = MediaOwnerViewModel.RecommendedSizeMb[collectionName];
 
                                     if (media.StreamLength > maxFileSize * 1024 * 1024)
                                     {
                                         var errorMessage = string.Format(Resources.InvalidFileSize, contentItem.Value, maxFileSize).LeaveFirst(2000);
+                                        errors.Add($"{round.Model.Name}:{theme.Model.Name}:{question.Model.Price}: {errorMessage}");
+                                    }
+
+                                    var extensions = MediaOwnerViewModel.RecommendedExtensions[collectionName];
+                                    var extension = System.IO.Path.GetExtension(contentItem.Value);
+
+                                    if (!extensions.Contains(extension))
+                                    {
+                                        var errorMessage = string.Format(
+                                            Resources.InvalidFileExtension,
+                                            contentItem.Value,
+                                            extension,
+                                            string.Join(", ", extensions));
+
                                         errors.Add($"{round.Model.Name}:{theme.Model.Name}:{question.Model.Price}: {errorMessage}");
                                     }
                                 }
@@ -2892,7 +2906,7 @@ public sealed class QDocument : WorkspaceViewModel
         {
             PlatformManager.Instance.ShowExclamationMessage(
                 Resources.CannotEnableQuality + Environment.NewLine + Environment.NewLine + string.Join(Environment.NewLine + Environment.NewLine, errors));
-            
+
             IsSideOpened = true;
             SideIndex = 6;
             return false;
@@ -3275,7 +3289,7 @@ public sealed class QDocument : WorkspaceViewModel
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
-        var recommendedSize = MediaOwnerViewModel.RecommenedSizeMb;
+        var recommendedSize = MediaOwnerViewModel.RecommendedSizeMb;
 
         var images = FillFiles(Images, recommendedSize[CollectionNames.ImagesStorageName], warnings);
         var audio = FillFiles(Audio, recommendedSize[CollectionNames.AudioStorageName], warnings);

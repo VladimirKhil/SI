@@ -439,6 +439,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question contains external link which is forbidden and will not be loaded.
+        /// </summary>
+        public static string ExternalLinksForbidden {
+            get {
+                return ResourceManager.GetString("ExternalLinksForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Player {0} tried to appellate the last right answer, but there are not enough players to win the appellation currently in the game.
         /// </summary>
         public static string FailedToAppellateForWrongAnswer {
@@ -804,6 +813,15 @@ namespace SICore.Properties {
         public static string InformChooser {
             get {
                 return ResourceManager.GetString("InformChooser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на File {0} has invalid extension {1}.
+        /// </summary>
+        public static string InvalidFileExtension {
+            get {
+                return ResourceManager.GetString("InvalidFileExtension", resourceCulture);
             }
         }
         
@@ -1263,6 +1281,15 @@ namespace SICore.Properties {
         public static string OversizedFile {
             get {
                 return ResourceManager.GetString("OversizedFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} in question {1} exceeds maximum size of {2} KB and will not be loaded.
+        /// </summary>
+        public static string OversizedFileForbidden {
+            get {
+                return ResourceManager.GetString("OversizedFileForbidden", resourceCulture);
             }
         }
         

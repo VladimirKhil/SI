@@ -38,7 +38,7 @@ internal static class PackageExtractor
 
     private static bool FileFilter(string filePath)
     {
-        if (filePath == "content.xml")
+        if (filePath == "content.xml" || filePath == "quality.marker")
         {
             return true;
         }

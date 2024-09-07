@@ -849,4 +849,13 @@
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>You got Question for all!</value>
   </data>
+  <data name="ExternalLinksForbidden" xml:space="preserve">
+    <value>Question contains external link which is forbidden and will not be loaded</value>
+  </data>
+  <data name="OversizedFileForbidden" xml:space="preserve">
+    <value>{0} in question {1} exceeds maximum size of {2} KB and will not be loaded</value>
+  </data>
+  <data name="InvalidFileExtension" xml:space="preserve">
+    <value>File {0} has invalid extension {1}</value>
+  </data>
 </root>

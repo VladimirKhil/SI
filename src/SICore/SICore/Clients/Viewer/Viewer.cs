@@ -652,7 +652,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     OnLayout(mparams);
                     break;
 
-                case Messages.TextShape:
+                case Messages.TextShape: // TODO: remove after v7.11.0 deprecation
                     _logic.OnTextShape(mparams);
                     break;
 

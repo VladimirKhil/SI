@@ -15,7 +15,7 @@ namespace SIQuester.ViewModel;
 /// <inheritdoc cref="ModelViewBase" />
 public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
 {
-    public static readonly Dictionary<string, int> RecommenedSizeMb = new()
+    public static readonly Dictionary<string, int> RecommendedSizeMb = new()
     {
         [CollectionNames.ImagesStorageName] = 1,
         [CollectionNames.AudioStorageName] = 5,
@@ -23,7 +23,7 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
         [CollectionNames.HtmlStorageName] = 1,
     };
 
-    public static readonly IReadOnlyDictionary<string, string[]> RecommenedExtensions = new Dictionary<string, string[]>()
+    public static readonly IReadOnlyDictionary<string, string[]> RecommendedExtensions = new Dictionary<string, string[]>()
     {
         [CollectionNames.ImagesStorageName] = new[] { ".jpg", ".jpe", ".jpeg", ".png", ".gif", ".webp" },
         [CollectionNames.AudioStorageName] = new[] { ".mp3" },
@@ -105,12 +105,12 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
     {
         var extension = Path.GetExtension(media.Uri).ToLowerInvariant();
 
-        var sizeWarning = AppSettings.Default.CheckFileSize && RecommenedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
+        var sizeWarning = AppSettings.Default.CheckFileSize && RecommendedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
             && media.StreamLength > recommendedMaxSize * 1024 * 1024
                 ? string.Format(Resources.MediaFileSizeExceedsRecommendedValue, recommendedMaxSize)
                 : null;
 
-        var extensionWarning = RecommenedExtensions.TryGetValue(Type, out var recommendedExtensions)
+        var extensionWarning = RecommendedExtensions.TryGetValue(Type, out var recommendedExtensions)
             && !recommendedExtensions.Contains(extension)
                 ? string.Format(Resources.MediaFileExtensionIsNotRecommended, string.Join(',', recommendedExtensions))
                 : null;

@@ -849,4 +849,13 @@
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>Вам достаётся Вопрос для Всех!</value>
   </data>
+  <data name="ExternalLinksForbidden" xml:space="preserve">
+    <value>Вопрос содержит внешнюю ссылку. Ссылки запрещены и не будут загружаться</value>
+  </data>
+  <data name="OversizedFileForbidden" xml:space="preserve">
+    <value>{0} в вопросе {1} превышает максимальный размер {2} КБ и не будет загружаться</value>
+  </data>
+  <data name="InvalidFileExtension" xml:space="preserve">
+    <value>У файла {0} неподдерживаемое расширение {1}</value>
+  </data>
 </root>

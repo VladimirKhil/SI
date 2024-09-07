@@ -232,7 +232,7 @@ public partial class TreeDocView : UserControl
                             break;
 
                         default:
-                            foreach (var item in MediaOwnerViewModel.RecommenedExtensions)
+                            foreach (var item in MediaOwnerViewModel.RecommendedExtensions)
                             {
                                 if (item.Value.Contains(fileExtension))
                                 {

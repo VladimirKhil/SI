@@ -489,7 +489,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
-        _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, text);
         _gameActions.SystemReplic(text);
 
         var nextTime = !waitForFinish ? 1 : atomTime;
@@ -514,7 +513,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPartial = false;
         // There is no need to send content for now, as we can send replic directly
         //_gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Replic, 0, ContentTypes.Text, text.EscapeNewLines());
-        _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Oral, text);
         _gameActions.ShowmanReplic(text);
 
         var atomTime = !waitForFinish ? 1 : (duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length));
@@ -528,30 +526,53 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.UseBackgroundAudio = !waitForFinish;
     }
 
-    private (bool success, string? globalUri, string? localUri) TryShareContent(ContentItem contentItem)
+    private static readonly IReadOnlyDictionary<string, string[]> AllowedExtensions = new Dictionary<string, string[]>()
+    {
+        [ContentTypes.Image] = new[] { ".jpg", ".jpe", ".jpeg", ".png", ".gif", ".webp" },
+        [ContentTypes.Audio] = new[] { ".mp3" },
+        [ContentTypes.Video] = new[] { ".mp4" },
+        [ContentTypes.Html] = new[] { ".html" },
+    };
+
+    private (bool success, string? globalUri, string? localUri, string? error) TryShareContent(ContentItem contentItem)
     {
         if (!contentItem.IsRef) // External link
         {
+            if (_data.PackageDoc.HasQualityControl)
+            {
+                return (false, null, null, LO[nameof(R.ExternalLinksForbidden)]);
+            }
+
             var link = contentItem.Value;
 
             if (Uri.TryCreate(link, UriKind.Absolute, out _))
             {
-                return (true, link, null);
+                return (true, link, null, null);
             }
 
             // There is no file in the package and it's name is not a valid absolute uri.
             // So, considering that the file is missing
 
-            return (false, link, null);
+            return (false, link, null, null);
         }
 
+        if (_data.PackageDoc.HasQualityControl)
+        {
+            var fileExtension = Path.GetExtension(contentItem.Value);
+
+            if (AllowedExtensions.TryGetValue(contentItem.Type, out var allowedExtensions) && !allowedExtensions.Contains(fileExtension))
+            {
+                return (false, null, null, string.Format(LO[nameof(R.InvalidFileExtension)], contentItem.Value, fileExtension));
+            }
+        }
+        
         var contentType = contentItem.Type;
         var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
         var media = _data.PackageDoc.TryGetMedia(contentItem);
 
         if (!media.HasValue || media.Value.Uri == null)
         {
-            return (false, $"{mediaCategory}/{contentItem.Value}", null);
+            return (false, $"{mediaCategory}/{contentItem.Value}", null, null);
         }
 
         var fullUri = media.Value.Uri;
@@ -559,7 +580,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (fileLength.HasValue)
         {
-            CheckFileLength(contentType, fileLength.Value);
+            var (success, error) = CheckFileLength(contentType, fileLength.Value);
+            
+            if (!success)
+            {
+                return (false, null, null, error);
+            }
         }
 
         string globalUri;
@@ -577,23 +603,19 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             localUri = null;
         }
 
-        return (true, globalUri, localUri);
+        return (true, globalUri, localUri, null);
     }
 
-    private bool ShareMedia(ContentItem contentItem, bool isBackground = false)
+    private bool ShareMedia(ContentItem contentItem)
     {
         try
         {
-            var (success, globalUri, localUri) = TryShareContent(contentItem);
-            var messageType = isBackground ? Messages.Atom_Second : Messages.Atom;
+            var (success, globalUri, localUri, error) = TryShareContent(contentItem);
 
             if (!success || globalUri == null)
             {
-                var errorText = string.Format(LO[nameof(R.MediaNotFound)], globalUri);
-
+                var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
                 _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
-                _gameActions.SendMessageWithArgs(messageType, AtomTypes.Text, errorText);
-
                 return false;
             }
 
@@ -604,37 +626,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 contentItem.Type,
                 globalUri);
 
-            // TODO: remove after complete switching to Content message
-            // {
-            var msg = new MessageBuilder(messageType);
-
-            var contentType = contentItem.Type;
-
-            if (contentType == AtomTypes.AudioNew)
-            {
-                contentType = AtomTypes.Audio; // For backward compatibility; remove later
-            }
-
-            msg.Add(contentType).Add(MessageParams.Atom_Uri);
-
-            foreach (var person in _data.AllPersons.Keys)
-            {
-                var msg2 = new StringBuilder(msg.ToString());
-
-                if (_gameActions.Client.CurrentServer.Contains(person))
-                {
-                    msg2.Append(Message.ArgsSeparatorChar).Append(localUri ?? globalUri);
-                }
-                else
-                {
-                    msg2.Append(Message.ArgsSeparatorChar).Append(globalUri);
-                }
-
-                _gameActions.SendMessage(msg2.ToString(), person);
-            }
-
-            // }
-
             return true;
         }
         catch (Exception exc)
@@ -644,23 +635,32 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
-    private void CheckFileLength(string contentType, long fileLength)
+    private (bool success, string? error) CheckFileLength(string contentType, long fileLength)
     {
-        int? maxRecommendedFileLength = contentType == AtomTypes.Image ? _data.Host.MaxImageSizeKb
-            : (contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew ? _data.Host.MaxAudioSizeKb
-            : (contentType == AtomTypes.Video ? _data.Host.MaxVideoSizeKb : null));
+        int? maxRecommendedFileLength = contentType == ContentTypes.Image ? _data.Host.MaxImageSizeKb
+            : (contentType == ContentTypes.Audio ? _data.Host.MaxAudioSizeKb
+            : (contentType == ContentTypes.Video ? _data.Host.MaxVideoSizeKb
+            : null));
 
         if (!maxRecommendedFileLength.HasValue || fileLength <= (long)maxRecommendedFileLength * 1024)
         {
-            return;
+            return (true, null);
+        }
+
+        var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
+
+        if (_data.PackageDoc.HasQualityControl)
+        {
+            var error = string.Format(LO[nameof(R.OversizedFileForbidden)], R.File, fileLocation, maxRecommendedFileLength);
+            return (false, error);
         }
 
         // Notify users that the media file is too large and could be downloaded slowly
-        var contentName = contentType == AtomTypes.Image ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Image)) :
-            (contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio)) :
-            (contentType == AtomTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video)) : R.File));
+        var contentName = contentType == ContentTypes.Image ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Image))
+            : (contentType == ContentTypes.Audio ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio))
+            : (contentType == ContentTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video))
+            : R.File));
 
-        var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
         var errorMessage = string.Format(LO[nameof(R.OversizedFile)], contentName, fileLocation, maxRecommendedFileLength);
 
         _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage);
@@ -672,6 +672,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             // Show message on table
             _gameActions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
         }
+
+        return (true, null);
     }
 
     internal void OnContentScreenImage(ContentItem contentItem)
@@ -708,7 +710,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     internal void OnContentBackgroundAudio(ContentItem contentItem)
     {
         _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(contentItem, _data.UseBackgroundAudio);
+        _data.MediaOk = ShareMedia(contentItem);
 
         var defaultTime = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
 
@@ -2027,7 +2029,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                             var subText = _data.Text[_data.TextLength..];
 
                             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
-                            _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText); // deprecated
                             _gameActions.SystemReplic(subText);
 
                             newTask = Tasks.MoveNext;
@@ -2833,7 +2834,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var subText = text.Substring(_data.TextLength, printingLength);
 
             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
-            _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
             _gameActions.SystemReplic(subText);
 
             _data.TextLength += printingLength;
@@ -4275,11 +4275,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     ShareMedia(logoItem);
 
                     // New
-                    var (success, globalUri, _) = TryShareContent(logoItem);
+                    var (success, globalUri, _, error) = TryShareContent(logoItem);
 
                     if (success && globalUri != null)
                     {
                         messageBuilder.Add(ContentTypes.Image).Add(globalUri);
+                    }
+                    else if (error != null)
+                    {
+                        messageBuilder.Add(ContentTypes.Text).Add(error);
                     }
                 }
 
@@ -4884,11 +4888,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            var (success, globalUri, _) = TryShareContent(answerOption.Content);
+            var (success, globalUri, _, error) = TryShareContent(answerOption.Content);
 
             if (!success || globalUri == null)
             {
-                messageBuilder.Add(ContentTypes.Text).Add(string.Format(LO[nameof(R.MediaNotFound)], globalUri));
+                messageBuilder.Add(ContentTypes.Text).Add(error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri));
             }
             else
             {
@@ -4915,8 +4919,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             foreach (var contentItem in contentList)
             {
-                var legacyBuilder = new MessageBuilder(placement == ContentPlacements.Background && contentTable.Keys.Count > 1 ? Messages.Atom_Second : Messages.Atom);
-
                 messageBuilder.Add(0); // LayoutId = 0 for this content
 
                 int duration;
@@ -4924,7 +4926,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 if (contentItem.Type == ContentTypes.Text)
                 {
                     messageBuilder.Add(contentItem.Type).Add(contentItem.Value.EscapeNewLines());
-                    legacyBuilder.Add(contentItem.Type).Add(contentItem.Value);
 
                     duration = contentItem.Duration > TimeSpan.Zero
                         ? (int)(contentItem.Duration.TotalMilliseconds / 100)
@@ -4932,18 +4933,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
                 else
                 {
-                    var (success, globalUri, _) = TryShareContent(contentItem);
+                    var (success, globalUri, _, error) = TryShareContent(contentItem);
 
                     if (!success || globalUri == null)
                     {
-                        messageBuilder.Add(ContentTypes.Text).Add(string.Format(LO[nameof(R.MediaNotFound)], globalUri));
-                        legacyBuilder.Add(ContentTypes.Text).Add(string.Format(LO[nameof(R.MediaNotFound)], globalUri));
+                        var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
+                        messageBuilder.Add(ContentTypes.Text).Add(errorText);
                         duration = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
                     }
                     else
                     {
                         messageBuilder.Add(contentItem.Type).Add(globalUri);
-                        legacyBuilder.Add(contentItem.Type == ContentTypes.Audio ? AtomTypes.Audio : contentItem.Type).Add(MessageParams.Atom_Uri).Add(globalUri);
 
                         if ((contentItem.Type == ContentTypes.Audio || contentItem.Type == ContentTypes.Video) && !registeredMediaPlay)
                         {
@@ -4963,8 +4963,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
 
                 contentListDuration += duration;
-
-                _gameActions.SendMessage(legacyBuilder.ToString());
             }
 
             _gameActions.SendMessage(messageBuilder.ToString());

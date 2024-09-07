@@ -204,18 +204,6 @@ public sealed class Player : Viewer
                     ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
                     break;
 
-                case Messages.Atom: // deprecated
-                    _logic.PlayerLogic.OnPlayerAtom(mparams);
-
-                    if (ClientData.QuestionType == QuestionTypes.Simple)
-                    {
-                        _logic.OnEnableButton();
-
-                        if (!ClientData.FalseStart)
-                            ClientData.PlayerDataExtensions.MyTry = true;
-                    }
-                    break;
-
                 case Messages.Content:
                     _logic.PlayerLogic.OnPlayerAtom(mparams);
 

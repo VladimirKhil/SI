@@ -580,7 +580,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     private void ValidateFileExtensionAndSize(string fileName)
     {
-        var fileExtensions = MediaOwnerViewModel.RecommenedExtensions[_name];
+        var fileExtensions = MediaOwnerViewModel.RecommendedExtensions[_name];
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
 
         if (!fileExtensions.Contains(extension))
@@ -593,7 +593,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                     string.Join(", ", fileExtensions)));
         }
 
-        var maximumSize = MediaOwnerViewModel.RecommenedSizeMb[_name] * 1024 * 1024;
+        var maximumSize = MediaOwnerViewModel.RecommendedSizeMb[_name] * 1024 * 1024;
 
         if (new FileInfo(fileName).Length > maximumSize)
         {
@@ -601,7 +601,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                 string.Format(
                     Resources.InvalidFileSize,
                     fileName,
-                    MediaOwnerViewModel.RecommenedSizeMb[_name]));
+                    MediaOwnerViewModel.RecommendedSizeMb[_name]));
         }
     }
 

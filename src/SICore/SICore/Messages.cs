@@ -57,21 +57,14 @@ public static class Messages
     public const string AskStake = "ASK_STAKE";
 
     /// <summary>
-    /// Единица сценария вопроса
+    /// Notifies the game that the client has completed viewing the media content.
     /// </summary>
-    [Obsolete("Use Content")]
     public const string Atom = "ATOM";
 
     /// <summary>
     /// Small hint fragment. Displayed separately from the main content.
     /// </summary>
     public const string Atom_Hint = "ATOM_HINT";
-
-    /// <summary>
-    /// Дополнительная единица сценария вопроса
-    /// </summary>
-    [Obsolete("Use Content")]
-    public const string Atom_Second = "ATOM_SECOND";
 
     /// <summary>
     /// Person's avatar.
@@ -156,7 +149,7 @@ public static class Messages
     public const string Connected = "CONNECTED";
 
     /// <summary>
-    /// Table content. Replaces <see cref="Atom" /> message.
+    /// Table content.
     /// </summary>
     public const string Content = "CONTENT";
 
