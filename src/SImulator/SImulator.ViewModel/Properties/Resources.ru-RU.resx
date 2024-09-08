@@ -118,99 +118,99 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Добавить</value>
   </data>
   <data name="ConnectionError" xml:space="preserve">
-    <value>Connection error: {0}</value>
+    <value>Ошибка связи: {0}</value>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>Error</value>
+    <value>Ошибка</value>
   </data>
   <data name="GameEndingError" xml:space="preserve">
-    <value>Game end error: {0}</value>
+    <value>Ошибка завершения игры: {0}</value>
   </data>
   <data name="GameEndsBecauseOfConnectionLoss" xml:space="preserve">
-    <value>Connection to the demonstration computer has been terminated. The game is stopped.</value>
+    <value>Соединение с демонстрационным компьютером было разорвано. Игра прекращена.</value>
   </data>
   <data name="GamePackageLoadError" xml:space="preserve">
-    <value>Error loading game package</value>
+    <value>Ошибка при загрузке игрового пакета</value>
   </data>
   <data name="GameStartError" xml:space="preserve">
-    <value>Game start error: {0}</value>
+    <value>Ошибка старта игры: {0}</value>
   </data>
   <data name="IpAddressHint" xml:space="preserve">
-    <value>[Your IP address]</value>
+    <value>[Ваш IP-адрес]</value>
   </data>
   <data name="LoggerCreationWarning" xml:space="preserve">
-    <value>Log file creation error: {0}. Logging will not be performed.</value>
+    <value>Ошибка создания файла лога: {0}. Лог записываться не будет</value>
   </data>
   <data name="LoggerInitError" xml:space="preserve">
-    <value>Error starting log recording</value>
+    <value>Ошибка старта записи лога</value>
   </data>
   <data name="LogsFolderNotSetWarning" xml:space="preserve">
-    <value>Log directory is not specified. Logs will not be recorded.</value>
+    <value>Папка для записи логов не задана! Логи вестись не будут</value>
   </data>
   <data name="Next" xml:space="preserve">
-    <value>Next</value>
+    <value>Дальше</value>
   </data>
   <data name="NoLicensesFolder" xml:space="preserve">
-    <value>License folder not found</value>
+    <value>Папка лицензий не найдена!</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>No Risk question</value>
+    <value>Вопрос без риска</value>
   </data>
   <data name="OpenLicensesError" xml:space="preserve">
-    <value>Error opening license folder: {0}</value>
+    <value>Ошибка при открытии папки лицензий: {0}</value>
   </data>
   <data name="PackagePreparationError" xml:space="preserve">
-    <value>Package preparation error</value>
+    <value>Ошибка подготовки пакета</value>
   </data>
   <data name="Pause" xml:space="preserve">
-    <value>Pause</value>
+    <value>Приостановить</value>
   </data>
   <data name="PressTheButton" xml:space="preserve">
-    <value>Press the button</value>
+    <value>Нажмите на кнопку</value>
   </data>
   <data name="Round" xml:space="preserve">
-    <value>Round</value>
+    <value>Раунд</value>
   </data>
   <data name="RoundThemes" xml:space="preserve">
-    <value>Round themes</value>
+    <value>Темы раунда</value>
   </data>
   <data name="RoundTimeout" xml:space="preserve">
-    <value>Round time has expired.</value>
+    <value>Время раунда вышло.</value>
   </data>
   <data name="Run" xml:space="preserve">
-    <value>Start</value>
+    <value>Запустить</value>
   </data>
   <data name="Score" xml:space="preserve">
-    <value>Score</value>
+    <value>Счёт</value>
   </data>
   <data name="SecretQuestion" xml:space="preserve">
-    <value>Secret question</value>
+    <value>Вопрос с секретом</value>
   </data>
   <data name="SelectAudioFile" xml:space="preserve">
-    <value>Select audio file</value>
+    <value>Выберите аудиофайл</value>
   </data>
   <data name="SelectBackgroundImage" xml:space="preserve">
-    <value>Select background image</value>
+    <value>Выберите изображение-фон</value>
   </data>
   <data name="SelectBackgroundVideo" xml:space="preserve">
-    <value>Select background video file</value>
+    <value>Выберите видеофайл-фон</value>
   </data>
   <data name="SelectIntroVideo" xml:space="preserve">
-    <value>Select splash video file</value>
+    <value>Выберите заставочный видеофайл</value>
   </data>
   <data name="SelectLogoImage" xml:space="preserve">
-    <value>Select splash image</value>
+    <value>Выберите изображение-заставку</value>
   </data>
   <data name="StakeQuestion" xml:space="preserve">
-    <value>Stake question</value>
+    <value>Вопрос со ставкой</value>
   </data>
   <data name="StartGame" xml:space="preserve">
-    <value>Start game</value>
+    <value>Начать игру</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
+    <value>Тема</value>
   </data>
 </root>

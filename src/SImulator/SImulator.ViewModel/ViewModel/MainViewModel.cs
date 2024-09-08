@@ -30,7 +30,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// <summary>
     /// Название продукта
     /// </summary>
-    public const string ProductName = "СИмулятор";
+    public const string ProductName = "SImulator";
 
     #endregion
 
@@ -240,11 +240,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         var screensLength = Screens.Length;
 
 #if DEBUG
-        Settings.ScreenNumber = Math.Max(0, screensLength - 1);
+        Settings.ScreenNumber = Math.Max(0, screensLength - 2);
 #else
         if (Settings.ScreenNumber == -1 || Settings.ScreenNumber >= screensLength)
         {
-            Settings.ScreenNumber = screensLength - 1;
+            Settings.ScreenNumber = screensLength - 2;
         }
 #endif
 
@@ -490,8 +490,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             var presentationListener = new PresentationListener(engine);
 
             IPresentationController presentationController = screen.IsWebView
-                ? new WebPresentationController(screen, presentationListener)
-                : new PresentationController(screen)
+                ? new WebPresentationController(screen, presentationListener, Settings.Sounds)
+                : new PresentationController(screen, Settings.Sounds)
                 {
                     Listener = presentationListener
                 };

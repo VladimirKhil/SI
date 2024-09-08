@@ -61,7 +61,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на О программе.
+        ///   Ищет локализованную строку, похожую на About.
         /// </summary>
         public static string About {
             get {
@@ -70,7 +70,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить игрока.
+        ///   Ищет локализованную строку, похожую на Add player.
         /// </summary>
         public static string AddPlayer {
             get {
@@ -79,7 +79,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить сумму.
+        ///   Ищет локализованную строку, похожую на Add sum.
         /// </summary>
         public static string AddSum {
             get {
@@ -88,7 +88,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить активному игроку.
+        ///   Ищет локализованную строку, похожую на Add to active player.
         /// </summary>
         public static string AddSumForActivePlayer {
             get {
@@ -97,7 +97,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Псевдоним.
+        ///   Ищет локализованную строку, похожую на Alias.
         /// </summary>
         public static string Alias {
             get {
@@ -106,7 +106,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (все).
+        ///   Ищет локализованную строку, похожую на (all).
         /// </summary>
         public static string All {
             get {
@@ -115,7 +115,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ответ.
+        ///   Ищет локализованную строку, похожую на Answer.
         /// </summary>
         public static string Answer {
             get {
@@ -124,7 +124,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Цвет фона отвечающего игрока.
+        ///   Ищет локализованную строку, похожую на Background color for the answering player.
         /// </summary>
         public static string AnswererBackgroundColor {
             get {
@@ -133,7 +133,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Варианты ответа.
+        ///   Ищет локализованную строку, похожую на Answer options.
         /// </summary>
         public static string AnswerOptions {
             get {
@@ -142,7 +142,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Язык приложения (требуется перезапуск).
+        ///   Ищет локализованную строку, похожую на Application language (requires restart).
         /// </summary>
         public static string AppLanguage {
             get {
@@ -151,7 +151,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на СИмулятор.
+        ///   Ищет локализованную строку, похожую на SImulator.
         /// </summary>
         public static string AppName {
             get {
@@ -160,7 +160,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Аудио.
+        ///   Ищет локализованную строку, похожую на Audio.
         /// </summary>
         public static string Audio {
             get {
@@ -169,7 +169,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автор.
+        ///   Ищет локализованную строку, похожую на Author.
         /// </summary>
         public static string Author {
             get {
@@ -178,7 +178,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Владимир Хиль.
+        ///   Ищет локализованную строку, похожую на Vladimir Khil.
         /// </summary>
         public static string AuthorName {
             get {
@@ -187,7 +187,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автоматическое ведение игры (без ведущего).
+        ///   Ищет локализованную строку, похожую на Automatic game management (without a host).
         /// </summary>
         public static string AutomaticGame {
             get {
@@ -196,7 +196,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Назад.
+        ///   Ищет локализованную строку, похожую на Back.
         /// </summary>
         public static string Back {
             get {
@@ -205,7 +205,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Цвет фона.
+        ///   Ищет локализованную строку, похожую на Background color.
         /// </summary>
         public static string BackgroundColor {
             get {
@@ -214,7 +214,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изображение-фон.
+        ///   Ищет локализованную строку, похожую на Background image.
         /// </summary>
         public static string BackgroundImage {
             get {
@@ -223,7 +223,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Видеофайл-фон.
+        ///   Ищет локализованную строку, похожую на Background video file.
         /// </summary>
         public static string BackgroundVideo {
             get {
@@ -232,7 +232,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время блокировки кнопки (с).
+        ///   Ищет локализованную строку, похожую на Button lock time (s).
         /// </summary>
         public static string ButtonBlockingTime {
             get {
@@ -241,7 +241,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Соответствуют позициям игроков в списке.
+        ///   Ищет локализованную строку, похожую на Matches positions of players in the list.
         /// </summary>
         public static string ButtonOrderHint {
             get {
@@ -250,7 +250,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нажатие на кнопку.
+        ///   Ищет локализованную строку, похожую на Button press.
         /// </summary>
         public static string ButtonPressed {
             get {
@@ -259,7 +259,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Кнопки.
+        ///   Ищет локализованную строку, похожую на Buttons.
         /// </summary>
         public static string Buttons {
             get {
@@ -268,7 +268,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на COM-порт.
+        ///   Ищет локализованную строку, похожую на COM port.
         /// </summary>
         public static string ButtonTypesCom {
             get {
@@ -277,7 +277,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Внешние.
+        ///   Ищет локализованную строку, похожую на External.
         /// </summary>
         public static string ButtonTypesExternal {
             get {
@@ -286,7 +286,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Джойстик.
+        ///   Ищет локализованную строку, похожую на Joystick.
         /// </summary>
         public static string ButtonTypesJoystick {
             get {
@@ -295,7 +295,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Клавиатура.
+        ///   Ищет локализованную строку, похожую на Keyboard.
         /// </summary>
         public static string ButtonTypesKeyboard {
             get {
@@ -304,7 +304,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не использовать.
+        ///   Ищет локализованную строку, похожую на Do not use.
         /// </summary>
         public static string ButtonTypesNone {
             get {
@@ -313,7 +313,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Веб-доступ.
+        ///   Ищет локализованную строку, похожую на Web access.
         /// </summary>
         public static string ButtonTypesWeb {
             get {
@@ -322,7 +322,16 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на По умолчанию.
+        ///   Ищет локализованную строку, похожую на Web access (new).
+        /// </summary>
+        public static string ButtonTypesWebNew {
+            get {
+                return ResourceManager.GetString("ButtonTypesWebNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Default.
         /// </summary>
         public static string ByDefault {
             get {
@@ -331,7 +340,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите игрока для ответа.
+        ///   Ищет локализованную строку, похожую на Select a player to answer.
         /// </summary>
         public static string ChoosePlayerToAnswer {
             get {
@@ -340,7 +349,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите игрока, начинающего игру.
+        ///   Ищет локализованную строку, похожую на Select a player to start the game.
         /// </summary>
         public static string ChoosePlayerToStart {
             get {
@@ -349,7 +358,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Очистить список.
+        ///   Ищет локализованную строку, похожую на Clear list.
         /// </summary>
         public static string ClearList {
             get {
@@ -358,7 +367,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Комментарий.
+        ///   Ищет локализованную строку, похожую на Comment.
         /// </summary>
         public static string Comment {
             get {
@@ -367,7 +376,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику..
+        ///   Ищет локализованную строку, похожую на An error occurred in the application: {0}\r\n\r\nThe application will be closed. Please contact the developer..
         /// </summary>
         public static string CommonAppError {
             get {
@@ -376,7 +385,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Лицензии используемых компонентов.
+        ///   Ищет локализованную строку, похожую на Licenses of used components.
         /// </summary>
         public static string ComponentsLicenses {
             get {
@@ -385,7 +394,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер COM-порта.
+        ///   Ищет локализованную строку, похожую на COM port number.
         /// </summary>
         public static string ComPortNumber {
             get {
@@ -394,7 +403,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (по умолчанию).
+        ///   Ищет локализованную строку, похожую на (by default).
         /// </summary>
         public static string Default {
             get {
@@ -403,7 +412,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить.
+        ///   Ищет локализованную строку, похожую на Delete.
         /// </summary>
         public static string Delete {
             get {
@@ -412,7 +421,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Внешний вид.
+        ///   Ищет локализованную строку, похожую на Design.
         /// </summary>
         public static string Design {
             get {
@@ -421,7 +430,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Закончилось место на диске.
+        ///   Ищет локализованную строку, похожую на Disk space is running out.
         /// </summary>
         public static string DiskFullError {
             get {
@@ -430,7 +439,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Откатывать статистику при шаге назад.
+        ///   Ищет локализованную строку, похожую на Rollback statistics when stepping back.
         /// </summary>
         public static string DropStatsOnBack {
             get {
@@ -439,7 +448,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возвращать суммы игроков и число их верных и неверных ответов.
+        ///   Ищет локализованную строку, похожую на Clear players sums and counters of their correct and incorrect answers.
         /// </summary>
         public static string DropStatsOnBackHint {
             get {
@@ -448,7 +457,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Завершать вопрос при правильном ответе.
+        ///   Ищет локализованную строку, похожую на End the question on correct answer.
         /// </summary>
         public static string EndQuestionOnRightAnswer {
             get {
@@ -457,7 +466,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.
+        ///   Ищет локализованную строку, похожую на This error is not reproducible. If you can reliably reproduce it, please contact the author..
         /// </summary>
         public static string ErrorCannotReproduce {
             get {
@@ -466,7 +475,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.
+        ///   Ищет локализованную строку, похожую на Failed to connect to the server when sending the error report. The report will be sent later..
         /// </summary>
         public static string ErrorConnectionError {
             get {
@@ -475,7 +484,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.
+        ///   Ищет локализованную строку, похожую на This error has been fixed in the new version of the program. Please update..
         /// </summary>
         public static string ErrorFixed {
             get {
@@ -484,9 +493,8 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Произошла ошибка в приложении: {0}
-        ///
-        ///Приложение будет закрыто. Отправить информацию разработчику?.
+        ///   Ищет локализованную строку, похожую на An error occurred in the application: {0}
+        ///The application will be closed. Send information to the developer?.
         /// </summary>
         public static string ErrorSendConfirm {
             get {
@@ -495,7 +503,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на В данном режиме используются кнопки, не подключённые к программе (независимые устройства, хлопки и т.д.). Программа показывает рамку в момент, когда можно нажимать (при игре с фальстартами).
+        ///   Ищет локализованную строку, похожую на In this mode, buttons not connected to the program (independent devices, claps, etc.) are used. The program displays a frame when it is possible to press (during the game with false starts)..
         /// </summary>
         public static string ExternalButtonsHint {
             get {
@@ -504,7 +512,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра с фальстартами.
+        ///   Ищет локализованную строку, похожую на Game with false starts.
         /// </summary>
         public static string FalseStartGame {
             get {
@@ -513,9 +521,9 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на При игре с фальстартами:
-        ///- на экране отображается текст вопросов;
-        ///- при использовании кнопок для старта таймера вопроса требуется дополнительное нажатие на кнопку &quot;Дальше&quot;, на экране при этом загорается цветная рамка.
+        ///   Ищет локализованную строку, похожую на When playing with false starts:
+        ///question text is displayed on the screen;
+        ///when using buttons to start the question timer, an additional press of the Next button is required, and a colored frame lights up on the screen&quot;.
         /// </summary>
         public static string FalseStartGameHint {
             get {
@@ -524,7 +532,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мультимедиа с фальстартами.
+        ///   Ищет локализованную строку, похожую на Multimedia with false starts.
         /// </summary>
         public static string FalseStartMultimedia {
             get {
@@ -533,7 +541,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Запрещает нажимать на кнопку в процессе проигрывания мультимедиа-файла.
+        ///   Ищет локализованную строку, похожую на Prevents pressing the button during multimedia file playback.
         /// </summary>
         public static string FalseStartMultimediaHint {
             get {
@@ -542,7 +550,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка удаления файла: {0}.
+        ///   Ищет локализованную строку, похожую на Error deleting file: {0}.
         /// </summary>
         public static string FileDeletionError {
             get {
@@ -551,7 +559,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удаление темы в финале.
+        ///   Ищет локализованную строку, похожую на Deleting theme in the final round.
         /// </summary>
         public static string FinalThemeRemoval {
             get {
@@ -560,7 +568,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Размышление в финале.
+        ///   Ищет локализованную строку, похожую на Final round thinking.
         /// </summary>
         public static string FinalThink {
             get {
@@ -569,7 +577,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на размышление в финале (с).
+        ///   Ищет локализованную строку, похожую на Final round thinking time (s).
         /// </summary>
         public static string FinalThinkingTime {
             get {
@@ -578,7 +586,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Завершить игру?.
+        ///   Ищет локализованную строку, похожую на Finish game?.
         /// </summary>
         public static string FinishGameQuestion {
             get {
@@ -587,7 +595,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Шрифт.
+        ///   Ищет локализованную строку, похожую на Font.
         /// </summary>
         public static string FontFamily {
             get {
@@ -596,7 +604,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра.
+        ///   Ищет локализованную строку, похожую на Game.
         /// </summary>
         public static string Game {
             get {
@@ -605,7 +613,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игровые кнопки.
+        ///   Ищет локализованную строку, похожую на Game buttons.
         /// </summary>
         public static string GameButtons {
             get {
@@ -614,7 +622,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Упрощённая.
+        ///   Ищет локализованную строку, похожую на Simplified.
         /// </summary>
         public static string GameModes_Sport {
             get {
@@ -623,7 +631,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Классическая.
+        ///   Ищет локализованную строку, похожую на Classic.
         /// </summary>
         public static string GameModes_Tv {
             get {
@@ -632,7 +640,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игровой пакет.
+        ///   Ищет локализованную строку, похожую на Game package.
         /// </summary>
         public static string GamePackage {
             get {
@@ -641,7 +649,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Правила игры.
+        ///   Ищет локализованную строку, похожую на Game rules.
         /// </summary>
         public static string GameRules {
             get {
@@ -650,7 +658,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начало игры.
+        ///   Ищет локализованную строку, похожую на Game start.
         /// </summary>
         public static string GameStart {
             get {
@@ -659,7 +667,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Темы игры.
+        ///   Ищет локализованную строку, похожую на Game themes.
         /// </summary>
         public static string GameThemes {
             get {
@@ -668,7 +676,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип игры.
+        ///   Ищет локализованную строку, похожую на Game type.
         /// </summary>
         public static string GameType {
             get {
@@ -677,7 +685,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Передать ход.
+        ///   Ищет локализованную строку, похожую на Pass the turn.
         /// </summary>
         public static string GiveTurn {
             get {
@@ -686,7 +694,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Цвет сетки.
+        ///   Ищет локализованную строку, похожую на Grid color.
         /// </summary>
         public static string GridColor {
             get {
@@ -695,7 +703,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Скрыть.
+        ///   Ищет локализованную строку, похожую на Hide.
         /// </summary>
         public static string Hide {
             get {
@@ -704,7 +712,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Для управления ходом игры нажимайте кнопку &quot;Дальше&quot;.
+        ///   Ищет локализованную строку, похожую на Press the &quot;Next&quot; button to control the game progress.
         /// </summary>
         public static string HintBeforeStart {
             get {
@@ -713,7 +721,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (Темы игры).
+        ///   Ищет локализованную строку, похожую на (Game themes).
         /// </summary>
         public static string HintGameThemes {
             get {
@@ -722,7 +730,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (Заставка).
+        ///   Ищет локализованную строку, похожую на (Splash screen).
         /// </summary>
         public static string HintIntro {
             get {
@@ -740,7 +748,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изображение.
+        ///   Ищет локализованную строку, похожую на Image.
         /// </summary>
         public static string Image {
             get {
@@ -749,7 +757,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Заставочный видеофайл.
+        ///   Ищет локализованную строку, похожую на Splash video file.
         /// </summary>
         public static string IntroVideo {
             get {
@@ -758,7 +766,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка завершения прослушивания клавиатуры.
+        ///   Ищет локализованную строку, похожую на Error completing keyboard listening.
         /// </summary>
         public static string KeyboardDetachError {
             get {
@@ -767,7 +775,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка прослушивания клавиатуры.
+        ///   Ищет локализованную строку, похожую на Error listening to the keyboard.
         /// </summary>
         public static string KeyboardListeningError {
             get {
@@ -776,7 +784,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Лицензия.
+        ///   Ищет локализованную строку, похожую на License.
         /// </summary>
         public static string License {
             get {
@@ -785,13 +793,13 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Все исключительные авторские права на Программный продукт и документацию к нему в печатном и/или электронном виде принадлежат Автору.
+        ///   Ищет локализованную строку, похожую на All exclusive copyrights to the Software Product and its documentation in print and/or electronic form belong to the Author.
         ///
-        ///Программа распространяется бесплатно.
+        ///The program is distributed free of charge.
         ///
-        ///Пользователь имеет право свободно использовать и распространять данную Программу, размещать её на сайтах и производить другие не запрещённые законодательством его страны действия с ней в течение сколь угодно длительного времени при условии сохранения авторских прав.
+        ///The User has the right to freely use and distribute this Program, place it on websites, and carry out other activities not prohibited by the legislation of their country of operation with it for any period of time, provided that the copyrights are preserved.
         ///
-        ///Программа поставляется «как есть». Автор не даёт никаких гаранти [остаток строки не уместился]&quot;;.
+        ///The program is provided &quot;as is&quot;. The Author does not provide any guarantees  [остаток строки не уместился]&quot;;.
         /// </summary>
         public static string LicenseText {
             get {
@@ -800,7 +808,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Папка для записи логов &quot;{0}&quot; не найдена.
+        ///   Ищет локализованную строку, похожую на The folder for logging &quot;{0}&quot; was not found..
         /// </summary>
         public static string LogsFolderNotFound {
             get {
@@ -809,7 +817,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Основной.
+        ///   Ищет локализованную строку, похожую на Main.
         /// </summary>
         public static string MainScreen {
             get {
@@ -818,7 +826,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сделать ставку.
+        ///   Ищет локализованную строку, похожую на Make stake.
         /// </summary>
         public static string MakeStake {
             get {
@@ -827,7 +835,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Название.
+        ///   Ищет локализованную строку, похожую на Name.
         /// </summary>
         public static string Name {
             get {
@@ -836,7 +844,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}.
+        ///   Ищет локализованную строку, похожую на An error occurred while navigating to the program website ({0}). Make sure you have your default browser configured: {1}.
         /// </summary>
         public static string NavigateToSiteError {
             get {
@@ -845,16 +853,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на новая версия.
-        /// </summary>
-        public static string NewVersion {
-            get {
-                return ResourceManager.GetString("NewVersion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Дальше.
+        ///   Ищет локализованную строку, похожую на Next.
         /// </summary>
         public static string Next {
             get {
@@ -863,7 +862,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нет ответа.
+        ///   Ищет локализованную строку, похожую на No answer.
         /// </summary>
         public static string NoAnswer {
             get {
@@ -872,7 +871,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос без риска.
+        ///   Ищет локализованную строку, похожую на No Risk question.
         /// </summary>
         public static string NoRiskQuestion {
             get {
@@ -881,7 +880,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не выбран.
+        ///   Ищет локализованную строку, похожую на Not selected.
         /// </summary>
         public static string NotSelected {
             get {
@@ -890,7 +889,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (не задано).
+        ///   Ищет локализованную строку, похожую на (not set).
         /// </summary>
         public static string NotSet {
             get {
@@ -899,7 +898,16 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Устный текст.
+        ///   Ищет локализованную строку, похожую на old version.
+        /// </summary>
+        public static string OldVersion {
+            get {
+                return ResourceManager.GetString("OldVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Oral.
         /// </summary>
         public static string Oral {
             get {
@@ -908,7 +916,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Недостаточно памяти для выполнения программы.
+        ///   Ищет локализованную строку, похожую на Not enough memory to run the program.
         /// </summary>
         public static string OutOfMemoryError {
             get {
@@ -917,7 +925,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пас.
+        ///   Ищет локализованную строку, похожую на Pass.
         /// </summary>
         public static string Pass {
             get {
@@ -926,7 +934,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Приостановить.
+        ///   Ищет локализованную строку, похожую на Pause.
         /// </summary>
         public static string Pause {
             get {
@@ -935,7 +943,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фон.
+        ///   Ищет локализованную строку, похожую на Background.
         /// </summary>
         public static string PlacementBackground {
             get {
@@ -944,7 +952,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Реплика.
+        ///   Ищет локализованную строку, похожую на Replica.
         /// </summary>
         public static string PlacementOral {
             get {
@@ -953,7 +961,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игроки.
+        ///   Ищет локализованную строку, похожую на Players.
         /// </summary>
         public static string Players {
             get {
@@ -962,7 +970,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Таблица игроков.
+        ///   Ищет локализованную строку, похожую на Player table.
         /// </summary>
         public static string PlayersTable {
             get {
@@ -971,7 +979,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Играть звуки.
+        ///   Ищет локализованную строку, похожую на Play sounds.
         /// </summary>
         public static string PlaySounds {
             get {
@@ -980,7 +988,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Играть спецвопросы.
+        ///   Ищет локализованную строку, похожую на Play special questions.
         /// </summary>
         public static string PlaySpecials {
             get {
@@ -989,7 +997,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Для выхода нажмите Escape, правую кнопку мыши или немного надавите пальцем.
+        ///   Ищет локализованную строку, похожую на To exit, press Escape, right mouse button, or tap slightly with your finger.
         /// </summary>
         public static string PresentationExitHint {
             get {
@@ -998,7 +1006,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игровое табло.
+        ///   Ищет локализованную строку, похожую на Game table.
         /// </summary>
         public static string PresentationTitle {
             get {
@@ -1007,7 +1015,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нажмите кнопку.
+        ///   Ищет локализованную строку, похожую на Press the button.
         /// </summary>
         public static string PressButton {
             get {
@@ -1016,7 +1024,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изображение-заставка.
+        ///   Ищет локализованную строку, похожую на Background image.
         /// </summary>
         public static string PreviewImage {
             get {
@@ -1025,7 +1033,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Предыдущий раунд.
+        ///   Ищет локализованную строку, похожую на Previous round.
         /// </summary>
         public static string PreviousRound {
             get {
@@ -1034,7 +1042,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Стоимость.
+        ///   Ищет локализованную строку, похожую на Price.
         /// </summary>
         public static string Price {
             get {
@@ -1043,7 +1051,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на От {0} до {1} с шагом {2}.
+        ///   Ищет локализованную строку, похожую на From {0} to {1} with step {2}.
         /// </summary>
         public static string PriceFromToStep {
             get {
@@ -1052,7 +1060,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Минимум или максимум в раунде.
+        ///   Ищет локализованную строку, похожую на Minimum or maximum in the round.
         /// </summary>
         public static string PriceMinMaxRound {
             get {
@@ -1061,7 +1069,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на {0} или {1}.
+        ///   Ищет локализованную строку, похожую на {0} or {1}.
         /// </summary>
         public static string PriceOr {
             get {
@@ -1070,7 +1078,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос.
+        ///   Ищет локализованную строку, похожую на Question.
         /// </summary>
         public static string Question {
             get {
@@ -1079,7 +1087,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Библиотека вопросов.
+        ///   Ищет локализованную строку, похожую на Question library.
         /// </summary>
         public static string QuestionLibrary {
             get {
@@ -1088,7 +1096,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Межстрочный интервал в вопросе.
+        ///   Ищет локализованную строку, похожую на Line spacing in question.
         /// </summary>
         public static string QuestionLineSpacing {
             get {
@@ -1097,7 +1105,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбор вопроса.
+        ///   Ищет локализованную строку, похожую на Question selection.
         /// </summary>
         public static string QuestionSelection {
             get {
@@ -1106,7 +1114,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время вопроса (c).
+        ///   Ищет локализованную строку, похожую на Question time (s).
         /// </summary>
         public static string QuestionTime {
             get {
@@ -1115,7 +1123,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос без риска.
+        ///   Ищет локализованную строку, похожую на No Risk question.
         /// </summary>
         public static string QuestionTypeNoRisk {
             get {
@@ -1124,7 +1132,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос с секретом.
+        ///   Ищет локализованную строку, похожую на Secret question.
         /// </summary>
         public static string QuestionTypeSecret {
             get {
@@ -1133,7 +1141,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос с секретом (деньги без вопроса).
+        ///   Ищет локализованную строку, похожую на Secret question (money without question).
         /// </summary>
         public static string QuestionTypeSecretNoQuestion {
             get {
@@ -1142,7 +1150,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос с секретом (тема и стоимость известны до передачи вопроса).
+        ///   Ищет локализованную строку, похожую на Secret question (theme and price known before passing the question).
         /// </summary>
         public static string QuestionTypeSecretPublicPrice {
             get {
@@ -1151,7 +1159,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Простой.
+        ///   Ищет локализованную строку, похожую на Simple.
         /// </summary>
         public static string QuestionTypeSimple {
             get {
@@ -1160,7 +1168,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос со ставкой.
+        ///   Ищет локализованную строку, похожую на Stake question.
         /// </summary>
         public static string QuestionTypeStake {
             get {
@@ -1169,7 +1177,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Последние файлы.
+        ///   Ищет локализованную строку, похожую на Recent files.
         /// </summary>
         public static string RecentFiles {
             get {
@@ -1178,7 +1186,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить игрока.
+        ///   Ищет локализованную строку, похожую на Delete player.
         /// </summary>
         public static string RemovePlayer {
             get {
@@ -1187,7 +1195,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить суммы и статистику.
+        ///   Ищет локализованную строку, похожую на Delete sums and statistics.
         /// </summary>
         public static string ResetSums {
             get {
@@ -1196,7 +1204,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ограничение.
+        ///   Ищет локализованную строку, похожую на Restriction.
         /// </summary>
         public static string Restriction {
             get {
@@ -1205,7 +1213,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Правильный ответ.
+        ///   Ищет локализованную строку, похожую на Correct answer.
         /// </summary>
         public static string RightAnswer {
             get {
@@ -1214,7 +1222,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Верных.
+        ///   Ищет локализованную строку, похожую на Correct.
         /// </summary>
         public static string RightAnswers {
             get {
@@ -1223,7 +1231,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Раунд.
+        ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         public static string Round {
             get {
@@ -1232,7 +1240,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начало раунда.
+        ///   Ищет локализованную строку, похожую на Round start.
         /// </summary>
         public static string RoundStart {
             get {
@@ -1241,7 +1249,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Темы раунда.
+        ///   Ищет локализованную строку, похожую на Round themes.
         /// </summary>
         public static string RoundThemes {
             get {
@@ -1250,7 +1258,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время раунда (с).
+        ///   Ищет локализованную строку, похожую на Round time (s).
         /// </summary>
         public static string RoundTime {
             get {
@@ -1259,7 +1267,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Окончание времени раунда.
+        ///   Ищет локализованную строку, похожую на Round timeout.
         /// </summary>
         public static string RoundTimeout {
             get {
@@ -1268,7 +1276,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось создать главное окно программы. Похоже, на вашем компьютере повреждена среда выполнения программ: {0}.
+        ///   Ищет локализованную строку, похожую на Failed to create the main window of the program. It seems that the runtime environment of the program on your computer is corrupted: {0}.
         /// </summary>
         public static string RuntimeBrokenError {
             get {
@@ -1277,7 +1285,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранять логи в папку.
+        ///   Ищет локализованную строку, похожую на Save logs to folder.
         /// </summary>
         public static string SaveLogsToFolder {
             get {
@@ -1286,7 +1294,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при сохранении настроек программы.
+        ///   Ищет локализованную строку, похожую на Error saving program settings.
         /// </summary>
         public static string SavingSettingsError {
             get {
@@ -1295,7 +1303,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Экран.
+        ///   Ищет локализованную строку, похожую на Screen.
         /// </summary>
         public static string Screen {
             get {
@@ -1304,7 +1312,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дополнительный.
+        ///   Ищет локализованную строку, похожую на Additional.
         /// </summary>
         public static string SecondaryScreen {
             get {
@@ -1313,7 +1321,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос с секретом.
+        ///   Ищет локализованную строку, похожую на Secret question.
         /// </summary>
         public static string SecretQuestion {
             get {
@@ -1322,7 +1330,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбрать.
+        ///   Ищет локализованную строку, похожую на Select.
         /// </summary>
         public static string Select {
             get {
@@ -1331,7 +1339,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Кому угодно.
+        ///   Ищет локализованную строку, похожую на Anyone.
         /// </summary>
         public static string SelectAny {
             get {
@@ -1340,7 +1348,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Кому угодно, кроме себя.
+        ///   Ищет локализованную строку, похожую на Anyone except yourself.
         /// </summary>
         public static string SelectAnyExceptCurrent {
             get {
@@ -1349,7 +1357,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Файл….
+        ///   Ищет локализованную строку, похожую на File….
         /// </summary>
         public static string SelectFile {
             get {
@@ -1358,7 +1366,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбрать….
+        ///   Ищет локализованную строку, похожую на Select….
         /// </summary>
         public static string SelectHeader {
             get {
@@ -1367,7 +1375,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Можно отдать.
+        ///   Ищет локализованную строку, похожую на Can be given to.
         /// </summary>
         public static string SelectionMode {
             get {
@@ -1376,7 +1384,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Библиотека вопросов….
+        ///   Ищет локализованную строку, похожую на Question library….
         /// </summary>
         public static string SelectLibrary {
             get {
@@ -1385,7 +1393,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите папку для записи логов.
+        ///   Ищет локализованную строку, похожую на Select a folder to save logs.
         /// </summary>
         public static string SelectLogsFolder {
             get {
@@ -1394,7 +1402,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбрать пакет.
+        ///   Ищет локализованную строку, похожую на Select Package.
         /// </summary>
         public static string SelectPackage {
             get {
@@ -1403,7 +1411,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите пакет вопросов.
+        ///   Ищет локализованную строку, похожую на Select question package.
         /// </summary>
         public static string SelectQuestionPackage {
             get {
@@ -1412,7 +1420,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на В отдельном окне.
+        ///   Ищет локализованную строку, похожую на In separate window.
         /// </summary>
         public static string SeparateWindow {
             get {
@@ -1421,7 +1429,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Задать кнопку.
+        ///   Ищет локализованную строку, похожую на Assign a button.
         /// </summary>
         public static string SetButton {
             get {
@@ -1430,7 +1438,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показать.
+        ///   Ищет локализованную строку, похожую на Show.
         /// </summary>
         public static string Show {
             get {
@@ -1439,7 +1447,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показывать игроков, проигравших кнопку.
+        ///   Ищет локализованную строку, похожую на Show players who lost the button.
         /// </summary>
         public static string ShowLostButtonPlayers {
             get {
@@ -1448,7 +1456,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показывать список игроков.
+        ///   Ищет локализованную строку, похожую на Show player list.
         /// </summary>
         public static string ShowPlayersList {
             get {
@@ -1457,7 +1465,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показывать рамку в момент, когда можно нажимать на кнопку.
+        ///   Ищет локализованную строку, похожую на Show frame when the button can be pressed.
         /// </summary>
         public static string ShowQuestionBorder {
             get {
@@ -1466,7 +1474,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показывать правильные ответы.
+        ///   Ищет локализованную строку, похожую на Show correct answers.
         /// </summary>
         public static string ShowRightAnswers {
             get {
@@ -1475,7 +1483,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показывать заголовок на игровом табло.
+        ///   Ищет локализованную строку, похожую на Show title on the game scoreboard.
         /// </summary>
         public static string ShowTableCaption {
             get {
@@ -1484,7 +1492,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показывать текст вопросов при игре без фальстартов.
+        ///   Ищет локализованную строку, похожую на Show text of questions during game without false starts.
         /// </summary>
         public static string ShowTextNoFalseStartsHint {
             get {
@@ -1493,7 +1501,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Принимать сигналы игроков после истечения времени на размышление.
+        ///   Ищет локализованную строку, похожую на Accept player signals after thinking time expires.
         /// </summary>
         public static string SignalsAfterTimerHint {
             get {
@@ -1502,7 +1510,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопросы СИ.
+        ///   Ищет локализованную строку, похожую на SI questions.
         /// </summary>
         public static string SIQuestions {
             get {
@@ -1511,7 +1519,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка работы с библиотекой вопросов: {0}.
+        ///   Ищет локализованную строку, похожую на Error working with question library: {0}.
         /// </summary>
         public static string SIStorageError {
             get {
@@ -1520,7 +1528,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Звуки.
+        ///   Ищет локализованную строку, похожую на Sounds.
         /// </summary>
         public static string Sounds {
             get {
@@ -1529,7 +1537,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Источник.
+        ///   Ищет локализованную строку, похожую на Source.
         /// </summary>
         public static string Source {
             get {
@@ -1538,7 +1546,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Псевдонимы спецвопросов.
+        ///   Ищет локализованную строку, похожую на Special questions aliases.
         /// </summary>
         public static string SpecialQuestionsAliases {
             get {
@@ -1547,7 +1555,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на размышление над спецвопросом (с).
+        ///   Ищет локализованную строку, похожую на Thinking time for special question (s).
         /// </summary>
         public static string SpecialThinkingTime {
             get {
@@ -1556,7 +1564,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ставка.
+        ///   Ищет локализованную строку, похожую на Stake.
         /// </summary>
         public static string Stake {
             get {
@@ -1565,7 +1573,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос со ставкой.
+        ///   Ищет локализованную строку, похожую на Stake question.
         /// </summary>
         public static string StakeQuestion {
             get {
@@ -1574,7 +1582,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Старт.
+        ///   Ищет локализованную строку, похожую на Start.
         /// </summary>
         public static string Start {
             get {
@@ -1583,7 +1591,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начать игру.
+        ///   Ищет локализованную строку, похожую на Start.
         /// </summary>
         public static string StartGame {
             get {
@@ -1592,7 +1600,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Завершить.
+        ///   Ищет локализованную строку, похожую на End.
         /// </summary>
         public static string Stop {
             get {
@@ -1601,7 +1609,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Завершить игру.
+        ///   Ищет локализованную строку, похожую на End game.
         /// </summary>
         public static string StopGame {
             get {
@@ -1610,7 +1618,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Снимать очки за неверный ответ.
+        ///   Ищет локализованную строку, похожую на Deduct points for wrong answer.
         /// </summary>
         public static string SubstractOnWrong {
             get {
@@ -1619,7 +1627,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вычесть сумму.
+        ///   Ищет локализованную строку, похожую на Subtract amount.
         /// </summary>
         public static string SubtractSum {
             get {
@@ -1628,7 +1636,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить у активного игрока.
+        ///   Ищет локализованную строку, похожую на Remove from active player.
         /// </summary>
         public static string SubtractSumForActivePlayer {
             get {
@@ -1637,7 +1645,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сумма.
+        ///   Ищет локализованную строку, похожую на Sum.
         /// </summary>
         public static string Sum {
             get {
@@ -1646,10 +1654,10 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Горячие клавиши игрового табло:
-        ///Пробел (левая кнопка мыши) - перейти дальше
-        ///Backspace - перейти назад
-        ///Escape (правая кнопка мыши) - завершить игру.
+        ///   Ищет локализованную строку, похожую на Game table hotkeys:
+        ///Space (left mouse button) - proceed
+        ///Backspace - go back
+        ///Escape (right mouse button) - end game.
         /// </summary>
         public static string TableHotKeysHint {
             get {
@@ -1658,7 +1666,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пакет тест.
+        ///   Ищет локализованную строку, похожую на Test package.
         /// </summary>
         public static string TestPackage {
             get {
@@ -1667,7 +1675,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Цвет текста.
+        ///   Ищет локализованную строку, похожую на Text color.
         /// </summary>
         public static string TextColor {
             get {
@@ -1676,7 +1684,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тема.
+        ///   Ищет локализованную строку, похожую на Theme.
         /// </summary>
         public static string Theme {
             get {
@@ -1685,7 +1693,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Комментарии темы.
+        ///   Ищет локализованную строку, похожую на Theme comments.
         /// </summary>
         public static string ThemeComments {
             get {
@@ -1694,7 +1702,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Размышление.
+        ///   Ищет локализованную строку, похожую на Thinking.
         /// </summary>
         public static string Thinking {
             get {
@@ -1703,7 +1711,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на размышление после нажатия кнопки (с).
+        ///   Ищет локализованную строку, похожую на Thinking time after button press (s).
         /// </summary>
         public static string ThinkingTime {
             get {
@@ -1712,7 +1720,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неизвестный тип.
+        ///   Ищет локализованную строку, похожую на Unknown type.
         /// </summary>
         public static string UnknownType {
             get {
@@ -1721,7 +1729,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Использовать клавиатурный выбор на табло.
+        ///   Ищет локализованную строку, похожую на Use keyboard selection on scoreboard.
         /// </summary>
         public static string UseKeysToSelectQuestions {
             get {
@@ -1730,7 +1738,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Позволяет выбирать вопросы на табло при помощи двух последовательных нажатий на цифровые кнопки (номер темы, номер вопроса/Escape для отмены) и убирать темы в финале при помощи одного нажатия.
+        ///   Ищет локализованную строку, похожую на Allows selecting questions on the scoreboard using two consecutive presses of the number buttons (theme number, question number/Escape to cancel) and removing themes in the final round with one press.
         /// </summary>
         public static string UseKeysToSelectQuestionsHint {
             get {
@@ -1739,7 +1747,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Версия.
+        ///   Ищет локализованную строку, похожую на Version.
         /// </summary>
         public static string Version {
             get {
@@ -1748,7 +1756,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Видео.
+        ///   Ищет локализованную строку, похожую на Video.
         /// </summary>
         public static string Video {
             get {
@@ -1757,7 +1765,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Адрес для подключения к игре: http://.
+        ///   Ищет локализованную строку, похожую на Connection address for game: http://.
         /// </summary>
         public static string WebButtonsConnectionString {
             get {
@@ -1766,8 +1774,8 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на В данном режиме в качестве кнопок используются мобильные устройства участников (телефоны, планшеты и пр.). Перед началом игры производится регистрация этих устройств и их связывание с игроками.
-        ///Для игры необходимо организовать локальную сеть.
+        ///   Ищет локализованную строку, похожую на In this mode, mobile devices of participants (phones, tablets, etc.) are used as buttons. Before the game starts, these devices are registered and associated with players.
+        ///To play, you need to organize a local network..
         /// </summary>
         public static string WebButtonsHint {
             get {
@@ -1776,7 +1784,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Порт веб-доступа.
+        ///   Ищет локализованную строку, похожую на Web access port.
         /// </summary>
         public static string WebButtonsPort {
             get {
@@ -1785,7 +1793,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сайт.
+        ///   Ищет локализованную строку, похожую на Website.
         /// </summary>
         public static string Website {
             get {
@@ -1794,7 +1802,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Окно (новая версия).
+        ///   Ищет локализованную строку, похожую на Window.
         /// </summary>
         public static string WebView {
             get {
@@ -1803,7 +1811,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Окно.
+        ///   Ищет локализованную строку, похожую на Window (old version).
         /// </summary>
         public static string Window {
             get {
@@ -1812,7 +1820,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверный ответ.
+        ///   Ищет локализованную строку, похожую на Wrong answer.
         /// </summary>
         public static string WrongAnswer {
             get {
@@ -1821,7 +1829,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверных.
+        ///   Ищет локализованную строку, похожую на Incorrect.
         /// </summary>
         public static string WrongAnswers {
             get {

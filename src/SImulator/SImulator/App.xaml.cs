@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using SImulator.Implementation;
+using SImulator.Helpers;
 using SImulator.ViewModel;
 using SImulator.ViewModel.Core;
 using SIStorage.Service.Client;
@@ -16,7 +17,6 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO.IsolatedStorage;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -47,12 +47,7 @@ public partial class App : Application
     private readonly DesktopManager _manager = new();
 #pragma warning restore IDE0052
 
-    /// <summary>
-    /// User settings configuration file name.
-    /// </summary>
-    private const string ConfigFileName = "user.config";
-
-    internal Settings Settings { get; } = LoadSettings();
+    internal Settings Settings { get; } = SettingsHelper.LoadSettings();
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -141,66 +136,9 @@ public partial class App : Application
     }
 
     protected override void OnExit(ExitEventArgs e)
-    {            
-        SaveSettings(Settings);           
-
+    {
+        SettingsHelper.SaveSettings(Settings); 
         base.OnExit(e);
-    }
-
-    private static void SaveSettings(Settings settings)
-    {
-        try
-        {
-            if (Monitor.TryEnter(ConfigFileName, 2000))
-            {
-                try
-                {
-                    using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-                    using var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file);
-                    settings.Save(stream, DesktopManager.SettingsSerializer);
-                }
-                finally
-                {
-                    Monitor.Exit(ConfigFileName);
-                }
-            }
-        }
-        catch (Exception exc)
-        {
-            MessageBox.Show(
-                $"{SImulator.Properties.Resources.SavingSettingsError}: {exc.Message}",
-                MainViewModel.ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Exclamation);
-        }
-    }
-
-    /// <summary>
-    /// Loads user settings.
-    /// </summary>
-    public static Settings LoadSettings()
-    {
-        try
-        {
-            using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-
-            if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
-            {
-                try
-                {
-                    using var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return Settings.Load(stream, DesktopManager.SettingsSerializer);
-                }
-                catch { }
-                finally
-                {
-                    Monitor.Exit(ConfigFileName);
-                }
-            }
-        }
-        catch { }
-
-        return new Settings();
     }
 
 #if !DEBUG

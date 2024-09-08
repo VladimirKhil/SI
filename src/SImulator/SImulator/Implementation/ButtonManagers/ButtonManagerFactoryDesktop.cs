@@ -2,6 +2,7 @@
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
+using SImulator.Implementation.ButtonManagers.WebNew;
 
 namespace SImulator.Implementation.ButtonManagers;
 
@@ -15,6 +16,7 @@ internal sealed class ButtonManagerFactoryDesktop : ButtonManagerFactory
             PlayerKeysModes.Joystick => new JoystickListener(buttonManagerListener),
             PlayerKeysModes.Com => new ComButtonManager(settings.ComPort, buttonManagerListener),
             PlayerKeysModes.Web => new WebManager(settings.WebPort, buttonManagerListener),
+            PlayerKeysModes.WebNew => new WebManagerNew(settings.WebPort, buttonManagerListener),
             _ => base.Create(settings, buttonManagerListener),
         };
 }

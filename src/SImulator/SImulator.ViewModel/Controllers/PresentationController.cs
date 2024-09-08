@@ -91,8 +91,11 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public Action<int>? DeletionCallback { get; set; }
 
-    public PresentationController(IDisplayDescriptor screen)
+    private readonly SoundsSettings _soundsSettings;
+
+    public PresentationController(IDisplayDescriptor screen, SoundsSettings soundsSettings)
     {
+        _soundsSettings = soundsSettings;
         Screen = screen;
 
         TInfo = new TableInfoViewModel
@@ -180,10 +183,11 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound), OnError);
 
-    public async Task StartAsync()
+    public async Task StartAsync(Action onLoad)
     {
         await PlatformManager.Instance.CreateMainViewAsync(this, Screen);
         TInfo.TStage = TableStage.Sign;
+        onLoad();
     }
 
     public async Task StopAsync()
@@ -199,7 +203,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         Listener = null;
     }
 
-    public void SetMedia(MediaSource media, bool background)
+    private void SetMedia(MediaSource media, bool background)
     {
         if (background)
         {
@@ -245,6 +249,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     private void SetScreenContent(IReadOnlyCollection<ContentGroup> content)
     {
+        TInfo.TStage = TableStage.Question;
         TInfo.Content = content;
         SetQuestionContentType(QuestionContentType.Collection);
     }
@@ -764,6 +769,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void OnPackage(string packageName, MediaInfo? packageLogo)
     {
+        SetSound(_soundsSettings.BeginGame);
+        
         if (!packageLogo.HasValue || packageLogo.Value.Uri == null)
         {
             return;
@@ -780,6 +787,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         SetText();
         SetActivePlayerIndex(-1);
     }
+
+    public void NoAnswer() => SetSound(_soundsSettings.NoAnswer);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }

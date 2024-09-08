@@ -1,4 +1,6 @@
-﻿namespace SImulator.ViewModel.ButtonManagers;
+﻿using SImulator.ViewModel.Contracts;
+
+namespace SImulator.ViewModel.ButtonManagers;
 
 /// <inheritdoc cref="IButtonManager" />
 public abstract class ButtonManagerBase : IButtonManager
@@ -10,6 +12,8 @@ public abstract class ButtonManagerBase : IButtonManager
     public abstract bool Start();
 
     public abstract void Stop();
+
+    public virtual ICommandExecutor? TryGetCommandExecutor() => null;
 
     public virtual ValueTask DisposeAsync() => new();
 }

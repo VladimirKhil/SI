@@ -1,4 +1,6 @@
-﻿namespace SImulator.ViewModel.ButtonManagers;
+﻿using SImulator.ViewModel.Contracts;
+
+namespace SImulator.ViewModel.ButtonManagers;
 
 /// <summary>
 /// Supports players buttons.
@@ -15,4 +17,9 @@ public interface IButtonManager : IAsyncDisposable
     /// Disables players buttons.
     /// </summary>
     void Stop();
+
+    /// <summary>
+    /// Gets command executor for current manager.
+    /// </summary>
+    ICommandExecutor? TryGetCommandExecutor();
 }

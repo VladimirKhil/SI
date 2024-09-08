@@ -752,7 +752,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                     return;
                 }
 
-                SetSound(Settings.Model.Sounds.NoAnswer);
                 PresentationController.NoAnswer();
                 StopQuestionTimer_Executed(1);
                 ActiveQuestionCommand = null;
@@ -954,6 +953,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             ThinkingTime = 0;
         }
 
+        PresentationController.StopThinkingTimer();
         _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
     }
 
@@ -1120,20 +1120,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         UpdateNextCommand();
 
-        await PresentationController.StartAsync();
-
-        PresentationController.ClearPlayers();
-
-        for (int i = 0; i < Players.Count; i++)
-        {
-            PresentationController.AddPlayer();
-            PresentationController.UpdatePlayerInfo(i, Players[i]);
-        }
-
-        PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
-        PresentationController.UpdateSettings(Settings.SIUISettings.Model);
-        PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
-        PresentationController.ClearPlayersState();
+        await PresentationController.StartAsync(InitPresentation);
 
         _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
 
@@ -1146,6 +1133,22 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         {
             Next_Executed();
         }
+    }
+
+    private void InitPresentation()
+    {
+        PresentationController.ClearPlayers();
+
+        for (int i = 0; i < Players.Count; i++)
+        {
+            PresentationController.AddPlayer();
+            PresentationController.UpdatePlayerInfo(i, Players[i]);
+        }
+
+        PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
+        PresentationController.UpdateSettings(Settings.SIUISettings.Model);
+        PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
+        PresentationController.ClearPlayersState();
     }
 
     internal void OnQuestion(Question question)
@@ -1273,11 +1276,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (!string.IsNullOrWhiteSpace(videoUrl))
         {
-            if (SetMedia(new MediaInfo(videoUrl)))
-            {
-                PresentationController.SetStage(TableStage.Question);
-                PresentationController.SetQuestionContentType(QuestionContentType.Video);
-            }
+            var content = new[] { new ContentItem { Type = ContentTypes.Video, Value = videoUrl } };
+            PresentationController.OnQuestionContent(content, contentItem => contentItem.Value, "");
         }
         else
         {
@@ -1285,11 +1285,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             var media = logo != null ? _engine.Document.TryGetMedia(logo) : null;
 
             PresentationController.OnPackage(package.Name, media);
-
-            SetSound(Settings.Model.Sounds.BeginGame);
         }
 
         LocalInfo.TStage = TableStage.Sign;
+        _buttonManager?.TryGetCommandExecutor()?.OnStage("Begin");
     }
 
     private void Engine_GameThemes(IEnumerable<string> themes)
@@ -1705,17 +1704,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         MediaProgress = 0;
     }
 
-    private bool SetMedia(MediaInfo media, bool background = false)
-    {
-        if (media.Uri == null)
-        {
-            return false;
-        }
-
-        PresentationController.SetMedia(new MediaSource(media.Uri.OriginalString), background);
-        return true;
-    }
-
     private string? _currentTheme;
 
     public string? CurrentTheme
@@ -1954,6 +1942,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 throw new InvalidOperationException($"_state has an invalid value of {_state}");
         }
     }
+
+    public void OnPlayerAdded(string userName) => Players.Add(new PlayerInfo { Name = userName });
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

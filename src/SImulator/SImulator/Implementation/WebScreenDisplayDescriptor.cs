@@ -12,7 +12,7 @@ public sealed class WebScreenDisplayDescriptor : IDisplayDescriptor
     /// </summary>
     public Screen Screen { get; set; }
 
-    public string Name => $"{(Screen == Screen.PrimaryScreen ? Resources.MainScreen : Resources.SecondaryScreen)} ({Resources.NewVersion})";
+    public string Name => Screen == Screen.PrimaryScreen ? Resources.MainScreen : Resources.SecondaryScreen;
 
     public bool IsFullScreen => true;
 

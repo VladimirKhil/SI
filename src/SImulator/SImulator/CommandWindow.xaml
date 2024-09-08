@@ -92,6 +92,7 @@
                         <x:Static x:Key="Joystick" Member="lp:Resources.ButtonTypesJoystick" />
                         <x:Static x:Key="Com" Member="lp:Resources.ButtonTypesCom" />
                         <x:Static x:Key="Web" Member="lp:Resources.ButtonTypesWeb" />
+                        <x:Static x:Key="WebNew" Member="lp:Resources.ButtonTypesWebNew" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
             </my:MappedConverter>
@@ -1561,6 +1562,10 @@
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.WebNew}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
@@ -1662,6 +1667,10 @@
                             
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                
+                                <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.WebNew}">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>

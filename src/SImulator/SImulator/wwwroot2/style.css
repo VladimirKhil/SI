@@ -1,0 +1,23 @@
+html, body, #reactHost {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: 'Standard';
+}
+
+button.join:nth-child(1), button.join:nth-child(3) {
+    display: none;
+}
+
+.miniApp {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.tableContextView {
+	min-width: 600px;
+}

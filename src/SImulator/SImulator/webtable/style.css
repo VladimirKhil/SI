@@ -12,7 +12,7 @@ html, body, #reactHost {
 
 body {
 	margin: 0;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: 'Standard';
 }
 
 .playersAndTable {
@@ -27,7 +27,7 @@ body {
 
 .gamePlayers {
     flex-direction: row !important;
-    background: radial-gradient(#0009ad, #000451) !important;
+    background: #0a0e30 !important;
     margin: 0 !important;
     width: 100% !important;
 }
@@ -75,8 +75,8 @@ body {
 
 @media screen and (min-width: 1100px) and (min-height: 700px) {
     .gamePlayer {
-    font-size: 35px !important;
-}
+        font-size: 35px !important;
+    }
 
         .gamePlayer:nth-last-child(n+6),
         .gamePlayer:nth-last-child(n+6) ~ li {

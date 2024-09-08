@@ -61,7 +61,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить.
+        ///   Ищет локализованную строку, похожую на Add.
         /// </summary>
         internal static string Add {
             get {
@@ -70,7 +70,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка связи: {0}.
+        ///   Ищет локализованную строку, похожую на Connection error: {0}.
         /// </summary>
         internal static string ConnectionError {
             get {
@@ -79,7 +79,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка.
+        ///   Ищет локализованную строку, похожую на Error.
         /// </summary>
         internal static string Error {
             get {
@@ -88,7 +88,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка завершения игры: {0}.
+        ///   Ищет локализованную строку, похожую на Game end error: {0}.
         /// </summary>
         internal static string GameEndingError {
             get {
@@ -97,7 +97,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Соединение с демонстрационным компьютером было разорвано. Игра прекращена..
+        ///   Ищет локализованную строку, похожую на Connection to the demonstration computer has been terminated. The game is stopped..
         /// </summary>
         internal static string GameEndsBecauseOfConnectionLoss {
             get {
@@ -106,7 +106,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при загрузке игрового пакета.
+        ///   Ищет локализованную строку, похожую на Error loading game package.
         /// </summary>
         internal static string GamePackageLoadError {
             get {
@@ -115,7 +115,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка старта игры: {0}.
+        ///   Ищет локализованную строку, похожую на Game start error: {0}.
         /// </summary>
         internal static string GameStartError {
             get {
@@ -124,7 +124,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на [Ваш IP-адрес].
+        ///   Ищет локализованную строку, похожую на [Your IP address].
         /// </summary>
         internal static string IpAddressHint {
             get {
@@ -133,7 +133,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка создания файла лога: {0}. Лог записываться не будет.
+        ///   Ищет локализованную строку, похожую на Log file creation error: {0}. Logging will not be performed..
         /// </summary>
         internal static string LoggerCreationWarning {
             get {
@@ -142,7 +142,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка старта записи лога.
+        ///   Ищет локализованную строку, похожую на Error starting log recording.
         /// </summary>
         internal static string LoggerInitError {
             get {
@@ -151,7 +151,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Папка для записи логов не задана! Логи вестись не будут.
+        ///   Ищет локализованную строку, похожую на Log directory is not specified. Logs will not be recorded..
         /// </summary>
         internal static string LogsFolderNotSetWarning {
             get {
@@ -160,7 +160,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дальше.
+        ///   Ищет локализованную строку, похожую на Next.
         /// </summary>
         internal static string Next {
             get {
@@ -169,7 +169,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Папка лицензий не найдена!.
+        ///   Ищет локализованную строку, похожую на License folder not found.
         /// </summary>
         internal static string NoLicensesFolder {
             get {
@@ -178,7 +178,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос без риска.
+        ///   Ищет локализованную строку, похожую на No Risk question.
         /// </summary>
         internal static string NoRiskQuestion {
             get {
@@ -187,7 +187,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при открытии папки лицензий: {0}.
+        ///   Ищет локализованную строку, похожую на Error opening license folder: {0}.
         /// </summary>
         internal static string OpenLicensesError {
             get {
@@ -196,7 +196,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка подготовки пакета.
+        ///   Ищет локализованную строку, похожую на Package preparation error.
         /// </summary>
         internal static string PackagePreparationError {
             get {
@@ -205,7 +205,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Приостановить.
+        ///   Ищет локализованную строку, похожую на Pause.
         /// </summary>
         internal static string Pause {
             get {
@@ -214,7 +214,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нажмите на кнопку.
+        ///   Ищет локализованную строку, похожую на Press the button.
         /// </summary>
         internal static string PressTheButton {
             get {
@@ -223,7 +223,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Раунд.
+        ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         internal static string Round {
             get {
@@ -232,7 +232,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Темы раунда.
+        ///   Ищет локализованную строку, похожую на Round themes.
         /// </summary>
         internal static string RoundThemes {
             get {
@@ -241,7 +241,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время раунда вышло..
+        ///   Ищет локализованную строку, похожую на Round time has expired..
         /// </summary>
         internal static string RoundTimeout {
             get {
@@ -250,7 +250,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Запустить.
+        ///   Ищет локализованную строку, похожую на Start.
         /// </summary>
         internal static string Run {
             get {
@@ -259,7 +259,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Счёт.
+        ///   Ищет локализованную строку, похожую на Score.
         /// </summary>
         internal static string Score {
             get {
@@ -268,7 +268,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос с секретом.
+        ///   Ищет локализованную строку, похожую на Secret question.
         /// </summary>
         internal static string SecretQuestion {
             get {
@@ -277,7 +277,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите аудиофайл.
+        ///   Ищет локализованную строку, похожую на Select audio file.
         /// </summary>
         internal static string SelectAudioFile {
             get {
@@ -286,7 +286,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите изображение-фон.
+        ///   Ищет локализованную строку, похожую на Select background image.
         /// </summary>
         internal static string SelectBackgroundImage {
             get {
@@ -295,7 +295,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите видеофайл-фон.
+        ///   Ищет локализованную строку, похожую на Select background video file.
         /// </summary>
         internal static string SelectBackgroundVideo {
             get {
@@ -304,7 +304,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите заставочный видеофайл.
+        ///   Ищет локализованную строку, похожую на Select splash video file.
         /// </summary>
         internal static string SelectIntroVideo {
             get {
@@ -313,7 +313,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите изображение-заставку.
+        ///   Ищет локализованную строку, похожую на Select splash image.
         /// </summary>
         internal static string SelectLogoImage {
             get {
@@ -322,7 +322,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос со ставкой.
+        ///   Ищет локализованную строку, похожую на Stake question.
         /// </summary>
         internal static string StakeQuestion {
             get {
@@ -331,7 +331,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начать игру.
+        ///   Ищет локализованную строку, похожую на Start game.
         /// </summary>
         internal static string StartGame {
             get {
@@ -340,7 +340,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тема.
+        ///   Ищет локализованную строку, похожую на Theme.
         /// </summary>
         internal static string Theme {
             get {

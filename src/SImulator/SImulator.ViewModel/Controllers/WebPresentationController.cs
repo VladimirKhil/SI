@@ -24,6 +24,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private readonly IPresentationListener _presentationListener;
     private readonly TaskCompletionSource _loadTSC = new();
 
+    private Action? _onLoad;
+
     private bool _isAnswer = false;
     private bool _isAnswerSimple = false;
 
@@ -40,11 +42,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private ItemViewModel[]? _answerOptions;
 
     private int _playerCount;
+    private readonly SoundsSettings _soundsSettings;
 
-    public WebPresentationController(IDisplayDescriptor displayDescriptor, IPresentationListener presentationListener)
+    public WebPresentationController(IDisplayDescriptor displayDescriptor, IPresentationListener presentationListener, SoundsSettings soundsSettings)
     {
         _displayDescriptor = displayDescriptor;
         _presentationListener = presentationListener;
+        _soundsSettings = soundsSettings;
     }
 
     public void AddLostButtonPlayerIndex(int playerIndex)
@@ -197,28 +201,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Themes = themes.ToArray()
     });
 
-    public void SetMedia(MediaSource media, bool background)
-    {
-        if (background)
-        {
-            SendMessage(new
-            {
-                Type = "content",
-                Placement = "background",
-                Content = new[] { new { Type = "audio", Value = media.Uri } }
-            });
-        }
-        else
-        {
-            SendMessage(new
-            {
-                Type = "content",
-                Placement = "screen",
-                Content = new[] { new { Type = "image", Value = media.Uri } }
-            });
-        }
-    }
-
     public void SetQuestionContentType(QuestionContentType questionContentType) { }
 
     public void SetQuestionSound(bool sound) { }
@@ -336,27 +318,44 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         }
     }
 
-    public async Task StartAsync()
+    public Task StartAsync(Action onLoad)
     {
-        await Task.WhenAll(_loadTSC.Task, PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor));
+        _onLoad = onLoad;
+        return Task.WhenAll(_loadTSC.Task, PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor));
+    }
 
-        SendMessage(new
+    private void InitInternal() => SendMessage(new
+    {
+        Type = "setSoundMap",
+        SoundMap = new Dictionary<string, string>
         {
-            Type = "setSoundMap",
-            SoundMap = new Dictionary<string, string>
-            {
-                ["final_delete"] = "../sounds/final_delete.mp3",
-                ["final_think"] = "../sounds/final_think.mp3",
-                ["round_begin"] = "../sounds/round_begin.mp3",
-                ["round_themes"] = "../sounds/round_themes.mp3",
-                ["round_timeout"] = "../sounds/round_timeout.mp3",
-                ["question_noanswers"] = "../sounds/question_noanswers.mp3",
-                ["question_norisk"] = "../sounds/question_norisk.mp3",
-                ["question_secret"] = "../sounds/question_secret.mp3",
-                ["question_stake"] = "../sounds/question_stake.mp3",
-                ["round_begin"] = "../sounds/round_begin.mp3"
-            }
-        });
+            ["final_delete"] = GetSoundUri(_soundsSettings.FinalDelete),
+            ["final_think"] = GetSoundUri(_soundsSettings.FinalThink),
+            ["round_begin"] = GetSoundUri(_soundsSettings.RoundBegin),
+            ["round_themes"] = GetSoundUri(_soundsSettings.RoundThemes),
+            ["round_timeout"] = GetSoundUri(_soundsSettings.RoundTimeout),
+            ["applause_small"] = GetSoundUri(_soundsSettings.AnswerRight),
+            ["question_norisk"] = GetSoundUri(_soundsSettings.NoRiskQuestion),
+            ["question_secret"] = GetSoundUri(_soundsSettings.SecretQuestion),
+            ["question_stake"] = GetSoundUri(_soundsSettings.StakeQuestion),
+            ["answer_wrong"] = GetSoundUri(_soundsSettings.AnswerWrong),
+            ["question_noanswers"] = GetSoundUri(_soundsSettings.NoAnswer),
+        }
+    });
+
+    private static string GetSoundUri(string sound)
+    {
+        if (!Uri.TryCreate(sound, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            return sound;
+        }
+
+        if (uri.IsAbsoluteUri)
+        {
+            return sound;
+        }
+
+        return $"../sounds/{sound}";
     }
 
     public Task StopAsync() => PlatformManager.Instance.CloseMainViewAsync();
@@ -366,14 +365,17 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         // TODO
     }
 
-    public void StopTimer()
+    public void StopTimer() => SendMessage(new
     {
-        SendMessage(new
-        {
-            Type = "timerStop",
-            TimerIndex = 1
-        });
-    }
+        Type = "timerStop",
+        TimerIndex = 1
+    });
+
+    public void StopThinkingTimer() => SendMessage(new
+    {
+        Type = "timerStop",
+        TimerIndex = 2
+    });
 
     public void UpdatePlayerInfo(int playerIndex, PlayerInfo player, string? propertyName = null)
     {
@@ -591,6 +593,9 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                 {
                     _loadTSC.SetResult();
                 }
+
+                _onLoad?.Invoke();
+                InitInternal();
                 break;
 
             case "loadError":

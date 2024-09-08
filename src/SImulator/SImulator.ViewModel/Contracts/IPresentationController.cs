@@ -21,7 +21,8 @@ public interface IPresentationController : IDisposable
     /// <summary>
     /// Starts new game.
     /// </summary>
-    Task StartAsync();
+    /// <param name="onLoad">Action to be called when the view is loaded.</param>
+    Task StartAsync(Action onLoad);
 
     /// <summary>
     /// Stops the game.
@@ -31,8 +32,6 @@ public interface IPresentationController : IDisposable
     void SetGameThemes(IEnumerable<string> themes);
 
     void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal);
-
-    void SetMedia(MediaSource media, bool background);
 
     void SetStage(TableStage stage);
 
@@ -98,6 +97,8 @@ public interface IPresentationController : IDisposable
 
     void StopTimer();
 
+    void StopThinkingTimer() { }
+
     /// <summary>
     /// Sets answer options (invisible by default) and corresponding table layout.
     /// </summary>
@@ -143,7 +144,7 @@ public interface IPresentationController : IDisposable
 
     void PlayerIsWrong(int playerIndex) { }
 
-    void NoAnswer() { }
+    void NoAnswer();
 
     void OnFinalThink() { }
 }

@@ -125,9 +125,9 @@ internal sealed class DesktopManager : PlatformManager
     }
 
     public override IDisplayDescriptor[] GetScreens() =>
-        Screen.AllScreens.Select(screen => new ScreenDisplayDescriptor(screen))
-            .Concat(Screen.AllScreens.Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen)))
-            .Concat(new IDisplayDescriptor[] { WindowDisplayDescriptor.Instance, WebDisplayDescriptor.Instance })
+        Screen.AllScreens.Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen))
+            .Concat(Screen.AllScreens.Select(screen => new ScreenDisplayDescriptor(screen)))
+            .Concat(new IDisplayDescriptor[] { WebDisplayDescriptor.Instance, WindowDisplayDescriptor.Instance })
             .ToArray();
 
     public override string[] GetLocalComputers()
