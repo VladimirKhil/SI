@@ -185,6 +185,17 @@ public sealed class GameEngine : EngineBase
 
     public override bool CanNext() => _stage != GameStage.None && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
 
+    public bool SkipQuestion()
+    {
+        if (Stage != GameStage.Question)
+        {
+            return false;
+        }
+
+        Stage = GameStage.EndQuestion;
+        return true;
+    }
+
     /// <summary>
     /// Ends round and moves to the next one.
     /// </summary>

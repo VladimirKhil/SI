@@ -994,7 +994,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (ClientData.ReportsCount == 0)
         {
-            _logic.ExecuteImmediate();
+            _logic.RescheduleTask();
         }
     }
 
@@ -2024,12 +2024,12 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (ClientData.HaveViewedAtom <= 0)
         {
             ClientData.IsPlayingMedia = false;
-            _logic.ExecuteImmediate();
+            _logic.RescheduleTask();
         }
         else
         {
-            // Иногда кто-то отваливается, и процесс затягивается на 60 секунд. Это недопустимо. Дадим 3 секунды
-            _logic.ScheduleExecution(Tasks.MoveNext, 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10, force: true);
+            // Sometimes someone drops out, and the process gets delayed by 120 seconds. This is unacceptable. We'll give 3 seconds
+            _logic.RescheduleTask(30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
         }
     }
 
@@ -2295,7 +2295,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnPass(Message message)
     {
-        if (!ClientData.IsQuestionPlaying)
+        if (!ClientData.IsQuestionAskPlaying)
         {
             return;
         }
@@ -2900,6 +2900,11 @@ public sealed class Game : Actor<GameData, GameLogic>
     {
         // Drop answerer index
         ClientData.AnswererIndex = -1;
+
+        if (!ClientData.IsQuestionAskPlaying)
+        {
+            return;
+        }
 
         var nextTask = Logic.Runner.PendingTask;
 

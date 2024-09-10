@@ -364,9 +364,9 @@ public sealed class GameData : Data
     public bool ShowmanDecision { get; set; }
 
     /// <summary>
-    /// Играется ли вопрос
+    /// Is question asking part played. This is the stage when somebody can answer. The next stage is showing answer.
     /// </summary>
-    internal bool IsQuestionPlaying { get; set; }
+    internal bool IsQuestionAskPlaying { get; set; }
 
     internal int TableInformStage { get; set; }
 

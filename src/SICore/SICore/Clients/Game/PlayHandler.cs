@@ -98,7 +98,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
             5000);
 
         _gameData.TableController = tableController;
-        _gameData.IsQuestionPlaying = false;
+        _gameData.IsQuestionAskPlaying = false;
         GameLogic?.ScheduleExecution(Tasks.AskFirst, 19 * _gameData.TInfo.RoundInfo.Count + Random.Shared.Next(10));
     }
 

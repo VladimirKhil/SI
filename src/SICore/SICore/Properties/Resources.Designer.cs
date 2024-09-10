@@ -2104,7 +2104,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Here we go!; We&apos;re starting!.
+        ///   Ищет локализованную строку, похожую на We&apos;re starting round.
         /// </summary>
         public static string WeBeginRound {
             get {

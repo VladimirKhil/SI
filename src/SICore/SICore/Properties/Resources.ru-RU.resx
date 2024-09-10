@@ -325,7 +325,7 @@
     <value>ВА-БАНК!!!</value>
   </data>
   <data name="WeBeginRound" xml:space="preserve">
-    <value>Итак, мы начинаем;Мы начинаем</value>
+    <value>Итак, мы начинаем раунд;Мы начинаем раунд</value>
   </data>
   <data name="With" xml:space="preserve">
     <value>за</value>

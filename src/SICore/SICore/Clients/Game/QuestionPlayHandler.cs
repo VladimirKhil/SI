@@ -261,7 +261,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                 break;
 
             case ContentPlacements.Background:
-                if (contentItem.Type == ContentTypes.Audio || contentItem.Type == AtomTypes.Audio)
+                if (contentItem.Type == ContentTypes.Audio)
                 {
                     GameLogic.OnContentBackgroundAudio(contentItem);
                 }

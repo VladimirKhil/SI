@@ -52,12 +52,12 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
         _taskArgument = taskArgument;
     }
 
-    public void ExecuteImmediate() =>
+    public void RescheduleTask(int taskTime = 10) =>
         _taskTimerLock.WithLock(() =>
         {
             if (!_disposed)
             {
-                _taskTimer.Change(10, Timeout.Infinite);
+                _taskTimer.Change(taskTime, Timeout.Infinite);
             }
         });
 

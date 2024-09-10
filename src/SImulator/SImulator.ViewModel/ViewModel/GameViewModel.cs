@@ -1218,7 +1218,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
             if (_taskRunner.CurrentTask != Tasks.NoTask)
             {
-                _taskRunner.ExecuteImmediate();
+                _taskRunner.RescheduleTask();
                 return;
             }
 

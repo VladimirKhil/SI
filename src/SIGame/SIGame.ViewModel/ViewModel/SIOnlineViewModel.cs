@@ -984,7 +984,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                     return null;
                 }
 
-                if (packageStream.Length > _gamesHostInfo?.MaxPackageSizeMb * 1024 * 1024)
+                if (packageStream.Length > MaxPackageSize * 1024 * 1024)
                 {
                     throw new Exception($"{Resources.FileTooLarge}. {string.Format(Resources.MaximumFileSize, _gamesHostInfo?.MaxPackageSizeMb)}");
                 }

@@ -2,7 +2,6 @@
 using SIEngine.Models;
 using SIEngine.Rules;
 using SIPackages;
-using SIPackages.Core;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -331,8 +330,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void SetActiveRound() => _activeRound = _roundIndex < _document.Package.Rounds.Count ? _document.Package.Rounds[_roundIndex] : null;
 
     public void SetTimeout() => _timeout = true;
-
-    public void SkipQuestion() => Stage = GameStage.EndQuestion;
 
     /// <summary>
     /// Skips rest of the question and goes directly to answer.

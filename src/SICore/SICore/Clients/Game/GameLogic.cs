@@ -95,7 +95,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private readonly HistoryLog _tasksHistory = new();
 
-    public SIEngine.EngineBase Engine { get; }
+    public SIEngine.GameEngine Engine { get; }
 
     public event Action<GameLogic, GameStages, string, int, int>? StageChanged;
 
@@ -119,7 +119,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal TaskRunner<Tasks> Runner => _taskRunner;
 
-    public GameLogic(GameData data, GameActions gameActions, SIEngine.EngineBase engine, ILocalizer localizer, IFileShare fileShare)
+    public GameLogic(GameData data, GameActions gameActions, SIEngine.GameEngine engine, ILocalizer localizer, IFileShare fileShare)
         : base(data)
     {
         _gameActions = gameActions;
@@ -444,7 +444,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.PendingAnswererIndex = -1;
         _data.AnswererPressDuration = -1;
         _data.PendingAnswererIndicies.Clear();
-        _data.IsQuestionPlaying = true;
+        _data.IsQuestionAskPlaying = true;
         _data.IsPlayingMedia = false;
         _data.IsPlayingMediaPaused = false;
         _data.CurPriceRight = _data.CurPriceWrong = question.Price;
@@ -799,7 +799,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void OnRoundEnded()
     {
-        _data.IsQuestionPlaying = false;
+        _data.IsQuestionAskPlaying = false;
+        _data.IsPlayingMedia = false;
 
         _gameActions.InformSums();
         _gameActions.AnnounceSums();
@@ -898,7 +899,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (StopReason == StopReason.Decision)
         {
-            ExecuteImmediate(); // Decision could be ready
+            RescheduleTask(); // Decision could be ready
         }
 
         _gameActions.SpecialReplic(LO[nameof(R.GameResumed)]);
@@ -1039,15 +1040,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _stopReason = reason;
-        ExecuteImmediate();
+        RescheduleTask();
 
         return true;
     }
 
-    internal void ExecuteImmediate()
+    internal void RescheduleTask(int taskTime = 10)
     {
-        _tasksHistory.AddLogEntry(nameof(ExecuteImmediate));
-        _taskRunner.ExecuteImmediate();
+        _tasksHistory.AddLogEntry(nameof(RescheduleTask));
+        _taskRunner.RescheduleTask(taskTime);
     }
 
     internal void CancelStop() => _stopReason = StopReason.None;
@@ -1340,7 +1341,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     _data.ChooserIndex = _data.AnswererIndex;
                     _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
 
-                    _data.IsQuestionPlaying = false;
+                    _data.IsQuestionAskPlaying = false;
 
                     _data.IsThinking = false;
                     _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Stop);
@@ -2428,7 +2429,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         ScheduleExecution(Tasks.MoveNext, 1, force: true);
 
-        _data.IsQuestionPlaying = false;
+        _data.IsQuestionAskPlaying = false;
     }
 
     private void WaitFinalStake()
