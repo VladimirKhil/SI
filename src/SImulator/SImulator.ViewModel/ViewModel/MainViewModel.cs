@@ -252,7 +252,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         var links = new List<LinkModel>
         {
-            new(new Uri("https://vladimirkhil.com/si/game"), "SIGame", "/SImulator;component/Images/sigame_logo.jpg")
+            new(new Uri("https://vladimirkhil.com/si/game"), "SIGame", "/SImulator;component/Images/sigame_logo.jpg"),
+            new(new Uri("https://vladimirkhil.com/si/siquester"), "SIQuester", "/SImulator;component/Images/siquester_logo.jpg")
         };
 
         if (Thread.CurrentThread.CurrentUICulture.Name == "ru-RU")

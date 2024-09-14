@@ -246,7 +246,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         CanMoveBack = false;
         UpdateCanMoveNextRound();
         UpdateCanMoveBackRound();
-        UpdateCanNext();
 
         if (_roundIndex < _document.Package.Rounds.Count)
         {
@@ -256,6 +255,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         {
             Stage = GameStage.EndGame;
         }
+
+        UpdateCanNext();
     }
 
     protected void UpdateCanMoveNextRound() => CanMoveNextRound = _roundIndex < _document.Package.Rounds.Count;

@@ -75,7 +75,6 @@ public sealed class AppSettingsViewModel
             Model.AutomaticGame = defaultSettings.AutomaticGame;
             Model.SubstractOnWrong = defaultSettings.SubstractOnWrong;
             Model.PlaySpecials = defaultSettings.PlaySpecials;
-            Model.PlaySounds = defaultSettings.PlaySounds;
             Model.FalseStartMultimedia = defaultSettings.FalseStartMultimedia;
             Model.GameMode = defaultSettings.GameMode;
 
@@ -91,6 +90,7 @@ public sealed class AppSettingsViewModel
 
         if (sounds)
         {
+            Model.PlaySounds = defaultSettings.PlaySounds;
             Model.Sounds.BeginGame = defaultSettings.Sounds.BeginGame;
             Model.Sounds.GameThemes = defaultSettings.Sounds.GameThemes;
             Model.Sounds.RoundBegin = defaultSettings.Sounds.RoundBegin;

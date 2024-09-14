@@ -140,10 +140,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Price = price
     });
 
-    public void RunMedia()
-    {
-        // TODO
-    }
+    public void ResumeMedia() => SendMessage(new { Type = "resumeMedia" });
 
     public void RunTimer() => SendMessage(new
     {
@@ -158,15 +155,16 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetActivePlayerIndex(int playerIndex)
     {
-        if (playerIndex > -1)
+        if (playerIndex <= -1)
         {
-            SendMessage(new
-            {
-                Type = "setChooser",
-                ChooserIndex = playerIndex,
-                SetAnswerer = true
-            });
+            return;
         }
+
+        SendMessage(new
+        {
+            Type = "endPressButtonByPlayer",
+            PlayerIndex = playerIndex
+        });
     }
 
     public void SetAnswerOptions(ItemViewModel[] answerOptions)
@@ -243,8 +241,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             });
         }
     }
-
-    public void SetSound(string sound = "") { }
 
     public void SetStage(TableStage stage) { }
 
@@ -335,6 +331,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             ["round_themes"] = GetSoundUri(_soundsSettings.RoundThemes),
             ["round_timeout"] = GetSoundUri(_soundsSettings.RoundTimeout),
             ["applause_small"] = GetSoundUri(_soundsSettings.AnswerRight),
+            ["applause_big"] = GetSoundUri(_soundsSettings.AnswerRight),
             ["question_norisk"] = GetSoundUri(_soundsSettings.NoRiskQuestion),
             ["question_secret"] = GetSoundUri(_soundsSettings.SecretQuestion),
             ["question_stake"] = GetSoundUri(_soundsSettings.StakeQuestion),
@@ -342,6 +339,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             ["question_noanswers"] = GetSoundUri(_soundsSettings.NoAnswer),
         }
     });
+
+    public void SetAppSound(bool isEnabled) => SendMessage(new { Type = "setAppSound", IsEnabled = isEnabled });
 
     private static string GetSoundUri(string sound)
     {

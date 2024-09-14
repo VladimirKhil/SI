@@ -32,10 +32,10 @@ public sealed class SoundsSettings : INotifyPropertyChanged
     private string _noRiskQuestion = "question_norisk.mp3";
     public string NoRiskQuestion { get => _noRiskQuestion; set { _noRiskQuestion = value; OnPropertyChanged(); } }
 
-    private string _answerRight = "";
+    private string _answerRight = "applause_small.mp3";
     public string AnswerRight { get => _answerRight; set { _answerRight = value; OnPropertyChanged(); } }
 
-    private string _answerWrong = "";
+    private string _answerWrong = "answer_wrong.mp3";
     public string AnswerWrong { get => _answerWrong; set { _answerWrong = value; OnPropertyChanged(); } }
 
     private string _noAnswer = "question_noanswers.mp3";

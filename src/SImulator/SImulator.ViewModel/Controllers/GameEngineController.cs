@@ -112,6 +112,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         switch (mode)
         {
             case StepParameterValues.AskAnswerMode_Button:
+                GameViewModel.StopThinkingTimer_Executed(0);
                 GameViewModel.StartQuestionTimer();
                 GameViewModel.AskAnswerButton();
                 break;

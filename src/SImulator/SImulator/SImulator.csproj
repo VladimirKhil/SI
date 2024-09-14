@@ -57,6 +57,7 @@
     <None Remove="Images\game_small.jpg" />
     <None Remove="Images\patreon_logo.png" />
     <None Remove="Images\sigame_logo.jpg" />
+    <None Remove="Images\siquester_logo.jpg" />
     <None Remove="Images\vk_logo.png" />
     <None Remove="Images\yoomoney_logo.png" />
   </ItemGroup>
@@ -72,6 +73,7 @@
     <Resource Include="Images\logo.png" />
     <Resource Include="Images\patreon_logo.png" />
     <Resource Include="Images\sigame_logo.jpg" />
+    <Resource Include="Images\siquester_logo.jpg" />
     <Resource Include="Images\vk_logo.png" />
     <Resource Include="Images\yoomoney_logo.png" />
     <EmbeddedResource Update="Properties\Resources.resx">
@@ -129,6 +131,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\SharpDX.LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="sounds\answer_wrong.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="sounds\applause_small.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="sounds\final_delete.mp3">

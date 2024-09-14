@@ -67,7 +67,7 @@ public interface IPresentationController : IDisposable
 
     void UpdateShowPlayers(bool showPlayers);
 
-    void SetSound(string sound = "");
+    void SetSound(string sound = "") { }
 
     void PlaySimpleSelection(int theme, int quest);
 
@@ -81,7 +81,7 @@ public interface IPresentationController : IDisposable
 
     void SeekMedia(int position);
 
-    void RunMedia();
+    void ResumeMedia();
 
     void StopMedia();
 
@@ -132,6 +132,8 @@ public interface IPresentationController : IDisposable
     
     void SetLanguage(string language) { }
 
+    void SetAppSound(bool isEnabled);
+
     void SetSimpleAnswer() { }
 
     void OnAnswerStart();
@@ -140,9 +142,9 @@ public interface IPresentationController : IDisposable
 
     void OnQuestionEnd() { }
 
-    void PlayerIsRight(int playerIndex) { }
+    void PlayerIsRight(int playerIndex);
 
-    void PlayerIsWrong(int playerIndex) { }
+    void PlayerIsWrong(int playerIndex);
 
     void NoAnswer();
 

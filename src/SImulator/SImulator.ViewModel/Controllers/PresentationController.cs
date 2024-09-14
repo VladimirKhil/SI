@@ -91,11 +91,13 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public Action<int>? DeletionCallback { get; set; }
 
+    private bool _isSoundEnabled;
+
     private readonly SoundsSettings _soundsSettings;
 
-    public PresentationController(IDisplayDescriptor screen, SoundsSettings soundsSettings)
+    public PresentationController(IDisplayDescriptor screen, SoundsSettings soundSettings)
     {
-        _soundsSettings = soundsSettings;
+        _soundsSettings = soundSettings;
         Screen = screen;
 
         TInfo = new TableInfoViewModel
@@ -147,6 +149,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         _animatableTimer.TimeChanged += AnimatableTimer_TimeChanged;
     }
 
+    public void SetAppSound(bool isEnabled) => _isSoundEnabled = isEnabled;
+
     private void AnimatableTimer_TimeChanged(IAnimatableTimer timer) =>
         TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
 
@@ -181,7 +185,15 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
     }
 
-    public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound), OnError);
+    public void SetSound(string sound = "")
+    {
+        if (!_isSoundEnabled)
+        {
+            return;
+        }
+
+        UI.Execute(() => PlatformManager.Instance.PlaySound(sound), OnError);
+    }
 
     public async Task StartAsync(Action onLoad)
     {
@@ -525,7 +537,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     private void OnError(Exception exc) => Error?.Invoke(exc);
 
-    public void RunMedia() => TInfo.OnMediaResume();
+    public void ResumeMedia() => TInfo.OnMediaResume();
 
     public void StopMedia() => TInfo.OnMediaPause();
 
@@ -789,6 +801,10 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     }
 
     public void NoAnswer() => SetSound(_soundsSettings.NoAnswer);
+
+    public void PlayerIsRight(int playerIndex) => SetSound(_soundsSettings.AnswerRight);
+
+    public void PlayerIsWrong(int playerIndex) => SetSound(_soundsSettings.AnswerWrong);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }

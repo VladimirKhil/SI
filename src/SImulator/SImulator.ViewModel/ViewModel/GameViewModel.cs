@@ -9,7 +9,6 @@ using SImulator.ViewModel.Properties;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
-using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -268,6 +267,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         get => _questionTimeMax;
         set { _questionTimeMax = value; OnPropertyChanged(); }
     }
+
+    private bool _isThinking = false;
 
     private int _thinkingTime = 0;
 
@@ -647,9 +648,20 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (sender != null && e.PropertyName == nameof(AppSettings.ShowPlayers))
+        if (sender == null)
         {
-            PresentationController.UpdateShowPlayers(((AppSettings)sender).ShowPlayers);
+            return;
+        }
+
+        var settings = (AppSettings)sender;
+
+        if (e.PropertyName == nameof(AppSettings.ShowPlayers))
+        {
+            PresentationController.UpdateShowPlayers(settings.ShowPlayers);
+        }
+        else if (e.PropertyName == nameof(AppSettings.PlaySounds))
+        {
+            PresentationController.SetAppSound(settings.PlaySounds);
         }
     }
 
@@ -938,6 +950,13 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void RunThinkingTimer_Executed(object? arg)
     {
+        if (_isThinking)
+        {
+            return;
+        }
+
+        _isThinking = true;
+
         if (arg != null)
         {
             ThinkingTime = 0;
@@ -948,6 +967,13 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     public void StopThinkingTimer_Executed(object? arg)
     {
+        if (!_isThinking)
+        {
+            return;
+        }
+
+        _isThinking = false;
+
         if (arg != null)
         {
             ThinkingTime = 0;
@@ -959,7 +985,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void RunMediaTimer_Executed(object? arg)
     {
-        PresentationController.RunMedia();
         ActiveMediaCommand = StopMediaTimer;
     }
 
@@ -1043,6 +1068,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 player = _selectedPlayer;
             }
 
+            StopThinkingTimer_Executed(0);
+
             player.Right++;
             player.Sum += Price;
 
@@ -1055,10 +1082,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 return;
             }
 
-            SetSound(Settings.Model.Sounds.AnswerRight);
-
             _answeringHistory.Push(Tuple.Create(player, Price, true));
-
             PresentationController.PlayerIsRight(Players.IndexOf(player));
 
             if (Settings.Model.EndQuestionOnRightAnswer)
@@ -1090,12 +1114,12 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             player = _selectedPlayer;
         }
 
+        StopThinkingTimer_Executed(0);
+
         player.Wrong++;
 
         var substract = Settings.Model.SubstractOnWrong ? (NegativePrice ?? Price) : 0;
         player.Sum -= substract;
-
-        SetSound(Settings.Model.Sounds.AnswerWrong);
 
         if (LocalInfo.LayoutMode == LayoutMode.AnswerOptions && _selectedAnswerIndex > -1)
         {
@@ -1108,9 +1132,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         _gameLogger.Write("{0} -{1}", player.Name, substract);
-
         _answeringHistory.Push(Tuple.Create(player, Price, false));
-
         PresentationController.PlayerIsWrong(Players.IndexOf(player));
 
         ReturnToQuestion();
@@ -1146,6 +1168,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
+        PresentationController.SetAppSound(Settings.Model.PlaySounds);
         PresentationController.UpdateSettings(Settings.SIUISettings.Model);
         PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
         PresentationController.ClearPlayersState();
@@ -1425,8 +1448,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     public void OnRightAnswer()
     {
-        StopQuestionTimer.Execute(0);
         StopThinkingTimer_Executed(0);
+        StopQuestionTimer.Execute(0);
         StopButtons();
         ActiveMediaCommand = null;
     }
@@ -1591,11 +1614,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         UnselectPlayer();
 
-        StopThinkingTimer_Executed(0);
-
         if (_mediaStopped)
         {
             RunMediaTimer_Executed(null);
+            PresentationController.ResumeMedia();
         }
     }
 
@@ -1921,7 +1943,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         {
             case QuestionState.Normal:
                 PresentationController.SetQuestionStyle(QuestionStyle.Normal);
-                StopThinkingTimer_Executed(0);
                 break;
 
             case QuestionState.Pressing:
