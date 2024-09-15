@@ -141,9 +141,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
 
         var textToShow =
-            GameViewModel.Settings.Model.FalseStart
-                || GameViewModel.Settings.Model.ShowTextNoFalstart
-                || GameViewModel.ActiveRound?.Type == RoundTypes.Final
+            GameViewModel.Settings.Model.FalseStart || GameViewModel.Settings.Model.ShowTextNoFalstart
             ? null
             : $"{GameViewModel.CurrentTheme}\n{GameViewModel.Price}";
 

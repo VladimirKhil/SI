@@ -38,17 +38,48 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
             return new JoinGameResponse { ErrorType = JoinGameErrorType.GameNotFound };
         }
 
-        // Add connection
-        _gameRepository.AddPlayer(request.UserName);
-
         await Groups.AddToGroupAsync(Context.ConnectionId, request.GameId.ToString(), Context.ConnectionAborted);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, SubscribersGroup, Context.ConnectionAborted);
+
+        // Add connection
+        _gameRepository.AddPlayer(request.UserName);
+        Context.Items["userName"] = request.UserName;
+
         return JoinGameResponse.Success;
     }
 
     public void SendMessage(Message m)
     {
-		// TODO
+        var args = m.Text.Split('\n');
+        
+        if (Context.Items["userName"] is not string playerName || args.Length == 0)
+        {
+            return;
+        }
+
+        switch (args[0])
+        {
+            case "ANSWER":
+                if (args.Length < 2)
+                {
+                    return;
+                }
+
+                var answer = args[1];
+                // TODO: accept player's answer
+                break;
+
+            case "I":
+                _gameRepository.OnPlayerPress(playerName);
+                break;
+
+            case "INFO":
+                _gameRepository.InformPlayer(playerName, Context.ConnectionId);
+                break;
+
+            default:
+                break;
+        }
     }
 
     public async Task LeaveGame()
@@ -63,6 +94,10 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
         }
 
         // Remove connection
+        if (Context.Items["userName"] is string playerName)
+        {
+            _gameRepository.RemovePlayer(playerName);
+        }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)

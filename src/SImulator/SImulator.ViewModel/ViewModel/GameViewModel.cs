@@ -139,9 +139,9 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     public ICommand RunMediaTimer { get; private set; }
     public ICommand StopMediaTimer { get; private set; }
 
-    public ICommand AddPlayer { get; private set; }
-    public ICommand RemovePlayer { get; private set; }
-    public ICommand ClearPlayers { get; private set; }
+    public SimpleCommand AddPlayer { get; private set; }
+    public SimpleCommand RemovePlayer { get; private set; }
+    public SimpleCommand ClearPlayers { get; private set; }
 
     public ICommand ResetSums { get; private set; }
 
@@ -474,6 +474,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     private readonly TaskRunner<Tasks> _taskRunner;
 
     private IReadOnlyList<Theme>? _roundThemes;
+
+    public bool ManagedMode { get; private set; }
 
     #endregion
 
@@ -994,14 +996,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveMediaCommand = RunMediaTimer;
     }
 
-    private void AddPlayer_Executed(object? arg)
-    {
-        var playerInfo = new PlayerInfo();
-        playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
-
-        Players.Add(playerInfo);
-        PresentationController.AddPlayer();
-    }
+    private void AddPlayer_Executed(object? arg) => OnPlayerAdded();
 
     private void RemovePlayer_Executed(object? arg)
     {
@@ -1010,10 +1005,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             return;
         }
 
-        player.PropertyChanged -= PlayerInfo_PropertyChanged;
-        var playerIndex = Players.IndexOf(player);
-        Players.Remove(player);
-        PresentationController.RemovePlayer(playerIndex);
+        RemovePlayerCore(player);
     }
 
     private void ClearPlayers_Executed(object? arg)
@@ -1142,9 +1134,20 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         UpdateNextCommand();
 
-        await PresentationController.StartAsync(InitPresentation);
-
         _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
+
+        if (_buttonManager != null && _buttonManager.ArePlayersManaged())
+        {
+            AddPlayer.CanBeExecuted = false;
+            RemovePlayer.CanBeExecuted = false;
+            ClearPlayers.CanBeExecuted = false;
+
+            Players.Clear();
+
+            ManagedMode = true;
+        }
+
+        await PresentationController.StartAsync(InitPresentation);
 
         _gameLogger.Write("Game started {0}", DateTime.Now);
         _gameLogger.Write("Package: {0}", _engine.PackageName);
@@ -1163,8 +1166,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         for (int i = 0; i < Players.Count; i++)
         {
-            PresentationController.AddPlayer();
-            PresentationController.UpdatePlayerInfo(i, Players[i]);
+            PresentationController.AddPlayer(Players[i].Name);
         }
 
         PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
@@ -1419,10 +1421,14 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     public void AskAnswerDirect()
     {
-        if (ActiveRound?.Type == RoundTypes.Final)
+        if (ActiveQuestion?.TypeName == QuestionTypes.StakeAll)
         {
-            SetSound(Settings.Model.Sounds.FinalThink);
             PresentationController.OnFinalThink();
+        }
+        
+        if (ActiveQuestion?.TypeName == QuestionTypes.StakeAll || ActiveQuestion?.TypeName == QuestionTypes.ForAll)
+        {
+            _buttonManager?.TryGetCommandExecutor()?.AskTextAnswer();
 
             var time = Settings.Model.FinalQuestionThinkingTime;
 
@@ -1431,8 +1437,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 ThinkingTimeMax = time;
                 RunThinkingTimer_Executed(0);
             }
-
-            return;
         }
         else
         {
@@ -1850,6 +1854,19 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         return ProcessPlayerPress(index, player);
     }
 
+    public void OnPlayerPressed(string playerName)
+    {
+        var player = Players.FirstOrDefault(p => p.Name == playerName);
+
+        if (player == null)
+        {
+            return;
+        }
+
+        var index = Players.IndexOf(player);
+        ProcessPlayerPress(index, player);
+    }
+
     private bool ProcessPlayerPress(int index, PlayerInfo player)
     {
         // The player has pressed already
@@ -1948,7 +1965,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             case QuestionState.Pressing:
                 if (Settings.Model.ShowQuestionBorder)
                 {
-                    PresentationController.SetQuestionStyle(QuestionStyle.WaitingForPress);
+                    PresentationController.BeginPressButton();
                 }
                 break;
 
@@ -1964,7 +1981,32 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    public void OnPlayerAdded(string userName) => Players.Add(new PlayerInfo { Name = userName });
+    public void OnPlayerAdded(string playerName = "")
+    {
+        var playerInfo = new PlayerInfo { Name = playerName };
+        playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
+
+        Players.Add(playerInfo);
+        PresentationController.AddPlayer(playerName);
+    }
+
+    public void OnPlayerRemoved(string playerName)
+    {
+        var player = Players.FirstOrDefault(p => p.Name == playerName);
+
+        if (player != null)
+        {
+            RemovePlayerCore(player);
+        }
+    }
+
+    private void RemovePlayerCore(PlayerInfo player)
+    {
+        player.PropertyChanged -= PlayerInfo_PropertyChanged;
+        var playerIndex = Players.IndexOf(player);
+        Players.Remove(player);
+        PresentationController.RemovePlayer(playerIndex);
+    }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -1993,11 +2035,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         UI.Execute(() => _buttonManager.Stop(), exc => OnError(exc.Message));
     }
 
-    internal void AskAnswerButton()
-    {
-        PresentationController.BeginPressButton();
-        State = QuestionState.Pressing;
-    }
+    internal void AskAnswerButton() => State = QuestionState.Pressing;
 
     internal void OnQuestionStart()
     {

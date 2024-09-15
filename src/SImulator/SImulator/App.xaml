@@ -409,7 +409,10 @@
                                             Width="Auto"
                                             HorizontalAlignment="Stretch"
                                             Height="23"
-                                            Text="{Binding Name}" />
+                                            Text="{Binding Name}"
+                                            IsReadOnly="{Binding
+                                                RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                                Path=DataContext.ManagedMode}" />
                                     </DockPanel>
                                     
                                     <ToggleButton

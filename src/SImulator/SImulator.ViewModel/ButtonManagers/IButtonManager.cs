@@ -8,6 +8,11 @@ namespace SImulator.ViewModel.ButtonManagers;
 public interface IButtonManager : IAsyncDisposable
 {
     /// <summary>
+    /// Does button manager manage player connections.
+    /// </summary>
+    bool ArePlayersManaged();
+
+    /// <summary>
     /// Enables players buttons.
     /// </summary>
     /// <returns>Has the start been successfull.</returns>

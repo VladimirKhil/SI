@@ -298,10 +298,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
             : TInfo.QuestionContentType;
     }
 
-    public void AddPlayer()
-    {
-        Players.Add(new SimplePlayerInfo());
-    }
+    public void AddPlayer(string playerName) => Players.Add(new SimplePlayerInfo { Name = playerName });
 
     public void RemovePlayer(int playerIndex)
     {
@@ -805,6 +802,10 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     public void PlayerIsRight(int playerIndex) => SetSound(_soundsSettings.AnswerRight);
 
     public void PlayerIsWrong(int playerIndex) => SetSound(_soundsSettings.AnswerWrong);
+
+    public void BeginPressButton() => SetQuestionStyle(QuestionStyle.WaitingForPress);
+
+    public void OnFinalThink() => SetSound(_soundsSettings.FinalThink);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }

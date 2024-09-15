@@ -56,7 +56,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         // TODO
     }
 
-    public void AddPlayer()
+    public void AddPlayer(string playerName)
     {
         SendMessage(new
         {
@@ -69,7 +69,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             Role = "player",
             Index = _playerCount,
             IsHuman = false,
-            Name = "",
+            Name = playerName,
             Sex = 0
         });
 
@@ -203,12 +203,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetQuestionSound(bool sound) { }
 
-    public void SetQuestionStyle(QuestionStyle questionStyle) { }
-
-    public void BeginPressButton() => SendMessage(new
-    {
-        Type = "beginPressButton"
-    });
+    public void BeginPressButton() => SendMessage(new { Type = "beginPressButton" });
 
     public void FinishQuestion() { }
 
@@ -401,10 +396,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         }
     }
 
-    public void OnFinalThink() => SendMessage(new
-    {
-        Type = "finalThink"
-    });
+    public void OnFinalThink() => SendMessage(new { Type = "finalThink" });
 
     public void UpdateSettings(Settings settings)
     {

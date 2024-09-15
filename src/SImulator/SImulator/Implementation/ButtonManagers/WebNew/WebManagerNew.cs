@@ -4,9 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.PlatformSpecific;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Utils;
 
 namespace SImulator.Implementation.ButtonManagers.WebNew;
 
@@ -16,7 +18,8 @@ namespace SImulator.Implementation.ButtonManagers.WebNew;
 public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommandExecutor
 {
     private readonly WebApplication _webApplication;
-    private readonly System.Windows.Threading.Dispatcher _dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
+
+    private string _stageName = "Before";
 
     public WebManagerNew(int port, IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
     {
@@ -44,6 +47,8 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         _webApplication.RunAsync($"http://+:{port}");
     }
 
+    public override bool ArePlayersManaged() => true;
+
     public override bool Start()
     {
         return true;
@@ -68,11 +73,29 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         Rules = GameRules.FalseStart
     };
 
-    public void AddPlayer(string userName) => _dispatcher.BeginInvoke(() => Listener.OnPlayerAdded(userName));
+    public void AddPlayer(string playerName) => UI.Execute(
+        () => Listener.OnPlayerAdded(playerName),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
+    public void RemovePlayer(string playerName) => UI.Execute(
+        () => Listener.OnPlayerRemoved(playerName),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
 
     public override ICommandExecutor? TryGetCommandExecutor() => this;
 
-    public void OnStage(string stageName) => SendMessage("STAGE", stageName);
+    public void OnStage(string stageName)
+    {
+        _stageName = stageName;
+        SendMessage("STAGE", stageName);
+    }
+
+    private void SendMessageTo(string connectionId, params string[] args)
+    {
+        var messageText = string.Join("\n", args);
+        var message = new Message { IsSystem = true, Sender = "@", Receiver = "*", Text = messageText };
+        var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
+        context.Clients.Client(connectionId).Receive(message);
+    }
 
     private void SendMessage(params string[] args)
     {
@@ -81,4 +104,16 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
         context.Clients.Group("1").Receive(message);
     }
+
+    public void OnPlayerPress(string playerName) => UI.Execute(
+        () => Listener.OnPlayerPressed(playerName),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
+    public void InformPlayer(string playerName, string connectionId)
+    {
+        SendMessageTo(connectionId, "INFO2", "1", "", "+", "+", "+", "+", playerName, "+", "+", "+", "+");
+        SendMessageTo(connectionId, "STAGE_INFO", _stageName, "", "-1");
+    }
+
+    public void AskTextAnswer() => SendMessage("ANSWER");
 }

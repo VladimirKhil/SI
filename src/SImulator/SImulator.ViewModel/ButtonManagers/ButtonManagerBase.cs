@@ -9,6 +9,8 @@ public abstract class ButtonManagerBase : IButtonManager
 
     public ButtonManagerBase(IButtonManagerListener buttonManagerListener) => Listener = buttonManagerListener;
 
+    public virtual bool ArePlayersManaged() => false;
+
     public abstract bool Start();
 
     public abstract void Stop();

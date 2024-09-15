@@ -49,13 +49,13 @@ public interface IPresentationController : IDisposable
 
     void SetQuestionContentType(QuestionContentType questionContentType);
 
-    void SetQuestionStyle(QuestionStyle questionStyle);
+    void SetQuestionStyle(QuestionStyle questionStyle) { }
 
     void OnContentStart();
 
     void SetQuestionSound(bool sound);
 
-    void AddPlayer();
+    void AddPlayer(string playerName);
 
     void RemovePlayer(int playerIndex);
 
@@ -119,7 +119,7 @@ public interface IPresentationController : IDisposable
 
     void OnQuestionStart();
 
-    void BeginPressButton() { }
+    void BeginPressButton();
 
     bool OnQuestionContent(
         IReadOnlyCollection<ContentItem> content,
@@ -148,5 +148,5 @@ public interface IPresentationController : IDisposable
 
     void NoAnswer();
 
-    void OnFinalThink() { }
+    void OnFinalThink();
 }
