@@ -3888,7 +3888,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
 
             var minimumStakeNew = (_data.Stake != -1 ? _data.Stake + ClientData.StakeStep : cost);
-            var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStake / ClientData.StakeStep) * ClientData.StakeStep;
+            var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStakeNew / ClientData.StakeStep) * ClientData.StakeStep;
 
             var stakeLimit = new StakeSettings(minimumStakeAlignedNew, _data.ActivePlayer.Sum, _data.StakeStep);
             AskToMakeStake(StakeReason.HighestPlays, _data.ActivePlayer.Name, stakeLimit);

@@ -1489,13 +1489,13 @@ public sealed class Game : Actor<GameData, GameLogic>
             _gameActions.InformStage(person); // deprecated
         }
 
-        _gameActions.InformStageInfo(person, roundIndex);
-        _gameActions.InformSums(person);
-
         if (ClientData.Stage != GameStage.Before)
         {
             _gameActions.InformRoundsNames(person);
         }
+
+        _gameActions.InformStageInfo(person, roundIndex);
+        _gameActions.InformSums(person);
 
         if (ClientData.Stage == GameStage.Round)
         {
