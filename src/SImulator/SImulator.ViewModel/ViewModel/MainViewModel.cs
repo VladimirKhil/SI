@@ -182,6 +182,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public IDisplayDescriptor[] Screens { get; private set; }
 
+    public IDisplayDescriptor CurrentScreen => Screens[Settings.ScreenNumber];
+
     public string Host => Resources.IpAddressHint;
 
     /// <summary>
@@ -248,7 +250,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 #endif
 
-        Settings.PropertyChanged += MyDefault_PropertyChanged;
+        Settings.PropertyChanged += Settings_PropertyChanged;
 
         var links = new List<LinkModel>
         {
@@ -353,7 +355,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private void MyDefault_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
@@ -364,6 +366,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             case nameof(AppSettings.PlayersView):
                 UpdatePlayersView();
+                break;
+
+            case nameof(AppSettings.ScreenNumber):
+                OnPropertyChanged(nameof(CurrentScreen));
                 break;
         }
     }
@@ -749,6 +755,14 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             case 14:
                 Settings.Sounds.FinalThink = fileUri;
+                break;
+
+            case 15:
+                Settings.Sounds.StakeForAllQuestion = fileUri;
+                break;
+
+            case 16:
+                Settings.Sounds.ForAllQuestion = fileUri;
                 break;
         }
     }

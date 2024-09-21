@@ -871,15 +871,6 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на No Risk question.
-        /// </summary>
-        public static string NoRiskQuestion {
-            get {
-                return ResourceManager.GetString("NoRiskQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Not selected.
         /// </summary>
         public static string NotSelected {
@@ -1123,6 +1114,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question For All.
+        /// </summary>
+        public static string QuestionTypeForAll {
+            get {
+                return ResourceManager.GetString("QuestionTypeForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на No Risk question.
         /// </summary>
         public static string QuestionTypeNoRisk {
@@ -1173,6 +1173,15 @@ namespace SImulator.Properties {
         public static string QuestionTypeStake {
             get {
                 return ResourceManager.GetString("QuestionTypeStake", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Stake For All question.
+        /// </summary>
+        public static string QuestionTypeStakeForAll {
+            get {
+                return ResourceManager.GetString("QuestionTypeStakeForAll", resourceCulture);
             }
         }
         
@@ -1317,15 +1326,6 @@ namespace SImulator.Properties {
         public static string SecondaryScreen {
             get {
                 return ResourceManager.GetString("SecondaryScreen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Secret question.
-        /// </summary>
-        public static string SecretQuestion {
-            get {
-                return ResourceManager.GetString("SecretQuestion", resourceCulture);
             }
         }
         
@@ -1569,15 +1569,6 @@ namespace SImulator.Properties {
         public static string Stake {
             get {
                 return ResourceManager.GetString("Stake", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Stake question.
-        /// </summary>
-        public static string StakeQuestion {
-            get {
-                return ResourceManager.GetString("StakeQuestion", resourceCulture);
             }
         }
         

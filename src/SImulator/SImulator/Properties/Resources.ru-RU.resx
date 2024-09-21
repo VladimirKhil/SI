@@ -396,9 +396,6 @@
   <data name="NoAnswer" xml:space="preserve">
     <value>Нет ответа</value>
   </data>
-  <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Вопрос без риска</value>
-  </data>
   <data name="NotSelected" xml:space="preserve">
     <value>Не выбран</value>
   </data>
@@ -480,6 +477,9 @@
   <data name="QuestionTime" xml:space="preserve">
     <value>Время вопроса (c)</value>
   </data>
+  <data name="QuestionTypeForAll" xml:space="preserve">
+    <value>Вопрос для всех</value>
+  </data>
   <data name="QuestionTypeNoRisk" xml:space="preserve">
     <value>Вопрос без риска</value>
   </data>
@@ -497,6 +497,9 @@
   </data>
   <data name="QuestionTypeStake" xml:space="preserve">
     <value>Вопрос со ставкой</value>
+  </data>
+  <data name="QuestionTypeStakeForAll" xml:space="preserve">
+    <value>Вопрос со ставкой для всех</value>
   </data>
   <data name="RecentFiles" xml:space="preserve">
     <value>Последние файлы</value>
@@ -545,9 +548,6 @@
   </data>
   <data name="SecondaryScreen" xml:space="preserve">
     <value>Дополнительный</value>
-  </data>
-  <data name="SecretQuestion" xml:space="preserve">
-    <value>Вопрос с секретом</value>
   </data>
   <data name="Select" xml:space="preserve">
     <value>Выбрать</value>
@@ -629,9 +629,6 @@
   </data>
   <data name="Stake" xml:space="preserve">
     <value>Ставка</value>
-  </data>
-  <data name="StakeQuestion" xml:space="preserve">
-    <value>Вопрос со ставкой</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Старт</value>

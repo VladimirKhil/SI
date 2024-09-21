@@ -330,6 +330,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             ["question_norisk"] = GetSoundUri(_soundsSettings.NoRiskQuestion),
             ["question_secret"] = GetSoundUri(_soundsSettings.SecretQuestion),
             ["question_stake"] = GetSoundUri(_soundsSettings.StakeQuestion),
+            ["question_stake_all"] = GetSoundUri(_soundsSettings.StakeForAllQuestion),
+            ["question_all"] = GetSoundUri(_soundsSettings.ForAllQuestion),
             ["answer_wrong"] = GetSoundUri(_soundsSettings.AnswerWrong),
             ["question_noanswers"] = GetSoundUri(_soundsSettings.NoAnswer),
         }

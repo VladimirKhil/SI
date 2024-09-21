@@ -762,6 +762,23 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
 
         SetStage(TableStage.Special);
+
+        switch (typeName)
+        {
+            case QuestionTypes.Secret:
+            case QuestionTypes.SecretPublicPrice:
+            case QuestionTypes.SecretNoQuestion:
+                SetSound(_soundsSettings.SecretQuestion);
+                break;
+
+            case QuestionTypes.Stake:
+                SetSound(_soundsSettings.StakeQuestion);
+                break;
+
+            case QuestionTypes.NoRisk:
+                SetSound(_soundsSettings.NoRiskQuestion);
+                break;
+        }
     }
 
     public void SetSimpleAnswer()

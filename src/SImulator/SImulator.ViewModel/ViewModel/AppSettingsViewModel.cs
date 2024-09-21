@@ -56,8 +56,6 @@ public sealed class AppSettingsViewModel
             Model.ShowPlayers = defaultSettings.ShowPlayers;
             Model.ShowTableCaption= defaultSettings.ShowTableCaption;
             Model.ShowTextNoFalstart = defaultSettings.ShowTextNoFalstart;
-
-            currentSettings.Model.ShowScore = defaultUISettings.ShowScore;
         }
 
         if (rules)
@@ -100,6 +98,8 @@ public sealed class AppSettingsViewModel
             Model.Sounds.NoRiskQuestion = defaultSettings.Sounds.NoRiskQuestion;
             Model.Sounds.SecretQuestion = defaultSettings.Sounds.SecretQuestion;
             Model.Sounds.StakeQuestion = defaultSettings.Sounds.StakeQuestion;
+            Model.Sounds.StakeForAllQuestion = defaultSettings.Sounds.StakeForAllQuestion;
+            Model.Sounds.ForAllQuestion = defaultSettings.Sounds.ForAllQuestion;
             Model.Sounds.AnswerRight = defaultSettings.Sounds.AnswerRight;
             Model.Sounds.AnswerWrong = defaultSettings.Sounds.AnswerWrong;
             Model.Sounds.NoAnswer = defaultSettings.Sounds.NoAnswer;

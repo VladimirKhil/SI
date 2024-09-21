@@ -223,6 +223,33 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question For All.
+        /// </summary>
+        internal static string QuestionTypeForAll {
+            get {
+                return ResourceManager.GetString("QuestionTypeForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Question with Button.
+        /// </summary>
+        internal static string QuestionTypeSimple {
+            get {
+                return ResourceManager.GetString("QuestionTypeSimple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Stake For All question.
+        /// </summary>
+        internal static string QuestionTypeStakeForAll {
+            get {
+                return ResourceManager.GetString("QuestionTypeStakeForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         internal static string Round {

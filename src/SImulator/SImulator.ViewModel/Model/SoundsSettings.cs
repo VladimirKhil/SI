@@ -29,9 +29,17 @@ public sealed class SoundsSettings : INotifyPropertyChanged
     private string _stakeQuestion = "question_stake.mp3";
     public string StakeQuestion { get => _stakeQuestion; set { _stakeQuestion = value; OnPropertyChanged(); } }
 
+    private string _stakeForAllQuestion = "question_stake_all.mp3";
+
+    public string StakeForAllQuestion { get => _stakeForAllQuestion; set { _stakeForAllQuestion = value; OnPropertyChanged(); } }
+
     private string _noRiskQuestion = "question_norisk.mp3";
     public string NoRiskQuestion { get => _noRiskQuestion; set { _noRiskQuestion = value; OnPropertyChanged(); } }
 
+    private string _forAllQuestion = "question_all.mp3";
+
+    public string ForAllQuestion { get => _forAllQuestion; set { _forAllQuestion = value; OnPropertyChanged(); } }
+    
     private string _answerRight = "applause_small.mp3";
     public string AnswerRight { get => _answerRight; set { _answerRight = value; OnPropertyChanged(); } }
 

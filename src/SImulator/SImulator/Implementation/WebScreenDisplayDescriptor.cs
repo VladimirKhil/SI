@@ -18,6 +18,8 @@ public sealed class WebScreenDisplayDescriptor : IDisplayDescriptor
 
     public bool IsWebView => true;
 
+    public bool IsCustomizable => false;
+
     /// <summary>
     /// Initializes a new instance if <see cref="WebScreenDisplayDescriptor" />.
     /// </summary>

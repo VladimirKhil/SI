@@ -171,6 +171,15 @@
   <data name="PressTheButton" xml:space="preserve">
     <value>Press the button</value>
   </data>
+  <data name="QuestionTypeForAll" xml:space="preserve">
+    <value>Question For All</value>
+  </data>
+  <data name="QuestionTypeSimple" xml:space="preserve">
+    <value>Question with Button</value>
+  </data>
+  <data name="QuestionTypeStakeForAll" xml:space="preserve">
+    <value>Stake For All question</value>
+  </data>
   <data name="Round" xml:space="preserve">
     <value>Round</value>
   </data>

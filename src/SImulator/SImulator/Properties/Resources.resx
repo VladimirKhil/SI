@@ -395,9 +395,6 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   <data name="NoAnswer" xml:space="preserve">
     <value>No answer</value>
   </data>
-  <data name="NoRiskQuestion" xml:space="preserve">
-    <value>No Risk question</value>
-  </data>
   <data name="NotSelected" xml:space="preserve">
     <value>Not selected</value>
   </data>
@@ -479,6 +476,9 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   <data name="QuestionTime" xml:space="preserve">
     <value>Question time (s)</value>
   </data>
+  <data name="QuestionTypeForAll" xml:space="preserve">
+    <value>Question For All</value>
+  </data>
   <data name="QuestionTypeNoRisk" xml:space="preserve">
     <value>No Risk question</value>
   </data>
@@ -496,6 +496,9 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   </data>
   <data name="QuestionTypeStake" xml:space="preserve">
     <value>Stake question</value>
+  </data>
+  <data name="QuestionTypeStakeForAll" xml:space="preserve">
+    <value>Stake For All question</value>
   </data>
   <data name="RecentFiles" xml:space="preserve">
     <value>Recent files</value>
@@ -544,9 +547,6 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   </data>
   <data name="SecondaryScreen" xml:space="preserve">
     <value>Additional</value>
-  </data>
-  <data name="SecretQuestion" xml:space="preserve">
-    <value>Secret question</value>
   </data>
   <data name="Select" xml:space="preserve">
     <value>Select</value>
@@ -628,9 +628,6 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   </data>
   <data name="Stake" xml:space="preserve">
     <value>Stake</value>
-  </data>
-  <data name="StakeQuestion" xml:space="preserve">
-    <value>Stake question</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>

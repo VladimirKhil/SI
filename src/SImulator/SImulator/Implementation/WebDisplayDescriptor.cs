@@ -13,4 +13,6 @@ internal sealed class WebDisplayDescriptor : IDisplayDescriptor
     public bool IsFullScreen => false;
 
     public bool IsWebView => true;
+
+    public bool IsCustomizable => false;
 }

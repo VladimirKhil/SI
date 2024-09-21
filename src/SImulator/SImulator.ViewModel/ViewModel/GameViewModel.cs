@@ -1273,18 +1273,33 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             case QuestionTypes.Secret:
             case QuestionTypes.SecretPublicPrice:
             case QuestionTypes.SecretNoQuestion:
-                SetSound(Settings.Model.Sounds.SecretQuestion);
                 PrintQuestionType(typeName, Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias, -1);
                 break;
 
             case QuestionTypes.Stake:
-                SetSound(Settings.Model.Sounds.StakeQuestion);
                 PrintQuestionType(typeName, Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias, ActiveRound.Themes.IndexOf(ActiveTheme));
                 break;
 
             case QuestionTypes.NoRisk:
-                SetSound(Settings.Model.Sounds.NoRiskQuestion);
                 PrintQuestionType(typeName, Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias, -1);
+                break;
+
+            case QuestionTypes.Simple:
+                if (!isDefault)
+                {
+                    PrintQuestionType(typeName, Resources.QuestionTypeSimple.ToUpper(), "", -1);
+                }
+                break;
+
+            case QuestionTypes.StakeAll:
+                if (!isDefault)
+                {
+                    PrintQuestionType(typeName, Resources.QuestionTypeStakeForAll.ToUpper(), "", -1);
+                }
+                break;
+
+            case QuestionTypes.ForAll:
+                PrintQuestionType(typeName, Resources.QuestionTypeForAll.ToUpper(), "", -1);
                 break;
 
             default:

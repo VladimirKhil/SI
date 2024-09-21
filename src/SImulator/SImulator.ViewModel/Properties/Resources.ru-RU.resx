@@ -171,6 +171,15 @@
   <data name="PressTheButton" xml:space="preserve">
     <value>Нажмите на кнопку</value>
   </data>
+  <data name="QuestionTypeForAll" xml:space="preserve">
+    <value>Вопрос для всех</value>
+  </data>
+  <data name="QuestionTypeSimple" xml:space="preserve">
+    <value>Вопрос с кнопкой</value>
+  </data>
+  <data name="QuestionTypeStakeForAll" xml:space="preserve">
+    <value>Вопрос со ставкой для всех</value>
+  </data>
   <data name="Round" xml:space="preserve">
     <value>Раунд</value>
   </data>

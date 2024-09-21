@@ -19,4 +19,9 @@ public interface IDisplayDescriptor
     /// Should the screen display a web UI.
     /// </summary>
     bool IsWebView => false;
+
+    /// <summary>
+    /// Can the screen be customized.
+    /// </summary>
+    bool IsCustomizable => true;
 }
