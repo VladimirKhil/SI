@@ -122,6 +122,27 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private const int QuestionReadingSpeedDefaultValue = 20;
+
+    private int _questionReadingSpeed = QuestionReadingSpeedDefaultValue;
+
+    /// <summary>
+    /// Question reading speed.
+    /// </summary>
+    [DefaultValue(QuestionReadingSpeedDefaultValue)]
+    public int QuestionReadingSpeed
+    {
+        get => _questionReadingSpeed;
+        set
+        {
+            if (_questionReadingSpeed != value && value > 0)
+            {
+                _questionReadingSpeed = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private int _screenNumber = 0;
 
     [DefaultValue(0)]

@@ -210,6 +210,9 @@
   <data name="ByDefault" xml:space="preserve">
     <value>Default</value>
   </data>
+  <data name="CharactersPerSecond" xml:space="preserve">
+    <value>characters per second</value>
+  </data>
   <data name="ChoosePlayerToAnswer" xml:space="preserve">
     <value>Select a player to answer</value>
   </data>
@@ -470,11 +473,14 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   <data name="QuestionLineSpacing" xml:space="preserve">
     <value>Line spacing in question</value>
   </data>
+  <data name="QuestionReadingSpeed" xml:space="preserve">
+    <value>Question reading speed</value>
+  </data>
   <data name="QuestionSelection" xml:space="preserve">
     <value>Question selection</value>
   </data>
   <data name="QuestionTime" xml:space="preserve">
-    <value>Question time (s)</value>
+    <value>Button press time (s)</value>
   </data>
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>Question For All</value>

@@ -59,22 +59,30 @@ public sealed class AppSettingsViewModel
         }
 
         if (rules)
-        {
+        {            
+            Model.GameMode = defaultSettings.GameMode;
+
+            Model.RoundTime = defaultSettings.RoundTime;
+            Model.ThinkingTime = defaultSettings.ThinkingTime;
+            Model.ThinkingTime2 = defaultSettings.ThinkingTime2;
+            Model.SpecialQuestionThinkingTime = defaultSettings.SpecialQuestionThinkingTime;
+            Model.FinalQuestionThinkingTime = defaultSettings.FinalQuestionThinkingTime;
+            Model.QuestionReadingSpeed = defaultSettings.QuestionReadingSpeed;
+            
             Model.BlockingTime = defaultSettings.BlockingTime;
+            Model.PlayersView = defaultSettings.PlayersView;
+
             Model.DropStatsOnBack = defaultSettings.DropStatsOnBack;
             Model.FalseStart = defaultSettings.FalseStart;
             Model.EndQuestionOnRightAnswer = defaultSettings.EndQuestionOnRightAnswer;
-            Model.RoundTime = defaultSettings.RoundTime;
             Model.SignalsAfterTimer = defaultSettings.SignalsAfterTimer;
-            Model.ThinkingTime = defaultSettings.ThinkingTime;
             Model.UsePlayersKeys = defaultSettings.UsePlayersKeys;
-            Model.PlayersView = defaultSettings.PlayersView;
-            Model.SaveLogs = defaultSettings.SaveLogs;
-            Model.AutomaticGame = defaultSettings.AutomaticGame;
             Model.SubstractOnWrong = defaultSettings.SubstractOnWrong;
             Model.PlaySpecials = defaultSettings.PlaySpecials;
             Model.FalseStartMultimedia = defaultSettings.FalseStartMultimedia;
-            Model.GameMode = defaultSettings.GameMode;
+
+            Model.SaveLogs = defaultSettings.SaveLogs;
+            Model.AutomaticGame = defaultSettings.AutomaticGame;
 
             Model.SpecialsAliases.StakeQuestionAlias = defaultSettings.SpecialsAliases.StakeQuestionAlias;
             Model.SpecialsAliases.SecretQuestionAlias = defaultSettings.SpecialsAliases.SecretQuestionAlias;

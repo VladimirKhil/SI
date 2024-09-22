@@ -24,4 +24,6 @@ public interface IButtonManagerListener
     void OnPlayerAdded(string playerName) { }
 
     void OnPlayerRemoved(string playerName) { }
+
+    void OnPlayerAnswered(string playerName, string answer) { }
 }

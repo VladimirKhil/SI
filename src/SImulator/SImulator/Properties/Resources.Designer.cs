@@ -340,6 +340,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на characters per second.
+        /// </summary>
+        public static string CharactersPerSecond {
+            get {
+                return ResourceManager.GetString("CharactersPerSecond", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Select a player to answer.
         /// </summary>
         public static string ChoosePlayerToAnswer {
@@ -1096,6 +1105,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question reading speed.
+        /// </summary>
+        public static string QuestionReadingSpeed {
+            get {
+                return ResourceManager.GetString("QuestionReadingSpeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Question selection.
         /// </summary>
         public static string QuestionSelection {
@@ -1105,7 +1123,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Question time (s).
+        ///   Ищет локализованную строку, похожую на Button press time (s).
         /// </summary>
         public static string QuestionTime {
             get {

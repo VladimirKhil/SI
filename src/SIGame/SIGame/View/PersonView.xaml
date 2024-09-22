@@ -11,6 +11,7 @@
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
     xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     xmlns:uwb="clr-namespace:Utils.Wpf.Behaviors;assembly=Utils.Wpf"
+    xmlns:vmm="clr-namespace:SIGame.ViewModel.Models;assembly=SIGame.ViewModel"
     mc:Ignorable="d"
     Name="root"
     d:DesignHeight="300"
@@ -48,7 +49,9 @@
                                         </DataTemplate>
                                     </Setter.Value>
                                 </Setter>
-                                
+
+                                <Setter Property="Visibility" Value="Collapsed" />
+
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasVideoAvatar}" Value="False">
                                         <Setter Property="ContentTemplate">
@@ -56,6 +59,12 @@
                                                 <DataTemplate />
                                             </Setter.Value>
                                         </Setter>
+                                    </DataTrigger>
+
+                                    <DataTrigger
+                                        Binding="{Binding DataContext.DialogMode, RelativeSource={RelativeSource AncestorType=Grid, AncestorLevel=3}}"
+                                        Value="{x:Static vmm:DialogModes.None}">
+                                        <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
 
                                     <DataTrigger

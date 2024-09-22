@@ -51,11 +51,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         _soundsSettings = soundsSettings;
     }
 
-    public void AddLostButtonPlayerIndex(int playerIndex)
-    {
-        // TODO
-    }
-
     public void AddPlayer(string playerName)
     {
         SendMessage(new
@@ -534,6 +529,12 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Language = language
     });
 
+    public void SetReadingSpeed(int readingSpeed) => SendMessage(new
+    {
+        Type = "setReadingSpeed",
+        ReadingSpeed = readingSpeed
+    });
+
     public void SetSimpleAnswer() => _isAnswerSimple = true;
 
     public void OnAnswerStart() => _isAnswer = true;
@@ -566,6 +567,12 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Type = "person",
         PlayerIndex = playerIndex,
         IsRight = false
+    });
+
+    public void AddLostButtonPlayerIndex(int playerIndex) => SendMessage(new
+    {
+        Type = "wrongTry",
+        PlayerIndex = playerIndex
     });
 
     public void OnMessage(string message)

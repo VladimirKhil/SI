@@ -1365,7 +1365,7 @@
                 </ComboBox>
                 
                 <UniformGrid Columns="2" Margin="0,0,4,0">
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RoundTime}" />
                         
                         <TextBox
@@ -1376,7 +1376,7 @@
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionTime}" />
 
                         <TextBox
@@ -1387,7 +1387,7 @@
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ThinkingTime}" TextWrapping="Wrap" />
 
                         <TextBox
@@ -1398,7 +1398,7 @@
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.SpecialThinkingTime}" TextWrapping="Wrap" />
 
                         <TextBox
@@ -1409,7 +1409,7 @@
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FinalThinkingTime}" />
 
                         <TextBox
@@ -1417,6 +1417,19 @@
                             HorizontalAlignment="Stretch"
                             lb:NumericBehavior.IsAttached="True"
                             Text="{Binding Settings.FinalQuestionThinkingTime}"
+                            IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
+                        <TextBlock Style="{StaticResource Header}" TextWrapping="Wrap">
+                            <Run Text="{x:Static lp:Resources.QuestionReadingSpeed}" /> <Run Text="(" /><Run Text="{x:Static lp:Resources.CharactersPerSecond}" /><Run Text=")" />
+                        </TextBlock>
+
+                        <TextBox
+                            Width="Auto"
+                            HorizontalAlignment="Stretch"
+                            lb:NumericBehavior.IsAttached="True"
+                            Text="{Binding Settings.QuestionReadingSpeed}"
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
                 </UniformGrid>

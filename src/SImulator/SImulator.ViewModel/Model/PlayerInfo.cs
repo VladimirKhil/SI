@@ -58,4 +58,15 @@ public sealed class PlayerInfo : SimplePlayerInfo
         get => _waitForRegistration;
         set { if (_waitForRegistration != value) { _waitForRegistration = value; OnPropertyChanged(); } }
     }
+
+    private string _answer = string.Empty;
+
+    /// <summary>
+    /// Player text answer.
+    /// </summary>
+    public string Answer
+    {
+        get => _answer;
+        set { if (_answer != value) { _answer = value; OnPropertyChanged(); } }
+    }
 }

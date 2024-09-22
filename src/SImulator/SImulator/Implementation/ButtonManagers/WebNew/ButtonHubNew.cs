@@ -66,7 +66,7 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
                 }
 
                 var answer = args[1];
-                // TODO: accept player's answer
+                _gameRepository.OnPlayerAnswer(playerName, answer);
                 break;
 
             case "I":

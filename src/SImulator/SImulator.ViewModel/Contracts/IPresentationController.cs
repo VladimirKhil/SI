@@ -132,6 +132,8 @@ public interface IPresentationController : IDisposable
     
     void SetLanguage(string language) { }
 
+    void SetReadingSpeed(int readingSpeed) { }
+
     void SetAppSound(bool isEnabled);
 
     void SetSimpleAnswer() { }

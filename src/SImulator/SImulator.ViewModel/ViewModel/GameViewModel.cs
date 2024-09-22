@@ -9,6 +9,7 @@ using SImulator.ViewModel.Properties;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
+using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -665,6 +666,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         {
             PresentationController.SetAppSound(settings.PlaySounds);
         }
+        else if (e.PropertyName == nameof(AppSettings.QuestionReadingSpeed))
+        {
+            PresentationController.SetReadingSpeed(settings.QuestionReadingSpeed);
+        }
     }
 
     private async void Engine_QuestionPostInfo()
@@ -1170,6 +1175,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
+        PresentationController.SetReadingSpeed(Settings.Model.QuestionReadingSpeed);
         PresentationController.SetAppSound(Settings.Model.PlaySounds);
         PresentationController.UpdateSettings(Settings.SIUISettings.Model);
         PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
@@ -1880,6 +1886,18 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         var index = Players.IndexOf(player);
         ProcessPlayerPress(index, player);
+    }
+
+    public void OnPlayerAnswered(string playerName, string answer)
+    {
+        var player = Players.FirstOrDefault(p => p.Name == playerName);
+
+        if (player == null)
+        {
+            return;
+        }
+
+        player.Answer = answer;
     }
 
     private bool ProcessPlayerPress(int index, PlayerInfo player)

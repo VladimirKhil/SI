@@ -210,6 +210,9 @@
   <data name="ByDefault" xml:space="preserve">
     <value>По умолчанию</value>
   </data>
+  <data name="CharactersPerSecond" xml:space="preserve">
+    <value>символов в секунду</value>
+  </data>
   <data name="ChoosePlayerToAnswer" xml:space="preserve">
     <value>Выберите игрока для ответа</value>
   </data>
@@ -471,11 +474,14 @@
   <data name="QuestionLineSpacing" xml:space="preserve">
     <value>Межстрочный интервал в вопросе</value>
   </data>
+  <data name="QuestionReadingSpeed" xml:space="preserve">
+    <value>Скорость чтения вопроса</value>
+  </data>
   <data name="QuestionSelection" xml:space="preserve">
     <value>Выбор вопроса</value>
   </data>
   <data name="QuestionTime" xml:space="preserve">
-    <value>Время вопроса (c)</value>
+    <value>Время на нажатие кнопки (c)</value>
   </data>
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>Вопрос для всех</value>
