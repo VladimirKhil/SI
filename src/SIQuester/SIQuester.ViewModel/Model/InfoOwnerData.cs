@@ -168,11 +168,10 @@ public sealed class InfoOwnerData
 
             var targetCollection = contentItem.Type switch
             {
-                AtomTypes.Image => Images,
-                AtomTypes.Audio => Audio,
-                AtomTypes.AudioNew => Audio,
-                AtomTypes.Video => Video,
-                AtomTypes.Html => Html,
+                ContentTypes.Image => Images,
+                ContentTypes.Audio => Audio,
+                ContentTypes.Video => Video,
+                ContentTypes.Html => Html,
                 _ => null,
             };
 

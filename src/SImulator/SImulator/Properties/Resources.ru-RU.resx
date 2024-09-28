@@ -426,6 +426,9 @@
   <data name="PlacementOral" xml:space="preserve">
     <value>Реплика</value>
   </data>
+  <data name="PlayContent" xml:space="preserve">
+    <value>Играть элемент</value>
+  </data>
   <data name="Players" xml:space="preserve">
     <value>Игроки</value>
   </data>

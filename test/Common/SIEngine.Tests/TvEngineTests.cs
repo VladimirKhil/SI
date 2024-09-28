@@ -36,8 +36,11 @@ internal sealed class TvEngineTests
 
         engineHandler.SelectQuestion?.Invoke(0, 0);
 
-        Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
+        Assert.That(engine.Stage, Is.EqualTo(GameStage.QuestionType));
 
+        AssertMove(engine, GameStage.Question);
+        AssertMove(engine, GameStage.Question);
+        AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.EndQuestion);
@@ -45,8 +48,10 @@ internal sealed class TvEngineTests
 
         engineHandler.SelectQuestion?.Invoke(0, 1);
 
-        Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
+        Assert.That(engine.Stage, Is.EqualTo(GameStage.QuestionType));
 
+        AssertMove(engine, GameStage.Question);
+        AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.EndQuestion);
@@ -54,8 +59,10 @@ internal sealed class TvEngineTests
 
         engineHandler.SelectQuestion?.Invoke(0, 2);
 
-        Assert.That(engine.Stage, Is.EqualTo(GameStage.Question));
+        Assert.That(engine.Stage, Is.EqualTo(GameStage.QuestionType));
 
+        AssertMove(engine, GameStage.Question);
+        AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.EndQuestion);
@@ -76,26 +83,45 @@ internal sealed class TvEngineTests
 
         var question = new Question();
         theme.Questions.Add(question);
-
-        question.Scenario.Add(new Atom { Type = AtomTypes.Text, Text = "question" });
-        question.Scenario.Add(new Atom { Type = AtomTypes.Marker });
-        question.Scenario.Add(new Atom { Type = AtomTypes.Audio, Text = "audio.mp3", AtomTime = 10 });
+        
+        SetQuestionPart(question, new ContentItem() { Type = ContentTypes.Text, Value = "question" });
+        SetAnswerPart(question, new ContentItem() { Type = ContentTypes.Audio, Value = "audio.mp3", Duration = TimeSpan.FromSeconds(10) });
 
         var question2 = new Question();
         theme.Questions.Add(question2);
 
-        question2.Scenario.Add(new Atom { Type = AtomTypes.Text, Text = "question" });
+        SetQuestionPart(question2, new ContentItem() { Type = ContentTypes.Text, Value = "question" });
         question2.Right.Add("right");
 
         var question3 = new Question();
         theme.Questions.Add(question3);
-
-        question3.Scenario.Add(new Atom { Type = AtomTypes.Text, Text = "question" });
-        question3.Scenario.Add(new Atom { Type = AtomTypes.Marker });
-        question3.Scenario.Add(new Atom { Type = AtomTypes.Audio, Text = "audio.mp3", AtomTime = 10 });
-        question3.Scenario.Add(new Atom { Type = AtomTypes.Text, Text = "answer" });
+        
+        SetQuestionPart(question3, new ContentItem() { Type = ContentTypes.Text, Value = "question" });
+        
+        SetAnswerPart(
+            question,
+            new ContentItem() { Type = ContentTypes.Audio, Value = "audio.mp3", Duration = TimeSpan.FromSeconds(10) },
+            new ContentItem() { Type = ContentTypes.Text, Value = "answer" });
 
         return document;
+    }
+
+    private static void SetQuestionPart(Question question, params ContentItem[] contentItems)
+    {
+        question.Parameters[QuestionParameterNames.Question] = new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue = new List<ContentItem>(contentItems)
+        };
+    }
+
+    private static void SetAnswerPart(Question question, params ContentItem[] contentItems)
+    {
+        question.Parameters[QuestionParameterNames.Answer] = new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue = new List<ContentItem>(contentItems)
+        };
     }
 
     private static void AssertMove(ISIEngine engine, GameStage stage)

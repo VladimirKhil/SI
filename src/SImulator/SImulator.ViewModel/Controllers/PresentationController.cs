@@ -41,6 +41,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     private readonly IAnimatableTimer _animatableTimer = PlatformManager.Instance.CreateAnimatableTimer();
 
+    public bool CanControlMedia => true;
+
     private IPresentationListener? _listener;
 
     internal IPresentationListener? Listener

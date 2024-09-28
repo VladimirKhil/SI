@@ -202,7 +202,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public void OnQuestionStart(bool buttonsRequired) { }
 
-    public void OnContentStart(IEnumerable<ContentItem> contentItems) { }
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback) { }
 
     public void OnSimpleRightAnswerStart() { }
 

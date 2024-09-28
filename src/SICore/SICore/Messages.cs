@@ -613,6 +613,11 @@ public static class Messages
     public const string Unbanned = "UNBANNED";
 
     /// <summary>
+    /// Defines a user-level error.
+    /// </summary>
+    public const string UserError = "USER_ERROR";
+
+    /// <summary>
     /// Необходимо провалидировать ответ игрока
     /// </summary>
     public const string Validation = "VALIDATION";

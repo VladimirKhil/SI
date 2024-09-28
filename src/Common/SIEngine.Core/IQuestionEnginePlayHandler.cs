@@ -75,7 +75,8 @@ public interface IQuestionEnginePlayHandler
     /// Handles content start.
     /// </summary>
     /// <param name="contentItems">Content items that would be played.</param>
-    void OnContentStart(IEnumerable<ContentItem> contentItems);
+    /// <param name="moveToContentCallback">Callback that allows to move play to specific content by index.</param>
+    void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback);
 
     /// <summary>
     /// Handles simple right answer start.

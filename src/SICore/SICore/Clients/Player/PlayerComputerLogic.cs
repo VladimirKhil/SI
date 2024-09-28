@@ -1973,11 +1973,7 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
         }
     }
 
-
-    public void OnChoice(string[] mparams)
-    {
-        _themeQuestionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;
-    }
+    public void OnChoice(string[] mparams) => _themeQuestionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;
 
     private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
 }

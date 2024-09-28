@@ -18,7 +18,7 @@ public sealed class QuestionType : Named, IEquatable<QuestionType>
     /// <summary>
     /// Type parameters specifying this type.
     /// </summary>
-    public List<QuestionTypeParam> Params => _parameters;
+    internal List<QuestionTypeParam> Params => _parameters;
 
     /// <summary>
     /// Initializes a new instance of <see cref="QuestionType" /> class.

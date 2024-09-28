@@ -44,6 +44,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private int _playerCount;
     private readonly SoundsSettings _soundsSettings;
 
+    public bool CanControlMedia => false;
+
     public WebPresentationController(IDisplayDescriptor displayDescriptor, IPresentationListener presentationListener, SoundsSettings soundsSettings)
     {
         _displayDescriptor = displayDescriptor;
@@ -533,6 +535,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     {
         Type = "setReadingSpeed",
         ReadingSpeed = readingSpeed
+    });
+
+    public void SetPause(bool pause) => SendMessage(new
+    {
+        Type = "pause",
+        IsPaused = pause,
+        CurrentTime = new int[] { 0, 0, 0 }
     });
 
     public void SetSimpleAnswer() => _isAnswerSimple = true;

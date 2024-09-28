@@ -47,7 +47,7 @@ public sealed class FalseStartHelperTests
                 Type = StepParameterTypes.Content,
                 ContentValue = new List<ContentItem>
                 {
-                    new ContentItem { Type = AtomTypes.Text, Value = "question text" }
+                    new ContentItem { Type = ContentTypes.Text, Value = "question text" }
                 }
             });
 
@@ -60,7 +60,7 @@ public sealed class FalseStartHelperTests
                 Type = StepParameterTypes.Content,
                 ContentValue = new List<ContentItem>
                 {
-                    new ContentItem { Type = AtomTypes.Audio, Value = "http://fake-audio-link" }
+                    new ContentItem { Type = ContentTypes.Audio, Value = "http://fake-audio-link" }
                 }
             });
 
@@ -76,7 +76,7 @@ public sealed class FalseStartHelperTests
                 Type = StepParameterTypes.Content,
                 ContentValue = new List<ContentItem>
                 {
-                    new ContentItem { Type = AtomTypes.Text, Value = "question answer" }
+                    new ContentItem { Type = ContentTypes.Text, Value = "question answer" }
                 }
             });
 

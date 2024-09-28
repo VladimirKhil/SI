@@ -25,26 +25,24 @@ internal sealed class QuestionTests
                                 Type = StepParameterTypes.Content,
                                 ContentValue = new List<ContentItem>
                                 {
-                                    new ContentItem { Type = AtomTypes.Text, Value = "item text" }
+                                    new() { Type = ContentTypes.Text, Value = "item text" }
                                 }
                             }
                         }
                     }
                 }
-            },
-            Parameters = new StepParameters
+            }
+        };
+
+        question.Parameters["test"] = new StepParameter
+        {
+            Type = StepParameterTypes.Group,
+            GroupValue = new StepParameters
             {
-                ["test"] = new StepParameter
+                ["inner"] = new StepParameter
                 {
-                    Type = StepParameterTypes.Group,
-                    GroupValue = new StepParameters
-                    {
-                        ["inner"] = new StepParameter
-                        {
-                            Type = StepParameterTypes.Simple,
-                            SimpleValue = "value"
-                        }
-                    }
+                    Type = StepParameterTypes.Simple,
+                    SimpleValue = "value"
                 }
             }
         };
@@ -95,19 +93,6 @@ internal sealed class QuestionTests
     }
 
     [Test]
-    public void GetText_Scenario_Ok()
-    {
-        var question = new Question();
-
-        question.Scenario.Add("first part");
-        question.Scenario.Add("second part");
-
-        var text = question.GetText();
-
-        Assert.That(text, Is.EqualTo("first part\nsecond part"));
-    }
-
-    [Test]
     public void GetText_Script_Ok()
     {
         var question = new Question
@@ -126,8 +111,8 @@ internal sealed class QuestionTests
                                 Type = StepParameterTypes.Content,
                                 ContentValue = new List<ContentItem>
                                 {
-                                    new ContentItem { Type = AtomTypes.Text, Value = "item text" },
-                                     new ContentItem { Type = AtomTypes.Text, Value = "item text 2" }
+                                    new() { Type = ContentTypes.Text, Value = "item text" },
+                                    new() { Type = ContentTypes.Text, Value = "item text 2" }
                                 }
                             }
                         }
@@ -147,19 +132,17 @@ internal sealed class QuestionTests
     {
         var question = new Question
         {
-            Parameters = new StepParameters
-            {
-                [QuestionParameterNames.Question] = new StepParameter
-                {
-                    Type = StepParameterTypes.Content,
-                    ContentValue = new List<ContentItem>
-                    {
-                        new ContentItem { Type = AtomTypes.Text, Value = "item text" },
-                            new ContentItem { Type = AtomTypes.Text, Value = "item text 2" }
-                    }
-                }
-            },
             TypeName = "test"
+        };
+
+        question.Parameters[QuestionParameterNames.Question] = new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue = new List<ContentItem>
+            {
+                new() { Type = ContentTypes.Text, Value = "item text" },
+                new() { Type = ContentTypes.Text, Value = "item text 2" }
+            }
         };
 
         var text = question.GetText();

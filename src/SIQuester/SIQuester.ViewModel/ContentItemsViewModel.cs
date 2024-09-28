@@ -408,11 +408,6 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         var media = data.Item1;
         var contentType = data.Item2.ToString() ?? "";
 
-        if (contentType == AtomTypes.Audio)
-        {
-            contentType = ContentTypes.Audio;
-        }
-
         try
         {
             if (media is MediaItemViewModel file)

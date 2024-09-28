@@ -1,7 +1,7 @@
 ﻿using SIPackages.Core;
+using SIPackages.Exceptions;
 using SIPackages.Helpers;
 using SIPackages.Models;
-using SIPackages.Properties;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml;
@@ -227,7 +227,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     public List<Round> Rounds { get; } = new List<Round>();
 
     /// <inheritdoc />
-    public override string ToString() => $"{Resources.Package}: {Name}";
+    public override string ToString() => Name;
 
     /// <summary>
     /// Creates a new round.
@@ -257,7 +257,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
         {
             if (version > MaximumSupportedVersion)
             {
-                throw new InvalidOperationException(string.Format(Resources.UnsupportedVersion, version, MaximumSupportedVersion));
+                throw new UnsupportedPackageVersionException(version, MaximumSupportedVersion);
             }
 
             _version = version;

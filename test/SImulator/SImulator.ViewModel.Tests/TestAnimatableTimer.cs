@@ -4,7 +4,7 @@ namespace SImulator.ViewModel.Tests;
 
 internal sealed class TestAnimatableTimer : IAnimatableTimer
 {
-    public int MaxTime { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public int MaxTime { get; set; }
 
     public double Time => throw new NotImplementedException();
 
@@ -24,10 +24,7 @@ internal sealed class TestAnimatableTimer : IAnimatableTimer
         throw new NotImplementedException();
     }
 
-    public void Run(int maxTime, bool byUser, double? fromValue = null)
-    {
-        throw new NotImplementedException();
-    }
+    public void Run(int maxTime, bool byUser, double? fromValue = null) { }
 
     public void Stop()
     {

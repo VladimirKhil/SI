@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SIPackages;
+using SIPackages.Exceptions;
 using SIQuester.Model;
 using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
@@ -657,6 +658,12 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     public static void ShowError(Exception exc, string? message = null)
     {
+        if (exc is UnsupportedPackageVersionException ex)
+        {
+            PlatformManager.Instance.ShowExclamationMessage(string.Format(Resources.UnsupportedVersion, ex.ActualVersion, ex.MaximumSupportedVersion));
+            return;
+        }
+
         var fullMessage = message != null ? $"{message}: {exc.Message}" : exc.Message;
 
         if (fullMessage.Length > MaxMessageLength)

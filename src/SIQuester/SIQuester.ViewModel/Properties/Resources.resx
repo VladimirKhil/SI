@@ -138,6 +138,9 @@
   <data name="Answer" xml:space="preserve">
     <value>Answer</value>
   </data>
+  <data name="Audio" xml:space="preserve">
+    <value>Audio</value>
+  </data>
   <data name="AudioIsNotOnBackground" xml:space="preserve">
     <value>Audio file {0} is not set as a background</value>
   </data>
@@ -331,8 +334,14 @@ Humor</value>
   <data name="HowToUseApp" xml:space="preserve">
     <value>How to use the program</value>
   </data>
+  <data name="Html" xml:space="preserve">
+    <value>HTML</value>
+  </data>
   <data name="HtmlFiles" xml:space="preserve">
     <value>HTML Files</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>Image</value>
   </data>
   <data name="Images" xml:space="preserve">
     <value>Images</value>
@@ -465,6 +474,9 @@ Humor</value>
   </data>
   <data name="OtherTypeQuestion" xml:space="preserve">
     <value>Other</value>
+  </data>
+  <data name="Package" xml:space="preserve">
+    <value>Package</value>
   </data>
   <data name="PackageClassicDescription" xml:space="preserve">
     <value>The same package as in the SIGame TV analogue</value>
@@ -719,11 +731,17 @@ theme - Cat's theme</value>
   <data name="UnsupportedFragment" xml:space="preserve">
     <value>Unsupported fragment: {0}</value>
   </data>
+  <data name="UnsupportedVersion" xml:space="preserve">
+    <value>Package version {0} is not supported. Maximum supported version is {1}</value>
+  </data>
   <data name="Untitled" xml:space="preserve">
     <value>Nameless</value>
   </data>
   <data name="UnusedFile" xml:space="preserve">
     <value>File {0} is not used. Delete it</value>
+  </data>
+  <data name="Video" xml:space="preserve">
+    <value>Video</value>
   </data>
   <data name="WrongBrackets" xml:space="preserve">
     <value>Incorrect bracket placement</value>

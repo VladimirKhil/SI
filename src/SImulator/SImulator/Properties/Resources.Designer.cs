@@ -961,6 +961,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Play content.
+        /// </summary>
+        public static string PlayContent {
+            get {
+                return ResourceManager.GetString("PlayContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Players.
         /// </summary>
         public static string Players {

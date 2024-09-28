@@ -1,5 +1,4 @@
 ﻿using SIPackages.Core;
-using SIPackages.Properties;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
@@ -9,7 +8,7 @@ namespace SIPackages;
 /// <summary>
 /// Defines a question scenario minimal item.
 /// </summary>
-public sealed class Atom : PropertyChangedNotifier, ITyped, IEquatable<Atom>
+internal sealed class Atom : PropertyChangedNotifier, ITyped, IEquatable<Atom>
 {
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private string _type = AtomTypes.Text;
@@ -42,19 +41,6 @@ public sealed class Atom : PropertyChangedNotifier, ITyped, IEquatable<Atom>
             }
         }
     }
-
-    /// <summary>
-    /// Localized string representation for a atom.
-    /// </summary>
-    public string TypeString => _type switch
-    {
-        AtomTypes.Image => Resources.Image,
-        AtomTypes.Video => Resources.Video,
-        AtomTypes.Audio => Resources.Audio,
-        AtomTypes.AudioNew => Resources.Audio,
-        AtomTypes.Html => Resources.Html,
-        _ => _type,
-    };
 
     /// <summary>
     /// Atom duration in seconds.

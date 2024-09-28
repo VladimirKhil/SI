@@ -246,6 +246,8 @@
                 </uic:TemplateConverter.Templates>
             </uic:TemplateConverter>
 
+            <my:IncludeConverter x:Key="IncludeConverter" />
+
             <ControlTemplate x:Key="QuestGrid" TargetType="{x:Type ContentControl}">
                 <ScrollViewer
                     HorizontalScrollBarVisibility="Disabled"
@@ -282,33 +284,63 @@
 
                         <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.Question}" Foreground="DarkGray" />
 
-                        <ListBox
+                        <ItemsControl
                             Grid.Row="1"
                             Grid.Column="1"
                             ItemsSource="{Binding ContentItems}"
-                            SelectionMode="Multiple"
-                            lb:ListBoxExtensions.SelectedItems="{Binding ActiveContent}"
-                            IsEnabled="False"
+                            IsEnabled="True"
                             BorderThickness="0"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                            <ListBox.ItemsPanel>
+                            <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel />
                                 </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
+                            </ItemsControl.ItemsPanel>
 
-                            <ListBox.ItemTemplate>
+                            <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock x:Name="text" Grid.Column="1" TextWrapping="Wrap">
-                                        <Run
-                                            Text="{Binding Placement, Converter={StaticResource PlacementConverter}}"
-                                            Foreground="Gray" /><Run
-                                            Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}"
-                                            Foreground="Gray" /><Run Text="{Binding Value}" />
-                                    </TextBlock>
+                                    <Border x:Name="bd">
+                                        <DockPanel>
+                                            <Button
+                                                Command="{Binding DataContext.MoveToContent, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="{x:Static lp:Resources.PlayContent}"
+                                                Width="30"
+                                                BorderThickness="0"
+                                                Margin="0,4,10,4"
+                                                Padding="3"
+                                                Foreground="#333333">
+                                                <Path
+                                                    Data="M0,0L11.6,6.7L0,13.4z"
+                                                    Stretch="Uniform"
+                                                    Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                           </Button>
+
+                                           <TextBlock x:Name="text" Grid.Column="1" TextWrapping="Wrap">
+                                                <Run
+                                                    Text="{Binding Placement, Converter={StaticResource PlacementConverter}}"
+                                                    Foreground="Gray" /><Run
+                                                    Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}"
+                                                    Foreground="Gray" /><Run Text="{Binding Value}" />
+                                            </TextBlock>
+                                        </DockPanel>
+                                    </Border>
+
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource IncludeConverter}">
+                                                    <Binding Path="DataContext.ActiveContent" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            
+                                            <Setter TargetName="bd" Property="Background" Value="Lavender" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
                                 </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
                         <StackPanel
                             Visibility="{Binding ActiveMediaCommand, Converter={StaticResource NotNull}}"
@@ -598,7 +630,43 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.Game}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.Game}" />
+
+                        <ToggleButton
+                            IsChecked="{Binding IsPaused}"
+                            Command="{Binding TogglePause}"
+                            ToolTip="{x:Static lp:Resources.Pause}"
+                            BorderThickness="0"
+                            Foreground="Black"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Padding="6"
+                            Margin="10,2,0,0"
+                            Height="25"
+                            Width="50">
+                            <Image Stretch="Uniform">
+                                <Image.Source>
+                                    <DrawingImage>
+                                        <DrawingImage.Drawing>
+                                            <DrawingGroup>
+                                                <DrawingGroup.Children>
+                                                    <GeometryDrawing
+                                                        Geometry="M0,0L1,0L1,4L0,4z"
+                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton},Path=Foreground}" />
+
+                                                    <GeometryDrawing
+                                                        Geometry="M2,0L3,0L3,4L2,4z"
+                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton},Path=Foreground}" />
+                                                </DrawingGroup.Children>
+                                            </DrawingGroup>
+                                        </DrawingImage.Drawing>
+                                    </DrawingImage>
+                                </Image.Source>
+                            </Image>
+                        </ToggleButton>
+                    </StackPanel>
+
                     <Separator Grid.Row="1" Width="250" />
 
                     <DockPanel Grid.Row="2">

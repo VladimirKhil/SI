@@ -18,6 +18,8 @@ public interface IPresentationController : IDisposable
 
     event Action<Exception>? Error;
 
+    bool CanControlMedia { get; }
+
     /// <summary>
     /// Starts new game.
     /// </summary>
@@ -151,4 +153,6 @@ public interface IPresentationController : IDisposable
     void NoAnswer();
 
     void OnFinalThink();
+
+    void SetPause(bool pause) { }
 }

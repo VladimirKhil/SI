@@ -1,5 +1,4 @@
 ﻿using Lingware.Spard.Expressions;
-using Microsoft.Extensions.Logging;
 using QTxtConverter;
 using SIPackages;
 using SIQuester.Model;
@@ -387,18 +386,18 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
         var trashAlias = new EditAlias(Resources.Trash, "#FFD3D3D3");
 
-        _packageTemplate = new SpardTemplateViewModel(SIPackages.Properties.Resources.Package, clipboardService);
-        _packageTemplate.Aliases["PName"] = new EditAlias(SIPackages.Properties.Resources.Package, "#FFDA70D6");
+        _packageTemplate = new SpardTemplateViewModel(Resources.Package, clipboardService);
+        _packageTemplate.Aliases["PName"] = new EditAlias(Resources.Package, "#FFDA70D6");
         _packageTemplate.Aliases["Some"] = trashAlias;
         Templates.Add(_packageTemplate);
 
-        _roundTemplate = new SpardTemplateViewModel(SIPackages.Properties.Resources.Round, clipboardService);
-        _roundTemplate.Aliases["RName"] = new EditAlias(SIPackages.Properties.Resources.Round, "#FFFFFFE0");
+        _roundTemplate = new SpardTemplateViewModel(Resources.Round, clipboardService);
+        _roundTemplate.Aliases["RName"] = new EditAlias(Resources.Round, "#FFFFFFE0");
         _roundTemplate.Aliases["Some"] = trashAlias;
         Templates.Add(_roundTemplate);
 
-        _themeTemplate = new SpardTemplateViewModel(SIPackages.Properties.Resources.Theme, clipboardService);
-        _themeTemplate.Aliases["TName"] = new EditAlias(SIPackages.Properties.Resources.Theme, "#FFF5DEB3");
+        _themeTemplate = new SpardTemplateViewModel(Resources.Theme, clipboardService);
+        _themeTemplate.Aliases["TName"] = new EditAlias(Resources.Theme, "#FFF5DEB3");
         _themeTemplate.Aliases["TAuthor"] = new EditAlias(Resources.Author, "#FF800000");
         _themeTemplate.Aliases["TComment"] = new EditAlias(Resources.Comment, "#FFFFA07A");
         _themeTemplate.Aliases["Some"] = trashAlias;

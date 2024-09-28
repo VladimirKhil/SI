@@ -24,8 +24,6 @@ internal sealed class YamlSerializer
             .WithEventEmitter(next => new FlowEmitter(next))
             .WithAttributeOverride<Package>(package => package.ID, new YamlMemberAttribute { Alias = "id" })
             .WithAttributeOverride<Package>(package => package.LogoItem, ignore)
-            .WithAttributeOverride<Atom>(atom => atom.IsLink, ignore)
-            .WithAttributeOverride<Atom>(atom => atom.TypeString, ignore)
             .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults | DefaultValuesHandling.OmitEmptyCollections)
             .Build();
 
@@ -34,8 +32,6 @@ internal sealed class YamlSerializer
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithAttributeOverride<Package>(package => package.ID, new YamlMemberAttribute { Alias = "id" })
             .WithAttributeOverride<Package>(package => package.LogoItem, ignore)
-            .WithAttributeOverride<Atom>(atom => atom.IsLink, ignore)
-            .WithAttributeOverride<Atom>(atom => atom.TypeString, ignore)
             .Build();
     }
 
@@ -89,10 +85,6 @@ internal sealed class YamlSerializer
             {
                 return new CollectionPropertyDesriptor<Question>(nameof(Theme.Questions), typeof(List<Question>));
             }
-            else if (type == typeof(Question) && name == nameof(Question.Scenario).ToLowerInvariant())
-            {
-                return new CollectionPropertyDesriptor<Atom>(nameof(Question.Scenario), typeof(Scenario));
-            }
             else if (type == typeof(Question) && name == nameof(Question.Right).ToLowerInvariant())
             {
                 return new CollectionPropertyDesriptor<string>(nameof(Question.Right), typeof(Answers));
@@ -104,14 +96,6 @@ internal sealed class YamlSerializer
             else if (type == typeof(Question) && name == nameof(Question.Parameters).ToLowerInvariant())
             {
                 return new StepParametersPropertyDesriptor();
-            }
-            else if (type == typeof(Question) && name == nameof(Question.Type).ToLowerInvariant())
-            {
-                return new QuestionTypePropertyDesriptor();
-            }
-            else if (type == typeof(QuestionType) && name == nameof(QuestionType.Params).ToLowerInvariant())
-            {
-                return new CollectionPropertyDesriptor<QuestionTypeParam>(nameof(QuestionType.Params), typeof(List<QuestionTypeParam>));
             }
             else if (type.IsSubclassOf(typeof(InfoOwner)) && name == nameof(InfoOwner.Info).ToLowerInvariant())
             {
@@ -226,33 +210,9 @@ internal sealed class YamlSerializer
                 return;
             }
 
-            question.Parameters ??= new StepParameters();
-
             foreach (var param in stepParameters)
             {
                 question.Parameters[param.Key] = param.Value;
-            }
-        }
-    }
-
-    private sealed class QuestionTypePropertyDesriptor : CustomPropertyDesriptor
-    {
-        public QuestionTypePropertyDesriptor() : base(typeof(QuestionType)) { }
-
-        public override void Write(object target, object? value)
-        {
-            var question = (Question)target;
-
-            if (value is not QuestionType questionType)
-            {
-                return;
-            }
-
-            question.Type.Name = questionType.Name;
-
-            foreach (var param in questionType.Params)
-            {
-                question.Type.Params.Add(param);
             }
         }
     }

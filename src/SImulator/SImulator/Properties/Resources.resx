@@ -425,6 +425,9 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   <data name="PlacementOral" xml:space="preserve">
     <value>Replica</value>
   </data>
+  <data name="PlayContent" xml:space="preserve">
+    <value>Play content</value>
+  </data>
   <data name="Players" xml:space="preserve">
     <value>Players</value>
   </data>

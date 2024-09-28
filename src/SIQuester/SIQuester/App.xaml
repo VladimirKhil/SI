@@ -2332,8 +2332,6 @@
                 <Setter Property="Cursor" Value="Hand" />
             </Style>
 
-            <siqcv:NumberSetViewModelConverter x:Key="NumberSetViewModelConverter" />
-
             <DataTemplate x:Key="SelectionModeTemplate" DataType="vm:StepParameterViewModel">
                 <ComboBox
                     Style="{StaticResource ComboBoxCommon}"

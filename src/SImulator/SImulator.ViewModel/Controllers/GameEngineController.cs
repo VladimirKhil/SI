@@ -262,7 +262,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         PresentationController.OnAnswerStart();
     }
 
-    public void OnContentStart(IEnumerable<ContentItem> contentItems)
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
         if (GameViewModel == null)
         {
@@ -275,6 +275,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         GameViewModel.ContentItems = contentItems;
         GameViewModel.ActiveMediaCommand = null;
         GameViewModel.DecisionMode = DecisionMode.None;
+        GameViewModel.MoveToContentCallback = moveToContentCallback;
     }
 
     public void OnSimpleRightAnswerStart()

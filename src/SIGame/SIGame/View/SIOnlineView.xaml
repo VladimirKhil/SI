@@ -25,7 +25,6 @@
         <localc:Multiplier x:Key="Multiplier" />
         <localc:EqualityToWeightConverter x:Key="EqualityToWeightConverter" />
         <localc:ShowChatToggleConverter x:Key="ShowChatToggleConverter" />
-        <localc:ChatColumnWidthConverter x:Key="ChatColumnWidthConverter" />
 
         <Style x:Key="ListBoxItemStyle1" TargetType="{x:Type ListBoxItem}">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -155,7 +154,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="6*" />
-                <ColumnDefinition Width="{Binding IsChatShown, Converter={StaticResource ChatColumnWidthConverter}}" />
+                <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
             
             <Grid.RowDefinitions>
@@ -653,7 +652,7 @@
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>
-            
+
             <TextBlock
                 Grid.Row="0"
                 Grid.Column="1"
@@ -664,161 +663,9 @@
                 TextTrimming="CharacterEllipsis"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center" />
-            
-            <TabControl Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Margin="0,-5,0,0" Padding="0" BorderThickness="0" FontSize="23">
-                <TabItem Header="{x:Static lp:Resources.Trends}" Style="{StaticResource TabItemStyle1}">
-                    <lv:TrendsView DataContext="{Binding Trends}" />
-                </TabItem>
-                
-                <TabItem Header="{x:Static lp:Resources.Tab_Chat}" Style="{StaticResource TabItemStyle1}">
-                    <DockPanel>
-                        <DockPanel DockPanel.Dock="Bottom" Height="46" Background="#FF5A95E2">
-                            <local:DropDownButton
-                                Style="{StaticResource SIDropDownButton}"
-                                Content="😃"
-                                ToolTip="{x:Static lp:Resources.Emoji}"
-                                BorderThickness="0"
-                                DockPanel.Dock="Right"
-                                VerticalAlignment="Top"
-                                Width="45"
-                                Height="45"
-                                FontSize="20">
-                                <local:DropDownButton.DropDown>
-                                    <ContextMenu
-                                        Style="{StaticResource SIContextMenuStyle}"
-                                        ItemsSource="{Binding Emoji}"
-                                        PreviewMouseDown="ContextMenu_MouseDown"
-                                        BorderThickness="1"
-                                        BorderBrush="{StaticResource MainColor}">
-                                        <ContextMenu.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel />
-                                            </ItemsPanelTemplate>
-                                        </ContextMenu.ItemsPanel>
-                                        
-                                        <ContextMenu.ItemContainerStyle>
-                                            <Style TargetType="MenuItem">
-                                                <Setter
-                                                    Property="Command"
-                                                    Value="{Binding
-                                                        DataContext.AddEmoji,
-                                                        RelativeSource={RelativeSource AncestorType=ContextMenu, AncestorLevel=1, Mode=FindAncestor}}" />
-                                                
-                                                <Setter Property="CommandParameter" Value="{Binding}" />
-                                                <Setter Property="FontSize" Value="25" />
-                                                <Setter Property="BorderThickness" Value="0" />
-                                                <Setter Property="Padding" Value="3" />
-                                                <Setter Property="Background" Value="#FF5A95E2" />
-                                                <Setter Property="Cursor" Value="Hand" />
-                                                
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                            <Border
-                                                                x:Name="templateRoot"
-                                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                                Background="{TemplateBinding Background}"
-                                                                SnapsToDevicePixels="true">
-                                                                <ContentPresenter
-                                                                    ContentSource="Header"
-                                                                    Margin="{TemplateBinding Padding}"
-                                                                    RecognizesAccessKey="True"
-                                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                                            </Border>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                                
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Background" Value="#98B9FF" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ContextMenu.ItemContainerStyle>
-                                    </ContextMenu>
-                                </local:DropDownButton.DropDown>
 
-                                <local:DropDownButton.ContentTemplate>
-                                    <DataTemplate>
-                                        <TextBlock
-                                            Text="{Binding}"
-                                            Foreground="{StaticResource MainColor}"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center" />
-                                    </DataTemplate>
-                                </local:DropDownButton.ContentTemplate>
-                            </local:DropDownButton>
-                            
-                            <TextBox
-                                x:Name="message"
-                                Text="{Binding ChatText, UpdateSourceTrigger=PropertyChanged}"
-                                Background="#FFC0CFF4"
-                                Padding="1"
-                                KeyDown="TextBox_KeyDown"
-                                TextWrapping="Wrap"
-                                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                MaxLength="250"
-                                FontSize="18" />
-                        </DockPanel>
-                        
-                        <RichTextBox
-                            x:Name="chat"
-                            Background="#FFC0CFF4"
-                            IsReadOnly="True"
-                            Padding="11,11"
-                            FontWeight="Light"
-                            TextBlock.LineHeight="25"
-                            FontSize="18"
-                            ScrollViewer.VerticalScrollBarVisibility="Visible" />
-                    </DockPanel>
-                </TabItem>
+            <lv:TrendsView Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Margin="0,38,0,0" Padding="0" BorderThickness="0" FontSize="23" DataContext="{Binding Trends}" />
 
-                <TabItem Header="{Binding Users.Count}" Style="{StaticResource TabItemStyle1}">
-                    <TabItem.HeaderTemplate>
-                        <DataTemplate>
-                            <Border BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3" Margin="5,0,0,0">
-                                <TextBlock Effect="{StaticResource Effect}" FontWeight="Bold" FontSize="23">
-                                    <Run Text="{x:Static lp:Resources.Tab_Players}" /><Run Text=" " /><Run Text="{Binding StringFormat=(\{0\}), Mode=OneWay}" />
-                                </TextBlock>
-                            </Border>
-                        </DataTemplate>
-                    </TabItem.HeaderTemplate>
-                    
-                    <ListBox ItemsSource="{Binding Users}" Background="#FFC0CFF4" Padding="0,5" FontSize="18">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" Margin="10,5">
-                                    <TextBlock.FontWeight>
-                                        <MultiBinding Converter="{StaticResource EqualityToWeightConverter}">
-                                            <Binding />
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ListBox}" Path="DataContext.Human.Name" />
-                                        </MultiBinding>
-                                    </TextBlock.FontWeight>
-                                </TextBlock>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </TabItem>
-            </TabControl>
-            
-            <ToggleButton
-                Grid.Column="1"
-                Grid.ColumnSpan="2"
-                Grid.Row="1"
-                IsChecked="{Binding IsChatShown}"
-                Width="34"
-                Height="34"
-                Margin="0,-2,0,0"
-                Style="{StaticResource SIToolButtonStyle}"
-                ToolTip="{Binding IsChatShown, Converter={StaticResource ShowChatToggleConverter}}"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                FontSize="15">
-                👁
-            </ToggleButton>
-            
             <ContentControl
                 Style="{StaticResource navigatorStyle}"
                 Grid.Row="1"

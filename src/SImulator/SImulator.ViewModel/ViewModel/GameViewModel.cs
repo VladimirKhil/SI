@@ -9,7 +9,6 @@ using SImulator.ViewModel.Properties;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
-using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -137,8 +136,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     public ICommand RunQuestionTimer { get; private set; }
     public ICommand StopQuestionTimer { get; private set; }
 
-    public ICommand RunMediaTimer { get; private set; }
-    public ICommand StopMediaTimer { get; private set; }
+    public ICommand? RunMediaTimer { get; private set; }
+    public ICommand? StopMediaTimer { get; private set; }
 
     public SimpleCommand AddPlayer { get; private set; }
     public SimpleCommand RemovePlayer { get; private set; }
@@ -313,16 +312,23 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         set { _activeTheme = value; OnPropertyChanged(); }
     }
 
-    private IEnumerable<ContentItem>? _contentItems = null;
+    private IReadOnlyList<ContentItem>? _contentItems = null;
 
     /// <summary>
     /// Currently played content items.
     /// </summary>
-    public IEnumerable<ContentItem>? ContentItems
+    public IReadOnlyList<ContentItem>? ContentItems
     {
         get => _contentItems;
         set { _contentItems = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// Moves question play to specific content item.
+    /// </summary>
+    public ICommand MoveToContent { get; private set; }
+
+    public Action<int>? MoveToContentCallback { get; set; }
 
     private IReadOnlyCollection<ContentItem> _activeContent = Array.Empty<ContentItem>();
 
@@ -478,6 +484,23 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     public bool ManagedMode { get; private set; }
 
+    private bool _isPaused = false;
+
+    public bool IsPaused
+    {
+        get => _isPaused;
+        set
+        {
+            if (_isPaused != value)
+            {
+                _isPaused = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public ICommand TogglePause { get; private set; }
+
     #endregion
 
     public GameViewModel(
@@ -521,6 +544,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         MakeStake = new SimpleCommand(MakeStake_Executed);
         _addRight = new SimpleCommand(AddRight_Executed);
         _addWrong = new SimpleCommand(AddWrong_Executed);
+        MoveToContent = new SimpleCommand(MoveToContent_Executed);
+        TogglePause = new SimpleCommand(TogglePause_Executed);
 
         RunRoundTimer = new SimpleUICommand(RunRoundTimer_Executed) { Name = Resources.Run };
         StopRoundTimer = new SimpleUICommand(StopRoundTimer_Executed) { Name = Resources.Pause };
@@ -528,8 +553,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         RunQuestionTimer = new SimpleUICommand(RunQuestionTimer_Executed) { Name = Resources.Run };
         StopQuestionTimer = new SimpleUICommand(StopQuestionTimer_Executed) { Name = Resources.Pause };
 
-        RunMediaTimer = new SimpleUICommand(RunMediaTimer_Executed) { Name = Resources.Run };
-        StopMediaTimer = new SimpleUICommand(StopMediaTimer_Executed) { Name = Resources.Pause };
+        if (presentationController.CanControlMedia)
+        {
+            RunMediaTimer = new SimpleUICommand(RunMediaTimer_Executed) { Name = Resources.Run };
+            StopMediaTimer = new SimpleUICommand(StopMediaTimer_Executed) { Name = Resources.Pause };
+        }
 
         _presentationListener.NextRound = _nextRound = new SimpleCommand(NextRound_Executed) { CanBeExecuted = false };
         _presentationListener.PreviousRound = _previousRound = new SimpleCommand(PreviousRound_Executed) { CanBeExecuted = false };
@@ -559,6 +587,25 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _presentationListener.MediaEnd += GameHost_MediaEnd;
         _presentationListener.RoundThemesFinished += GameHost_RoundThemesFinished;
         _presentationListener.AnswerSelected += PresentationListener_AnswerSelected;
+    }
+
+    private void TogglePause_Executed(object? arg) => PresentationController.SetPause(IsPaused);
+
+    private void MoveToContent_Executed(object? arg)
+    {
+        if (ContentItems == null || arg is not ContentItem contentItem || !contentItem.WaitForFinish)
+        {
+            return;
+        }
+
+        for (var i = 0; i < ContentItems.Count; i++)
+        {
+            if (ContentItems[i] == contentItem)
+            {
+                MoveToContentCallback?.Invoke(i);
+                break;
+            }
+        }        
     }
 
     public void ExecuteTask(Tasks taskId, int arg)
