@@ -3,6 +3,7 @@ using SIEngine.Rules;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Helpers;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
@@ -482,7 +483,91 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private IReadOnlyList<Theme>? _roundThemes;
 
-    public bool ManagedMode { get; private set; }
+    private bool _managedMode;
+
+    public bool ManagedMode
+    {
+        get => _managedMode;
+        set
+        {
+            if (_managedMode != value)
+            {
+                _managedMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string[]? _ipAddresses = null;
+
+    public string[]? IpAddresses
+    {
+        get
+        {
+            if (_ipAddresses == null)
+            {
+                LoadIpAddresses();
+            }           
+
+            return _ipAddresses;
+        }
+    }
+
+    private readonly object _ipAddressesLock = new();
+    private bool _isLoadingAddresses = false;
+
+    private async void LoadIpAddresses()
+    {
+        lock (_ipAddressesLock)
+        {
+            if (_isLoadingAddresses)
+            {
+                return;
+            }
+
+            _isLoadingAddresses = true;
+        }
+
+        _ipAddresses = await NetworkHelper.GetIdAddressesAsync();
+        OnPropertyChanged(nameof(IpAddresses));
+
+        CurrentIpAddress = NetworkHelper.FindLocalNetworkAddress(_ipAddresses);
+    }
+
+    private string _currentIpAddress = "";
+
+    public string CurrentIpAddress
+    {
+        get => _currentIpAddress;
+        set
+        {
+            if (_currentIpAddress != value)
+            {
+                _currentIpAddress = value;
+                OnPropertyChanged();
+                UpdateQRCode();
+            }
+        }
+    }
+
+    private bool _qRCodeShown = false;
+
+    public bool QRCodeShown
+    {
+        get => _qRCodeShown;
+        set
+        {
+            if (_qRCodeShown != value)
+            {
+                _qRCodeShown = value;
+                OnPropertyChanged();
+                UpdateQRCode();
+            }
+        }
+    }
+
+    private void UpdateQRCode() => PresentationController.ShowQRCode(
+        _qRCodeShown ? $"http://{_currentIpAddress}:{Settings.Model.WebPort}" : null);
 
     private bool _isPaused = false;
 

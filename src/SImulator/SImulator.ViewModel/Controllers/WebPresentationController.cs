@@ -584,6 +584,12 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         PlayerIndex = playerIndex
     });
 
+    public void ShowQRCode(string? value) => SendMessage(new
+    {
+        Type = "qrCode",
+        QrCode = value
+    });
+
     public void OnMessage(string message)
     {
         var data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(message);

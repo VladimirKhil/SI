@@ -155,4 +155,6 @@ public interface IPresentationController : IDisposable
     void OnFinalThink();
 
     void SetPause(bool pause) { }
+
+    void ShowQRCode(string? value) { }
 }

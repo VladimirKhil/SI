@@ -123,6 +123,9 @@
   <data name="AddPlayer" xml:space="preserve">
     <value>Add player</value>
   </data>
+  <data name="AddressToConnect" xml:space="preserve">
+    <value>Address to connect</value>
+  </data>
   <data name="AddSum" xml:space="preserve">
     <value>Add sum</value>
   </data>
@@ -601,6 +604,9 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   </data>
   <data name="ShowPlayersList" xml:space="preserve">
     <value>Show player list</value>
+  </data>
+  <data name="ShowQRCode" xml:space="preserve">
+    <value>Show QR code</value>
   </data>
   <data name="ShowQuestionBorder" xml:space="preserve">
     <value>Show frame when the button can be pressed</value>

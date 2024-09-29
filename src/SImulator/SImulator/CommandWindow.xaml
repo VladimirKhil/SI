@@ -43,8 +43,6 @@
             <my:GameModeToVisibilityConverter x:Key="StartView" Mode="{x:Static vmc:GameMode.Start}" />
             <my:GameModeToVisibilityConverter x:Key="ModeratorView" Mode="{x:Static vmc:GameMode.Moderator}" />
 
-            <my:GameModeToNonVisibilityConverter x:Key="DisplayView" Mode="{x:Static vmc:GameMode.Moderator}" />
-
             <my:GameModeToBooleanConverter x:Key="IsStart" Mode="{x:Static vmc:GameMode.Start}" />
             <my:GameModeToBooleanConverter x:Key="IsModerator" Mode="{x:Static vmc:GameMode.Moderator}" />
 
@@ -785,6 +783,34 @@
                                 </Image.Source>
                             </Image>
                         </RadioButton>
+
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Background="#EEEEEE"
+                            Margin="10,0,0,0"
+                            Visibility="{Binding ManagedMode, Converter={StaticResource BVConverter}}">
+                            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0">
+                                <Run Text="{x:Static lp:Resources.AddressToConnect}" />
+                                <Run Text="http://" />
+                            </TextBlock>
+
+                            <ComboBox
+                                Width="100"
+                                IsEditable="True"
+                                ItemsSource="{Binding IpAddresses}"
+                                SelectedItem="{Binding CurrentIpAddress}" />
+
+                            <TextBlock VerticalAlignment="Center">
+                                <Run Text=":" /><Run Text="{Binding Settings.Model.WebPort}" />
+                            </TextBlock>
+
+                            <ToggleButton
+                                Content="{x:Static lp:Resources.ShowQRCode}"
+                                IsChecked="{Binding QRCodeShown}"
+                                Padding="10,0"
+                                BorderThickness="0"
+                                Margin="10,0,0,0" />
+                        </StackPanel>
                     </StackPanel>
 
                     <Border Margin="0,5,0,0" Grid.Row="5">
