@@ -14,6 +14,13 @@ try {
                 resolve(true);
             });
         },
+        sendAnswer: function (answer) {
+            window.chrome.webview.postMessage({ type: 'sendAnswer', answer: answer });
+
+            return new Promise(function (resolve) {
+                resolve(true);
+            });
+        },
         mediaLoaded: function () { }
     });
 
@@ -22,6 +29,12 @@ try {
     window.chrome.webview.postMessage({ type: 'loadError', error: e });
 }
 
-window.addEventListener('click', function () {
+window.addEventListener('click', function (e) {
+    const option = e.target.closest('.answerOption');
+
+    if (option) {
+        return;
+    }
+
     window.chrome.webview.postMessage({ type: 'move' });
 });

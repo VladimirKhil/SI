@@ -95,6 +95,8 @@ public interface IPresentationController : IDisposable
 
     void RunTimer();
 
+    void RunPlayerTimer(int playerIndex, int maxTime) { }
+
     void PauseTimer(int currentTime);
 
     void StopTimer();
@@ -154,7 +156,7 @@ public interface IPresentationController : IDisposable
 
     void OnFinalThink();
 
-    void SetPause(bool pause) { }
+    void SetPause(bool pause, int passedTime) { }
 
     void ShowQRCode(string? value) { }
 }

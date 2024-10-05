@@ -312,6 +312,16 @@
                                                     Data="M0,0L11.6,6.7L0,13.4z"
                                                     Stretch="Uniform"
                                                     Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter Property="Visibility" Value="Hidden" />
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
                                            </Button>
 
                                            <TextBlock x:Name="text" Grid.Column="1" TextWrapping="Wrap">
@@ -633,7 +643,6 @@
 
                         <ToggleButton
                             IsChecked="{Binding IsPaused}"
-                            Command="{Binding TogglePause}"
                             ToolTip="{x:Static lp:Resources.Pause}"
                             BorderThickness="0"
                             Foreground="Black"
@@ -641,7 +650,7 @@
                             VerticalAlignment="Center"
                             Padding="6"
                             Margin="10,2,0,0"
-                            Height="25"
+                            Height="23"
                             Width="50">
                             <Image Stretch="Uniform">
                                 <Image.Source>
@@ -662,6 +671,18 @@
                                     </DrawingImage>
                                 </Image.Source>
                             </Image>
+
+                            <ToggleButton.Style>
+                                <Style TargetType="ToggleButton">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding LocalInfo.TStage}" Value="{x:Static uim:TableStage.Question}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
                         </ToggleButton>
                     </StackPanel>
 
@@ -787,8 +808,7 @@
                         <StackPanel
                             Orientation="Horizontal"
                             Background="#EEEEEE"
-                            Margin="10,0,0,0"
-                            Visibility="{Binding ManagedMode, Converter={StaticResource BVConverter}}">
+                            Margin="10,0,0,0">
                             <TextBlock VerticalAlignment="Center" Margin="5,0,0,0">
                                 <Run Text="{x:Static lp:Resources.AddressToConnect}" />
                                 <Run Text="http://" />
@@ -810,6 +830,18 @@
                                 Padding="10,0"
                                 BorderThickness="0"
                                 Margin="10,0,0,0" />
+
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="{Binding ManagedMode, Converter={StaticResource BVConverter}}" />
+                                    
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding PresentationController.CanControlMedia}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
                         </StackPanel>
                     </StackPanel>
 

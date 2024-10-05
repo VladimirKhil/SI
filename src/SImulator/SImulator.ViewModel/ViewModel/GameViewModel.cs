@@ -327,7 +327,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     /// <summary>
     /// Moves question play to specific content item.
     /// </summary>
-    public ICommand MoveToContent { get; private set; }
+    public ContextCommand MoveToContent { get; private set; }
 
     public Action<int>? MoveToContentCallback { get; set; }
 
@@ -580,11 +580,30 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             {
                 _isPaused = value;
                 OnPropertyChanged();
+                OnIsPausedChanged();
             }
         }
     }
 
-    public ICommand TogglePause { get; private set; }
+    private bool _timerPaused;
+
+    private void OnIsPausedChanged()
+    {
+        PresentationController.SetPause(IsPaused, QuestionTime * 10);
+
+        if (IsPaused && ActiveQuestionCommand == StopQuestionTimer)
+        {
+            _questionTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            ActiveQuestionCommand = RunQuestionTimer;
+            _timerPaused = true;
+        }
+        else if (!IsPaused && _timerPaused)
+        {
+            _questionTimer.Change(1000, 1000);
+            ActiveQuestionCommand = StopQuestionTimer;
+            _timerPaused = false;
+        }
+    }
 
     #endregion
 
@@ -629,8 +648,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         MakeStake = new SimpleCommand(MakeStake_Executed);
         _addRight = new SimpleCommand(AddRight_Executed);
         _addWrong = new SimpleCommand(AddWrong_Executed);
-        MoveToContent = new SimpleCommand(MoveToContent_Executed);
-        TogglePause = new SimpleCommand(TogglePause_Executed);
+        MoveToContent = new ContextCommand(MoveToContent_Executed);
 
         RunRoundTimer = new SimpleUICommand(RunRoundTimer_Executed) { Name = Resources.Run };
         StopRoundTimer = new SimpleUICommand(StopRoundTimer_Executed) { Name = Resources.Pause };
@@ -674,11 +692,9 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _presentationListener.AnswerSelected += PresentationListener_AnswerSelected;
     }
 
-    private void TogglePause_Executed(object? arg) => PresentationController.SetPause(IsPaused);
-
     private void MoveToContent_Executed(object? arg)
     {
-        if (ContentItems == null || arg is not ContentItem contentItem || !contentItem.WaitForFinish)
+        if (ContentItems == null || arg is not ContentItem contentItem)
         {
             return;
         }
@@ -1102,6 +1118,16 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         _thinkingTimer.Change(1000, 1000);
+
+        if (_selectedPlayer != null)
+        {
+            var playerIndex = Players.IndexOf(_selectedPlayer);
+
+            if (playerIndex >= 0)
+            {
+                PresentationController.RunPlayerTimer(playerIndex, ThinkingTimeMax * 10);
+            }
+        }
     }
 
     public void StopThinkingTimer_Executed(object? arg)
@@ -1372,6 +1398,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         try
         {
+            if (IsPaused)
+            {
+                IsPaused = false;
+            }
+
             if (_continuation != null)
             {
                 _continuation();
@@ -2035,7 +2066,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     private bool ProcessPlayerPress(int index, PlayerInfo player)
     {
         // The player has pressed already
-        if (_selectedPlayers.Contains(player))
+        if (_selectedPlayers.Contains(player) || IsPaused)
         {
             return false;
         }

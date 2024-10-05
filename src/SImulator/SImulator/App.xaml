@@ -203,6 +203,16 @@
             </uic:TemplateConverter.Templates>
         </uic:TemplateConverter>
 
+        <Style x:Key="ManagedColumn" TargetType="ColumnDefinition">
+            <Setter Property="Width" Value="3*" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.ManagedMode, RelativeSource={RelativeSource AncestorType=DockPanel}}" Value="False">
+                    <Setter Property="Width" Value="0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <DataTemplate x:Key="PlayersTable">
             <DockPanel Margin="1,3,1,1">
                 <DockPanel.Resources>
@@ -314,7 +324,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Style="{StaticResource ManagedColumn}" />
                         <ColumnDefinition Width="29" />
                     </Grid.ColumnDefinitions>
 
@@ -352,7 +362,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Style="{StaticResource ManagedColumn}" />
                                         <ColumnDefinition Width="29" />
                                     </Grid.ColumnDefinitions>
 
