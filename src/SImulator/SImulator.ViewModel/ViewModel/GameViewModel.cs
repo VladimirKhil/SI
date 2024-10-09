@@ -2237,6 +2237,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         State = QuestionState.Normal;
         _previousState = QuestionState.Normal;
+
+        foreach (var player in Players)
+        {
+            player.Answer = "";
+        }
     }
 
     internal void OnContentStart()
