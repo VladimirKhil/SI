@@ -113,6 +113,10 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         () => Listener.OnPlayerAnswered(playerName, answer),
         exc => PlatformManager.Instance.ShowMessage(exc.Message));
 
+    public void OnPlayerPass(string playerName) => UI.Execute(
+        () => Listener.OnPlayerPassed(playerName),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
     public void InformPlayer(string playerName, string connectionId)
     {
         SendMessageTo(connectionId, "INFO2", "1", "", "+", "+", "+", "+", playerName, "+", "+", "+", "+");

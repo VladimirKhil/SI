@@ -17,7 +17,7 @@ public partial class CommandWindow : Window
     /// <summary>
     /// Application version.
     /// </summary>
-    public string? Version => typeof(MainViewModel).Assembly.GetName().Version?.ToString(3); //Assembly.GetExecutingAssembly().GetName().Version?.ToString(3);
+    public string? Version => App.ProductVersion.ToString(3);
 
     public CommandWindow() => InitializeComponent();
 

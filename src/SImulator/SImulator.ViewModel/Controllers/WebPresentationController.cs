@@ -603,6 +603,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         QrCode = value
     });
 
+    public void OnPlayerPassed(int playerIndex) => SendMessage(new { Type = "pass", PlayerIndex = playerIndex });
+
     public void OnMessage(string message)
     {
         var data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(message);

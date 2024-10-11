@@ -2063,6 +2063,18 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         player.Answer = answer;
     }
 
+    public void OnPlayerPassed(string playerName)
+    {
+        for (var i = 0; i < Players.Count; i++)
+        {
+            if (Players[i].Name == playerName)
+            {
+                PresentationController.OnPlayerPassed(i);
+                break;
+            }
+        }
+    }
+
     private bool ProcessPlayerPress(int index, PlayerInfo player)
     {
         // The player has pressed already

@@ -159,4 +159,6 @@ public interface IPresentationController : IDisposable
     void SetPause(bool pause, int passedTime) { }
 
     void ShowQRCode(string? value) { }
+
+    void OnPlayerPassed(int playerIndex) { }
 }
