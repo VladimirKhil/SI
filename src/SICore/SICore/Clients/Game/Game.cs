@@ -810,7 +810,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnPin(string hostName)
     {
-        var pin = Logic.PinHelper.GeneratePin();
+        var pin = Logic.PinHelper?.GeneratePin() ?? 0;
         _gameActions.SendMessageToWithArgs(hostName, Messages.Pin, pin);
     }
 

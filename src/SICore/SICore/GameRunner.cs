@@ -33,7 +33,7 @@ public sealed class GameRunner
     private readonly ComputerAccount[] _defaultShowmans;
     private readonly string? _documentPath;
     private readonly IAvatarHelper _avatarHelper;
-    private readonly IPinHelper _pinHelper;
+    private readonly IPinHelper? _pinHelper;
     private readonly string? _gameName;
     private readonly bool _createHost;
 
@@ -47,7 +47,7 @@ public sealed class GameRunner
         ComputerAccount[] defaultShowmans,
         string? documentPath,
         IAvatarHelper avatarHelper,
-        IPinHelper pinHelper,
+        IPinHelper? pinHelper,
         string? gameName = null,
         bool createHost = true)
     {

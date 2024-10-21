@@ -119,9 +119,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal TaskRunner<Tasks> Runner => _taskRunner;
 
-    internal IPinHelper PinHelper { get; }
+    internal IPinHelper? PinHelper { get; }
 
-    public GameLogic(GameData data, GameActions gameActions, SIEngine.GameEngine engine, ILocalizer localizer, IFileShare fileShare, IPinHelper pinHelper)
+    public GameLogic(
+        GameData data,
+        GameActions gameActions,
+        SIEngine.GameEngine engine,
+        ILocalizer localizer,
+        IFileShare fileShare,
+        IPinHelper? pinHelper)
         : base(data)
     {
         _gameActions = gameActions;

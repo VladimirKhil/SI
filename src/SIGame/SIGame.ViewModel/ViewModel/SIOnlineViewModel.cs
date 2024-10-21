@@ -1251,11 +1251,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             ruleValues.Add(Resources.GameRule_IgnoreWrong);
         }
 
-        if ((rules & SI.GameServer.Contract.GameRules.PingPenalty) > 0)
-        {
-            ruleValues.Add(Resources.GameRule_PingPenalty);
-        }
-
         return ruleValues.ToArray();
     }
 

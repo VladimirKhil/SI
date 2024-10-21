@@ -656,7 +656,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
         catch (Exception exc)
         {
-            _viewerActions.Client.CurrentServer.OnError(exc, false);
+            _viewerActions.Client.CurrentNode.OnError(exc, false);
         }
     }
 

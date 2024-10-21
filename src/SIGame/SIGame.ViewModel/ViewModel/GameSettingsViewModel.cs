@@ -761,7 +761,8 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             _computerPlayers.ToArray(),
             _computerShowmans.ToArray(),
             documentPath,
-            avatarHelper)
+            avatarHelper,
+            null)
             .Run((data, actions, localizer) =>
             {
                 // TODO: (refactor) quite ugly way to create GameViewModel but it's the only way to pass all the required parameters
