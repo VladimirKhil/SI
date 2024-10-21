@@ -88,7 +88,7 @@ public sealed class Game : Actor<GameData, GameLogic>
     /// </summary>
     public void Run()
     {
-        Client.CurrentServer.SerializationError += CurrentServer_SerializationError;
+        Client.CurrentNode.SerializationError += CurrentServer_SerializationError;
 
         _logic.Run();
 
@@ -582,6 +582,13 @@ public sealed class Game : Actor<GameData, GameLogic>
                         OnPicture(message, args);
                         break;
 
+                    case Messages.Pin:
+                        if (message.Sender == ClientData.HostName)
+                        {
+                            OnPin(message.Sender);
+                        }
+                        break;
+
                     case Messages.Avatar:
                         OnAvatar(message, args);
                         break;
@@ -800,6 +807,12 @@ public sealed class Game : Actor<GameData, GameLogic>
                 _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
+
+    private void OnPin(string hostName)
+    {
+        var pin = Logic.PinHelper.GeneratePin();
+        _gameActions.SendMessageToWithArgs(hostName, Messages.Pin, pin);
+    }
 
     private void OnSelectedPlayer(int playerIndex, string messageSender)
     {

@@ -398,6 +398,11 @@ public static class Messages
     public const string Picture = "PICTURE";
 
     /// <summary>
+    /// Asks or receives game PIN.
+    /// </summary>
+    public const string Pin = "PIN";
+
+    /// <summary>
     /// Sets player state.
     /// </summary>
     public const string PlayerState = "PLAYER_STATE";

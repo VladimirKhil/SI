@@ -15,7 +15,7 @@ public interface IClient : IDisposable
     /// <summary>
     /// Client node.
     /// </summary>
-    INode CurrentServer { get; }
+    INode CurrentNode { get; }
 
     /// <summary>
     /// Receives incoming message.

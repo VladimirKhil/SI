@@ -55,7 +55,7 @@ public abstract class Actor<D, L> : IActor
         }
         catch (Exception exc)
         {
-            Client.CurrentServer.OnError(exc, true);
+            Client.CurrentNode.OnError(exc, true);
         }
     }
 

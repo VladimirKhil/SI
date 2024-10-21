@@ -197,7 +197,7 @@ public sealed class GameActions
 
         if (person != NetworkConstants.Everybody)
         {
-            if (Client.CurrentServer.Contains(person))
+            if (Client.CurrentNode.Contains(person))
             {
                 return; // local person does not need to preload anything
             }
@@ -207,7 +207,7 @@ public sealed class GameActions
         else
         {
             // local persons do not need to preload anything
-            var personsList = _gameData.AllPersons.Keys.Where(name => !Client.CurrentServer.Contains(name)).ToList();
+            var personsList = _gameData.AllPersons.Keys.Where(name => !Client.CurrentNode.Contains(name)).ToList();
 
             if (personsList.Count == 0)
             {

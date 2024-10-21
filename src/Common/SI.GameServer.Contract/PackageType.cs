@@ -11,7 +11,7 @@ public enum PackageType
     Content,
 
     /// <summary>
-    /// Library file. It is accessed a as single file with no password and should be extracted before use.
+    /// Library file. It is accessed as a single file with no password and should be extracted before use.
     /// </summary>
     LibraryItem
 }

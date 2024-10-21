@@ -119,7 +119,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal TaskRunner<Tasks> Runner => _taskRunner;
 
-    public GameLogic(GameData data, GameActions gameActions, SIEngine.GameEngine engine, ILocalizer localizer, IFileShare fileShare)
+    internal IPinHelper PinHelper { get; }
+
+    public GameLogic(GameData data, GameActions gameActions, SIEngine.GameEngine engine, ILocalizer localizer, IFileShare fileShare, IPinHelper pinHelper)
         : base(data)
     {
         _gameActions = gameActions;
@@ -127,6 +129,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         LO = localizer;
         _fileShare = fileShare;
         _taskRunner = new(this);
+        PinHelper = pinHelper;
     }
 
     internal void Run()
@@ -3090,7 +3093,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             throw new Exception("_data.Chooser == null");
         }
 
-        if (_gameActions.Client.CurrentServer == null)
+        if (_gameActions.Client.CurrentNode == null)
         {
             throw new Exception("_actor.Client.CurrentServer == null");
         }

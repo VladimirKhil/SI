@@ -33,6 +33,7 @@ public sealed class GameRunner
     private readonly ComputerAccount[] _defaultShowmans;
     private readonly string? _documentPath;
     private readonly IAvatarHelper _avatarHelper;
+    private readonly IPinHelper _pinHelper;
     private readonly string? _gameName;
     private readonly bool _createHost;
 
@@ -46,6 +47,7 @@ public sealed class GameRunner
         ComputerAccount[] defaultShowmans,
         string? documentPath,
         IAvatarHelper avatarHelper,
+        IPinHelper pinHelper,
         string? gameName = null,
         bool createHost = true)
     {
@@ -58,6 +60,7 @@ public sealed class GameRunner
         _defaultShowmans = defaultShowmans;
         _documentPath = documentPath;
         _avatarHelper = avatarHelper;
+        _pinHelper = pinHelper;
         _gameName = gameName;
         _createHost = createHost;
     }
@@ -161,7 +164,14 @@ public sealed class GameRunner
         var client = Client.Create(NetworkConstants.GameName, _node);
 
         var gameActions = new GameActions(client, gameData, localizer, _fileShare);
-        var gameLogic = new GameLogic(gameData, gameActions, /* TODO: This dependency should be removed by using engine callbacks */ engine, localizer, _fileShare);
+        
+        var gameLogic = new GameLogic(
+            gameData,
+            gameActions,
+            /* TODO: This dependency should be removed by using engine callbacks */ engine,
+            localizer,
+            _fileShare,
+            _pinHelper);
 
         questionPlayHandler.GameLogic = gameLogic;
         playHandler.GameActions = gameActions;

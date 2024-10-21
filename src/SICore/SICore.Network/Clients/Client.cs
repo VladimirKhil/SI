@@ -104,9 +104,9 @@ public sealed class Client : IClient
     }
 
     /// <summary>
-    /// Текущий сервер
+    /// Defines a node that the client is currently attached to.
     /// </summary>
-    public INode CurrentServer => Node;
+    public INode CurrentNode => Node;
 
     /// <summary>
     /// Подсоединение к серверу
