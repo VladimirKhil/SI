@@ -76,18 +76,26 @@ public static class WebView2Behavior
         webView2.NavigationStarting -= WebView2_NavigationStarting;
         webView2.Unloaded -= WebView2_Unloaded;
 
-        var coreWebView = webView2.CoreWebView2;
-
-        if (coreWebView != null)
+        try
         {
-            // Prevent WebView for producing sound after unload
-            coreWebView.IsMuted = true;
+            var coreWebView = webView2.CoreWebView2;
 
-            if (webView2.DataContext is IWebInterop webInterop)
+            if (coreWebView != null)
             {
-                webInterop.SendJsonMessage -= coreWebView.PostWebMessageAsJson;
-                webView2.WebMessageReceived -= WebView2_WebMessageReceived;
+                // Prevent WebView for producing sound after unload
+                coreWebView.IsMuted = true;
+
+                if (webView2.DataContext is IWebInterop webInterop)
+                {
+                    webInterop.SendJsonMessage -= coreWebView.PostWebMessageAsJson;
+                    webView2.WebMessageReceived -= WebView2_WebMessageReceived;
+                    webView2.CoreWebView2.ProcessFailed -= CoreWebView2_ProcessFailed;
+                }
             }
+        }
+        catch (InvalidOperationException exc)
+        {
+            Trace.TraceError(exc.ToString());
         }
     }
 
@@ -106,11 +114,20 @@ public static class WebView2Behavior
             {
                 webInterop.SendJsonMessage += webView2.CoreWebView2.PostWebMessageAsJson;
                 webView2.WebMessageReceived += WebView2_WebMessageReceived;
+                webView2.CoreWebView2.ProcessFailed += CoreWebView2_ProcessFailed;
             }
         }
         catch (Exception exc)
         {
             Trace.TraceError(exc.ToString());
+        }
+    }
+
+    private static void CoreWebView2_ProcessFailed(object? sender, CoreWebView2ProcessFailedEventArgs e)
+    {
+        if (sender is CoreWebView2)
+        {
+            MessageBox.Show($"Browser error: {e.ExitCode} {e.Reason} {e.ExitCode}");
         }
     }
 

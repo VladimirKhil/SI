@@ -125,6 +125,26 @@ public sealed class GameActions
         SystemReplic(s.ToString());
     }
 
+    public void SendThemeInfo(bool animate = false, int? overridenQuestionCount = null)
+    {
+        var theme = _gameData.Theme;
+        var themeInfo = theme.Info;
+
+        var message = new MessageBuilder(
+            Messages.Theme,
+            theme.Name,
+            overridenQuestionCount ?? theme.Questions.Count,
+            animate ? '+' : '-',
+            themeInfo.Comments.Text.EscapeNewLines(),
+            themeInfo.Authors.Count)
+            .AddRange(themeInfo.Authors)
+            .Add(themeInfo.Sources.Count)
+            .AddRange(themeInfo.Sources)
+            .ToString();
+
+        SendMessage(message);
+    }
+
     /// <summary>
     /// Informs receiver about round table state.
     /// </summary>

@@ -19,7 +19,6 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Windows.Input;
 using Utils;
-using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -103,8 +102,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         CanJoin = _currentGame != null && (!_currentGame.PasswordRequired || !string.IsNullOrEmpty(_password));
 
     public ICommand Cancel { get; }
-
-    public SimpleCommand AddEmoji { get; set; }
 
     public GamesFilter GamesFilter
     {
@@ -329,30 +326,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         }
     }
 
-    public string[] Emoji { get; } =
-        new string[] { "😃", "😁", "😪", "🎄", "🎓", "💥", "🦄", "🍋", "🍄", "🔥", "❤️", "✨", "🎅", "🎁", "☃️", "🦌" };
-
-    private string _chatText = "";
-
-    public string ChatText
-    {
-        get => _chatText;
-        set
-        {
-            if (_chatText != value)
-            {
-                _chatText = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public bool IsChatShown
-    {
-        get => _userSettings.GameSettings.AppSettings.IsChatShown;
-        set { _userSettings.GameSettings.AppSettings.IsChatShown = value; OnPropertyChanged(); }
-    }
-
     protected override string[] ContentPublicBaseUrls => _gamesHostInfo?.ContentPublicBaseUrls ?? Array.Empty<string>();
 
     private readonly IGameServerClient _gameServerClient;
@@ -392,8 +365,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         _gameServerClient.Closed += GameServerClient_Closed;
 
         ServerAddress = _gameServerClient.ServiceUri;
-
-        AddEmoji = new SimpleCommand(AddEmoji_Executed);
 
         _siStatisticsServiceClient = siStatisticsServiceClient;
 
@@ -439,14 +410,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             cancellationToken);
 
         return Task.CompletedTask;
-    }
-
-    private void AddEmoji_Executed(object? arg)
-    {
-        if (arg != null)
-        {
-            ChatText += arg.ToString();
-        }
     }
 
     private Task GameServerClient_Closed(Exception? exception)
@@ -695,31 +658,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
         using var contentServiceClient = _gamesHostInfo?.ContentInfos?.Length > 0 ? GetContentClient() : null;
         return await UploadAvatarAsync(contentServiceClient, Human, _cancellationTokenSource.Token);
-    }
-
-    public async void Load()
-    {
-        try
-        {
-            var news = await _gameServerClient.GetNewsNewAsync(_cancellationTokenSource.Token);
-
-            if (!string.IsNullOrEmpty(news))
-            {
-                OnMessage(Resources.News, news);
-            }
-
-            var latestMesssages = await _gameServerClient.GetLatestChatMessagesAsync(_cancellationTokenSource.Token);
-
-            foreach (var item in latestMesssages)
-            {
-                OnMessage(item.UserName, item.Text);
-            }
-        }
-        catch (Exception exc)
-        {
-            Error = exc.Message;
-            FullError = exc.ToString();
-        }
     }
 
     private async Task ReloadUsersAsync(CancellationToken cancellationToken = default)

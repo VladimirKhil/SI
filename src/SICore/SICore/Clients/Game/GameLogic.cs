@@ -659,14 +659,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         // Notify users that the media file is too large and could be downloaded slowly
-        var contentName = contentType == ContentTypes.Image ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Image))
-            : (contentType == ContentTypes.Audio ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio))
-            : (contentType == ContentTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video))
-            : R.File));
-
-        var errorMessage = string.Format(LO[nameof(R.OversizedFile)], contentName, fileLocation, maxRecommendedFileLength);
-
+        var errorMessage = string.Format(LO[nameof(R.OversizedFile)], R.File, fileLocation, maxRecommendedFileLength);
         _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage);
+        _gameActions.SendMessageWithArgs(Messages.UserError, ErrorCode.OversizedFile, contentType, maxRecommendedFileLength);
 
         if (_data.OversizedMediaNotificationsCount < MaxMediaNotifications)
         {
@@ -952,7 +947,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_data.Theme.Name}");
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _data.Theme.Name);
-        _gameActions.SendMessageWithArgs(Messages.Theme, _data.Theme.Name, 1);
+        _gameActions.SendThemeInfo(overridenQuestionCount: 1);
 
         ProceedToThemeAndQuestion();
     }

@@ -111,7 +111,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         return false;
     }
 
-    public void OnContentStart(IEnumerable<ContentItem> contentItems)
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
         if (GameLogic == null || GameData == null)
         {

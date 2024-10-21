@@ -1105,12 +1105,14 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (per.Name == message.Sender)
         {
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickYouself);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
         if (!per.IsHuman)
         {
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickBots);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
 
@@ -1142,12 +1144,14 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (person.Name == message.Sender)
         {
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanYourself);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
         if (!person.IsHuman)
         {
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanBots);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
 
@@ -1179,12 +1183,14 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (person.Name == message.Sender)
         {
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToYourself);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToYourself);
             return;
         }
 
         if (!person.IsHuman)
         {
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToBots);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToBots);
             return;
         }
 
@@ -2055,33 +2061,26 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (Logic.HaveMultipleAnswerers())
         {
-            ClientData.AnswererIndex = -1;
-
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
                 if (ClientData.Players[i].Name == message.Sender && ClientData.QuestionPlayState.AnswererIndicies.Contains(i))
                 {
-                    ClientData.AnswererIndex = i;
-                    break;
+                    ClientData.Players[i].Answer = args[1];
+                    return;
                 }
             }
 
-            if (ClientData.AnswererIndex == -1)
-            {
-                return;
-            }
+            return;
         }
-        else if (!ClientData.IsWaiting || ClientData.Answerer != null && ClientData.Answerer.Name != message.Sender)
+
+        var answerer = ClientData.Answerer;
+        
+        if (!ClientData.IsWaiting || answerer == null || !answerer.IsHuman || answerer.Name != message.Sender)
         {
             return;
         }
 
-        if (ClientData.Answerer == null || !ClientData.Answerer.IsHuman)
-        {
-            return;
-        }
-
-        ClientData.Answerer.Answer = args[1];
+        answerer.Answer = args[1];
     }
 
     private void OnAnswer(Message message, string[] args)
@@ -2583,7 +2582,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         try
         {
             ClientData.Players.RemoveAt(index);
-            Logic.AddHistory($"Player removed at {index}");
+            Logic.AddHistory($"Player removed at {index}; AnswererIndex: {ClientData.AnswererIndex}");
 
             try
             {
@@ -2670,6 +2669,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (ClientData.AnswererIndex > playerIndex)
         {
             ClientData.AnswererIndex--;
+            Logic.AddHistory($"AnswererIndex reduced to {ClientData.AnswererIndex}");
         }
         else if (ClientData.AnswererIndex == playerIndex)
         {

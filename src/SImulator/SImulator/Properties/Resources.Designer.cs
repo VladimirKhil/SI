@@ -79,6 +79,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Address to connect.
+        /// </summary>
+        public static string AddressToConnect {
+            get {
+                return ResourceManager.GetString("AddressToConnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Add sum.
         /// </summary>
         public static string AddSum {
@@ -961,6 +970,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Play content.
+        /// </summary>
+        public static string PlayContent {
+            get {
+                return ResourceManager.GetString("PlayContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Players.
         /// </summary>
         public static string Players {
@@ -1479,6 +1497,15 @@ namespace SImulator.Properties {
         public static string ShowPlayersList {
             get {
                 return ResourceManager.GetString("ShowPlayersList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Show QR code.
+        /// </summary>
+        public static string ShowQRCode {
+            get {
+                return ResourceManager.GetString("ShowQRCode", resourceCulture);
             }
         }
         

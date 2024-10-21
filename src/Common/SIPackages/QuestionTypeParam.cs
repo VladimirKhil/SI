@@ -6,7 +6,7 @@ namespace SIPackages;
 /// <summary>
 /// Defines a question type parameter.
 /// </summary>
-public sealed class QuestionTypeParam : Named, IEquatable<QuestionTypeParam>
+internal sealed class QuestionTypeParam : Named, IEquatable<QuestionTypeParam>
 {
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private string _value = "";

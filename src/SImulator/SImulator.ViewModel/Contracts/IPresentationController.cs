@@ -18,6 +18,8 @@ public interface IPresentationController : IDisposable
 
     event Action<Exception>? Error;
 
+    bool CanControlMedia { get; }
+
     /// <summary>
     /// Starts new game.
     /// </summary>
@@ -93,6 +95,8 @@ public interface IPresentationController : IDisposable
 
     void RunTimer();
 
+    void RunPlayerTimer(int playerIndex, int maxTime) { }
+
     void PauseTimer(int currentTime);
 
     void StopTimer();
@@ -151,4 +155,10 @@ public interface IPresentationController : IDisposable
     void NoAnswer();
 
     void OnFinalThink();
+
+    void SetPause(bool pause, int passedTime) { }
+
+    void ShowQRCode(string? value) { }
+
+    void OnPlayerPassed(int playerIndex) { }
 }

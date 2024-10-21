@@ -17,16 +17,14 @@ internal static class PackageItemsHelper
         var question = new Question
         {
             Price = price,
-            Parameters = new StepParameters
+        };
+
+        question.Parameters[QuestionParameterNames.Question] = new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue = new List<ContentItem>
             {
-                [QuestionParameterNames.Question] = new StepParameter
-                {
-                    Type = StepParameterTypes.Content,
-                    ContentValue = new List<ContentItem>
-                    {
-                        new() { Type = ContentTypes.Text, Value = "" },
-                    }
-                }
+                new() { Type = ContentTypes.Text, Value = "" },
             }
         };
 

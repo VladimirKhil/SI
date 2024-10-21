@@ -16,10 +16,11 @@ button.join:nth-child(1), button.join:nth-child(3) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	width: 100%;
 }
 
 .tableContextView {
-	min-width: 600px;
+	width: 100%;
 }
 
 	.tableContextView .reactionButton, .tableContextView .ready_button {

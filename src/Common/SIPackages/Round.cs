@@ -1,7 +1,6 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
 using SIPackages.Models;
-using SIPackages.Properties;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml;
@@ -33,7 +32,7 @@ public sealed class Round : InfoOwner, IEquatable<Round>
     }
 
     /// <inheritdoc/>
-    public override string ToString() => $"{Resources.Round}: {Resources.Round}";
+    public override string ToString() => Name;
 
     /// <summary>
     /// Создание темы

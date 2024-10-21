@@ -717,16 +717,6 @@ public sealed class SIDocument : IDisposable
         sources[index] = $"@{Sources[collectionIndex].Id}";
     }
 
-    /// <summary>
-    /// Связывание единицы сценария и хранилища
-    /// </summary>
-    /// <param name="atom">Единица сценария</param>
-    /// <param name="entryName">Название объекта в хранилище</param>
-    public static void SetLink(Atom atom, string entryName)
-    {
-        atom.Text = $"@{entryName}";
-    }
-
     #endregion
 
     #region Collection functions

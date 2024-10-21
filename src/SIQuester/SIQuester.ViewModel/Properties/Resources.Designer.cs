@@ -124,6 +124,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Audio.
+        /// </summary>
+        public static string Audio {
+            get {
+                return ResourceManager.GetString("Audio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Audio file {0} is not set as a background.
         /// </summary>
         public static string AudioIsNotOnBackground {
@@ -653,11 +662,29 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на HTML.
+        /// </summary>
+        public static string Html {
+            get {
+                return ResourceManager.GetString("Html", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на HTML Files.
         /// </summary>
         public static string HtmlFiles {
             get {
                 return ResourceManager.GetString("HtmlFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Image.
+        /// </summary>
+        public static string Image {
+            get {
+                return ResourceManager.GetString("Image", resourceCulture);
             }
         }
         
@@ -1054,6 +1081,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string OtherTypeQuestion {
             get {
                 return ResourceManager.GetString("OtherTypeQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Package.
+        /// </summary>
+        public static string Package {
+            get {
+                return ResourceManager.GetString("Package", resourceCulture);
             }
         }
         
@@ -1755,6 +1791,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Package version {0} is not supported. Maximum supported version is {1}.
+        /// </summary>
+        public static string UnsupportedVersion {
+            get {
+                return ResourceManager.GetString("UnsupportedVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Nameless.
         /// </summary>
         public static string Untitled {
@@ -1769,6 +1814,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string UnusedFile {
             get {
                 return ResourceManager.GetString("UnusedFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Video.
+        /// </summary>
+        public static string Video {
+            get {
+                return ResourceManager.GetString("Video", resourceCulture);
             }
         }
         

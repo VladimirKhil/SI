@@ -349,7 +349,11 @@ public sealed class QuestionEngine
                     {
                         if (_contentIndex == 0)
                         {
-                            _playHandler.OnContentStart(content.ContentValue);
+                            var currentStepIndex = _stepIndex;
+
+                            _playHandler.OnContentStart(
+                                content.ContentValue,
+                                index => MoveToContent(currentStepIndex, content.ContentValue.Count, index));
                         }
 
                         var contentItem = content.ContentValue[_contentIndex++];
@@ -411,6 +415,16 @@ public sealed class QuestionEngine
         }
 
         return false;
+    }
+
+    private void MoveToContent(int stepIndex, int maxContentIndex, int contentIndex)
+    {
+        if (contentIndex > -1 && contentIndex < maxContentIndex)
+        {
+            _stepIndex = stepIndex;
+            _contentIndex = contentIndex;
+            PlayNext();
+        }
     }
 
     private StepParameter? TryGetParameter(Step step, string parameter)

@@ -1,5 +1,4 @@
 ﻿using SIPackages.Core;
-using SIPackages.Properties;
 using SIPackages.TypeConverters;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -35,7 +34,7 @@ public sealed class Comments : PropertyChangedNotifier, IEquatable<Comments>
     }
 
     /// <inheritdoc />
-    public override string ToString() => $"{Resources.Comments}: {_text}";
+    public override string ToString() => _text;
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is Comments other && Equals(other);

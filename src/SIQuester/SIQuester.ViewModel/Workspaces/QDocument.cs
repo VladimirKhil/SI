@@ -98,10 +98,10 @@ public sealed class QDocument : WorkspaceViewModel
 
     public MediaStorageViewModel? TryGetCollectionByMediaType(string mediaType) => mediaType switch
     {
-        AtomTypes.Image => Images,
-        AtomTypes.Audio or AtomTypes.AudioNew => Audio,
-        AtomTypes.Video => Video,
-        AtomTypes.Html => Html,
+        ContentTypes.Image => Images,
+        ContentTypes.Audio => Audio,
+        ContentTypes.Video => Video,
+        ContentTypes.Html => Html,
         _ => null,
     };
 
@@ -1206,9 +1206,9 @@ public sealed class QDocument : WorkspaceViewModel
         var msvmLogger = loggerFactory.CreateLogger<MediaStorageViewModel>();
 
         Images = new MediaStorageViewModel(this, Document.Images, Resources.Images, msvmLogger, true);
-        Audio = new MediaStorageViewModel(this, Document.Audio, SIPackages.Properties.Resources.Audio, msvmLogger);
-        Video = new MediaStorageViewModel(this, Document.Video, SIPackages.Properties.Resources.Video, msvmLogger);
-        Html = new MediaStorageViewModel(this, Document.Html, SIPackages.Properties.Resources.Html, msvmLogger);
+        Audio = new MediaStorageViewModel(this, Document.Audio, Resources.Audio, msvmLogger);
+        Video = new MediaStorageViewModel(this, Document.Video, Resources.Video, msvmLogger);
+        Html = new MediaStorageViewModel(this, Document.Html, Resources.Html, msvmLogger);
 
         Images.Changed += OperationsManager.AddChange;
         Audio.Changed += OperationsManager.AddChange;
@@ -1683,7 +1683,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                             foreach (var item in question.GetContent())
                             {
-                                if (item.Type != AtomTypes.Image && item.Type != AtomTypes.Audio && item.Type != AtomTypes.AudioNew && item.Type != AtomTypes.Video && item.Type != AtomTypes.Html)
+                                if (item.Type != ContentTypes.Image && item.Type != ContentTypes.Audio && item.Type != ContentTypes.Video && item.Type != ContentTypes.Html)
                                 {
                                     continue;
                                 }
@@ -3137,19 +3137,6 @@ public sealed class QDocument : WorkspaceViewModel
         base.Dispose(disposing);
     }
 
-    internal IMedia Wrap(Atom atom)
-    {
-        var link = atom.Text;
-
-        if (!atom.IsLink) // External link
-        {
-            return new Media(link);
-        }
-
-        var collection = GetCollectionByMediaType(atom.Type);
-        return collection.Wrap(link[1..]);
-    }
-
     internal IMedia Wrap(ContentItem contentItem)
     {
         var link = contentItem.Value;
@@ -3314,7 +3301,7 @@ public sealed class QDocument : WorkspaceViewModel
                 unusedFiles.Append(", ");
             }
 
-            unusedFiles.Append($"{SIPackages.Properties.Resources.Image}: {file}");
+            unusedFiles.Append($"{Resources.Image}: {file}");
         }
 
         foreach (var file in unusedAudio)
@@ -3324,7 +3311,7 @@ public sealed class QDocument : WorkspaceViewModel
                 unusedFiles.Append(", ");
             }
 
-            unusedFiles.Append($"{SIPackages.Properties.Resources.Audio}: {file}");
+            unusedFiles.Append($"{Resources.Audio}: {file}");
         }
 
         foreach (var file in unusedVideo)
@@ -3334,7 +3321,7 @@ public sealed class QDocument : WorkspaceViewModel
                 unusedFiles.Append(", ");
             }
 
-            unusedFiles.Append($"{SIPackages.Properties.Resources.Video}: {file}");
+            unusedFiles.Append($"{Resources.Video}: {file}");
         }
 
         foreach (var file in unusedHtml)
@@ -3344,7 +3331,7 @@ public sealed class QDocument : WorkspaceViewModel
                 unusedFiles.Append(", ");
             }
 
-            unusedFiles.Append($"{SIPackages.Properties.Resources.Html}: {file}");
+            unusedFiles.Append($"{Resources.Html}: {file}");
         }
 
         if (unusedFiles.Length == 0)

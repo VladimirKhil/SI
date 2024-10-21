@@ -44,6 +44,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private int _playerCount;
     private readonly SoundsSettings _soundsSettings;
 
+    public bool CanControlMedia => false;
+
     public WebPresentationController(IDisplayDescriptor displayDescriptor, IPresentationListener presentationListener, SoundsSettings soundsSettings)
     {
         _displayDescriptor = displayDescriptor;
@@ -86,6 +88,14 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         _isAnswerSimple = false;
         _isAnswer = false;
     }
+
+    public void RunPlayerTimer(int playerIndex, int maxTime) => SendMessage(new
+    {
+        Type = "timerRun",
+        TimerIndex = 2,
+        TimerArgument = maxTime,
+        TimerPersonIndex = playerIndex
+    });
 
     public void PauseTimer(int currentTime) => SendMessage(new
     {
@@ -169,6 +179,11 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             Type = "answerOptionsLayout",
             QuestionHasScreenContent = true,
             TypeNames = answerOptions.Select(o => o.Content.Type.ToString().ToLowerInvariant()).ToArray()
+        });
+
+        SendMessage(new
+        {
+            Type = "askAnswer"
         });
 
         _answerOptions = answerOptions;
@@ -535,6 +550,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         ReadingSpeed = readingSpeed
     });
 
+    public void SetPause(bool pause, int passedTime) => SendMessage(new
+    {
+        Type = "pause",
+        IsPaused = pause,
+        CurrentTime = new int[] { 0, passedTime, 0 }
+    });
+
     public void SetSimpleAnswer() => _isAnswerSimple = true;
 
     public void OnAnswerStart() => _isAnswer = true;
@@ -575,6 +597,14 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         PlayerIndex = playerIndex
     });
 
+    public void ShowQRCode(string? value) => SendMessage(new
+    {
+        Type = "qrCode",
+        QrCode = value
+    });
+
+    public void OnPlayerPassed(int playerIndex) => SendMessage(new { Type = "pass", PlayerIndex = playerIndex });
+
     public void OnMessage(string message)
     {
         var data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(message);
@@ -612,6 +642,29 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
             case "deleteTheme":
                 DeletionCallback?.Invoke(data["themeIndex"].GetInt32());
+                break;
+
+            case "sendAnswer":
+                var answer = data["answer"].GetString();
+                int answerIndex;
+
+                if (_answerOptions != null)
+                {
+                    for (answerIndex = 0; answerIndex < _answerOptions.Length; answerIndex++)
+                    {
+                        if (_answerOptions[answerIndex].Label == answer)
+                        {
+                            _presentationListener.OnAnswerSelected(answerIndex);
+                            break;
+                        }
+                    }
+                }
+
+                SendMessage(new
+                {
+                    Type = "askAnswer"
+                });
+
                 break;
 
             default:

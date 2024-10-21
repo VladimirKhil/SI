@@ -141,6 +141,8 @@ public partial class App : Application
         base.OnExit(e);
     }
 
+    internal static Version ProductVersion => typeof(MainViewModel).Assembly.GetName().Version ?? new Version();
+
 #if !DEBUG
     private async void ProcessAsync(CancellationToken cancellationToken = default)
     {
@@ -150,7 +152,7 @@ public partial class App : Application
 
         try
         {
-            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version ?? throw new Exception("No app version found");
+            var currentVersion = ProductVersion;
 
             // Update application launch counter
             await appRegistryClient.Apps.PostAppUsageAsync(
@@ -247,7 +249,7 @@ public partial class App : Application
                 MessageBoxImage.Question) == MessageBoxResult.Yes)
         {
             var appRegistryServiceClient = _host.Services.GetRequiredService<IAppRegistryServiceClient>();
-            var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
+            var version = ProductVersion;
             var errorMessage = e.Exception.ToStringDemystified();
 
             try

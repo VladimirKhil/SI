@@ -1,5 +1,4 @@
 ﻿using SIPackages.Core;
-using SIPackages.Properties;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -10,10 +9,10 @@ public sealed class ContentTypeConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value switch
     {
         ContentTypes.Text => Properties.Resources.Text,
-        ContentTypes.Image => Resources.Image,
-        ContentTypes.Audio => Resources.Audio,
-        ContentTypes.Video => Resources.Video,
-        ContentTypes.Html => Resources.Html,
+        ContentTypes.Image => ViewModel.Properties.Resources.Image,
+        ContentTypes.Audio => ViewModel.Properties.Resources.Audio,
+        ContentTypes.Video => ViewModel.Properties.Resources.Video,
+        ContentTypes.Html => ViewModel.Properties.Resources.Html,
         _ => value
     };
 

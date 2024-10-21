@@ -19,6 +19,8 @@ public interface IButtonManagerListener
 
     void OnPlayerPressed(string playerName) { }
 
+    void OnPlayerPassed(string playerName) { }
+
     PlayerInfo? GetPlayerById(string playerId, bool strict);
     
     void OnPlayerAdded(string playerName) { }

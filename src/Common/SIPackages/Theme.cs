@@ -1,7 +1,6 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
 using SIPackages.Models;
-using SIPackages.Properties;
 using System.Xml;
 
 namespace SIPackages;
@@ -17,7 +16,7 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
     public List<Question> Questions { get; } = new();
 
     /// <inheritdoc />
-    public override string ToString() => $"{Resources.Theme}: {Name}";
+    public override string ToString() => Name;
 
     /// <summary>
     /// Creates a new question in the theme.
@@ -31,17 +30,15 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
 
         var quest = new Question
         {
-            Price = qPrice,
-            Parameters = new StepParameters
+            Price = qPrice
+        };
+
+        quest.Parameters[QuestionParameterNames.Question] = new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue = new List<ContentItem>
             {
-                [QuestionParameterNames.Question] = new StepParameter
-                {
-                    Type = StepParameterTypes.Content,
-                    ContentValue = new List<ContentItem>
-                    {
-                        new() { Type = ContentTypes.Text, Value = text },
-                    }
-                }
+                new() { Type = ContentTypes.Text, Value = text },
             }
         };
 

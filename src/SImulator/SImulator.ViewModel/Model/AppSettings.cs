@@ -135,7 +135,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         get => _questionReadingSpeed;
         set
         {
-            if (_questionReadingSpeed != value && value > 0)
+            if (_questionReadingSpeed != value && value >= 0)
             {
                 _questionReadingSpeed = value;
                 OnPropertyChanged();

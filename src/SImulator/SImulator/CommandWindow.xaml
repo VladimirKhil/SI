@@ -43,8 +43,6 @@
             <my:GameModeToVisibilityConverter x:Key="StartView" Mode="{x:Static vmc:GameMode.Start}" />
             <my:GameModeToVisibilityConverter x:Key="ModeratorView" Mode="{x:Static vmc:GameMode.Moderator}" />
 
-            <my:GameModeToNonVisibilityConverter x:Key="DisplayView" Mode="{x:Static vmc:GameMode.Moderator}" />
-
             <my:GameModeToBooleanConverter x:Key="IsStart" Mode="{x:Static vmc:GameMode.Start}" />
             <my:GameModeToBooleanConverter x:Key="IsModerator" Mode="{x:Static vmc:GameMode.Moderator}" />
 
@@ -246,6 +244,8 @@
                 </uic:TemplateConverter.Templates>
             </uic:TemplateConverter>
 
+            <my:IncludeConverter x:Key="IncludeConverter" />
+
             <ControlTemplate x:Key="QuestGrid" TargetType="{x:Type ContentControl}">
                 <ScrollViewer
                     HorizontalScrollBarVisibility="Disabled"
@@ -282,33 +282,73 @@
 
                         <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.Question}" Foreground="DarkGray" />
 
-                        <ListBox
+                        <ItemsControl
                             Grid.Row="1"
                             Grid.Column="1"
                             ItemsSource="{Binding ContentItems}"
-                            SelectionMode="Multiple"
-                            lb:ListBoxExtensions.SelectedItems="{Binding ActiveContent}"
-                            IsEnabled="False"
+                            IsEnabled="True"
                             BorderThickness="0"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                            <ListBox.ItemsPanel>
+                            <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel />
                                 </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
+                            </ItemsControl.ItemsPanel>
 
-                            <ListBox.ItemTemplate>
+                            <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock x:Name="text" Grid.Column="1" TextWrapping="Wrap">
-                                        <Run
-                                            Text="{Binding Placement, Converter={StaticResource PlacementConverter}}"
-                                            Foreground="Gray" /><Run
-                                            Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}"
-                                            Foreground="Gray" /><Run Text="{Binding Value}" />
-                                    </TextBlock>
+                                    <Border x:Name="bd">
+                                        <DockPanel>
+                                            <Button
+                                                Command="{Binding DataContext.MoveToContent, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="{x:Static lp:Resources.PlayContent}"
+                                                Width="30"
+                                                BorderThickness="0"
+                                                Margin="0,4,10,4"
+                                                Padding="3"
+                                                Foreground="#333333">
+                                                <Path
+                                                    Data="M0,0L11.6,6.7L0,13.4z"
+                                                    Stretch="Uniform"
+                                                    Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter Property="Visibility" Value="Hidden" />
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                           </Button>
+
+                                           <TextBlock x:Name="text" Grid.Column="1" TextWrapping="Wrap">
+                                                <Run
+                                                    Text="{Binding Placement, Converter={StaticResource PlacementConverter}}"
+                                                    Foreground="Gray" /><Run
+                                                    Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}"
+                                                    Foreground="Gray" /><Run Text="{Binding Value}" />
+                                            </TextBlock>
+                                        </DockPanel>
+                                    </Border>
+
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource IncludeConverter}">
+                                                    <Binding Path="DataContext.ActiveContent" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            
+                                            <Setter TargetName="bd" Property="Background" Value="Lavender" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
                                 </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
                         <StackPanel
                             Visibility="{Binding ActiveMediaCommand, Converter={StaticResource NotNull}}"
@@ -598,7 +638,54 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.Game}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.Game}" />
+
+                        <ToggleButton
+                            IsChecked="{Binding IsPaused}"
+                            ToolTip="{x:Static lp:Resources.Pause}"
+                            BorderThickness="0"
+                            Foreground="Black"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Padding="6"
+                            Margin="10,2,0,0"
+                            Height="23"
+                            Width="50">
+                            <Image Stretch="Uniform">
+                                <Image.Source>
+                                    <DrawingImage>
+                                        <DrawingImage.Drawing>
+                                            <DrawingGroup>
+                                                <DrawingGroup.Children>
+                                                    <GeometryDrawing
+                                                        Geometry="M0,0L1,0L1,4L0,4z"
+                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton},Path=Foreground}" />
+
+                                                    <GeometryDrawing
+                                                        Geometry="M2,0L3,0L3,4L2,4z"
+                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton},Path=Foreground}" />
+                                                </DrawingGroup.Children>
+                                            </DrawingGroup>
+                                        </DrawingImage.Drawing>
+                                    </DrawingImage>
+                                </Image.Source>
+                            </Image>
+
+                            <ToggleButton.Style>
+                                <Style TargetType="ToggleButton">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding LocalInfo.TStage}" Value="{x:Static uim:TableStage.Question}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+                    </StackPanel>
+
                     <Separator Grid.Row="1" Width="250" />
 
                     <DockPanel Grid.Row="2">
@@ -717,6 +804,45 @@
                                 </Image.Source>
                             </Image>
                         </RadioButton>
+
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Background="#EEEEEE"
+                            Margin="10,0,0,0">
+                            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0">
+                                <Run Text="{x:Static lp:Resources.AddressToConnect}" />
+                                <Run Text="http://" />
+                            </TextBlock>
+
+                            <ComboBox
+                                Width="100"
+                                IsEditable="True"
+                                ItemsSource="{Binding IpAddresses}"
+                                SelectedItem="{Binding CurrentIpAddress}" />
+
+                            <TextBlock VerticalAlignment="Center">
+                                <Run Text=":" /><Run Text="{Binding Settings.Model.WebPort}" />
+                            </TextBlock>
+
+                            <ToggleButton
+                                Content="{x:Static lp:Resources.ShowQRCode}"
+                                IsChecked="{Binding QRCodeShown}"
+                                Padding="10,0"
+                                BorderThickness="0"
+                                Margin="10,0,0,0" />
+
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="{Binding ManagedMode, Converter={StaticResource BVConverter}}" />
+                                    
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding PresentationController.CanControlMedia}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                        </StackPanel>
                     </StackPanel>
 
                     <Border Margin="0,5,0,0" Grid.Row="5">

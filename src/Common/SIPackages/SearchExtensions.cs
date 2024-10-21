@@ -47,12 +47,4 @@ public static class SearchExtensions
 
         yield return new SearchData(str, index, kind);
     }
-
-    /// <summary>
-    /// Searches a value inside <see cref="Atom" />.
-    /// </summary>
-    /// <param name="atom">Atom to search within.</param>
-    /// <param name="value">Value to search.</param>
-    /// <returns>Search results.</returns>
-    public static IEnumerable<SearchData> Search(this Atom atom, string value) => Search(ResultKind.Text, atom.Text, value);
 }

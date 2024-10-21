@@ -7,7 +7,7 @@ namespace SIPackages;
 /// Defines a question scenario.
 /// </summary>
 /// <inheritdoc cref="List{T}" />
-public sealed class Scenario : List<Atom>, IEquatable<Scenario>
+internal sealed class Scenario : List<Atom>, IEquatable<Scenario>
 {
     /// <inheritdoc />
     public override string ToString() => string.Join(Environment.NewLine, this.Select(atom => atom.ToString()).ToArray());
@@ -17,23 +17,6 @@ public sealed class Scenario : List<Atom>, IEquatable<Scenario>
     /// </summary>
     /// <param name="value">Text value.</param>
     public bool ContainsQuery(string value) => this.Any(item => item.Contains(value));
-
-    /// <summary>
-    /// Searches a value inside the object.
-    /// </summary>
-    /// <param name="value">Value to search.</param>
-    /// <returns>Search results.</returns>
-    public IEnumerable<SearchData> Search(string value)
-    {
-        for (var i = 0; i < Count; i++)
-        {
-            foreach (var item in this[i].Search(value))
-            {
-                item.ItemIndex = i;
-                yield return item;
-            }
-        }
-    }
 
     /// <summary>
     /// Adds new atom to this scenario.

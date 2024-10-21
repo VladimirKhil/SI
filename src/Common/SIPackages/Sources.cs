@@ -1,6 +1,5 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
-using SIPackages.Properties;
 
 namespace SIPackages;
 
@@ -21,7 +20,7 @@ public sealed class Sources : List<string>, IEquatable<Sources>
     public Sources(IEnumerable<string> collection) : base(collection) { }
 
     /// <inheritdoc />
-    public override string ToString() => $"{Resources.Sources}: {this.ToCommonString()}";
+    public override string ToString() => this.ToCommonString();
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is Sources other && Equals(other);

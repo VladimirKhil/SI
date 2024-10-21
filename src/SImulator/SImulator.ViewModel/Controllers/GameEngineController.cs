@@ -153,6 +153,21 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
 
         GameViewModel.ActiveContent = content;
+
+        var moveToContent = GameViewModel.MoveToContent;
+        moveToContent.ExecutionContext.Clear();
+
+        var canMoveToContent = true;
+
+        foreach (var item in content)
+        {
+            if (canMoveToContent)
+            {
+                moveToContent.ExecutionContext.Add(item);
+            }
+
+            canMoveToContent = item.WaitForFinish;
+        }
     }
 
     public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility)
@@ -262,7 +277,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         PresentationController.OnAnswerStart();
     }
 
-    public void OnContentStart(IEnumerable<ContentItem> contentItems)
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
         if (GameViewModel == null)
         {
@@ -275,6 +290,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         GameViewModel.ContentItems = contentItems;
         GameViewModel.ActiveMediaCommand = null;
         GameViewModel.DecisionMode = DecisionMode.None;
+        GameViewModel.MoveToContentCallback = moveToContentCallback;
     }
 
     public void OnSimpleRightAnswerStart()

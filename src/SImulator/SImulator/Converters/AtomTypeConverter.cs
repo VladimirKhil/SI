@@ -24,14 +24,11 @@ public sealed class AtomTypeConverter : IValueConverter
     private static string GetLocalizedName(string value) =>
         value switch
         {
-            AtomTypes.Text => "",
-            AtomTypes.Image => Resources.Image,
-            AtomTypes.Audio => Resources.Audio,
-            AtomTypes.AudioNew => Resources.Audio,
-            AtomTypes.Video => Resources.Video,
-            AtomTypes.Oral => Resources.Oral,
-            AtomTypes.Html => Resources.Html,
-            AtomTypes.Marker => Resources.Answer,
+            ContentTypes.Text => "",
+            ContentTypes.Image => Resources.Image,
+            ContentTypes.Audio => Resources.Audio,
+            ContentTypes.Video => Resources.Video,
+            ContentTypes.Html => Resources.Html,
             _ => Resources.UnknownType,
         };
 }

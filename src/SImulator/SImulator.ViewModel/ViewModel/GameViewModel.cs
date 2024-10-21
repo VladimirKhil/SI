@@ -3,13 +3,13 @@ using SIEngine.Rules;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Helpers;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
-using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -137,8 +137,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     public ICommand RunQuestionTimer { get; private set; }
     public ICommand StopQuestionTimer { get; private set; }
 
-    public ICommand RunMediaTimer { get; private set; }
-    public ICommand StopMediaTimer { get; private set; }
+    public ICommand? RunMediaTimer { get; private set; }
+    public ICommand? StopMediaTimer { get; private set; }
 
     public SimpleCommand AddPlayer { get; private set; }
     public SimpleCommand RemovePlayer { get; private set; }
@@ -313,16 +313,23 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         set { _activeTheme = value; OnPropertyChanged(); }
     }
 
-    private IEnumerable<ContentItem>? _contentItems = null;
+    private IReadOnlyList<ContentItem>? _contentItems = null;
 
     /// <summary>
     /// Currently played content items.
     /// </summary>
-    public IEnumerable<ContentItem>? ContentItems
+    public IReadOnlyList<ContentItem>? ContentItems
     {
         get => _contentItems;
         set { _contentItems = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// Moves question play to specific content item.
+    /// </summary>
+    public ContextCommand MoveToContent { get; private set; }
+
+    public Action<int>? MoveToContentCallback { get; set; }
 
     private IReadOnlyCollection<ContentItem> _activeContent = Array.Empty<ContentItem>();
 
@@ -476,7 +483,127 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private IReadOnlyList<Theme>? _roundThemes;
 
-    public bool ManagedMode { get; private set; }
+    private bool _managedMode;
+
+    public bool ManagedMode
+    {
+        get => _managedMode;
+        set
+        {
+            if (_managedMode != value)
+            {
+                _managedMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string[]? _ipAddresses = null;
+
+    public string[]? IpAddresses
+    {
+        get
+        {
+            if (_ipAddresses == null)
+            {
+                LoadIpAddresses();
+            }           
+
+            return _ipAddresses;
+        }
+    }
+
+    private readonly object _ipAddressesLock = new();
+    private bool _isLoadingAddresses = false;
+
+    private async void LoadIpAddresses()
+    {
+        lock (_ipAddressesLock)
+        {
+            if (_isLoadingAddresses)
+            {
+                return;
+            }
+
+            _isLoadingAddresses = true;
+        }
+
+        _ipAddresses = await NetworkHelper.GetIdAddressesAsync();
+        OnPropertyChanged(nameof(IpAddresses));
+
+        CurrentIpAddress = NetworkHelper.FindLocalNetworkAddress(_ipAddresses);
+    }
+
+    private string _currentIpAddress = "";
+
+    public string CurrentIpAddress
+    {
+        get => _currentIpAddress;
+        set
+        {
+            if (_currentIpAddress != value)
+            {
+                _currentIpAddress = value;
+                OnPropertyChanged();
+                UpdateQRCode();
+            }
+        }
+    }
+
+    private bool _qRCodeShown = false;
+
+    public bool QRCodeShown
+    {
+        get => _qRCodeShown;
+        set
+        {
+            if (_qRCodeShown != value)
+            {
+                _qRCodeShown = value;
+                OnPropertyChanged();
+                UpdateQRCode();
+            }
+        }
+    }
+
+    private void UpdateQRCode() => PresentationController.ShowQRCode(
+        _qRCodeShown ? $"http://{_currentIpAddress}:{Settings.Model.WebPort}" : null);
+
+    private bool _isPaused = false;
+
+    public bool IsPaused
+    {
+        get => _isPaused;
+        set
+        {
+            if (_isPaused != value)
+            {
+                _isPaused = value;
+                OnPropertyChanged();
+                OnIsPausedChanged();
+            }
+        }
+    }
+
+    private bool _timerPaused;
+
+    private void OnIsPausedChanged()
+    {
+        PresentationController.SetPause(IsPaused, QuestionTime * 10);
+
+        if (IsPaused && ActiveQuestionCommand == StopQuestionTimer)
+        {
+            _questionTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            ActiveQuestionCommand = RunQuestionTimer;
+            _timerPaused = true;
+        }
+        else if (!IsPaused && _timerPaused)
+        {
+            _questionTimer.Change(1000, 1000);
+            ActiveQuestionCommand = StopQuestionTimer;
+            _timerPaused = false;
+        }
+    }
 
     #endregion
 
@@ -521,6 +648,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         MakeStake = new SimpleCommand(MakeStake_Executed);
         _addRight = new SimpleCommand(AddRight_Executed);
         _addWrong = new SimpleCommand(AddWrong_Executed);
+        MoveToContent = new ContextCommand(MoveToContent_Executed);
 
         RunRoundTimer = new SimpleUICommand(RunRoundTimer_Executed) { Name = Resources.Run };
         StopRoundTimer = new SimpleUICommand(StopRoundTimer_Executed) { Name = Resources.Pause };
@@ -528,8 +656,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         RunQuestionTimer = new SimpleUICommand(RunQuestionTimer_Executed) { Name = Resources.Run };
         StopQuestionTimer = new SimpleUICommand(StopQuestionTimer_Executed) { Name = Resources.Pause };
 
-        RunMediaTimer = new SimpleUICommand(RunMediaTimer_Executed) { Name = Resources.Run };
-        StopMediaTimer = new SimpleUICommand(StopMediaTimer_Executed) { Name = Resources.Pause };
+        if (presentationController.CanControlMedia)
+        {
+            RunMediaTimer = new SimpleUICommand(RunMediaTimer_Executed) { Name = Resources.Run };
+            StopMediaTimer = new SimpleUICommand(StopMediaTimer_Executed) { Name = Resources.Pause };
+        }
 
         _presentationListener.NextRound = _nextRound = new SimpleCommand(NextRound_Executed) { CanBeExecuted = false };
         _presentationListener.PreviousRound = _previousRound = new SimpleCommand(PreviousRound_Executed) { CanBeExecuted = false };
@@ -559,6 +690,23 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _presentationListener.MediaEnd += GameHost_MediaEnd;
         _presentationListener.RoundThemesFinished += GameHost_RoundThemesFinished;
         _presentationListener.AnswerSelected += PresentationListener_AnswerSelected;
+    }
+
+    private void MoveToContent_Executed(object? arg)
+    {
+        if (ContentItems == null || arg is not ContentItem contentItem)
+        {
+            return;
+        }
+
+        for (var i = 0; i < ContentItems.Count; i++)
+        {
+            if (ContentItems[i] == contentItem)
+            {
+                MoveToContentCallback?.Invoke(i);
+                break;
+            }
+        }        
     }
 
     public void ExecuteTask(Tasks taskId, int arg)
@@ -970,6 +1118,16 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         _thinkingTimer.Change(1000, 1000);
+
+        if (_selectedPlayer != null)
+        {
+            var playerIndex = Players.IndexOf(_selectedPlayer);
+
+            if (playerIndex >= 0)
+            {
+                PresentationController.RunPlayerTimer(playerIndex, ThinkingTimeMax * 10);
+            }
+        }
     }
 
     public void StopThinkingTimer_Executed(object? arg)
@@ -1240,6 +1398,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         try
         {
+            if (IsPaused)
+            {
+                IsPaused = false;
+            }
+
             if (_continuation != null)
             {
                 _continuation();
@@ -1900,10 +2063,22 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         player.Answer = answer;
     }
 
+    public void OnPlayerPassed(string playerName)
+    {
+        for (var i = 0; i < Players.Count; i++)
+        {
+            if (Players[i].Name == playerName)
+            {
+                PresentationController.OnPlayerPassed(i);
+                break;
+            }
+        }
+    }
+
     private bool ProcessPlayerPress(int index, PlayerInfo player)
     {
         // The player has pressed already
-        if (_selectedPlayers.Contains(player))
+        if (_selectedPlayers.Contains(player) || IsPaused)
         {
             return false;
         }
@@ -2074,6 +2249,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         State = QuestionState.Normal;
         _previousState = QuestionState.Normal;
+
+        foreach (var player in Players)
+        {
+            player.Answer = "";
+        }
     }
 
     internal void OnContentStart()

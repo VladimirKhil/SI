@@ -34,8 +34,7 @@ public sealed class CommonTests
         game.Next.Execute(null);
 
         game.LocalInfo.SelectQuestion.Execute(game.LocalInfo.RoundInfo[0].Questions[0]);
-
-        game.Next.Execute(null);
+        await Task.Delay(2000); // TODO: make test more stable
 
         Assert.That(
             ((PresentationController)game.PresentationController).TInfo.Text,

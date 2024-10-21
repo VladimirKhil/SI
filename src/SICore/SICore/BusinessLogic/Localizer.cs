@@ -8,8 +8,6 @@ public sealed class Localizer : ILocalizer
 {
     private readonly ResourceManager _resourceManager;
 
-    private ResourceManager _packagesResourceManager;
-
     public CultureInfo Culture { get; }
 
     public Localizer(string culture)
@@ -19,13 +17,4 @@ public sealed class Localizer : ILocalizer
     }
 
     public string this[string key] => _resourceManager.GetString(key, Culture);
-
-    public string GetPackagesString(string key)
-    {
-        _packagesResourceManager ??= new ResourceManager(
-            "SIPackages.Properties.Resources",
-            typeof(SIPackages.Properties.Resources).Assembly);
-
-        return _packagesResourceManager.GetString(key, Culture);
-    }
 }

@@ -42,7 +42,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// </summary>
     [Obsolete("Left for backward compatibility with old format. Use TypeName and Parameters properties")]
     [DefaultValue(typeof(QuestionType), QuestionTypes.Simple)]
-    public QuestionType Type { get; } = new();
+    internal QuestionType Type { get; } = new();
 
     /// <summary>
     /// Question type name.
@@ -61,7 +61,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// Question scenario.
     /// </summary>
     [Obsolete("Left for backward compatibility with old format. Use Parameters property")]
-    public Scenario Scenario { get; } = new();
+    internal Scenario Scenario { get; } = new();
 
     /// <summary>
     /// Question script.
@@ -77,7 +77,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <remarks>
     /// Replaces deprecated <see cref="Scenario" /> and <see cref="Type" /> properties.
     /// </remarks>
-    public StepParameters? Parameters { get; set; }
+    public StepParameters Parameters { get; } = new();
 
     /// <summary>
     /// Right answers.
@@ -93,7 +93,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public override string ToString() =>
         Parameters != null && Parameters.TryGetValue(QuestionParameterNames.Question, out var questionBody)
             ? $"{_price}: {questionBody} ({Right.FirstOrDefault()})"
-            : $"{_price}: {Scenario} ({(Right.Count > 0 ? Right[0] : "")})";
+            : $"{_price}: ({(Right.Count > 0 ? Right[0] : "")})";
 
     /// <summary>
     /// Question name (not used).
@@ -104,8 +104,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <inheritdoc />
     public override bool Contains(string value) =>
         base.Contains(value) ||
-        Type.Contains(value) ||
-        Scenario.ContainsQuery(value) ||
         Parameters != null && Parameters.ContainsQuery(value) ||
         Right.ContainsQuery(value) ||
         Wrong.ContainsQuery(value);
@@ -114,16 +112,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public override IEnumerable<SearchData> Search(string value)
     {
         foreach (var item in base.Search(value))
-        {
-            yield return item;
-        }
-
-        foreach (var item in Type.Search(value))
-        {
-            yield return item;
-        }
-
-        foreach (var item in Scenario.Search(value))
         {
             yield return item;
         }
@@ -202,8 +190,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                             break;
 
                         case "params":
-                            Parameters = new();
-
                             if (!reader.IsEmptyElement)
                             {
                                 Parameters.ReadXml(reader, limits);
@@ -292,47 +278,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
 
         base.WriteXml(writer);
 
-        if (Type.Name != QuestionTypes.Simple)
-        {
-            writer.WriteStartElement("type");
-            writer.WriteAttributeString("name", Type.Name);
-
-            foreach (var item in Type.Params)
-            {
-                writer.WriteStartElement("param");
-                writer.WriteAttributeString("name", item.Name);
-                writer.WriteValue(item.Value);
-                writer.WriteEndElement();
-            }
-
-            writer.WriteEndElement();
-        }
-
-        if (Scenario.Any())
-        {
-            writer.WriteStartElement("scenario");
-
-            foreach (var atom in Scenario)
-            {
-                writer.WriteStartElement("atom");
-
-                if (atom.AtomTime != 0)
-                {
-                    writer.WriteAttributeString("time", atom.AtomTime.ToString());
-                }
-
-                if (atom.Type != AtomTypes.Text)
-                {
-                    writer.WriteAttributeString("type", atom.Type);
-                }
-
-                writer.WriteValue(atom.Text);
-                writer.WriteEndElement();
-            }
-
-            writer.WriteEndElement();
-        }
-
         if (Script != null)
         {
             writer.WriteStartElement("script");
@@ -377,29 +322,21 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public Question Clone()
     {
         var question = new Question { _price = _price, TypeName = _typeName };
-        question.Type.Name = Type.Name;
 
         question.SetInfoFromOwner(this);
 
         if (Parameters != null)
         {
-            question.Parameters = Parameters.Clone();
-        }
-
-        foreach (var atom in Scenario)
-        {
-            question.Scenario.Add(new Atom { AtomTime = atom.AtomTime, Text = atom.Text, Type = atom.Type });
+            foreach (var parameter in Parameters)
+            {
+                question.Parameters[parameter.Key] = parameter.Value.Clone();
+            }
         }
 
         question.Right.Clear();
 
         question.Right.AddRange(Right);
         question.Wrong.AddRange(Wrong);
-
-        foreach (var par in Type.Params)
-        {
-            question.Type[par.Name] = par.Value;
-        }
 
         return question;
     }
@@ -409,11 +346,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// </summary>
     internal void Upgrade()
     {
-        if (Parameters != null)
-        {
-            return;
-        }
-
         if (Price == InvalidPrice)
         {
             Scenario.Clear();
@@ -421,8 +353,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             TypeName = Type.Name = QuestionTypes.Default;
             return;
         }
-
-        Parameters = new();
 
         switch (Type.Name)
         {
@@ -466,15 +396,13 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                             Type.Name = QuestionTypes.Simple;
                             TypeName = QuestionTypes.SecretNoQuestion;
 
-                            Parameters = new StepParameters
+                            Parameters[QuestionParameterNames.Price] = new StepParameter
                             {
-                                [QuestionParameterNames.Price] = new StepParameter
-                                {
-                                    Type = StepParameterTypes.NumberSet,
-                                    NumberSetValue = numberSet
-                                },
-                                [QuestionParameterNames.SelectionMode] = new StepParameter { SimpleValue = selectAnswererMode },
+                                Type = StepParameterTypes.NumberSet,
+                                NumberSetValue = numberSet
                             };
+
+                            Parameters[QuestionParameterNames.SelectionMode] = new StepParameter { SimpleValue = selectAnswererMode };
                             return;
 
                         case QuestionTypeParams.BagCat_Knows_Value_Before:
@@ -482,16 +410,15 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                         default:
                             TypeName = knows == QuestionTypeParams.BagCat_Knows_Value_Before ? QuestionTypes.SecretPublicPrice : QuestionTypes.Secret;
 
-                            Parameters = new StepParameters
+                            Parameters[QuestionParameterNames.Theme] = new StepParameter { SimpleValue = theme };
+                            
+                            Parameters[QuestionParameterNames.Price] = new StepParameter
                             {
-                                [QuestionParameterNames.Theme] = new StepParameter { SimpleValue = theme },
-                                [QuestionParameterNames.Price] = new StepParameter
-                                {
-                                    Type = StepParameterTypes.NumberSet,
-                                    NumberSetValue = numberSet
-                                },
-                                [QuestionParameterNames.SelectionMode] = new StepParameter { SimpleValue = selectAnswererMode },
+                                Type = StepParameterTypes.NumberSet,
+                                NumberSetValue = numberSet
                             };
+                            
+                            Parameters[QuestionParameterNames.SelectionMode] = new StepParameter { SimpleValue = selectAnswererMode };
                             break;
                     }
                 }
@@ -573,12 +500,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             _ => ContentPlacements.Screen,
         };
 
-    /// <summary>
-    /// Gets question right answers.
-    /// </summary>
-    [Obsolete("Use Right property")]
-    public IList<string> GetRightAnswers() => Right;
-
     /// <inheritdoc />
     public bool Equals(Question? other) =>
         other is not null
@@ -601,11 +522,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     {
         if (Script == null)
         {
-            if (Parameters == null)
-            {
-                return "";
-            }
-
             if (Parameters.TryGetValue(QuestionParameterNames.Question, out var question))
             {
                 return GetTextFromContent(question);
@@ -647,15 +563,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Gets question content parts.
     /// </summary>
-    public IEnumerable<ContentItem> GetContent()
-    {
-        if (Parameters == null)
-        {
-            return Array.Empty<ContentItem>();
-        }
-
-        return GetContentFromParameters(Parameters);
-    }
+    public IEnumerable<ContentItem> GetContent() => GetContentFromParameters(Parameters);
 
     private static IEnumerable<ContentItem> GetContentFromParameters(StepParameters parameters)
     {
@@ -730,39 +638,11 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         return result.ToString();
     }
 
-    private string GetTextFromScenario()
-    {
-        var questionText = new StringBuilder();
-
-        foreach (var atom in Scenario)
-        {
-            if (atom.Type == AtomTypes.Text || atom.Type == AtomTypes.Oral)
-            {
-                if (questionText.Length > 0)
-                {
-                    questionText.Append(UniversalLineSeparatorChar);
-                }
-
-                questionText.Append(atom.Text);
-            }
-        }
-
-        return questionText.ToString();
-    }
-
     public bool HasMediaContent()
     {
         foreach (var item in GetContent())
         {
             if (item.Type != AtomTypes.Text && item.Type != AtomTypes.Oral)
-            {
-                return true;
-            }
-        }
-
-        foreach (var atom in Scenario)
-        {
-            if (atom.Type != AtomTypes.Text && atom.Type != AtomTypes.Oral)
             {
                 return true;
             }

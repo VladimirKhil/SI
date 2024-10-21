@@ -77,6 +77,10 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
                 _gameRepository.InformPlayer(playerName, Context.ConnectionId);
                 break;
 
+            case "PASS":
+                _gameRepository.OnPlayerPass(playerName);
+                break;
+
             default:
                 break;
         }

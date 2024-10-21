@@ -30,7 +30,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public bool OnButtonPressStart() => false;
 
-    public void OnContentStart(IEnumerable<ContentItem> contentItems)
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
         
     }

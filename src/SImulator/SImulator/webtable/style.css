@@ -73,6 +73,14 @@ body {
         color: darkblue !important;
     }
 
+.stakeHost {
+    display: none !important;
+}
+
+.gamePlayer .progress {
+    top: 0 !important;
+}
+
 @media screen and (min-width: 1100px) and (min-height: 700px) {
     .gamePlayer {
         font-size: 35px !important;
