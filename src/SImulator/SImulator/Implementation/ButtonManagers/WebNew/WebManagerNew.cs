@@ -6,6 +6,7 @@ using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.PlatformSpecific;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Utils;
@@ -20,6 +21,8 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
     private readonly WebApplication _webApplication;
 
     private string _stageName = "Before";
+
+    public ICollection<string> BannedNames { get; } = new HashSet<string>();
 
     public WebManagerNew(int port, IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
     {
@@ -73,8 +76,8 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         Rules = GameRules.FalseStart
     };
 
-    public void AddPlayer(string playerName) => UI.Execute(
-        () => Listener.OnPlayerAdded(playerName),
+    public void AddPlayer(string id, string playerName) => UI.Execute(
+        () => Listener.OnPlayerAdded(id, playerName),
         exc => PlatformManager.Instance.ShowMessage(exc.Message));
 
     public void RemovePlayer(string playerName) => UI.Execute(
@@ -124,4 +127,11 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
     }
 
     public void AskTextAnswer() => SendMessage("ANSWER");
+
+    public override void RemovePlayerById(string id, string name)
+    {
+        var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
+        context.Clients.Client(id).Disconnect();
+        BannedNames.Add(name);
+    }
 }

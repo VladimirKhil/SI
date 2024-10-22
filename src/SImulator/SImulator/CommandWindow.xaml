@@ -1605,7 +1605,7 @@
                     IsEnabled="{Binding SettingsViewModel.Model.PlaySpecials}">
                     <Grid Margin="3" Background="LightGray" DataContext="{Binding SettingsViewModel.Model}">
                         <UniformGrid Columns="2" Margin="3">
-                            <TextBlock FontWeight="Bold" Text="{x:Static lp:Resources.Name}" />
+                            <TextBlock FontWeight="Bold" Text="{x:Static lp:Resources.Question}" />
                             <TextBlock FontWeight="Bold" Text="{x:Static lp:Resources.Alias}" />
                             <TextBlock Text="{x:Static lp:Resources.QuestionTypeStake}" />
 

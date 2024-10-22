@@ -47,6 +47,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     private static readonly TimeSpan HintLifetime = TimeSpan.FromSeconds(6);
 
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
     private bool _disposed = false;
 
     private readonly ILocalFileManager _localFileManager = new LocalFileManager();
@@ -59,9 +61,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public bool CanSwitchType => true;
 
-    public IPlayerLogic PlayerLogic { get; }
+    public IPersonLogic PlayerLogic { get; }
 
-    public IShowmanLogic ShowmanLogic { get; }
+    public IPersonLogic ShowmanLogic { get; }
 
     private string? _prependTableText;
     private string? _appendTableText;
@@ -1455,6 +1457,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _timer.Dispose();
 
         _protocolWriter?.Dispose();
+        
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
 
         await _localFileManager.DisposeAsync();
     }
@@ -1554,7 +1559,22 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _data.EnableMediaLoadButton = false;
     }
 
-    public void OnPauseChanged(bool isPaused) => TInfo.Pause = isPaused;
+    public void OnPauseChanged(bool isPaused)
+    {
+        TInfo.Pause = isPaused;
+
+        var manageTableCommand = _gameViewModel.ManageTable;
+
+        if (manageTableCommand != null)
+        {
+            manageTableCommand.CanBeExecuted = isPaused;
+        }
+
+        if (!isPaused)
+        {
+            TInfo.IsEditable = false;
+        }
+    }
 
     public void TableLoaded() => UI.Execute(TableLoadedUI, exc => _data.Host.SendError(exc));
 
@@ -1841,4 +1861,99 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void OnEnableButton() => _gameViewModel.EnableGameButton(true);
 
     public void OnDisableButton() => _gameViewModel.DisableGameButton(true);
+
+    public void StarterChoose()
+    {
+        _gameViewModel.ClearReplic();
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectStarter)];
+        _data.Host.OnFlash();
+    }
+
+    public void FirstStake()
+    {
+        _gameViewModel.ClearReplic();
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectStaker)];
+        _data.Host.OnFlash();
+    }
+
+    public void FirstDelete()
+    {
+        _gameViewModel.ClearReplic();
+        _gameViewModel.Hint = _localizer[nameof(R.HintThemeDeleter)];
+        _data.Host.OnFlash();
+    }
+
+    public void IsRight(bool voteForRight, string answer)
+    {
+        _gameViewModel.Hint = _localizer[nameof(R.HintCheckAnswer)];
+        _gameViewModel.DialogMode = DialogModes.AnswerValidation;
+        _gameViewModel.Answer = answer;
+        _data.Host.OnFlash();
+    }
+
+    public void Answer()
+    {
+        _data.Host.OnFlash();
+
+        if (TInfo.LayoutMode == LayoutMode.Simple)
+        {
+            _gameViewModel.Answer = "";
+            _gameViewModel.DialogMode = DialogModes.Answer;
+            ((PlayerAccount)_data.Me).IsDeciding = false;
+
+            StartSendingVersion(_cancellationTokenSource.Token);
+        }
+        else
+        {
+            TInfo.Selectable = true;
+            TInfo.SelectAnswer.CanBeExecuted = true;
+        }
+    }
+
+    /// <summary>
+    /// Periodically sends player answer to server.
+    /// </summary>
+    private async void StartSendingVersion(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var version = _gameViewModel.Answer;
+
+            do
+            {
+                await Task.Delay(3000, cancellationToken);
+
+                if (_gameViewModel.Answer != version)
+                {
+                    _gameViewModel.SendAnswerVersion.Execute(null);
+                    version = _gameViewModel.Answer;
+                }
+            } while (_gameViewModel.DialogMode == DialogModes.Answer && !cancellationToken.IsCancellationRequested);
+        }
+        catch
+        {
+            // Ignore
+        }
+    }
+
+    public void OnPlayerOutcome(int playerIndex, bool isRight)
+    {
+        if (_data.QuestionType != QuestionTypes.Simple
+            && _data.Players[playerIndex].Name == _viewerActions.Client.Name
+            || isRight)
+        {
+            _data.PlayerDataExtensions.Apellate.CanBeExecuted = _data.PlayerDataExtensions.ApellationCount > 0;
+            _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
+        }
+    }
+
+    public void OnHint(string hint) => _gameViewModel.Hint = $"{_localizer[nameof(R.RightAnswer)].ToUpperInvariant()} : {hint}";
+
+    public void EndThink() => _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
+
+    public void Report()
+    {
+        _gameViewModel.DialogMode = DialogModes.Report;
+        _data.Host.OnFlash();
+    }
 }

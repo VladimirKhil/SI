@@ -4,7 +4,6 @@ using SICore.Network.Clients;
 using SIData;
 using SIPackages.Core;
 using System.Text;
-using Utils.Commands;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -191,12 +190,12 @@ public sealed class Player : Viewer
                 case Messages.Choice:
                     ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
                     ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = false;
-                    _logic.PlayerLogic.OnChoice(mparams);
+                    _logic.OnQuestionSelected();
                     break;
 
                 case Messages.Theme:
                     ClientData.QuestionIndex = -1;
-                    _logic.PlayerLogic.OnTheme(mparams);
+                    _logic.OnTheme(mparams);
                     break;
 
                 case Messages.Question:
@@ -205,7 +204,7 @@ public sealed class Player : Viewer
                     break;
 
                 case Messages.Content:
-                    _logic.PlayerLogic.OnPlayerAtom(mparams);
+                    _logic.OnQuestionContent();
 
                     if (ClientData.QuestionType == QuestionTypes.Simple)
                     {
@@ -225,7 +224,7 @@ public sealed class Player : Viewer
                 case Messages.YouTry:
                     ClientData.PlayerDataExtensions.MyTry = true;
                     _logic.OnEnableButton();
-                    _logic.PlayerLogic.StartThink();
+                    _logic.StartThink();
                     break;
 
                 case Messages.EndTry:
@@ -234,7 +233,7 @@ public sealed class Player : Viewer
 
                     if (mparams[1] == MessageParams.EndTry_All)
                     {
-                        _logic.PlayerLogic.EndThink();
+                        _logic.EndThink();
 
                         ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = ClientData.PlayerDataExtensions.ApellationCount > 0;
                         ClientData.PlayerDataExtensions.Pass.CanBeExecuted = false;
@@ -242,12 +241,12 @@ public sealed class Player : Viewer
                     break;
 
                 case Messages.Answer:
-                    _logic.PlayerLogic.Answer();
+                    _logic.Answer();
                     break;
 
                 case Messages.AskSelectPlayer: // Uncomment later
                     //OnAskSelectPlayer(mparams);
-                    //_logic.PlayerLogic.SelectPlayer();
+                    //_logic.SelectPlayer();
                     break;
 
                 case Messages.Cat:
@@ -358,7 +357,7 @@ public sealed class Player : Viewer
                         break;
                     }
 
-                    _logic.PlayerLogic.PersonAnswered(playerIndex, isRight);
+                    _logic.OnPlayerOutcome(playerIndex, isRight);
                     break;
 
                 case Messages.Report:
@@ -377,7 +376,7 @@ public sealed class Player : Viewer
 
                     ClientData.PlayerDataExtensions.Report.Report = report.ToString();
                     ((PlayerAccount)ClientData.Me).IsDeciding = false;
-                    _logic.PlayerLogic.Report();
+                    _logic.Report();
                     break;
             }
         }
@@ -412,6 +411,6 @@ public sealed class Player : Viewer
         ClientData.PersonDataExtensions.ShowExtraRightButtons = mparams[4] == "+";
 
         ((PersonAccount)ClientData.Me).IsDeciding = false;
-        _logic.PlayerLogic.IsRight(mparams[3] == "+", mparams[2]);
+        _logic.IsRight(mparams[3] == "+", mparams[2]);
     }
 }

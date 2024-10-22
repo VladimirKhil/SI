@@ -1159,7 +1159,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveMediaCommand = RunMediaTimer;
     }
 
-    private void AddPlayer_Executed(object? arg) => OnPlayerAdded();
+    private void AddPlayer_Executed(object? arg) => OnPlayerAdded(null);
 
     private void RemovePlayer_Executed(object? arg)
     {
@@ -1302,7 +1302,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
         {
             AddPlayer.CanBeExecuted = false;
-            RemovePlayer.CanBeExecuted = false;
             ClearPlayers.CanBeExecuted = false;
 
             Players.Clear();
@@ -2189,9 +2188,9 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    public void OnPlayerAdded(string playerName = "")
+    public void OnPlayerAdded(string? id, string playerName = "")
     {
-        var playerInfo = new PlayerInfo { Name = playerName };
+        var playerInfo = new PlayerInfo { Id = id, Name = playerName };
         playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
 
         Players.Add(playerInfo);
@@ -2214,6 +2213,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         var playerIndex = Players.IndexOf(player);
         Players.Remove(player);
         PresentationController.RemovePlayer(playerIndex);
+
+        if (player.Id != null)
+        {
+            _buttonManager?.RemovePlayerById(player.Id, player.Name);
+        }
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

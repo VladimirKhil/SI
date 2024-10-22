@@ -90,8 +90,6 @@ public sealed class ViewerData : Data
 
     public PlayerData PlayerDataExtensions { get; private set; } = new();
 
-    public ShowmanData ShowmanDataExtensions { get; private set; } = new();
-
     public event Action<string?, string, LogMode> StringAdding;
 
     private List<PlayerAccount> _players = new();

@@ -29,8 +29,6 @@ public sealed class Showman : Viewer
             ClearSelections();
         });
 
-        ClientData.ShowmanDataExtensions.ManageTable = new CustomCommand(ManageTable_Executed) { CanBeExecuted = ClientData.TInfo.Pause };
-
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
 
         ClientData.PersonDataExtensions.AreAnswersShown = data.Host.AreAnswersShown;
@@ -50,8 +48,6 @@ public sealed class Showman : Viewer
             ClientData.Host.AreAnswersShown = ClientData.PersonDataExtensions.AreAnswersShown;
         }
     }
-
-    private void ManageTable_Executed(object? arg) => _logic.ShowmanLogic.ManageTable();
 
     void ClientData_AutoReadyChanged()
     {
@@ -109,7 +105,7 @@ public sealed class Showman : Viewer
 
                 case Messages.AskSelectPlayer: // Uncomment later
                     //OnAskSelectPlayer(mparams);
-                    //_logic.ShowmanLogic.SelectPlayer();
+                    //_logic.SelectPlayer();
                     break;
 
                 case Messages.First:
@@ -123,7 +119,7 @@ public sealed class Showman : Viewer
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.First, num); ClearSelections(); };
                         }
 
-                        _logic.ShowmanLogic.StarterChoose();
+                        _logic.StarterChoose();
                         break;
 
                         #endregion
@@ -139,7 +135,7 @@ public sealed class Showman : Viewer
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Next, num); ClearSelections(); };
                         }
 
-                        _logic.ShowmanLogic.FirstStake();
+                        _logic.FirstStake();
                         break;
 
                         #endregion
@@ -160,7 +156,7 @@ public sealed class Showman : Viewer
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.NextDelete, num); ClearSelections(); };
                         }
 
-                        _logic.ShowmanLogic.FirstDelete();
+                        _logic.FirstDelete();
                         break;
 
                         #endregion
@@ -172,7 +168,7 @@ public sealed class Showman : Viewer
                             break;
                         }
 
-                        _logic.ShowmanLogic.OnHint(mparams[1]);
+                        _logic.OnHint(mparams[1]);
                         break;
                     }
                 case Messages.Stage:
@@ -213,7 +209,7 @@ public sealed class Showman : Viewer
 
                 case Messages.AskStake: // Uncomment later
                     //OnAskStake(mparams);
-                    //_logic.ShowmanLogic.StakeNew();
+                    //_logic.StakeNew();
                     break;
 
                 case Messages.CatCost:
@@ -274,33 +270,13 @@ public sealed class Showman : Viewer
                     break;
 
                 case Messages.Answer:
-                    _logic.ShowmanLogic.Answer();
-                    break;
-
-                case Messages.Pause:
-                    OnPause(mparams);
+                    _logic.Answer();
                     break;
             }
         }
         catch (Exception exc)
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
-        }
-    }
-
-    private void OnPause(string[] mparams)
-    {
-        var isPaused = mparams[1] == "+";
-        var manageTableCommand = ClientData.ShowmanDataExtensions.ManageTable;
-
-        if (manageTableCommand != null)
-        {
-            manageTableCommand.CanBeExecuted = isPaused;
-        }
-
-        if (!isPaused)
-        {
-            _logic.ShowmanLogic.ManageTable(false);
         }
     }
 
@@ -330,7 +306,7 @@ public sealed class Showman : Viewer
 
         ((PersonAccount)ClientData.Me).IsDeciding = false;
 
-        _logic.ShowmanLogic.IsRight(mparams[2]);
+        _logic.IsRight(true, mparams[2]);
     }
 
     private void ClearSelections(bool full = false) => _logic.ClearSelections(full);

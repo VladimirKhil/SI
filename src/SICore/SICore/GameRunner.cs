@@ -88,7 +88,11 @@ public sealed class GameRunner
                 var showmanClient = new Client(_settings.Showman.Name);
                 var data = new ViewerData(_gameHost);
                 var actions = new ViewerActions(showmanClient, localizer);
-                var logic = isHost ? hostLogicFactory(data, actions, localizer) : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Showman);
+                
+                var logic = isHost
+                    ? hostLogicFactory(data, actions, localizer)
+                    : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Showman, GameRole.Showman);
+                
                 var showman = new Showman(showmanClient, _settings.Showman, isHost, logic, actions, localizer, data);
                 showmanClient.ConnectTo(_node);
 
@@ -112,7 +116,11 @@ public sealed class GameRunner
                     var playerClient = new Client(_settings.Players[i].Name);
                     var data = new ViewerData(_gameHost);
                     var actions = new ViewerActions(playerClient, localizer);
-                    var logic = isHost ? hostLogicFactory(data, actions, localizer) : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Players[i]);
+                    
+                    var logic = isHost
+                        ? hostLogicFactory(data, actions, localizer)
+                        : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Players[i], GameRole.Player);
+                    
                     var player = new Player(playerClient, _settings.Players[i], isHost, logic, actions, localizer, data);
                     playerClient.ConnectTo(_node);
 

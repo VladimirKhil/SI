@@ -23,7 +23,7 @@ public interface IButtonManagerListener
 
     PlayerInfo? GetPlayerById(string playerId, bool strict);
     
-    void OnPlayerAdded(string playerName) { }
+    void OnPlayerAdded(string? id, string playerName) { }
 
     void OnPlayerRemoved(string playerName) { }
 

@@ -520,6 +520,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public ICommand ChangeSums2 { get; set; }
 
+    /// <summary>
+    /// Manage game table command.
+    /// </summary>
+    public SimpleCommand ManageTable { get; }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -601,7 +606,10 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         SendAllInNew = new SimpleCommand(SendAllInNew_Executed);
 
         ChangeSums2 = new SimpleCommand(ChangeSums2_Executed);
+        ManageTable = new SimpleCommand(ManageTable_Executed) { CanBeExecuted = false };
     }
+
+    private void ManageTable_Executed(object? arg) => TInfo.IsEditable = !TInfo.IsEditable;
 
     private void ChangeSums2_Executed(object? arg)
     {

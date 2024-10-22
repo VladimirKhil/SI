@@ -13,10 +13,7 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
 
     private readonly IGameRepository _gameRepository;
 
-    public ButtonHubNew(IGameRepository gameRepository)
-    {
-        _gameRepository = gameRepository;
-    }
+    public ButtonHubNew(IGameRepository gameRepository) => _gameRepository = gameRepository;
 
     public async Task<GameInfo?> TryGetGameInfo(int gameId)
     {
@@ -38,11 +35,16 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
             return new JoinGameResponse { ErrorType = JoinGameErrorType.GameNotFound };
         }
 
+        if (_gameRepository.BannedNames.Contains(request.UserName))
+        {
+            return new JoinGameResponse { ErrorType = JoinGameErrorType.Forbidden };
+        }
+
         await Groups.AddToGroupAsync(Context.ConnectionId, request.GameId.ToString(), Context.ConnectionAborted);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, SubscribersGroup, Context.ConnectionAborted);
 
         // Add connection
-        _gameRepository.AddPlayer(request.UserName);
+        _gameRepository.AddPlayer(Context.ConnectionId, request.UserName);
         Context.Items["userName"] = request.UserName;
 
         return JoinGameResponse.Success;

@@ -1850,7 +1850,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             ClientData.PersonDataExtensions.IsWrong =
             ClientData.PersonDataExtensions.SendCatCost =
             ClientData.PersonDataExtensions.SendFinalStake =
-            ClientData.ShowmanDataExtensions.ManageTable =
             ClientData.PlayerDataExtensions.Apellate = null;
 
         var person = ClientData.PersonDataExtensions;

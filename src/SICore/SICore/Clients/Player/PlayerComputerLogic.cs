@@ -13,7 +13,7 @@ namespace SICore;
 /// <summary>
 /// Логика игрока-компьютера
 /// </summary>
-internal sealed class PlayerComputerLogic : IPlayerLogic
+internal sealed class PlayerComputerLogic : IPersonLogic
 {
     private const int DefaultThemeQuestionCount = 5;
 
@@ -1814,7 +1814,7 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
     /// <summary>
     /// Получение части вопроса
     /// </summary>
-    public void OnPlayerAtom(string[] mparams)
+    public void OnQuestionContent()
     {
         var playerData = _data.PlayerDataExtensions;
 
@@ -1923,7 +1923,7 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
     /// </summary>
     public void CatCost() => ScheduleExecution(PlayerTasks.CatCost, 15);
 
-    public void IsRight(bool voteForRight, string answer) =>
+    public void IsRight(bool voteForRight) =>
         ScheduleExecution(voteForRight ? PlayerTasks.AnswerRight : PlayerTasks.AnswerWrong, 10 + Random.Shared.Next(10));
 
     #endregion
@@ -1973,7 +1973,7 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
         }
     }
 
-    public void OnChoice(string[] mparams) => _themeQuestionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;
+    public void OnQuestionSelected() => _themeQuestionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;
 
     private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
 }
