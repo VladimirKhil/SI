@@ -800,6 +800,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                             ReportText = args[2]
                         });
                         break;
+
+                    case Messages.Validate:
+                        OnValidate(message, args);
+                        break;
                 }
             }
             catch (Exception exc)
@@ -807,6 +811,31 @@ public sealed class Game : Actor<GameData, GameLogic>
                 _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
+
+    private void OnValidate(Message message, string[] args)
+    {
+        if (message.Sender != ClientData.ShowMan.Name
+            || ClientData.Decision != DecisionType.Answering
+            || !Logic.HaveMultipleAnswerers()
+            || args.Length <= 2
+            || !int.TryParse(args[1], out var playerIndex)
+            || playerIndex < 0
+            || playerIndex >= ClientData.Players.Count)
+        {
+            return;
+        }
+
+        var validationStatus = args[2] == "+";
+        var player = ClientData.Players[playerIndex];
+
+        if (player.AnswerValidationStatus.HasValue)
+        {
+            return;
+        }
+
+        player.AnswerValidationStatus = validationStatus;
+        player.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[3], out var factor) && factor >= 0.0 ? factor : 1.0;
+    }
 
     private void OnPin(string hostName)
     {
@@ -2103,6 +2132,18 @@ public sealed class Game : Actor<GameData, GameLogic>
                     ClientData.AnswererIndex = i;
                     ClientData.Players[i].Flag = false;
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
+                    
+                    if (ClientData.Players[i].IsHuman)
+                    {
+                        ClientData.Players[i].AnswerValidationStatus = null;
+
+                        _gameActions.SendMessageToWithArgs(
+                            ClientData.ShowMan.Name,
+                            Messages.AskValidate,
+                            i,
+                            args[1].Length > 0 ? args[1] : LO[nameof(R.IDontKnow)]);
+                    }
+
                     break;
                 }
             }
@@ -2250,7 +2291,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         {
             ClientData.Decision = DecisionType.AnswerValidating;
             ClientData.Answerer.AnswerIsRight = args[1] == "+";
-            ClientData.Answerer.AnswerIsRightFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor >= 0.0 ? factor : 1.0;
+            ClientData.Answerer.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor >= 0.0 ? factor : 1.0;
             ClientData.ShowmanDecision = true;
 
             _logic.Stop(StopReason.Decision);

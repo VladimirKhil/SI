@@ -460,6 +460,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Order = Array.Empty<int>();
         _data.OrderIndex = -1;
 
+        foreach (var player in ClientData.Players)
+        {
+            player.AnswerValidationStatus = null;
+        }
+
         if (_data.Settings.AppSettings.HintShowman)
         {
             var rightAnswers = question.Right;
@@ -1326,9 +1331,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             if (!_data.QuestionPlayState.HiddenStakes)
             {
                 var outcome = _data.CurPriceRight;
-                updateSum = (int)(outcome * _data.Answerer.AnswerIsRightFactor);
+                updateSum = (int)(outcome * _data.Answerer.AnswerValidationFactor);
 
-                s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerIsRightFactor)})");
+                s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerValidationFactor)})");
 
                 _gameActions.ShowmanReplic(s.ToString());
                 _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, updateSum);
@@ -1390,17 +1395,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             if (!_data.QuestionPlayState.HiddenStakes)
             {
-                s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerIsRightFactor)})");                
+                s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerValidationFactor)})");                
                 _gameActions.ShowmanReplic(s.ToString());
 
-                if (_data.Answerer.AnswerIsRightFactor == 0)
+                if (_data.Answerer.AnswerValidationFactor == 0)
                 {
                     _gameActions.SendMessageWithArgs(Messages.Pass, _data.AnswererIndex);
                     updateSum = -1;
                 }
                 else
                 {
-                    updateSum = (int)(outcome * _data.Answerer.AnswerIsRightFactor);
+                    updateSum = (int)(outcome * _data.Answerer.AnswerValidationFactor);
                     _gameActions.SendMessageWithArgs(Messages.Person, '-', _data.AnswererIndex, updateSum);
                     _data.Answerer.SubtractWrongSum(updateSum);
                     _gameActions.InformSums();
@@ -2168,7 +2173,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var isRight = answer != null && AnswerChecker.IsAnswerRight(answer, _data.Question.Right);
 
         _data.Answerer.AnswerIsRight = isRight;
-        _data.Answerer.AnswerIsRightFactor = 1.0;
+        _data.Answerer.AnswerValidationFactor = 1.0;
 
         _data.ShowmanDecision = true;
         OnDecision();
@@ -2387,6 +2392,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
+            _gameActions.SendMessage(Messages.ComplexValidationFinish, _data.ShowMan.Name);
+
             for (var i = 0; i < _data.Players.Count; i++)
             {
                 if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && string.IsNullOrEmpty(_data.Players[i].Answer))
@@ -3286,7 +3293,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var rightLabel = ClientData.Question?.Right.FirstOrDefault();
 
             _data.Answerer.AnswerIsRight = _data.Answerer.Answer == rightLabel;
-            _data.Answerer.AnswerIsRightFactor = 1.0;
+            _data.Answerer.AnswerValidationFactor = 1.0;
             _data.ShowmanDecision = true;
 
             OnDecision();
@@ -3297,7 +3304,18 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.Decision = DecisionType.AnswerValidating;
 
             _data.Answerer.AnswerIsRight = !_data.Answerer.AnswerIsWrong;
-            _data.Answerer.AnswerIsRightFactor = 1.0;
+            _data.Answerer.AnswerValidationFactor = 1.0;
+            _data.ShowmanDecision = true;
+
+            OnDecision();
+        }
+        else if (_data.Answerer.AnswerValidationStatus.HasValue)
+        {
+            _data.IsWaiting = true;
+            _data.Decision = DecisionType.AnswerValidating;
+
+            _data.Answerer.AnswerIsRight = _data.Answerer.AnswerValidationStatus.Value;
+            _data.Answerer.AnswerValidationFactor = 1.0;
             _data.ShowmanDecision = true;
 
             OnDecision();
@@ -3374,6 +3392,21 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     _gameActions.SendMessage(Messages.Answer, _data.Players[i].Name);
                 }
             }
+
+            var question = _data.Question ?? throw new InvalidOperationException("Question is null");
+
+            var rightAnswers = question.Right;
+            var wrongAnswers = question.Wrong;
+
+            var message = new MessageBuilder(
+                Messages.ComplexValidationStart,
+                '-',
+                rightAnswers.Count)
+                .AddRange(rightAnswers)
+                .AddRange(wrongAnswers)
+                .Build();
+
+            _gameActions.SendMessage(message, _data.ShowMan.Name);
 
             _data.AnswerCount = _data.QuestionPlayState.AnswererIndicies.Count;
             ScheduleExecution(Tasks.WaitAnswer, timeSettings.TimeForFinalThinking * 10, force: true);

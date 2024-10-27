@@ -1,5 +1,4 @@
-﻿using SICore;
-using SIGame.ViewModel;
+﻿using SIGame.ViewModel;
 using SIWindows.WinAPI;
 using System;
 using System.ComponentModel;
@@ -75,6 +74,50 @@ public partial class MainWindow : Window
         {
             e.Handled = OnMoveNextKeyPressed();
         }
+        else if (key == appSettings.YesKey)
+        {
+            e.Handled = OnYesKeyPressed();
+        }
+        else if (key == appSettings.NoKey)
+        {
+            e.Handled = OnNoKeyPressed();
+        }
+    }
+
+    private bool OnYesKeyPressed()
+    {
+        if (((MainViewModel)DataContext).ActiveView is not GameViewModel game)
+        {
+            return false;
+        }
+
+        var isRight = game.Data.PersonDataExtensions.IsRight;
+        
+        if (isRight != null)
+        {
+            isRight.Execute(1);
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool OnNoKeyPressed()
+    {
+        if (((MainViewModel)DataContext).ActiveView is not GameViewModel game)
+        {
+            return false;
+        }
+
+        var isWrong = game.Data.PersonDataExtensions.IsWrong;
+
+        if (isWrong != null)
+        {
+            isWrong.Execute(1);
+            return true;
+        }
+
+        return false;
     }
 
     private bool OnMoveNextKeyPressed()

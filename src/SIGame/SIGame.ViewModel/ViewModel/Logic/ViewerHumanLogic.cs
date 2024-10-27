@@ -1111,18 +1111,17 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         switch (externalContent.ContentType)
         {
-            case AtomTypes.Image:
+            case ContentTypes.Image:
                 TInfo.QuestionContentType = QuestionContentType.Image;
                 TInfo.Sound = false;
                 break;
 
-            case AtomTypes.Audio:
-            case AtomTypes.AudioNew:
+            case ContentTypes.Audio:
                 TInfo.QuestionContentType = QuestionContentType.Clef;
                 TInfo.Sound = true;
                 break;
 
-            case AtomTypes.Video:
+            case ContentTypes.Video:
                 TInfo.QuestionContentType = QuestionContentType.Video;
                 TInfo.Sound = false;
                 break;
@@ -1379,6 +1378,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     HighlightCurrentTheme();
                     TInfo.Text = Resources.QuestionTypeStakeForAll.ToUpper();
                     TInfo.TStage = TableStage.Special;
+                    _data.Sound = Sounds.QuestionStakeAll;
                 }
                 break;
 
@@ -1388,6 +1388,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     HighlightCurrentTheme();
                     TInfo.Text = Resources.QuestionTypeForAll.ToUpper();
                     TInfo.TStage = TableStage.Special;
+                    _data.Sound = Sounds.QuestionAll;
                 }
                 break;
 

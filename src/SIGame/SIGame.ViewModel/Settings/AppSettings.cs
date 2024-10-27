@@ -13,9 +13,15 @@ public sealed class AppSettings : AppSettingsCore
 {
     internal const int DefaultGameButtonKey2 = 119; // RightCtrl
     internal const int DefaultMoveNextKey = 25; // Right
+    internal const int DefaultYesKey = 85; // OemPlus
+    internal const int DefaultNoKey = 87; // OemMinus
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private string _logsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), CommonSettings.ManufacturerEn, CommonSettings.AppNameEn, CommonSettings.LogsFolderName);
+    private string _logsFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        CommonSettings.ManufacturerEn,
+        CommonSettings.AppNameEn,
+        CommonSettings.LogsFolderName);
 
     /// <summary>
     /// Папка логов
@@ -78,6 +84,26 @@ public sealed class AppSettings : AppSettingsCore
     {
         get => _moveNextKey;
         set { _moveNextKey = value; OnPropertyChanged(); }
+    }
+
+    private int _yesKey = DefaultYesKey;
+
+    [XmlAttribute]
+    [DefaultValue(DefaultYesKey)]
+    public int YesKey
+    {
+        get => _yesKey;
+        set { _yesKey = value; OnPropertyChanged(); }
+    }
+
+    private int _noKey = DefaultNoKey;
+
+    [XmlAttribute]
+    [DefaultValue(DefaultNoKey)]
+    public int NoKey
+    {
+        get => _noKey;
+        set { _noKey = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

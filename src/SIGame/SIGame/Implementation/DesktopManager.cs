@@ -284,6 +284,7 @@ public sealed class DesktopManager : PlatformManager
 
         var themeSettings = UserSettings.Default.GameSettings.AppSettings.ThemeSettings;
         var source = GetSoundUri(themeSettings, sound);
+        
         if (source != null && File.Exists(source))
         {
             PlaySoundInternal(source, speed, loop);
@@ -319,6 +320,8 @@ public sealed class DesktopManager : PlatformManager
         Sounds.RoundThemes => themeSettings.SoundRoundThemesUri,
         Sounds.QuestionSecret => themeSettings.SoundQuestionGiveUri,
         Sounds.QuestionStake => themeSettings.SoundQuestionStakeUri,
+        Sounds.QuestionStakeAll => themeSettings.SoundQuestionStakeAllUri,
+        Sounds.QuestionAll => themeSettings.SoundQuestionAllUri,
         Sounds.QuestionNoRisk => themeSettings.SoundQuestionNoRiskUri,
         Sounds.QuestionNoAnswers => themeSettings.SoundNoAnswerUri,
         Sounds.FinalThink => themeSettings.SoundFinalThinkUri,

@@ -71,6 +71,16 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
                 _gameRepository.OnPlayerAnswer(playerName, answer);
                 break;
 
+            case "ANSWER_VERSION":
+                if (args.Length < 2)
+                {
+                    return;
+                }
+
+                var answerVersion = args[1];
+                // TODO
+                break;
+
             case "I":
                 _gameRepository.OnPlayerPress(playerName);
                 break;
