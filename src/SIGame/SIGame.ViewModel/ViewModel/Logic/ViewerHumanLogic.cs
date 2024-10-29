@@ -23,7 +23,7 @@ namespace SICore;
 /// </summary>
 public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDisposable
 {
-    private record struct ContentInfo(string Type, string Uri);
+    private record struct ContentInfo(string Type, string Uri, string OriginalUri);
 
     /// <summary>
     /// Maximum length of text that could be automatically added to game table.
@@ -80,8 +80,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     private readonly string? _serverPublicUrl;
     private readonly string[]? _contentPublicUrls;
 
-    public string? _protocolPath = null;
-    private StreamWriter? _protocolWriter = null;
+    private StreamWriter? _gameLogger = null;
+    private string? _logFilePath = null;
 
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
@@ -264,70 +264,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
-    private static readonly XmlReaderSettings ReaderSettings = new() { ConformanceLevel = ConformanceLevel.Fragment };
-
-    /// <summary>
-    /// Вывод текста в протокол и в форму
-    /// </summary>
-    /// <param name="text">Выводимый текст</param>
-    [Obsolete("Use OnReplic instead")]
-    public void Print(string text)
-    {
-        var chatMessageBuilder = new StringBuilder();
-        var logMessageBuilder = new StringBuilder();
-
-        var isPrintable = false;
-        var special = false;
-
-        try
-        {
-            using var reader = new StringReader(text);
-            using var xmlReader = XmlReader.Create(reader, ReaderSettings);
-
-            xmlReader.Read();
-            while (!xmlReader.EOF)
-            {
-                if (xmlReader.NodeType == XmlNodeType.Element)
-                {
-                    ParseMessageToPrint(xmlReader, chatMessageBuilder, logMessageBuilder, ref isPrintable, ref special);
-                }
-                else
-                {
-                    xmlReader.Read();
-                }
-            }
-        }
-        catch (XmlException exc)
-        {
-            throw new Exception($"{_localizer[nameof(R.StringParseError)]} {text}.", exc);
-        }
-
-        var toFormStr = chatMessageBuilder.ToString();
-        if (isPrintable)
-        {
-            var pair = toFormStr.Split(':');
-            var speech = (pair.Length > 1 && pair[0].Length + 2 < toFormStr.Length) ? toFormStr[(pair[0].Length + 2)..] : toFormStr;
-
-            _gameViewModel.ClearReplic();
-            var speaker = _gameViewModel.Speaker = _data.MainPersons.FirstOrDefault(item => item.Name == pair[0]);
-
-            if (speaker != null)
-            {
-                speaker.Replic = speech.Trim();
-            }
-        }
-
-        if (_data.Host.TranslateGameToChat || special)
-        {
-            _data.OnAddString(null, toFormStr.Trim(), LogMode.Protocol);
-        }
-
-        if (_data.Host.MakeLogs)
-        {
-            AddToFileLog(logMessageBuilder.ToString());
-        }
-    }
-
     /// <summary>
     /// Вывод сообщения в лог файл и в чат игры
     /// </summary>
@@ -405,19 +341,20 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     internal void AddToFileLog(string text)
     {
-        if (_protocolWriter == null)
+        if (_gameLogger == null)
         {
-            if (_protocolPath != null)
+            if (_logFilePath != null)
             {
                 try
                 {
                     var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out var path);
-                    _protocolPath = path;
-                    _protocolWriter = new StreamWriter(stream);
-                    _protocolWriter.Write(text);
+                    _logFilePath = path;
+                    _gameLogger = new StreamWriter(stream);
+                    _gameLogger.Write(text);
                 }
-                catch (IOException)
+                catch (IOException exc)
                 {
+                    _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                 }
             }
         }
@@ -425,7 +362,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         {
             try
             {
-                _protocolWriter.Write(text);
+                _gameLogger.Write(text);
             }
             catch (IOException exc)
             {
@@ -433,82 +370,20 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 
                 try
                 {
-                    _protocolWriter.Dispose();
+                    _gameLogger.Dispose();
                 }
                 catch
                 {
                     // Can be problems when there is not enough space on disk
                 }
 
-                _protocolPath = null;
-                _protocolWriter = null;
+                _logFilePath = null;
+                _gameLogger = null;
             }
             catch (EncoderFallbackException exc)
             {
                 _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
             }
-        }
-    }
-
-    [Obsolete]
-    private void ParseMessageToPrint(
-        XmlReader reader,
-        StringBuilder chatMessageBuilder,
-        StringBuilder logMessageBuilder,
-        ref bool isPrintable,
-        ref bool special)
-    {
-        var name = reader.Name;
-        var content = reader.ReadElementContentAsString();
-
-        switch (name)
-        {
-            case "this.client":
-                chatMessageBuilder.AppendFormat("{0}: ", content);
-                logMessageBuilder.AppendFormat("<span class=\"l\">{0}: </span>", content);
-                break;
-
-            case Constants.Player:
-                {
-                    isPrintable = true;
-
-                    if (int.TryParse(content, out var playerIndex))
-                    {
-                        var speaker = $"<span class=\"sr n{playerIndex}\">";
-
-                        var playerName = playerIndex < _data.Players.Count ? _data.Players[playerIndex].Name : "<" + _localizer[nameof(R.UnknownPerson)] + ">";
-                        chatMessageBuilder.AppendFormat("{0}: ", playerName);
-                        logMessageBuilder.AppendFormat("{0}{1}: </span>", speaker, playerName);
-                    }
-                }
-                break;
-
-            case Constants.Showman:
-                isPrintable = true;
-                chatMessageBuilder.AppendFormat("{0}: ", content);
-                logMessageBuilder.AppendFormat("<span class=\"sh\">{0}: </span>", content);
-                break;
-
-            case "replic":
-                chatMessageBuilder.Append(content);
-                logMessageBuilder.AppendFormat("<span class=\"r\">{0}</span>", content);
-                break;
-
-            case "system":
-                chatMessageBuilder.Append(content);
-                logMessageBuilder.AppendFormat("<span class=\"s\">{0}</span>", content);
-                break;
-
-            case "special":
-                special = true;
-                chatMessageBuilder.AppendFormat("* {0}", content.ToUpper());
-                logMessageBuilder.AppendFormat("<span class=\"sl\">{0}</span>", content);
-                break;
-
-            case "line":
-                chatMessageBuilder.Append('\r');
-                logMessageBuilder.Append("<br />");
-                break;
         }
     }
 
@@ -522,20 +397,20 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             case GameStage.Begin:
                 TInfo.TStage = TableStage.Sign;
 
-                if (_data.Host.MakeLogs && _protocolWriter == null)
+                if (_data.Host.MakeLogs && _gameLogger == null)
                 {
                     try
                     {
                         var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out string path);
-                        _protocolPath = path;
-                        _protocolWriter = new StreamWriter(stream);
-                        _protocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title>");
-                        _protocolWriter.Write("<style>.sr { font-weight:bold; color: #00FFFF; } .n0 { color: #EF21A9; } .n1 { color: #0BE6CF; } .n2 { color: #EF9F21; } .n3 { color: #FF0000; } .n4 { color: #00FF00; } .n5 { color: #0000FF; } .sp, .sl { font-style: italic; font-weight: bold; } .sh { color: #0AEA2A; font-weight: bold; } .l { color: #646464; font-weight: bold; } .r { font-weight: bold; } .s { font-style: italic; } </style>");
-                        _protocolWriter.Write("</head><body>");
+                        _logFilePath = path;
+                        _gameLogger = new StreamWriter(stream);
+                        _gameLogger.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title>");
+                        _gameLogger.Write("<style>.sr { font-weight:bold; color: #00FFFF; } .n0 { color: #EF21A9; } .n1 { color: #0BE6CF; } .n2 { color: #EF9F21; } .n3 { color: #FF0000; } .n4 { color: #00FF00; } .n5 { color: #0000FF; } .sp, .sl { font-style: italic; font-weight: bold; } .sh { color: #0AEA2A; font-weight: bold; } .l { color: #646464; font-weight: bold; } .r { font-weight: bold; } .s { font-style: italic; } </style>");
+                        _gameLogger.Write("</head><body>");
                     }
-                    catch (IOException)
+                    catch (IOException exc)
                     {
-
+                        _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                     }
                     catch (ArgumentException exc)
                     {
@@ -572,7 +447,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 break;
 
             case GameStage.After:
-                _protocolWriter?.Write("</body></html>");
+                _gameLogger?.Write("</body></html>");
                 break;
 
             default:
@@ -793,9 +668,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 var contentType = mparams[i + 1];
                 var contentValue = mparams[i + 2];
 
-                contentValue = PreprocessUri(contentType, contentValue);
+                var processedContentValue = PreprocessUri(contentType, contentValue);
 
-                content.Add(new ContentInfo(contentType, contentValue));
+                content.Add(new ContentInfo(contentType, processedContentValue, contentValue));
 
                 i += 2;
             }
@@ -834,7 +709,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 break;
 
             case ContentPlacements.Replic:
-                var (contentType, contentValue) = content.LastOrDefault();
+                var (contentType, contentValue, _) = content.LastOrDefault();
 
                 if (contentType == ContentTypes.Text)
                 {
@@ -843,11 +718,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 break;
 
             case ContentPlacements.Background:
-                var (contentType2, contentValue2) = content.LastOrDefault();
+                var (contentType2, contentValue2, originalValue) = content.LastOrDefault();
 
                 if (contentType2 == ContentTypes.Audio)
                 {
-                    OnBackgroundAudio(contentValue2);
+                    OnBackgroundAudio(contentValue2, originalValue);
                 }
                 break;
 
@@ -946,7 +821,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         var groups = new List<ContentGroup>();
         ContentGroup? currentGroup = null;
 
-        foreach (var (contentType, contentValue) in contentInfo)
+        foreach (var (contentType, contentValue, originalValue) in contentInfo)
         {
             _data.AtomType = contentType;
 
@@ -990,14 +865,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                         return;
                     }
 
-                    uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
-                    Data.Host.Log($"Media uri conversion: {mediaUri} => {uri}");
+                    var localUri = _localFileManager.TryGetFile(mediaUri) ?? uri;
+                    Data.Host.Log($"Media uri conversion: {mediaUri} => {localUri}");
 
                     var tableContentType = contentType == ContentTypes.Image
                         ? ContentType.Image
                         : (contentType == ContentTypes.Video ? ContentType.Video : ContentType.Html);
 
-                    currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
+                    currentGroup.Content.Add(new ContentViewModel(tableContentType, localUri, OriginalValue: originalValue));
 
                     // TODO: this logic should be moved to server; client should receive just boolean flag
                     if (contentType == ContentTypes.Image
@@ -1049,7 +924,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     private void OnReplicText(string text) => OnReplic(ReplicCodes.Showman.ToString(), text.UnescapeNewLines());
 
-    private void OnBackgroundAudio(string uri)
+    private void OnBackgroundAudio(string uri, string originalUri)
     {
         if (TInfo.TStage != TableStage.Question)
         {
@@ -1071,9 +946,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             return;
         }
 
-        uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
+        var localUri = _localFileManager.TryGetFile(mediaUri) ?? uri;
 
-        TInfo.SoundSource = new MediaSource(uri);
+        TInfo.SoundSource = new MediaSource(localUri) { OriginalValue = originalUri };
         TInfo.Sound = true;
 
         if (TInfo.QuestionContentType == QuestionContentType.Void)
@@ -1457,7 +1332,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         _timer.Dispose();
 
-        _protocolWriter?.Dispose();
+        _gameLogger?.Dispose();
         
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();

@@ -31,6 +31,20 @@ public static class MediaController
     private static readonly DependencyPropertyDescriptor SourceDescriptor =
         DependencyPropertyDescriptor.FromProperty(MediaElement.SourceProperty, typeof(MediaElement));
 
+    public static string GetContentType(DependencyObject obj) => (string)obj.GetValue(ContentTypeProperty);
+
+    public static void SetContentType(DependencyObject obj, string value) => obj.SetValue(ContentTypeProperty, value);
+
+    public static readonly DependencyProperty ContentTypeProperty =
+        DependencyProperty.RegisterAttached("ContentType", typeof(string), typeof(MediaController), new PropertyMetadata(""));
+
+    public static string GetContentValue(DependencyObject obj) => (string)obj.GetValue(ContentValueProperty);
+
+    public static void SetContentValue(DependencyObject obj, string value) => obj.SetValue(ContentValueProperty, value);
+
+    public static readonly DependencyProperty ContentValueProperty =
+        DependencyProperty.RegisterAttached("ContentValue", typeof(string), typeof(MediaController), new PropertyMetadata(""));
+
     public static TableInfoViewModel? GetLoadHandler(DependencyObject obj) => (TableInfoViewModel?)obj.GetValue(LoadHandlerProperty);
 
     public static void SetLoadHandler(DependencyObject obj, TableInfoViewModel? value) => obj.SetValue(LoadHandlerProperty, value);

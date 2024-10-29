@@ -85,11 +85,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         // Do nothing
     }
 
-    public void Print(string text)
-    {
-        // Do nothing
-    }
-
     public void Stage()
     {
         // Do nothing

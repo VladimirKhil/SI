@@ -101,13 +101,20 @@ public sealed class RoundViewModel : ItemViewModel<Round>
 
         var ownerDocument = ownerPackage.Document;
 
-        using var change = ownerDocument.OperationsManager.BeginComplexChange();
-        ownerPackage.Rounds.Remove(this);
-        change.Commit();
-
-        if (ownerDocument?.ActiveNode == this)
+        try
         {
-            ownerDocument.ActiveNode = ownerPackage;
+            using var change = ownerDocument.OperationsManager.BeginComplexChange();
+            ownerPackage.Rounds.Remove(this);
+            change.Commit();
+
+            if (ownerDocument?.ActiveNode == this)
+            {
+                ownerDocument.ActiveNode = ownerPackage;
+            }
+        }
+        catch (Exception ex)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowErrorMessage(ex.Message);
         }
     }
 

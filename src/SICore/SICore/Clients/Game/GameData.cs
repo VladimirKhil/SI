@@ -254,16 +254,6 @@ public sealed class GameData : Data
     internal bool CanMarkQuestion { get; set; }
 
     /// <summary>
-    /// Number of media content completions that are awaited.
-    /// </summary>
-    internal int InitialMediaContentCompletionCount { get; set; }
-
-    /// <summary>
-    /// Count of players which have viewed media atom already.
-    /// </summary>
-    internal int HaveViewedAtom { get; set; }
-
-    /// <summary>
     /// Player indicies in the order of making stakes.
     /// </summary>
     public int[] Order { get; set; } = Array.Empty<int>();
@@ -490,6 +480,10 @@ public sealed class GameData : Data
         }
     }
 
+    internal int ActiveHumanCount => Viewers.Count
+        + Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
+        + (ShowMan.IsHuman && ShowMan.IsConnected ? 1 : 0);
+
     internal void BeginUpdatePersons(string reason) =>
         PersonsUpdateHistory.AppendLine("===").Append($"Before ({reason}): ").Append(PrintPersons());
 
@@ -567,8 +561,6 @@ public sealed class GameData : Data
     /// Is question text being printed partially.
     /// </summary>
     public bool IsPartial { get; internal set; }
-
-    public bool MediaOk { get; internal set; }
 
     public int InitialPartialTextLength { get; internal set; }
 

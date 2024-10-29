@@ -304,21 +304,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             }
         }
     }
-
-    private SimpleCommand _atomViewed;
-
-    public SimpleCommand AtomViewed
-    {
-        get => _atomViewed;
-        set
-        {
-            if (_atomViewed != value)
-            {
-                _atomViewed = value;
-                OnPropertyChanged();
-            }
-        }
-    }
     
     private SimpleCommand _kick;
 
@@ -583,7 +568,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _changeSums = new SimpleCommand(ChangeSums_Executed) { CanBeExecuted = IsShowman };
         _changeActivePlayer = new SimpleCommand(ChangeActivePlayer_Executed) { CanBeExecuted = IsShowman };
 
-        _atomViewed = new SimpleCommand(AtomViewed_Executed);
         _kick = new SimpleCommand(Kick_Executed);
         _ban = new SimpleCommand(Ban_Executed);
         _setHost = new SimpleCommand(SetHost_Executed);
@@ -825,7 +809,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Host?.Actions.SendMessage(Messages.Kick, person.Name);
     }
 
-    private void AtomViewed_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Atom);
+    public void OnMediaContentCompleted(string contentType, string contentValue) =>
+        Host?.Actions.SendMessageWithArgs(Messages.Atom, contentType, contentValue);
 
     private void ChangeActivePlayer_Executed(object? arg)
     {

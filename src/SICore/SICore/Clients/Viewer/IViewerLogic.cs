@@ -21,12 +21,6 @@ public interface IViewerLogic : ILogic
     void ReceiveText(Message m);
 
     /// <summary>
-    /// Печать в протокол формы
-    /// </summary>
-    /// <param name="text">Текст</param>
-    void Print(string text);
-
-    /// <summary>
     /// Новое состояние игры
     /// </summary>
     void Stage();

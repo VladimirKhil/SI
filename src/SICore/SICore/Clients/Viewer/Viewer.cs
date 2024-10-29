@@ -239,7 +239,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                 case SystemMessages.Disconnect:
                     {
-                        _logic.Print(ReplicManager.Special(LO[nameof(R.DisconnectMessage)]));
+                        _logic.OnReplic(ReplicCodes.System.ToString(), LO[nameof(R.DisconnectMessage)]);
                         break;
                     }
 
@@ -541,7 +541,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         for (var i = 1; i < mparams.Length; i++)
                         {
                             ClientData.TInfo.GameThemes.Add(mparams[i]);
-                            _logic.Print(ReplicManager.System(mparams[i]));
+                            _logic.OnReplic(ReplicCodes.System.ToString(), mparams[i]);
                         }
 
                         _logic.GameThemes();
@@ -1229,7 +1229,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                 if (playMode != ThemesPlayMode.None)
                 {
-                    _logic.Print(ReplicManager.System(mparams[i]));
+                    _logic.OnReplic(ReplicCodes.System.ToString(), mparams[i]);
                 }
             }
         }

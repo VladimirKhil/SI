@@ -467,7 +467,14 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             return;
         }
 
-        Import(new FileTextSource(sourceFile));
+        try
+        {
+            Import(new FileTextSource(sourceFile));
+        }
+        catch (Exception ex)
+        {
+            OnError(ex);
+        }
     }
 
     internal void Import(ITextSource textSource)

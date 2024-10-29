@@ -622,7 +622,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.Atom:
-                        OnAtom();
+                        OnAtom(args);
                         break;
 
                     case Messages.MediaLoaded:
@@ -2060,16 +2060,38 @@ public sealed class Game : Actor<GameData, GameLogic>
         _logic.OnPauseCore(args[1] == "+");
     }
 
-    private void OnAtom()
+    private void OnAtom(string[] args)
     {
-        ClientData.HaveViewedAtom--;
+        Completion? completion;
+        var completions = ClientData.QuestionPlayState.MediaContentCompletions;
+
+        if (args.Length > 2)
+        {
+            var contentType = args[1];
+            var contentValue = args[2];
+
+            if (!completions.TryGetValue((contentType, contentValue), out completion))
+            {
+                return;
+            }
+        }
+        else if (completions.Count == 0)
+        {
+            return;
+        }
+        else
+        {
+            completion = completions.Values.First();
+        }
+
+        completion.Current++;
 
         if (!ClientData.IsPlayingMedia || ClientData.TInfo.Pause)
         {
             return;
         }
 
-        if (ClientData.HaveViewedAtom <= 0)
+        if (completion.Current == completion.Total)
         {
             ClientData.IsPlayingMedia = false;
             _logic.RescheduleTask();

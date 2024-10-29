@@ -142,7 +142,7 @@ public sealed class TextList : TextBox
 
                 if (_infos.Count != ItemsSource.Count)
                 {
-                    throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems.Count}");
+                    throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems?.Count}");
                 }
                 break;
 
@@ -262,6 +262,11 @@ public sealed class TextList : TextBox
 
     private void OnItemsAdded(NotifyCollectionChangedEventArgs e)
     {
+        if (e.NewItems == null)
+        {
+            return;
+        }
+
         _blockChanges = true;
         _blockSelection++;
 
@@ -430,7 +435,7 @@ public sealed class TextList : TextBox
         {
             var offset = ConvertGlobalOffsetToLocalOffset(change.Offset, out var index);
 
-            var origin = ItemsSource[index].ToString();
+            var origin = ItemsSource[index]?.ToString() ?? "";
             _blockNotificationsFlag = true;
 
             if (offset + change.RemovedLength > origin.Length)
@@ -457,13 +462,15 @@ public sealed class TextList : TextBox
                         offset = origin.Length;
                     }
 
-                    ItemsSource[index] = string.Concat(origin.AsSpan(0, offset), newText, origin.AsSpan(offset + change.RemovedLength));
-                    _infos[index] = new ItemInfo(ItemsSource[index].ToString().Length, _infos[index]._readOnlyLength, _infos[index]._canBeSpecified);
+                    var newValue = string.Concat(origin.AsSpan(0, offset), newText, origin.AsSpan(offset + change.RemovedLength));
+                    ItemsSource[index] = newValue;
+                    _infos[index] = new ItemInfo(newValue.Length, _infos[index]._readOnlyLength, _infos[index]._canBeSpecified);
                 }
                 else
                 {
-                    ItemsSource[index] = string.Concat(origin.AsSpan(0, offset), Text.AsSpan(change.Offset, change.AddedLength), origin.AsSpan(offset + change.RemovedLength));
-                    _infos[index] = new ItemInfo(ItemsSource[index].ToString().Length, _infos[index]._readOnlyLength, _infos[index]._canBeSpecified);
+                    var newValue = string.Concat(origin.AsSpan(0, offset), Text.AsSpan(change.Offset, change.AddedLength), origin.AsSpan(offset + change.RemovedLength));
+                    ItemsSource[index] = newValue;
+                    _infos[index] = new ItemInfo(newValue.Length, _infos[index]._readOnlyLength, _infos[index]._canBeSpecified);
                 }
             }
             catch (Exception exc)
