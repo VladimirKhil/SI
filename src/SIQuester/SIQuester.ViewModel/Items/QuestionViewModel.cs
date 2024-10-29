@@ -126,7 +126,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             {
                 Type = StepParameterTypes.Content,
                 ContentValue = new List<ContentItem>(new[]
-                    {
+                {
                     new ContentItem { Type = ContentTypes.Text, Placement = ContentPlacements.Screen, Value = "" }
                 })
             }));
@@ -142,7 +142,15 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     private void AddWrongAnswers_Executed(object? arg)
     {
         QDocument.ActivatedObject = Wrong;
-        Wrong.Add("");
+
+        try
+        {
+            Wrong.Add("");
+        }
+        catch (Exception ex)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(ex.Message, true);
+        }
     }
 
     private void CloneQuestion_Executed(object? arg)

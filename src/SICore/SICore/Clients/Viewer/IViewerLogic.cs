@@ -9,9 +9,9 @@ namespace SICore;
 /// </summary>
 public interface IViewerLogic : ILogic
 {
-    IPlayerLogic PlayerLogic { get; }
+    IPersonLogic PlayerLogic { get; }
 
-    IShowmanLogic ShowmanLogic { get; }
+    IPersonLogic ShowmanLogic { get; }
 
     bool CanSwitchType { get; }
 
@@ -19,12 +19,6 @@ public interface IViewerLogic : ILogic
     /// Получение сообщений
     /// </summary>
     void ReceiveText(Message m);
-
-    /// <summary>
-    /// Печать в протокол формы
-    /// </summary>
-    /// <param name="text">Текст</param>
-    void Print(string text);
 
     /// <summary>
     /// Новое состояние игры
@@ -209,4 +203,72 @@ public interface IViewerLogic : ILogic
     void OnDisableButton() { }
 
     void OnSetJoinMode(JoinMode joinMode) { }
+
+    void SelectPlayer() { }
+
+    /// <summary>
+    /// Selects person to select the question.
+    /// </summary>
+    [Obsolete]
+    void StarterChoose();
+
+    /// <summary>
+    /// Selects next person to make a stake.
+    /// </summary>
+    [Obsolete]
+    void FirstStake();
+
+    /// <summary>
+    /// Selects next person to delete a theme.
+    /// </summary>
+    [Obsolete]
+    void FirstDelete();
+
+    /// <summary>
+    /// Validates the answer.
+    /// </summary>
+    void IsRight(bool voteForRight, string answer);
+
+    /// <summary>
+    /// Reacts to sending answer request.
+    /// </summary>
+    void Answer() { }
+
+    /// <summary>
+    /// Handles game hint.
+    /// </summary>
+    /// <param name="hint">Game hint.</param>
+    void OnHint(string hint) { }
+
+    /// <summary>
+    /// Handles start of thinking.
+    /// </summary>
+    void StartThink() { }
+
+    /// <summary>
+    /// Handles end of thinking.
+    /// </summary>
+    void EndThink();
+
+    /// <summary>
+    /// Handles receiving of question content part.
+    /// </summary>
+    void OnQuestionContent() { }
+
+    /// <summary>
+    /// Handles game report request.
+    /// </summary>
+    void Report();
+
+    void OnTheme(string[] mparams) { }
+
+    /// <summary>
+    /// Handles question selection.
+    /// </summary>
+    void OnQuestionSelected() { }
+    
+    /// <summary>
+    /// Handles player answering outcome.
+    /// </summary>
+    void OnPlayerOutcome(int playerIndex, bool isRight);
 }

@@ -18,6 +18,7 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
     private const string YoomoneyUri = @"https://yoomoney.ru/to/410012283941753";
     private const string BoostyUri = @"https://boosty.to/vladimirkhil";
     private const string PatreonUri = @"https://patreon.com/vladimirkhil";
+    private const string SIGameUri = @"https://vladimirkhil.com/si/game";
 
     public UICommandCollection MainCommands { get; } = new();
 
@@ -38,6 +39,8 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
     public ICommand NavigateToBoosty { get; private set; }
 
     public ICommand NavigateToPatreon { get; private set; }
+
+    public ICommand LoadSIGame8 { get; private set; }
 
     private ICommand? _update;
 
@@ -89,6 +92,21 @@ public sealed class StartMenuViewModel : INotifyPropertyChanged
         NavigateToPatreon = new SimpleCommand(NavigateToPatreon_Executed);
 
         CancelUpdate = new SimpleCommand(obj => Update = null);
+        LoadSIGame8 = new SimpleCommand(LoadSIGame8_Executed) { CanBeExecuted = Environment.OSVersion.Version.Major >= 10 };
+    }
+
+    private void LoadSIGame8_Executed(object? arg)
+    {
+        try
+        {
+            Browser.Open(SIGameUri);
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.SiteNavigationError + "\r\n{1}", Resources.GroupLink, exc.Message),
+                PlatformSpecific.MessageType.Error);
+        }
     }
 
     private void NavigateToSImulator_Executed(object? arg)

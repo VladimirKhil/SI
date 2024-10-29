@@ -134,6 +134,36 @@ public sealed class ThemeSettings : INotifyPropertyChanged
         set { _soundQuestionStakeUri = value; OnPropertyChanged(); }
     }
 
+    private string? _soundQuestionStakeAllUri = null;
+
+    public string? SoundQuestionStakeAllUri
+    {
+        get => _soundQuestionStakeAllUri;
+        set
+        {
+            if (_soundQuestionStakeAllUri != value)
+            {
+                _soundQuestionStakeAllUri = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string? _soundQuestionAllUri = null;
+
+    public string? SoundQuestionAllUri
+    {
+        get => _soundQuestionAllUri;
+        set
+        {
+            if (_soundQuestionAllUri != value)
+            {
+                _soundQuestionAllUri = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private string _soundQuestionGiveUri = null;
 

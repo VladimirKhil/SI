@@ -67,6 +67,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private const string ContentShapeCharacter = "&";
 
     /// <summary>
+    /// Execution completion;
+    /// </summary>
+    private Action? _completion;
+
+    /// <summary>
     /// Execution continuation.
     /// </summary>
     private Action? _continuation;
@@ -119,9 +124,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal TaskRunner<Tasks> Runner => _taskRunner;
 
-    internal IPinHelper PinHelper { get; }
+    internal IPinHelper? PinHelper { get; }
 
-    public GameLogic(GameData data, GameActions gameActions, SIEngine.GameEngine engine, ILocalizer localizer, IFileShare fileShare, IPinHelper pinHelper)
+    public GameLogic(
+        GameData data,
+        GameActions gameActions,
+        SIEngine.GameEngine engine,
+        ILocalizer localizer,
+        IFileShare fileShare,
+        IPinHelper? pinHelper)
         : base(data)
     {
         _gameActions = gameActions;
@@ -188,9 +199,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     internal void OnContentScreenHtml(ContentItem contentItem)
     {
         _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(contentItem);
+        ShareMedia(contentItem);
 
-        int atomTime = GetContentItemDuration(contentItem, DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
+        var atomTime = GetContentItemDuration(contentItem, DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
 
         _data.AtomTime = atomTime;
         _data.AtomStart = DateTime.UtcNow;
@@ -454,6 +465,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Order = Array.Empty<int>();
         _data.OrderIndex = -1;
 
+        foreach (var player in ClientData.Players)
+        {
+            player.AnswerValidationStatus = null;
+        }
+
         if (_data.Settings.AppSettings.HintShowman)
         {
             var rightAnswers = question.Right;
@@ -609,7 +625,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         return (true, globalUri, localUri, null);
     }
 
-    private bool ShareMedia(ContentItem contentItem)
+    private string? ShareMedia(ContentItem contentItem)
     {
         try
         {
@@ -619,7 +635,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
                 _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
-                return false;
+                return null;
             }
 
             _gameActions.SendMessageWithArgs(
@@ -629,12 +645,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 contentItem.Type,
                 globalUri);
 
-            return true;
+            return globalUri;
         }
         catch (Exception exc)
         {
             ClientData.Host.OnError(exc);
-            return false;
+            return null;
         }
     }
 
@@ -705,19 +721,19 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             ? (contentItem.Duration > TimeSpan.Zero ? (int)(contentItem.Duration.TotalMilliseconds / 100) : defaultValue)
             : 1;
 
+    private void ClearMediaContent() => _data.QuestionPlayState.MediaContentCompletions.Clear();
+
     internal void OnContentBackgroundAudio(ContentItem contentItem)
     {
         _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(contentItem);
+        var globalUri = ShareMedia(contentItem);
 
         var defaultTime = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
 
-        if (_data.MediaOk)
+        if (globalUri != null)
         {
-            _data.InitialMediaContentCompletionCount = _data.HaveViewedAtom = _data.Viewers.Count
-                + _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
-                + (_data.ShowMan.IsHuman && _data.ShowMan.IsConnected ? 1 : 0);
-
+            _data.QuestionPlayState.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_data.ActiveHumanCount);
+            _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
 
@@ -736,16 +752,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     internal void OnContentScreenVideo(ContentItem contentItem)
     {
         _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(contentItem);
+        var globalUri = ShareMedia(contentItem);
 
         var defaultTime = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
 
-        if (_data.MediaOk)
+        if (globalUri != null)
         {
-            _data.InitialMediaContentCompletionCount = _data.HaveViewedAtom = _data.Viewers.Count
-                + _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
-                + (_data.ShowMan.IsHuman && _data.ShowMan.IsConnected ? 1 : 0);
-
+            _data.QuestionPlayState.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_data.ActiveHumanCount);
+            _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
 
@@ -900,7 +914,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             RescheduleTask(); // Decision could be ready
         }
 
-        _gameActions.SpecialReplic(LO[nameof(R.GameResumed)]);
+        _gameActions.SystemReplic(LO[nameof(R.GameResumed)]);
         _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
     }
 
@@ -1321,9 +1335,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             if (!_data.QuestionPlayState.HiddenStakes)
             {
                 var outcome = _data.CurPriceRight;
-                updateSum = (int)(outcome * _data.Answerer.AnswerIsRightFactor);
+                updateSum = (int)(outcome * _data.Answerer.AnswerValidationFactor);
 
-                s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerIsRightFactor)})");
+                s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerValidationFactor)})");
 
                 _gameActions.ShowmanReplic(s.ToString());
                 _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, updateSum);
@@ -1385,17 +1399,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             if (!_data.QuestionPlayState.HiddenStakes)
             {
-                s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerIsRightFactor)})");                
+                s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerValidationFactor)})");                
                 _gameActions.ShowmanReplic(s.ToString());
 
-                if (_data.Answerer.AnswerIsRightFactor == 0)
+                if (_data.Answerer.AnswerValidationFactor == 0)
                 {
                     _gameActions.SendMessageWithArgs(Messages.Pass, _data.AnswererIndex);
                     updateSum = -1;
                 }
                 else
                 {
-                    updateSum = (int)(outcome * _data.Answerer.AnswerIsRightFactor);
+                    updateSum = (int)(outcome * _data.Answerer.AnswerValidationFactor);
                     _gameActions.SendMessageWithArgs(Messages.Person, '-', _data.AnswererIndex, updateSum);
                     _data.Answerer.SubtractWrongSum(updateSum);
                     _gameActions.InformSums();
@@ -1526,7 +1540,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
             _gameActions.SendMessage(Messages.Resume);
 
-            var waitTime = _data.IsPlayingMedia && _data.HaveViewedAtom < _data.InitialMediaContentCompletionCount
+            var waitTime = _data.IsPlayingMedia && _data.QuestionPlayState.MediaContentCompletions.All(p => p.Value.Current > 0)
                 ? 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10
                 : _data.AtomTime;
 
@@ -1962,7 +1976,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
                 }
 
-                _gameActions.SpecialReplic(LO[nameof(R.PauseInGame)]);
+                _gameActions.SystemReplic(LO[nameof(R.PauseInGame)]);
                 _gameActions.SendMessageWithArgs(Messages.Pause, '+', times[0], times[1], times[2]);
                 break;
 
@@ -2163,7 +2177,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var isRight = answer != null && AnswerChecker.IsAnswerRight(answer, _data.Question.Right);
 
         _data.Answerer.AnswerIsRight = isRight;
-        _data.Answerer.AnswerIsRightFactor = 1.0;
+        _data.Answerer.AnswerValidationFactor = 1.0;
 
         _data.ShowmanDecision = true;
         OnDecision();
@@ -2210,6 +2224,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void MoveNext()
     {
+        if (_completion != null)
+        {
+            _completion();
+            _completion = null;
+        }
+
         if (_continuation != null)
         {
             _continuation();
@@ -2382,6 +2402,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
+            _gameActions.SendMessage(Messages.ComplexValidationFinish, _data.ShowMan.Name);
+
             for (var i = 0; i < _data.Players.Count; i++)
             {
                 if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && string.IsNullOrEmpty(_data.Players[i].Answer))
@@ -3281,7 +3303,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var rightLabel = ClientData.Question?.Right.FirstOrDefault();
 
             _data.Answerer.AnswerIsRight = _data.Answerer.Answer == rightLabel;
-            _data.Answerer.AnswerIsRightFactor = 1.0;
+            _data.Answerer.AnswerValidationFactor = 1.0;
             _data.ShowmanDecision = true;
 
             OnDecision();
@@ -3292,7 +3314,18 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.Decision = DecisionType.AnswerValidating;
 
             _data.Answerer.AnswerIsRight = !_data.Answerer.AnswerIsWrong;
-            _data.Answerer.AnswerIsRightFactor = 1.0;
+            _data.Answerer.AnswerValidationFactor = 1.0;
+            _data.ShowmanDecision = true;
+
+            OnDecision();
+        }
+        else if (_data.Answerer.AnswerValidationStatus.HasValue)
+        {
+            _data.IsWaiting = true;
+            _data.Decision = DecisionType.AnswerValidating;
+
+            _data.Answerer.AnswerIsRight = _data.Answerer.AnswerValidationStatus.Value;
+            _data.Answerer.AnswerValidationFactor = 1.0;
             _data.ShowmanDecision = true;
 
             OnDecision();
@@ -3369,6 +3402,21 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     _gameActions.SendMessage(Messages.Answer, _data.Players[i].Name);
                 }
             }
+
+            var question = _data.Question ?? throw new InvalidOperationException("Question is null");
+
+            var rightAnswers = question.Right;
+            var wrongAnswers = question.Wrong;
+
+            var message = new MessageBuilder(
+                Messages.ComplexValidationStart,
+                '-',
+                rightAnswers.Count)
+                .AddRange(rightAnswers)
+                .AddRange(wrongAnswers)
+                .Build();
+
+            _gameActions.SendMessage(message, _data.ShowMan.Name);
 
             _data.AnswerCount = _data.QuestionPlayState.AnswererIndicies.Count;
             ScheduleExecution(Tasks.WaitAnswer, timeSettings.TimeForFinalThinking * 10, force: true);
@@ -4951,9 +4999,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                             _data.IsPlayingMedia = true;
                             _data.IsPlayingMediaPaused = false;
 
-                            _data.InitialMediaContentCompletionCount = _data.HaveViewedAtom = _data.Viewers.Count
-                                + _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
-                                + (_data.ShowMan.IsHuman && _data.ShowMan.IsConnected ? 1 : 0);
+                            _data.QuestionPlayState.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_data.ActiveHumanCount);
+                            _completion = ClearMediaContent;
                         }
 
                         duration = contentItem.Duration > TimeSpan.Zero

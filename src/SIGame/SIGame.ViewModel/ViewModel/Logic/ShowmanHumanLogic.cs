@@ -9,7 +9,7 @@ namespace SICore;
 /// <summary>
 /// Логика ведущего-человека
 /// </summary>
-internal sealed class ShowmanHumanLogic : IShowmanLogic
+internal sealed class ShowmanHumanLogic : IPersonLogic
 {
     private readonly ViewerActions _viewerActions;
     private readonly ViewerData _data;
@@ -37,35 +37,6 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
 
         TInfo.SelectQuestion.CanBeExecuted = false;
         TInfo.SelectTheme.CanBeExecuted = false;
-    }
-
-    public void StarterChoose()
-    {
-        _gameViewModel.ClearReplic();
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectStarter)];
-        _data.Host.OnFlash();
-    }
-
-    public void FirstStake()
-    {
-        _gameViewModel.ClearReplic();
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectStaker)];
-        _data.Host.OnFlash();
-    }
-
-    public void IsRight(string answer)
-    {
-        _gameViewModel.Hint = _localizer[nameof(R.HintCheckAnswer)];
-        _gameViewModel.DialogMode = DialogModes.AnswerValidation;
-        _gameViewModel.Answer = answer;
-        _data.Host.OnFlash();
-    }
-
-    public void FirstDelete()
-    {
-        _gameViewModel.ClearReplic();
-        _gameViewModel.Hint = _localizer[nameof(R.HintThemeDeleter)];
-        _data.Host.OnFlash();
     }
 
     public void OnInitialized()
@@ -163,19 +134,4 @@ internal sealed class ShowmanHumanLogic : IShowmanLogic
             }
         }
     }
-
-    public void ManageTable(bool? mode) => TInfo.IsEditable = mode ?? !TInfo.IsEditable;
-
-    public void Answer()
-    {
-        _data.Host.OnFlash();
-
-        if (TInfo.LayoutMode != LayoutMode.Simple)
-        {
-            TInfo.Selectable = true;
-            TInfo.SelectAnswer.CanBeExecuted = true;
-        }
-    }
-
-    public void OnHint(string hint) => _gameViewModel.Hint = $"{_localizer[nameof(R.RightAnswer)].ToUpperInvariant()} : {hint}";
 }

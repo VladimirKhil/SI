@@ -91,57 +91,28 @@ public sealed class GameServerClient : IGameServerClient
     }
 
     public Task JoinLobbyAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync("JoinLobby2", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
+        Connection.InvokeAsync("JoinLobby2", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
 
     public Task LeaveLobbyAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync("LeaveLobby", cancellationToken);
+        Connection.InvokeAsync("LeaveLobby", cancellationToken);
 
     public Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
+        Connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
 
     public Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<HostInfo>("GetGamesHostInfoNew", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
+        Connection.InvokeAsync<HostInfo>("GetGamesHostInfoNew", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
 
     public Task<string> GetNewsAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<string>("GetNews", cancellationToken);
+        Connection.InvokeAsync<string>("GetNews", cancellationToken);
 
     public Task<string> GetNewsNewAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<string>("GetNewsNew", cancellationToken);
+        Connection.InvokeAsync<string>("GetNewsNew", cancellationToken);
 
     public Task<ChatMessage[]> GetLatestChatMessagesAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<ChatMessage[]>("GetLatestChatMessages", cancellationToken);
+        Connection.InvokeAsync<ChatMessage[]>("GetLatestChatMessages", cancellationToken);
 
     public Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<string[]>("GetUsers", cancellationToken);
-
-    private async Task AuthenticateUserAsync(
-        string user,
-        string password,
-        CancellationToken cancellationToken = default)
-    {
-        var uri = "api/Account/LogOn";
-
-        using var content = new FormUrlEncodedContent(
-            new Dictionary<string, string>
-            {
-                ["login"] = user,
-                ["password"] = password
-            });
-
-        using var response = await _client.PostAsync(uri, content, cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return;
-        }
-
-        throw response.StatusCode switch
-        {
-            HttpStatusCode.Conflict => new Exception(Resources.OnlineUserConflict),
-            HttpStatusCode.Forbidden => new Exception(Resources.LoginForbidden),
-            _ => new Exception($"Error ({response.StatusCode}): {await response.Content.ReadAsStringAsync(cancellationToken)}"),
-        };
-    }
+        Connection.InvokeAsync<string[]>("GetUsers", cancellationToken);
 
     public async Task OpenAsync(string userName, CancellationToken cancellationToken = default)
     {
@@ -149,8 +120,6 @@ public sealed class GameServerClient : IGameServerClient
         {
             throw new InvalidOperationException("Client has been already opened");
         }
-
-        await AuthenticateUserAsync(userName, "", cancellationToken);
 
         _connection = new HubConnectionBuilder()
             .WithUrl(
@@ -201,7 +170,7 @@ public sealed class GameServerClient : IGameServerClient
         _isOpened = true;
     }
 
-    public Task SayAsync(string message) => _connection.InvokeAsync("Say", message);
+    public Task SayAsync(string message) => Connection.InvokeAsync("Say", message);
 
     private Task OnConnectionClosedAsync(Exception? exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
 

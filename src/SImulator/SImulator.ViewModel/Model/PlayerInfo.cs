@@ -9,6 +9,11 @@ namespace SImulator.ViewModel.Model;
 [DataContract]
 public sealed class PlayerInfo : SimplePlayerInfo
 {
+    /// <summary>
+    /// Unique player identifier.
+    /// </summary>
+    public string? Id { get; set; }
+
     private int _right = 0;
 
     [DataMember]

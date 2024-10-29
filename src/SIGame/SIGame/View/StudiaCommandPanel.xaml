@@ -524,10 +524,10 @@
             <Button
                 Width="70"
                 Cursor="Hand"
-                Command="{Binding Data.ShowmanDataExtensions.ManageTable}"
+                Command="{Binding ManageTable}"
                 FontSize="20"
                 ToolTip="{x:Static lp:Resources.EditTable}"
-                Visibility="{Binding Data.ShowmanDataExtensions.ManageTable, Converter={StaticResource NotNullToVisibilityConverter1}}"
+                Visibility="{Binding IsShowman, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 ToolTipService.ShowOnDisabled="True">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource {x:Type ButtonBase}}">

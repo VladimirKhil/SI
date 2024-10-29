@@ -1,4 +1,5 @@
-﻿using SIEngine.Core;
+﻿using SICore.Models;
+using SIEngine.Core;
 using SIPackages;
 
 namespace SICore.Clients.Game;
@@ -48,6 +49,11 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal bool HiddenStakes { get; set; }
 
+    /// <summary>
+    /// Content completions waiting table.
+    /// </summary>
+    internal Dictionary<(string ContentType, string ContentValue), Completion> MediaContentCompletions { get; } = new();
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -57,6 +63,7 @@ internal sealed class QuestionPlayState
         AnswerOptionsShown = false;
         ScreenContentSequence = null;
         HiddenStakes = false;
+        MediaContentCompletions.Clear();
     }
 
     internal void RemovePlayer(int playerIndex)

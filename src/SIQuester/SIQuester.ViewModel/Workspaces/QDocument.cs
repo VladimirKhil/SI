@@ -2979,10 +2979,10 @@ public sealed class QDocument : WorkspaceViewModel
         var directoryCreated = false;
         var downloadCounter = 0;
 
-        using var change = OperationsManager.BeginComplexChange();
-
         try
         {
+            using var change = OperationsManager.BeginComplexChange();
+
             foreach (var round in Package.Rounds)
             {
                 foreach (var theme in round.Themes)

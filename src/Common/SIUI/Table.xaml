@@ -599,6 +599,8 @@
                                 <MediaElement
                                     Source="{Binding Value}"
                                     Stretch="Uniform"
+                                    lb:MediaController.ContentType="video"
+                                    lb:MediaController.ContentValue="{Binding OriginalValue}"
                                     lb:MediaController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" />
                             </DataTemplate>
 
@@ -662,7 +664,12 @@
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Video}">
-                                <MediaElement Source="{Binding MediaSource.Uri}" Stretch="Uniform" lb:MediaController.LoadHandler="{Binding}" />
+                                <MediaElement
+                                    Source="{Binding MediaSource.Uri}"
+                                    Stretch="Uniform"
+                                    lb:MediaController.ContentType="video"
+                                    lb:MediaController.ContentValue="{Binding MediaSource.Uri}"
+                                    lb:MediaController.LoadHandler="{Binding}" />
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Html}">
@@ -1126,6 +1133,8 @@
                                                                     <Grid>
                                                                         <MediaElement
                                                                             Source="{Binding SoundSource.Uri}"
+                                                                            lb:MediaController.ContentType="audio"
+                                                                            lb:MediaController.ContentValue="{Binding SoundSource.OriginalValue}"
                                                                             lb:MediaController.LoadHandler="{Binding}" />
 
                                                                         <ContentControl

@@ -622,7 +622,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.Atom:
-                        OnAtom();
+                        OnAtom(args);
                         break;
 
                     case Messages.MediaLoaded:
@@ -800,6 +800,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                             ReportText = args[2]
                         });
                         break;
+
+                    case Messages.Validate:
+                        OnValidate(message, args);
+                        break;
                 }
             }
             catch (Exception exc)
@@ -808,9 +812,34 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }, 5000);
 
+    private void OnValidate(Message message, string[] args)
+    {
+        if (message.Sender != ClientData.ShowMan.Name
+            || ClientData.Decision != DecisionType.Answering
+            || !Logic.HaveMultipleAnswerers()
+            || args.Length <= 2
+            || !int.TryParse(args[1], out var playerIndex)
+            || playerIndex < 0
+            || playerIndex >= ClientData.Players.Count)
+        {
+            return;
+        }
+
+        var validationStatus = args[2] == "+";
+        var player = ClientData.Players[playerIndex];
+
+        if (player.AnswerValidationStatus.HasValue)
+        {
+            return;
+        }
+
+        player.AnswerValidationStatus = validationStatus;
+        player.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[3], out var factor) && factor >= 0.0 ? factor : 1.0;
+    }
+
     private void OnPin(string hostName)
     {
-        var pin = Logic.PinHelper.GeneratePin();
+        var pin = Logic.PinHelper?.GeneratePin() ?? 0;
         _gameActions.SendMessageToWithArgs(hostName, Messages.Pin, pin);
     }
 
@@ -2031,16 +2060,38 @@ public sealed class Game : Actor<GameData, GameLogic>
         _logic.OnPauseCore(args[1] == "+");
     }
 
-    private void OnAtom()
+    private void OnAtom(string[] args)
     {
-        ClientData.HaveViewedAtom--;
+        Completion? completion;
+        var completions = ClientData.QuestionPlayState.MediaContentCompletions;
+
+        if (args.Length > 2)
+        {
+            var contentType = args[1];
+            var contentValue = args[2];
+
+            if (!completions.TryGetValue((contentType, contentValue), out completion))
+            {
+                return;
+            }
+        }
+        else if (completions.Count == 0)
+        {
+            return;
+        }
+        else
+        {
+            completion = completions.Values.First();
+        }
+
+        completion.Current++;
 
         if (!ClientData.IsPlayingMedia || ClientData.TInfo.Pause)
         {
             return;
         }
 
-        if (ClientData.HaveViewedAtom <= 0)
+        if (completion.Current == completion.Total)
         {
             ClientData.IsPlayingMedia = false;
             _logic.RescheduleTask();
@@ -2103,6 +2154,18 @@ public sealed class Game : Actor<GameData, GameLogic>
                     ClientData.AnswererIndex = i;
                     ClientData.Players[i].Flag = false;
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
+                    
+                    if (ClientData.Players[i].IsHuman)
+                    {
+                        ClientData.Players[i].AnswerValidationStatus = null;
+
+                        _gameActions.SendMessageToWithArgs(
+                            ClientData.ShowMan.Name,
+                            Messages.AskValidate,
+                            i,
+                            args[1].Length > 0 ? args[1] : LO[nameof(R.IDontKnow)]);
+                    }
+
                     break;
                 }
             }
@@ -2250,7 +2313,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         {
             ClientData.Decision = DecisionType.AnswerValidating;
             ClientData.Answerer.AnswerIsRight = args[1] == "+";
-            ClientData.Answerer.AnswerIsRightFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor >= 0.0 ? factor : 1.0;
+            ClientData.Answerer.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor >= 0.0 ? factor : 1.0;
             ClientData.ShowmanDecision = true;
 
             _logic.Stop(StopReason.Decision);
@@ -3497,7 +3560,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData(ClientData.Host);
         var actions = new ViewerActions(playerClient, LO);
-        var logic = new ViewerComputerLogic(data, actions, account);
+        var logic = new ViewerComputerLogic(data, actions, account, GameRole.Player);
         _ = new Player(playerClient, account, false, logic, actions, LO, data);
 
         OnInfo(newAccount.Name);
@@ -3526,7 +3589,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData(ClientData.Host);
         var actions = new ViewerActions(showmanClient, LO);
-        var logic = new ViewerComputerLogic(data, actions, account);
+        var logic = new ViewerComputerLogic(data, actions, account, GameRole.Showman);
         var showman = new Showman(showmanClient, account, false, logic, actions, LO, data);
 
         OnInfo(newAccount.Name);

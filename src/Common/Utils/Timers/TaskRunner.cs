@@ -11,11 +11,23 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
     /// </summary>
     private const int MaximumWaitTime = 1200;
 
+    /// <summary>
+    /// Minimum interval before task fire that alows rescheduling (to avoid concurrency issues).
+    /// </summary>
+    /// <remarks>
+    /// Not ideal but there is no easy way to transfer state to each timer call.
+    /// </remarks>
+    private static readonly TimeSpan _minimumRescheduleTime = TimeSpan.FromMilliseconds(100);
+
     private readonly ITaskRunHandler<T> _taskRunHandler;
 
     private readonly Timer _taskTimer;
 
     private int _taskArgument = -1;
+
+    private int _taskSequenceId = -1;
+
+    private int _lastExecutedTaskSequenceId = -1;
 
     private readonly Lock _taskTimerLock = new(nameof(_taskTimerLock));
 
@@ -52,12 +64,21 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
         _taskArgument = taskArgument;
     }
 
+    /// <summary>
+    /// Reschedules the task to be run with different schedule.
+    /// </summary>
+    /// <param name="taskTime">New task schedule.</param>
+    /// <remarks>
+    /// This method should always be run separately from _taskRunHandler.ExecuteTask (with the help of locks)
+    /// to prevent collisions.
+    /// </remarks>
     public void RescheduleTask(int taskTime = 10) =>
         _taskTimerLock.WithLock(() =>
         {
-            if (!_disposed)
+            if (!_disposed && (_finishingTime - DateTime.UtcNow) > _minimumRescheduleTime)
             {
                 _taskTimer.Change(taskTime, Timeout.Infinite);
+                _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
             }
         });
 
@@ -127,6 +148,7 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
                 return;
             }
 
+            _taskSequenceId++;
             _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
             _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
         });
@@ -134,10 +156,13 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
 
     private void TaskTimer_Elapsed(object? state)
     {
-        if (EqualityComparer<T>.Default.Equals(CurrentTask, default))
+        if (EqualityComparer<T>.Default.Equals(CurrentTask, default)
+            || _lastExecutedTaskSequenceId >= _taskSequenceId)
         {
             return;
         }
+
+        _lastExecutedTaskSequenceId = _taskSequenceId;
 
         try
         {

@@ -35,8 +35,6 @@ public abstract class Node : INode
 
     public event Action? Reconnected;
 
-    public event Action<Node, bool>? ConnectionClosed;
-
     private bool _wrongUserMessageShown = false;
 
     protected void OnReconnecting() => Reconnecting?.Invoke();
@@ -59,12 +57,10 @@ public abstract class Node : INode
         return new ValueTask<bool>(true);
     }
 
-    public virtual async ValueTask RemoveConnectionAsync(IConnection connection, bool withError, CancellationToken cancellationToken = default)
+    public virtual ValueTask RemoveConnectionAsync(IConnection connection, bool withError, CancellationToken cancellationToken = default)
     {
         ClearListeners(connection);
-        await connection.DisposeAsync();
-
-        ConnectionClosed?.Invoke(this, withError);
+        return connection.DisposeAsync();
     }
 
     protected void ClearListeners(IConnection connection)

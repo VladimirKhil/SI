@@ -1,4 +1,5 @@
 ﻿using SIGame.ViewModel;
+using SIUI.Behaviors;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,12 +16,12 @@ public partial class Studia : UserControl
     // TODO: can Table call the command directly?
     private void Table_MediaEnded(object sender, RoutedEventArgs e)
     {
-        var viewed = ((GameViewModel)DataContext).AtomViewed;
-        
-        if (viewed != null && viewed.CanExecute(null))
-        {
-            viewed.Execute(null);
-        }
+        var mediaElement = (MediaElement)e.OriginalSource;
+
+        var contentType = MediaController.GetContentType(mediaElement);
+        var contentValue = MediaController.GetContentValue(mediaElement);
+
+        ((GameViewModel)DataContext).OnMediaContentCompleted(contentType, contentValue);
     }
 
     private void UserControl_MouseRightButtonDown(object sender, MouseButtonEventArgs e) =>

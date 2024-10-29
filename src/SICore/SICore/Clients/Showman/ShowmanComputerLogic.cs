@@ -4,9 +4,9 @@ using SIData;
 namespace SICore;
 
 /// <summary>
-/// Логика ведущего-компьютера
+/// Defines a showman bot logic.
 /// </summary>
-internal sealed class ShowmanComputerLogic : IShowmanLogic
+internal sealed class ShowmanComputerLogic : IPersonLogic
 {
     private readonly ViewerActions _viewerActions;
     private readonly ViewerData _data;

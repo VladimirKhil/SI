@@ -52,6 +52,11 @@ public sealed class GamePlayerAccount : GamePersonAccount
     /// </summary>
     internal string? Answer { get; set; } // TODO: try to make non-nullable but check problems with accepting answers in questions for all
 
+    /// <summary>
+    /// Defines answer validation status.
+    /// </summary>
+    internal bool? AnswerValidationStatus { get; set; }
+    
     // TODO: Will be moved to QuestionPlayState
     /// <summary>
     /// Ответ верен
@@ -60,9 +65,9 @@ public sealed class GamePlayerAccount : GamePersonAccount
 
     // TODO: Will be moved to QuestionPlayState
     /// <summary>
-    /// Answer right price factor.
+    /// Answer validation factor.
     /// </summary>
-    internal double AnswerIsRightFactor { get; set; } = 1.0;
+    internal double AnswerValidationFactor { get; set; } = 1.0;
 
     // TODO: Will be moved to QuestionPlayState
     /// <summary>

@@ -1,8 +1,12 @@
-﻿namespace SImulator.Implementation.ButtonManagers.WebNew;
+﻿using System.Collections.Generic;
+
+namespace SImulator.Implementation.ButtonManagers.WebNew;
 
 public interface IGameRepository
 {
-    void AddPlayer(string userName);
+    ICollection<string> BannedNames { get; }
+
+    void AddPlayer(string id, string userName);
 
     void RemovePlayer(string userName);
 

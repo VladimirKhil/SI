@@ -12,6 +12,8 @@ public static class Sounds
     public const string QuestionNoRisk = "question_norisk";
     public const string QuestionSecret = "question_secret";
     public const string QuestionStake = "question_stake";
+    public const string QuestionStakeAll = "question_stake_all";
+    public const string QuestionAll = "question_all";
     public const string RoundBegin = "round_begin";
     public const string RoundThemes = "round_themes";
     public const string RoundTimeout = "round_timeout";

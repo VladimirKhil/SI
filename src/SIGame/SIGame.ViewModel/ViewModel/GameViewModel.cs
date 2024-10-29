@@ -304,21 +304,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             }
         }
     }
-
-    private SimpleCommand _atomViewed;
-
-    public SimpleCommand AtomViewed
-    {
-        get => _atomViewed;
-        set
-        {
-            if (_atomViewed != value)
-            {
-                _atomViewed = value;
-                OnPropertyChanged();
-            }
-        }
-    }
     
     private SimpleCommand _kick;
 
@@ -520,6 +505,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public ICommand ChangeSums2 { get; set; }
 
+    /// <summary>
+    /// Manage game table command.
+    /// </summary>
+    public SimpleCommand ManageTable { get; }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -578,7 +568,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _changeSums = new SimpleCommand(ChangeSums_Executed) { CanBeExecuted = IsShowman };
         _changeActivePlayer = new SimpleCommand(ChangeActivePlayer_Executed) { CanBeExecuted = IsShowman };
 
-        _atomViewed = new SimpleCommand(AtomViewed_Executed);
         _kick = new SimpleCommand(Kick_Executed);
         _ban = new SimpleCommand(Ban_Executed);
         _setHost = new SimpleCommand(SetHost_Executed);
@@ -601,7 +590,10 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         SendAllInNew = new SimpleCommand(SendAllInNew_Executed);
 
         ChangeSums2 = new SimpleCommand(ChangeSums2_Executed);
+        ManageTable = new SimpleCommand(ManageTable_Executed) { CanBeExecuted = false };
     }
+
+    private void ManageTable_Executed(object? arg) => TInfo.IsEditable = !TInfo.IsEditable;
 
     private void ChangeSums2_Executed(object? arg)
     {
@@ -817,7 +809,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Host?.Actions.SendMessage(Messages.Kick, person.Name);
     }
 
-    private void AtomViewed_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Atom);
+    public void OnMediaContentCompleted(string contentType, string contentValue) =>
+        Host?.Actions.SendMessageWithArgs(Messages.Atom, contentType, contentValue);
 
     private void ChangeActivePlayer_Executed(object? arg)
     {

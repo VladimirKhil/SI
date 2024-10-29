@@ -106,16 +106,23 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
 
     private void RemoveItem_Executed(object? arg)
     {
-        if (arg != null)
+        try
         {
-            Remove((T)arg);
-        }
-        else if (_currentPosition > -1 && _currentPosition < Count)
-        {
-            RemoveAt(_currentPosition);
-        }
+            if (arg != null)
+            {
+                Remove((T)arg);
+            }
+            else if (_currentPosition > -1 && _currentPosition < Count)
+            {
+                RemoveAt(_currentPosition);
+            }
 
-        UpdateCommands();
+            UpdateCommands();
+        }
+        catch (Exception ex)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowErrorMessage(ex.Message);
+        }
     }
 
     private void MoveLeft_Executed(object? arg)

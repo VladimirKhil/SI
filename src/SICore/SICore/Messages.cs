@@ -57,6 +57,11 @@ public static class Messages
     public const string AskStake = "ASK_STAKE";
 
     /// <summary>
+    /// Asks to validate player's answer.
+    /// </summary>
+    public const string AskValidate = "ASK_VALIDATE";
+
+    /// <summary>
     /// Notifies the game that the client has completed viewing the media content.
     /// </summary>
     public const string Atom = "ATOM";
@@ -125,6 +130,16 @@ public static class Messages
     /// Сделанный выбор вопроса
     /// </summary>
     public const string Choose = "CHOOSE";
+
+    /// <summary>
+    /// Finishes complex validation.
+    /// </summary>
+    public const string ComplexValidationFinish = "COMPLEX_VALIDATION_FINISH";
+
+    /// <summary>
+    /// Starts complex validation by sending right and wrong answers.
+    /// </summary>
+    public const string ComplexValidationStart = "COMPLEX_VALIDATION_START";
 
     /// <summary>
     /// Default computer players.
@@ -621,6 +636,11 @@ public static class Messages
     /// Defines a user-level error.
     /// </summary>
     public const string UserError = "USER_ERROR";
+
+    /// <summary>
+    /// Answer validation decision.
+    /// </summary>
+    public const string Validate = "VALIDATE";
 
     /// <summary>
     /// Необходимо провалидировать ответ игрока

@@ -5,6 +5,7 @@ using SIQuester.Helpers;
 using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.ViewModel;
+using SIQuester.ViewModel.PlatformSpecific;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
@@ -69,7 +70,14 @@ public partial class FlatDocView : UserControl
 
         if (host != null)
         {
-            OnHostClick(host);
+            try
+            {
+                OnHostClick(host);
+            }
+            catch (Exception ex)
+            {
+                PlatformManager.Instance.ShowErrorMessage(ex.Message);
+            }
         }
 
         if (AppSettings.Default.Edit != EditMode.FloatPanel)

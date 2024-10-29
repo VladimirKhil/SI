@@ -14,30 +14,73 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     public bool CanSwitchType => false;
 
     private readonly PlayerComputerLogic _player;
+    private readonly ShowmanComputerLogic _showman;
 
-    public IPlayerLogic PlayerLogic => _player;
+    public IPersonLogic PlayerLogic => _player;
 
-    public IShowmanLogic ShowmanLogic { get; }
+    public IPersonLogic ShowmanLogic => _showman;
 
+    private readonly TimerInfo[] _timersInfo = new TimerInfo[] { new(), new(), new() };
 
+    private readonly GameRole _role;
 
-    private readonly TimerInfo[] _timersInfo = new TimerInfo[] { new TimerInfo(), new TimerInfo(), new TimerInfo() };
-
-    internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
+    internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount, GameRole role)
         : base(data)
     {
         _viewerActions = viewerActions;
+        _role = role;
 
         _player = new PlayerComputerLogic(data, computerAccount, viewerActions, _timersInfo);
-        ShowmanLogic = new ShowmanComputerLogic(data, viewerActions, computerAccount);
+        _showman = new ShowmanComputerLogic(data, viewerActions, computerAccount);
     }
+
+    public void StarterChoose() => _showman.StarterChoose();
+
+    public void FirstStake() => _showman.FirstStake();
+
+    public void FirstDelete() => _showman.FirstDelete();
+
+    public void IsRight(bool voteForRight, string answer)
+    {
+        if (_role == GameRole.Showman)
+        {
+            _showman.IsRight(answer);
+        }
+        else
+        {
+            _player.IsRight(voteForRight);
+        }
+    }
+
+    public void SelectPlayer()
+    {
+        if (_role == GameRole.Showman)
+        {
+            _showman.SelectPlayer();
+        }
+        else
+        {
+            _player.SelectPlayer();
+        }
+    }
+
+    public void OnTheme(string[] mparams) => _player.OnTheme(mparams);
+
+    public void OnQuestionSelected() => _player.OnQuestionSelected();
+
+    public void StartThink() => _player.StartThink();
+
+    public void EndThink() => _player.EndThink();
+
+    public void Answer() => _player.Answer();
+
+    public void OnPlayerOutcome(int playerIndex, bool isRight) => _player.PersonAnswered(playerIndex, isRight);
+
+    public void OnQuestionContent() => _player.OnQuestionContent();
+
+    public void Report() => _player.Report();
 
     public void ReceiveText(Message m)
-    {
-        // Do nothing
-    }
-
-    public void Print(string text)
     {
         // Do nothing
     }
