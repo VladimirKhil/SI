@@ -943,12 +943,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, 10);
     }
 
-    internal void AnnounceFinalTheme()
+    internal void AnnounceFinalTheme(Question question)
     {
         _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_data.Theme.Name}");
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _data.Theme.Name);
         _gameActions.SendThemeInfo(overridenQuestionCount: 1);
-
+        
+        InitQuestionState(question);
         ProceedToThemeAndQuestion();
     }
 

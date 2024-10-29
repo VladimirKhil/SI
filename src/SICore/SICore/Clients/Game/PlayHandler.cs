@@ -185,7 +185,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         _gameData.QuestionIndex = questionIndex;
         _gameData.Question = _gameData.Theme.Questions[_gameData.QuestionIndex];
 
-        GameLogic?.AnnounceFinalTheme();
+        GameLogic?.AnnounceFinalTheme(_gameData.Question);
     }
 
     public void OnTheme(Theme theme)
