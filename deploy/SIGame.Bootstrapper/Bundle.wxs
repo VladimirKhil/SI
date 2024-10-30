@@ -1,45 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
-     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
 	
-    <Bundle AboutUrl="https://vladimirkhil.com/si/game"
-            Name="SIGame"
-            Condition="(VersionNT = v6.0 AND ServicePackLevel >= 2) OR (VersionNT = v6.1 AND ServicePackLevel >= 1) OR (VersionNT >= v6.2)"
-            Version="$(var.ProductVersion)"
-            Manufacturer="Khil-soft"
-            UpgradeCode="cb6fe944-ebb6-44a9-afcd-ba2ded1790b2"
-            IconSourceFile="Resources\game.ico">
+    <Bundle AboutUrl="https://vladimirkhil.com/si/game" Name="SIGame" Condition="(VersionNT = v6.0 AND ServicePackLevel &gt;= 2) OR (VersionNT = v6.1 AND ServicePackLevel &gt;= 1) OR (VersionNT &gt;= v6.2)" Version="$(var.ProductVersion)" Manufacturer="Khil-soft" UpgradeCode="cb6fe944-ebb6-44a9-afcd-ba2ded1790b2" IconSourceFile="Resources\game.ico">
 		
-        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+        <BootstrapperApplication>
 			
-            <bal:WixStandardBootstrapperApplication
-				LicenseUrl=""
-                LocalizationFile="Resources\HyperlinkTheme.wxl" 
-                LogoFile="Resources\game_small.jpg"
-                ThemeFile="Resources\HyperlinkTheme.xml"
-                SuppressOptionsUI="yes" />
+            <bal:WixStandardBootstrapperApplication LicenseUrl="" LocalizationFile="Resources\HyperlinkTheme.wxl" LogoFile="Resources\game_small.jpg" ThemeFile="Resources\HyperlinkTheme.xml" SuppressOptionsUI="yes" Theme="hyperlinkLicense" />
 
             <Payload Id="thm_ru" Name="1049\thm.wxl" Compressed="yes" SourceFile="Resources\1049\HyperlinkTheme.wxl" />
 			
-        </BootstrapperApplicationRef>
+        </BootstrapperApplication>
 
         <Chain>
-			<MsiPackage
-	            Id="SIGame.Setup.x86"
-				Compressed="no"
-                DisplayName="SIGame"
-                SourceFile="..\..\bin\.Release\SIGame.Setup\x86\ru-ru\SIGame.x86.msi"
-				DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/sigame-v$(var.ProductVersion)/SIGame.x86.msi"
-	            InstallCondition="NOT VersionNT64" />
+			<MsiPackage Id="SIGame.Setup.x86" Compressed="no" DisplayName="SIGame" SourceFile="..\..\bin\.Release\SIGame.Setup\x86\ru-ru\SIGame.x86.msi" DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/sigame-v$(var.ProductVersion)/SIGame.x86.msi" InstallCondition="NOT VersionNT64" />
 
-			<MsiPackage
-			    Id="SIGame.Setup.x64"
-				Compressed="no"
-			    DisplayName="SIGame"
-			    SourceFile="..\..\bin\.Release\SIGame.Setup\x64\ru-ru\SIGame.x64.msi"
-				DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/sigame-v$(var.ProductVersion)/SIGame.x64.msi"
-			    InstallCondition="VersionNT64" />
+			<MsiPackage Id="SIGame.Setup.x64" Compressed="no" DisplayName="SIGame" SourceFile="..\..\bin\.Release\SIGame.Setup\x64\ru-ru\SIGame.x64.msi" DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/sigame-v$(var.ProductVersion)/SIGame.x64.msi" InstallCondition="VersionNT64" />
         </Chain>
     </Bundle>
 </Wix>

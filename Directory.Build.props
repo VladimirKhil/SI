@@ -3,8 +3,8 @@
 		<Authors>Vladimir Khil</Authors>
 		<Company>Khil-soft</Company>
 		<Copyright>Copyright © Khil-soft 2002 - 2024</Copyright>
-		<SIGameVersion>7.12.1</SIGameVersion>
-		<SIQuesterVersion>6.1.1</SIQuesterVersion>
+		<SIGameVersion>7.13.0</SIGameVersion>
+		<SIQuesterVersion>6.2.0</SIQuesterVersion>
 		<SImulatorVersion>3.0.0</SImulatorVersion>
 	</PropertyGroup>
 	

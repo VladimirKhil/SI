@@ -34,7 +34,7 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
     /// <summary>
     /// Estimated time for current task to fire.
     /// </summary>
-    private DateTime _finishingTime;
+    public DateTime FinishingTime { get; private set; }
 
     private bool _disposed;
 
@@ -62,6 +62,7 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
     {
         CurrentTask = task;
         _taskArgument = taskArgument;
+        _taskSequenceId++;
     }
 
     /// <summary>
@@ -75,10 +76,10 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
     public void RescheduleTask(int taskTime = 10) =>
         _taskTimerLock.WithLock(() =>
         {
-            if (!_disposed && (_finishingTime - DateTime.UtcNow) > _minimumRescheduleTime)
+            if (!_disposed && (FinishingTime - DateTime.UtcNow) > _minimumRescheduleTime)
             {
                 _taskTimer.Change(taskTime, Timeout.Infinite);
-                _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
+                FinishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
             }
         });
 
@@ -96,14 +97,9 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
         RunTaskTimer(Math.Min(MaximumWaitTime, taskTime));
     }
 
-    public void PauseExecution(T task, int taskArgument)
+    public void PauseExecution(T task, int taskArgument, int leftTime)
     {
-        var now = DateTime.UtcNow;
-
-        // Saving running task, its argument and left time
-        var leftTime = (int)((_finishingTime - now).TotalMilliseconds / 100);
         _oldTasks.Push(Tuple.Create(task, taskArgument, leftTime));
-
         CurrentTask = default;
     }
 
@@ -148,9 +144,8 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
                 return;
             }
 
-            _taskSequenceId++;
             _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
-            _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
+            FinishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
         });
     }
 

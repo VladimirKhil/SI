@@ -122,6 +122,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal StopReason StopReason => _stopReason;
 
+    private int _leftTime;
+
     internal TaskRunner<Tasks> Runner => _taskRunner;
 
     internal IPinHelper? PinHelper { get; }
@@ -1052,7 +1054,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _stopReason = reason;
-        RescheduleTask();
+
+        if (reason == StopReason.Pause || reason == StopReason.Appellation)
+        {
+            _leftTime = (int)((_taskRunner.FinishingTime - DateTime.UtcNow).TotalMilliseconds / 100);
+        }
+
+        _taskRunner.RescheduleTask();
 
         return true;
     }
@@ -1097,7 +1105,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         StopWaiting();
-        ScheduleExecution(Tasks.MoveNext, 1);
+        ScheduleExecution(Tasks.MoveNext, 1, force: true);
         return true;
     }
 
@@ -1949,7 +1957,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             case StopReason.Pause:
                 _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {_taskRunner.PrintOldTasks()}");
-                _taskRunner.PauseExecution(task, arg);
+                _taskRunner.PauseExecution(task, arg, _leftTime);
 
                 ClientData.PauseStartTime = DateTime.UtcNow;
 
@@ -1997,7 +2005,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({_taskRunner.PrintOldTasks()})");
 
-                _taskRunner.PauseExecution(savedTask, arg);
+                _taskRunner.PauseExecution(savedTask, arg, _leftTime);
                 ScheduleExecution(Tasks.PrintAppellation, 10);
                 break;
 
@@ -2754,7 +2762,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (arg >= 2)
         {
-            ScheduleExecution(Tasks.MoveNext, delay, arg + 1);
+            ScheduleExecution(Tasks.MoveNext, delay, arg + 1, force: !informed);
             return;
         }
 
@@ -4563,7 +4571,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            ScheduleExecution(Tasks.MoveNext, 1);
+            ScheduleExecution(Tasks.MoveNext, 1, force: true);
         }
     }
 
