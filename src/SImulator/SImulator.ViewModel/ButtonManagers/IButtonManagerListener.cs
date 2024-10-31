@@ -27,5 +27,5 @@ public interface IButtonManagerListener
 
     void OnPlayerRemoved(string playerName) { }
 
-    void OnPlayerAnswered(string playerName, string answer) { }
+    void OnPlayerAnswered(string playerName, string answer, bool isPreliminary) { }
 }

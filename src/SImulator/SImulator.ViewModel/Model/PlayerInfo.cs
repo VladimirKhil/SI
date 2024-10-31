@@ -50,6 +50,7 @@ public sealed class PlayerInfo : SimplePlayerInfo
     /// <summary>
     /// Is the player registered in web buttons mode.
     /// </summary>
+    [Obsolete]
     public bool IsRegistered
     {
         get => _isRegistered;
@@ -58,13 +59,14 @@ public sealed class PlayerInfo : SimplePlayerInfo
 
     private bool _waitForRegistration;
 
+    [Obsolete]
     public bool WaitForRegistration
     {
         get => _waitForRegistration;
         set { if (_waitForRegistration != value) { _waitForRegistration = value; OnPropertyChanged(); } }
     }
 
-    private string _answer = string.Empty;
+    private string _answer = "";
 
     /// <summary>
     /// Player text answer.
@@ -73,5 +75,16 @@ public sealed class PlayerInfo : SimplePlayerInfo
     {
         get => _answer;
         set { if (_answer != value) { _answer = value; OnPropertyChanged(); } }
+    }
+
+    private bool _isPreliminaryAnswer;
+
+    /// <summary>
+    /// Is current answer is a preliminary one.
+    /// </summary>
+    public bool IsPreliminaryAnswer
+    {
+        get => _isPreliminaryAnswer;
+        set { if (_isPreliminaryAnswer != value) { _isPreliminaryAnswer = value; OnPropertyChanged(); } }
     }
 }

@@ -68,7 +68,7 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
                 }
 
                 var answer = args[1];
-                _gameRepository.OnPlayerAnswer(playerName, answer);
+                _gameRepository.OnPlayerAnswer(playerName, answer, false);
                 break;
 
             case "ANSWER_VERSION":
@@ -78,7 +78,7 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
                 }
 
                 var answerVersion = args[1];
-                // TODO
+                _gameRepository.OnPlayerAnswer(playerName, answerVersion, true);
                 break;
 
             case "I":

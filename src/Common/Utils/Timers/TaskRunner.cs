@@ -76,7 +76,7 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
     public void RescheduleTask(int taskTime = 10) =>
         _taskTimerLock.WithLock(() =>
         {
-            if (!_disposed && (FinishingTime - DateTime.UtcNow) > _minimumRescheduleTime)
+            if (!_disposed && (!IsRunning || (FinishingTime - DateTime.UtcNow) > _minimumRescheduleTime))
             {
                 _taskTimer.Change(taskTime, Timeout.Infinite);
                 FinishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);

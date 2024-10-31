@@ -459,7 +459,18 @@
                                         Margin="1"
                                         Grid.Column="6"
                                         IsReadOnly="True"
-                                        Text="{Binding Answer}" />
+                                        Text="{Binding Answer}"
+                                        VerticalContentAlignment="Center">
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPreliminaryAnswer}" Value="True">
+                                                        <Setter Property="Foreground" Value="Gray" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBox.Style>
+                                    </TextBox>
 
                                     <Button
                                         Grid.Column="7"

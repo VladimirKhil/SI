@@ -17,7 +17,8 @@ public interface IButtonManager : IAsyncDisposable
     /// </summary>
     /// <param name="id">Player identifier.</param>
     /// <param name="name">Player name.</param>
-    void RemovePlayerById(string id, string name);
+    /// <param name="manually">Has the player been removed manually.</param>
+    void RemovePlayerById(string id, string name, bool manually = true);
 
     /// <summary>
     /// Enables players buttons.

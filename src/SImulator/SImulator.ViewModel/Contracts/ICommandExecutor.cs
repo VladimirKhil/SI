@@ -5,4 +5,6 @@ public interface ICommandExecutor
     void OnStage(string stageName);
 
     void AskTextAnswer();
+
+    void Cancel();
 }

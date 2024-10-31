@@ -112,8 +112,8 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         () => Listener.OnPlayerPressed(playerName),
         exc => PlatformManager.Instance.ShowMessage(exc.Message));
 
-    public void OnPlayerAnswer(string playerName, string answer) => UI.Execute(
-        () => Listener.OnPlayerAnswered(playerName, answer),
+    public void OnPlayerAnswer(string playerName, string answer, bool isPreliminary) => UI.Execute(
+        () => Listener.OnPlayerAnswered(playerName, answer, isPreliminary),
         exc => PlatformManager.Instance.ShowMessage(exc.Message));
 
     public void OnPlayerPass(string playerName) => UI.Execute(
@@ -128,8 +128,15 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
 
     public void AskTextAnswer() => SendMessage("ANSWER");
 
-    public override void RemovePlayerById(string id, string name)
+    public void Cancel() => SendMessage("CANCEL");
+
+    public override void RemovePlayerById(string id, string name, bool manually = true)
     {
+        if (!manually)
+        {
+            return;
+        }
+
         var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
         context.Clients.Client(id).Disconnect();
         BannedNames.Add(name);

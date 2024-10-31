@@ -16,7 +16,7 @@ public interface IGameRepository
 
     void InformPlayer(string playerName, string connectionId);
 
-    void OnPlayerAnswer(string playerName, string answer);
+    void OnPlayerAnswer(string playerName, string answer, bool isPreliminary);
 
     void OnPlayerPass(string playerName);
 }

@@ -1144,6 +1144,16 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             ThinkingTime = 0;
         }
 
+        if (ActiveQuestion?.TypeName == QuestionTypes.StakeAll || ActiveQuestion?.TypeName == QuestionTypes.ForAll)
+        {
+            _buttonManager?.TryGetCommandExecutor()?.Cancel();
+
+            foreach (var player in Players)
+            {
+                player.IsPreliminaryAnswer = false;
+            }
+        }
+
         PresentationController.StopThinkingTimer();
         _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
     }
@@ -2050,7 +2060,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ProcessPlayerPress(index, player);
     }
 
-    public void OnPlayerAnswered(string playerName, string answer)
+    public void OnPlayerAnswered(string playerName, string answer, bool isPreliminary)
     {
         var player = Players.FirstOrDefault(p => p.Name == playerName);
 
@@ -2060,6 +2070,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         player.Answer = answer;
+        player.IsPreliminaryAnswer = isPreliminary;
     }
 
     public void OnPlayerPassed(string playerName)
@@ -2203,11 +2214,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (player != null)
         {
-            RemovePlayerCore(player);
+            RemovePlayerCore(player, false);
         }
     }
 
-    private void RemovePlayerCore(PlayerInfo player)
+    private void RemovePlayerCore(PlayerInfo player, bool manually = true)
     {
         player.PropertyChanged -= PlayerInfo_PropertyChanged;
         var playerIndex = Players.IndexOf(player);
@@ -2216,7 +2227,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (player.Id != null)
         {
-            _buttonManager?.RemovePlayerById(player.Id, player.Name);
+            _buttonManager?.RemovePlayerById(player.Id, player.Name, manually);
         }
     }
 
