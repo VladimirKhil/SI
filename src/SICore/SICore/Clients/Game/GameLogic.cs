@@ -2410,7 +2410,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            _gameActions.SendMessage(Messages.ComplexValidationFinish, _data.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name); // Cancel validation
 
             for (var i = 0; i < _data.Players.Count; i++)
             {
@@ -3411,20 +3411,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
             }
 
-            var question = _data.Question ?? throw new InvalidOperationException("Question is null");
-
-            var rightAnswers = question.Right;
-            var wrongAnswers = question.Wrong;
-
-            var message = new MessageBuilder(
-                Messages.ComplexValidationStart,
-                '-',
-                rightAnswers.Count)
-                .AddRange(rightAnswers)
-                .AddRange(wrongAnswers)
-                .Build();
-
-            _gameActions.SendMessage(message, _data.ShowMan.Name);
+            if (_data.QuestionPlayState.AnswerOptions == null)
+            {
+                SendQuestionAnswersToShowman();
+            }
 
             _data.AnswerCount = _data.QuestionPlayState.AnswererIndicies.Count;
             ScheduleExecution(Tasks.WaitAnswer, timeSettings.TimeForFinalThinking * 10, force: true);
@@ -3495,6 +3485,24 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.AnswerCount = 1;
         ScheduleExecution(Tasks.WaitAnswer, waitAnswerTime);
         WaitFor(DecisionType.Answering, waitAnswerTime, _data.AnswererIndex);
+    }
+
+    private void SendQuestionAnswersToShowman()
+    {
+        var question = _data.Question ?? throw new InvalidOperationException("Question is null");
+
+        var rightAnswers = question.Right;
+        var wrongAnswers = question.Wrong;
+
+        var message = new MessageBuilder(
+            Messages.QuestionAnswers,
+            '-',
+            rightAnswers.Count)
+            .AddRange(rightAnswers)
+            .AddRange(wrongAnswers)
+            .Build();
+
+        _gameActions.SendMessage(message, _data.ShowMan.Name);
     }
 
     private void InformWrongTries()

@@ -119,7 +119,7 @@ public sealed class ScenariosTests
         await showmanListener.AssertNextMessageAsync(Messages.QType);
 
         await showmanListener.AssertNextMessageAsync(Messages.Content);
-        var complexValidationMessage = await showmanListener.AssertNextMessageAsync(Messages.ComplexValidationStart);
+        var complexValidationMessage = await showmanListener.AssertNextMessageAsync(Messages.QuestionAnswers);
 
         var answerMessage = await playerAListener.WaitForMessageAsync(Messages.Answer);
 
@@ -134,7 +134,7 @@ public sealed class ScenariosTests
         var validateMsg = new MessageBuilder(Messages.Validate, 0, "+", 1);
         showmanClient.SendMessage(validateMsg.ToString(), receiver: NetworkConstants.GameName);
 
-        await showmanListener.AssertNextMessageAsync(Messages.ComplexValidationFinish);
+        await showmanListener.AssertNextMessageAsync(Messages.Cancel);
         var personMsg = await showmanListener.AssertNextMessageAsync(Messages.Person);
         Assert.That(personMsg[1], Is.EqualTo("+"));
         Assert.That(personMsg[2], Is.EqualTo("0"));

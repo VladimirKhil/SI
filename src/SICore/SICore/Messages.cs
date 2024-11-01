@@ -132,16 +132,6 @@ public static class Messages
     public const string Choose = "CHOOSE";
 
     /// <summary>
-    /// Finishes complex validation.
-    /// </summary>
-    public const string ComplexValidationFinish = "COMPLEX_VALIDATION_FINISH";
-
-    /// <summary>
-    /// Starts complex validation by sending right and wrong answers.
-    /// </summary>
-    public const string ComplexValidationStart = "COMPLEX_VALIDATION_START";
-
-    /// <summary>
     /// Default computer players.
     /// </summary>
     [IdempotencyRequired]
@@ -462,6 +452,11 @@ public static class Messages
     /// Вопрос
     /// </summary>
     public const string Question = "QUESTION";
+
+    /// <summary>
+    /// Question right and wrong answers.
+    /// </summary>
+    public const string QuestionAnswers = "QUESTION_ANSWERS";
 
     /// <summary>
     /// Заголовок вопроса
