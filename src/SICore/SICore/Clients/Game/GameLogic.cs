@@ -467,11 +467,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Order = Array.Empty<int>();
         _data.OrderIndex = -1;
 
-        foreach (var player in ClientData.Players)
-        {
-            player.AnswerValidationStatus = null;
-        }
-
         if (_data.Settings.AppSettings.HintShowman)
         {
             var rightAnswers = question.Right;
@@ -2410,8 +2405,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name); // Cancel validation
-
             for (var i = 0; i < _data.Players.Count; i++)
             {
                 if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && string.IsNullOrEmpty(_data.Players[i].Answer))
@@ -3301,8 +3294,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             throw new InvalidOperationException("Answerer is null");
         }
 
-        _data.ShowmanDecision = false;
-
         if (_data.QuestionPlayState.AnswerOptions != null)
         {
             _data.IsWaiting = true;
@@ -3316,7 +3307,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             OnDecision();
         }
-        else if (!_data.Answerer.IsHuman)
+        else if (!_data.Answerer.IsHuman || _data.Answerer.AnswerIsWrong)
         {
             _data.IsWaiting = true;
             _data.Decision = DecisionType.AnswerValidating;
@@ -3327,19 +3318,23 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             OnDecision();
         }
-        else if (_data.Answerer.AnswerValidationStatus.HasValue)
+        else if (_data.Answerer.Answer != null
+            && _data.QuestionPlayState.Validations.TryGetValue(_data.Answerer.Answer, out var validation)
+            && validation.HasValue)
         {
             _data.IsWaiting = true;
             _data.Decision = DecisionType.AnswerValidating;
 
-            _data.Answerer.AnswerIsRight = _data.Answerer.AnswerValidationStatus.Value;
-            _data.Answerer.AnswerValidationFactor = 1.0;
+            _data.Answerer.AnswerIsRight = validation.Value.Item1;
+            _data.Answerer.AnswerValidationFactor = validation.Value.Item2;
             _data.ShowmanDecision = true;
 
             OnDecision();
         }
         else
         {
+            _data.ShowmanDecision = false;
+
             if (!_data.IsOralNow || HaveMultipleAnswerers())
             {
                 SendAnswersInfoToShowman(_data.Answerer.Answer ?? "");
@@ -3437,9 +3432,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessageWithArgs(Messages.StopPlay);
         }
 
-        var waitAnswerTime = IsSpecialQuestion()
-            ? timeSettings.TimeForThinkingOnSpecial * 10
-            : timeSettings.TimeForPrintingAnswer * 10;
+        var waitAnswerTime = IsSpecialQuestion() ? timeSettings.TimeForThinkingOnSpecial * 10 : timeSettings.TimeForPrintingAnswer * 10;
 
         var useAnswerOptions = _data.QuestionPlayState.AnswerOptions != null;
         _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
@@ -3517,6 +3510,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
 
             _gameActions.SendMessageWithArgs(Messages.WrongTry, playerIndex);
+            _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, playerIndex);
         }
     }
 

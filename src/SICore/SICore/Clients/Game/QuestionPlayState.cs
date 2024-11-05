@@ -54,6 +54,11 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal Dictionary<(string ContentType, string ContentValue), Completion> MediaContentCompletions { get; } = new();
 
+    /// <summary>
+    /// Answer validations status.
+    /// </summary>
+    internal Dictionary<string, (bool, double)?> Validations { get; } = new();
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -64,6 +69,7 @@ internal sealed class QuestionPlayState
         ScreenContentSequence = null;
         HiddenStakes = false;
         MediaContentCompletions.Clear();
+        Validations.Clear();
     }
 
     internal void RemovePlayer(int playerIndex)

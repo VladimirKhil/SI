@@ -952,6 +952,22 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 ClientData.Players[playerIndex].State = state;
             }
         }
+
+        if (state == PlayerState.Lost)
+        {
+            Task.Run(async () =>
+            {
+                await Task.Delay(200);
+
+                foreach (var player in ClientData.Players)
+                {
+                    if (player.State == PlayerState.Lost)
+                    {
+                        player.State = PlayerState.None;
+                    }
+                }
+            });
+        }
     }
 
     private void OnAvatar(string[] mparams)

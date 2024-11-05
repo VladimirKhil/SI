@@ -814,27 +814,21 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnValidate(Message message, string[] args)
     {
-        if (message.Sender != ClientData.ShowMan.Name
-            || ClientData.Decision != DecisionType.Answering
-            || !Logic.HaveMultipleAnswerers()
-            || args.Length <= 2
-            || !int.TryParse(args[1], out var playerIndex)
-            || playerIndex < 0
-            || playerIndex >= ClientData.Players.Count)
+        if (message.Sender != ClientData.ShowMan.Name || args.Length <= 2)
         {
             return;
         }
 
+        var answer = args[1];
         var validationStatus = args[2] == "+";
-        var player = ClientData.Players[playerIndex];
+        var validationFactor = args.Length > 2 && double.TryParse(args[3], out var factor) && factor >= 0.0 ? factor : 1.0;
 
-        if (player.AnswerValidationStatus.HasValue)
+        if (!ClientData.QuestionPlayState.Validations.TryGetValue(answer, out var validation) || validation.HasValue)
         {
             return;
         }
 
-        player.AnswerValidationStatus = validationStatus;
-        player.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[3], out var factor) && factor >= 0.0 ? factor : 1.0;
+        ClientData.QuestionPlayState.Validations[answer] = (validationStatus, validationFactor);
     }
 
     private void OnPin(string hostName)
@@ -2143,7 +2137,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (Logic.HaveMultipleAnswerers())
         {
-            ClientData.AnswererIndex = -1;
+            ClientData.AnswererIndex = -1; // TODO: do not use AnswererIndex here - update player answer directly
 
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
@@ -2154,16 +2148,24 @@ public sealed class Game : Actor<GameData, GameLogic>
                     ClientData.AnswererIndex = i;
                     ClientData.Players[i].Flag = false;
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
-                    
-                    if (ClientData.Players[i].IsHuman)
+                    _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
+
+                    if (ClientData.Players[i].IsHuman && args[1].Length > 0)
                     {
-                        ClientData.Players[i].AnswerValidationStatus = null;
+                        var answer = args[1];
+
+                        if (ClientData.QuestionPlayState.Validations.ContainsKey(answer))
+                        {
+                            break;
+                        }
+
+                        ClientData.QuestionPlayState.Validations[answer] = null;
 
                         _gameActions.SendMessageToWithArgs(
                             ClientData.ShowMan.Name,
                             Messages.AskValidate,
                             i,
-                            args[1].Length > 0 ? args[1] : LO[nameof(R.IDontKnow)]);
+                            answer);
                     }
 
                     break;

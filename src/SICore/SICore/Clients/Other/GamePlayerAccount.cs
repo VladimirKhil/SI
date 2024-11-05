@@ -51,11 +51,6 @@ public sealed class GamePlayerAccount : GamePersonAccount
     /// Ответ игрока
     /// </summary>
     internal string? Answer { get; set; } // TODO: try to make non-nullable but check problems with accepting answers in questions for all
-
-    /// <summary>
-    /// Defines answer validation status.
-    /// </summary>
-    internal bool? AnswerValidationStatus { get; set; }
     
     // TODO: Will be moved to QuestionPlayState
     /// <summary>
