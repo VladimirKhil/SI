@@ -124,8 +124,8 @@ public class MainTest
         Assert.That(gameSettings.IsProgress, Is.False);
         Assert.That(gameSettings.ErrorMessage, Is.Null);
 
-        var siOnlineError = mainViewModel.ActiveView as SIOnlineViewModel;
-        Assert.That(siOnlineError, Is.Null, siOnlineError?.Error);
+        siOnline = mainViewModel.ActiveView as SIOnlineViewModel;
+        Assert.That(siOnline, Is.Null, siOnline?.Error);
 
         var game = (GameViewModel?)mainViewModel.ActiveView;
 

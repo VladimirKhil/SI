@@ -2400,7 +2400,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             if (string.IsNullOrEmpty(_data.Answerer.Answer))
             {
                 _data.Answerer.Answer = LO[nameof(R.IDontKnow)];
-                _data.Answerer.AnswerIsWrong = true;
+                _data.Answerer.AnswerIsWrong = !_data.IsOralNow;
             }
         }
         else
