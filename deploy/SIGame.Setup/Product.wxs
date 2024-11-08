@@ -154,10 +154,10 @@
         <File Id="question_stake.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_stake.mp3" />
       </Component>
 	<Component Guid="{730fe9db-d9d3-490b-a02d-349a1e1c3c9f}">
-		<File Id="question_stake.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_all.mp3" />
+		<File Id="question_all.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_all.mp3" />
 	</Component>
 	<Component Guid="{500cf45a-f40a-4eb1-84ac-b81bb9f9587d}">
-		<File Id="question_stake.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_stake_all.mp3" />
+		<File Id="question_stake_all.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_stake_all.mp3" />
 	</Component>
       <Component Guid="{06D59D9F-73E5-4C3D-84E9-9EE629C58ECD}">
         <File Id="round_begin.mp3" KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_begin.mp3" />
