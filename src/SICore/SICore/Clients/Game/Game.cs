@@ -629,6 +629,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                         OnMediaLoaded(message);
                         break;
 
+                    case Messages.MediaPreloaded:
+                        OnMediaPreloaded(message);
+                        break;
+
                     case Messages.Report:
                         OnReport(message, args);
                         break;
@@ -1035,6 +1039,8 @@ public sealed class Game : Actor<GameData, GameLogic>
     }
 
     private void OnMediaLoaded(Message message) => _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaLoaded, message.Sender);
+
+    private void OnMediaPreloaded(Message message) => _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaPreloaded, message.Sender);
 
     private void OnToggle(Message message, string[] args)
     {
@@ -1989,7 +1995,11 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (ClientData.TInfo.Pause)
         {
             _logic.OnPauseCore(false);
-            return;
+
+            if (moveDirection == MoveDirections.Next)
+            {
+                return;
+            }
         }
 
         _logic.AddHistory($"Move started: {moveDirection}");

@@ -58,67 +58,75 @@ internal sealed class LocalFileManager : ILocalFileManager
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 
-    public bool AddFile(Uri uri) => _processingQueue.Writer.TryWrite(new FileTask { Uri = uri });
+    public bool AddFile(Uri uri, Action? onCompleted = null) =>
+        _processingQueue.Writer.TryWrite(new FileTask { Uri = uri, OnCompleted = onCompleted });
 
     private async Task ProcesFileAsync(FileTask fileTask, CancellationToken cancellationToken)
     {
         var fileName = FilePathHelper.GetSafeFileName(fileTask.Uri);
         var localFile = Path.Combine(_rootFolder, fileName);
 
-        if (File.Exists(localFile))
-        {
-            return;
-        }
-
-        lock (_globalLock)
-        {
-            if (_lockedFiles.Contains(localFile))
-            {
-                return;
-            }
-
-            _lockedFiles.Add(localFile);
-        }
-
         try
         {
-            Directory.CreateDirectory(_rootFolder);
-
-            using var response = await _client.GetAsync(fileTask.Uri, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
+            if (File.Exists(localFile))
             {
-                Error?.Invoke(
-                    fileTask.Uri,
-                    new Exception($"{Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(cancellationToken)}"));
-
                 return;
             }
 
-            using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            using var fileStream = File.Create(localFile);
-            await responseStream.CopyToAsync(fileStream, cancellationToken);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
-        catch (Exception exc)
-        {
-            Error?.Invoke(fileTask.Uri, exc);
+            lock (_globalLock)
+            {
+                if (_lockedFiles.Contains(localFile))
+                {
+                    return;
+                }
+
+                _lockedFiles.Add(localFile);
+            }
 
             try
             {
-                if (File.Exists(localFile))
+                Directory.CreateDirectory(_rootFolder);
+
+                using var response = await _client.GetAsync(fileTask.Uri, cancellationToken);
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    File.Delete(localFile);
+                    Error?.Invoke(
+                        fileTask.Uri,
+                        new Exception($"{Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(cancellationToken)}"));
+
+                    return;
+                }
+
+                using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                using var fileStream = File.Create(localFile);
+                await responseStream.CopyToAsync(fileStream, cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
+            catch (Exception exc)
+            {
+                Error?.Invoke(fileTask.Uri, exc);
+
+                try
+                {
+                    if (File.Exists(localFile))
+                    {
+                        File.Delete(localFile);
+                    }
+                }
+                catch { }
+            }
+            finally
+            {
+                lock (_globalLock)
+                {
+                    _lockedFiles.Remove(localFile);
                 }
             }
-            catch { }
         }
         finally
         {
-            lock (_globalLock)
-            {
-                _lockedFiles.Remove(localFile);
-            }
+            try { fileTask.OnCompleted?.Invoke(); } catch { /* Ignore */ }
         }
     }
 
@@ -176,5 +184,7 @@ internal sealed class LocalFileManager : ILocalFileManager
     private readonly struct FileTask
     {
         public Uri Uri { get; init; }
+
+        public Action? OnCompleted { get; init; }
     }
 }

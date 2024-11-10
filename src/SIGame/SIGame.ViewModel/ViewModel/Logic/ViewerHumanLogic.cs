@@ -1594,6 +1594,10 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void OnRoundContent(string[] mparams)
     {
+        // We do not start from 0 and increment it to avoid issues when the value could accidentally reach zero
+        // if the work is processed faster than it is queued
+        var fileCounter = mparams.Length - 1;
+
         for (var i = 1; i < mparams.Length; i++)
         {
             var uri = mparams[i];
@@ -1614,15 +1618,23 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             }
             else if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
             {
+                Interlocked.Decrement(ref fileCounter);
                 continue;
             }
 
             if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
             {
+                Interlocked.Decrement(ref fileCounter);
                 continue;
             }
-
-            _localFileManager.AddFile(mediaUri);
+            
+            _localFileManager.AddFile(mediaUri, () =>
+            {
+                if (Interlocked.Decrement(ref fileCounter) == 0)
+                {
+                    _viewerActions.SendMessage(Messages.MediaPreloaded);
+                }
+            });
         }
     }
 

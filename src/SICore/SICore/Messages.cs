@@ -304,6 +304,11 @@ public static class Messages
     public const string MediaLoaded = "MEDIALOADED";
 
     /// <summary>
+    /// Notifies that the client has preloaded the media.
+    /// </summary>
+    public const string MediaPreloaded = "MEDIA_PRELOADED";
+
+    /// <summary>
     /// Сменить состояние игры
     /// </summary>
     public const string Move = "MOVE";

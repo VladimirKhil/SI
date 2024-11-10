@@ -7,7 +7,7 @@ internal interface ILocalFileManager : IAsyncDisposable
 {
     event Action<Uri, Exception>? Error;
 
-    bool AddFile(Uri mediaUri);
+    bool AddFile(Uri mediaUri, Action? onCompleted = null);
 
     string? TryGetFile(Uri mediaUri);
 }
