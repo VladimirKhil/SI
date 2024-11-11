@@ -331,6 +331,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game closed by server due to inactivity .
+        /// </summary>
+        public static string GameClosedMessage {
+            get {
+                return ResourceManager.GetString("GameClosedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Game connection timeout.
         /// </summary>
         public static string GameConnectionTimeout {

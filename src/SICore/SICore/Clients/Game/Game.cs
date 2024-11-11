@@ -2812,20 +2812,29 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         themeDeleters.RemoveAt(playerIndex);
         
-        if (ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting && !themeDeleters.IsEmpty())
+        if (ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting)
         {
-            var indicies = themeDeleters.Current.PossibleIndicies;
-            var hasAnyFlag = false;
-
-            for (var i = 0; i < ClientData.Players.Count; i++)
+            if (themeDeleters.IsEmpty())
             {
-                ClientData.Players[i].Flag = indicies.Contains(i);
-                hasAnyFlag = true;
+                _logic.StopWaiting();
+                ClientData.MoveDirection = MoveDirections.RoundNext;
+                _logic.Stop(StopReason.Move);
             }
-
-            if (!hasAnyFlag)
+            else
             {
-                _logic.PlanExecution(Tasks.AskToDelete, 10);
+                var indicies = themeDeleters.Current.PossibleIndicies;
+                var hasAnyFlag = false;
+
+                for (var i = 0; i < ClientData.Players.Count; i++)
+                {
+                    ClientData.Players[i].Flag = indicies.Contains(i);
+                    hasAnyFlag = true;
+                }
+
+                if (!hasAnyFlag)
+                {
+                    _logic.PlanExecution(Tasks.AskToDelete, 10);
+                }
             }
         }
     }

@@ -243,6 +243,12 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         break;
                     }
 
+                case SystemMessages.GameClosed:
+                    {
+                        _logic.OnGameClosed();
+                        break;
+                    }
+
                 case Messages.Disconnected:
                     await OnDisconnectedAsync(mparams);
                     break;

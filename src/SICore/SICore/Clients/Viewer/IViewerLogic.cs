@@ -271,4 +271,9 @@ public interface IViewerLogic : ILogic
     /// Handles player answering outcome.
     /// </summary>
     void OnPlayerOutcome(int playerIndex, bool isRight);
+
+    /// <summary>
+    /// Handles game closing.
+    /// </summary>
+    void OnGameClosed() { }
 }

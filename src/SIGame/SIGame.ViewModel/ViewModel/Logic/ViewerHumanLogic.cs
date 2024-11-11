@@ -1844,4 +1844,10 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _gameViewModel.DialogMode = DialogModes.Report;
         _data.Host.OnFlash();
     }
+
+    public void OnGameClosed()
+    {
+        PlatformManager.Instance.ShowMessage(Resources.GameClosedMessage, MessageType.Warning, true);
+        OnReplic(ReplicCodes.Special.ToString(), Resources.GameClosedMessage);
+    }
 }

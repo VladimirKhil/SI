@@ -2272,6 +2272,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
+        if (!isSelectingStaker && _data.ThemeDeleters != null && _data.ThemeDeleters.IsEmpty())
+        {
+            throw new InvalidOperationException("_data.ThemeDeleters are empty");
+        }
+
         var playerIndex = isSelectingStaker ? _data.Order[_data.OrderIndex] : _data.ThemeDeleters?.Current.PlayerIndex;
 
         if (playerIndex == -1) // The showman has not made a decision

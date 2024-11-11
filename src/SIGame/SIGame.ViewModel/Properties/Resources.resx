@@ -579,4 +579,7 @@
   <data name="QuestionTypeWithButton" xml:space="preserve">
     <value>Question with button</value>
   </data>
+  <data name="GameClosedMessage" xml:space="preserve">
+    <value>Game closed by server due to inactivity </value>
+  </data>
 </root>
