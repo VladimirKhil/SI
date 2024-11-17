@@ -8,6 +8,7 @@ namespace SIPackages;
 /// <summary>
 /// Defines a question scenario minimal item.
 /// </summary>
+[Obsolete]
 internal sealed class Atom : PropertyChangedNotifier, ITyped, IEquatable<Atom>
 {
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

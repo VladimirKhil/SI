@@ -622,7 +622,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
 
         foreach (var contentItem in content.ContentValue)
         {
-            if (contentItem.Type != AtomTypes.Text || contentItem.Value.Length == 0)
+            if (contentItem.Type != ContentTypes.Text || contentItem.Value.Length == 0)
             {
                 continue;
             }
@@ -642,7 +642,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     {
         foreach (var item in GetContent())
         {
-            if (item.Type != AtomTypes.Text && item.Type != AtomTypes.Oral)
+            if (item.Type != ContentTypes.Text)
             {
                 return true;
             }

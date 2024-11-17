@@ -10,16 +10,6 @@ public sealed class HostInfo
     /// </summary>
     public string Name { get; set; } = "";
 
-    /// <summary>
-    /// Server hostname.
-    /// </summary>
-    public string Host { get; set; } = "";
-
-    /// <summary>
-    /// Port number for TCP-based connections.
-    /// </summary>
-    public int Port { get; set; }
-
     [Obsolete]
     public string PackagesPublicBaseUrl { get; set; } = "";
 
