@@ -13,12 +13,16 @@ public interface IButtonManager : IAsyncDisposable
     bool ArePlayersManaged();
 
     /// <summary>
+    /// Handles player added event.
+    /// </summary>
+    void OnPlayersChanged();
+
+    /// <summary>
     /// Removes player by identifier.
     /// </summary>
     /// <param name="id">Player identifier.</param>
     /// <param name="name">Player name.</param>
-    /// <param name="manually">Has the player been removed manually.</param>
-    void RemovePlayerById(string id, string name, bool manually = true);
+    void DisconnectPlayerById(string id, string name);
 
     /// <summary>
     /// Enables players buttons.

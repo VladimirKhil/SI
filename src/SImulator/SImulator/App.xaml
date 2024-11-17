@@ -213,6 +213,26 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="ManagedColumn2" TargetType="ColumnDefinition">
+            <Setter Property="Width" Value="29" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.ManagedMode, RelativeSource={RelativeSource AncestorType=DockPanel}}" Value="False">
+                    <Setter Property="Width" Value="0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ManagedColumn3" TargetType="ColumnDefinition">
+            <Setter Property="Width" Value="70" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.ManagedMode, RelativeSource={RelativeSource AncestorType=DockPanel}}" Value="False">
+                    <Setter Property="Width" Value="0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <DataTemplate x:Key="PlayersTable">
             <DockPanel Margin="1,3,1,1">
                 <DockPanel.Resources>
@@ -324,7 +344,9 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Style="{StaticResource ManagedColumn3}" />
                         <ColumnDefinition Style="{StaticResource ManagedColumn}" />
+                        <ColumnDefinition Style="{StaticResource ManagedColumn2}" />
                         <ColumnDefinition Width="29" />
                     </Grid.ColumnDefinitions>
 
@@ -338,7 +360,8 @@
                     <TextBlock Grid.Column="3" Text="{x:Static lp:Resources.Sum}" />
                     <TextBlock Grid.Column="4" Text="{x:Static lp:Resources.RightAnswers}" />
                     <TextBlock Grid.Column="5" Text="{x:Static lp:Resources.WrongAnswers}" />
-                    <TextBlock Grid.Column="6" Text="{x:Static lp:Resources.Answer}" />
+                    <TextBlock Grid.Column="6" Text="{x:Static lp:Resources.Stake}" />
+                    <TextBlock Grid.Column="7" Text="{x:Static lp:Resources.Answer}" />
                 </Grid>
 
                 <ScrollViewer Margin="0,3" VerticalScrollBarVisibility="Auto">
@@ -362,7 +385,9 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Style="{StaticResource ManagedColumn3}" />
                                         <ColumnDefinition Style="{StaticResource ManagedColumn}" />
+                                        <ColumnDefinition Style="{StaticResource ManagedColumn2}" />
                                         <ColumnDefinition Width="29" />
                                     </Grid.ColumnDefinitions>
 
@@ -418,6 +443,7 @@
                                         </Button>
                                         
                                         <TextBox
+                                            x:Name="name"
                                             FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                                             Margin="1"
                                             Width="Auto"
@@ -459,6 +485,13 @@
                                         Margin="1"
                                         Grid.Column="6"
                                         IsReadOnly="True"
+                                        Text="{Binding Stake}"
+                                        VerticalContentAlignment="Center" />
+
+                                    <TextBox
+                                        Margin="1"
+                                        Grid.Column="7"
+                                        IsReadOnly="True"
                                         Text="{Binding Answer}"
                                         VerticalContentAlignment="Center">
                                         <TextBox.Style>
@@ -473,7 +506,37 @@
                                     </TextBox>
 
                                     <Button
-                                        Grid.Column="7"
+                                        Grid.Column="8"
+                                        Padding="3"
+                                        Margin="1"
+                                        ToolTip="{x:Static lp:Resources.KickPlayer}"
+                                        VerticalContentAlignment="Center"
+                                        Height="23"
+                                        Width="23"
+                                        Command="{Binding
+                                            RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                            Path=DataContext.KickPlayer}"
+                                        CommandParameter="{Binding}">
+                                        <Path
+                                            Data="M 53.2929,21.2929L 54.7071,22.7071C 56.4645,24.4645 56.4645,27.3137 54.7071,29.0711L 52.2323,31.5459L 44.4541,23.7677L 46.9289,21.2929C 48.6863,19.5355 51.5355,19.5355 53.2929,21.2929 Z M 31.7262,52.052L 23.948,44.2738L 43.0399,25.182L 50.818,32.9601L 31.7262,52.052 Z M 23.2409,47.1023L 28.8977,52.7591L 21.0463,54.9537L 23.2409,47.1023 Z M 17,28L 17,23L 34,23L 34,28L 17,28 Z "
+                                            Stretch="Fill"
+                                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}"
+                                            Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}"
+                                            StrokeThickness="1" />
+                                        
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource ToolButton}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsConnected}" Value="False">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+
+                                    <Button
+                                        Grid.Column="9"
                                         Style="{StaticResource ToolButton}"
                                         Padding="3"
                                         Margin="1"
@@ -575,6 +638,15 @@
                                         </MultiDataTrigger.Conditions>
 
                                         <Setter TargetName="line" Property="Background" Value="Orange" />
+                                    </MultiDataTrigger>
+
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding DataContext.ManagedMode, RelativeSource={RelativeSource AncestorType=DockPanel}}" Value="True" />
+                                            <Condition Binding="{Binding IsConnected}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+
+                                        <Setter TargetName="name" Property="Background" Value="LightGray" />
                                     </MultiDataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>

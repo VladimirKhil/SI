@@ -7,7 +7,9 @@ using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.PlatformSpecific;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Utils;
 
@@ -23,6 +25,13 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
     private string _stageName = "Before";
 
     public ICollection<string> BannedNames { get; } = new HashSet<string>();
+
+    public ConnectionPersonData[] Players => Listener.GamePlayers.Select(p => new ConnectionPersonData
+    {
+        Role = GameRole.Player,
+        IsOnline = p.IsConnected,
+        Name = p.Name
+    }).ToArray();
 
     public WebManagerNew(int port, IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
     {
@@ -69,19 +78,16 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         GameID = 1,
         GameName = "SIGame",
         StartTime = DateTime.Now,
-        Persons = new ConnectionPersonData[]
-        {
-            new() { Role = GameRole.Player, IsOnline = false, Name = "" }
-        },
+        Persons = Players,
         Rules = GameRules.FalseStart
     };
 
-    public void AddPlayer(string id, string playerName) => UI.Execute(
-        () => Listener.OnPlayerAdded(id, playerName),
+    public Task<bool> TryAddPlayerAsync(string id, string playerName) => UI.ExecuteAsync(
+        () => Listener.TryConnectPlayer(playerName, id),
         exc => PlatformManager.Instance.ShowMessage(exc.Message));
 
-    public void RemovePlayer(string playerName) => UI.Execute(
-        () => Listener.OnPlayerRemoved(playerName),
+    public Task<bool> TryRemovePlayerAsync(string playerName) => UI.ExecuteAsync(
+        () => Listener.TryDisconnectPlayer(playerName),
         exc => PlatformManager.Instance.ShowMessage(exc.Message));
 
     public override ICommandExecutor? TryGetCommandExecutor() => this;
@@ -120,23 +126,30 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         () => Listener.OnPlayerPassed(playerName),
         exc => PlatformManager.Instance.ShowMessage(exc.Message));
 
+    public void OnPlayerStake(string playerName, int stake) => UI.Execute(
+        () => Listener.OnPlayerStake(playerName, stake),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
     public void InformPlayer(string playerName, string connectionId)
     {
         SendMessageTo(connectionId, "INFO2", "1", "", "+", "+", "+", "+", playerName, "+", "+", "+", "+");
         SendMessageTo(connectionId, "STAGE_INFO", _stageName, "", "-1");
     }
 
+    public void AskStake(string connectionId, int maximum) => SendMessageTo(connectionId, "ASK_STAKE", "Stake", "1", maximum.ToString(), "1", "", "");
+
     public void AskTextAnswer() => SendMessage("ANSWER");
 
     public void Cancel() => SendMessage("CANCEL");
 
-    public override void RemovePlayerById(string id, string name, bool manually = true)
+    public override void OnPlayersChanged()
     {
-        if (!manually)
-        {
-            return;
-        }
+        var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
+        context.Clients.Group(ButtonHubNew.SubscribersGroup).GamePersonsChanged(1, Players);
+    }
 
+    public override void DisconnectPlayerById(string id, string name)
+    {
         var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
         context.Clients.Client(id).Disconnect();
         BannedNames.Add(name);

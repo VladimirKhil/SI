@@ -13,6 +13,11 @@ public interface IButtonManagerListener
     /// </summary>
     int ButtonBlockTime { get; }
 
+    /// <summary>
+    /// Gets game players.
+    /// </summary>
+    IEnumerable<PlayerInfo> GamePlayers { get; }
+
     bool OnKeyPressed(GameKey key);
 
     bool OnPlayerPressed(PlayerInfo player);
@@ -25,7 +30,11 @@ public interface IButtonManagerListener
     
     void OnPlayerAdded(string? id, string playerName) { }
 
-    void OnPlayerRemoved(string playerName) { }
+    bool TryConnectPlayer(string playerName, string connectionId) => false;
+
+    bool TryDisconnectPlayer(string playerName) => false;
 
     void OnPlayerAnswered(string playerName, string answer, bool isPreliminary) { }
+
+    void OnPlayerStake(string playerName, int stake) { }
 }

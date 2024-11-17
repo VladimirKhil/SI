@@ -87,4 +87,26 @@ public sealed class PlayerInfo : SimplePlayerInfo
         get => _isPreliminaryAnswer;
         set { if (_isPreliminaryAnswer != value) { _isPreliminaryAnswer = value; OnPropertyChanged(); } }
     }
+
+    private bool _isConnected;
+
+    /// <summary>
+    /// Is the player connected.
+    /// </summary>
+    public bool IsConnected
+    {
+        get => _isConnected;
+        set { if (_isConnected != value) { _isConnected = value; OnPropertyChanged(); } }
+    }
+
+    private int _stake = 0;
+
+    /// <summary>
+    /// Players stake.
+    /// </summary>
+    public int Stake
+    {
+        get => _stake;
+        set { if (_stake != value) { _stake = value; OnPropertyChanged(); } }
+    }
 }

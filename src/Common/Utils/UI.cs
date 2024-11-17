@@ -37,4 +37,27 @@ public static class UI
 
         wrappedAction();
     }
+
+    public static async Task<T?> ExecuteAsync<T>(Func<T> func, Action<Exception> onError, CancellationToken cancellationToken = default)
+    {
+        T? wrappedAction()
+        {
+            try
+            {
+                return func();
+            }
+            catch (Exception exc)
+            {
+                onError(exc);
+                return default;
+            }
+        }
+
+        if (TaskScheduler.Current != Scheduler && Scheduler != null)
+        {
+            return await Task.Factory.StartNew(wrappedAction, cancellationToken, TaskCreationOptions.DenyChildAttach, Scheduler);
+        }
+
+        return wrappedAction();
+    }
 }

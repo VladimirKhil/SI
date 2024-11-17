@@ -183,6 +183,12 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         {
             return GameViewModel.OnSetAnswererByHighestStake();
         }
+        else if (mode == StepParameterValues.SetAnswererMode_Stake
+            && select == StepParameterValues.SetAnswererSelect_AllPossible
+            && stakeVisibility == StepParameterValues.SetAnswererStakeVisibility_Hidden)
+        {
+            return GameViewModel.OnAskHiddenStakes();
+        }
         else if (mode == StepParameterValues.SetAnswererMode_ByCurrent)
         {
             return GameViewModel.OnSetAnswererDirectly(select == StepParameterValues.SetAnswererSelect_Any);

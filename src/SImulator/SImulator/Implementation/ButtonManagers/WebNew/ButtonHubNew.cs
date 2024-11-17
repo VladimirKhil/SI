@@ -40,11 +40,16 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
             return new JoinGameResponse { ErrorType = JoinGameErrorType.Forbidden };
         }
 
+        if (!(await _gameRepository.TryAddPlayerAsync(Context.ConnectionId, request.UserName)))
+        {
+            return new JoinGameResponse { ErrorType = JoinGameErrorType.InvalidRole };
+        }
+
         await Groups.AddToGroupAsync(Context.ConnectionId, request.GameId.ToString(), Context.ConnectionAborted);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, SubscribersGroup, Context.ConnectionAborted);
+        await Clients.Group(SubscribersGroup).GamePersonsChanged(request.GameId, _gameRepository.Players);
 
         // Add connection
-        _gameRepository.AddPlayer(Context.ConnectionId, request.UserName);
         Context.Items["userName"] = request.UserName;
 
         return JoinGameResponse.Success;
@@ -93,6 +98,15 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
                 _gameRepository.OnPlayerPass(playerName);
                 break;
 
+            case "SET_STAKE":
+                if (args.Length < 2 || !int.TryParse(args[2], out var stake))
+                {
+                    return;
+                }
+
+                _gameRepository.OnPlayerStake(playerName, stake);
+                break;
+
             default:
                 break;
         }
@@ -112,7 +126,10 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
         // Remove connection
         if (Context.Items["userName"] is string playerName)
         {
-            _gameRepository.RemovePlayer(playerName);
+            if (await _gameRepository.TryRemovePlayerAsync(playerName))
+            {
+                await Clients.Group(SubscribersGroup).GamePersonsChanged(gameId, _gameRepository.Players);
+            }
         }
     }
 

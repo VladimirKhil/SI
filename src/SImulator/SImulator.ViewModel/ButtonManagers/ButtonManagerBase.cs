@@ -11,7 +11,9 @@ public abstract class ButtonManagerBase : IButtonManager
 
     public virtual bool ArePlayersManaged() => false;
 
-    public virtual void RemovePlayerById(string id, string name, bool manually = true) { }
+    public virtual void OnPlayersChanged() { }
+
+    public virtual void DisconnectPlayerById(string id, string name) { }
 
     public abstract bool Start();
 

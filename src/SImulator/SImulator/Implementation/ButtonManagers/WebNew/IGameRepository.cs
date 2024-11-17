@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SImulator.Implementation.ButtonManagers.WebNew;
 
@@ -6,9 +7,11 @@ public interface IGameRepository
 {
     ICollection<string> BannedNames { get; }
 
-    void AddPlayer(string id, string userName);
+    ConnectionPersonData[] Players { get; }
 
-    void RemovePlayer(string userName);
+    Task<bool> TryAddPlayerAsync(string id, string userName);
+
+    Task<bool> TryRemovePlayerAsync(string playerName);
 
     GameInfo? TryGetGameById(int gameId);
 
@@ -19,4 +22,6 @@ public interface IGameRepository
     void OnPlayerAnswer(string playerName, string answer, bool isPreliminary);
 
     void OnPlayerPass(string playerName);
+
+    void OnPlayerStake(string playerName, int stake);
 }

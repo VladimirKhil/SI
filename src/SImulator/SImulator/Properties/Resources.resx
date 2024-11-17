@@ -732,4 +732,7 @@ To play, you need to organize a local network.</value>
   <data name="WrongAnswers" xml:space="preserve">
     <value>Incorrect</value>
   </data>
+  <data name="KickPlayer" xml:space="preserve">
+    <value>Kick player</value>
+  </data>
 </root>

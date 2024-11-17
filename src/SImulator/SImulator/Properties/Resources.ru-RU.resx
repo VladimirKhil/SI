@@ -733,4 +733,7 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="WrongAnswers" xml:space="preserve">
     <value>Неверных</value>
   </data>
+  <data name="KickPlayer" xml:space="preserve">
+    <value>Выгнать игрока</value>
+  </data>
 </root>

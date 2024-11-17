@@ -144,6 +144,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     public SimpleCommand RemovePlayer { get; private set; }
     public SimpleCommand ClearPlayers { get; private set; }
 
+    public SimpleCommand KickPlayer { get; private set; }
+
     public ICommand ResetSums { get; private set; }
 
     public ICommand GiveTurn { get; private set; }
@@ -203,6 +205,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     /// Game players.
     /// </summary>
     public IList<PlayerInfo> Players { get; }
+
+    public IEnumerable<PlayerInfo> GamePlayers => Players;
 
     private Func<bool>? _continuation = null;
 
@@ -642,6 +646,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         AddPlayer = new SimpleCommand(AddPlayer_Executed);
         RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
         ClearPlayers = new SimpleCommand(ClearPlayers_Executed);
+        KickPlayer = new SimpleCommand(KickPlayer_Executed);
         ResetSums = new SimpleCommand(ResetSums_Executed);
         GiveTurn = new SimpleCommand(GiveTurn_Executed);
         Pass = new SimpleCommand(Pass_Executed);
@@ -1187,6 +1192,21 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         PresentationController.ClearPlayers();
     }
 
+    private void KickPlayer_Executed(object? arg)
+    {
+        if (arg is not PlayerInfo player)
+        {
+            return;
+        }
+
+        if (player.Id != null && player.IsConnected)
+        {
+            _buttonManager?.DisconnectPlayerById(player.Id, player.Name);
+            player.IsConnected = false;
+            _buttonManager?.OnPlayersChanged();
+        }
+    }
+
     private void ResetSums_Executed(object? arg)
     {
         foreach (var player in Players)
@@ -1311,7 +1331,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
         {
-            AddPlayer.CanBeExecuted = false;
             ClearPlayers.CanBeExecuted = false;
 
             Players.Clear();
@@ -2085,6 +2104,18 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
+    public void OnPlayerStake(string playerName, int stake)
+    {
+        for (var i = 0; i < Players.Count; i++)
+        {
+            if (Players[i].Name == playerName)
+            {
+                Players[i].Stake = stake;
+                break;
+            }
+        }
+    }
+
     private bool ProcessPlayerPress(int index, PlayerInfo player)
     {
         // The player has pressed already
@@ -2206,29 +2237,59 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         Players.Add(playerInfo);
         PresentationController.AddPlayer(playerName);
+        _buttonManager?.OnPlayersChanged();
     }
 
-    public void OnPlayerRemoved(string playerName)
+    public bool TryConnectPlayer(string playerName, string connectionId)
     {
-        var player = Players.FirstOrDefault(p => p.Name == playerName);
+        foreach (var player in Players)
+        {
+            if (player.IsConnected && player.Name == playerName)
+            {
+                return false;
+            }
+        }
+
+        foreach (var player in Players)
+        {
+            if (!player.IsConnected)
+            {
+                player.Name = playerName;
+                player.Id = connectionId;
+                player.IsConnected = true;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool TryDisconnectPlayer(string playerName)
+    {
+        var player = Players.FirstOrDefault(p => p.Name == playerName && p.IsConnected);
 
         if (player != null)
         {
-            RemovePlayerCore(player, false);
+            player.IsConnected = false;
+            return true;
         }
+
+        return false;
     }
 
-    private void RemovePlayerCore(PlayerInfo player, bool manually = true)
+    private void RemovePlayerCore(PlayerInfo player)
     {
+        if (player.Id != null && player.IsConnected)
+        {
+            _buttonManager?.DisconnectPlayerById(player.Id, player.Name);
+        }
+
         player.PropertyChanged -= PlayerInfo_PropertyChanged;
         var playerIndex = Players.IndexOf(player);
         Players.Remove(player);
         PresentationController.RemovePlayer(playerIndex);
 
-        if (player.Id != null)
-        {
-            _buttonManager?.RemovePlayerById(player.Id, player.Name, manually);
-        }
+        _buttonManager?.OnPlayersChanged();
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
@@ -2509,5 +2570,20 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         return false;
+    }
+
+    internal bool OnAskHiddenStakes()
+    {
+        foreach (var player in Players)
+        {
+            player.Stake = 0;
+
+            if (player.Id != null && player.IsConnected && player.Sum > 1)
+            {
+                _buttonManager?.TryGetCommandExecutor()?.AskStake(player.Id, player.Sum);
+            }
+        }
+
+        return true;
     }
 }

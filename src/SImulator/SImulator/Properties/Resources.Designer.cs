@@ -802,6 +802,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Kick player.
+        /// </summary>
+        public static string KickPlayer {
+            get {
+                return ResourceManager.GetString("KickPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на License.
         /// </summary>
         public static string License {

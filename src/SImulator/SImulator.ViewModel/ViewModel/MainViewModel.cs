@@ -191,11 +191,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// </summary>
     public ObservableCollection<SimplePlayerInfo> Players { get; set; }
 
+    public IEnumerable<PlayerInfo> GamePlayers => throw new NotImplementedException();
+
     public int ButtonBlockTime => (int)(Settings.BlockingTime * 1000);
 
     public LinkModel[] Links { get; }
 
-    private SimpleCommand _navigateTo;
+    private readonly SimpleCommand _navigateTo;
 
     public ICommand NavigateTo => _navigateTo;
 
