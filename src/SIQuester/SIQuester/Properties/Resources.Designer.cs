@@ -844,6 +844,34 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на To ensure a positive and responsible experience, please follow these guidelines while working in the question editor:
+        ///
+        ///Responsible Use of Content:
+        ///You are responsible for ensuring that any material you include in your questions complies with copyright laws, even if it&apos;s only used internally or temporarily.
+        ///
+        ///Use Public Domain or Licensed Content:
+        ///We encourage you to use materials that are:
+        ///
+        ///- In the public domain
+        ///- Licensed under Creative Commons or similar free-use licenses
+        ///- Created by you or ful [остаток строки не уместился]&quot;;.
+        /// </summary>
+        public static string ContentGuideline {
+            get {
+                return ResourceManager.GetString("ContentGuideline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Content Guidelines.
+        /// </summary>
+        public static string ContentGuidelineHeader {
+            get {
+                return ResourceManager.GetString("ContentGuidelineHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Format for TV and Comp-SIGame.
         /// </summary>
         public static string ConvertToCompSI {

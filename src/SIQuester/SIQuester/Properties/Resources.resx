@@ -378,6 +378,43 @@
   <data name="ContactUri" xml:space="preserve">
     <value>Contact address</value>
   </data>
+  <data name="ContentGuideline" xml:space="preserve">
+    <value>To ensure a positive and responsible experience, please follow these guidelines while working in the question editor:
+
+Responsible Use of Content:
+You are responsible for ensuring that any material you include in your questions complies with copyright laws, even if it's only used internally or temporarily.
+
+Use Public Domain or Licensed Content:
+We encourage you to use materials that are:
+
+- In the public domain
+- Licensed under Creative Commons or similar free-use licenses
+- Created by you or fully owned by you
+
+Give Attribution:
+To respect creators, it’s a good practice to credit the source of any third-party content used in your questions (e.g., "Image from Wikimedia Commons").
+
+Avoid Copyrighted Material Without Permission:
+Refrain from using copyrighted materials (e.g., movie screenshots, song lyrics, or book excerpts) unless you have permission from the copyright owner.
+
+Keep It Educational and Transformative:
+Focus on reworking materials in a way that adds value, such as analyzing, summarizing, or providing context to the content, where applicable.
+
+For Internal Use Only:
+If the questions are for personal or internal use, ensure they still comply with these guidelines to avoid potential issues.
+
+Need inspiration or legal resources for your quizzes? Here are some helpful links:
+
+- Wikimedia Commons
+- Pexels
+- Unsplash
+- Project Gutenberg
+
+By following these steps, you help maintain a responsible and collaborative environment for quiz creation. Happy editing!</value>
+  </data>
+  <data name="ContentGuidelineHeader" xml:space="preserve">
+    <value>Content Guidelines</value>
+  </data>
   <data name="ConvertToCompSI" xml:space="preserve">
     <value>Format for TV and Comp-SIGame</value>
   </data>

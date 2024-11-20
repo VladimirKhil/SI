@@ -188,6 +188,7 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
 
                                         <TextBlock FontSize="24" HorizontalAlignment="Center" Text="{x:Static lp:Resources.RecentFiles}" />
@@ -236,6 +237,14 @@
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
+
+                                        <Expander Grid.Row="2" Margin="0,10,0,10" FontSize="16">
+                                            <Expander.Header>
+                                                <TextBlock Text="{x:Static lp:Resources.ContentGuidelineHeader}" Margin="3,0,0,0" FontSize="20" />
+                                            </Expander.Header>
+                                            
+                                            <TextBlock Text="{x:Static lp:Resources.ContentGuideline}" MaxWidth="600" TextWrapping="Wrap" />
+                                        </Expander>
                                     </Grid>
                                 </ScrollViewer>
 
