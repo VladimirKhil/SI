@@ -166,10 +166,10 @@ public sealed class Package : InfoOwner, IEquatable<Package>
 
             if (string.IsNullOrEmpty(link)) // External link
             {
-                return new ContentItem { IsRef = false, Value = Logo, Type = AtomTypes.Image };
+                return new ContentItem { IsRef = false, Value = Logo, Type = ContentTypes.Image };
             }
 
-            return new ContentItem { IsRef = true, Value = link, Type = AtomTypes.Image };
+            return new ContentItem { IsRef = true, Value = link, Type = ContentTypes.Image };
         }
     }
 

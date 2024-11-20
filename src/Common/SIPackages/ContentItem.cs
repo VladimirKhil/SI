@@ -109,7 +109,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
         }
     }
 
-    private string GetDefaultPlacement() => (_type == ContentTypes.Audio || _type == AtomTypes.Audio) ? ContentPlacements.Background : ContentPlacements.Screen;
+    private string GetDefaultPlacement() => _type == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen;
 
     /// <summary>
     /// Content play duration.
@@ -156,7 +156,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     /// <inheritdoc />
     public override string ToString()
     {
-        if (_type == AtomTypes.Text && _placement == ContentPlacements.Screen)
+        if (_type == ContentTypes.Text && _placement == ContentPlacements.Screen)
         {
             return _value;
         }
@@ -235,7 +235,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
         {
             writer.WriteAttributeString("placement", _placement);
         }
-        else if (_type == ContentTypes.Audio || _type == AtomTypes.Audio) // For backward compatibility; remove later
+        else if (_type == ContentTypes.Audio)
         {
             writer.WriteAttributeString("placement", GetDefaultPlacement());
         }
@@ -258,7 +258,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     {
         Duration = _duration,
         IsRef = _isRef,
-        Placement = _placement,
+        _placement = _placement,
         WaitForFinish = _waitForFinish,
         Type = _type,
         Value = _value

@@ -39,10 +39,10 @@ public static class CollectionNames
     /// <returns>Found collection name or null.</returns>
     public static string? TryGetCollectionName(string mediaType) => mediaType switch
     {
-        AtomTypes.Image => ImagesStorageName,
-        AtomTypes.Audio or AtomTypes.AudioNew => AudioStorageName,
-        AtomTypes.Video => VideoStorageName,
-        AtomTypes.Html => HtmlStorageName,
+        ContentTypes.Image => ImagesStorageName,
+        ContentTypes.Audio => AudioStorageName,
+        ContentTypes.Video => VideoStorageName,
+        ContentTypes.Html => HtmlStorageName,
         _ => null,
     };
 
