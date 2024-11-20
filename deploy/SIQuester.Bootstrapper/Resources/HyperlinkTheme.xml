@@ -21,7 +21,7 @@
 			<Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes" Visible="no" Name="CheckingForUpdatesLabel" />
 		</Page>
 		<Page Name="Install">
-			<Label X="115" Y="50" Width="-11" Height="60" FontId="0" DisablePrefix="yes">#(loc.AntivirusHint)</Label>
+			<Label X="80" Y="50" Width="-11" Height="60" FontId="0" DisablePrefix="yes">#(loc.AntivirusHint)</Label>
 			<Hypertext Name="EulaHyperlink" X="11" Y="121" Width="-11" Height="51" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallLicenseLinkText)</Hypertext>
 			<Checkbox Name="EulaAcceptCheckbox" X="-11" Y="-41" Width="260" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallAcceptCheckbox)</Checkbox>
 			<Button Name="InstallUpdateButton" X="11" Y="-11" Width="200" Height="23" TabStop="yes" FontId="0" EnableCondition="WixStdBAUpdateAvailable" HideWhenDisabled="yes">#(loc.UpdateButton)</Button>
