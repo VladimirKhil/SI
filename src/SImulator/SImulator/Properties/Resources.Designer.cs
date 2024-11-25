@@ -88,6 +88,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Add stake.
+        /// </summary>
+        public static string AddStake {
+            get {
+                return ResourceManager.GetString("AddStake", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Add sum.
         /// </summary>
         public static string AddSum {
@@ -780,6 +789,15 @@ namespace SImulator.Properties {
         public static string IntroVideo {
             get {
                 return ResourceManager.GetString("IntroVideo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Joystick not found.
+        /// </summary>
+        public static string JoystickNotFound {
+            get {
+                return ResourceManager.GetString("JoystickNotFound", resourceCulture);
             }
         }
         
@@ -1668,6 +1686,15 @@ namespace SImulator.Properties {
         public static string SubstractOnWrong {
             get {
                 return ResourceManager.GetString("SubstractOnWrong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Subtract stake.
+        /// </summary>
+        public static string SubtractStake {
+            get {
+                return ResourceManager.GetString("SubtractStake", resourceCulture);
             }
         }
         

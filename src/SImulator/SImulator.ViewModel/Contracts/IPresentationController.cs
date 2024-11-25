@@ -45,7 +45,9 @@ public interface IPresentationController : IDisposable
 
     void SetTheme(string themeName);
 
-    void SetQuestion(int questionPrice);
+    void SetQuestionPrice(int questionPrice);
+
+    void SetCurrentThemeAndQuestion(Theme? activeTheme, Question activeQuestion) { }
 
     void SetText(string text = "");
 

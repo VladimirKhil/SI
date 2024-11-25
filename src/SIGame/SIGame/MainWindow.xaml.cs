@@ -91,7 +91,7 @@ public partial class MainWindow : Window
             return false;
         }
 
-        var isRight = game.Data.PersonDataExtensions.IsRight;
+        var isRight = game.IsRight;
         
         if (isRight != null)
         {
@@ -109,7 +109,7 @@ public partial class MainWindow : Window
             return false;
         }
 
-        var isWrong = game.Data.PersonDataExtensions.IsWrong;
+        var isWrong = game.IsWrong;
 
         if (isWrong != null)
         {

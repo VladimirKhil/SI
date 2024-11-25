@@ -1930,11 +1930,13 @@ internal sealed class PlayerComputerLogic : IPersonLogic
 
     public void Report()
     {
-        var cmd = _data.SystemLog.Length > 0 ? _data.PlayerDataExtensions.Report.SendReport : _data.PlayerDataExtensions.Report.SendNoReport;
-        
-        if (cmd != null && cmd.CanExecute(null))
+        if (_data.SystemLog.Length > 0)
         {
-            cmd.Execute(null);
+            _viewerActions.SendMessage(Messages.Report, MessageParams.Report_Log, _data.SystemLog.ToString());
+        }
+        else
+        {
+            _viewerActions.SendMessage(Messages.Report, "DECLINE");
         }
     }
 

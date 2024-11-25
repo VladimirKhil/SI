@@ -616,7 +616,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         SetStage(TableStage.Theme);
     }
 
-    public void SetQuestion(int questionPrice)
+    public void SetQuestionPrice(int questionPrice)
     {
         SetText(questionPrice.ToString());
         SetStage(TableStage.QuestionPrice);

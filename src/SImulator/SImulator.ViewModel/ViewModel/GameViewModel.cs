@@ -157,6 +157,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     public ICommand AddRight => _addRight;
     public ICommand AddWrong => _addWrong;
 
+    public ICommand AddStake { get; }
+
+    public ICommand SubtractStake { get; }
+
     public ICommand NextRound => _nextRound;
 
     public ICommand PreviousRound => _previousRound;
@@ -653,6 +657,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         MakeStake = new SimpleCommand(MakeStake_Executed);
         _addRight = new SimpleCommand(AddRight_Executed);
         _addWrong = new SimpleCommand(AddWrong_Executed);
+        AddStake = new SimpleCommand(AddStake_Executed);
+        SubtractStake = new SimpleCommand(SubtractStake_Executed);
         MoveToContent = new ContextCommand(MoveToContent_Executed);
 
         RunRoundTimer = new SimpleUICommand(RunRoundTimer_Executed) { Name = Resources.Run };
@@ -695,6 +701,26 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _presentationListener.MediaEnd += GameHost_MediaEnd;
         _presentationListener.RoundThemesFinished += GameHost_RoundThemesFinished;
         _presentationListener.AnswerSelected += PresentationListener_AnswerSelected;
+    }
+
+    private void AddStake_Executed(object? arg)
+    {
+        if (arg is not PlayerInfo player)
+        {
+            return;
+        }
+
+        player.Sum += player.Stake;
+    }
+
+    private void SubtractStake_Executed(object? arg)
+    {
+        if (arg is not PlayerInfo player)
+        {
+            return;
+        }
+
+        player.Sum -= player.Stake;
     }
 
     private void MoveToContent_Executed(object? arg)
@@ -1188,8 +1214,12 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void ClearPlayers_Executed(object? arg)
     {
-        Players.Clear();
-        PresentationController.ClearPlayers();
+        var players = Players.ToArray();
+
+        foreach (var player in players)
+        {
+            RemovePlayerCore(player);
+        }
     }
 
     private void KickPlayer_Executed(object? arg)
@@ -1331,10 +1361,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
         {
-            ClearPlayers.CanBeExecuted = false;
-
             Players.Clear();
-
             ManagedMode = true;
         }
 
@@ -1372,7 +1399,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         ActiveQuestion = question;
 
-        PresentationController.SetQuestion(question.Price);
+        PresentationController.SetCurrentThemeAndQuestion(ActiveTheme, ActiveQuestion);
+        PresentationController.SetQuestionPrice(question.Price);
 
         CurrentTheme = ActiveTheme?.Name;
         Price = question.Price;
@@ -1510,10 +1538,16 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     private void Engine_Package(Package package)
     {
         var videoUrl = Settings.Model.VideoUrl;
+        var imageUrl = Settings.SIUISettings.Model.LogoUri;
 
         if (!string.IsNullOrWhiteSpace(videoUrl))
         {
             var content = new[] { new ContentItem { Type = ContentTypes.Video, Value = videoUrl } };
+            PresentationController.OnQuestionContent(content, contentItem => contentItem.Value, "");
+        }
+        else if (!string.IsNullOrWhiteSpace(imageUrl))
+        {
+            var content = new[] { new ContentItem { Type = ContentTypes.Image, Value = imageUrl } };
             PresentationController.OnQuestionContent(content, contentItem => contentItem.Value, "");
         }
         else
@@ -1665,7 +1699,13 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     public void OnRightAnswer()
     {
         StopThinkingTimer_Executed(0);
-        StopQuestionTimer.Execute(0);
+
+        if (ActiveQuestionCommand == StopQuestionTimer)
+        {
+            StopQuestionTimer.Execute(0);
+            PresentationController.NoAnswer();
+        }
+
         StopButtons();
         ActiveMediaCommand = null;
     }
@@ -1902,6 +1942,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         ActiveTheme = theme;
         ActiveQuestion = theme.Questions[questionIndex];
+        PresentationController.SetCurrentThemeAndQuestion(ActiveTheme, ActiveQuestion);
 
         PresentationController.SetTheme(theme.Name);
         PresentationController.SetSound();
@@ -1986,6 +2027,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             _gameLogger.Write("\r\n{0}, {1}", CurrentTheme, Price);
 
             SetSound(Settings.Model.Sounds.QuestionSelected);
+            PresentationController.SetCurrentThemeAndQuestion(ActiveTheme, ActiveQuestion);
             PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
             _taskRunner.ScheduleExecution(Tasks.MoveNext, 17);
 

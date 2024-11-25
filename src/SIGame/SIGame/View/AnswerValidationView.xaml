@@ -117,7 +117,7 @@
             <Button
                 Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding Data.PersonDataExtensions.IsWrong}" 
+                Command="{Binding IsWrong}" 
                 CommandParameter="0"
                 Content="−0"
                 Foreground="DarkRed"
@@ -150,7 +150,7 @@
 
             <Button
                 Grid.ColumnSpan="3"
-                Command="{Binding Data.PersonDataExtensions.IsRight}"
+                Command="{Binding IsRight}"
                 CommandParameter="1"
                 Content="{x:Static lp:Resources.Yes}"
                 FontSize="25"
@@ -171,7 +171,7 @@
             <Button
                 Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding Data.PersonDataExtensions.IsRight}" 
+                Command="{Binding IsRight}" 
                 CommandParameter="0.5"
                 Content="×0.5"
                 Width="50"
@@ -182,7 +182,7 @@
                 Grid.Column="2"
                 Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding Data.PersonDataExtensions.IsRight}" 
+                Command="{Binding IsRight}" 
                 CommandParameter="2.0"
                 Content="×2"
                 Width="50"
@@ -199,7 +199,7 @@
 
             <Button
                 Grid.ColumnSpan="3"
-                Command="{Binding Data.PersonDataExtensions.IsWrong}"
+                Command="{Binding IsWrong}"
                 Content="{x:Static lp:Resources.No}"
                 FontSize="25"
                 FontWeight="SemiBold"
@@ -220,7 +220,7 @@
             <Button
                 Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding Data.PersonDataExtensions.IsWrong}" 
+                Command="{Binding IsWrong}" 
                 CommandParameter="0.5"
                 Content="×0.5"
                 Width="50"
@@ -231,7 +231,7 @@
                 Grid.Column="2"
                 Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding Data.PersonDataExtensions.IsWrong}" 
+                Command="{Binding IsWrong}" 
                 CommandParameter="2.0"
                 Content="×2"
                 Width="50"

@@ -98,24 +98,7 @@ public sealed class PersonData : INotifyPropertyChanged
         }
     }
 
-
-    private ICommand? _isRight = null;
-
-    public ICommand? IsRight
-    {
-        get => _isRight;
-        set { _isRight = value; OnPropertyChanged(); }
-    }
-
-    private ICommand _isWrong = null;
-
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    public ICommand IsWrong
-    {
-        get => _isWrong;
-        set { _isWrong = value; OnPropertyChanged(); }
-    }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -444,6 +444,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 {
                     player.ClearState();
                 }
+
+                _gameViewModel.Apellate.CanBeExecuted = false;
                 break;
 
             case GameStage.After:
@@ -1830,17 +1832,28 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             && _data.Players[playerIndex].Name == _viewerActions.Client.Name
             || isRight)
         {
-            _data.PlayerDataExtensions.Apellate.CanBeExecuted = _data.PlayerDataExtensions.ApellationCount > 0;
-            _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
+            _gameViewModel.Apellate.CanBeExecuted = _gameViewModel.ApellationCount > 0;
+            _gameViewModel.Pass.CanBeExecuted = false;
         }
     }
 
     public void OnHint(string hint) => _gameViewModel.Hint = $"{_localizer[nameof(R.RightAnswer)].ToUpperInvariant()} : {hint}";
 
-    public void EndThink() => _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
-
-    public void Report()
+    public void EndThink()
     {
+        _gameViewModel.Apellate.CanBeExecuted = _gameViewModel.ApellationCount > 0;
+        _gameViewModel.Pass.CanBeExecuted = false;
+    }
+
+    public void Report(string report)
+    {
+        if (!_data.Host.SendReport)
+        {
+            _gameViewModel.Report.SendNoReport.Execute(null);
+            return;
+        }
+
+        _gameViewModel.Report.Report = report;
         _gameViewModel.DialogMode = DialogModes.Report;
         _data.Host.OnFlash();
     }
@@ -1849,5 +1862,16 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     {
         PlatformManager.Instance.ShowMessage(Resources.GameClosedMessage, MessageType.Warning, true);
         OnReplic(ReplicCodes.Special.ToString(), Resources.GameClosedMessage);
+    }
+
+    public void OnCanPressButton()
+    {
+        _gameViewModel.Apellate.CanBeExecuted = false;
+        _gameViewModel.Pass.CanBeExecuted = true;
+    }
+
+    public void OnQuestionSelected()
+    {
+        _gameViewModel.Apellate.CanBeExecuted = false;
     }
 }

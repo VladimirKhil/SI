@@ -1,4 +1,5 @@
 ﻿using SharpDX.DirectInput;
+using SImulator.Properties;
 using SImulator.ViewModel;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
@@ -89,7 +90,7 @@ internal sealed class JoystickListener : ButtonManagerBase
                     
                     if (devices.Count == 0)
                     {
-                        ShowError("Джойстик не обнаружен!");
+                        ShowError(Resources.JoystickNotFound);
                         return false;
                     }
 

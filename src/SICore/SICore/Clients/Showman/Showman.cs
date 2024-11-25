@@ -17,18 +17,6 @@ public sealed class Showman : Viewer
     public Showman(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
     {
-        ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessage(Messages.IsRight, "+", arg?.ToString() ?? "1");
-            ClearSelections();
-        });
-
-        ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessage(Messages.IsRight, "-", arg?.ToString() ?? "1");
-            ClearSelections();
-        });
-
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
 
         ClientData.PersonDataExtensions.AreAnswersShown = data.Host.AreAnswersShown;
@@ -49,7 +37,7 @@ public sealed class Showman : Viewer
         }
     }
 
-    void ClientData_AutoReadyChanged()
+    private void ClientData_AutoReadyChanged()
     {
         lock (_readyLock)
         {

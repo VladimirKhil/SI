@@ -582,4 +582,10 @@
   <data name="GameClosedMessage" xml:space="preserve">
     <value>Game closed by server due to inactivity </value>
   </data>
+  <data name="ReportTip" xml:space="preserve">
+    <value>Your comment about game and questions:</value>
+  </data>
+  <data name="ReportTitle" xml:space="preserve">
+    <value>Game report</value>
+  </data>
 </root>

@@ -258,7 +258,8 @@ public interface IViewerLogic : ILogic
     /// <summary>
     /// Handles game report request.
     /// </summary>
-    void Report();
+    /// <param name="report">Report text.</param>
+    void Report(string report);
 
     void OnTheme(string[] mparams) { }
 
@@ -276,4 +277,6 @@ public interface IViewerLogic : ILogic
     /// Handles game closing.
     /// </summary>
     void OnGameClosed() { }
+
+    void OnCanPressButton() { }
 }

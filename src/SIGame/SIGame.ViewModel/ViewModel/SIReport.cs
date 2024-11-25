@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
-namespace SICore;
+namespace SIGame.ViewModel;
 
 /// <summary>
 /// Defines a user provided report.

@@ -168,6 +168,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
             canMoveToContent = item.WaitForFinish;
         }
+
+        moveToContent.OnCanBeExecutedChanged();
     }
 
     public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility)
@@ -280,6 +282,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
 
         GameViewModel.State = QuestionState.Normal;
+        GameViewModel.OnRightAnswer();
         PresentationController.OnAnswerStart();
     }
 

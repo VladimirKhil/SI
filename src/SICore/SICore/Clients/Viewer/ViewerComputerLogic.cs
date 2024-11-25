@@ -78,7 +78,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public void OnQuestionContent() => _player.OnQuestionContent();
 
-    public void Report() => _player.Report();
+    public void Report(string report) => _player.Report();
 
     public void ReceiveText(Message m)
     {

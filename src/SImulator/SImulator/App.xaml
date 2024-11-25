@@ -224,7 +224,7 @@
         </Style>
 
         <Style x:Key="ManagedColumn3" TargetType="ColumnDefinition">
-            <Setter Property="Width" Value="70" />
+            <Setter Property="Width" Value="100" />
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding DataContext.ManagedMode, RelativeSource={RelativeSource AncestorType=DockPanel}}" Value="False">
@@ -481,12 +481,50 @@
                                         Grid.Column="5"
                                         Text="{Binding Wrong}" />
 
-                                    <TextBox
-                                        Margin="1"
-                                        Grid.Column="6"
-                                        IsReadOnly="True"
-                                        Text="{Binding Stake}"
-                                        VerticalContentAlignment="Center" />
+                                    <DockPanel Grid.Column="6">
+                                        <Button
+                                            Style="{StaticResource ToolButton}"
+                                            DockPanel.Dock="Left"
+                                            Padding="3"
+                                            Margin="1"
+                                            ToolTip="{x:Static lp:Resources.AddStake}"
+                                            VerticalContentAlignment="Center"
+                                            Height="23"
+                                            Width="23"
+                                            Command="{Binding
+                                                RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                                Path=DataContext.AddStake}"
+                                            CommandParameter="{Binding}">
+                                            <Path
+                                                Data="M10,10L20,10L20,0L30,0L30,10L40,10L40,20L30,20L30,30L20,30L20,20L10,20z"
+                                                Stretch="Fill"
+                                                Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                        </Button>
+
+                                        <Button
+                                            Style="{StaticResource ToolButton}"
+                                            DockPanel.Dock="Right"
+                                            Padding="3"
+                                            Margin="1"
+                                            ToolTip="{x:Static lp:Resources.SubtractStake}"
+                                            VerticalContentAlignment="Center"
+                                            Height="23"
+                                            Width="23"
+                                            Command="{Binding
+                                                RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                                Path=DataContext.SubtractStake}"
+                                            CommandParameter="{Binding}">
+                                            <Path
+                                                Data="M0,0L30,0L30,10L0,10z"
+                                                Stretch="Uniform"
+                                                Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                        </Button>
+
+                                        <TextBox
+                                            Margin="1"
+                                            Text="{Binding Stake}"
+                                            VerticalContentAlignment="Center" />
+                                    </DockPanel>
 
                                     <TextBox
                                         Margin="1"

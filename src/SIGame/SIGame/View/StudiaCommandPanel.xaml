@@ -416,7 +416,7 @@
             Margin="0,8"
             Style="{StaticResource PassButton}"
             Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}"
-            Command="{Binding Data.PlayerDataExtensions.Pass}"
+            Command="{Binding Pass}"
             ToolTip="{x:Static lp:Resources.Pass}" />
 
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -554,7 +554,7 @@
                 Width="70"
                 Cursor="Hand"
                 ToolTip="{x:Static lp:Resources.Apellate_Right_Hint}"
-                Command="{Binding Data.PlayerDataExtensions.Apellate}"
+                Command="{Binding Apellate}"
                 CommandParameter="+"
                 Style="{StaticResource ApellateButton}"
                 FontSize="20">
@@ -565,7 +565,7 @@
                 Width="70"
                 Cursor="Hand"
                 ToolTip="{x:Static lp:Resources.Apellate_Wrong_Hint}"
-                Command="{Binding Data.PlayerDataExtensions.Apellate}"
+                Command="{Binding Apellate}"
                 Content="🤨"
                 CommandParameter="-"
                 Style="{StaticResource ApellateWrongButton}"

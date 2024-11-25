@@ -763,6 +763,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         }
 
                         var isRight = mparams[1] == "+";
+                        
                         if (!int.TryParse(mparams[2], out var playerIndex)
                             || playerIndex < 0
                             || playerIndex >= ClientData.Players.Count)
@@ -1868,15 +1869,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             throw new InvalidOperationException($"Trying to switch type of computer account:\n{info}");
         }
 
-        ClientData.PersonDataExtensions.IsRight =
-            ClientData.PersonDataExtensions.IsWrong =
-            ClientData.PersonDataExtensions.SendCatCost =
-            ClientData.PersonDataExtensions.SendFinalStake =
-            ClientData.PlayerDataExtensions.Apellate = null;
-
-        var person = ClientData.PersonDataExtensions;
-
-        ClientData.PlayerDataExtensions.Report.SendReport = ClientData.PlayerDataExtensions.Report.SendNoReport = null;
+        ClientData.PersonDataExtensions.SendCatCost = ClientData.PersonDataExtensions.SendFinalStake = null;
 
         IViewerClient viewer = role switch
         {

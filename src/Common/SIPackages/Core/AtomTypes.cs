@@ -4,7 +4,7 @@
 /// Defines well-known atom types.
 /// </summary>
 [Obsolete("Use ContentTypes class")]
-public static class AtomTypes
+internal static class AtomTypes
 {
     /// <summary>
     /// Plain text.

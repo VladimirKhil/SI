@@ -42,6 +42,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private ItemViewModel[]? _answerOptions;
 
     private int _playerCount;
+    private Theme? _theme;
+    private Question? _question;
     private readonly SoundsSettings _soundsSettings;
 
     public bool CanControlMedia => false;
@@ -87,6 +89,15 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     {
         _isAnswerSimple = false;
         _isAnswer = false;
+
+        if (_theme != null && _theme.Info.Comments.Text.Length > 0)
+        {
+            SendMessage(new
+            {
+                Type = "themeComments",
+                ThemeComments = _theme.Info.Comments.Text
+            });
+        }
     }
 
     public void RunPlayerTimer(int playerIndex, int maxTime) => SendMessage(new
@@ -427,7 +438,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         ThemeName = themeName
     });
 
-    public void SetQuestion(int questionPrice) => SendMessage(new
+    public void SetCurrentThemeAndQuestion(Theme? activeTheme, Question activeQuestion) 
+    {
+        _theme = activeTheme;
+        _question = activeQuestion;
+    }
+
+    public void SetQuestionPrice(int questionPrice) => SendMessage(new
     {
         Type = "question",
         QuestionPrice = questionPrice
@@ -440,7 +457,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             SendMessage(new
             {
                 Type = "rightAnswerStart",
-                Answer = "" // TODO: provide simple right answer here
+                Answer = _question?.Right.FirstOrDefault()
             });
 
             _isAnswer = false;

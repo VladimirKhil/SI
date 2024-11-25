@@ -8,7 +8,9 @@
     mc:Ignorable="d"
     Width="500"
     Loaded="UserControl_Loaded"
-    FontSize="16">
+    FontSize="16"
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    d:DataContext="{d:DesignInstance vm:SIReport}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -22,7 +24,7 @@
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
-        
+
         <TextBlock Grid.ColumnSpan="2" Name="textBlock1" Text="{Binding Title}" Margin="5" TextWrapping="Wrap" />
         <TextBlock Grid.Row="2" Name="textBlock2" Text="{Binding Subtitle}" Grid.ColumnSpan="2" Margin="5" TextWrapping="Wrap" />
         
@@ -31,7 +33,7 @@
             Grid.Row="3"
             Padding="5,1"
             Name="tbComments"
-            Text="{Binding Path=Comment}"
+            Text="{Binding Comment}"
             VerticalScrollBarVisibility="Auto"
             AcceptsReturn="True"
             TextWrapping="Wrap" />

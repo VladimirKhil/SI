@@ -4,17 +4,17 @@
     <ProductVersion>3.9</ProductVersion>
     <OutputName>SIGame.$(Platform)</OutputName>
     <DefineConstants>ProductVersion=$(MsiProductVersion)</DefineConstants>
-	<SuppressIces>ICE38;ICE57;ICE91</SuppressIces>
+    <SuppressIces>ICE38;ICE57;ICE91</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-	  <DefineConstants>Debug</DefineConstants>
+    <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.1" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
     <PackageReference Include="WixToolset.UI.wixext" Version="5.0.1" />
-    <PackageReference Include="WixToolset.NetFx.wixext" Version="5.0.1" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SIGame\SIGame\SIGame.csproj">
@@ -27,5 +27,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="5.0.1" />
-  <Target Name="AfterBuild"></Target>
+  <Target Name="AfterBuild">
+  </Target>
 </Project>

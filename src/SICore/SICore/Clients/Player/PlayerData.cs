@@ -8,36 +8,6 @@ namespace SICore;
 /// </summary>
 public sealed class PlayerData : INotifyPropertyChanged
 {
-    private CustomCommand _apellate;
-
-    public CustomCommand Apellate
-    {
-        get => _apellate;
-        set
-        {
-            if (_apellate != value)
-            {
-                _apellate = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private CustomCommand _pass;
-
-    public CustomCommand Pass
-    {
-        get => _pass;
-        set
-        {
-            if (_pass != value)
-            {
-                _pass = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     /// <summary>
     /// Знает ли ответ
     /// </summary>
@@ -74,30 +44,6 @@ public sealed class PlayerData : INotifyPropertyChanged
     /// Продолжается ли чтение вопроса
     /// </summary>
     internal bool IsQuestionInProgress { get; set; }
-
-    /// <summary>
-    /// Отчёт об игре
-    /// </summary>
-    public SIReport Report { get; set; } = new SIReport();
-
-    private int _apellationCount = int.MaxValue;
-
-    public int ApellationCount
-    {
-        get => _apellationCount;
-        set { _apellationCount = value; OnPropertyChanged(); }
-    }
-
-    private bool _myTry;
-
-    /// <summary>
-    /// Можно жать на кнопку (чтобы при игре без фальстартов компьютерные игроки соображали помедленнее)
-    /// </summary>
-    public bool MyTry
-    {
-        get => _myTry;
-        set { _myTry = value; OnPropertyChanged(); }
-    }
 
     /// <summary>
     /// Defines time stamp when game buttons have been activated.

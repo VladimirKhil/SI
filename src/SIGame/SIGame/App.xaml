@@ -1319,7 +1319,7 @@
 
                     <DataTemplate x:Key="{x:Static vmm:DialogModes.Report}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.ReportTitle}">
-                            <l:GameReportView DataContext="{Binding Data.PlayerDataExtensions.Report}" />
+                            <l:GameReportView DataContext="{Binding Report}" />
                         </ContentControl>
                     </DataTemplate>
                 </localc:ViewConverter.Views>

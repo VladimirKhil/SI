@@ -42,37 +42,6 @@ public sealed class Player : Viewer
             Clear();
         });
 
-        ClientData.PlayerDataExtensions.Apellate = new CustomCommand(arg =>
-        {
-            ClientData.PlayerDataExtensions.ApellationCount--;
-            _viewerActions.SendMessage(Messages.Apellate, arg.ToString());
-        }) { CanBeExecuted = false };
-
-        ClientData.PlayerDataExtensions.Pass = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessage(Messages.Pass);
-        })
-        { CanBeExecuted = false };
-
-        ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.IsRight, "+"); Clear(); });
-        ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.IsRight, "-"); Clear(); });
-
-        ClientData.PlayerDataExtensions.Report.Title = LO[nameof(R.ReportTitle)];
-        ClientData.PlayerDataExtensions.Report.Subtitle = LO[nameof(R.ReportTip)];
-
-        ClientData.PlayerDataExtensions.Report.SendReport = new CustomCommand(arg => 
-        {
-            if (ClientData.SystemLog.Length > 0)
-            {
-                _viewerActions.SendMessage(Messages.Report, MessageParams.Report_Log, ClientData.SystemLog.ToString());
-            }
-
-            _viewerActions.SendMessage(Messages.Report, "ACCEPT", ClientData.PlayerDataExtensions.Report.Comment);
-            Clear();
-        });
-
-        ClientData.PlayerDataExtensions.Report.SendNoReport = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Report, "DECLINE"); Clear(); });
-
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
     }
 
@@ -163,8 +132,6 @@ public sealed class Player : Viewer
                         ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
                     }
 
-                    ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = false;
-
                     #endregion
                     break;
 
@@ -189,7 +156,6 @@ public sealed class Player : Viewer
 
                 case Messages.Choice:
                     ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
-                    ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = false;
                     _logic.OnQuestionSelected();
                     break;
 
@@ -209,34 +175,25 @@ public sealed class Player : Viewer
                     if (ClientData.QuestionType == QuestionTypes.Simple)
                     {
                         _logic.OnEnableButton();
-
-                        if (!ClientData.FalseStart)
-                            ClientData.PlayerDataExtensions.MyTry = true;
                     }
                     break;
 
                 case Messages.Try:
-                    ClientData.PlayerDataExtensions.Pass.CanBeExecuted = true;
-                    ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = false;
                     ClientData.PlayerDataExtensions.TryStartTime = DateTimeOffset.UtcNow;
+                    _logic.OnCanPressButton();
                     break;
 
                 case Messages.YouTry:
-                    ClientData.PlayerDataExtensions.MyTry = true;
                     _logic.OnEnableButton();
                     _logic.StartThink();
                     break;
 
                 case Messages.EndTry:
-                    ClientData.PlayerDataExtensions.MyTry = false;
                     _logic.OnDisableButton();
 
                     if (mparams[1] == MessageParams.EndTry_All)
                     {
                         _logic.EndThink();
-
-                        ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = ClientData.PlayerDataExtensions.ApellationCount > 0;
-                        ClientData.PlayerDataExtensions.Pass.CanBeExecuted = false;
                     }
                     break;
 
@@ -361,12 +318,6 @@ public sealed class Player : Viewer
                     break;
 
                 case Messages.Report:
-                    if (!ClientData.Host.SendReport)
-                    {
-                        ClientData.PlayerDataExtensions.Report.SendNoReport.Execute(null);
-                        break;
-                    }
-
                     var report = new StringBuilder();
 
                     for (var r = 1; r < mparams.Length; r++)
@@ -374,9 +325,8 @@ public sealed class Player : Viewer
                         report.AppendLine(mparams[r]);
                     }
 
-                    ClientData.PlayerDataExtensions.Report.Report = report.ToString();
                     ((PlayerAccount)ClientData.Me).IsDeciding = false;
-                    _logic.Report();
+                    _logic.Report(report.ToString());
                     break;
             }
         }

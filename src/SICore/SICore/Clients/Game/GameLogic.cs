@@ -4725,8 +4725,48 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (HaveMultipleAnswerers() && _data.AnnouncedAnswerersEnumerator != null)
         {
             _data.AnnouncedAnswerersEnumerator.Reset();
-            ScheduleExecution(Tasks.AnnouncePostStake, (answerTime == 0 ? 2 : answerTime) * 10);
-            return;
+
+            if (_data.QuestionPlayState.HiddenStakes)
+            {
+                ScheduleExecution(Tasks.AnnouncePostStake, (answerTime == 0 ? 2 : answerTime) * 10);
+                return;
+            }
+            else
+            {
+                while (_data.AnnouncedAnswerersEnumerator.MoveNext())
+                {
+                    var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
+
+                    if (answererIndex < 0 || answererIndex >= _data.Players.Count)
+                    {
+                        continue;
+                    }
+
+                    var answerer = _data.Players[answererIndex];
+                    var isRight = answerer.Answer == _data.RightOptionLabel;
+
+                    var message = new MessageBuilder(Messages.Person);
+                    int outcome;
+
+                    if (isRight)
+                    {
+                        message.Add('+');
+                        answerer.AddRightSum(_data.CurPriceRight);
+                        outcome = _data.CurPriceRight;
+                    }
+                    else
+                    {
+                        message.Add('-');
+                        answerer.SubtractWrongSum(_data.CurPriceWrong);
+                        outcome = _data.CurPriceWrong;
+                    }
+
+                    message.Add(answererIndex).Add(outcome);
+                    _gameActions.SendMessage(message.ToString());
+                }
+
+                _gameActions.InformSums();
+            }
         }
 
         ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);

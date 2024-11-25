@@ -27,7 +27,7 @@
     Height="650"
     Width="755"
     MinHeight="650"
-    MinWidth="755"
+    MinWidth="855"
     lb:CommandWindowBehavior.IsAttached="True"
     Background="{StaticResource MainBackground}"
     d:DataContext="{d:DesignInstance vm:MainViewModel}">
@@ -631,7 +631,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="3*" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition x:Name="playersRow" Height="0" />
@@ -1009,7 +1009,7 @@
                     <DataTrigger
                         Binding="{Binding Game.Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Visible}}"
                         Value="True">
-                        <Setter TargetName="playersRow" Property="Height" Value="*" />
+                        <Setter TargetName="playersRow" Property="Height" Value="2*" />
                     </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>

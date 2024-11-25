@@ -1141,6 +1141,24 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Your comment about game and questions:.
+        /// </summary>
+        public static string ReportTip {
+            get {
+                return ResourceManager.GetString("ReportTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Game report.
+        /// </summary>
+        public static string ReportTitle {
+            get {
+                return ResourceManager.GetString("ReportTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The round themes are; Here are the themes of the round.
         /// </summary>
         public static string RoundThemes {

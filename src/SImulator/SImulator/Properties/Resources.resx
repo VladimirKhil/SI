@@ -735,4 +735,13 @@ To play, you need to organize a local network.</value>
   <data name="KickPlayer" xml:space="preserve">
     <value>Kick player</value>
   </data>
+  <data name="AddStake" xml:space="preserve">
+    <value>Add stake</value>
+  </data>
+  <data name="SubtractStake" xml:space="preserve">
+    <value>Subtract stake</value>
+  </data>
+  <data name="JoystickNotFound" xml:space="preserve">
+    <value>Joystick not found</value>
+  </data>
 </root>

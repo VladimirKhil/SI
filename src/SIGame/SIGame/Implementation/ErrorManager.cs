@@ -1,9 +1,9 @@
 ﻿using AppRegistryService.Contract;
 using AppRegistryService.Contract.Models;
 using AppRegistryService.Contract.Requests;
-using SICore;
 using SIGame.Contracts;
 using SIGame.Properties;
+using SIGame.ViewModel;
 using SIGame.ViewModel.Settings;
 using SIStatisticsService.Contract;
 using System;
@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
+using Utils.Commands;
 
 namespace SIGame.Implementation;
 
@@ -105,7 +106,7 @@ internal sealed class ErrorManager : IErrorManager
 
             var mainWindow = Application.Current.MainWindow;
 
-            errorReport.SendReport = new CustomCommand(async arg =>
+            errorReport.SendReport = new SimpleCommand(async arg =>
             {
                 var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
 
@@ -153,7 +154,7 @@ internal sealed class ErrorManager : IErrorManager
                 Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
             });
 
-            errorReport.SendNoReport = new CustomCommand(arg =>
+            errorReport.SendNoReport = new SimpleCommand(arg =>
             {
                 mainWindow?.Close();
                 Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);

@@ -464,7 +464,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    // TODO: move to ViewerHumanLogic after merging with other logis
+    // TODO: move to ViewerHumanLogic after merging with other logics
     public PersonAccount? Speaker { get; set; }
 
     public ObservableCollection<PlayerAccount> Players { get; } = new();
@@ -507,6 +507,27 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     /// Manage game table command.
     /// </summary>
     public SimpleCommand ManageTable { get; }
+
+    public SimpleCommand Apellate { get; }
+
+    public SimpleCommand Pass { get; }
+
+    private int _apellationCount = int.MaxValue;
+
+    public int ApellationCount
+    {
+        get => _apellationCount;
+        set { _apellationCount = value; OnPropertyChanged(); }
+    }
+
+    public ICommand? IsRight { get; }
+
+    public ICommand IsWrong { get; }
+
+    /// <summary>
+    /// Game report.
+    /// </summary>
+    public SIReport Report { get; } = new();
 
     public GameViewModel(
         ViewerData viewerData,
@@ -574,7 +595,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _forceStart = new SimpleCommand(ForceStart_Executed);
 
         _addTable = new SimpleCommand(AddTable_Executed);
-        
+
         _pressGameButton = new SimpleCommand(PressGameButton_Execute) { CanBeExecuted = Host?.Role == GameRole.Player };
 
         SendPass = new SimpleCommand(SendPass_Executed);
@@ -588,6 +609,55 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         ChangeSums2 = new SimpleCommand(ChangeSums2_Executed);
         ManageTable = new SimpleCommand(ManageTable_Executed) { CanBeExecuted = false };
+
+        Apellate = new SimpleCommand(Apellate_Executed) { CanBeExecuted = false };
+        Pass = new SimpleCommand(Pass_Executed) { CanBeExecuted = false };
+
+        IsRight = new SimpleCommand(IsRight_Executed);
+        IsWrong = new SimpleCommand(IsWrong_Executed);
+
+        Report.Title = Resources.ReportTitle;
+        Report.Subtitle = Resources.ReportTip;
+
+        Report.SendReport = new SimpleCommand(SendReport_Executed);
+        Report.SendNoReport = new SimpleCommand(SendNoReport_Executed);
+    }
+
+    private void IsRight_Executed(object? arg)
+    {
+        Host?.Actions.SendMessage(Messages.IsRight, "+", arg?.ToString() ?? "1");
+        ClearSelections();
+    }
+
+    private void IsWrong_Executed(object? arg)
+    {
+        Host?.Actions.SendMessage(Messages.IsRight, "-", arg?.ToString() ?? "1");
+        ClearSelections();
+    }
+
+    private void Pass_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Pass);
+
+    private void SendNoReport_Executed(object? arg)
+    {
+        Host?.Actions.SendMessage(Messages.Report, "DECLINE");
+        ClearSelections();
+    }
+
+    private void SendReport_Executed(object? arg)
+    {
+        if (_data.SystemLog.Length > 0)
+        {
+            Host?.Actions.SendMessage(Messages.Report, MessageParams.Report_Log, _data.SystemLog.ToString());
+        }
+
+        Host?.Actions.SendMessage(Messages.Report, "ACCEPT", Report.Comment);
+        ClearSelections();
+    }
+
+    private void Apellate_Executed(object? arg)
+    {
+        _apellationCount--;
+        Host?.Actions.SendMessage(Messages.Apellate, arg?.ToString() ?? "");
     }
 
     private void ManageTable_Executed(object? arg) => TInfo.IsEditable = !TInfo.IsEditable;
