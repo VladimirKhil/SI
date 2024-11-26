@@ -649,7 +649,7 @@
     <value>Старт</value>
   </data>
   <data name="StartGame" xml:space="preserve">
-    <value />
+    <value>Старт</value>
   </data>
   <data name="Stop" xml:space="preserve">
     <value>Завершить</value>

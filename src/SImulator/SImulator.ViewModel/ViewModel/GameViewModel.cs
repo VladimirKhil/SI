@@ -2536,7 +2536,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         for (var i = 0; i < _stakers.Count; )
         {
-            if (i == _stakersIterator)
+            if (i == _stakersIterator || _stakers[i] < 0 || _stakers[i] >= Players.Count)
             {
                 i++;
                 continue;
@@ -2563,7 +2563,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             return;
         }
 
-        _isAllIn = Staker.Sum == Stake;
+        var staker = Staker;
+        _isAllIn = staker != null && staker.Sum == Stake;
 
         _stakersIterator++;
 
@@ -2580,6 +2581,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         StakerIndex = _stakers[_stakersIterator];
         var staker = Staker;
+
+        if (staker == null)
+        {
+            return;
+        }
 
         if (_isAllIn)
         {
