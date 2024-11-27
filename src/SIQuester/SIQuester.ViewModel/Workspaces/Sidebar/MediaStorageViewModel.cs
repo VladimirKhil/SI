@@ -523,7 +523,14 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
         foreach (var file in files)
         {
-            AddFile(file);
+            try
+            {
+                AddFile(file);
+            }
+            catch (Exception exc)
+            {
+                OnError(exc);
+            }
         }
 
         HasPendingChanges = IsChanged();

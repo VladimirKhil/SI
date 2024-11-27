@@ -220,25 +220,26 @@ internal sealed class PlayerComputerLogic : IPersonLogic
 
                 default:
                     {
-                        var maxVars = (_data.PersonDataExtensions.StakeInfo.Maximum - _data.PersonDataExtensions.StakeInfo.Minimum) / _data.PersonDataExtensions.StakeInfo.Step + 1;
-                        var var = 0;
+                        var stakeInfo = _data.PersonDataExtensions.StakeInfo;
+                        var optionCount = stakeInfo.Step == 0 ? 2 : (stakeInfo.Maximum - stakeInfo.Minimum) / stakeInfo.Step + 1;
+                        var stepIndex = 0;
 
                         switch (_account.Style)
                         {
                             case PlayerStyle.Careful:
-                                var = 0;
+                                stepIndex = 0;
                                 break;
 
                             case PlayerStyle.Normal:
-                                var = Random.Shared.Next(maxVars);
+                                stepIndex = Random.Shared.Next(optionCount);
                                 break;
 
                             case PlayerStyle.Agressive:
-                                var = maxVars - 1;
+                                stepIndex = optionCount - 1;
                                 break;
                         }
 
-                        stakeSum = _data.PersonDataExtensions.StakeInfo.Minimum + var * _data.PersonDataExtensions.StakeInfo.Step;
+                        stakeSum = stakeInfo.Minimum + stepIndex * stakeInfo.Step;
                         break;
                     }
             }
@@ -353,31 +354,32 @@ internal sealed class PlayerComputerLogic : IPersonLogic
     {
         try
         {
-            var maxVars = (_data.PersonDataExtensions.StakeInfo.Maximum - _data.PersonDataExtensions.StakeInfo.Minimum) / _data.PersonDataExtensions.StakeInfo.Step + 1;
-            var var = 0;
+            var stakeInfo = _data.PersonDataExtensions.StakeInfo;
+            var optionCount = stakeInfo.Step == 0 ? 2 : (stakeInfo.Maximum - stakeInfo.Minimum) / stakeInfo.Step + 1;
+            
+            var optionIndex = 0;
 
             switch (_account.Style)
             {
                 case PlayerStyle.Careful:
-                    var = 0;
+                    optionIndex = 0;
                     break;
 
                 case PlayerStyle.Normal:
-                    var = Random.Shared.Next(maxVars);
+                    optionIndex = Random.Shared.Next(optionCount);
                     break;
 
                 case PlayerStyle.Agressive:
-                    var = maxVars - 1;
+                    optionIndex = optionCount - 1;
                     break;
             }
 
-            int price = _data.PersonDataExtensions.StakeInfo.Minimum + var * _data.PersonDataExtensions.StakeInfo.Step;
+            var price = stakeInfo.Minimum + optionIndex * stakeInfo.Step;
             _viewerActions.SendMessage(Messages.CatCost, price.ToString());
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Ошибка при выборе стоимости Вопроса с секретом. Описание ошибки: {0}", exc)
-                .AppendLine();
+            _data.SystemLog.AppendFormat("Secret question price selection error: {0}", exc).AppendLine();
         }
     }
 
@@ -467,14 +469,14 @@ internal sealed class PlayerComputerLogic : IPersonLogic
     }
 
     /// <summary>
-    /// Выбрать вопрос на табло
+    /// Selects question from game table.
     /// </summary>
-    /// <param name="theme">Выбор темы</param>
-    /// <param name="quest">Выбор вопроса</param>
-    internal void SelectQuestion(out int theme, out int quest)
+    /// <param name="themeIndex">Selected theme index.</param>
+    /// <param name="questionIndex">Selected question index.</param>
+    internal void SelectQuestion(out int themeIndex, out int questionIndex)
     {
         var myInfo = _account;
-        theme = -1; quest = -1;
+        themeIndex = -1; questionIndex = -1;
 
         int nv1 = myInfo.V1, nv4 = myInfo.V4, nv5 = myInfo.V5, nv6 = myInfo.V6, nv7 = myInfo.V7;
         var np2 = myInfo.P2;
@@ -498,12 +500,24 @@ internal sealed class PlayerComputerLogic : IPersonLogic
         }
 
         var r = Random.Shared.Next(101);
-        var selectByThemeIndex = r < nv1; // Выбор по номеру темы
+        var selectByThemeIndex = r < nv1;
 
         var table = _data.TInfo.RoundInfo;
 
+        if (table.Count == 0)
+        {
+            throw new InvalidOperationException("Game table is empty");
+        }
+
+        var maxQuestionCount = table.Max(th => th.Questions.Count(QuestionHelper.IsActive));
+
+        if (maxQuestionCount == 0)
+        {
+            throw new InvalidOperationException("No questions in the game table");
+        }
+
         var canSelectTheme = new bool[table.Count];
-        var canSelectQuestion = new bool[table.Max(th => th.Questions.Count)];
+        var canSelectQuestion = new bool[maxQuestionCount];
         var firstSelectionStage = true;
 
         for (var stage = 0; stage < 2; stage++, firstSelectionStage = !firstSelectionStage)
@@ -512,17 +526,17 @@ internal sealed class PlayerComputerLogic : IPersonLogic
             {
                 if (firstSelectionStage)
                 {
-                    for (theme = 0; theme < table.Count; theme++)
+                    for (themeIndex = 0; themeIndex < table.Count; themeIndex++)
                     {
-                        canSelectTheme[theme] = table[theme].Questions.Any(QuestionHelper.IsActive);
+                        canSelectTheme[themeIndex] = table[themeIndex].Questions.Any(QuestionHelper.IsActive);
                     }
                 }
                 else
                 {
-                    // theme уже зафиксировано
-                    for (quest = 0; quest < table[theme].Questions.Count; quest++)
+                    // Theme is already defined
+                    for (questionIndex = 0; questionIndex < table[themeIndex].Questions.Count; questionIndex++)
                     {
-                        canSelectQuestion[quest] = table[theme].Questions[quest].IsActive();
+                        canSelectQuestion[questionIndex] = table[themeIndex].Questions[questionIndex].IsActive();
                     }
                 }
             }
@@ -530,94 +544,81 @@ internal sealed class PlayerComputerLogic : IPersonLogic
             {
                 if (firstSelectionStage)
                 {
-                    for (var q = 0; q < canSelectQuestion.Length; q++)
+                    for (var i = 0; i < canSelectQuestion.Length; i++)
                     {
-                        canSelectQuestion[q] = table.Any(th => th.Questions.Count > q && th.Questions[q].Price > -1);
+                        canSelectQuestion[i] = table.Any(th => th.Questions.Count > i && th.Questions[i].IsActive());
                     }
-
                 }
                 else
                 {
-                    // quest уже зафиксировано
-                    for (theme = 0; theme < table.Count; theme++)
+                    // Question is already defined
+                    for (themeIndex = 0; themeIndex < table.Count; themeIndex++)
                     {
-                        canSelectTheme[theme] = table[theme].Questions.Count > quest && table[theme].Questions[quest].Price > -1;
+                        canSelectTheme[themeIndex] = table[themeIndex].Questions.Count > questionIndex && table[themeIndex].Questions[questionIndex].Price > -1;
                     }
                 }
             }
 
             if (selectByThemeIndex && firstSelectionStage || !selectByThemeIndex && !firstSelectionStage)
             {
-                // Выбор темы
-                var numOfThemes = canSelectTheme.Count(can => can);
+                // Theme selection
+                var themeCount = canSelectTheme.Count(can => can);
 
-                if (numOfThemes == 1)
+                if (themeCount == 1)
                 {
-                    // Выбор очевиден
-                    theme = -1;
-                    while (!canSelectTheme[++theme]) ;
+                    // Single theme is available
+                    themeIndex = Array.FindIndex(canSelectTheme, can => can);
                 }
                 else
                 {
-                    var previousTheme = false; // Можно ли выбрать предыдущую тему
+                    var canSelectPreviousTheme = false; // Can the previous theme be selected
 
                     lock (_data.ChoiceLock)
                     {
-                        if (_data.ThemeIndex != -1 && canSelectTheme[_data.ThemeIndex])
+                        if (_data.ThemeIndex > -1 && _data.ThemeIndex < canSelectTheme.Length && canSelectTheme[_data.ThemeIndex])
                         {
-                            previousTheme = true;
+                            canSelectPreviousTheme = true;
                         }
 
-                        if (previousTheme)
-                            r = Random.Shared.Next(100);
-                        else
-                            r = myInfo.V2 + Random.Shared.Next(100 - myInfo.V2);
+                        r = canSelectPreviousTheme ? Random.Shared.Next(100) : myInfo.V2 + Random.Shared.Next(100 - myInfo.V2);
 
                         if (r < myInfo.V2)
                         {
-                            theme = _data.ThemeIndex;
+                            themeIndex = _data.ThemeIndex;
                         }
                         else if (r < myInfo.V2 + myInfo.V3)
                         {
-                            // Выбор темы согласно приоритету
-                            for (int k = 0; k < myInfo.P1.Length; k++)
+                            // Selecting a theme according to the priority
+                            for (var k = 0; k < myInfo.P1.Length; k++)
                             {
-                                var index = (myInfo.P1[k] - '0') - 1;
+                                var index = myInfo.P1[k] - '0' - 1;
 
-                                if (index < canSelectTheme.Length && canSelectTheme[index])
+                                if (index > -1 && index < canSelectTheme.Length && canSelectTheme[index])
                                 {
-                                    theme = index;
+                                    themeIndex = index;
                                     break;
                                 }
                             }
-
-                            if (theme == -1)
-                            {
-                                var k = Random.Shared.Next(numOfThemes);
-                                theme = -1;
-                                do { theme++; if (theme < canSelectTheme.Length && canSelectTheme[theme]) k--; } while (k >= 0);
-                            }
                         }
-                        else
+
+                        if (themeIndex == -1)
                         {
-                            var k = Random.Shared.Next(numOfThemes);
-                            theme = -1;
-                            do { theme++; if (theme < canSelectTheme.Length && canSelectTheme[theme]) k--; } while (k >= 0);
+                            var k = Random.Shared.Next(themeCount);
+                            themeIndex = -1;
+                            do { themeIndex++; if (themeIndex < canSelectTheme.Length && canSelectTheme[themeIndex]) k--; } while (k >= 0);
                         }
                     }
                 }
             }
-
             else
             {
-                // Выбор вопроса
-                var numOfQuestions = canSelectQuestion.Count(can => can);
+                // Question selection
+                var questionCount = canSelectQuestion.Count(can => can);
 
-                if (numOfQuestions == 1)
+                if (questionCount == 1)
                 {
-                    // Выбор очевиден
-                    quest = -1;
-                    while (!canSelectQuestion[++quest]) ;
+                    // Single question is available
+                    questionIndex = Array.FindIndex(canSelectQuestion, can => can);
                 }
                 else
                 {
@@ -652,44 +653,38 @@ internal sealed class PlayerComputerLogic : IPersonLogic
                     if (r < nv4)
                     {
                         var k = Random.Shared.Next(n4);
-                        quest = _data.QuestionIndex;
-                        do if (canSelectQuestion[--quest]) k--; while (k >= 0);
+                        questionIndex = _data.QuestionIndex;
+                        do if (canSelectQuestion[--questionIndex]) k--; while (k >= 0);
                     }
                     else if (r < nv4 + nv5)
                     {
                         var k = Random.Shared.Next(n5);
-                        quest = _data.QuestionIndex;
-                        do if (canSelectQuestion[++quest]) k--; while (k >= 0);
+                        questionIndex = _data.QuestionIndex;
+                        do if (canSelectQuestion[++questionIndex]) k--; while (k >= 0);
                     }
                     else if (r < nv4 + nv5 + nv6)
                     {
-                        quest = _data.QuestionIndex;
+                        questionIndex = _data.QuestionIndex;
                     }
                     else if (r < nv4 + nv5 + nv6 + nv7)
                     {
-                        // Выбор вопроса согласно приоритету
-                        for (int k = 0; k < np2.Length; k++)
+                        // Selecting a question according to the priority
+                        for (var k = 0; k < np2.Length; k++)
                         {
-                            var index = (np2[k] - '0') - 1;
-                            if (index < canSelectQuestion.Length && canSelectQuestion[index])
+                            var index = np2[k] - '0' - 1;
+                            if (index > -1 && index < canSelectQuestion.Length && canSelectQuestion[index])
                             {
-                                quest = index;
+                                questionIndex = index;
                                 break;
                             }
                         }
-
-                        if (quest == -1)
-                        {
-                            var k = Random.Shared.Next(numOfQuestions);
-                            quest = -1;
-                            do if (canSelectQuestion[++quest]) k--; while (k >= 0);
-                        }
                     }
-                    else
+
+                    if (questionIndex == -1)
                     {
-                        var k = Random.Shared.Next(numOfQuestions);
-                        quest = -1;
-                        do if (canSelectQuestion[++quest]) k--; while (k >= 0);
+                        var k = Random.Shared.Next(questionCount);
+                        questionIndex = -1;
+                        do if (canSelectQuestion[++questionIndex]) k--; while (k >= 0);
                     }
                 }
             }
@@ -1067,14 +1062,14 @@ internal sealed class PlayerComputerLogic : IPersonLogic
     /// </summary>
     private bool IsCritical()
     {
-        int numQu;
+        int leftQuestionCount;
 
         lock (_data.TInfoLock)
         {
-            numQu = _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
+            leftQuestionCount = _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
         }
 
-        return (numQu <= _account.Nq || GetTimePercentage(0) > 100 - 10 * _account.Nq / 3)
+        return (leftQuestionCount <= _account.Nq || GetTimePercentage(0) > 100 - 10 * _account.Nq / 3)
             && _data.MySum() < _account.Part * _data.BigSum(_viewerActions.Client) / 100;
     }
 

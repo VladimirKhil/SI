@@ -2882,7 +2882,7 @@ public sealed class QDocument : WorkspaceViewModel
                                     }
 
                                     var extensions = MediaOwnerViewModel.RecommendedExtensions[collectionName];
-                                    var extension = System.IO.Path.GetExtension(contentItem.Value);
+                                    var extension = System.IO.Path.GetExtension(contentItem.Value)?.ToLowerInvariant();
 
                                     if (!extensions.Contains(extension))
                                     {

@@ -574,7 +574,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (_data.PackageDoc.HasQualityControl)
         {
-            var fileExtension = Path.GetExtension(contentItem.Value);
+            var fileExtension = Path.GetExtension(contentItem.Value)?.ToLowerInvariant();
 
             if (AllowedExtensions.TryGetValue(contentItem.Type, out var allowedExtensions) && !allowedExtensions.Contains(fileExtension))
             {

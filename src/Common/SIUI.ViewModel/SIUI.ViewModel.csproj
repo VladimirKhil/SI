@@ -16,9 +16,6 @@
     <None Include="key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SIUI.Model\SIUI.Model.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>

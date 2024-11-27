@@ -33,10 +33,6 @@
     <ProjectReference Include="..\SICore.Network\SICore.Network.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Threading.Channels" Version="6.0.0" />
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

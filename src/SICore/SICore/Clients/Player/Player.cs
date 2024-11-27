@@ -4,7 +4,6 @@ using SICore.Network.Clients;
 using SIData;
 using SIPackages.Core;
 using System.Text;
-using R = SICore.Properties.Resources;
 
 namespace SICore;
 
