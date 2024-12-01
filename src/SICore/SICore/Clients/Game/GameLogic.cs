@@ -3889,17 +3889,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / ClientData.StakeStep) * ClientData.StakeStep;
 
             _data.StakeTypes = StakeTypes.AllIn | (_data.StakerIndex == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
-            _data.StakeModes = StakeModes.AllIn;
-
-            if (_data.StakerIndex != -1)
-            {
-                _data.StakeModes |= StakeModes.Pass;
-            }
 
             if (!_data.AllIn && playerMoney >= minimumStakeAligned)
             {
                 _data.StakeTypes |= StakeTypes.Stake;
-                _data.StakeModes |= StakeModes.Stake;
             }
 
             _data.StakeVariants[0] = _data.StakerIndex == -1;
@@ -3949,8 +3942,20 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _gameActions.SendMessage(stakeMsg2.Build(), _data.ShowMan.Name);
             }
 
-            var minimumStakeNew = (_data.Stake != -1 ? _data.Stake + ClientData.StakeStep : cost);
+            var minimumStakeNew = _data.Stake != -1 ? _data.Stake + ClientData.StakeStep : cost;
             var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStakeNew / ClientData.StakeStep) * ClientData.StakeStep;
+            
+            _data.StakeModes = StakeModes.AllIn;
+
+            if (_data.StakerIndex != -1)
+            {
+                _data.StakeModes |= StakeModes.Pass;
+            }
+
+            if (!_data.AllIn && playerMoney >= minimumStakeAlignedNew)
+            {
+                _data.StakeModes |= StakeModes.Stake;
+            }
 
             var stakeLimit = new StakeSettings(minimumStakeAlignedNew, _data.ActivePlayer.Sum, _data.StakeStep);
             AskToMakeStake(StakeReason.HighestPlays, _data.ActivePlayer.Name, stakeLimit);
