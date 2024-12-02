@@ -531,17 +531,17 @@ internal sealed class PlayerComputerLogic : IPersonLogic
             {
                 if (firstSelectionStage)
                 {
-                    for (themeIndex = 0; themeIndex < table.Count; themeIndex++)
+                    for (var i = 0; i < table.Count; i++)
                     {
-                        canSelectTheme[themeIndex] = table[themeIndex].Questions.Any(QuestionHelper.IsActive);
+                        canSelectTheme[i] = table[i].Questions.Any(QuestionHelper.IsActive);
                     }
                 }
                 else
                 {
                     // Theme is already defined
-                    for (questionIndex = 0; questionIndex < table[themeIndex].Questions.Count; questionIndex++)
+                    for (var i = 0; i < table[themeIndex].Questions.Count; i++)
                     {
-                        canSelectQuestion[questionIndex] = table[themeIndex].Questions[questionIndex].IsActive();
+                        canSelectQuestion[i] = table[themeIndex].Questions[i].IsActive();
                     }
                 }
             }
@@ -557,9 +557,9 @@ internal sealed class PlayerComputerLogic : IPersonLogic
                 else
                 {
                     // Question is already defined
-                    for (themeIndex = 0; themeIndex < table.Count; themeIndex++)
+                    for (var i = 0; i < table.Count; i++)
                     {
-                        canSelectTheme[themeIndex] = table[themeIndex].Questions.Count > questionIndex && table[themeIndex].Questions[questionIndex].Price > -1;
+                        canSelectTheme[i] = table[i].Questions.Count > questionIndex && table[i].Questions[questionIndex].Price > -1;
                     }
                 }
             }

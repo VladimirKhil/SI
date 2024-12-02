@@ -24,8 +24,6 @@ public abstract class Data : INotifyPropertyChanged
     /// </summary>
     public TableInfo TInfo { get; } = new();
 
-    public object TInfoLock { get; } = new object();
-
     /// <summary>
     /// Currently played theme index.
     /// </summary>

@@ -1452,6 +1452,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         {
             TInfo.IsEditable = false;
         }
+
+        _gameViewModel.OnIsPausedChanged(isPaused);
     }
 
     public void TableLoaded() => UI.Execute(TableLoadedUI, exc => _data.Host.SendError(exc));
@@ -1495,8 +1497,10 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         
     }
 
-    public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person)
+    public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string? person = null)
     {
+        _gameViewModel.OnTimerChanged(timerIndex, timerCommand, arg);
+
         if (timerIndex == 1 && timerCommand == MessageParams.Timer_Resume)
         {
             TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
@@ -1874,4 +1878,10 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     {
         _gameViewModel.Apellate.CanBeExecuted = false;
     }
+
+    public void OnPersonConnected() => _gameViewModel.UpdateCommands();
+
+    public void OnPersonDisconnected() => _gameViewModel.UpdateCommands();
+
+    public void OnHostChanged() => _gameViewModel.UpdateCommands();
 }

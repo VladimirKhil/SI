@@ -23,12 +23,6 @@ public interface IViewerClient : IActor
 
     string? Avatar { get; set; }
 
-    event Action PersonConnected;
-
-    event Action PersonDisconnected;
-
-    event Action<int, string, string> Timer;
-
     void GetInfo();
 
     void Pause();
@@ -40,10 +34,6 @@ public interface IViewerClient : IActor
     event Action<GameStage> StageChanged;
 
     event Action<string?> Ad;
-
-    event Action<bool> IsPausedChanged;
-
-    event Action IsHostChanged;
 
     void RecreateCommands();
 

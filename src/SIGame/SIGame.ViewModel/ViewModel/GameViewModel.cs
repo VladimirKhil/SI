@@ -41,12 +41,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             {
                 _host.Switch -= Host_Switch;
                 _host.StageChanged -= Host_StageChanged;
-                _host.PersonConnected -= UpdateCommands;
-                _host.PersonDisconnected -= UpdateCommands;
-                _host.IsHostChanged -= UpdateCommands;
-                _host.Timer -= Host_Timer;
                 _host.Ad -= Host_Ad;
-                _host.IsPausedChanged -= Host_IsPausedChanged;
             }
 
             _host = value;
@@ -55,12 +50,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             {
                 _host.Switch += Host_Switch;
                 _host.StageChanged += Host_StageChanged;
-                _host.PersonConnected += UpdateCommands;
-                _host.PersonDisconnected += UpdateCommands;
-                _host.IsHostChanged += UpdateCommands;
-                _host.Timer += Host_Timer;
                 _host.Ad += Host_Ad;
-                _host.IsPausedChanged += Host_IsPausedChanged;
             }
         }
     }
@@ -956,11 +946,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         if (avatarUri != null)
         {
-            Host.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, avatarUri);
+            Host?.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, avatarUri);
         }
     }
 
-    private void DeleteVideoAvatar_Executed(object? arg) => Host.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, "");
+    private void DeleteVideoAvatar_Executed(object? arg) => Host?.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, "");
 
     private void UpdateCurrentPlayerCommands()
     {
@@ -976,13 +966,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Kick.CanBeExecuted = Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = Host.IsHost;
     }
 
-    private void FreeTable_Executed(object? arg) => Host.MyData.CurrentPerson?.Free.Execute(arg);
+    private void FreeTable_Executed(object? arg) => Host?.MyData.CurrentPerson?.Free.Execute(arg);
 
-    private void DeleteTable_Executed(object? arg) => ((PlayerAccount?)Host.MyData.CurrentPerson)?.Delete.Execute(arg);
+    private void DeleteTable_Executed(object? arg) => ((PlayerAccount?)Host?.MyData.CurrentPerson)?.Delete.Execute(arg);
 
-    private void ChangeType_Executed(object? arg) => Host.MyData.CurrentPerson?.ChangeType.Execute(arg);
+    private void ChangeType_Executed(object? arg) => Host?.MyData.CurrentPerson?.ChangeType.Execute(arg);
 
-    private void Replace_Executed(object? arg) => Host.MyData.CurrentPerson?.Replace.Execute(arg);
+    private void Replace_Executed(object? arg) => Host?.MyData.CurrentPerson?.Replace.Execute(arg);
 
     private void OpenLink_Executed(object? arg)
     {
@@ -1018,7 +1008,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Host?.MyLogic.ReloadMedia();
     }
 
-    private void Host_IsPausedChanged(bool isPaused) => IsPaused = isPaused;
+    public void OnIsPausedChanged(bool isPaused) => IsPaused = isPaused;
 
     private void Server_Reconnected()
     {
@@ -1044,7 +1034,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     private void GameViewModel_TimeChanged(IAnimatableTimer timer) =>
         TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
 
-    private void Host_Timer(int timerIndex, string timerCommand, string arg)
+    public void OnTimerChanged(int timerIndex, string timerCommand, string arg)
     {
         var timer = Timers[timerIndex];
 
@@ -1085,7 +1075,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private void UpdateCommands()
+    public void UpdateCommands()
     {
         IsShowman = Host?.Role == GameRole.Showman;
         Move.CanBeExecuted = Data.Stage != GameStage.Before && (Host != null && Host.IsHost || IsShowman);
@@ -1107,7 +1097,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         OnPropertyChanged(nameof(TInfo));
     }
 
-    private void Move_Executed(object? arg) => Host.Move(arg);
+    private void Move_Executed(object? arg) => Host?.Move(arg);
 
     private void Cancel_Executed(object? arg)
     {
@@ -1115,7 +1105,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Hint = "";
     }
 
-    private void ChangePauseInGame_Executed(object? arg) => Host.Pause();
+    private void ChangePauseInGame_Executed(object? arg) => Host?.Pause();
 
     private void EndGame_Executed(object? arg) => GameEnded?.Invoke();
 
@@ -1189,7 +1179,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         await Task.Delay(2000, cancellationToken);
 
-        Host.AddLog($"IP:\n{string.Join("\n", ips)}");
+        Host?.AddLog($"IP:\n{string.Join("\n", ips)}");
     }
 
     public async ValueTask DisposeAsync()

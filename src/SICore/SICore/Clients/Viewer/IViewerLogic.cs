@@ -127,7 +127,7 @@ public interface IViewerLogic : ILogic
 
     void OnTimeChanged();
 
-    void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person);
+    void OnTimerChanged(int timerIndex, string timerCommand, string arg, string? person = null);
 
     void OnPersonFinalStake(int playerIndex);
 
@@ -279,4 +279,10 @@ public interface IViewerLogic : ILogic
     void OnGameClosed() { }
 
     void OnCanPressButton() { }
+
+    void OnPersonConnected() { }
+
+    void OnPersonDisconnected() { }
+
+    void OnHostChanged() { }
 }

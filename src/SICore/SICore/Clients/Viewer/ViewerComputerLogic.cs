@@ -192,7 +192,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person)
+    public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string? person = null)
     {
         switch (timerCommand)
         {

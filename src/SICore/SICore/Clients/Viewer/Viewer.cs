@@ -26,8 +26,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     public ViewerActions Actions => _viewerActions;
 
-    public event Action? IsHostChanged;
-
     public virtual GameRole Role => GameRole.Viewer;
 
     private bool _isHost;
@@ -44,13 +42,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             if (_isHost != value)
             {
                 _isHost = value;
-                IsHostChanged?.Invoke();
-
-                foreach (var account in MyData.MainPersons)
-                {
-                    account.IsExtendedMode = IsHost;
-                }
-
+                _logic.OnHostChanged();
                 OnPropertyChanged();
             }
         }
@@ -61,15 +53,11 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
     public event Action<IViewerClient>? Switch;
     public event Action<GameStage>? StageChanged;
     public event Action<string?>? Ad;
-    public event Action<bool>? IsPausedChanged;
 
     public ViewerData MyData => ClientData;
 
     public string? Avatar { get; set; }
 
-    public event Action? PersonConnected;
-    public event Action? PersonDisconnected;
-    public event Action<int, string, string>? Timer;
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void Initialize(bool isHost)
@@ -196,46 +184,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             switch (mparams[0])
             {
                 case Messages.Connected:
-                    #region Connected
-                    {
-                        if (mparams[3] == _client.Name)
-                        {
-                            return;
-                        }
-
-                        var role = mparams[1];
-
-                        if (role != Constants.Showman && role != Constants.Player && role != Constants.Viewer)
-                        {
-                            return;
-                        }
-
-                        if (!_client.Node.IsMain)
-                        {
-                            await _client.Node.ConnectionsLock.WithLockAsync(() =>
-                            {
-                                var currentConnection = ((ISecondaryNode)_client.Node).HostServer;
-
-                                if (currentConnection != null)
-                                {
-                                    lock (currentConnection.ClientsSync)
-                                    {
-                                        currentConnection.Clients.Add(mparams[3]);
-                                    }
-                                }
-                            });
-                        }
-
-                        var account = new Account(mparams[3], mparams[4] == "m");
-                        _ = int.TryParse(mparams[2], out var index);
-
-                        InsertPerson(role, account, index);
-
-                        PersonConnected?.Invoke();
-
-                        break;
-                    }
-                    #endregion
+                    await OnConnectedAsync(mparams);
+                    break;
 
                 case SystemMessages.Disconnect:
                     {
@@ -391,19 +341,14 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                         var isPaused = mparams[1] == "+";
                         _logic.OnPauseChanged(isPaused);
-                        IsPausedChanged?.Invoke(isPaused);
 
                         if (mparams.Length > 4)
                         {
                             var message = ClientData.TInfo.Pause ? MessageParams.Timer_UserPause : MessageParams.Timer_UserResume;
 
-                            _logic.OnTimerChanged(0, message, mparams[2], null);
-                            _logic.OnTimerChanged(1, message, mparams[3], null);
-                            _logic.OnTimerChanged(2, message, mparams[4], null);
-                            
-                            Timer?.Invoke(0, message, mparams[2]);
-                            Timer?.Invoke(1, message, mparams[3]);
-                            Timer?.Invoke(2, message, mparams[4]);
+                            _logic.OnTimerChanged(0, message, mparams[2]);
+                            _logic.OnTimerChanged(1, message, mparams[3]);
+                            _logic.OnTimerChanged(2, message, mparams[4]);
                         }
 
                         break;
@@ -531,11 +476,18 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
                 case Messages.Timer:
                     {
-                        var timerIndex = int.Parse(mparams[1]);
+                        if (!int.TryParse(mparams[1], out var timerIndex) || timerIndex < 0 || timerIndex > 2)
+                        {
+                            return;
+                        }
+
                         var timerCommand = mparams[2];
 
-                        _logic.OnTimerChanged(timerIndex, timerCommand, mparams.Length > 3 ? mparams[3] : null, mparams.Length > 4 ? mparams[4] : null);
-                        Timer?.Invoke(timerIndex, timerCommand, mparams.Length > 3 ? mparams[3] : null);
+                        _logic.OnTimerChanged(
+                            timerIndex,
+                            timerCommand,
+                            mparams.Length > 3 ? mparams[3] : "",
+                            mparams.Length > 4 ? mparams[4] : null);
 
                         break;
                     }
@@ -728,31 +680,27 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         #endregion
                         break;
                     }
-                case Messages.EndTry:
-                    {
-                        #region EndTry
 
+                case Messages.EndTry:
+                    if (mparams.Length > 1)
+                    {
                         if (mparams[1] == MessageParams.EndTry_All)
                         {
-                            _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "", null);
-                            Timer?.Invoke(1, MessageParams.Timer_Stop, "");
+                            _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "");
                         }
 
                         _logic.EndTry(mparams[1]);
-
-                        #endregion
-                        break;
                     }
+                    break;
 
                 case Messages.StopPlay:
                     _logic.OnStopPlay();
                     break;
 
                 case Messages.WrongTry:
-                    {
-                        OnWrongTry(mparams);
-                        break;
-                    }
+                    OnWrongTry(mparams);
+                    break;
+
                 case Messages.Person:
                     {
                         #region Person
@@ -824,24 +772,15 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     break;
 
                 case Messages.Stop:
-                    {
-                        #region Stop
+                    _logic.StopRound();
 
-                        _logic.StopRound();
+                    _logic.OnTimerChanged(0, MessageParams.Timer_Stop, "");
+                    _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "");
+                    _logic.OnTimerChanged(2, MessageParams.Timer_Stop, "");
 
-                        _logic.OnTimerChanged(0, MessageParams.Timer_Stop, "", null);
-                        _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "", null);
-                        _logic.OnTimerChanged(2, MessageParams.Timer_Stop, "", null);
+                    OnAd();
+                    break;
 
-                        Timer?.Invoke(0, MessageParams.Timer_Stop, "");
-                        Timer?.Invoke(1, MessageParams.Timer_Stop, "");
-                        Timer?.Invoke(2, MessageParams.Timer_Stop, "");
-
-                        OnAd();
-
-                        #endregion
-                        break;
-                    }
                 case Messages.FinalRound:
                     {
                         #region FinalRound
@@ -941,6 +880,43 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private async ValueTask OnConnectedAsync(string[] mparams)
+    {
+        if (mparams.Length < 5 || mparams[3] == _client.Name)
+        {
+            return;
+        }
+
+        var role = mparams[1];
+
+        if (role != Constants.Showman && role != Constants.Player && role != Constants.Viewer)
+        {
+            return;
+        }
+
+        if (!_client.Node.IsMain) // TODO: this should be handled on node level
+        {
+            await _client.Node.ConnectionsLock.WithLockAsync(() =>
+            {
+                var currentConnection = ((ISecondaryNode)_client.Node).HostServer;
+
+                if (currentConnection != null)
+                {
+                    lock (currentConnection.ClientsSync)
+                    {
+                        currentConnection.Clients.Add(mparams[3]);
+                    }
+                }
+            });
+        }
+
+        var account = new Account(mparams[3], mparams[4] == "m");
+        _ = int.TryParse(mparams[2], out var connectedIndex);
+
+        InsertPerson(role, account, connectedIndex);
+        _logic.OnPersonConnected();
     }
 
     private void OnPlayerState(string[] mparams)
@@ -1211,7 +1187,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             }
         }
 
-        if (!_client.Node.IsMain)
+        if (!_client.Node.IsMain) // TODO: this should be handled on node level
         {
             await _client.Node.ConnectionsLock.WithLockAsync(() =>
             {
@@ -1230,7 +1206,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             });
         }
 
-        PersonDisconnected?.Invoke();
+        _logic.OnPersonDisconnected();
     }
 
     private void OnAd(string? text = null) => Ad?.Invoke(text);
@@ -1383,8 +1359,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             var account = new PlayerAccount(mparams[2], mparams[3] == "+", mparams[4] == "+", ClientData.Stage != GameStage.Before)
             {
                 IsHuman = mparams[5] == "+",
-                Ready = mparams[6] == "+",
-                IsExtendedMode = IsHost
+                Ready = mparams[6] == "+"
             };
 
             CreatePlayerCommands(account);
@@ -1887,7 +1862,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         viewer.Init();
 
-        Dispose();
+        Dispose(); // TODO: do not dispose anything here
 
         viewer.RecreateCommands();
 
@@ -1970,17 +1945,12 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             CreatePlayerCommands(account);
         }
 
-        foreach (var account in MyData.MainPersons)
-        {
-            account.IsExtendedMode = IsHost;
-        }
-
         if (ClientData.Me != null)
         {
             ClientData.Me.Picture = ClientData.Picture;
         }
 
-        if (!_client.Node.IsMain)
+        if (!_client.Node.IsMain) // TODO: this should be handled on node level
         {
             foreach (var item in ClientData.AllPersons.Values)
             {
@@ -2099,8 +2069,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                         IsConnected = true,
                         Ready = false,
                         GameStarted = ClientData.Stage != GameStage.Before,
-                        IsShowman = true,
-                        IsExtendedMode = IsHost
+                        IsShowman = true
                     };
 
                     CreateShowmanCommands();
@@ -2118,8 +2087,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             ClientData.Stage != GameStage.Before)
                         {
                             IsHuman = true,
-                            Ready = false,
-                            IsExtendedMode = IsHost
+                            Ready = false
                         };
 
                         CreatePlayerCommands(p);

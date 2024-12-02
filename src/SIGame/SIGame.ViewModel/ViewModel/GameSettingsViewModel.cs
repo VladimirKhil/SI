@@ -4,7 +4,6 @@ using SI.GameServer.Contract;
 using SICore;
 using SICore.BusinessLogic;
 using SICore.Clients;
-using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;

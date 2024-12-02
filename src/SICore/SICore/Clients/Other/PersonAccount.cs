@@ -119,21 +119,6 @@ public class PersonAccount : ViewerAccount
 
     public bool IsShowman { get; set; }
 
-    private bool isExtendedMode = false;
-
-    public bool IsExtendedMode
-    {
-        get { return isExtendedMode; }
-        set
-        {
-            if (isExtendedMode != value)
-            {
-                isExtendedMode = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     private bool _isDeciding;
 
     public bool IsDeciding
