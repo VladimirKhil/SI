@@ -11,7 +11,7 @@ using R = SICore.Properties.Resources;
 namespace SICore;
 
 /// <summary>
-/// Логика игрока-компьютера
+/// Defines a player computer logic.
 /// </summary>
 internal sealed class PlayerComputerLogic : IPersonLogic
 {
@@ -26,9 +26,8 @@ internal sealed class PlayerComputerLogic : IPersonLogic
     private int _themeQuestionCount = -1;
 
     /// <summary>
-    /// Создание логики
+    /// Initializes a new instance of the <see cref="PlayerComputerLogic"/> class.
     /// </summary>
-    /// <param name="client">Текущий клиент</param>
     public PlayerComputerLogic(ViewerData data, ComputerAccount account, ViewerActions viewerActions, TimerInfo[] timerInfos)
     {
         _account = account;
@@ -37,6 +36,7 @@ internal sealed class PlayerComputerLogic : IPersonLogic
         _timersInfo = timerInfos;
     }
 
+    // TODO: Switch to TaskRunner and support task cancellation
     private async void ScheduleExecution(PlayerTasks task, double taskTime)
     {
         await Task.Delay((int)taskTime * 100);
@@ -476,32 +476,20 @@ internal sealed class PlayerComputerLogic : IPersonLogic
         var themeIndex = -1;
         var questionIndex = -1;
 
-        int pSelectByThemeIndex = _account.V1,
-            pSelectLowerPrice = _account.V4,
-            pSelectHigherPrice = _account.V5,
-            pSelectExactPrice = _account.V6,
-            pSelectByQuestionPriority = _account.V7;
-        
-        var questionIndiciesPriority = _account.P2;
-        var pSelectPreviousTheme = _account.V2;
-        var themeIndiciesPriority = _account.P1;
+        var pSelectByThemeIndex = _account.V1;
 
         if (_account.Style == PlayerStyle.Agressive && _data.MySum() < 2 * _data.BigSum(_viewerActions.Client))
         {
-            pSelectByThemeIndex = pSelectLowerPrice = pSelectHigherPrice = pSelectExactPrice = 0;
-            pSelectByQuestionPriority = 100;
+            pSelectByThemeIndex = 0;
         }
         else if (_account.Style == PlayerStyle.Normal && _data.MySum() < _data.BigSum(_viewerActions.Client))
         {
-            pSelectByThemeIndex = pSelectLowerPrice = pSelectHigherPrice = pSelectExactPrice = 0;
-            pSelectByQuestionPriority = 80;
+            pSelectByThemeIndex = 0;
         }
 
         if (IsCritical())
         {
-            pSelectByThemeIndex = pSelectLowerPrice = pSelectHigherPrice = pSelectExactPrice = 0;
-            pSelectByQuestionPriority = 100;
-            questionIndiciesPriority = "54321".ToCharArray();
+            pSelectByThemeIndex = 0;
         }
 
         var r = Random.Shared.Next(101);
@@ -523,198 +511,225 @@ internal sealed class PlayerComputerLogic : IPersonLogic
 
         var canSelectTheme = new bool[table.Count];
         var canSelectQuestion = new bool[maxQuestionCount];
-        var firstSelectionStage = true;
 
-        for (var stage = 0; stage < 2; stage++, firstSelectionStage = !firstSelectionStage)
+        if (selectByThemeIndex)
         {
-            if (selectByThemeIndex)
+            for (var i = 0; i < table.Count; i++)
             {
-                if (firstSelectionStage)
-                {
-                    for (var i = 0; i < table.Count; i++)
-                    {
-                        canSelectTheme[i] = table[i].Questions.Any(QuestionHelper.IsActive);
-                    }
-                }
-                else
-                {
-                    // Theme is already defined
-                    for (var i = 0; i < table[themeIndex].Questions.Count; i++)
-                    {
-                        canSelectQuestion[i] = table[themeIndex].Questions[i].IsActive();
-                    }
-                }
-            }
-            else
-            {
-                if (firstSelectionStage)
-                {
-                    for (var i = 0; i < canSelectQuestion.Length; i++)
-                    {
-                        canSelectQuestion[i] = table.Any(theme => theme.Questions.Count > i && theme.Questions[i].IsActive());
-                    }
-                }
-                else
-                {
-                    // Question is already defined
-                    for (var i = 0; i < table.Count; i++)
-                    {
-                        canSelectTheme[i] = table[i].Questions.Count > questionIndex && table[i].Questions[questionIndex].Price > -1;
-                    }
-                }
+                canSelectTheme[i] = table[i].Questions.Any(QuestionHelper.IsActive);
             }
 
-            if (selectByThemeIndex && firstSelectionStage || !selectByThemeIndex && !firstSelectionStage)
+            themeIndex = SelectThemeIndex(canSelectTheme, _data.ThemeIndex);
+
+            for (var i = 0; i < canSelectQuestion.Length; i++)
             {
-                // Theme selection
-                var themeCount = canSelectTheme.Count(can => can);
-
-                if (themeCount == 1)
-                {
-                    // Single theme is available
-                    themeIndex = Array.FindIndex(canSelectTheme, can => can);
-                }
-                else
-                {
-                    var canSelectPreviousTheme = false; // Can the previous theme be selected
-
-                    lock (_data.ChoiceLock)
-                    {
-                        if (_data.ThemeIndex > -1 && _data.ThemeIndex < canSelectTheme.Length && canSelectTheme[_data.ThemeIndex])
-                        {
-                            canSelectPreviousTheme = true;
-                        }
-
-                        r = canSelectPreviousTheme ? Random.Shared.Next(100) : pSelectPreviousTheme + Random.Shared.Next(100 - pSelectPreviousTheme);
-
-                        if (r < pSelectPreviousTheme)
-                        {
-                            themeIndex = _data.ThemeIndex;
-                        }
-                        else if (r < pSelectPreviousTheme + _account.V3)
-                        {
-                            // Selecting a theme according to the priority
-                            for (var k = 0; k < themeIndiciesPriority.Length; k++)
-                            {
-                                var index = themeIndiciesPriority[k] - '0' - 1;
-
-                                if (index > -1 && index < canSelectTheme.Length && canSelectTheme[index])
-                                {
-                                    themeIndex = index;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (themeIndex == -1)
-                        {
-                            var k = Random.Shared.Next(themeCount);
-                            themeIndex = -1;
-                            
-                            do {
-                                themeIndex++;
-
-                                if (themeIndex < canSelectTheme.Length && canSelectTheme[themeIndex])
-                                {
-                                    k--;
-                                }
-                            } while (k >= 0);
-                        }
-                    }
-                }
-
-                if (themeIndex < 0 || themeIndex >= canSelectTheme.Length || !canSelectTheme[themeIndex])
-                {
-                    throw new InvalidOperationException($"Theme index was not defined correctly: {themeIndex} of {canSelectTheme.Length}");
-                }
+                canSelectQuestion[i] = i < table[themeIndex].Questions.Count && table[themeIndex].Questions[i].IsActive();
             }
-            else
+
+            questionIndex = SelectQuestionIndex(canSelectQuestion, _data.QuestionIndex);
+        }
+        else
+        {
+            for (var i = 0; i < canSelectQuestion.Length; i++)
             {
-                // Question selection
-                var questionCount = canSelectQuestion.Count(can => can);
-
-                if (questionCount == 1)
-                {
-                    // Single question is available
-                    questionIndex = Array.FindIndex(canSelectQuestion, can => can);
-                }
-                else
-                {
-                    bool canSelectLowerPrice = false, canSelectHigherPrice = false, canSelectExactPrice = false;
-                    int lowerPriceCount = 0, higherPriceCount = 0;
-
-                    if (_data.QuestionIndex != -1)
-                    {
-                        for (int k = 0; k < canSelectQuestion.Length; k++)
-                        {
-                            if (canSelectQuestion[k])
-                            {
-                                if (k < _data.QuestionIndex) { canSelectLowerPrice = true; lowerPriceCount++; }
-                                else if (k == _data.QuestionIndex) canSelectExactPrice = true;
-                                else { canSelectHigherPrice = true; higherPriceCount++; }
-                            }
-                        }
-                    }
-
-                    var maxr = 100;
-
-                    if (!canSelectLowerPrice) maxr -= pSelectLowerPrice;
-                    if (!canSelectHigherPrice) maxr -= pSelectHigherPrice;
-                    if (!canSelectExactPrice) maxr -= pSelectExactPrice;
-
-                    r = Random.Shared.Next(maxr);
-                    
-                    if (!canSelectLowerPrice) r += pSelectLowerPrice;
-                    if (!canSelectHigherPrice && r >= pSelectLowerPrice) r += pSelectHigherPrice;
-                    if (!canSelectExactPrice && r >= pSelectLowerPrice + pSelectHigherPrice) r += pSelectExactPrice;
-
-                    if (r < pSelectLowerPrice)
-                    {
-                        var k = Random.Shared.Next(lowerPriceCount);
-                        questionIndex = Math.Min(_data.QuestionIndex, canSelectQuestion.Length);
-                        do if (canSelectQuestion[--questionIndex]) k--; while (k >= 0);
-                    }
-                    else if (r < pSelectLowerPrice + pSelectHigherPrice)
-                    {
-                        var k = Random.Shared.Next(higherPriceCount);
-                        questionIndex = Math.Max(_data.QuestionIndex, -1);
-                        do if (canSelectQuestion[++questionIndex]) k--; while (k >= 0);
-                    }
-                    else if (r < pSelectLowerPrice + pSelectHigherPrice + pSelectExactPrice)
-                    {
-                        questionIndex = _data.QuestionIndex;
-                    }
-                    else if (r < pSelectLowerPrice + pSelectHigherPrice + pSelectExactPrice + pSelectByQuestionPriority)
-                    {
-                        // Selecting a question according to the priority
-                        for (var k = 0; k < questionIndiciesPriority.Length; k++)
-                        {
-                            var index = questionIndiciesPriority[k] - '0' - 1;
-                            
-                            if (index > -1 && index < canSelectQuestion.Length && canSelectQuestion[index])
-                            {
-                                questionIndex = index;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (questionIndex == -1)
-                    {
-                        var k = Random.Shared.Next(questionCount);
-                        questionIndex = -1;
-                        do if (canSelectQuestion[++questionIndex]) k--; while (k >= 0);
-                    }
-                }
-
-                if (questionIndex < 0 || questionIndex >= canSelectQuestion.Length || !canSelectQuestion[questionIndex])
-                {
-                    throw new InvalidOperationException($"Question index was not defined correctly: {questionIndex} of {canSelectQuestion.Length}");
-                }
+                canSelectQuestion[i] = table.Any(theme => theme.Questions.Count > i && theme.Questions[i].IsActive());
             }
+
+            questionIndex = SelectQuestionIndex(canSelectQuestion, _data.QuestionIndex);
+
+            for (var i = 0; i < table.Count; i++)
+            {
+                canSelectTheme[i] = table[i].Questions.Count > questionIndex && table[i].Questions[questionIndex].IsActive();
+            }
+
+            themeIndex = SelectThemeIndex(canSelectTheme, _data.ThemeIndex);
         }
 
         return (themeIndex, questionIndex);
+    }
+
+    private int SelectQuestionIndex(bool[] canSelectQuestion, int previousIndex)
+    {
+        // Question selection
+        var questionCount = canSelectQuestion.Count(can => can);
+        var questionIndex = -1;
+
+        int pSelectLowerPrice = _account.V4,
+            pSelectHigherPrice = _account.V5,
+            pSelectExactPrice = _account.V6;
+
+        var pSelectByQuestionPriority = _account.V7;
+
+        var questionIndiciesPriority = _account.P2;
+
+        if (_account.Style == PlayerStyle.Agressive && _data.MySum() < 2 * _data.BigSum(_viewerActions.Client))
+        {
+            pSelectLowerPrice = pSelectHigherPrice = pSelectExactPrice = 0;
+            pSelectByQuestionPriority = 100;
+        }
+        else if (_account.Style == PlayerStyle.Normal && _data.MySum() < _data.BigSum(_viewerActions.Client))
+        {
+            pSelectLowerPrice = pSelectHigherPrice = pSelectExactPrice = 0;
+            pSelectByQuestionPriority = 80;
+        }
+
+        if (IsCritical())
+        {
+            pSelectLowerPrice = pSelectHigherPrice = pSelectExactPrice = 0;
+            pSelectByQuestionPriority = 100;
+            questionIndiciesPriority = "54321".ToCharArray();
+        }
+
+        if (questionCount == 1)
+        {
+            // Single question is available
+            questionIndex = Array.FindIndex(canSelectQuestion, can => can);
+        }
+        else
+        {
+            bool canSelectLowerPrice = false, canSelectHigherPrice = false, canSelectExactPrice = false;
+            int lowerPriceCount = 0, higherPriceCount = 0;
+
+            if (previousIndex != -1)
+            {
+                for (var k = 0; k < canSelectQuestion.Length; k++)
+                {
+                    if (canSelectQuestion[k])
+                    {
+                        if (k < previousIndex) { canSelectLowerPrice = true; lowerPriceCount++; }
+                        else if (k == previousIndex) canSelectExactPrice = true;
+                        else { canSelectHigherPrice = true; higherPriceCount++; }
+                    }
+                }
+            }
+
+            var maxr = 100;
+
+            if (!canSelectLowerPrice) maxr -= pSelectLowerPrice;
+            if (!canSelectHigherPrice) maxr -= pSelectHigherPrice;
+            if (!canSelectExactPrice) maxr -= pSelectExactPrice;
+
+            var r = Random.Shared.Next(maxr);
+
+            if (!canSelectLowerPrice) r += pSelectLowerPrice;
+            if (!canSelectHigherPrice && r >= pSelectLowerPrice) r += pSelectHigherPrice;
+            if (!canSelectExactPrice && r >= pSelectLowerPrice + pSelectHigherPrice) r += pSelectExactPrice;
+
+            if (r < pSelectLowerPrice)
+            {
+                var k = Random.Shared.Next(lowerPriceCount);
+                questionIndex = Math.Min(previousIndex, canSelectQuestion.Length);
+                do if (canSelectQuestion[--questionIndex]) k--; while (k >= 0);
+            }
+            else if (r < pSelectLowerPrice + pSelectHigherPrice)
+            {
+                var k = Random.Shared.Next(higherPriceCount);
+                questionIndex = Math.Max(previousIndex, -1);
+                do if (canSelectQuestion[++questionIndex]) k--; while (k >= 0);
+            }
+            else if (r < pSelectLowerPrice + pSelectHigherPrice + pSelectExactPrice)
+            {
+                questionIndex = previousIndex;
+            }
+            else if (r < pSelectLowerPrice + pSelectHigherPrice + pSelectExactPrice + pSelectByQuestionPriority)
+            {
+                // Selecting a question according to the priority
+                for (var k = 0; k < questionIndiciesPriority.Length; k++)
+                {
+                    var index = questionIndiciesPriority[k] - '0' - 1;
+
+                    if (index > -1 && index < canSelectQuestion.Length && canSelectQuestion[index])
+                    {
+                        questionIndex = index;
+                        break;
+                    }
+                }
+            }
+
+            if (questionIndex == -1)
+            {
+                var k = Random.Shared.Next(questionCount);
+                questionIndex = -1;
+                do if (canSelectQuestion[++questionIndex]) k--; while (k >= 0);
+            }
+        }
+
+        if (questionIndex < 0 || questionIndex >= canSelectQuestion.Length || !canSelectQuestion[questionIndex])
+        {
+            throw new InvalidOperationException($"Question index was not defined correctly: {questionIndex} of {canSelectQuestion.Length}");
+        }
+
+        return questionIndex;
+    }
+
+    private int SelectThemeIndex(bool[] canSelectTheme, int previousIndex)
+    {
+        // Theme selection
+        var themeCount = canSelectTheme.Count(can => can);
+        var themeIndex = -1;
+
+        var pSelectPreviousTheme = _account.V2;
+        var pSelectByThemePriority = _account.V3;
+        var themeIndiciesPriority = _account.P1;
+
+        if (themeCount == 1)
+        {
+            // Single theme is available
+            themeIndex = Array.FindIndex(canSelectTheme, can => can);
+        }
+        else
+        {
+            var canSelectPreviousTheme = false; // Can the previous theme be selected
+
+            if (previousIndex > -1 && previousIndex < canSelectTheme.Length && canSelectTheme[previousIndex])
+            {
+                canSelectPreviousTheme = true;
+            }
+
+            var r = canSelectPreviousTheme ? Random.Shared.Next(100) : pSelectPreviousTheme + Random.Shared.Next(100 - pSelectPreviousTheme);
+
+            if (r < pSelectPreviousTheme)
+            {
+                themeIndex = previousIndex;
+            }
+            else if (r < pSelectPreviousTheme + pSelectByThemePriority)
+            {
+                // Selecting a theme according to the priority
+                for (var k = 0; k < themeIndiciesPriority.Length; k++)
+                {
+                    var index = themeIndiciesPriority[k] - '0' - 1;
+
+                    if (index > -1 && index < canSelectTheme.Length && canSelectTheme[index])
+                    {
+                        themeIndex = index;
+                        break;
+                    }
+                }
+            }
+
+            if (themeIndex == -1)
+            {
+                var k = Random.Shared.Next(themeCount);
+                themeIndex = -1;
+
+                do
+                {
+                    themeIndex++;
+
+                    if (themeIndex < canSelectTheme.Length && canSelectTheme[themeIndex])
+                    {
+                        k--;
+                    }
+                } while (k >= 0);
+            }
+        }
+
+        if (themeIndex < 0 || themeIndex >= canSelectTheme.Length || !canSelectTheme[themeIndex])
+        {
+            throw new InvalidOperationException($"Theme index was not defined correctly: {themeIndex} of {canSelectTheme.Length}");
+        }
+
+        return themeIndex;
     }
 
     internal static int MakeFinalStake(int[] sums, int myIndex, PlayerStyle style)
