@@ -106,6 +106,8 @@ public interface IViewerLogic : ILogic
     /// </summary>
     void FinalThink();
 
+    void OnAd(string? text = null) { }
+
     /// <summary>
     /// Обновление изображения
     /// </summary>
@@ -161,7 +163,7 @@ public interface IViewerLogic : ILogic
 
     void RemovePlayerAt(int index) { }
 
-    void ResetPlayers() { }
+    void OnInfo() { }
 
     void OnAnswerOptions(bool questionHasScreenContent, IEnumerable<string> optionsTypes) { }
 
@@ -285,4 +287,10 @@ public interface IViewerLogic : ILogic
     void OnPersonDisconnected() { }
 
     void OnHostChanged() { }
+
+    void OnPersonStake() { }
+
+    void OnClientSwitch(IViewerClient viewer) { }
+
+    void DeleteTheme();
 }

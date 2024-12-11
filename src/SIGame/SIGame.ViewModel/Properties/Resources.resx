@@ -280,7 +280,7 @@
     <value>A user with such name is already on the server</value>
   </data>
   <data name="OpenLogsError" xml:space="preserve">
-    <value>Log folder opening error</value>
+    <value>Log folder opening error: {0}</value>
   </data>
   <data name="PackageCheck" xml:space="preserve">
     <value>Checking the pack...</value>

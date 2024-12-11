@@ -396,7 +396,7 @@
             Margin="0,8"
             x:Name="gameButton"
             Style="{StaticResource GameButton}"
-            Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}"
+            Visibility="{Binding IsPlayer, Converter={StaticResource BooleanToVisibilityConverter1}}"
             Command="{Binding PressGameButton}" />
 
         <Border Grid.Row="2" Grid.ColumnSpan="3" Margin="6" Name="gameBorder" Visibility="Hidden" CornerRadius="20" Opacity="0">
@@ -415,7 +415,7 @@
             Cursor="Hand"
             Margin="0,8"
             Style="{StaticResource PassButton}"
-            Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}"
+            Visibility="{Binding IsPlayer, Converter={StaticResource BooleanToVisibilityConverter1}}"
             Command="{Binding Pass}"
             ToolTip="{x:Static lp:Resources.Pass}" />
 

@@ -162,43 +162,11 @@
             Style="{StaticResource ReadyStyle}"
             Margin="3,2"
             Visibility="{Binding GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=True}">
-            <DockPanel>
-                <Button
-                    DockPanel.Dock="Right"
-                    Style="{StaticResource UnReadyButton}"
-                    Padding="5"
-                    Margin="0"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"
-                    ToolTip="{x:Static lp:Resources.CancelReady}"
-                    Width="{Binding RelativeSource={RelativeSource Self},Path=ActualHeight}"
-                    Command="{Binding BeUnReadyCommand}"
-                    Background="#AA555555">
-                    <Button.ContentTemplate>
-                        <DataTemplate>
-                            <Path Data="M0,0L1,1M0,1L1,0" Stretch="Fill" Stroke="{StaticResource MainColor}" />
-                        </DataTemplate>
-                    </Button.ContentTemplate>
-                </Button>
-                
-                <ContentControl>
-                    <TextBlock
-                        Style="{StaticResource PersonTextStyle}"
-                        Text="{Binding IsMale,ConverterParameter=Ready,Converter={StaticResource SexConverter}}"
-                        uib:FillManager.Fill="True" />
-                </ContentControl>
-            </DockPanel>
+            <TextBlock
+                Style="{StaticResource PersonTextStyle}"
+                Text="{Binding IsMale,ConverterParameter=Ready,Converter={StaticResource SexConverter}}"
+                uib:FillManager.Fill="True" />
         </Border>
-
-        <Button
-            Grid.Row="2"
-            Grid.ColumnSpan="3"
-            FontSize="25"
-            Style="{StaticResource ReadyButton}"
-            Padding="0"
-            Command="{Binding BeReadyCommand}"
-            Background="#AA555555"
-            Content="{Binding IsMale,ConverterParameter=Ready,Converter={StaticResource SexConverter}}" />
 
         <Canvas>
             <Border

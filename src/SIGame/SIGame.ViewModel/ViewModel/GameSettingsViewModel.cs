@@ -787,7 +787,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         if (!NetworkGame)
         {
             host.MyData.IsChatOpened = false;
-            host.MyData.AutoReady = true;
         }
 
         MoveToGame(gameViewModel, (ViewerHumanLogic)host.MyLogic);

@@ -136,7 +136,7 @@ public class MainTest
 
         if (gameRole != GameRole.Viewer)
         {
-            ((PersonAccount)game.Data.Me).BeReadyCommand.Execute(null);
+            game.Ready.Execute(null);
         }
 
         if (packageSourceType == PackageSourceTypes.Local) // One mode check is enough

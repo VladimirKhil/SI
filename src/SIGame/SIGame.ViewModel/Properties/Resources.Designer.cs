@@ -979,7 +979,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Log folder opening error.
+        ///   Ищет локализованную строку, похожую на Log folder opening error: {0}.
         /// </summary>
         public static string OpenLogsError {
             get {

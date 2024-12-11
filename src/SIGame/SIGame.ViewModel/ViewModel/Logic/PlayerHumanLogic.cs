@@ -2,7 +2,6 @@
 using SIGame.ViewModel;
 using SIGame.ViewModel.Models;
 using SIUI.ViewModel;
-using System.Diagnostics;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -10,6 +9,7 @@ namespace SICore;
 /// <summary>
 /// Логика игрока-человека
 /// </summary>
+[Obsolete]
 internal sealed class PlayerHumanLogic : IPersonLogic
 {
     private readonly ViewerActions _viewerActions;
@@ -32,9 +32,6 @@ internal sealed class PlayerHumanLogic : IPersonLogic
         TInfo = tableInfoViewModel;
         _gameViewModel = gameViewModel;
         _localizer = localizer;
-
-        TInfo.SelectQuestion.CanBeExecuted = false;
-        TInfo.SelectTheme.CanBeExecuted = false;
     }
 
     #region PlayerInterface Members
@@ -70,17 +67,6 @@ internal sealed class PlayerHumanLogic : IPersonLogic
         _data.Host.OnFlash();
     }
 
-    public void ChooseFinalTheme()
-    {
-        _data.ThemeIndex = -1;
-
-        TInfo.Selectable = true;
-        TInfo.SelectTheme.CanBeExecuted = true;
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectTheme)];
-
-        _data.Host.OnFlash();
-    }
-
     public void FinalStake()
     {
         _gameViewModel.Hint = _localizer[nameof(R.HintMakeAStake)];
@@ -98,24 +84,4 @@ internal sealed class PlayerHumanLogic : IPersonLogic
     }
 
     #endregion
-
-    private async void Greet()
-    {
-        try
-        {
-            await Task.Delay(2000);
-
-            _data.OnAddString(null, string.Format(_viewerActions.LO[nameof(R.Hint)], _data.Host.GameButtonKey), LogMode.Log);
-            _data.OnAddString(null, _viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine, LogMode.Log);
-        }
-        catch (ObjectDisposedException)
-        {
-        }
-        catch (Exception exc)
-        {
-            Trace.TraceError("Greet error: " + exc);
-        }
-    }
-
-    public void OnInitialized() => Greet();
 }

@@ -69,21 +69,6 @@ public sealed class ViewerData : Data
     /// </summary>
     internal string Picture { get; set; }
 
-    private bool _isPlayer;
-
-    public bool IsPlayer
-    {
-        get => _isPlayer;
-        set
-        {
-            if (_isPlayer != value)
-            {
-                _isPlayer = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     public string Sound { set => Host.PlaySound(value); }
 
     internal bool FalseStart { get; set; } = true;
@@ -202,6 +187,8 @@ public sealed class ViewerData : Data
         {
             throw new Exception($"!AllPersons.ContainsKey({Name})! {string.Join(",", AllPersons.Keys)} {PersonsUpdateHistory}");
         }
+
+        OnPropertyChanged(nameof(Me));
     }
 
     public void OnMainPersonsChanged()
@@ -332,18 +319,6 @@ public sealed class ViewerData : Data
 
     public override void OnAddString(string? person, string text, LogMode mode) => StringAdding?.Invoke(person, text, mode);
 
-    private bool _autoReady = false;
-
-    public bool AutoReady
-    {
-        get => _autoReady;
-        set
-        {
-            _autoReady = value;
-            OnAutoReadyChanged();
-        }
-    }
-
     public string PackageId { get; internal set; }
 
     public int ButtonBlockingTime { get; internal set; } = 3;
@@ -453,8 +428,4 @@ public sealed class ViewerData : Data
     }
 
     public bool IsAnswer { get; set; }
-
-    internal event Action? AutoReadyChanged;
-
-    private void OnAutoReadyChanged() => AutoReadyChanged?.Invoke();
 }

@@ -10,15 +10,11 @@ namespace SICore;
 /// </summary>
 public sealed class Showman : Viewer
 {
-    private readonly object _readyLock = new();
-
     public override GameRole Role => GameRole.Showman;
 
     public Showman(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
     {
-        ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
-
         ClientData.PersonDataExtensions.AreAnswersShown = data.Host.AreAnswersShown;
         ClientData.PropertyChanged += ClientData_PropertyChanged;
 
@@ -37,41 +33,6 @@ public sealed class Showman : Viewer
         }
     }
 
-    private void ClientData_AutoReadyChanged()
-    {
-        lock (_readyLock)
-        {
-            if (ClientData.Me == null)
-            {
-                return;
-            }
-
-            var readyCommand = ((PersonAccount)ClientData.Me).BeReadyCommand;
-
-            if (ClientData.AutoReady && readyCommand != null)
-            {
-                readyCommand.Execute(null);
-            }
-        }
-    }
-
-    public override void Init()
-    {
-        base.Init();
-
-        lock (_readyLock)
-        {
-            var readyCommand = ((PersonAccount)ClientData.Me).BeReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready));
-            ((PersonAccount)ClientData.Me).BeUnReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready, "-"));
-            _logic.ShowmanLogic.OnInitialized();
-
-            if (ClientData.AutoReady)
-            {
-                readyCommand.Execute(null);
-            }
-        }
-    }
-
     /// <summary>
     /// Получение сообщения
     /// </summary>
@@ -83,10 +44,6 @@ public sealed class Showman : Viewer
         {
             switch (mparams[0])
             {
-                case Messages.Info2:
-                    Init();
-                    break;
-
                 case Messages.Cancel:                     
                     ClearSelections(true);
                     break;
@@ -178,7 +135,7 @@ public sealed class Showman : Viewer
                     }
                     else
                     {
-                        _logic.ShowmanLogic.ChooseFinalTheme();
+                        _logic.DeleteTheme();
                     }
 
                     #endregion

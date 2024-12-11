@@ -1,4 +1,5 @@
-﻿using SICore.Models;
+﻿using SICore.Contracts;
+using SICore.Models;
 using SIData;
 using SIPackages;
 
@@ -24,13 +25,13 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     private readonly GameRole _role;
 
-    internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount, GameRole role)
+    internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount, IIntelligence intelligence, GameRole role)
         : base(data)
     {
         _viewerActions = viewerActions;
         _role = role;
 
-        _player = new PlayerComputerLogic(data, computerAccount, viewerActions, _timersInfo);
+        _player = new PlayerComputerLogic(data, computerAccount, intelligence, viewerActions, _timersInfo);
         _showman = new ShowmanComputerLogic(data, viewerActions, computerAccount);
     }
 
@@ -103,10 +104,10 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     public void Choice()
     {
         lock (_data.ChoiceLock)
-        lock (_data.TInfoLock)
-        {
-            _data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = Question.InvalidPrice;
-        }
+            lock (_data.TInfoLock)
+            {
+                _data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = Question.InvalidPrice;
+            }
     }
 
     public void OnRightAnswer(string answer) { }
@@ -136,10 +137,10 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     public void Out(int themeIndex)
     {
         lock (_data.ChoiceLock)
-        lock (_data.TInfoLock)
-        {
-            _data.TInfo.RoundInfo[themeIndex].Name = null;
-        }
+            lock (_data.TInfoLock)
+            {
+                _data.TInfo.RoundInfo[themeIndex].Name = null;
+            }
     }
 
     public void TimeOut()
@@ -184,7 +185,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public void PrintGreeting()
     {
-        
+
     }
 
     public void OnTimeChanged()
@@ -239,7 +240,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
                 var now2 = DateTime.UtcNow;
                 _timersInfo[timerIndex].EndTime = now2.AddMilliseconds((_timersInfo[timerIndex].MaxTime - _timersInfo[timerIndex].PauseTime) * 100);
                 _timersInfo[timerIndex].StartTime = _timersInfo[timerIndex].EndTime.AddMilliseconds(-_timersInfo[timerIndex].MaxTime * 100);
-                
+
                 break;
 
             case MessageParams.Timer_UserResume:
@@ -253,7 +254,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
                 var now3 = DateTime.UtcNow;
                 _timersInfo[timerIndex].EndTime = now3.AddMilliseconds((_timersInfo[timerIndex].MaxTime - _timersInfo[timerIndex].PauseTime) * 100);
                 _timersInfo[timerIndex].StartTime = _timersInfo[timerIndex].EndTime.AddMilliseconds(-_timersInfo[timerIndex].MaxTime * 100);
-                
+
                 break;
 
             case MessageParams.Timer_MaxTime:
@@ -265,27 +266,27 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public void OnPersonFinalStake(int playerIndex)
     {
-        
+
     }
 
     public void OnPersonFinalAnswer(int playerIndex)
     {
-        
+
     }
 
     public void OnPackageLogo(string uri)
     {
-        
+
     }
 
     public void OnPersonApellated(int playerIndex)
     {
-        
+
     }
 
     public void OnPersonPass(int playerIndex)
     {
-        
+
     }
 
     public void OnReplic(string personCode, string text)
@@ -294,4 +295,18 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     }
 
     public void SelectQuestion() => _player.ChooseQuest();
+
+    public void DeleteTheme() => _player.ChooseFinalTheme();
+
+    public void OnInfo()
+    {
+        if (_role == GameRole.Showman)
+        {
+            _showman.OnInitialized();
+        }
+        else
+        {
+            _player.OnInitialized();
+        }
+    }
 }

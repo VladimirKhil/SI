@@ -27,14 +27,6 @@ public interface IViewerClient : IActor
 
     void Pause();
 
-    void Init();
-
-    event Action<IViewerClient> Switch;
-
-    event Action<GameStage> StageChanged;
-
-    event Action<string?> Ad;
-
     void RecreateCommands();
 
     void Say(string text, string whom = NetworkConstants.Everybody, bool isPrivate = false);

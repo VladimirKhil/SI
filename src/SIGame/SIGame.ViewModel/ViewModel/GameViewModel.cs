@@ -35,24 +35,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public IViewerClient? Host
     {
         get => _host;
-        set
-        {
-            if (_host != null)
-            {
-                _host.Switch -= Host_Switch;
-                _host.StageChanged -= Host_StageChanged;
-                _host.Ad -= Host_Ad;
-            }
-
-            _host = value;
-
-            if (_host != null)
-            {
-                _host.Switch += Host_Switch;
-                _host.StageChanged += Host_StageChanged;
-                _host.Ad += Host_Ad;
-            }
-        }
+        set => _host = value;
     }
 
     private readonly ViewerData _data;
@@ -292,7 +275,22 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             }
         }
     }
-    
+
+    private bool _isPlayer;
+
+    public bool IsPlayer
+    {
+        get => _isPlayer;
+        set
+        {
+            if (_isPlayer != value)
+            {
+                _isPlayer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private SimpleCommand _kick;
 
     public SimpleCommand Kick
@@ -402,20 +400,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private SimpleCommand _pressGameButton;
-
-    public SimpleCommand PressGameButton
-    {
-        get => _pressGameButton;
-        set
-        {
-            if (_pressGameButton != value)
-            {
-                _pressGameButton = value;
-                OnPropertyChanged();
-            }
-        }
-    }
+    public SimpleCommand PressGameButton { get; }
 
     private bool _buttonDisabledByGame = false;
     private bool _buttonDisabledByTimer = false;
@@ -519,6 +504,10 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     /// </summary>
     public SIReport Report { get; } = new();
 
+    public SimpleCommand Ready { get; }
+
+    public SimpleCommand UnReady { get; }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -540,6 +529,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             Enabled = true,
             Volume = PlatformManager.Instance.Volume
         };
+
+        IsShowman = Host?.Role == GameRole.Showman;
+        IsPlayer = Host?.Role == GameRole.Player;
 
         _node.Reconnecting += Server_Reconnecting;
         _node.Reconnected += Server_Reconnected;
@@ -572,7 +564,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         SendAnswer = new SimpleCommand(SendAnswer_Executed);
         SendAnswerVersion = new SimpleCommand(SendAnswerVersion_Executed);
-        IsShowman = Host?.Role == GameRole.Showman;
         _changeSums = new SimpleCommand(ChangeSums_Executed) { CanBeExecuted = IsShowman };
         _changeActivePlayer = new SimpleCommand(ChangeActivePlayer_Executed) { CanBeExecuted = IsShowman };
 
@@ -586,7 +577,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         _addTable = new SimpleCommand(AddTable_Executed);
 
-        _pressGameButton = new SimpleCommand(PressGameButton_Execute) { CanBeExecuted = Host?.Role == GameRole.Player };
+        PressGameButton = new SimpleCommand(PressGameButton_Execute) { CanBeExecuted = IsPlayer };
 
         SendPass = new SimpleCommand(SendPass_Executed);
         SendStake = new SimpleCommand(SendStake_Executed);
@@ -611,7 +602,14 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         Report.SendReport = new SimpleCommand(SendReport_Executed);
         Report.SendNoReport = new SimpleCommand(SendNoReport_Executed);
+
+        Ready = new SimpleCommand(Ready_Executed) { CanBeExecuted = IsPlayer || IsShowman };
+        UnReady = new SimpleCommand(UnReady_Executed) { CanBeExecuted = IsPlayer || IsShowman };
     }
+
+    private void Ready_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Ready);
+
+    private void UnReady_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Ready, "-");
 
     private void IsRight_Executed(object? arg)
     {
@@ -755,7 +753,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         if (!_buttonDisabledByGame && !_buttonDisabledByTimer)
         {
-            PressGameButton.CanBeExecuted = true;
+            PressGameButton.CanBeExecuted = IsPlayer;
         }
     }
 
@@ -1000,8 +998,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private void Host_StageChanged(GameStage gameStage) => UpdateCommands();
-
     private void EnableExtrenalMediaLoad_Executed(object? arg)
     {
         UserSettings.LoadExternalMedia = true;
@@ -1017,19 +1013,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     }
 
     private void Server_Reconnecting() => Host?.AddLog(Resources.ReconnectingMessage);
-
-    private void Host_Ad(string? text)
-    {
-        Ad = text;
-
-        if (!string.IsNullOrEmpty(text))
-        {
-            TInfo.Text = "";
-            TInfo.QuestionContentType = QuestionContentType.Text;
-            TInfo.Sound = false;
-            TInfo.TStage = TableStage.Question;
-        }
-    }
 
     private void GameViewModel_TimeChanged(IAnimatableTimer timer) =>
         TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
@@ -1078,23 +1061,16 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public void UpdateCommands()
     {
         IsShowman = Host?.Role == GameRole.Showman;
+        IsPlayer = Host?.Role == GameRole.Player;
         Move.CanBeExecuted = Data.Stage != GameStage.Before && (Host != null && Host.IsHost || IsShowman);
         ChangePauseInGame.CanBeExecuted = Move.CanBeExecuted;
         _changeSums.CanBeExecuted = _changeActivePlayer.CanBeExecuted = IsShowman;
         ForceStart.CanBeExecuted = Host != null && Host.IsHost && Host.MyData.Stage == GameStage.Before;
-        _pressGameButton.CanBeExecuted = Host?.Role == GameRole.Player;
+        PressGameButton.CanBeExecuted = IsPlayer;
+        Ready.CanBeExecuted = UnReady.CanBeExecuted = IsPlayer || IsShowman;
 
         UpdateAddTableCommand();
         UpdateCurrentPlayerCommands();
-    }
-
-    private void Host_Switch(IViewerClient newHost)
-    {
-        Host = newHost;
-
-        UpdateCommands();
-
-        OnPropertyChanged(nameof(TInfo));
     }
 
     private void Move_Executed(object? arg) => Host?.Move(arg);

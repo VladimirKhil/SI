@@ -441,6 +441,9 @@
   <data name="Mixed" xml:space="preserve">
     <value>Разные</value>
   </data>
+  <data name="RoundThemes" xml:space="preserve">
+    <value>Темы раунда</value>
+  </data>
   <data name="RoundTrailing" xml:space="preserve">
     <value>{0}-й раунд</value>
   </data>
@@ -449,9 +452,6 @@
   </data>
   <data name="ReconnectedMessage" xml:space="preserve">
     <value>Соединение восстановлено.</value>
-  </data>
-  <data name="ReconnectingMessage" xml:space="preserve">
-    <value>Разрыв соединения, переподключаемся...</value>
   </data>
   <data name="PackageNotSelected" xml:space="preserve">
     <value>пакет не выбран</value>

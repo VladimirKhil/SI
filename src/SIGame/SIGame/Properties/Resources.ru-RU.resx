@@ -117,134 +117,59 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="All" xml:space="preserve">
-    <value>Все</value>
-  </data>
-  <data name="Application" xml:space="preserve">
-    <value>Приложение</value>
-  </data>
-  <data name="At" xml:space="preserve">
-    <value>за</value>
-  </data>
-  <data name="Created" xml:space="preserve">
-    <value>Создана</value>
-  </data>
-  <data name="English" xml:space="preserve">
-    <value>Английский</value>
-  </data>
-  <data name="Entrance" xml:space="preserve">
-    <value>ВХОД В ИГРУ</value>
-  </data>
-  <data name="Exit" xml:space="preserve">
-    <value>Выход</value>
-  </data>
-  <data name="File" xml:space="preserve">
-    <value>Файл…</value>
-  </data>
-  <data name="GameName" xml:space="preserve">
-    <value>Название игры</value>
-  </data>
-  <data name="GameRules" xml:space="preserve">
-    <value>Правила игры</value>
-  </data>
-  <data name="GameTable" xml:space="preserve">
-    <value>игровым столом</value>
-  </data>
-  <data name="Host" xml:space="preserve">
-    <value>Хост</value>
-  </data>
-  <data name="Logon" xml:space="preserve">
-    <value>ВОЙТИ</value>
-  </data>
-  <data name="NetworkGameHint" xml:space="preserve">
-    <value>Для создания сетевой игры нужно играть по локальной сети, иметь реальный IP или настроить NAT</value>
-  </data>
-  <data name="Next" xml:space="preserve">
-    <value>Следующий пакет</value>
-  </data>
-  <data name="Options" xml:space="preserve">
-    <value>Опции</value>
-  </data>
-  <data name="Password" xml:space="preserve">
-    <value>Пароль</value>
-  </data>
-  <data name="Players" xml:space="preserve">
-    <value>Игроки</value>
-  </data>
-  <data name="PortNumber" xml:space="preserve">
-    <value>Номер порта</value>
-  </data>
-  <data name="QuestionLibrary" xml:space="preserve">
-    <value>Онлайн Библиотека вопросов</value>
-  </data>
-  <data name="QuestionPack" xml:space="preserve">
-    <value>Пакет вопросов</value>
-  </data>
-  <data name="RandomSpecials" xml:space="preserve">
-    <value>случайные спецвопросы</value>
-  </data>
-  <data name="RandomThemes" xml:space="preserve">
-    <value>Случайный набор тем</value>
-  </data>
-  <data name="Rules" xml:space="preserve">
-    <value>Правила игры</value>
-  </data>
-  <data name="RunUpdate" xml:space="preserve">
-    <value>Обновить</value>
-  </data>
-  <data name="Russian" xml:space="preserve">
-    <value>Русский</value>
-  </data>
-  <data name="Select" xml:space="preserve">
-    <value>Выбрать</value>
-  </data>
-  <data name="SettingsManagement" xml:space="preserve">
-    <value>Управление настройками</value>
-  </data>
-  <data name="Showman" xml:space="preserve">
-    <value>Ведущий</value>
-  </data>
-  <data name="ShowMore" xml:space="preserve">
-    <value>Подробнее</value>
-  </data>
-  <data name="Skip" xml:space="preserve">
-    <value>Пропустить</value>
-  </data>
-  <data name="Started" xml:space="preserve">
-    <value>Начата</value>
-  </data>
-  <data name="StartGame" xml:space="preserve">
-    <value>Создать комнату</value>
-  </data>
-  <data name="Status" xml:space="preserve">
-    <value>Статус</value>
-  </data>
-  <data name="Time" xml:space="preserve">
-    <value>Время</value>
-  </data>
-  <data name="UI" xml:space="preserve">
-    <value>Интерфейс</value>
-  </data>
-  <data name="Update" xml:space="preserve">
-    <value>Обновление</value>
-  </data>
-  <data name="UpdateException" xml:space="preserve">
-    <value>При поиске обновления возникла следующая ошибка: {0}</value>
-  </data>
-  <data name="Viewers" xml:space="preserve">
-    <value>Зрители</value>
-  </data>
   <data name="About_Author" xml:space="preserve">
     <value>Автор: Владимир Хиль</value>
   </data>
   <data name="About_Site" xml:space="preserve">
     <value>Сайт программы</value>
   </data>
+  <data name="Address" xml:space="preserve">
+    <value>Адрес</value>
+  </data>
+  <data name="AddTable" xml:space="preserve">
+    <value>Добавить стол</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="AllInOnQuestion1" xml:space="preserve">
+    <value>Вероятность: ВА-БАНК на вопросе 1 категории</value>
+  </data>
+  <data name="AllInOnQuestion5" xml:space="preserve">
+    <value>Вероятность: ВА-БАНК на вопросе 5 категории</value>
+  </data>
+  <data name="AnswerCheck" xml:space="preserve">
+    <value>Проверка ответа</value>
+  </data>
+  <data name="Apellate_Right" xml:space="preserve">
+    <value>Я прав!</value>
+  </data>
+  <data name="Apellate_Right_Hint" xml:space="preserve">
+    <value>Я ответил верно</value>
+  </data>
+  <data name="Apellate_Wrong" xml:space="preserve">
+    <value>Я против!</value>
+  </data>
+  <data name="Apellate_Wrong_Hint" xml:space="preserve">
+    <value>Другой ответил неверно</value>
+  </data>
   <data name="AppLanguage" xml:space="preserve">
     <value>Язык приложения</value>
   </data>
+  <data name="Application" xml:space="preserve">
+    <value>Приложение</value>
+  </data>
   <data name="AppSettings" xml:space="preserve">
     <value>Настройки приложения</value>
+  </data>
+  <data name="AppTheme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="Ascending" xml:space="preserve">
+    <value>по возрастанию</value>
+  </data>
+  <data name="At" xml:space="preserve">
+    <value>за</value>
   </data>
   <data name="Authors" xml:space="preserve">
     <value>Авторы</value>
@@ -252,8 +177,20 @@
   <data name="Avatar" xml:space="preserve">
     <value>Аватар…</value>
   </data>
+  <data name="BaseCostForRandomPackage" xml:space="preserve">
+    <value>Базовая стоимость вопроса в случайном пакете</value>
+  </data>
   <data name="BirthDate" xml:space="preserve">
     <value>Дата рождения</value>
+  </data>
+  <data name="Bravery" xml:space="preserve">
+    <value>Смелость</value>
+  </data>
+  <data name="CancelReady" xml:space="preserve">
+    <value>Отмена готовности</value>
+  </data>
+  <data name="CatCost" xml:space="preserve">
+    <value>Стоимость Вопроса с секретом</value>
   </data>
   <data name="Categories" xml:space="preserve">
     <value>Категории</value>
@@ -261,17 +198,161 @@
   <data name="Category" xml:space="preserve">
     <value>Категория</value>
   </data>
+  <data name="CharactersPerSecond" xml:space="preserve">
+    <value>Cимволов в секунду</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="Common" xml:space="preserve">
+    <value>Общее</value>
+  </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Подключиться</value>
+  </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Создана</value>
+  </data>
+  <data name="CriticalQuestionsCount" xml:space="preserve">
+    <value>Число вопросов в конце раунда для мобилизации</value>
+  </data>
+  <data name="CriticalSumPartition" xml:space="preserve">
+    <value>% своей суммы от денег лидера для мобилизации</value>
+  </data>
+  <data name="DefaultSettingsWillBeUsed" xml:space="preserve">
+    <value>Будут использованы настройки по умолчанию.</value>
+  </data>
+  <data name="DeleteTable" xml:space="preserve">
+    <value>Удалить стол</value>
+  </data>
+  <data name="Descending" xml:space="preserve">
+    <value>по убыванию</value>
+  </data>
+  <data name="DenyPressWhileReading" xml:space="preserve">
+    <value>Нельзя нажимать на кнопку до окончания чтения вопроса</value>
+  </data>
   <data name="Donate" xml:space="preserve">
     <value>Поблагодарить автора…</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>Английский</value>
+  </data>
+  <data name="Entrance" xml:space="preserve">
+    <value>ВХОД В ИГРУ</value>
+  </data>
+  <data name="Error_DirectXBroken" xml:space="preserve">
+    <value>Не удалось запустить игру, так как повреждена система отрисовки DirectX 9</value>
+  </data>
+  <data name="Error_FilesBroken" xml:space="preserve">
+    <value>Не удалось запустить игру, так как файлы игры повреждены</value>
+  </data>
+  <data name="Error_IncifficientResources" xml:space="preserve">
+    <value>Недостаточно памяти для запуска программы!</value>
+  </data>
+  <data name="Error_IncifficientResourcesForExecution" xml:space="preserve">
+    <value>Недостаточно памяти для выполнения программы!</value>
+  </data>
+  <data name="Error_NetBroken" xml:space="preserve">
+    <value>Не удалось создать главное окно игры! Похоже, на вашем компьютере повреждена среда выполнения программ. Попробуйте переустановить .NET Framework 4.</value>
+  </data>
+  <data name="Error_OSBroken" xml:space="preserve">
+    <value>Обнаружено повреждение операционной системы. Запуск игры невозможен.</value>
+  </data>
+  <data name="Error_RuntimeBroken" xml:space="preserve">
+    <value>Не удалось создать главное окно игры! Похоже, на вашем компьютере повреждена среда выполнения программ</value>
+  </data>
+  <data name="Error_SettingsLoading" xml:space="preserve">
+    <value>Ошибка при загрузке настроек программы</value>
+  </data>
+  <data name="Error_SettingsSaving" xml:space="preserve">
+    <value>Ошибка при сохранении настроек программы</value>
+  </data>
+  <data name="Error_WindowsAutomationBroken" xml:space="preserve">
+    <value>Ошибка старта игры, связанная с Windows Automation. Попробуйте установить обновления для своей операционной системы, для .NET Framework 4 или установить библиотеку API Windows Automation (ссылка находится на странице игры). Если ничего не поможет, свяжитесь, пожалуйста, с автором игры.</value>
+  </data>
+  <data name="Erudition" xml:space="preserve">
+    <value>Эрудиция</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="ExitPrompt" xml:space="preserve">
+    <value>Действительно выйти?</value>
+  </data>
+  <data name="Exit_Button" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+  <data name="FalseStart" xml:space="preserve">
+    <value>Фальстарты</value>
   </data>
   <data name="Feedback" xml:space="preserve">
     <value>Замечания и предложения…</value>
   </data>
+  <data name="File" xml:space="preserve">
+    <value>Файл…</value>
+  </data>
+  <data name="ForceStartGame" xml:space="preserve">
+    <value>НАЧАТЬ ИГРУ</value>
+  </data>
+  <data name="ForceStartGame_Hint" xml:space="preserve">
+    <value>Начать, не дожидаясь готовности участников</value>
+  </data>
+  <data name="Forward" xml:space="preserve">
+    <value>Дальше (→)</value>
+  </data>
+  <data name="Free" xml:space="preserve">
+    <value>Освободить</value>
+  </data>
   <data name="FullScreen" xml:space="preserve">
     <value>Полноэкранный режим</value>
   </data>
+  <data name="GameButtonKey" xml:space="preserve">
+    <value>Клавиша игровой кнопки</value>
+  </data>
+  <data name="GameButton_Hint" xml:space="preserve">
+    <value>Игровая кнопка</value>
+  </data>
+  <data name="GameName" xml:space="preserve">
+    <value>Название игры</value>
+  </data>
+  <data name="GameRules" xml:space="preserve">
+    <value>Правила игры</value>
+  </data>
+  <data name="GameStyle" xml:space="preserve">
+    <value>Стиль игры</value>
+  </data>
+  <data name="GameTable" xml:space="preserve">
+    <value>игровым столом</value>
+  </data>
+  <data name="GameType" xml:space="preserve">
+    <value>Тип игры</value>
+  </data>
+  <data name="GiveCatToWorst" xml:space="preserve">
+    <value>Вероятность: отдать "Вопрос с секретом" тому, у кого меньше денег</value>
+  </data>
   <data name="Help" xml:space="preserve">
     <value>Помощь…</value>
+  </data>
+  <data name="HintShowman" xml:space="preserve">
+    <value>Сообщать ведущему правильные ответы заранее</value>
+  </data>
+  <data name="Host" xml:space="preserve">
+    <value>Хост</value>
+  </data>
+  <data name="LineHeight" xml:space="preserve">
+    <value>Межстрочный интервал в вопросе</value>
+  </data>
+  <data name="LocalNetworkOnly" xml:space="preserve">
+    <value>Для игры по локальной сети</value>
+  </data>
+  <data name="Logic" xml:space="preserve">
+    <value>Логика</value>
+  </data>
+  <data name="Logon" xml:space="preserve">
+    <value>ВОЙТИ</value>
   </data>
   <data name="Logs" xml:space="preserve">
     <value>Логи…</value>
@@ -279,20 +360,140 @@
   <data name="Man" xml:space="preserve">
     <value>мужчина</value>
   </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Игра</value>
+  </data>
+  <data name="ManagedGame" xml:space="preserve">
+    <value>Управляемая игра</value>
+  </data>
+  <data name="ManagedGame_Hint" xml:space="preserve">
+    <value>Игра продолжается только по нажатию кнопки "Дальше"</value>
+  </data>
+  <data name="Management" xml:space="preserve">
+    <value>Управление</value>
+  </data>
+  <data name="Manage_Hint" xml:space="preserve">
+    <value>Управление ходом игры</value>
+  </data>
+  <data name="MediaPort" xml:space="preserve">
+    <value>Порт изображений и мультимедиа-вопросов</value>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Сообщения</value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>Переместить…</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Имя</value>
+  </data>
+  <data name="NetworkGameHint" xml:space="preserve">
+    <value>Для создания сетевой игры нужно играть по локальной сети, иметь реальный IP или настроить NAT</value>
+  </data>
+  <data name="NewGame" xml:space="preserve">
+    <value>НОВАЯ ИГРА</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Следующий пакет</value>
+  </data>
+  <data name="NextRound" xml:space="preserve">
+    <value>Следующий раунд</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>НЕТ</value>
   </data>
+  <data name="NoPenaltyForWrongAnswer" xml:space="preserve">
+    <value>Не снимать очки за неверный ответ</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Опции</value>
+  </data>
+  <data name="OralGame" xml:space="preserve">
+    <value>Устная игра</value>
+  </data>
+  <data name="OralGame_Hint" xml:space="preserve">
+    <value>Если ведущий – человек. Хорошо подходит для стримов. Игроки делают выбор и дают ответ голосом</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Прочее</value>
+  </data>
   <data name="Package" xml:space="preserve">
     <value>Пакет</value>
+  </data>
+  <data name="PartialQuestions" xml:space="preserve">
+    <value>Частичный вывод текста</value>
+  </data>
+  <data name="PartialQuestions_Hint" xml:space="preserve">
+    <value>При игре без фальстартов текст выводится порционно</value>
+  </data>
+  <data name="PassOnQuestion1" xml:space="preserve">
+    <value>Вероятность: ПАС на вопросе 1 категории</value>
+  </data>
+  <data name="PassOnQuestion5" xml:space="preserve">
+    <value>Вероятность: ПАС на вопросе 5 категории</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Пауза</value>
+  </data>
+  <data name="Persons" xml:space="preserve">
+    <value>Участники</value>
+  </data>
+  <data name="Players" xml:space="preserve">
+    <value>Игроки</value>
   </data>
   <data name="PlayerSum" xml:space="preserve">
     <value>Сумма игрока:</value>
   </data>
+  <data name="PortNumber" xml:space="preserve">
+    <value>Номер порта</value>
+  </data>
+  <data name="PreviousRound" xml:space="preserve">
+    <value>Предыдущий раунд</value>
+  </data>
+  <data name="PublishedDate" xml:space="preserve">
+    <value>Дата публикации</value>
+  </data>
   <data name="Publisher" xml:space="preserve">
     <value>Издатель</value>
+  </data>
+  <data name="QuestionLibrary" xml:space="preserve">
+    <value>Онлайн Библиотека вопросов</value>
+  </data>
+  <data name="QuestionPack" xml:space="preserve">
+    <value>Пакет вопросов</value>
+  </data>
+  <data name="RandomRoundsCount" xml:space="preserve">
+    <value>Число раундов в случайном пакете</value>
+  </data>
+  <data name="RandomServer" xml:space="preserve">
+    <value>Случайный набор тем сервера</value>
+  </data>
+  <data name="RandomSpecials" xml:space="preserve">
+    <value>случайные спецвопросы</value>
+  </data>
+  <data name="RandomThemes" xml:space="preserve">
+    <value>Случайный набор тем</value>
+  </data>
+  <data name="RandomThemesCount" xml:space="preserve">
+    <value>Число тем в случайном пакете</value>
+  </data>
+  <data name="ReactionSpeed" xml:space="preserve">
+    <value>Скорость реакции</value>
+  </data>
+  <data name="ReadingSpeed" xml:space="preserve">
+    <value>Скорость чтения вопроса</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Готов</value>
+  </data>
+  <data name="ReplaceTo" xml:space="preserve">
+    <value>Заменить на</value>
+  </data>
+  <data name="ReportTitle" xml:space="preserve">
+    <value>Ваши впечатления от игры</value>
   </data>
   <data name="Report_Info" xml:space="preserve">
     <value>Отчёт об игре содержит информацию об итогах игры, об апеллированных ответах и ваших неправильных версиях. Он позволяет сделать игру лучше</value>
@@ -309,191 +510,26 @@
   <data name="RightAnswers" xml:space="preserve">
     <value>Верные ответы</value>
   </data>
+  <data name="Rules" xml:space="preserve">
+    <value>Правила игры</value>
+  </data>
+  <data name="RunUpdate" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="Russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
   <data name="SeacrhForUpdates" xml:space="preserve">
     <value>Поиск обновлений</value>
   </data>
   <data name="Search" xml:space="preserve">
     <value>Поиск</value>
   </data>
-  <data name="SendGameReport" xml:space="preserve">
-    <value>Отправлять отчёт об игре</value>
+  <data name="Select" xml:space="preserve">
+    <value>Выбрать</value>
   </data>
-  <data name="Sex" xml:space="preserve">
-    <value>Пол</value>
-  </data>
-  <data name="Sound" xml:space="preserve">
-    <value>Звук</value>
-  </data>
-  <data name="Validate_IsTrue" xml:space="preserve">
-    <value>Верен ли ответ игрока</value>
-  </data>
-  <data name="Woman" xml:space="preserve">
-    <value>женщина</value>
-  </data>
-  <data name="WrongAnswers" xml:space="preserve">
-    <value>Неверные ответы</value>
-  </data>
-  <data name="Yes" xml:space="preserve">
-    <value>ДА</value>
-  </data>
-  <data name="Sort" xml:space="preserve">
-    <value>Сортировка</value>
-  </data>
-  <data name="Ascending" xml:space="preserve">
-    <value>по возрастанию</value>
-  </data>
-  <data name="Descending" xml:space="preserve">
-    <value>по убыванию</value>
-  </data>
-  <data name="PublishedDate" xml:space="preserve">
-    <value>Дата публикации</value>
-  </data>
-  <data name="UserPackages" xml:space="preserve">
-    <value>Пользовательские пакеты…</value>
-  </data>
-  <data name="RandomServer" xml:space="preserve">
-    <value>Случайный набор тем сервера</value>
-  </data>
-  <data name="GameButtonKey" xml:space="preserve">
-    <value>Клавиша игровой кнопки</value>
-  </data>
-  <data name="LineHeight" xml:space="preserve">
-    <value>Межстрочный интервал в вопросе</value>
-  </data>
-  <data name="Move" xml:space="preserve">
-    <value>Переместить…</value>
-  </data>
-  <data name="ShowAnimations" xml:space="preserve">
-    <value>3D-анимации на табло</value>
-  </data>
-  <data name="ShowBorderOnFalseStart" xml:space="preserve">
-    <value>Показывать рамку в начале чтения вопроса при игре без фальстартов</value>
-  </data>
-  <data name="TableBackground" xml:space="preserve">
-    <value>Цвет фона табло</value>
-  </data>
-  <data name="TableColor" xml:space="preserve">
-    <value>Цвет текста табло</value>
-  </data>
-  <data name="TableFont" xml:space="preserve">
-    <value>Шрифт табло</value>
-  </data>
-  <data name="TranslateToChat" xml:space="preserve">
-    <value>Транслировать игру в чат</value>
-  </data>
-  <data name="WriteLogs" xml:space="preserve">
-    <value>Вести логи</value>
-  </data>
-  <data name="Messages" xml:space="preserve">
-    <value>Сообщения</value>
-  </data>
-  <data name="Persons" xml:space="preserve">
-    <value>Участники</value>
-  </data>
-  <data name="TimeSettings" xml:space="preserve">
-    <value>Настройки времени</value>
-  </data>
-  <data name="Server" xml:space="preserve">
-    <value>Сервер</value>
-  </data>
-  <data name="Connect" xml:space="preserve">
-    <value>Подключиться</value>
-  </data>
-  <data name="NewGame" xml:space="preserve">
-    <value>НОВАЯ ИГРА</value>
-  </data>
-  <data name="Send" xml:space="preserve">
-    <value>Отправить</value>
-  </data>
-  <data name="Address" xml:space="preserve">
-    <value>Адрес</value>
-  </data>
-  <data name="AllInOnQuestion1" xml:space="preserve">
-    <value>Вероятность: ВА-БАНК на вопросе 1 категории</value>
-  </data>
-  <data name="AllInOnQuestion5" xml:space="preserve">
-    <value>Вероятность: ВА-БАНК на вопросе 5 категории</value>
-  </data>
-  <data name="Apellate_Right" xml:space="preserve">
-    <value>Я прав!</value>
-  </data>
-  <data name="Apellate_Right_Hint" xml:space="preserve">
-    <value>Я ответил верно</value>
-  </data>
-  <data name="Apellate_Wrong" xml:space="preserve">
-    <value>Я против!</value>
-  </data>
-  <data name="Apellate_Wrong_Hint" xml:space="preserve">
-    <value>Другой ответил неверно</value>
-  </data>
-  <data name="Bravery" xml:space="preserve">
-    <value>Смелость</value>
-  </data>
-  <data name="CancelReady" xml:space="preserve">
-    <value>Отмена готовности</value>
-  </data>
-  <data name="Common" xml:space="preserve">
-    <value>Общее</value>
-  </data>
-  <data name="CriticalQuestionsCount" xml:space="preserve">
-    <value>Число вопросов в конце раунда для мобилизации</value>
-  </data>
-  <data name="CriticalSumPartition" xml:space="preserve">
-    <value>% своей суммы от денег лидера для мобилизации</value>
-  </data>
-  <data name="DeleteTable" xml:space="preserve">
-    <value>Удалить стол</value>
-  </data>
-  <data name="Erudition" xml:space="preserve">
-    <value>Эрудиция</value>
-  </data>
-  <data name="Exit_Button" xml:space="preserve">
-    <value>Выйти</value>
-  </data>
-  <data name="Free" xml:space="preserve">
-    <value>Освободить</value>
-  </data>
-  <data name="GameButton_Hint" xml:space="preserve">
-    <value>Игровая кнопка</value>
-  </data>
-  <data name="GameStyle" xml:space="preserve">
-    <value>Стиль игры</value>
-  </data>
-  <data name="GiveCatToWorst" xml:space="preserve">
-    <value>Вероятность: отдать "Вопрос с секретом" тому, у кого меньше денег</value>
-  </data>
-  <data name="Logic" xml:space="preserve">
-    <value>Логика</value>
-  </data>
-  <data name="Manage" xml:space="preserve">
-    <value>Игра</value>
-  </data>
-  <data name="Management" xml:space="preserve">
-    <value>Управление</value>
-  </data>
-  <data name="Manage_Hint" xml:space="preserve">
-    <value>Управление ходом игры</value>
-  </data>
-  <data name="NextRound" xml:space="preserve">
-    <value>Следующий раунд</value>
-  </data>
-  <data name="PassOnQuestion1" xml:space="preserve">
-    <value>Вероятность: ПАС на вопросе 1 категории</value>
-  </data>
-  <data name="PassOnQuestion5" xml:space="preserve">
-    <value>Вероятность: ПАС на вопросе 5 категории</value>
-  </data>
-  <data name="PreviousRound" xml:space="preserve">
-    <value>Предыдущий раунд</value>
-  </data>
-  <data name="ReactionSpeed" xml:space="preserve">
-    <value>Скорость реакции</value>
-  </data>
-  <data name="Ready" xml:space="preserve">
-    <value>Готов</value>
-  </data>
-  <data name="ReplaceTo" xml:space="preserve">
-    <value>Заменить на</value>
+  <data name="SelectBackground" xml:space="preserve">
+    <value>Выбрать…</value>
   </data>
   <data name="SelectionStyle" xml:space="preserve">
     <value>Выбор вопроса</value>
@@ -537,11 +573,83 @@
   <data name="Selection_UseThemePriority" xml:space="preserve">
     <value>Вероятность: тема согласно приоритету тем</value>
   </data>
+  <data name="Send" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
+  <data name="SendGameReport" xml:space="preserve">
+    <value>Отправлять отчёт об игре</value>
+  </data>
+  <data name="Server" xml:space="preserve">
+    <value>Сервер</value>
+  </data>
+  <data name="SettingsManagement" xml:space="preserve">
+    <value>Управление настройками</value>
+  </data>
+  <data name="Sex" xml:space="preserve">
+    <value>Пол</value>
+  </data>
+  <data name="ShowAnimations" xml:space="preserve">
+    <value>3D-анимации на табло</value>
+  </data>
+  <data name="ShowBorderOnFalseStart" xml:space="preserve">
+    <value>Показывать рамку в начале чтения вопроса при игре без фальстартов</value>
+  </data>
+  <data name="Showman" xml:space="preserve">
+    <value>Ведущий</value>
+  </data>
+  <data name="ShowMore" xml:space="preserve">
+    <value>Подробнее</value>
+  </data>
+  <data name="Skip" xml:space="preserve">
+    <value>Пропустить</value>
+  </data>
+  <data name="Sort" xml:space="preserve">
+    <value>Сортировка</value>
+  </data>
+  <data name="Sound" xml:space="preserve">
+    <value>Звук</value>
+  </data>
+  <data name="Stake" xml:space="preserve">
+    <value>Ставка</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>Начата</value>
+  </data>
+  <data name="StartGame" xml:space="preserve">
+    <value>Создать комнату</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="StudiaBackground" xml:space="preserve">
+    <value>Фоновое изображение студии</value>
+  </data>
+  <data name="StudiaBackground_Hint" xml:space="preserve">
+    <value>Действует для всех участников игры</value>
+  </data>
+  <data name="SumChange" xml:space="preserve">
+    <value>Изменение суммы</value>
+  </data>
   <data name="Sums" xml:space="preserve">
     <value>Суммы</value>
   </data>
   <data name="Sums_Hint" xml:space="preserve">
     <value>Изменить суммы участников</value>
+  </data>
+  <data name="TableBackground" xml:space="preserve">
+    <value>Цвет фона табло</value>
+  </data>
+  <data name="TableColor" xml:space="preserve">
+    <value>Цвет текста табло</value>
+  </data>
+  <data name="TableFont" xml:space="preserve">
+    <value>Шрифт табло</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Время</value>
+  </data>
+  <data name="TimeSettings" xml:space="preserve">
+    <value>Настройки времени</value>
   </data>
   <data name="Time_Decide" xml:space="preserve">
     <value>Время на принятие решения</value>
@@ -552,164 +660,56 @@
   <data name="Time_Round" xml:space="preserve">
     <value>Время раунда</value>
   </data>
-  <data name="AddTable" xml:space="preserve">
-    <value>Добавить стол</value>
-  </data>
-  <data name="AnswerCheck" xml:space="preserve">
-    <value>Проверка ответа</value>
-  </data>
-  <data name="CatCost" xml:space="preserve">
-    <value>Стоимость Вопроса с секретом</value>
-  </data>
-  <data name="Continue" xml:space="preserve">
-    <value>Продолжить</value>
-  </data>
-  <data name="ExitPrompt" xml:space="preserve">
-    <value>Действительно выйти?</value>
-  </data>
-  <data name="ForceStartGame" xml:space="preserve">
-    <value>НАЧАТЬ ИГРУ</value>
-  </data>
-  <data name="ForceStartGame_Hint" xml:space="preserve">
-    <value>Начать, не дожидаясь готовности участников</value>
-  </data>
-  <data name="Forward" xml:space="preserve">
-    <value>Дальше (→)</value>
-  </data>
-  <data name="Pause" xml:space="preserve">
-    <value>Пауза</value>
-  </data>
-  <data name="ReportTitle" xml:space="preserve">
-    <value>Ваши впечатления от игры</value>
-  </data>
-  <data name="Stake" xml:space="preserve">
-    <value>Ставка</value>
-  </data>
-  <data name="SumChange" xml:space="preserve">
-    <value>Изменение суммы</value>
-  </data>
-  <data name="YourAnswer" xml:space="preserve">
-    <value>Ваш ответ</value>
-  </data>
-  <data name="BaseCostForRandomPackage" xml:space="preserve">
-    <value>Базовая стоимость вопроса в случайном пакете</value>
-  </data>
-  <data name="CharactersPerSecond" xml:space="preserve">
-    <value>Cимволов в секунду</value>
-  </data>
-  <data name="Clear" xml:space="preserve">
-    <value>Очистить</value>
-  </data>
-  <data name="DenyPressWhileReading" xml:space="preserve">
-    <value>Нельзя нажимать на кнопку до окончания чтения вопроса</value>
-  </data>
-  <data name="FalseStart" xml:space="preserve">
-    <value>Фальстарты</value>
-  </data>
-  <data name="GameType" xml:space="preserve">
-    <value>Тип игры</value>
-  </data>
-  <data name="HintShowman" xml:space="preserve">
-    <value>Сообщать ведущему правильные ответы заранее</value>
-  </data>
-  <data name="LocalNetworkOnly" xml:space="preserve">
-    <value>Для игры по локальной сети</value>
-  </data>
-  <data name="ManagedGame" xml:space="preserve">
-    <value>Управляемая игра</value>
-  </data>
-  <data name="ManagedGame_Hint" xml:space="preserve">
-    <value>Игра продолжается только по нажатию кнопки "Дальше"</value>
-  </data>
-  <data name="MediaPort" xml:space="preserve">
-    <value>Порт изображений и мультимедиа-вопросов</value>
-  </data>
-  <data name="NoPenaltyForWrongAnswer" xml:space="preserve">
-    <value>Не снимать очки за неверный ответ</value>
-  </data>
-  <data name="OralGame" xml:space="preserve">
-    <value>Устная игра</value>
-  </data>
-  <data name="OralGame_Hint" xml:space="preserve">
-    <value>Если ведущий – человек. Хорошо подходит для стримов. Игроки делают выбор и дают ответ голосом</value>
-  </data>
-  <data name="PartialQuestions" xml:space="preserve">
-    <value>Частичный вывод текста</value>
-  </data>
-  <data name="PartialQuestions_Hint" xml:space="preserve">
-    <value>При игре без фальстартов текст выводится порционно</value>
-  </data>
-  <data name="RandomRoundsCount" xml:space="preserve">
-    <value>Число раундов в случайном пакете</value>
-  </data>
-  <data name="RandomThemesCount" xml:space="preserve">
-    <value>Число тем в случайном пакете</value>
-  </data>
-  <data name="ReadingSpeed" xml:space="preserve">
-    <value>Скорость чтения вопроса</value>
-  </data>
-  <data name="SelectBackground" xml:space="preserve">
-    <value>Выбрать…</value>
-  </data>
-  <data name="StudiaBackground" xml:space="preserve">
-    <value>Фоновое изображение студии</value>
-  </data>
-  <data name="StudiaBackground_Hint" xml:space="preserve">
-    <value>Действует для всех участников игры</value>
-  </data>
-  <data name="DefaultSettingsWillBeUsed" xml:space="preserve">
-    <value>Будут использованы настройки по умолчанию.</value>
-  </data>
-  <data name="Error_DirectXBroken" xml:space="preserve">
-    <value>Не удалось запустить игру, так как повреждена система отрисовки DirectX 9</value>
-  </data>
-  <data name="Error_FilesBroken" xml:space="preserve">
-    <value>Не удалось запустить игру, так как файлы игры повреждены</value>
-  </data>
-  <data name="Error_IncifficientResources" xml:space="preserve">
-    <value>Недостаточно памяти для запуска программы!</value>
-  </data>
-  <data name="Error_IncifficientResourcesForExecution" xml:space="preserve">
-    <value>Недостаточно памяти для выполнения программы!</value>
-  </data>
-  <data name="Error_NetBroken" xml:space="preserve">
-    <value>Не удалось создать главное окно игры! Похоже, на вашем компьютере повреждена среда выполнения программ. Попробуйте переустановить .NET Framework 4.</value>
-  </data>
-  <data name="Error_OSBroken" xml:space="preserve">
-    <value>Обнаружено повреждение операционной системы. Запуск игры невозможен.</value>
-  </data>
-  <data name="Error_RuntimeBroken" xml:space="preserve">
-    <value>Не удалось создать главное окно игры! Похоже, на вашем компьютере повреждена среда выполнения программ</value>
-  </data>
-  <data name="Error_SettingsLoading" xml:space="preserve">
-    <value>Ошибка при загрузке настроек программы</value>
-  </data>
-  <data name="Error_SettingsSaving" xml:space="preserve">
-    <value>Ошибка при сохранении настроек программы</value>
-  </data>
-  <data name="Error_WindowsAutomationBroken" xml:space="preserve">
-    <value>Ошибка старта игры, связанная с Windows Automation. Попробуйте установить обновления для своей операционной системы, для .NET Framework 4 или установить библиотеку API Windows Automation (ссылка находится на странице игры). Если ничего не поможет, свяжитесь, пожалуйста, с автором игры.</value>
+  <data name="TranslateToChat" xml:space="preserve">
+    <value>Транслировать игру в чат</value>
   </data>
   <data name="TryReinstallApp" xml:space="preserve">
     <value>Попробуйте переустановить программу</value>
   </data>
+  <data name="UI" xml:space="preserve">
+    <value>Интерфейс</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Обновление</value>
+  </data>
+  <data name="UpdateException" xml:space="preserve">
+    <value>При поиске обновления возникла следующая ошибка: {0}</value>
+  </data>
+  <data name="UserPackages" xml:space="preserve">
+    <value>Пользовательские пакеты…</value>
+  </data>
+  <data name="Validate_IsTrue" xml:space="preserve">
+    <value>Верен ли ответ игрока</value>
+  </data>
+  <data name="Viewers" xml:space="preserve">
+    <value>Зрители</value>
+  </data>
   <data name="WelcomeToSIOnline" xml:space="preserve">
     <value>Добро пожаловать в СИ Онлайн!</value>
   </data>
-  <data name="AppTheme" xml:space="preserve">
-    <value>Тема</value>
+  <data name="Woman" xml:space="preserve">
+    <value>женщина</value>
   </data>
-  <data name="Other" xml:space="preserve">
-    <value>Прочее</value>
+  <data name="WriteLogs" xml:space="preserve">
+    <value>Вести логи</value>
+  </data>
+  <data name="WrongAnswers" xml:space="preserve">
+    <value>Неверные ответы</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>ДА</value>
+  </data>
+  <data name="YourAnswer" xml:space="preserve">
+    <value>Ваш ответ</value>
   </data>
   <data name="VolumeControl" xml:space="preserve">
     <value>Регулятор громкости</value>
   </data>
-  <data name="AccountTypes_Computer" xml:space="preserve">
-    <value>Компьютер</value>
+  <data name="GameModes_Sport" xml:space="preserve">
+    <value>Упрощённая</value>
   </data>
-  <data name="AccountTypes_Human" xml:space="preserve">
-    <value>Человек</value>
+  <data name="GameModes_Tv" xml:space="preserve">
+    <value>Классическая</value>
   </data>
   <data name="GameRole_Player" xml:space="preserve">
     <value>Игрок</value>
@@ -735,17 +735,17 @@
   <data name="PlayerStyle_Normal" xml:space="preserve">
     <value>Спокойный</value>
   </data>
-  <data name="GameModes_Sport" xml:space="preserve">
-    <value>Упрощённая</value>
-  </data>
-  <data name="GameModes_Tv" xml:space="preserve">
-    <value>Классическая</value>
-  </data>
   <data name="About_Design" xml:space="preserve">
     <value>Дизайнер: Александр Кузнецов</value>
   </data>
   <data name="About_Images" xml:space="preserve">
     <value>Изображения участников находятся в общественном достоянии и взяты с сайта wikipedia.org</value>
+  </data>
+  <data name="AccountTypes_Computer" xml:space="preserve">
+    <value>Компьютер</value>
+  </data>
+  <data name="AccountTypes_Human" xml:space="preserve">
+    <value>Человек</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>(по умолчанию)</value>
@@ -801,6 +801,12 @@
   <data name="ExitGame" xml:space="preserve">
     <value>Выход из игры</value>
   </data>
+  <data name="Filter_All" xml:space="preserve">
+    <value>(все)</value>
+  </data>
+  <data name="Filter_NotSet" xml:space="preserve">
+    <value>(не задано)</value>
+  </data>
   <data name="JumpList_Feedback" xml:space="preserve">
     <value>Замечания</value>
   </data>
@@ -818,12 +824,6 @@
   </data>
   <data name="JumpList_Logs_Hint" xml:space="preserve">
     <value>Открыть папку логов игры</value>
-  </data>
-  <data name="Filter_All" xml:space="preserve">
-    <value>(все)</value>
-  </data>
-  <data name="Filter_NotSet" xml:space="preserve">
-    <value>(не задано)</value>
   </data>
   <data name="Settings_Default" xml:space="preserve">
     <value>По умолчанию</value>
@@ -1101,9 +1101,6 @@
   <data name="AllowEveryoneToPlayHiddenStakes" xml:space="preserve">
     <value>Все могут играть Вопрос со ставками для всех (финал)</value>
   </data>
-  <data name="TypeUsePingPenalty" xml:space="preserve">
-    <value>замедление пинга</value>
-  </data>
   <data name="EvenWithNegativeScore" xml:space="preserve">
     <value>даже с 0 или отрицательным счётом</value>
   </data>
@@ -1223,5 +1220,11 @@
   </data>
   <data name="PartialImages_Hint" xml:space="preserve">
     <value>При игре без фальстартов изображения выводятся порционно</value>
+  </data>
+  <data name="TypeUsePingPenalty" xml:space="preserve">
+    <value>замедление пинга</value>
+  </data>
+  <data name="NotReady" xml:space="preserve">
+    <value>Не готов</value>
   </data>
 </root>

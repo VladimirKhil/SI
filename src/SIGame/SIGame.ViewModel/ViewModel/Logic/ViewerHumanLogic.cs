@@ -11,7 +11,6 @@ using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Diagnostics;
 using System.Text;
-using System.Xml;
 using Utils;
 using Utils.Timers;
 using R = SICore.Properties.Resources;
@@ -110,6 +109,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.ThemeSelected += TInfo_ThemeSelected;
         TInfo.AnswerSelected += TInfo_AnswerSelected;
 
+        TInfo.QuestionToggled += TInfo_QuestionToggled;
+
         PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, gameViewModel, localizer);
         ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, gameViewModel, localizer);
 
@@ -129,6 +130,29 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
 
         _contentPublicUrls = contentPublicUrls;
+    }
+
+    private void TInfo_QuestionToggled(QuestionInfoViewModel question)
+    {
+        var found = false;
+
+        for (var i = 0; i < TInfo.RoundInfo.Count; i++)
+        {
+            for (var j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)
+            {
+                if (TInfo.RoundInfo[i].Questions[j] == question)
+                {
+                    found = true;
+                    _viewerActions.SendMessageWithArgs(Messages.Toggle, i, j);
+                    break;
+                }
+            }
+
+            if (found)
+            {
+                break;
+            }
+        }
     }
 
     private async void GameViewModel_Disposed() => await DisposeAsync();
@@ -387,6 +411,19 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
+    public void OnAd(string? text = null)
+    {
+        _gameViewModel.Ad = text;
+
+        if (!string.IsNullOrEmpty(text))
+        {
+            TInfo.Text = "";
+            TInfo.QuestionContentType = QuestionContentType.Text;
+            TInfo.Sound = false;
+            TInfo.TStage = TableStage.Question;
+        }
+    }
+
     public void Stage()
     {
         switch (_data.Stage)
@@ -457,6 +494,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
 
         _gameViewModel.Hint = "";
+        _gameViewModel.UpdateCommands();
+        OnAd();
     }
 
     public void GameThemes()
@@ -465,7 +504,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _data.EnableMediaLoadButton = false;
     }
 
-    public void RoundThemes(Models.ThemesPlayMode playMode) => UI.Execute(() => RoundThemesUI(playMode), exc => _data.Host.SendError(exc));
+    public void RoundThemes(Models.ThemesPlayMode playMode)
+    {
+        UI.Execute(() => RoundThemesUI(playMode), exc => _data.Host.SendError(exc));
+        OnAd();
+    }
 
     private void RoundThemesUI(Models.ThemesPlayMode playMode)
     {
@@ -1300,7 +1343,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
-    public void StopRound() => TInfo.TStage = TableStage.Sign;
+    public void StopRound()
+    {
+        TInfo.TStage = TableStage.Sign;
+        OnAd();
+    }
 
     public void Out(int themeIndex)
     {
@@ -1435,7 +1482,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.Text = text;
         TInfo.TStage = stage == Models.TableStage.Theme ? TableStage.Theme : stage == Models.TableStage.Round ? TableStage.Round : TableStage.QuestionPrice;
         _data.EnableMediaLoadButton = false;
+
+        if (stage == Models.TableStage.Theme || stage == Models.TableStage.QuestionPrice)
+        {
+            OnAd();
+        }
     }
+
+    public void OnPersonStake() => OnAd();
 
     public void OnPauseChanged(bool isPaused)
     {
@@ -1717,19 +1771,45 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         },
         ClientData.Host.OnError);
 
-    public void ResetPlayers() => UI.Execute(
-        () =>
-        {
-            _gameViewModel.Players.Clear();
-
-            foreach (var player in ClientData.Players)
+    public void OnInfo()
+    {
+        UI.Execute(
+            () =>
             {
-                _gameViewModel.Players.Add(player);
-            }
+                _gameViewModel.Players.Clear();
 
-            _gameViewModel.UpdateAddTableCommand();
-        },
-        ClientData.Host.OnError);
+                foreach (var player in ClientData.Players)
+                {
+                    _gameViewModel.Players.Add(player);
+                }
+
+                _gameViewModel.UpdateAddTableCommand();
+            },
+            ClientData.Host.OnError);
+
+        if (_gameViewModel.Host?.Role == GameRole.Player)
+        {
+            Greet();
+        }
+    }
+
+    private async void Greet()
+    {
+        try
+        {
+            await Task.Delay(2000);
+
+            _data.OnAddString(null, string.Format(_viewerActions.LO[nameof(R.Hint)], _data.Host.GameButtonKey), LogMode.Log);
+            _data.OnAddString(null, _viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine, LogMode.Log);
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+        catch (Exception exc)
+        {
+            Trace.TraceError("Greet error: " + exc);
+        }
+    }
 
     public void OnAnswerOptions(bool questionHasScreenContent, IEnumerable<string> optionsTypes)
     {
@@ -1871,7 +1951,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void OnCanPressButton()
     {
         _gameViewModel.Apellate.CanBeExecuted = false;
-        _gameViewModel.Pass.CanBeExecuted = true;
+        _gameViewModel.Pass.CanBeExecuted = _gameViewModel.IsPlayer;
     }
 
     public void OnQuestionSelected()
@@ -1884,4 +1964,21 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void OnPersonDisconnected() => _gameViewModel.UpdateCommands();
 
     public void OnHostChanged() => _gameViewModel.UpdateCommands();
+
+    public void OnClientSwitch(IViewerClient viewer)
+    {
+        _gameViewModel.Host = viewer;
+        _gameViewModel.UpdateCommands();
+    }
+
+    public void DeleteTheme()
+    {
+        _data.ThemeIndex = -1;
+
+        TInfo.Selectable = true;
+        TInfo.SelectTheme.CanBeExecuted = true;
+        _gameViewModel.Hint = _localizer[nameof(R.HintSelectTheme)];
+
+        _data.Host.OnFlash();
+    }
 }

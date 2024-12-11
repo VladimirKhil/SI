@@ -9,6 +9,7 @@ using SICore.Network.Clients;
 using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
 using SICore.Results;
+using SICore.Services;
 using SICore.Special;
 using SICore.Utils;
 using SIData;
@@ -3581,7 +3582,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData(ClientData.Host);
         var actions = new ViewerActions(playerClient, LO);
-        var logic = new ViewerComputerLogic(data, actions, account, GameRole.Player);
+        var logic = new ViewerComputerLogic(data, actions, account, new Intelligence(account), GameRole.Player);
         _ = new Player(playerClient, account, false, logic, actions, LO, data);
 
         OnInfo(newAccount.Name);
@@ -3610,7 +3611,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData(ClientData.Host);
         var actions = new ViewerActions(showmanClient, LO);
-        var logic = new ViewerComputerLogic(data, actions, account, GameRole.Showman);
+        var logic = new ViewerComputerLogic(data, actions, account, new Intelligence(account), GameRole.Showman);
         var showman = new Showman(showmanClient, account, false, logic, actions, LO, data);
 
         OnInfo(newAccount.Name);

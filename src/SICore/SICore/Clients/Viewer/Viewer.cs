@@ -50,10 +50,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     public IViewerLogic MyLogic => _logic;
 
-    public event Action<IViewerClient>? Switch;
-    public event Action<GameStage>? StageChanged;
-    public event Action<string?>? Ad;
-
     public ViewerData MyData => ClientData;
 
     public string? Avatar { get; set; }
@@ -437,8 +433,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             }
                         }
 
-                        StageChanged?.Invoke(ClientData.Stage);
-
                         if (mparams[0] == Messages.Stage)
                         {
                             _logic.SetCaption("");
@@ -467,7 +461,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                             }
 
                             _logic.Stage();
-                            OnAd();
                         }
 
                         #endregion
@@ -777,8 +770,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     _logic.OnTimerChanged(0, MessageParams.Timer_Stop, "");
                     _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "");
                     _logic.OnTimerChanged(2, MessageParams.Timer_Stop, "");
-
-                    OnAd();
                     break;
 
                 case Messages.FinalRound:
@@ -871,7 +862,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 case Messages.Ads:
                     if (mparams.Length > 1)
                     {
-                        OnAd(mparams[1]);
+                        _logic.OnAd(mparams[1]);
                     }
                     break;
             }
@@ -1209,8 +1200,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         _logic.OnPersonDisconnected();
     }
 
-    private void OnAd(string? text = null) => Ad?.Invoke(text);
-
     private void OnRoundThemes(string[] mparams)
     {
         if (mparams.Length < 2 || !Enum.TryParse<ThemesPlayMode>(mparams[1], out var playMode))
@@ -1241,8 +1230,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         {
             ClientData.Host.SendError(exc, true);
         }
-
-        OnAd();
     }
 
     private void OnThemeOrQuestion()
@@ -1251,8 +1238,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         {
             player.ClearState();
         }
-
-        OnAd();
     }
 
     private void OnPersonStake(string[] mparams)
@@ -1295,7 +1280,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         ClientData.Players[ClientData.LastStakerIndex].Stake = stake;
 
-        OnAd();
+        _logic.OnPersonStake();
     }
 
     private void OnReplic(string[] mparams)
@@ -1784,16 +1769,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 {
                     SwitchToNewType(role, other, me);
                 }
-                else
-                {
-                    var current = (PersonAccount)me;
-
-                    ((PersonAccount)other).BeReadyCommand = current.BeReadyCommand;
-                    ((PersonAccount)other).BeUnReadyCommand = current.BeUnReadyCommand;
-
-                    current.BeReadyCommand = null;
-                    current.BeUnReadyCommand = null;
-                }
             }
             else if (other == me)
             {
@@ -1802,16 +1777,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 if (newRole != role)
                 {
                     SwitchToNewType(newRole, account, me);
-                }
-                else
-                {
-                    var current = (PersonAccount)me;
-
-                    account.BeReadyCommand = current.BeReadyCommand;
-                    account.BeUnReadyCommand = current.BeUnReadyCommand;
-
-                    current.BeReadyCommand = null;
-                    current.BeUnReadyCommand = null;
                 }
             }
         }
@@ -1853,20 +1818,13 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             _ => new Showman(_client, newAccount, IsHost, _logic, _viewerActions, LO, ClientData),
         };
 
-        if (oldAccount is PersonAccount current)
-        {
-            current.BeReadyCommand = current.BeUnReadyCommand = null;
-        }
-
         viewer.Avatar = Avatar;
-
-        viewer.Init();
 
         Dispose(); // TODO: do not dispose anything here
 
         viewer.RecreateCommands();
 
-        Switch?.Invoke(viewer);
+        _logic.OnClientSwitch(viewer);
 
         SendPicture();
     }
@@ -1931,7 +1889,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             ClientData.Viewers = newViewers;
             ClientData.IsInfoInitialized = true;
 
-            Logic.ResetPlayers();
+            _logic.OnInfo();
         }
         finally
         {
@@ -2281,8 +2239,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
     /// Sends game info request.
     /// </summary>
     public void GetInfo() => _viewerActions.SendMessage(Messages.Info);
-
-    public virtual void Init() => ClientData.IsPlayer = false;
 
     protected void OnAskSelectPlayer(string[] mparams)
     {

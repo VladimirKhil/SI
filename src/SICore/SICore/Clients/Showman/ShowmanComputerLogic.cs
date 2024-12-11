@@ -64,7 +64,7 @@ internal sealed class ShowmanComputerLogic : IPersonLogic
         }
     }
 
-    private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
+    private void Ready() => _viewerActions.SendMessage(Messages.Ready);
 
     private void SelectPlayer(string message)
     {
@@ -116,11 +116,6 @@ internal sealed class ShowmanComputerLogic : IPersonLogic
     }
 
     public void Stake()
-    {
-        
-    }
-
-    public void ChooseFinalTheme()
     {
         
     }

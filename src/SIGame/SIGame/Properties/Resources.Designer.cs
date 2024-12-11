@@ -1816,6 +1816,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Not ready.
+        /// </summary>
+        public static string NotReady {
+            get {
+                return ResourceManager.GetString("NotReady", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Not set.
         /// </summary>
         public static string NotSet {
@@ -3198,6 +3207,15 @@ namespace SIGame.Properties {
         public static string TwitchHint {
             get {
                 return ResourceManager.GetString("TwitchHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на .
+        /// </summary>
+        public static string TypeUsePingPenalty {
+            get {
+                return ResourceManager.GetString("TypeUsePingPenalty", resourceCulture);
             }
         }
         

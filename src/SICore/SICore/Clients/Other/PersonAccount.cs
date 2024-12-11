@@ -1,7 +1,6 @@
 ﻿using SIData;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Windows.Input;
 
 namespace SICore;
 
@@ -29,24 +28,6 @@ public class PersonAccount : ViewerAccount
     {
         get { return _gameStarted; }
         set { if (_gameStarted != value) { _gameStarted = value; OnPropertyChanged(); } }
-    }
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private ICommand _beReadyCommand = null;
-
-    public ICommand BeReadyCommand
-    {
-        get { return _beReadyCommand; }
-        set { if (_beReadyCommand != value) { _beReadyCommand = value; OnPropertyChanged(); } }
-    }
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private ICommand _beUnReadyCommand = null;
-
-    public ICommand BeUnReadyCommand
-    {
-        get { return _beUnReadyCommand; }
-        set { if (_beUnReadyCommand != value) { _beUnReadyCommand = value; OnPropertyChanged(); } }
     }
 
     /// <summary>

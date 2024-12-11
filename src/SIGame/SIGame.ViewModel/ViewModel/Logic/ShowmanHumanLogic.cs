@@ -9,6 +9,7 @@ namespace SICore;
 /// <summary>
 /// Логика ведущего-человека
 /// </summary>
+[Obsolete]
 internal sealed class ShowmanHumanLogic : IPersonLogic
 {
     private readonly ViewerActions _viewerActions;
@@ -32,16 +33,6 @@ internal sealed class ShowmanHumanLogic : IPersonLogic
         TInfo = tableInfoViewModel;
         _gameViewModel = gameViewModel;
         _localizer = localizer;
-
-        TInfo.QuestionToggled += TInfo_QuestionToggled;
-
-        TInfo.SelectQuestion.CanBeExecuted = false;
-        TInfo.SelectTheme.CanBeExecuted = false;
-    }
-
-    public void OnInitialized()
-    {
-
     }
 
     public void Cat()
@@ -83,22 +74,6 @@ internal sealed class ShowmanHumanLogic : IPersonLogic
         }
     }
 
-    public void ChooseFinalTheme()
-    {
-        _data.ThemeIndex = -1;
-
-        TInfo.Selectable = true;
-        TInfo.SelectTheme.CanBeExecuted = true;
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectTheme)];
-
-        _data.Host.OnFlash();
-    }
-
-    public void FinalStake()
-    {
-        
-    }
-
     public void CatCost()
     {
         _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintChooseCatPrice)];
@@ -110,28 +85,5 @@ internal sealed class ShowmanHumanLogic : IPersonLogic
         }
 
         _data.Host.OnFlash();
-    }
-
-    private void TInfo_QuestionToggled(QuestionInfoViewModel question)
-    {
-        var found = false;
-
-        for (var i = 0; i < TInfo.RoundInfo.Count; i++)
-        {
-            for (var j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)
-            {
-                if (TInfo.RoundInfo[i].Questions[j] == question)
-                {
-                    found = true;
-                    _viewerActions.SendMessageWithArgs(Messages.Toggle, i, j);
-                    break;
-                }
-            }
-
-            if (found)
-            {
-                break;
-            }
-        }
     }
 }

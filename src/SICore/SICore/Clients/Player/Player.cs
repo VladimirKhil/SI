@@ -12,8 +12,6 @@ namespace SICore;
 /// </summary>
 public sealed class Player : Viewer
 {
-    private readonly object _readyLock = new();
-
     public override GameRole Role => GameRole.Player;
 
     /// <summary>
@@ -40,58 +38,9 @@ public sealed class Player : Viewer
             _viewerActions.SendMessageWithArgs(Messages.FinalStake, ClientData.PersonDataExtensions.StakeInfo.Stake);
             Clear();
         });
-
-        ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        ClientData.AutoReadyChanged -= ClientData_AutoReadyChanged;
-
-        base.Dispose(disposing);
-    }
-
-    private void ClientData_AutoReadyChanged()
-    {
-        lock (_readyLock)
-        {
-            if (ClientData.Me == null)
-            {
-                return;
-            }
-
-            var readyCommand = ((PersonAccount)ClientData.Me).BeReadyCommand;
-
-            if (ClientData.AutoReady && readyCommand != null)
-            {
-                readyCommand.Execute(null);
-            }
-        }
     }
 
     private void Clear() => _logic.ClearSelections(true);
-
-    public override void Init()
-    {
-        base.Init();
-
-        ClientData.IsPlayer = true;
-
-        lock (_readyLock)
-        {
-            if (ClientData.Me is PersonAccount personAccount)
-            {
-                var readyCommand = personAccount.BeReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready));
-                personAccount.BeUnReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready, "-"));
-                _logic.PlayerLogic.OnInitialized();
-
-                if (ClientData.AutoReady)
-                {
-                    readyCommand.Execute(null);
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// Получение системного сообщения
@@ -104,10 +53,6 @@ public sealed class Player : Viewer
         {
             switch (mparams[0])
             {
-                case Messages.Info2:
-                    Init();
-                    break;
-
                 case Messages.Stage:
                     #region STAGE
 
@@ -147,7 +92,7 @@ public sealed class Player : Viewer
                     }
                     else
                     {
-                        _logic.PlayerLogic.ChooseFinalTheme();
+                        _logic.DeleteTheme();
                     }
 
                     #endregion

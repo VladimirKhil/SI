@@ -13,8 +13,15 @@ public sealed class SexConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
+        var resourceName = parameter.ToString();
+
+        if (resourceName == null)
+        {
+            return value;
+        }
+
         var resourceManager = new ResourceManager("SIGame.Properties.Resources", typeof(Resources).Assembly);
-        var parameterValue = resourceManager.GetString(parameter.ToString());
+        var parameterValue = resourceManager.GetString(resourceName);
 
         if (Thread.CurrentThread.CurrentUICulture.Name != "ru-RU")
         {

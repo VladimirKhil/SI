@@ -4,6 +4,7 @@ using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
+using SICore.Services;
 using SIData;
 using SIEngine;
 using SIPackages;
@@ -88,10 +89,10 @@ public sealed class GameRunner
                 var showmanClient = new Client(_settings.Showman.Name);
                 var data = new ViewerData(_gameHost);
                 var actions = new ViewerActions(showmanClient, localizer);
-                
+
                 var logic = isHost
                     ? hostLogicFactory(data, actions, localizer)
-                    : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Showman, GameRole.Showman);
+                    : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Showman, new Intelligence((ComputerAccount)_settings.Showman), GameRole.Showman);
                 
                 var showman = new Showman(showmanClient, _settings.Showman, isHost, logic, actions, localizer, data);
                 showmanClient.ConnectTo(_node);
@@ -116,10 +117,10 @@ public sealed class GameRunner
                     var playerClient = new Client(_settings.Players[i].Name);
                     var data = new ViewerData(_gameHost);
                     var actions = new ViewerActions(playerClient, localizer);
-                    
+
                     var logic = isHost
                         ? hostLogicFactory(data, actions, localizer)
-                        : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Players[i], GameRole.Player);
+                        : new ViewerComputerLogic(data, actions, (ComputerAccount)_settings.Players[i], new Intelligence((ComputerAccount)_settings.Players[i]), GameRole.Player);
                     
                     var player = new Player(playerClient, _settings.Players[i], isHost, logic, actions, localizer, data);
                     playerClient.ConnectTo(_node);

@@ -367,6 +367,29 @@
             </Expander>
 
             <local:StudiaCommandPanel x:Name="studiaCommandPanel" Grid.Column="4" Grid.Row="1" />
+
+            <Button
+                Grid.Row="2"
+                FontSize="25"
+                Padding="0"
+                Background="#AA555555"
+                Height="45"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,5">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource ReadyButton}">
+                        <Setter Property="Command" Value="{Binding Ready}" />
+                        <Setter Property="Content" Value="{Binding Data.Me.IsMale, ConverterParameter=Ready, Converter={StaticResource SexConverter}}" />
+                        
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Data.Me.Ready}" Value="True">
+                                <Setter Property="Command" Value="{Binding UnReady}" />
+                                <Setter Property="Content" Value="{Binding Data.Me.IsMale, ConverterParameter=NotReady, Converter={StaticResource SexConverter}}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </Grid>
 
         <TextBlock
