@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;

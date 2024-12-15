@@ -6,6 +6,9 @@ using System.Windows.Data;
 
 namespace SIQuester.Converters;
 
+/// <summary>
+/// Defines a list of commands for content items collection.
+/// </summary>
 public sealed class ContentCommandsConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -13,12 +16,17 @@ public sealed class ContentCommandsConverter : IMultiValueConverter
         var contentItems = (IContentCollection)values[0];
         var files = (ICollection<MediaItemViewModel>)values[1];
         var contentType = (string)values[2];
+        var qualityControl = (bool)values[3];
 
-        var commands = new List<UICommand>(files.Count + 2)
+        var commands = new List<UICommand>(files.Count + (qualityControl ? 1 : 2))
         {
-            new(contentItems.AddFile, ViewModel.Properties.Resources.File, contentType),
-            new(contentItems.LinkUri, ViewModel.Properties.Resources.Link, contentType)
+            new(contentItems.AddFile, ViewModel.Properties.Resources.File, contentType)
         };
+
+        if (!qualityControl)
+        {
+            commands.Add(new UICommand(contentItems.LinkUri, ViewModel.Properties.Resources.Link, contentType));
+        }
 
         foreach (var file in files)
         {

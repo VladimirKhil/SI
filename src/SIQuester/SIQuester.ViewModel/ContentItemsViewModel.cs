@@ -84,14 +84,6 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         LinkUri = new SimpleCommand(LinkUri_Executed);
         AddFile = new SimpleCommand(AddFile_Executed);
         IsTopLevel = isTopLevel;
-
-        UpdateQualityCommands();
-    }
-
-    public void UpdateQualityCommands()
-    {
-        var package = Owner.OwnerTheme?.OwnerRound?.OwnerPackage;
-        LinkUri.CanBeExecuted = package != null && !package.HasQualityControl;
     }
 
     internal void AddScreenText_Executed(object? arg) => QDocument.ActivatedObject = Add(ContentTypes.Text, "", ContentPlacements.Screen);

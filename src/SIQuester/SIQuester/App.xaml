@@ -318,15 +318,6 @@
 
             <siqcv:MappedConverter x:Key="QuestionTypeConverterNew" Map="{StaticResource QuestionTypesNew}" />
 
-            <siqcv:StringDictionary x:Key="QTParams">
-                <x:Static x:Key="{x:Static pc:QuestionTypeParams.Cat_Theme}" Member="lp:Resources.Theme" />
-                <x:Static x:Key="{x:Static pc:QuestionTypeParams.Cat_Cost}" Member="lp:Resources.Price" />
-                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows}" Member="lp:Resources.BagCat_Knows" />
-                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self}" Member="lp:Resources.BagCat_Self" />
-            </siqcv:StringDictionary>
-
-            <siqcv:MappedConverter x:Key="QuestionTypeParamConverter" Map="{StaticResource QTParams}" />
-
             <siqcv:StringDictionary x:Key="QuestionParameterNames">
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.Question}" Member="lp:Resources.Question" />
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.Answer}" Member="lp:Resources.Answer" />
@@ -1483,6 +1474,7 @@
                                                                     <Binding />
                                                                     <Binding Path="OwnerDocument.Images.Files" />
                                                                     <Binding Source="{x:Static pc:ContentTypes.Image}" />
+                                                                    <Binding Path="Owner.OwnerTheme.OwnerRound.OwnerPackage.HasQualityControl" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
                                                         </MenuItem>
@@ -1500,6 +1492,7 @@
                                                                     <Binding />
                                                                     <Binding Path="OwnerDocument.Audio.Files" />
                                                                     <Binding Source="{x:Static pc:ContentTypes.Audio}" />
+                                                                    <Binding Path="Owner.OwnerTheme.OwnerRound.OwnerPackage.HasQualityControl" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
                                                         </MenuItem>
@@ -1517,6 +1510,7 @@
                                                                     <Binding />
                                                                     <Binding Path="OwnerDocument.Video.Files" />
                                                                     <Binding Source="{x:Static pc:ContentTypes.Video}" />
+                                                                    <Binding Path="Owner.OwnerTheme.OwnerRound.OwnerPackage.HasQualityControl" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
                                                         </MenuItem>
@@ -1535,6 +1529,7 @@
                                                                     <Binding />
                                                                     <Binding Path="OwnerDocument.Html.Files" />
                                                                     <Binding Source="{x:Static pc:ContentTypes.Html}" />
+                                                                    <Binding Path="Owner.OwnerTheme.OwnerRound.OwnerPackage.HasQualityControl" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
                                                         </MenuItem>
@@ -1650,6 +1645,7 @@
                                                                         <Binding />
                                                                         <Binding Path="OwnerDocument.Images.Files" />
                                                                         <Binding Source="{x:Static pc:ContentTypes.Image}" />
+                                                                        <Binding Path="Owner.OwnerTheme.OwnerRound.OwnerPackage.HasQualityControl" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
                                                             </MenuItem>
@@ -1668,6 +1664,7 @@
                                                                         <Binding />
                                                                         <Binding Path="OwnerDocument.Audio.Files" />
                                                                         <Binding Source="{x:Static pc:ContentTypes.Audio}" />
+                                                                        <Binding Path="Owner.OwnerTheme.OwnerRound.OwnerPackage.HasQualityControl" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
                                                             </MenuItem>
@@ -1686,6 +1683,7 @@
                                                                         <Binding />
                                                                         <Binding Path="OwnerDocument.Video.Files" />
                                                                         <Binding Source="{x:Static pc:ContentTypes.Video}" />
+                                                                        <Binding Path="Owner.OwnerTheme.OwnerRound.OwnerPackage.HasQualityControl" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
                                                             </MenuItem>
@@ -1704,6 +1702,7 @@
                                                                         <Binding />
                                                                         <Binding Path="OwnerDocument.Html.Files" />
                                                                         <Binding Source="{x:Static pc:ContentTypes.Html}" />
+                                                                        <Binding Path="Owner.OwnerTheme.OwnerRound.OwnerPackage.HasQualityControl" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
                                                             </MenuItem>

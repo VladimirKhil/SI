@@ -1,6 +1,7 @@
 ﻿using EnsureThat;
 using SIPackages.Containers;
 using SIPackages.Core;
+using SIPackages.Helpers;
 using SIPackages.Models;
 using System.Diagnostics;
 using System.Xml;
@@ -216,7 +217,7 @@ public sealed class SIDocument : IDisposable
         long maxAllowedDataLength = long.MaxValue,
         CancellationToken cancellationToken = default)
     {
-        var extractionMap = await PackageExtractor.ExtractPackageToFolderAsync(
+        var extractionMap = await ZipExtractorExtensions.ExtractPackageToFolderAsync(
             sourceFile,
             folder,
             maxAllowedDataLength,

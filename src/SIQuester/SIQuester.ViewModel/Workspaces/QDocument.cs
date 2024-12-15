@@ -2279,10 +2279,10 @@ public sealed class QDocument : WorkspaceViewModel
 
     internal void Search(string query, CancellationToken token)
     {
-        SearchResults = new SearchResults() { Query = query };
+        SearchResults = new SearchResults { Query = query };
         var package = Package;
 
-        if (package.Model.Contains(query))
+        if (package.Model.ContainsInfoOwner(query))
         {
             lock (_searchSync)
             {
@@ -2297,7 +2297,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         foreach (var round in package.Rounds)
         {
-            if (round.Model.Contains(query))
+            if (round.Model.ContainsInfoOwner(query))
             {
                 lock (_searchSync)
                 {
@@ -2312,7 +2312,7 @@ public sealed class QDocument : WorkspaceViewModel
 
             foreach (var theme in round.Themes)
             {
-                if (theme.Model.Contains(query))
+                if (theme.Model.ContainsInfoOwner(query))
                 {
                     lock (_searchSync)
                     {

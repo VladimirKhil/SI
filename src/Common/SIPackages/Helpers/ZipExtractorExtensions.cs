@@ -1,11 +1,11 @@
 ﻿using ZipUtils;
 
-namespace SIPackages;
+namespace SIPackages.Helpers;
 
 /// <summary>
 /// Provides method to extract package to folder.
 /// </summary>
-internal static class PackageExtractor
+internal static class ZipExtractorExtensions
 {
     /// <summary>
     /// Extarcts package to folder.

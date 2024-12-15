@@ -3,7 +3,6 @@ using SIPackages.Exceptions;
 using SIPackages.Helpers;
 using SIPackages.Models;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Xml;
 
 namespace SIPackages;
@@ -23,32 +22,15 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     /// </summary>
     public const double MaximumSupportedVersion = 5.0;
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private double _version = DefaultVersion;
-
     /// <summary>
     /// Package version.
     /// </summary>
-    public double Version { get => _version; set { _version = value; } }
-
-    private string _id = "";
+    public double Version { get; set; } = DefaultVersion;
 
     /// <summary>
     /// Unique package identifier.
     /// </summary>
-    public string ID
-    {
-        get => _id;
-        set
-        {
-            if (_id != value)
-            {
-                var oldValue = _id;
-                _id = value;
-                OnPropertyChanged(oldValue);
-            }
-        }
-    }
+    public string ID { get; set; } = "";
 
     private string _restriction = "";
 
@@ -229,23 +211,6 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     /// <inheritdoc />
     public override string ToString() => Name;
 
-    /// <summary>
-    /// Creates a new round.
-    /// </summary>
-    /// <param name="type">Round type.</param>
-    /// <param name="name">Round name.</param>
-    public Round CreateRound(string type, string? name)
-    {
-        var round = new Round
-        {
-            Name = name ?? (Rounds.Count + 1).ToString(),
-            Type = type
-        };
-
-        Rounds.Add(round);
-        return round;
-    }
-
     /// <inheritdoc />
     public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
@@ -260,12 +225,12 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                 throw new UnsupportedPackageVersionException(version, MaximumSupportedVersion);
             }
 
-            _version = version;
+            Version = version;
         }
 
         if (reader.MoveToAttribute("id"))
         {
-            _id = reader.Value;
+            ID = reader.Value;
         }
 
         if (reader.MoveToAttribute("restriction"))
@@ -369,9 +334,9 @@ public sealed class Package : InfoOwner, IEquatable<Package>
         writer.WriteAttributeString("name", Name);
         writer.WriteAttributeString("version", Math.Max(DefaultVersion, Version).ToString());
 
-        if (!string.IsNullOrEmpty(_id))
+        if (!string.IsNullOrEmpty(ID))
         {
-            writer.WriteAttributeString("id", _id);
+            writer.WriteAttributeString("id", ID);
         }
 
         if (!string.IsNullOrEmpty(_restriction))

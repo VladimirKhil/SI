@@ -5,6 +5,7 @@ using Notions;
 using QTxtConverter.Properties;
 using SIPackages;
 using SIPackages.Core;
+using SIPackages.Helpers;
 using Spard.Data;
 using Spard.Exceptions;
 using System.Diagnostics;

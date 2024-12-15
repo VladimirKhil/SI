@@ -3,7 +3,8 @@
 /// <summary>
 /// Provides well-known question type parameters.
 /// </summary>
-public static class QuestionTypeParams
+[Obsolete]
+internal static class QuestionTypeParams
 {
     /// <summary>
     /// Question special theme.

@@ -1,4 +1,6 @@
-﻿namespace SIPackages.Core;
+﻿using SIPackages.Core;
+
+namespace SIQuester.ViewModel.Contracts;
 
 /// <summary>
 /// Defines a package media object.

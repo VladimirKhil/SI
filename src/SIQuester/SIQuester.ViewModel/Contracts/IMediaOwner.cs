@@ -1,6 +1,4 @@
-﻿using SIPackages.Core;
-
-namespace SIQuester.ViewModel.Contracts;
+﻿namespace SIQuester.ViewModel.Contracts;
 
 /// <summary>
 /// Defines an object which could provide access to some media data.

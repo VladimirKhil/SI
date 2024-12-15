@@ -1,5 +1,5 @@
 ﻿using SIPackages;
-using SIPackages.Core;
+using SIQuester.ViewModel.Contracts;
 
 namespace SIQuester.ViewModel;
 

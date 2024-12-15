@@ -1,5 +1,4 @@
-﻿using SIPackages.Core;
-using SIPackages.Helpers;
+﻿using SIPackages.Helpers;
 using SIPackages.Models;
 using System.Xml;
 
@@ -17,66 +16,6 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
 
     /// <inheritdoc />
     public override string ToString() => Name;
-
-    /// <summary>
-    /// Creates a new question in the theme.
-    /// </summary>
-    /// <param name="price">Question price.</param>
-    /// <param name="isFinal">Does the question belong to the final round.</param>
-    /// <param name="text">Question text.</param>
-    public Question CreateQuestion(int price = -1, bool isFinal = false, string text = "")
-    {
-        int qPrice = DetectQuestionPrice(price, isFinal);
-
-        var quest = new Question
-        {
-            Price = qPrice
-        };
-
-        quest.Parameters[QuestionParameterNames.Question] = new StepParameter
-        {
-            Type = StepParameterTypes.Content,
-            ContentValue = new List<ContentItem>
-            {
-                new() { Type = ContentTypes.Text, Value = text },
-            }
-        };
-
-        quest.Right.Add("");
-        Questions.Add(quest);
-
-        return quest;
-    }
-
-    private int DetectQuestionPrice(int price, bool isFinal)
-    {
-        if (price != -1)
-        {
-            return price;
-        }
-
-        var validQuestions = Questions.Where(q => q.Price != Question.InvalidPrice).ToList();
-
-        var questionCount = validQuestions.Count;
-
-        if (questionCount > 1)
-        {
-            var stepValue = validQuestions[1].Price - validQuestions[0].Price;
-            return Math.Max(0, validQuestions[questionCount - 1].Price + stepValue);
-        }
-
-        if (questionCount > 0)
-        {
-            return validQuestions[0].Price * 2;
-        }
-
-        if (isFinal)
-        {
-            return 0;
-        }
-
-        return 100;
-    }
 
     /// <inheritdoc />
     public override void ReadXml(XmlReader reader, PackageLimits? limits = null)

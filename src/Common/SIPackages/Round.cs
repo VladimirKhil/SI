@@ -34,17 +34,6 @@ public sealed class Round : InfoOwner, IEquatable<Round>
     /// <inheritdoc/>
     public override string ToString() => Name;
 
-    /// <summary>
-    /// Создание темы
-    /// </summary>
-    /// <param name="name">Название темы</param>
-    public Theme CreateTheme(string? name)
-    {
-        var theme = new Theme { Name = name ?? "" };
-        Themes.Add(theme);
-        return theme;
-    }
-
     /// <inheritdoc/>
     public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {

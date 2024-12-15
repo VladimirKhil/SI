@@ -19,7 +19,7 @@ public static class QuestionTypes
     /// Stake question type.
     /// </summary>
     [Obsolete("Use Stake question type")]
-    public const string Auction = "auction";
+    internal const string Auction = "auction";
 
     /// <summary>
     /// Stake question type.
@@ -35,7 +35,7 @@ public static class QuestionTypes
     /// Secret question type.
     /// </summary>
     [Obsolete("Use Secret question type")]
-    public const string Cat = "cat";
+    internal const string Cat = "cat";
 
     /// <summary>
     /// Secret question type.
@@ -56,13 +56,13 @@ public static class QuestionTypes
     /// Extended secret question type.
     /// </summary>
     [Obsolete("Use Secret question type")]
-    public const string BagCat = "bagcat";
+    internal const string BagCat = "bagcat";
 
     /// <summary>
     /// No-risk question.
     /// </summary>
     [Obsolete("Use NoRisk question type")]
-    public const string Sponsored = "sponsored";
+    internal const string Sponsored = "sponsored";
 
     /// <summary>
     /// No-risk question.

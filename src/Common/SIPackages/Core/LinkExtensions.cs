@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides helper methods for working with document links.
 /// </summary>
-public static class LinkExtensions
+internal static class LinkExtensions
 {
     /// <summary>
     /// Extracts link from value.

@@ -1,6 +1,7 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Properties;
 using System.Collections.ObjectModel;
 using System.Windows.Input;

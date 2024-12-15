@@ -1,4 +1,4 @@
-﻿namespace SIPackages.Core;
+﻿namespace SIQuester.ViewModel.Helpers;
 
 /// <summary>
 /// Respresent a string containing search result splitted by this result.

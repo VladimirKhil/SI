@@ -7,6 +7,7 @@ using SIQuester.Model;
 using SIQuester.Properties;
 using SIQuester.View;
 using SIQuester.ViewModel;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
 using System.Diagnostics;

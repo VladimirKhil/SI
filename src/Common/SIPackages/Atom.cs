@@ -1,7 +1,6 @@
 ﻿using SIPackages.Core;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Text;
 
 namespace SIPackages;
 
@@ -9,7 +8,7 @@ namespace SIPackages;
 /// Defines a question scenario minimal item.
 /// </summary>
 [Obsolete]
-internal sealed class Atom : PropertyChangedNotifier, ITyped, IEquatable<Atom>
+internal sealed class Atom
 {
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private string _type = AtomTypes.Text;
@@ -36,9 +35,7 @@ internal sealed class Atom : PropertyChangedNotifier, ITyped, IEquatable<Atom>
         {
             if (_type != value)
             {
-                var oldValue = _type;
                 _type = value;
-                OnPropertyChanged(oldValue);
             }
         }
     }
@@ -54,9 +51,7 @@ internal sealed class Atom : PropertyChangedNotifier, ITyped, IEquatable<Atom>
         {
             if (_atomTime != value)
             {
-                var oldValue = _atomTime;
                 _atomTime = value;
-                OnPropertyChanged(oldValue);
             }
         }
     }
@@ -71,44 +66,8 @@ internal sealed class Atom : PropertyChangedNotifier, ITyped, IEquatable<Atom>
         {
             if (_text != value)
             {
-                var oldValue = _text;
                 _text = value;
-                OnPropertyChanged(oldValue);
             }
         }
     }
-
-    /// <summary>
-    /// Does the atom text contain specified value.
-    /// </summary>
-    /// <param name="value">Text value.</param>
-    public bool Contains(string value) => _text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
-
-    /// <inheritdoc />
-    public override string ToString()
-    {
-        if (_type == AtomTypes.Text)
-        {
-            return _text;
-        }
-
-        var res = new StringBuilder();
-        res.AppendFormat("#{0} ", _type);
-        res.Append(_text);
-
-        return res.ToString();
-    }
-
-    /// <inheritdoc />
-    public bool Equals(Atom? other) =>
-        other is not null
-        && Type.Equals(other.Type)
-        && AtomTime.Equals(other.AtomTime)
-        && Text.Equals(other.Text);
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj) => Equals(obj as Atom);
-
-    /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Type, AtomTime, Text);
 }

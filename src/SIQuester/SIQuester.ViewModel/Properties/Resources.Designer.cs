@@ -1580,24 +1580,6 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Super Secret question.
-        /// </summary>
-        public static string SuperSecretQuestion {
-            get {
-                return ResourceManager.GetString("SuperSecretQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Television analog of SIGame.
-        /// </summary>
-        public static string TeleSI {
-            get {
-                return ResourceManager.GetString("TeleSI", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Template name.
         /// </summary>
         public static string TemplateName {
@@ -1675,28 +1657,6 @@ namespace SIQuester.ViewModel.Properties {
         public static string ToBase {
             get {
                 return ResourceManager.GetString("ToBase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Export to IRC.
-        /// </summary>
-        public static string ToIRC {
-            get {
-                return ResourceManager.GetString("ToIRC", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на This file is created for playing &apos;svoyak&apos; in the IRC chat. Please do not manually edit anything in it, as this may lead to unpleasant consequences during the game.
-        ///For the script to work, you need the sportsi.ini files (the script itself), ssi-load.cmd (script loading), and ssi-restore.cmd (script unloading). They must be placed in the folder of your IRC client. To start the game, load the script with the command
-        ////play -c ssi-load.cmd
-        ///Then you can get all the help by pressing the F2 key.
-        ///After completin [остаток строки не уместился]&quot;;.
-        /// </summary>
-        public static string ToIRCtext {
-            get {
-                return ResourceManager.GetString("ToIRCtext", resourceCulture);
             }
         }
         

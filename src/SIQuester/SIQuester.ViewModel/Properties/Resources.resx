@@ -640,12 +640,6 @@ Humor</value>
   <data name="Success" xml:space="preserve">
     <value>The input file has been completely read! The entire file header is placed in the package comments. Please sort its content yourself. Total imported themes:</value>
   </data>
-  <data name="SuperSecretQuestion" xml:space="preserve">
-    <value>Super Secret question</value>
-  </data>
-  <data name="TeleSI" xml:space="preserve">
-    <value>Television analog of SIGame</value>
-  </data>
   <data name="TemplateName" xml:space="preserve">
     <value>Template name</value>
   </data>
@@ -672,34 +666,6 @@ Humor</value>
   </data>
   <data name="ToBase" xml:space="preserve">
     <value>Export to Question Base</value>
-  </data>
-  <data name="ToIRC" xml:space="preserve">
-    <value>Export to IRC</value>
-  </data>
-  <data name="ToIRCtext" xml:space="preserve">
-    <value>This file is created for playing 'svoyak' in the IRC chat. Please do not manually edit anything in it, as this may lead to unpleasant consequences during the game.
-For the script to work, you need the sportsi.ini files (the script itself), ssi-load.cmd (script loading), and ssi-restore.cmd (script unloading). They must be placed in the folder of your IRC client. To start the game, load the script with the command
-/play -c ssi-load.cmd
-Then you can get all the help by pressing the F2 key.
-After completing the game, you can unload the script with the command
-/play -c ssi-restore.cmd
-Notations in the file:
-p - package
-r - round
-t - topic
-q - question
-(then the number)
-name - name
-price - question price
-type - type (for round and question)
-auth - authors
-sour - sources
-comm - comments
-text - question text
-right - correct answers
-wrong - incorrect answers
-cost - Cat's price
-theme - Cat's theme</value>
   </data>
   <data name="TotalImport" xml:space="preserve">
     <value>Total themes imported:</value>

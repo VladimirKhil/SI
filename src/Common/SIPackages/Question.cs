@@ -102,42 +102,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public override string Name => "";
 
     /// <inheritdoc />
-    public override bool Contains(string value) =>
-        base.Contains(value) ||
-        Parameters != null && Parameters.ContainsQuery(value) ||
-        Right.ContainsQuery(value) ||
-        Wrong.ContainsQuery(value);
-
-    /// <inheritdoc />
-    public override IEnumerable<SearchData> Search(string value)
-    {
-        foreach (var item in base.Search(value))
-        {
-            yield return item;
-        }
-
-        if (Parameters != null)
-        {
-            foreach (var item in Parameters.Search(value))
-            {
-                yield return item;
-            }
-        }
-
-        foreach (var item in Right.Search(value))
-        {
-            item.Kind = ResultKind.Right;
-            yield return item;
-        }
-
-        foreach (var item in Wrong.Search(value))
-        {
-            item.Kind = ResultKind.Wrong;
-            yield return item;
-        }
-    }
-
-    /// <inheritdoc />
     public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
         var priceStr = reader.GetAttribute("price");

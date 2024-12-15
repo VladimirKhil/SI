@@ -59,13 +59,6 @@ public sealed class AnswersViewModel : ItemsViewModel<string>, IContentCollectio
 
         UpdateCommands();
         UpdateAnswersCommands();
-        UpdateQualityCommands();
-    }
-
-    public void UpdateQualityCommands()
-    {
-        var package = Owner.OwnerTheme?.OwnerRound?.OwnerPackage;
-        LinkUri.CanBeExecuted = package != null && !package.HasQualityControl;
     }
 
     protected override void OnCurrentItemChanged(string? oldValue, string? newValue)

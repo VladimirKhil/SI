@@ -1,4 +1,4 @@
-﻿namespace SIPackages.Core;
+﻿namespace SIQuester.ViewModel.Helpers;
 
 /// <summary>
 /// Defines a search result data.

@@ -1,4 +1,7 @@
-﻿namespace SIPackages.Core;
+﻿using SIPackages.Core;
+using SIQuester.ViewModel.Contracts;
+
+namespace SIQuester.ViewModel.Model;
 
 /// <inheritdoc cref="IMedia" />
 public sealed class Media : IMedia

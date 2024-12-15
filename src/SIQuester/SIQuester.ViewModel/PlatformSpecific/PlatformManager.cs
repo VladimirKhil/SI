@@ -1,6 +1,6 @@
 ﻿using SIPackages;
-using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Model;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;

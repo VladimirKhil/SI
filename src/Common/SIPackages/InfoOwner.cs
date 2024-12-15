@@ -3,7 +3,6 @@ using SIPackages.Helpers;
 using SIPackages.Models;
 using System.ComponentModel;
 using System.Xml;
-using System.Xml.Schema;
 
 namespace SIPackages;
 
@@ -19,75 +18,6 @@ public abstract class InfoOwner : Named
     /// </summary>
     [DefaultValue(typeof(Info), "")]
     public Info Info { get; } = new();
-
-    /// <summary>
-    /// Copies info from source object.
-    /// </summary>
-    /// <param name="infoOwner">Source object.</param>
-    public void SetInfoFromOwner(InfoOwner infoOwner)
-    {
-        foreach (string s in infoOwner.Info.Authors)
-        {
-            Info.Authors.Add(s);
-        }
-
-        foreach (string s in infoOwner.Info.Sources)
-        {
-            Info.Sources.Add(s);
-        }
-
-        Info.Comments.Text = infoOwner.Info.Comments.Text;
-
-        if (infoOwner.Info.ShowmanComments != null)
-        {
-            Info.ShowmanComments ??= new Comments();
-            Info.ShowmanComments.Text = infoOwner.Info.ShowmanComments.Text;
-        }
-
-        Info.Extension = infoOwner.Info.Extension;
-    }
-
-    /// <inheritdoc />
-    public override bool Contains(string value) => 
-        base.Contains(value) ||
-        Info.Authors.ContainsQuery(value) ||
-        Info.Sources.ContainsQuery(value) ||
-        Info.Comments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1 ||
-        Info.ShowmanComments != null && Info.ShowmanComments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
-
-    /// <inheritdoc />
-    public override IEnumerable<SearchData> Search(string value)
-    {
-        foreach (var item in base.Search(value))
-        {
-            yield return item;
-        }
-
-        foreach (var item in Info.Authors.Search(value))
-        {
-            item.Kind = ResultKind.Author;
-            yield return item;
-        }
-
-        foreach (var item in Info.Sources.Search(value))
-        {
-            item.Kind = ResultKind.Source;
-            yield return item;
-        }
-
-        foreach (var item in SearchExtensions.Search(ResultKind.Comment, Info.Comments.Text, value))
-        {
-            yield return item;
-        }
-
-        if (Info.ShowmanComments != null)
-        {
-            foreach (var item in SearchExtensions.Search(ResultKind.Comment, Info.ShowmanComments.Text, value))
-            {
-                yield return item;
-            }
-        }
-    }
 
     /// <summary>
     /// Reads data from XML reader.
