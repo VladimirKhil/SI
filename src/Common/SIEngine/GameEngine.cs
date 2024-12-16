@@ -146,8 +146,9 @@ public sealed class GameEngine : EngineBase
 
     private void OnQuestionType()
     {
-        var isDefault = ActiveQuestion.TypeName == GameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType;        
-        PlayHandler.OnQuestionType(ActiveQuestion.TypeName, isDefault);
+        var questionTypeName = QuestionEngine.QuestionTypeName;
+        var isDefault = questionTypeName == GameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType;
+        PlayHandler.OnQuestionType(questionTypeName, isDefault);
         Stage = GameStage.Question;
     }
 
@@ -172,12 +173,6 @@ public sealed class GameEngine : EngineBase
         _questionIndex = questionIndex;
 
         SetActiveThemeQuestion();
-
-        if (!OptionsProvider().PlaySpecials)
-        {
-            ActiveQuestion.TypeName = QuestionTypes.Default;
-        }
-
         OnMoveToQuestion();
         UpdateCanNext();
         CanMoveBack = SelectionStrategy.CanMoveBack();

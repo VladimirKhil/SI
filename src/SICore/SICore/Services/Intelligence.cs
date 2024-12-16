@@ -52,7 +52,8 @@ internal sealed class Intelligence : IIntelligence
             throw new InvalidOperationException("Game table is empty");
         }
 
-        var maxQuestionCount = table.Max(theme => theme.Questions.Count(QuestionHelper.IsActive));
+        // Do not filter by IsActive as we'll miss the questions after the empty ones
+        var maxQuestionCount = table.Max(theme => theme.Questions.Count); 
 
         if (maxQuestionCount == 0)
         {

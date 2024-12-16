@@ -111,4 +111,9 @@ public interface ISIEnginePlayHandler
     /// <param name="questionIndex">Question index.</param>
     /// <param name="price">Question price.</param>
     void OnQuestionRestored(int themeIndex, int questionIndex, int price);
+
+    /// <summary>
+    /// Handles question end.
+    /// </summary>
+    void OnQuestionEnd();
 }

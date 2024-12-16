@@ -150,7 +150,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         Engine.Package += Engine_Package;
         Engine.GameThemes += Engine_GameThemes;
 
-        Engine.QuestionPostInfo += Engine_QuestionPostInfo;
         Engine.QuestionFinish += Engine_QuestionFinish;
         Engine.NextQuestion += Engine_NextQuestion;
 
@@ -286,7 +285,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
-    private void Engine_QuestionPostInfo()
+    private void OnQuestionPostInfo()
     {
         _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
 
@@ -1891,8 +1890,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         AnnounceStake();
                         break;
 
-                    case Tasks.AnnouncePostStake:
-                        AnnouncePostStake();
+                    case Tasks.AnnouncePostStakeWithAnswerOptions:
+                        AnnouncePostStakeWithAnswerOptions();
                         break;
 
                     case Tasks.WaitReport:
@@ -2496,11 +2495,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
-    private void AnnouncePostStake()
+    private void AnnouncePostStakeWithAnswerOptions()
     {
         if (_data.AnnouncedAnswerersEnumerator == null || !_data.AnnouncedAnswerersEnumerator.MoveNext())
         {
-            ScheduleExecution(Tasks.MoveNext, 15, 1, true);
+            OnQuestionPostInfo();
             return;
         }
 
@@ -2509,7 +2508,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.PlayerIsRight = _data.Answerer?.Answer == _data.RightOptionLabel;
         AnnounceStakeCore();
-        ScheduleExecution(Tasks.AnnouncePostStake, 15);
+        ScheduleExecution(Tasks.AnnouncePostStakeWithAnswerOptions, 15);
     }
 
     private void AnnounceStake()
@@ -2960,7 +2959,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _gameActions.PlayerReplic(answererIndex, answer);
 
-        if (_data.QuestionPlayState.AnswerOptions != null)
+        if (_data.QuestionPlayState.ValidateAfterRightAnswer)
         {
             ScheduleExecution(Tasks.Announce, 25, force: true);
         }
@@ -4700,16 +4699,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     internal void OnComplexAnswer()
     {
         var last = _data.QuestionHistory.LastOrDefault();
-        var answer = _data.Question?.Right.FirstOrDefault();
+        var answer = _data.Question?.Right.FirstOrDefault() ?? "";
 
         if (last == null || !last.IsRight) // There has been no right answer
         {
-            var printedAnswer = answer != null ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
+            var printedAnswer = answer.Length > 0 ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
             _gameActions.ShowmanReplic(printedAnswer);
         }
 
         if (_data.QuestionPlayState.AnswerOptions != null)
         {
+            _data.RightOptionLabel = answer;
             var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == answer);
 
             if (answerIndex > -1)
@@ -4718,7 +4718,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
-        _gameActions.SendMessageWithArgs(Messages.RightAnswerStart, ContentTypes.Text, answer ?? "");
+        _gameActions.SendMessageWithArgs(Messages.RightAnswerStart, ContentTypes.Text, answer);
     }
 
     internal void OnRightAnswerOption(string rightOptionLabel)
@@ -4726,55 +4726,83 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.RightOptionLabel = rightOptionLabel;
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
         var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
+        answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
+        ScheduleExecution(Tasks.MoveNext, answerTime);
+    }
 
+    internal void OnQuestionEnd()
+    {
+        if (_data.QuestionPlayState.ValidateAfterRightAnswer)
+        {
+            if (ValidatePlayersAnswers())
+            {
+                return;
+            }
+        }
+
+        OnQuestionPostInfo();
+    }
+
+    private bool ValidatePlayersAnswers()
+    {
         if (HaveMultipleAnswerers() && _data.AnnouncedAnswerersEnumerator != null)
         {
             _data.AnnouncedAnswerersEnumerator.Reset();
 
             if (_data.QuestionPlayState.HiddenStakes)
             {
-                ScheduleExecution(Tasks.AnnouncePostStake, (answerTime == 0 ? 2 : answerTime) * 10);
-                return;
+                ScheduleExecution(Tasks.AnnouncePostStakeWithAnswerOptions, 1);
+                return true;
             }
             else
             {
-                while (_data.AnnouncedAnswerersEnumerator.MoveNext())
-                {
-                    var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
-
-                    if (answererIndex < 0 || answererIndex >= _data.Players.Count)
-                    {
-                        continue;
-                    }
-
-                    var answerer = _data.Players[answererIndex];
-                    var isRight = answerer.Answer == _data.RightOptionLabel;
-
-                    var message = new MessageBuilder(Messages.Person);
-                    int outcome;
-
-                    if (isRight)
-                    {
-                        message.Add('+');
-                        answerer.AddRightSum(_data.CurPriceRight);
-                        outcome = _data.CurPriceRight;
-                    }
-                    else
-                    {
-                        message.Add('-');
-                        answerer.SubtractWrongSum(_data.CurPriceWrong);
-                        outcome = _data.CurPriceWrong;
-                    }
-
-                    message.Add(answererIndex).Add(outcome);
-                    _gameActions.SendMessage(message.ToString());
-                }
-
-                _gameActions.InformSums();
+                CalculateOutcomesByRightAnswerOption();
             }
         }
 
-        ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);
+        return false;
+    }
+
+    private void CalculateOutcomesByRightAnswerOption()
+    {
+        if (_data.AnnouncedAnswerersEnumerator == null)
+        {
+            return;
+        }
+
+        while (_data.AnnouncedAnswerersEnumerator.MoveNext())
+        {
+            var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
+
+            if (answererIndex < 0 || answererIndex >= _data.Players.Count)
+            {
+                continue;
+            }
+
+            var answerer = _data.Players[answererIndex];
+            var isRight = answerer.Answer == _data.RightOptionLabel;
+
+            var message = new MessageBuilder(Messages.Person);
+            int outcome;
+
+            if (isRight)
+            {
+                message.Add('+');
+                answerer.AddRightSum(_data.CurPriceRight);
+                outcome = _data.CurPriceRight;
+            }
+            else
+            {
+                message.Add('-');
+                answerer.SubtractWrongSum(_data.CurPriceWrong);
+                outcome = _data.CurPriceWrong;
+            }
+
+            message.Add(answererIndex).Add(outcome);
+            _gameActions.SendMessage(message.ToString());
+        }
+
+        _gameActions.InformSums();
     }
 
     internal void OnAnnouncePrice(NumberSet availableRange)

@@ -1791,6 +1791,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         {
             Greet();
         }
+
+        if (!_data.IsNetworkGame && _gameViewModel.Ready.CanBeExecuted)
+        {
+            _gameViewModel.Ready.Execute(null);
+        }
     }
 
     private async void Greet()

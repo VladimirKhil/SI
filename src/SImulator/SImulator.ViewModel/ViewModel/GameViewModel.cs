@@ -688,7 +688,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         _engine.Package += Engine_Package;
         _engine.GameThemes += Engine_GameThemes;
-        _engine.QuestionPostInfo += Engine_QuestionPostInfo;
         _engine.QuestionFinish += Engine_QuestionFinish;
         _engine.EndQuestion += Engine_EndQuestion;
         _engine.NextQuestion += Engine_NextQuestion;
@@ -851,7 +850,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    private async void Engine_QuestionPostInfo()
+    internal async void OnQuestionEnd()
     {
         await Task.Yield();
 

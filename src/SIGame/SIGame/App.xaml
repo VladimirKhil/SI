@@ -11,6 +11,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    xmlns:sd="clr-namespace:SIData;assembly=SIData"
     DispatcherUnhandledException="Application_DispatcherUnhandledException"
     Startup="Application_Startup"
     Exit="Application_Exit"
@@ -1132,10 +1133,14 @@
             </Style>
 
             <Style x:Key="ReadyButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButton}">
-                <Setter Property="Visibility" Value="{Binding GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=True}" />
+                <Setter Property="Visibility" Value="Collapsed" />
                 <Setter Property="FontWeight" Value="SemiBold" />
 
                 <Style.Triggers>
+                    <DataTrigger Binding="{Binding Data.Stage}" Value="{x:Static sd:GameStage.Before}">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    
                     <DataTrigger Binding="{Binding Ready}" Value="True">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>

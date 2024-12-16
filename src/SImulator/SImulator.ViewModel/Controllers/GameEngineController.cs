@@ -415,4 +415,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     }
 
     public void OnQuestionType(string typeName, bool isDefault) => GameViewModel?.PlayQuestionType(typeName, isDefault);
+
+    public void OnQuestionEnd() => GameViewModel?.OnQuestionEnd();
 }

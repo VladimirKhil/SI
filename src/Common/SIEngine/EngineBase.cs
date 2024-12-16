@@ -170,7 +170,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action<IEnumerable<string>>? GameThemes;
 
     // TODO: investigate and eliminate duplicates
-    public event Action? QuestionPostInfo;
     public event Action<int, int>? EndQuestion;
     public event Action? QuestionFinish;
     public event Action? NextQuestion;
@@ -209,8 +208,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnPackage(Package package) => Package?.Invoke(package);
 
     protected void OnGameThemes(IEnumerable<string> gameThemes) => GameThemes?.Invoke(gameThemes);
-
-    protected void OnQuestionPostInfo() => QuestionPostInfo?.Invoke();
 
     protected void OnQuestionFinish() => QuestionFinish?.Invoke();
 
@@ -341,7 +338,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     {
         if (!QuestionEngine.PlayNext())
         {
-            OnQuestionPostInfo();
+            PlayHandler.OnQuestionEnd();
             Stage = GameStage.EndQuestion;
         }
     }
@@ -359,6 +356,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
                     : FalseStartMode.Disabled,
 
                 ShowSimpleRightAnswers = options.ShowRight,
+                PlaySpecials = options.PlaySpecials,
 
                 DefaultTypeName = GameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType
             });

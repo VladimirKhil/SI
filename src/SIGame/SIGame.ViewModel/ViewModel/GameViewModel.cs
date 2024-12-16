@@ -35,7 +35,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public IViewerClient? Host
     {
         get => _host;
-        set => _host = value;
+        set { _host = value; UpdateCommands(); }
     }
 
     private readonly ViewerData _data;

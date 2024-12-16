@@ -28,6 +28,11 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
+    public void OnQuestionEnd()
+    {
+        
+    }
+
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
     {
         

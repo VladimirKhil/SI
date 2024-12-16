@@ -59,6 +59,11 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal Dictionary<string, (bool, double)?> Validations { get; } = new();
 
+    /// <summary>
+    /// Should the player answers be validated after right answer.
+    /// </summary>
+    internal bool ValidateAfterRightAnswer => AnswerOptions != null;
+
     internal void Clear()
     {
         AnswererIndicies.Clear();

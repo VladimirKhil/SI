@@ -209,4 +209,6 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         question.Price = price;
         GameActions?.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, price);
     }
+
+    public void OnQuestionEnd() => GameLogic?.OnQuestionEnd();
 }

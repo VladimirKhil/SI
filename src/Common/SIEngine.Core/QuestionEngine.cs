@@ -26,6 +26,8 @@ public sealed class QuestionEngine
 
     public bool CanNext => _script != null && _stepIndex < _script.Steps.Count;
 
+    public string QuestionTypeName { get; } = "";
+
     /// <summary>
     /// Initializes a new instance of <see cref="QuestionEngine" /> class.
     /// </summary>
@@ -41,12 +43,8 @@ public sealed class QuestionEngine
 
         if (_script == null)
         {
-            var typeName = _question.TypeName == QuestionTypes.Default ? options.DefaultTypeName : _question.TypeName;
-
-            // TODO: do not update package objects; they should be read only
-            question.TypeName = typeName;
-
-            ScriptsLibrary.Scripts.TryGetValue(typeName, out _script);
+            QuestionTypeName = _question.TypeName == QuestionTypes.Default || !options.PlaySpecials ? options.DefaultTypeName : _question.TypeName;
+            ScriptsLibrary.Scripts.TryGetValue(QuestionTypeName, out _script);
         }
     }
 

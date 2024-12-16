@@ -21,4 +21,9 @@ public sealed class QuestionEngineOptions
     /// Default type name.
     /// </summary>
     public string DefaultTypeName { get; set; } = QuestionTypes.Simple;
+
+    /// <summary>
+    /// Play special questions.
+    /// </summary>
+    public bool PlaySpecials { get; set; } = true;
 }
