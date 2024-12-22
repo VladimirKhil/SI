@@ -2166,7 +2166,7 @@ public sealed class Game : Actor<GameData>
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
                     _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
 
-                    if (ClientData.Players[i].IsHuman && args[1].Length > 0)
+                    if (ClientData.QuestionPlayState.AnswerOptions == null && ClientData.Players[i].IsHuman && args[1].Length > 0)
                     {
                         var answer = args[1];
 
