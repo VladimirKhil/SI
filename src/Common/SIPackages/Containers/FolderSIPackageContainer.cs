@@ -67,7 +67,7 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
 
     public void Flush() { }
 
-    public string[] GetEntries(string category)
+    public IEnumerable<string> GetEntries(string category)
     {
         var directoryInfo = new DirectoryInfo(Path.Combine(_folder, category));
 
@@ -76,7 +76,7 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
             return Array.Empty<string>();
         }
 
-        return directoryInfo.GetFiles().Select(file => file.Name).ToArray();
+        return directoryInfo.GetFiles().Select(file => file.Name);
     }
 
     public StreamInfo? GetStream(string name, bool read = true)

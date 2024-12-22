@@ -122,17 +122,16 @@ public partial class MainWindow : Window
 
     private bool OnMoveNextKeyPressed()
     {
-        if (((MainViewModel)DataContext).ActiveView is not GameViewModel game)
+        if (((MainViewModel)DataContext).ActiveView is not GameViewModel gameViewModel)
         {
             return false;
         }
 
         var appSettings = UserSettings.Default.GameSettings.AppSettings;
 
-        if (appSettings.BindNextButton && game.Move.CanBeExecuted)
+        if (appSettings.BindNextButton && gameViewModel.Move.CanBeExecuted)
         {
-            game.Data.PlayerDataExtensions.OnPressNextButton();
-            game.Move.Execute(1);
+            gameViewModel.Move.Execute(1);
             return true;
         }
 
@@ -149,17 +148,14 @@ public partial class MainWindow : Window
             }
         }
 
-        if (((MainViewModel)DataContext).ActiveView is not GameViewModel game)
+        if (((MainViewModel)DataContext).ActiveView is not GameViewModel gameViewModel)
         {
             return false;
         }
 
-        var data = game.Data;
-
-        if (game.PressGameButton != null && game.PressGameButton.CanExecute(null))
+        if (gameViewModel.PressGameButton != null && gameViewModel.PressGameButton.CanExecute(null))
         {
-            data.PlayerDataExtensions.OnPressButton();
-            game.PressGameButton.Execute(null);
+            gameViewModel.PressGameButton.Execute(null);
             return true;
         }
 

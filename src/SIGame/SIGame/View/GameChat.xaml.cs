@@ -38,12 +38,12 @@ public partial class GameChat : UserControl
     {
         if (e.NewValue is GameViewModel gameViewModel)
         {
-            gameViewModel.Data.StringAdding += AddMessage;
+            gameViewModel.StringAdding += AddMessage;
         }
 
         if (e.OldValue is GameViewModel oldModel)
         {
-            oldModel.Data.StringAdding -= AddMessage;
+            oldModel.StringAdding -= AddMessage;
         }
     }
 

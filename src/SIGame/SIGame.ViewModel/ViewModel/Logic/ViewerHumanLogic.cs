@@ -82,6 +82,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     private StreamWriter? _gameLogger = null;
     private string? _logFilePath = null;
 
+    private readonly List<string> _chatTable = new();
+
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
         ViewerData data,
@@ -244,7 +246,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     }
 
     private void LocalFileManager_Error(Uri mediaUri, Exception e) =>
-        _data.OnAddString(
+        _gameViewModel.OnAddString(
             null,
             $"\n{string.Format(R.FileLoadError, Path.GetFileName(mediaUri.ToString()))}: {e.Message}\n",
             LogMode.Log);
@@ -264,7 +266,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             error = (exc.InnerException ?? exc).ToString();
         }
 
-        _data.OnAddString(null, $"{_localizer[nameof(R.MediaLoadError)]} {exc.MediaUri}: {error}{Environment.NewLine}", LogMode.Log);
+        _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.MediaLoadError)]} {exc.MediaUri}: {error}{Environment.NewLine}", LogMode.Log);
     }
 
     private void TInfo_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -278,9 +280,27 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
+    /// <summary>
+    /// Adds mesage to the game chat.
+    /// </summary>
+    /// <param name="message">Message to add.</param>
+    private void AddToChat(Message message)
+    {
+        var index = _chatTable.IndexOf(message.Sender);
+
+        // if user is not present in user list, add him
+        if (index == -1)
+        {
+            _chatTable.Add(message.Sender);
+            index = _chatTable.Count - 1;
+        }
+
+        _gameViewModel.OnAddString(message.Sender, message.Text, LogMode.Chat + index);
+    }
+
     public void ReceiveText(Message m)
     {
-        _data.AddToChat(m);
+        AddToChat(m);
 
         if (_data.Host.MakeLogs)
         {
@@ -312,7 +332,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
             if (_data.Host.TranslateGameToChat)
             {
-                _data.AddToChat(new Message(text, _gameViewModel.Speaker.Name));
+                AddToChat(new Message(text, _gameViewModel.Speaker.Name));
             }
         }
         else if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
@@ -329,20 +349,20 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                 if (_data.Host.TranslateGameToChat)
                 {
-                    _data.AddToChat(new Message(text, _gameViewModel.Speaker.Name));
+                    AddToChat(new Message(text, _gameViewModel.Speaker.Name));
                 }
             }
         }
         else if (replicCode == ReplicCodes.Special.ToString())
         {
             logString = $"<span class=\"sp\">{text}</span>";
-            _data.OnAddString("* ", text, LogMode.Protocol);
+            _gameViewModel.OnAddString("* ", text, LogMode.Protocol);
         }
         else
         {
             if (_data.Host.TranslateGameToChat)
             {
-                _data.OnAddString(null, text, LogMode.Protocol);
+                _gameViewModel.OnAddString(null, text, LogMode.Protocol);
             }
 
             // all other types of messages are printed only to logs
@@ -378,7 +398,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 }
                 catch (IOException exc)
                 {
-                    _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                    _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                 }
             }
         }
@@ -390,7 +410,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             }
             catch (IOException exc)
             {
-                _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                 
                 try
                 {
@@ -406,7 +426,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             }
             catch (EncoderFallbackException exc)
             {
-                _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
             }
         }
     }
@@ -447,7 +467,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     }
                     catch (IOException exc)
                     {
-                        _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                        _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                     }
                     catch (ArgumentException exc)
                     {
@@ -895,7 +915,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
                     if (contentType != ContentTypes.Html
                         && !uri.StartsWith("http://localhost")
-                        && !Data.Host.LoadExternalMedia
+                        && !_data.Host.LoadExternalMedia
                         && !ExternalUrlOk(uri))
                     {
                         currentGroup.Content.Add(new ContentViewModel(ContentType.Text, string.Format(_localizer[nameof(R.ExternalLink)], uri)));
@@ -911,7 +931,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     }
 
                     var localUri = _localFileManager.TryGetFile(mediaUri) ?? uri;
-                    Data.Host.Log($"Media uri conversion: {mediaUri} => {localUri}");
+                    _data.Host.Log($"Media uri conversion: {mediaUri} => {localUri}");
 
                     var tableContentType = contentType == ContentTypes.Image
                         ? ContentType.Image
@@ -942,7 +962,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             groups.Add(currentGroup);
         }
 
-        if (Data.Host.AttachContentToTable && groups.Count == 1 && groups[0].Content.Count == 1 && groups[0].Content[0].Type != ContentType.Text)
+        if (_data.Host.AttachContentToTable && groups.Count == 1 && groups[0].Content.Count == 1 && groups[0].Content[0].Type != ContentType.Text)
         {
             if (_prependTableText != null)
             {
@@ -977,7 +997,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             TInfo.QuestionContentType = QuestionContentType.Void;
         }
 
-        if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
+        if (!uri.StartsWith("http://localhost") && !_data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
         {
             TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
             TInfo.QuestionContentType = QuestionContentType.SpecialText;
@@ -1000,7 +1020,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         {
             var additionalText = _appendTableText ?? _prependTableText;
 
-            if (Data.Host.AttachContentToTable && additionalText != null)
+            if (_data.Host.AttachContentToTable && additionalText != null)
             {
                 var groups = new List<ContentGroup>();
                 var group = new ContentGroup();
@@ -1538,7 +1558,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         try
         {
             await Task.Delay(1000);
-            _data.OnAddString(null, _localizer[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
+            _gameViewModel.OnAddString(null, _localizer[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
         }
         catch (Exception exc)
         {
@@ -1676,7 +1696,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             {
                 uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
             }
-            else if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
+            else if (!uri.StartsWith("http://localhost") && !_data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
             {
                 Interlocked.Decrement(ref fileCounter);
                 continue;
@@ -1804,8 +1824,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         {
             await Task.Delay(2000);
 
-            _data.OnAddString(null, string.Format(_viewerActions.LO[nameof(R.Hint)], _data.Host.GameButtonKey), LogMode.Log);
-            _data.OnAddString(null, _viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine, LogMode.Log);
+            _gameViewModel.OnAddString(null, string.Format(_viewerActions.LO[nameof(R.Hint)], _data.Host.GameButtonKey), LogMode.Log);
+            _gameViewModel.OnAddString(null, _viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine, LogMode.Log);
         }
         catch (ObjectDisposedException)
         {

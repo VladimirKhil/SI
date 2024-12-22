@@ -40,7 +40,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         }
     }
 
-    public StepParametersViewModel? Parameters { get; private set; }
+    public StepParametersViewModel Parameters { get; private set; }
 
     public ICommand AddComplexAnswer { get; private set; }
 
@@ -88,11 +88,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     {
         Right = new AnswersViewModel(this, question.Right, true);
         Wrong = new AnswersViewModel(this, question.Wrong, false);
-
-        if (question.Parameters != null)
-        {
-            Parameters = new StepParametersViewModel(this, question.Parameters);
-        }
+        Parameters = new StepParametersViewModel(this, question.Parameters);
 
         BindHelper.Bind(Right, question.Right);
         BindHelper.Bind(Wrong, question.Wrong);

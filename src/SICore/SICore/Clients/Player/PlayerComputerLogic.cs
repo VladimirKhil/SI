@@ -28,6 +28,38 @@ internal sealed class PlayerComputerLogic : IPersonLogic
     private int _themeQuestionCount = -1;
 
     /// <summary>
+    /// Does the player know the answer.
+    /// </summary>
+    internal bool KnowsAnswer { get; set; } = false;
+
+    /// <summary>
+    /// Is the player sure in the answer.
+    /// </summary>
+    internal bool IsSure { get; set; } = false;
+
+    /// <summary>
+    /// Is the player ready to press the button.
+    /// </summary>
+    internal bool ReadyToPress { get; set; } = false;
+
+    private int _realBrave = 0;
+
+    /// <summary>
+    /// Current brave value.
+    /// </summary>
+    internal int RealBrave { get => _realBrave; set { _realBrave = Math.Max(0, value); } }
+
+    /// <summary>
+    /// Brave change speed.
+    /// </summary>
+    internal int DeltaBrave { get; set; } = 0;
+
+    /// <summary>
+    /// Current reaction speed.
+    /// </summary>
+    internal int RealSpeed { get; set; } = 0;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="PlayerComputerLogic"/> class.
     /// </summary>
     public PlayerComputerLogic(ViewerData data, ComputerAccount account, IIntelligence intelligence, ViewerActions viewerActions, TimerInfo[] timerInfos)
@@ -450,10 +482,10 @@ internal sealed class PlayerComputerLogic : IPersonLogic
         {
             var ans = new StringBuilder(Messages.Answer)
                 .Append(Message.ArgsSeparatorChar)
-                .Append(_data.PlayerDataExtensions.KnowsAnswer ? MessageParams.Answer_Right : MessageParams.Answer_Wrong)
+                .Append(KnowsAnswer ? MessageParams.Answer_Right : MessageParams.Answer_Wrong)
                 .Append(Message.ArgsSeparatorChar);
 
-            if (_data.PlayerDataExtensions.IsSure)
+            if (IsSure)
             {
                 ans.Append(
                     string.Format(
@@ -869,24 +901,24 @@ internal sealed class PlayerComputerLogic : IPersonLogic
 
         if (_data.MySum() < -2000) // Отрицательная сумма -> смелость падает
         {
-            if (playerData.RealBrave >= _account.F + 80)
+            if (RealBrave >= _account.F + 80)
             {
-                playerData.RealBrave -= 80;
+                RealBrave -= 80;
             }
             else
             {
-                playerData.RealBrave = _account.F;
+                RealBrave = _account.F;
             }
         }
         else if (_data.MySum() < 0)
         {
-            if (playerData.RealBrave >= _account.F + 10)
+            if (RealBrave >= _account.F + 10)
             {
-                playerData.RealBrave -= 10;
+                RealBrave -= 10;
             }
             else
             {
-                playerData.RealBrave = _account.F;
+                RealBrave = _account.F;
             }
         }
 
@@ -902,18 +934,18 @@ internal sealed class PlayerComputerLogic : IPersonLogic
             switch (_account.Style)
             {
                 case PlayerStyle.Agressive:
-                    playerData.RealBrave += 7;
-                    playerData.DeltaBrave = 3;
+                    RealBrave += 7;
+                    DeltaBrave = 3;
                     break;
 
                 case PlayerStyle.Normal:
-                    playerData.RealBrave += 5;
-                    playerData.DeltaBrave = 2;
+                    RealBrave += 5;
+                    DeltaBrave = 2;
                     break;
 
                 default:
-                    playerData.RealBrave += 3;
-                    playerData.DeltaBrave = 1;
+                    RealBrave += 3;
+                    DeltaBrave = 1;
                     break;
             }
         }
@@ -922,35 +954,35 @@ internal sealed class PlayerComputerLogic : IPersonLogic
             switch (_account.Style)
             {
                 case PlayerStyle.Agressive:
-                    playerData.RealBrave -= 60;
-                    playerData.DeltaBrave = 3;
+                    RealBrave -= 60;
+                    DeltaBrave = 3;
                     break;
 
                 case PlayerStyle.Normal:
-                    playerData.RealBrave -= 80;
-                    playerData.DeltaBrave = 2;
+                    RealBrave -= 80;
+                    DeltaBrave = 2;
                     break;
 
                 default:
-                    playerData.RealBrave -= 100;
-                    playerData.DeltaBrave = 1;
+                    RealBrave -= 100;
+                    DeltaBrave = 1;
                     break;
             }
         }
         else if (isRight) // Кто-то другой ответил правильно
         {
-            playerData.RealBrave += playerData.DeltaBrave;
+            RealBrave += DeltaBrave;
 
-            if (playerData.DeltaBrave < 5)
+            if (DeltaBrave < 5)
             {
-                playerData.DeltaBrave++;
+                DeltaBrave++;
             }
         }
 
         // Критическая ситуация
         if (IsCritical())
         {
-            playerData.RealBrave += 10;
+            RealBrave += 10;
         }
     }
 
@@ -1620,32 +1652,32 @@ internal sealed class PlayerComputerLogic : IPersonLogic
 
         if (shortThink)
         {
-            playerData.IsSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
+            IsSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
 
-            var riskRateLimit = playerData.RealBrave > 0
-                ? (int)(100 * Math.Max(0, Math.Min(1, playerStrength / playerData.RealBrave)))
+            var riskRateLimit = RealBrave > 0
+                ? (int)(100 * Math.Max(0, Math.Min(1, playerStrength / RealBrave)))
                 : 100;
 
             try
             {
                 var riskRate = riskRateLimit < 100 ? 1 - Random.Shared.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
 
-                playerData.KnowsAnswer = playerData.IsSure || Random.Shared.Next(100) < playerStrength * riskRate / (difficulty + 1);
-                playerData.RealSpeed = Math.Max(1, (int)((playerLag + (int)Random.Shared.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
+                KnowsAnswer = IsSure || Random.Shared.Next(100) < playerStrength * riskRate / (difficulty + 1);
+                RealSpeed = Math.Max(1, (int)((playerLag + (int)Random.Shared.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
 
-                playerData.ReadyToPress = playerData.IsSure || Random.Shared.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
+                ReadyToPress = IsSure || Random.Shared.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
             }
             catch (ArgumentOutOfRangeException exc)
             {
-                throw new Exception($"CalculateAnsweringStrategy: riskRateLimit = {riskRateLimit}, playerStrength = {playerStrength}, playerData.RealBrave = {playerData.RealBrave}", exc);
+                throw new Exception($"CalculateAnsweringStrategy: riskRateLimit = {riskRateLimit}, playerStrength = {playerStrength}, playerData.RealBrave = {RealBrave}", exc);
             }
         }
         else
         {
-            playerData.IsSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1); // 50% for F = 200 and difficulty = 3
-            playerData.KnowsAnswer = playerData.IsSure || Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.5;
+            IsSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1); // 50% for F = 200 and difficulty = 3
+            KnowsAnswer = IsSure || Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.5;
 
-            playerData.RealSpeed = Math.Max(1, playerLag + (int)Random.Shared.NextGaussian(50 - playerStrength / 20, 15)); // 5s average, 4s for strong player
+            RealSpeed = Math.Max(1, playerLag + (int)Random.Shared.NextGaussian(50 - playerStrength / 20, 15)); // 5s average, 4s for strong player
         }
     }
 
@@ -1654,13 +1686,13 @@ internal sealed class PlayerComputerLogic : IPersonLogic
     /// </summary>
     public void StartThink()
     {
-        if (!_data.PlayerDataExtensions.ReadyToPress)
+        if (!ReadyToPress)
         {
             return;
         }
 
-        ScheduleExecution(PlayerTasks.PressButton, _data.PlayerDataExtensions.RealSpeed);
-        _data.PlayerDataExtensions.RealSpeed /= 2; // Повторные попытки выполняются быстрее
+        ScheduleExecution(PlayerTasks.PressButton, RealSpeed);
+        RealSpeed /= 2; // Повторные попытки выполняются быстрее
     }
 
     /// <summary>
@@ -1668,14 +1700,14 @@ internal sealed class PlayerComputerLogic : IPersonLogic
     /// </summary>
     public void EndThink()
     {
-        _data.PlayerDataExtensions.RealBrave++;
+        RealBrave++;
     }
 
     /// <summary>
     /// Необходимо отвечать
     /// </summary>
     public void Answer() => ScheduleExecution(PlayerTasks.Answer,
-        _data.QuestionType == QuestionTypes.Simple ? 10 + Random.Shared.Next(10) : _data.PlayerDataExtensions.RealSpeed);
+        _data.QuestionType == QuestionTypes.Simple ? 10 + Random.Shared.Next(10) : RealSpeed);
 
     /// <summary>
     /// Необходимо отдать Вопрос с секретом
@@ -1725,7 +1757,7 @@ internal sealed class PlayerComputerLogic : IPersonLogic
 
     public void OnInitialized()
     {
-        _data.PlayerDataExtensions.RealBrave = _account.B0;
+        RealBrave = _account.B0;
         ScheduleExecution(PlayerTasks.Ready, 10);
     }
 

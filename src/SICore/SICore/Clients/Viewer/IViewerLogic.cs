@@ -7,7 +7,7 @@ namespace SICore;
 /// <summary>
 /// Defines a viewer behavior.
 /// </summary>
-public interface IViewerLogic : ILogic
+public interface IViewerLogic
 {
     IPersonLogic PlayerLogic { get; }
 
@@ -293,4 +293,6 @@ public interface IViewerLogic : ILogic
     void OnClientSwitch(IViewerClient viewer) { }
 
     void DeleteTheme();
+
+    void ValidateAnswer(int playerIndex, string answer) { }
 }

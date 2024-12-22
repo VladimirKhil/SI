@@ -15,22 +15,11 @@ public sealed class Showman : Viewer
     public Showman(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
     {
-        ClientData.PersonDataExtensions.AreAnswersShown = data.Host.AreAnswersShown;
-        ClientData.PropertyChanged += ClientData_PropertyChanged;
-
         ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
         {
             _viewerActions.SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
             ClearSelections();
         });
-    }
-
-    private void ClientData_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(PersonData.AreAnswersShown))
-        {
-            ClientData.Host.AreAnswersShown = ClientData.PersonDataExtensions.AreAnswersShown;
-        }
     }
 
     /// <summary>
@@ -44,13 +33,25 @@ public sealed class Showman : Viewer
         {
             switch (mparams[0])
             {
-                case Messages.Cancel:                     
+                case Messages.Cancel:
                     ClearSelections(true);
                     break;
 
                 case Messages.AskSelectPlayer: // Uncomment later
                     //OnAskSelectPlayer(mparams);
                     //_logic.SelectPlayer();
+                    break;
+
+                case Messages.AskValidate:
+                    if (mparams.Length < 3
+                        || !int.TryParse(mparams[1], out var playerIndex)
+                        || playerIndex < 0
+                        || playerIndex >= ClientData.Players.Count)
+                    {
+                        break;
+                    }
+
+                    Logic.ValidateAnswer(playerIndex, mparams[2]);
                     break;
 
                 case Messages.First:
@@ -64,7 +65,7 @@ public sealed class Showman : Viewer
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.First, num); ClearSelections(); };
                         }
 
-                        _logic.StarterChoose();
+                        Logic.StarterChoose();
                         break;
 
                         #endregion
@@ -80,7 +81,7 @@ public sealed class Showman : Viewer
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Next, num); ClearSelections(); };
                         }
 
-                        _logic.FirstStake();
+                        Logic.FirstStake();
                         break;
 
                         #endregion
@@ -101,7 +102,7 @@ public sealed class Showman : Viewer
                             ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.NextDelete, num); ClearSelections(); };
                         }
 
-                        _logic.FirstDelete();
+                        Logic.FirstDelete();
                         break;
 
                         #endregion
@@ -113,9 +114,14 @@ public sealed class Showman : Viewer
                             break;
                         }
 
-                        _logic.OnHint(mparams[1]);
+                        Logic.OnHint(mparams[1]);
                         break;
                     }
+
+                case Messages.QuestionAnswers:
+                    OnQuestionAnswers(mparams);
+                    break;
+
                 case Messages.Stage:
                     {
                         for (int i = 0; i < ClientData.Players.Count; i++)
@@ -131,11 +137,11 @@ public sealed class Showman : Viewer
 
                     if (mparams[1] == "1")
                     {
-                        _logic.SelectQuestion();
+                        Logic.SelectQuestion();
                     }
                     else
                     {
-                        _logic.DeleteTheme();
+                        Logic.DeleteTheme();
                     }
 
                     #endregion
@@ -149,7 +155,7 @@ public sealed class Showman : Viewer
                         ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Cat, num); ClearSelections(); };
                     }
 
-                    _logic.ShowmanLogic.Cat();
+                    Logic.ShowmanLogic.Cat();
                     break;
 
                 case Messages.AskStake: // Uncomment later
@@ -166,7 +172,7 @@ public sealed class Showman : Viewer
                         Stake = int.Parse(mparams[1])
                     };
 
-                    _logic.ShowmanLogic.CatCost();
+                    Logic.ShowmanLogic.CatCost();
                     break;
 
                 case Messages.Stake:
@@ -184,7 +190,7 @@ public sealed class Showman : Viewer
                         PlayerName = mparams.Length >= 8 ? mparams[7] : null,
                     };
 
-                    _logic.ShowmanLogic.Stake();
+                    Logic.ShowmanLogic.Stake();
                     break;
 
                 case Messages.Stake2:
@@ -211,11 +217,11 @@ public sealed class Showman : Viewer
                         PlayerName = mparams[5],
                     };
 
-                    _logic.ShowmanLogic.Stake();
+                    Logic.ShowmanLogic.Stake();
                     break;
 
                 case Messages.Answer:
-                    _logic.Answer();
+                    Logic.Answer();
                     break;
             }
         }
@@ -223,6 +229,34 @@ public sealed class Showman : Viewer
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private void OnQuestionAnswers(string[] mparams)
+    {
+        if (mparams.Length < 3)
+        {
+            return;
+        }
+
+        _ = int.TryParse(mparams[1], out var rightAnswersCount);
+        rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 2);
+
+        var right = new List<string>();
+
+        for (var i = 0; i < rightAnswersCount; i++)
+        {
+            right.Add(mparams[2 + i]);
+        }
+
+        var wrong = new List<string>();
+
+        for (var i = 2 + rightAnswersCount; i < mparams.Length; i++)
+        {
+            wrong.Add(mparams[i]);
+        }
+
+        ClientData.PersonDataExtensions.Right = right.ToArray();
+        ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
     }
 
     private void OnValidation2(string[] mparams)
@@ -251,8 +285,8 @@ public sealed class Showman : Viewer
 
         ((PersonAccount)ClientData.Me).IsDeciding = false;
 
-        _logic.IsRight(true, mparams[2]);
+        Logic.IsRight(true, mparams[2]);
     }
 
-    private void ClearSelections(bool full = false) => _logic.ClearSelections(full);
+    private void ClearSelections(bool full = false) => Logic.ClearSelections(full);
 }

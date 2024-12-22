@@ -47,9 +47,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Question type name.
     /// </summary>
-    /// <remarks>
-    /// Replaces deprecated <see cref="Type" /> property.
-    /// </remarks>
     [DefaultValue(QuestionTypes.Default)]
     public string TypeName
     {
@@ -66,17 +63,11 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Question script.
     /// </summary>
-    /// <remarks>
-    /// Replaces deprecated <see cref="Scenario" /> property.
-    /// </remarks>
     public Script? Script { get; set; }
 
     /// <summary>
     /// Question parameters.
     /// </summary>
-    /// <remarks>
-    /// Replaces deprecated <see cref="Scenario" /> and <see cref="Type" /> properties.
-    /// </remarks>
     public StepParameters Parameters { get; } = new();
 
     /// <summary>
@@ -602,6 +593,9 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         return result.ToString();
     }
 
+    /// <summary>
+    /// Checks if the question has media content.
+    /// </summary>
     public bool HasMediaContent()
     {
         foreach (var item in GetContent())

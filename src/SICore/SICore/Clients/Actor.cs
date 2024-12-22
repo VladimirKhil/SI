@@ -10,23 +10,15 @@ namespace SICore;
 /// </summary>
 /// <typeparam name="D">Тип данных клиента</typeparam>
 /// <typeparam name="L">Тип логики клиента</typeparam>
-public abstract class Actor<D, L> : IActor
+public abstract class Actor<D> : IActor
     where D : Data
-    where L : class, ILogic
 {
     protected Client _client;
-
-    /// <summary>
-    /// Логика клиента
-    /// </summary>
-    protected L _logic;
 
     /// <summary>
     /// Данные клиента
     /// </summary>
     public D ClientData { get; private set; }
-
-    public L Logic => _logic;
 
     public IClient Client => _client;
 
@@ -58,8 +50,6 @@ public abstract class Actor<D, L> : IActor
             Client.CurrentNode.OnError(exc, true);
         }
     }
-
-    public void AddLog(string s) => _logic.AddLog(s);
 
     protected virtual void Dispose(bool disposing)
     {

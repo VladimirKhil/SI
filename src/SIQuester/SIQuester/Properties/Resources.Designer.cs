@@ -3053,6 +3053,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Theme list.
+        /// </summary>
+        public static string ThemeList {
+            get {
+                return ResourceManager.GetString("ThemeList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Theme name font size.
         /// </summary>
         public static string ThemeNameFontSize {

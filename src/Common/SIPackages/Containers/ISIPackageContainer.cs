@@ -11,7 +11,7 @@ public interface ISIPackageContainer : IDisposable
     /// Gets container entries by category.
     /// </summary>
     /// <param name="category">Category name.</param>
-    string[] GetEntries(string category);
+    IEnumerable<string> GetEntries(string category);
 
     /// <summary>
     /// Gets stream length.

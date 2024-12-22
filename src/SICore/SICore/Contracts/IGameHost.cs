@@ -34,8 +34,6 @@ public interface IGameHost
 
     bool SendReport { get; }
 
-    bool AreAnswersShown { get; set; }
-
     string PhotoUri { get; }
 
     bool ShowBorderOnFalseStart { get; }

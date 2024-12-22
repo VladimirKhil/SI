@@ -3,8 +3,6 @@ using System.IO.Compression;
 
 namespace SIPackages.Containers;
 
-// TODO: Keep Uri.EscapeUriString only for backward compatibility; use original names in zip archive
-
 /// <summary>
 /// Define a Zip-based package source.
 /// </summary>
@@ -16,11 +14,33 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
 {
     private readonly Stream _stream;
     private readonly ZipArchive _zipArchive;
+    private readonly Dictionary<string, Dictionary<string, string>> _nameMap = new();
 
     private ZipSIPackageContainer(Stream stream, ZipArchive zipArchive)
     {
         _stream = stream;
         _zipArchive = zipArchive;
+
+        // Fill the categories name maps
+        foreach (var entry in _zipArchive.Entries)
+        {
+            var nameSegments = entry.FullName.Split('/', 2);
+
+            if (nameSegments.Length < 2)
+            {
+                continue;
+            }
+
+            var category = nameSegments[0];
+            var name = Uri.UnescapeDataString(entry.Name);
+            
+            if (!_nameMap.TryGetValue(category, out var categoryMap))
+            {
+                _nameMap[category] = categoryMap = new Dictionary<string, string>();
+            }
+
+            categoryMap[name] = entry.Name;
+        }
     }
 
     /// <summary>
@@ -35,17 +55,19 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
     public static ZipSIPackageContainer Open(Stream stream, bool read = true) =>
         new(stream, new ZipArchive(stream, read ? ZipArchiveMode.Read : ZipArchiveMode.Update, false));
 
-    public string[] GetEntries(string category)
+    public IEnumerable<string> GetEntries(string category)
     {
         if (_zipArchive.Mode == ZipArchiveMode.Create)
         {
             return Array.Empty<string>();
         }
 
-        return _zipArchive.Entries
-            .Where(entry => entry.FullName.StartsWith(category))
-            .Select(entry => Uri.UnescapeDataString(entry.Name))
-            .ToArray();
+        if (!_nameMap.TryGetValue(category, out var categoryMap))
+        {
+            return Array.Empty<string>();
+        }
+
+        return categoryMap.Keys;
     }
 
     public StreamInfo? GetStream(string name, bool read = true)
@@ -67,12 +89,35 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
         return new StreamInfo { Stream = stream, Length = _zipArchive.Mode == ZipArchiveMode.Read ? entry.Length : 0 };
     }
 
-    public StreamInfo? GetStream(string category, string name, bool read = true) => GetStream($"{category}/{Uri.EscapeUriString(name)}", read);
+    public StreamInfo? GetStream(string category, string name, bool read = true)
+    {
+        if (!_nameMap.TryGetValue(category, out var categoryMap))
+        {
+            return null;
+        }
 
-    public void CreateStream(string name) => _zipArchive.CreateEntry(Uri.EscapeUriString(name), CompressionLevel.Optimal);
+        if (!categoryMap.TryGetValue(name, out var entryName))
+        {
+            return null;
+        }
 
-    public void CreateStream(string category, string name) =>
-        _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.NoCompression);
+        return GetStream($"{category}/{entryName}", read);
+    }
+
+    public void CreateStream(string name) => _zipArchive.CreateEntry(name, CompressionLevel.Optimal);
+
+    public void CreateStream(string category, string name)
+    {
+        var entryName = Uri.EscapeUriString(name); // TODO: do not escape after everyone updates to the new version
+        _zipArchive.CreateEntry($"{category}/{entryName}", CompressionLevel.NoCompression);
+
+        if (!_nameMap.TryGetValue(category, out var categoryMap))
+        {
+            _nameMap[category] = categoryMap = new Dictionary<string, string>();
+        }
+
+        categoryMap[name] = entryName;
+    }
 
     public async Task CreateStreamAsync(
         string category,
@@ -80,7 +125,15 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
         Stream stream,
         CancellationToken cancellationToken = default)
     {
-        var entry = _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.NoCompression);
+        var entryName = Uri.EscapeUriString(name); // TODO: do not escape after everyone updates to the new version
+        var entry = _zipArchive.CreateEntry($"{category}/{entryName}", CompressionLevel.NoCompression);
+
+        if (!_nameMap.TryGetValue(category, out var categoryMap))
+        {
+            _nameMap[category] = categoryMap = new Dictionary<string, string>();
+        }
+
+        categoryMap[name] = entryName;
 
         using var writeStream = entry.Open();
         await stream.CopyToAsync(writeStream, cancellationToken);
@@ -99,7 +152,20 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
         return true;
     }
 
-    public bool DeleteStream(string category, string name) => DeleteStream($"{category}/{Uri.EscapeUriString(name)}");
+    public bool DeleteStream(string category, string name)
+    {
+        if (!_nameMap.TryGetValue(category, out var categoryMap))
+        {
+            return false;
+        }
+
+        if (!categoryMap.TryGetValue(name, out var entryName))
+        {
+            return false;
+        }
+
+        return DeleteStream($"{category}/{entryName}");
+    }
 
     public ISIPackageContainer CopyTo(Stream stream, bool closeCurrent, out bool isNew)
     {
@@ -135,11 +201,34 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
         return entry?.Length ?? -1;
     }
 
-    public long GetStreamLength(string category, string name) => GetStreamLength($"{category}/{Uri.EscapeUriString(name)}");
+    public long GetStreamLength(string category, string name)
+    {
+        if (!_nameMap.TryGetValue(category, out var categoryMap))
+        {
+            return -1;
+        }
+
+        if (!categoryMap.TryGetValue(name, out var entryName))
+        {
+            return -1;
+        }
+
+        return GetStreamLength($"{category}/{entryName}");
+    }
 
     public MediaInfo? TryGetMedia(string category, string name)
     {
-        var fullName = $"{category}/{Uri.EscapeUriString(name)}";
+        if (!_nameMap.TryGetValue(category, out var categoryMap))
+        {
+            return null;
+        }
+
+        if (!categoryMap.TryGetValue(name, out var entryName))
+        {
+            return null;
+        }
+
+        var fullName = $"{category}/{entryName}";
         var entry = _zipArchive.GetEntry(fullName);
 
         if (entry == null)

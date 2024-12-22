@@ -363,9 +363,9 @@ public sealed class GameData : Data
     internal Lock TableInformStageLock { get; } = new Lock(nameof(TableInformStageLock));
 
     /// <summary>
-    /// Количество ставящих в финале
+    /// Number of players that are making hidden stakes.
     /// </summary>
-    internal int NumOfStakers { get; set; }
+    internal int HiddenStakerCount { get; set; }
 
     /// <summary>
     /// Прав ли игрок

@@ -39,7 +39,7 @@ internal sealed class PackageContainerMock : ISIPackageContainer
 
     public void Flush() => throw new NotImplementedException();
 
-    public string[] GetEntries(string category)
+    public IEnumerable<string> GetEntries(string category)
     {
         if (!_streams.TryGetValue(category, out var categoryStreams))
         {

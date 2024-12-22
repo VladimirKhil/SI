@@ -65,21 +65,6 @@ public sealed class PersonData : INotifyPropertyChanged
     /// </summary>
     public string ValidatorName { get; set; }
 
-    private bool _areAnswersShown = true;
-
-    public bool AreAnswersShown
-    {
-        get => _areAnswersShown;
-        set
-        {
-            if (_areAnswersShown != value)
-            {
-                _areAnswersShown = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     private bool _showExtraRightButtons;
 
     /// <summary>

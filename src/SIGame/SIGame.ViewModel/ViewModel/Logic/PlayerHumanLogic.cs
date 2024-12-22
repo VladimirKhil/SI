@@ -55,18 +55,6 @@ internal sealed class PlayerHumanLogic : IPersonLogic
         _data.Host.OnFlash();
     }
 
-    public void StakeNew()
-    {
-        _gameViewModel.SendStakeNew.CanBeExecuted = _data.PersonDataExtensions.Var[1];
-        _gameViewModel.SendPassNew.CanBeExecuted = _data.PersonDataExtensions.Var[2];
-        _gameViewModel.SendAllInNew.CanBeExecuted = _data.PersonDataExtensions.Var[3];
-
-        _gameViewModel.DialogMode = DialogModes.StakeNew;
-        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
-        ((PlayerAccount)_data.Me).IsDeciding = false;
-        _data.Host.OnFlash();
-    }
-
     public void FinalStake()
     {
         _gameViewModel.Hint = _localizer[nameof(R.HintMakeAStake)];

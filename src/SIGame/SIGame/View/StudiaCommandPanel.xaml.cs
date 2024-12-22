@@ -1,5 +1,4 @@
-﻿using SICore;
-using SIGame.ViewModel;
+﻿using SIGame.ViewModel;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,7 +30,7 @@ public partial class StudiaCommandPanel : UserControl
         gameBorder.Visibility = Visibility.Hidden;
     }
 
-    private void RaiseButtonClick()
+    private void Game_Clicked()
     {
         if (gameButton.IsEnabled)
         {
@@ -40,7 +39,7 @@ public partial class StudiaCommandPanel : UserControl
         }
     }
 
-    private void RaiseNextClick()
+    private void Next_Clicked()
     {
         if (forward.IsEnabled)
         {
@@ -51,13 +50,10 @@ public partial class StudiaCommandPanel : UserControl
 
     private void Studia_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        var logic = ((GameViewModel)DataContext)?.Host?.MyLogic;
+        var gameViewModel = (GameViewModel)DataContext;
 
-        if (logic != null)
-        {
-            ((ViewerData)logic.Data).PlayerDataExtensions.PressButton += RaiseButtonClick;
-            ((ViewerData)logic.Data).PlayerDataExtensions.PressNextButton += RaiseNextClick;
-        }
+        gameViewModel.GameButtonPressed += Game_Clicked;
+        gameViewModel.NextButtonPressed += Next_Clicked;
     }
 
     public void OnMouseRightButtonDown()
@@ -66,7 +62,6 @@ public partial class StudiaCommandPanel : UserControl
 
         if (pressCmd != null && pressCmd.CanBeExecuted)
         {
-            RaiseButtonClick();
             pressCmd.Execute(null);
         }
     }

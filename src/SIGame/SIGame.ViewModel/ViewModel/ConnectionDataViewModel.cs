@@ -311,7 +311,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
             _host.GetInfo();
 
-            Error = null;
+            Error = "";
 
             _node.Error += Server_Error;
 

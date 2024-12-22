@@ -153,14 +153,21 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     private void InformActivePlayers()
     {
-        var s = new MessageBuilder(Messages.FinalRound);
+        var passed = new List<object>();
 
         for (var i = 0; i < _gameData.Players.Count; i++)
         {
-            s.Add(_gameData.Players[i].InGame ? '+' : '-');
+            if (!_gameData.Players[i].InGame)
+            {
+                passed.Add(i);
+            }
         }
 
-        GameActions?.SendMessage(s.ToString());
+        if (passed.Count > 0)
+        {
+            var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passed);
+            GameActions?.SendMessage(msg.ToString());
+        }
     }
 
     public void AskForThemeDelete(Action<int> deleteCallback)

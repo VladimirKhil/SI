@@ -2,7 +2,6 @@
 using SIEngine.QuestionSelectionStrategies;
 using SIEngine.Rules;
 using SIPackages;
-using SIPackages.Core;
 
 namespace SIEngine;
 

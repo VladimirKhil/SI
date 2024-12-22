@@ -77,8 +77,6 @@ public sealed class ViewerData : Data
 
     public PlayerData PlayerDataExtensions { get; private set; } = new();
 
-    public event Action<string?, string, LogMode> StringAdding;
-
     private List<PlayerAccount> _players = new();
 
     /// <summary>
@@ -296,28 +294,6 @@ public sealed class ViewerData : Data
     {
 
     }
-
-    private readonly List<string> _chatTable = new();
-
-    /// <summary>
-    /// Adds mesage to the game chat.
-    /// </summary>
-    /// <param name="message">Message to add.</param>
-    public void AddToChat(Message message)
-    {
-        var index = _chatTable.IndexOf(message.Sender);
-        
-        // if user is not present in user list, add him
-        if (index == -1)
-        {
-            _chatTable.Add(message.Sender);
-            index = _chatTable.Count - 1;
-        }
-
-        OnAddString(message.Sender, message.Text, LogMode.Chat + index);
-    }
-
-    public override void OnAddString(string? person, string text, LogMode mode) => StringAdding?.Invoke(person, text, mode);
 
     public string PackageId { get; internal set; }
 

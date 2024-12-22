@@ -147,9 +147,9 @@ public enum Tasks
     /// </summary>
     WaitDelete,
     /// <summary>
-    /// Ожидание ставки игроков в финале
+    /// Waiting for the players to make hidden stakes.
     /// </summary>
-    WaitFinalStake,
+    WaitHiddenStake,
     /// <summary>
     /// Announce hidden answer of next player.
     /// </summary>
@@ -256,10 +256,12 @@ public enum DecisionType
     /// Удаление темы в финале
     /// </summary>
     FinalThemeDeleting,
+    
     /// <summary>
-    /// Выставление ставки в финале
+    /// Making hidden stake.
     /// </summary>
-    FinalStakeMaking,
+    HiddenStakeMaking,
+    
     /// <summary>
     /// Нажатие на кнопку
     /// </summary>

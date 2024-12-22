@@ -60,6 +60,11 @@ internal sealed class QuestionPlayState
     internal Dictionary<string, (bool, double)?> Validations { get; } = new();
 
     /// <summary>
+    /// Number of active validations.
+    /// </summary>
+    internal int ActiveValidationCount => Validations.Count(pair => pair.Value == null);
+
+    /// <summary>
     /// Should the player answers be validated after right answer.
     /// </summary>
     internal bool ValidateAfterRightAnswer => AnswerOptions != null;

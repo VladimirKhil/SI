@@ -40,7 +40,7 @@ public sealed class Player : Viewer
         });
     }
 
-    private void Clear() => _logic.ClearSelections(true);
+    private void Clear() => Logic.ClearSelections(true);
 
     /// <summary>
     /// Получение системного сообщения
@@ -88,11 +88,11 @@ public sealed class Player : Viewer
 
                     if (mparams[1] == "1")
                     {
-                        _logic.SelectQuestion();
+                        Logic.SelectQuestion();
                     }
                     else
                     {
-                        _logic.DeleteTheme();
+                        Logic.DeleteTheme();
                     }
 
                     #endregion
@@ -100,12 +100,12 @@ public sealed class Player : Viewer
 
                 case Messages.Choice:
                     ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
-                    _logic.OnQuestionSelected();
+                    Logic.OnQuestionSelected();
                     break;
 
                 case Messages.Theme:
                     ClientData.QuestionIndex = -1;
-                    _logic.OnTheme(mparams);
+                    Logic.OnTheme(mparams);
                     break;
 
                 case Messages.Question:
@@ -114,35 +114,35 @@ public sealed class Player : Viewer
                     break;
 
                 case Messages.Content:
-                    _logic.OnQuestionContent();
+                    Logic.OnQuestionContent();
 
                     if (ClientData.QuestionType == QuestionTypes.Simple)
                     {
-                        _logic.OnEnableButton();
+                        Logic.OnEnableButton();
                     }
                     break;
 
                 case Messages.Try:
                     ClientData.PlayerDataExtensions.TryStartTime = DateTimeOffset.UtcNow;
-                    _logic.OnCanPressButton();
+                    Logic.OnCanPressButton();
                     break;
 
                 case Messages.YouTry:
-                    _logic.OnEnableButton();
-                    _logic.StartThink();
+                    Logic.OnEnableButton();
+                    Logic.StartThink();
                     break;
 
                 case Messages.EndTry:
-                    _logic.OnDisableButton();
+                    Logic.OnDisableButton();
 
                     if (mparams[1] == MessageParams.EndTry_All)
                     {
-                        _logic.EndThink();
+                        Logic.EndThink();
                     }
                     break;
 
                 case Messages.Answer:
-                    _logic.Answer();
+                    Logic.Answer();
                     break;
 
                 case Messages.AskSelectPlayer: // Uncomment later
@@ -163,7 +163,7 @@ public sealed class Player : Viewer
                         };
                     }
 
-                    _logic.PlayerLogic.Cat();
+                    Logic.PlayerLogic.Cat();
                     break;
 
                 case Messages.AskStake: // Uncomment later
@@ -180,7 +180,7 @@ public sealed class Player : Viewer
                         Stake = int.Parse(mparams[1])
                     };
 
-                    _logic.PlayerLogic.CatCost();
+                    Logic.PlayerLogic.CatCost();
                     break;
 
                 case Messages.Stake:
@@ -197,7 +197,7 @@ public sealed class Player : Viewer
                         Stake = int.Parse(mparams[5])
                     };
 
-                    _logic.PlayerLogic.Stake();
+                    Logic.PlayerLogic.Stake();
                     break;
 
                 case Messages.Stake2:
@@ -222,7 +222,7 @@ public sealed class Player : Viewer
                         Stake = minimumStake
                     };
 
-                    _logic.PlayerLogic.Stake();
+                    Logic.PlayerLogic.Stake();
                     break;
 
                 case Messages.FinalStake:
@@ -236,7 +236,7 @@ public sealed class Player : Viewer
 
                     ((PlayerAccount)ClientData.Me).IsDeciding = false;
 
-                    _logic.PlayerLogic.FinalStake();
+                    Logic.PlayerLogic.FinalStake();
                     break;
 
                 case Messages.Validation2:
@@ -258,7 +258,7 @@ public sealed class Player : Viewer
                         break;
                     }
 
-                    _logic.OnPlayerOutcome(playerIndex, isRight);
+                    Logic.OnPlayerOutcome(playerIndex, isRight);
                     break;
 
                 case Messages.Report:
@@ -270,7 +270,7 @@ public sealed class Player : Viewer
                     }
 
                     ((PlayerAccount)ClientData.Me).IsDeciding = false;
-                    _logic.Report(report.ToString());
+                    Logic.Report(report.ToString());
                     break;
             }
         }
@@ -305,6 +305,6 @@ public sealed class Player : Viewer
         ClientData.PersonDataExtensions.ShowExtraRightButtons = mparams[4] == "+";
 
         ((PersonAccount)ClientData.Me).IsDeciding = false;
-        _logic.IsRight(mparams[3] == "+", mparams[2]);
+        Logic.IsRight(mparams[3] == "+", mparams[2]);
     }
 }

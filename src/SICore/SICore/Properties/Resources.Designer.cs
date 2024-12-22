@@ -979,7 +979,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Dear players, make your bets, please;Ladies and gentlemen, make your bets, please.
+        ///   Ищет локализованную строку, похожую на Dear players, make your stakes, please;Ladies and gentlemen, make your stakes, please.
         /// </summary>
         public static string MakeStake {
             get {
@@ -1947,15 +1947,6 @@ namespace SICore.Properties {
         public static string TryReconnect {
             get {
                 return ResourceManager.GetString("TryReconnect", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на everyone can play hiden stakes question.
-        /// </summary>
-        public static string TypeAllowEveryoneToPlayStakes {
-            get {
-                return ResourceManager.GetString("TypeAllowEveryoneToPlayStakes", resourceCulture);
             }
         }
         

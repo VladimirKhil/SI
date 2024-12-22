@@ -316,7 +316,7 @@
     <value>So, let's look at the players' answers;It's time to look at our players' answers</value>
   </data>
   <data name="MakeStake" xml:space="preserve">
-    <value>Dear players, make your bets, please;Ladies and gentlemen, make your bets, please</value>
+    <value>Dear players, make your stakes, please;Ladies and gentlemen, make your stakes, please</value>
   </data>
   <data name="ManuallyPlayedQuestion" xml:space="preserve">
     <value>This question will be played manually (while pauses). The game will resume in 15 seconds</value>
@@ -779,9 +779,6 @@
   </data>
   <data name="TypeUsePingPenalty" xml:space="preserve">
     <value>ping penalty</value>
-  </data>
-  <data name="TypeAllowEveryoneToPlayStakes" xml:space="preserve">
-    <value>everyone can play hiden stakes question</value>
   </data>
   <data name="JoinModeSwitchedToAny" xml:space="preserve">
     <value>{0} allowed to join as any role</value>

@@ -309,4 +309,10 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
             _player.OnInitialized();
         }
     }
+
+    public void ValidateAnswer(int playerIndex, string answer)
+    {
+        var isRight = AnswerChecker.IsAnswerRight(answer, _data.PersonDataExtensions.Right);
+        _viewerActions.SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
+    }
 }

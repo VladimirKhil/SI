@@ -196,11 +196,6 @@ public static class Messages
     public const string FalseStart = "FALSESTART";
 
     /// <summary>
-    /// Финальный раунд
-    /// </summary>
-    public const string FinalRound = "FINALROUND";
-
-    /// <summary>
     /// Ставка в финале
     /// </summary>
     [Obsolete("Use AskStake")]

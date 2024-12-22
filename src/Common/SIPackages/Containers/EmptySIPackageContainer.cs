@@ -47,7 +47,7 @@ public sealed class EmptySIPackageContainer : ISIPackageContainer
     public void Flush() => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public string[] GetEntries(string category) => Array.Empty<string>();
+    public IEnumerable<string> GetEntries(string category) => Array.Empty<string>();
 
     /// <inheritdoc />
     public StreamInfo? GetStream(string name, bool read = true) => null;

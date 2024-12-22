@@ -23,7 +23,7 @@ namespace SICore;
 /// <summary>
 /// Defines a game actor. Responds to all game-related messages.
 /// </summary>
-public sealed class Game : Actor<GameData, GameLogic>
+public sealed class Game : Actor<GameData>
 {
     private const string VideoAvatarUri = "https://vdo.ninja/";
 
@@ -42,6 +42,11 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private readonly IFileShare _fileShare;
     private readonly IAvatarHelper _avatarHelper;
+
+    private readonly GameLogic _logic;
+
+	[Obsolete("Use _logic")]
+    private GameLogic Logic => _logic;
 
     public Game(
         Client client,
@@ -733,7 +738,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.FinalStake:
-                        if (ClientData.IsWaiting && ClientData.Decision == DecisionType.FinalStakeMaking)
+                        if (ClientData.IsWaiting && ClientData.Decision == DecisionType.HiddenStakeMaking)
                         {
                             #region FinalStake
 
@@ -746,7 +751,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                                     if (int.TryParse(args[1], out int finalStake) && finalStake >= 1 && finalStake <= player.Sum)
                                     {
                                         player.PersonalStake = finalStake;
-                                        ClientData.NumOfStakers--;
+                                        ClientData.HiddenStakerCount--;
 
                                         _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                                     }
@@ -755,7 +760,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                                 }
                             }
 
-                            if (ClientData.NumOfStakers == 0)
+                            if (ClientData.HiddenStakerCount == 0)
                             {
                                 _logic.Stop(StopReason.Decision);
                             }
@@ -826,7 +831,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         var answer = args[1];
         var validationStatus = args[2] == "+";
-        var validationFactor = args.Length > 2 && double.TryParse(args[3], out var factor) && factor >= 0.0 ? factor : 1.0;
+        var validationFactor = args.Length > 3 && double.TryParse(args[3], out var factor) && factor >= 0.0 ? factor : 1.0;
 
         if (!ClientData.QuestionPlayState.Validations.TryGetValue(answer, out var validation) || validation.HasValue)
         {
@@ -1390,7 +1395,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 _logic.Stop(StopReason.Decision);
                 break;
 
-            case DecisionType.FinalStakeMaking:
+            case DecisionType.HiddenStakeMaking:
                 for (var i = 0; i < ClientData.Players.Count; i++)
                 {
                     var player = ClientData.Players[i];
@@ -1398,7 +1403,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                     if (stakerName == player.Name)
                     {
                         player.PersonalStake = stakeSum;
-                        ClientData.NumOfStakers--;
+                        ClientData.HiddenStakerCount--;
                         ClientData.StakeLimits.Remove(stakerName);
 
                         _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
@@ -1406,7 +1411,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                     }
                 }
 
-                if (ClientData.NumOfStakers == 0)
+                if (ClientData.HiddenStakerCount == 0)
                 {
                     _logic.Stop(StopReason.Decision);
                 }
@@ -3075,7 +3080,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 ClientData.Stake = ClientData.CurPriceRight;
             }
 
-            PlanExecution(Tasks.PrintAuctPlayer, 10);
+            Logic.PlanExecution(Tasks.PrintAuctPlayer, 10);
         }
         else
         {
@@ -3085,7 +3090,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 ClientData.OrderIndex--;
             }
 
-            PlanExecution(Tasks.AskStake, 20);
+            Logic.PlanExecution(Tasks.AskStake, 20);
         }
     }
 

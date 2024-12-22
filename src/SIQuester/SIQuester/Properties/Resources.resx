@@ -1144,6 +1144,9 @@ By following these steps, you help maintain a responsible and collaborative envi
   <data name="Theme" xml:space="preserve">
     <value>Theme</value>
   </data>
+  <data name="ThemeList" xml:space="preserve">
+    <value>Theme list</value>
+  </data>
   <data name="ThemeNameFontSize" xml:space="preserve">
     <value>Theme name font size</value>
   </data>

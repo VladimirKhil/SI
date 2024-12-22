@@ -1083,7 +1083,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         DecisionType.StakeMaking => OnDecisionStakeMaking(),
         DecisionType.NextPersonFinalThemeDeleting => OnNextPersonFinalThemeDeleting(),
         DecisionType.FinalThemeDeleting => OnDecisionFinalThemeDeleting(),
-        DecisionType.FinalStakeMaking => OnFinalStakeMaking(),
+        DecisionType.HiddenStakeMaking => OnHiddenStakeMaking(),
         DecisionType.AppellationDecision => OnAppellationDecision(),
         _ => false,
     };
@@ -1142,20 +1142,20 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         return true;
     }
 
-    private bool OnFinalStakeMaking()
+    private bool OnHiddenStakeMaking()
     {
-        if (_data.NumOfStakers != 0)
+        if (_data.HiddenStakerCount != 0)
         {
             return false;
         }
 
         StopWaiting();
-        ProceedToFinalQuestion();
+        ProceedToHiddenStakesQuestion();
 
         return true;
     }
 
-    private void ProceedToFinalQuestion()
+    private void ProceedToHiddenStakesQuestion()
     {
         _gameActions.ShowmanReplic(LO[nameof(R.ThankYou)]);
         ScheduleExecution(Tasks.MoveNext, 20);
@@ -1234,6 +1234,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             _gameActions.PlayerReplic(playerIndex, LO[nameof(R.Pass)]);
             _data.Players[playerIndex].StakeMaking = false;
+            var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass, playerIndex);
+            _gameActions.SendMessage(passMsg.ToString());
         }
         else
         {
@@ -1878,8 +1880,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         WaitDelete();
                         break;
 
-                    case Tasks.WaitFinalStake:
-                        WaitFinalStake();
+                    case Tasks.WaitHiddenStake:
+                        WaitHiddenStake();
                         break;
 
                     case Tasks.Announce:
@@ -2409,6 +2411,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
+            if (_data.QuestionPlayState.ActiveValidationCount > 0)
+            {
+                _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name); // Cancel validation
+            }
+
             for (var i = 0; i < _data.Players.Count; i++)
             {
                 if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && string.IsNullOrEmpty(_data.Players[i].Answer))
@@ -2458,7 +2465,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsQuestionAskPlaying = false;
     }
 
-    private void WaitFinalStake()
+    private void WaitHiddenStake()
     {
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
@@ -2473,7 +2480,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
-        _data.NumOfStakers = 0;
+        _data.HiddenStakerCount = 0;
         OnDecision();
     }
 
@@ -2550,12 +2557,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, stake);
     }
 
-    private void AskFinalStake()
+    private void AskHiddenStakes()
     {
         var s = GetRandomString(LO[nameof(R.MakeStake)]);
         _gameActions.ShowmanReplic(s);
 
-        _data.NumOfStakers = 0;
+        _data.HiddenStakerCount = 0;
         var stakers = new List<(string, StakeSettings)>();
 
         for (var i = 0; i < _data.Players.Count; i++)
@@ -2570,16 +2577,16 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
 
                 _data.Players[i].PersonalStake = -1;
-                _data.NumOfStakers++;
+                _data.HiddenStakerCount++;
                 _gameActions.SendMessage(Messages.FinalStake, _data.Players[i].Name);
 
                 stakers.Add((_data.Players[i].Name, new(1, _data.Players[i].Sum, 1)));
             }
         }
 
-        if (_data.NumOfStakers == 0)
+        if (_data.HiddenStakerCount == 0)
         {
-            ProceedToFinalQuestion();
+            ProceedToHiddenStakesQuestion();
             return;
         }
 
@@ -2588,8 +2595,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         AskToMakeStake(StakeReason.Hidden, stakers);
 
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
-        ScheduleExecution(Tasks.WaitFinalStake, waitTime);
-        WaitFor(DecisionType.FinalStakeMaking, waitTime, -2);
+        ScheduleExecution(Tasks.WaitHiddenStake, waitTime);
+        WaitFor(DecisionType.HiddenStakeMaking, waitTime, -2);
     }
 
     private void WaitDelete()
@@ -3092,11 +3099,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             rules.Add(LO[nameof(R.TypeManaged)]);
         }
 
-        if (settings.AllowEveryoneToPlayHiddenStakes)
-        {
-            rules.Add(LO[nameof(R.TypeAllowEveryoneToPlayStakes)]);
-        }
-
         if (rules.Count == 0)
         {
             rules.Add(LO[nameof(R.TypeClassic)]);
@@ -3462,7 +3464,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
             else // The only place where we do not check CanPlayerAct()
             {
-                // TODO: Support forced written answers here
                 _gameActions.SendMessage(Messages.Answer, _data.Answerer.Name);
             }
         }
@@ -3491,10 +3492,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var rightAnswers = question.Right;
         var wrongAnswers = question.Wrong;
 
-        var message = new MessageBuilder(
-            Messages.QuestionAnswers,
-            '-',
-            rightAnswers.Count)
+        var message = new MessageBuilder(Messages.QuestionAnswers, rightAnswers.Count)
             .AddRange(rightAnswers)
             .AddRange(wrongAnswers)
             .Build();
@@ -3623,144 +3621,109 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     /// <returns>Стоит ли продолжать выполнение</returns>
     private bool DetectNextStaker()
     {
-        var errorLog = new StringBuilder()
-            .Append(' ').Append(_data.Stake).Append(' ').Append(_data.OrderIndex)
-            .Append(' ').Append(string.Join(":", _data.Order))
-            .Append(' ').Append(string.Join(":", _data.Players.Select(p => p.Sum)))
-            .Append(' ').Append(string.Join(":", _data.Players.Select(p => p.StakeMaking)))
-            .Append(' ').Append(string.Join(":", _data.OrderHistory));
+        var candidatesAll = Enumerable.Range(0, _data.Order.Length).Except(_data.Order).ToArray(); // Незадействованные игроки
 
-        var stage = 0;
-
-        try
+        if (_data.OrderIndex < _data.Order.Length - 1)
         {
-            var candidatesAll = Enumerable.Range(0, _data.Order.Length).Except(_data.Order).ToArray(); // Незадействованные игроки
-            
-            if (_data.OrderIndex < _data.Order.Length - 1)
+            // Ещё есть, из кого выбирать
+
+            // Сначала отбросим тех, у кого недостаточно денег для ставки
+            var candidates = candidatesAll.Where(n => _data.Players[n].StakeMaking);
+
+            if (candidates.Count() > 1)
             {
-                // Ещё есть, из кого выбирать
+                // У кандидатов должна быть минимальная сумма
+                var minSum = candidates.Min(n => _data.Players[n].Sum);
+                candidates = candidates.Where(n => _data.Players[n].Sum == minSum);
+            }
 
-                // Сначала отбросим тех, у кого недостаточно денег для ставки
-                var candidates = candidatesAll.Where(n => _data.Players[n].StakeMaking);
+            if (!candidates.Any()) // Никто из оставшихся не может перебить ставку
+            {
+                var ind = _data.OrderIndex;
 
-                if (candidates.Count() > 1)
+                if (_data.OrderIndex + candidatesAll.Length > _data.Order.Length)
                 {
-                    // У кандидатов должна быть минимальная сумма
-                    var minSum = candidates.Min(n => _data.Players[n].Sum);
-                    candidates = candidates.Where(n => _data.Players[n].Sum == minSum);
+                    throw new InvalidOperationException(
+                        $"Invalid order index. Order index: {_data.OrderIndex}; " +
+                        $"candidates length: {candidatesAll.Length}; order length: {_data.Order.Length}");
                 }
 
-                if (!candidates.Any()) // Никто из оставшихся не может перебить ставку
+                for (var i = 0; i < candidatesAll.Length; i++)
                 {
-                    stage = 1;
+                    _data.Order[ind + i] = candidatesAll[i];
+                    CheckOrder(ind + i);
+                    _data.Players[candidatesAll[i]].StakeMaking = false;
+                }
 
-                    var ind = _data.OrderIndex;
+                var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(candidatesAll.Select(i => (object)i));
+                _gameActions.SendMessage(passMsg.ToString());
 
-                    if (_data.OrderIndex + candidatesAll.Length > _data.Order.Length)
+                var stakerCount = _data.Players.Count(p => p.StakeMaking);
+
+                if (stakerCount == 1)
+                {
+                    // Player is defined
+                    for (var i = 0; i < _data.Players.Count; i++)
                     {
-                        throw new InvalidOperationException(
-                            $"Invalid order index. Order index: {_data.OrderIndex}; " +
-                            $"candidates length: {candidatesAll.Length}; order length: {_data.Order.Length}");
-                    }
-
-                    for (var i = 0; i < candidatesAll.Length; i++)
-                    {
-                        _data.Order[ind + i] = candidatesAll[i];
-                        CheckOrder(ind + i);
-                        _data.Players[candidatesAll[i]].StakeMaking = false;
-                    }
-
-                    stage = 2;
-
-                    var stakersCount = _data.Players.Count(p => p.StakeMaking);
-
-                    if (stakersCount == 1)
-                    {
-                        // Игрок определён
-                        for (var i = 0; i < _data.Players.Count; i++)
+                        if (_data.Players[i].StakeMaking)
                         {
-                            if (_data.Players[i].StakeMaking)
-                            {
-                                _data.StakerIndex = i;
-                                break;
-                            }
+                            _data.StakerIndex = i;
+                            break;
                         }
-
-                        _data.ChooserIndex = _data.StakerIndex;
-                        _data.AnswererIndex = _data.StakerIndex;
-                        _data.QuestionPlayState.SetSingleAnswerer(_data.StakerIndex);
-                        _data.CurPriceRight = _data.Stake;
-                        _data.CurPriceWrong = _data.Stake;
-
-                        if (_data.AnswererIndex == -1)
-                        {
-                            _data.Host.SendError(new Exception("this.data.AnswererIndex == -1"), true);
-                        }
-
-                        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-
-                        ScheduleExecution(Tasks.MoveNext, 10, 1);
-                        return false;
                     }
 
-                    _data.OrderIndex = -1;
-                    AskStake(false);
+                    PrintStakeQuestionPlayer();
                     return false;
                 }
 
-                stage = 3;
+                _data.OrderIndex = -1;
+                AskStake(false);
+                return false;
+            }
 
-                _data.IsWaiting = false;
+            _data.IsWaiting = false;
 
-                if (candidates.Count() == 1)
-                {
-                    _data.Order[_data.OrderIndex] = candidates.First();
-                    CheckOrder(_data.OrderIndex);
-                }
-                else
-                {
-                    // Showman should choose the next staker
-                    for (var i = 0; i < _data.Players.Count; i++)
-                    {
-                        _data.Players[i].Flag = candidates.Contains(i);
-                    }
-
-                    // -- deprecated
-                    var msg = new StringBuilder(Messages.FirstStake);
-
-                    for (var i = 0; i < _data.Players.Count; i++)
-                    {
-                        msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
-                    }
-
-                    _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
-                    // -- end
-                    AskToSelectPlayer(SelectPlayerReason.Staker, _data.ShowMan.Name);
-                    _data.OrderHistory.AppendLine("Asking showman for the next staker");
-
-                    var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-                    ScheduleExecution(Tasks.WaitNext, time);
-                    WaitFor(DecisionType.NextPersonStakeMaking, time, -1);
-                    return false;
-                }
+            if (candidates.Count() == 1)
+            {
+                _data.Order[_data.OrderIndex] = candidates.First();
+                CheckOrder(_data.OrderIndex);
             }
             else
             {
-                stage = 4;
+                // Showman should choose the next staker
+                for (var i = 0; i < _data.Players.Count; i++)
+                {
+                    _data.Players[i].Flag = candidates.Contains(i);
+                }
 
-                // Остался последний игрок, выбор очевиден
-                var leftIndex = candidatesAll[0];
-                _data.Order[_data.OrderIndex] = leftIndex;
-                CheckOrder(_data.OrderIndex);
+                // -- deprecated
+                var msg = new StringBuilder(Messages.FirstStake);
+
+                for (var i = 0; i < _data.Players.Count; i++)
+                {
+                    msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
+                }
+
+                _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
+                // -- end
+                AskToSelectPlayer(SelectPlayerReason.Staker, _data.ShowMan.Name);
+                _data.OrderHistory.AppendLine("Asking showman for the next staker");
+
+                var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+                ScheduleExecution(Tasks.WaitNext, time);
+                WaitFor(DecisionType.NextPersonStakeMaking, time, -1);
+                return false;
             }
-
-            return true;
         }
-        catch (Exception exc)
+        else
         {
-            errorLog.Append(' ').Append(stage);
-            throw new Exception(errorLog.ToString(), exc);
+            // Остался последний игрок, выбор очевиден
+            var leftIndex = candidatesAll[0];
+            _data.Order[_data.OrderIndex] = leftIndex;
+            CheckOrder(_data.OrderIndex);
         }
+
+        return true;
     }
 
     public void CheckOrder(int index)
@@ -4875,6 +4838,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void SetAnswererByHighestVisibleStake()
     {
+        if (_data.Question == null)
+        {
+            throw new InvalidOperationException("_data.Question == null");
+        }
+
         var nominal = _data.Question.Price;
 
         if (_data.ChooserIndex == -1)
@@ -4883,17 +4851,28 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _data.Order = new int[_data.Players.Count];
+        var passes = new List<object>();
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
-            _data.Players[i].StakeMaking = i == _data.ChooserIndex || _data.Players[i].Sum > nominal;
+            var canMakeStake = i == _data.ChooserIndex || _data.Players[i].Sum > nominal;
+            _data.Players[i].StakeMaking = canMakeStake;
             _data.Order[i] = -1;
+
+            if (!canMakeStake)
+            {
+                passes.Add(i);
+            }
+        }
+
+        if (passes.Count > 0)
+        {
+            var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passes);
+            _gameActions.SendMessage(passMsg.ToString());
         }
 
         _data.Stake = _data.StakerIndex = -1;
-
         _data.Order[0] = _data.ChooserIndex;
-
         _data.OrderHistory.Clear();
 
         _data.OrderHistory.Append("Stake making. Initial state. ")
@@ -4919,6 +4898,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     internal void SetAnswerersByAllHiddenStakes()
     {
         var answerers = new List<int>();
+        var passes = new List<object>();
 
         for (var i = 0; i < ClientData.Players.Count; i++)
         {
@@ -4926,13 +4906,24 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 answerers.Add(i);
             }
+            else
+            {
+                passes.Add(i);
+            }
         }
 
         var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(answerers.Select(i => (object)i));
         _gameActions.SendMessage(msg.ToString());
+
+        if (passes.Count > 0)
+        {
+            var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passes);
+            _gameActions.SendMessage(passMsg.ToString());
+        }
+
         ClientData.QuestionPlayState.SetMultipleAnswerers(answerers);
         ClientData.QuestionPlayState.HiddenStakes = true;
-        AskFinalStake();
+        AskHiddenStakes();
     }
 
     internal void OnSetNoRiskPrice()

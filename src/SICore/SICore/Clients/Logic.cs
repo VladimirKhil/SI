@@ -6,7 +6,7 @@ namespace SICore;
 /// Represents agent logic.
 /// </summary>
 /// <typeparam name="D">Agent data type.</typeparam>
-public abstract class Logic<D> : ILogic
+public abstract class Logic<D>
     where D : Data
 {
     /// <summary>
@@ -25,12 +25,6 @@ public abstract class Logic<D> : ILogic
     public Data Data => _data;
 
     public Logic(D data) => _data = data ?? throw new ArgumentNullException(nameof(data));
-
-    /// <summary>
-    /// Запись сообщения в лог
-    /// </summary>
-    /// <param name="s"></param>
-    public void AddLog(string s) => _data.OnAddString(null, s, LogMode.Log);
 
     protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition) =>
         list.SelectRandom(condition, Random.Shared);

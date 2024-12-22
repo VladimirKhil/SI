@@ -54,7 +54,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     /// </summary>
     public SimpleCommand ChangePauseInGame { get; }
 
-    public SimpleCommand Move { get; set; }
+    public SimpleCommand Move { get; }
 
     /// <summary>
     /// Open provided link.
@@ -508,6 +508,23 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public SimpleCommand UnReady { get; }
 
+    public event Action? GameButtonPressed;
+    public event Action? NextButtonPressed;
+    public event Action<string?, string, LogMode>? StringAdding;
+
+    public bool AreAnswersShown
+    {
+        get => UserSettings.GameSettings.AppSettings.AreAnswersShown;
+        set
+        {
+            if (UserSettings.GameSettings.AppSettings.AreAnswersShown != value)
+            {
+                UserSettings.GameSettings.AppSettings.AreAnswersShown = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -606,6 +623,10 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Ready = new SimpleCommand(Ready_Executed) { CanBeExecuted = IsPlayer || IsShowman };
         UnReady = new SimpleCommand(UnReady_Executed) { CanBeExecuted = IsPlayer || IsShowman };
     }
+
+    public void OnAddString(string? person, string text, LogMode mode) => StringAdding?.Invoke(person, text, mode);
+
+    public void AddLog(string s) => StringAdding?.Invoke(null, s, LogMode.Log);
 
     private void Ready_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Ready);
 
@@ -722,6 +743,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
 
         Host.Actions.PressButton(Host.MyData.PlayerDataExtensions.TryStartTime);
+        GameButtonPressed?.Invoke();
         DisableGameButton(false);
         ReleaseGameButton();
     }
@@ -801,13 +823,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         if (person.Name == Data.Name)
         {
-            Host?.AddLog(Resources.CannotSetHostToYourself);
+            AddLog(Resources.CannotSetHostToYourself);
             return;
         }
 
         if (!person.IsHuman)
         {
-            Host?.AddLog(Resources.CannotSetHostToBot);
+            AddLog(Resources.CannotSetHostToBot);
             return;
         }
 
@@ -829,13 +851,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         if (person.Name == Data.Name)
         {
-            Host?.AddLog(Resources.CannotBanYourself);
+            AddLog(Resources.CannotBanYourself);
             return;
         }
 
         if (!person.IsHuman)
         {
-            Host?.AddLog(Resources.CannotBanBots);
+            AddLog(Resources.CannotBanBots);
             return;
         }
 
@@ -851,13 +873,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         if (person.Name == Data.Name)
         {
-            Host?.AddLog(Resources.CannotKickYouself);
+            AddLog(Resources.CannotKickYouself);
             return;
         }
 
         if (!person.IsHuman)
         {
-            Host?.AddLog(Resources.CannotKickBots);
+            AddLog(Resources.CannotKickBots);
             return;
         }
 
@@ -1008,11 +1030,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void Server_Reconnected()
     {
-        Host?.AddLog(Resources.ReconnectedMessage);
+        AddLog(Resources.ReconnectedMessage);
         Host?.GetInfo(); // Invalidate game state
     }
 
-    private void Server_Reconnecting() => Host?.AddLog(Resources.ReconnectingMessage);
+    private void Server_Reconnecting() => AddLog(Resources.ReconnectingMessage);
 
     private void GameViewModel_TimeChanged(IAnimatableTimer timer) =>
         TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
@@ -1073,7 +1095,20 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         UpdateCurrentPlayerCommands();
     }
 
-    private void Move_Executed(object? arg) => Host?.Move(arg);
+    private void Move_Executed(object? arg)
+    {
+        if (arg == null)
+        {
+            return;
+        }
+
+        Host?.Move(arg);
+        
+        if (Equals(arg, 1))
+        {
+            NextButtonPressed?.Invoke();
+        }
+    }
 
     private void Cancel_Executed(object? arg)
     {
@@ -1109,7 +1144,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         try
         {
             var hostInfo = HostUri != null ? "&host=" + Uri.EscapeDataString(HostUri.ToString()) : "";
-            Host?.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.NewOnlineGameUrl}{GameId}{hostInfo}&invite=true");
+            AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.NewOnlineGameUrl}{GameId}{hostInfo}&invite=true");
         }
         catch (Exception exc)
         {
@@ -1155,7 +1190,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         await Task.Delay(2000, cancellationToken);
 
-        Host?.AddLog($"IP:\n{string.Join("\n", ips)}");
+        AddLog($"IP:\n{string.Join("\n", ips)}");
     }
 
     public async ValueTask DisposeAsync()

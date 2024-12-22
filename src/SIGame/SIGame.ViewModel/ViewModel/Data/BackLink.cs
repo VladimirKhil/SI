@@ -136,12 +136,6 @@ public sealed class BackLink : GameHostBase
         });
     }
 
-    public override bool AreAnswersShown
-    {
-        get => _userSettings.GameSettings.AppSettings.AreAnswersShown;
-        set => _userSettings.GameSettings.AppSettings.AreAnswersShown = value;
-    }
-
     public override bool ShowBorderOnFalseStart => _userSettings.GameSettings.AppSettings.ShowBorderOnFalseStart;
 
     public override bool LoadExternalMedia => _userSettings.LoadExternalMedia;

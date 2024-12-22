@@ -71,8 +71,6 @@ public abstract class GameHostBase : IGameHost
 
     public abstract void LogWarning(string message);
 
-    public abstract bool AreAnswersShown { get; set; }
-
     public abstract bool ShowBorderOnFalseStart { get; }
 
     public abstract bool LoadExternalMedia { get; }

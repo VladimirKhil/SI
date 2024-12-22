@@ -6,12 +6,12 @@
 public static class RoundTypes
 {
     /// <summary>
-    /// Simple round type.
+    /// [Table] Simple round type.
     /// </summary>
     public const string Standart = "standart";
 
     /// <summary>
-    /// Final round type.
+    /// [Theme list] Final round type.
     /// </summary>
     public const string Final = "final";
 }

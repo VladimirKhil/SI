@@ -62,10 +62,6 @@ public abstract class Data : INotifyPropertyChanged
     protected static string PrintAccount(ViewerAccount viewerAccount) =>
         $"{viewerAccount?.Name}@{viewerAccount?.IsHuman}:{viewerAccount?.IsConnected}";
 
-    public virtual void OnAddString(string person, string text, LogMode mode)
-    {
-    }
-
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

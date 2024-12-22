@@ -780,9 +780,6 @@
   <data name="TypeUsePingPenalty" xml:space="preserve">
     <value>замедление пинга</value>
   </data>
-  <data name="TypeAllowEveryoneToPlayStakes" xml:space="preserve">
-    <value>вопрос с закрытыми ставками играют все</value>
-  </data>
   <data name="JoinModeSwitchedToAny" xml:space="preserve">
     <value>{0} разрешил(а) входить под любой ролью</value>
   </data>

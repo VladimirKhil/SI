@@ -20,13 +20,17 @@ namespace SICore;
 /// <summary>
 /// Implements a game viewer.
 /// </summary>
-public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPropertyChanged
+public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
 {
     protected readonly ViewerActions _viewerActions;
 
     public ViewerActions Actions => _viewerActions;
 
     public virtual GameRole Role => GameRole.Viewer;
+
+    private readonly IViewerLogic _logic;
+
+    protected IViewerLogic Logic => _logic;
 
     private bool _isHost;
 
@@ -121,7 +125,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
             if (index < 0 || index >= ClientData.Players.Count)
             {
-                AddLog($"Wrong index: {index}" + Environment.NewLine);
                 return;
             }
 
@@ -772,18 +775,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     _logic.OnTimerChanged(2, MessageParams.Timer_Stop, "");
                     break;
 
-                case Messages.FinalRound:
-                    {
-                        #region FinalRound
-
-                        for (var i = 0; i < ClientData.Players.Count; i++)
-                        {
-                            ClientData.Players[i].InGame = i + 1 < mparams.Length && mparams[i + 1] == "+";
-                        }
-
-                        #endregion
-                        break;
-                    }
                 case Messages.Out:
                     {
                         #region Out
@@ -843,21 +834,8 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                     break;
 
                 case Messages.SetChooser:
-                    {
-                        var index = int.Parse(mparams[1]);
-
-                        for (int i = 0; i < ClientData.Players.Count; i++)
-                        {
-                            ClientData.Players[i].IsChooser = i == index;
-
-                            if (i == index && mparams.Length > 2)
-                            {
-                                ClientData.Players[i].State = PlayerState.Answering;
-                            }
-                        }
-
-                        break;
-                    }
+                    OnSetChooser(mparams);
+                    break;
 
                 case Messages.Ads:
                     if (mparams.Length > 1)
@@ -870,6 +848,24 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         catch (Exception exc)
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
+        }
+    }
+
+    private void OnSetChooser(string[] mparams)
+    {
+        if (mparams.Length < 2 || !int.TryParse(mparams[1], out var index))
+        {
+            return;
+        }
+
+        for (int i = 0; i < ClientData.Players.Count; i++)
+        {
+            ClientData.Players[i].IsChooser = i == index;
+
+            if (mparams.Length > 2)
+            {
+                ClientData.Players[i].State = i == index ? PlayerState.Answering : PlayerState.Pass;
+            }
         }
     }
 
@@ -1015,7 +1011,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
             optionsTypes.Add(mparams[i]);
         }
 
-        Logic.OnAnswerOptions(questionHasScreenContent, optionsTypes);
+        _logic.OnAnswerOptions(questionHasScreenContent, optionsTypes);
     }
 
     private void OnQuestionType(string[] mparams)
@@ -1242,9 +1238,11 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
     private void OnPersonStake(string[] mparams)
     {
-        if (!int.TryParse(mparams[1], out var lastStakerIndex) ||
+        if (mparams.Length < 3 ||
+            !int.TryParse(mparams[1], out var lastStakerIndex) ||
             lastStakerIndex < 0 ||
-            lastStakerIndex >= ClientData.Players.Count)
+            lastStakerIndex >= ClientData.Players.Count ||
+            !int.TryParse(mparams[2], out var stakeType))
         {
             return;
         }
@@ -1253,21 +1251,22 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
 
         int stake;
 
-        if (mparams[2] == "0")
+        if (stakeType == 0)
         {
             stake = -1;
         }
-        else if (mparams[2] == "2")
+        else if (stakeType == 2)
         {
             stake = -2;
+            ClientData.Players[ClientData.LastStakerIndex].State = PlayerState.Pass;
         }
-        else if (mparams[2] == "3")
+        else if (stakeType == 3)
         {
             stake = -3;
         }
         else
         {
-            if (!int.TryParse(mparams[3], out stake))
+            if (stakeType != 1 || mparams.Length < 4 || !int.TryParse(mparams[3], out stake))
             {
                 return;
             }
@@ -1279,7 +1278,6 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
         }
 
         ClientData.Players[ClientData.LastStakerIndex].Stake = stake;
-
         _logic.OnPersonStake();
     }
 
@@ -1359,7 +1357,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 player.Delete.CanBeExecuted = canDelete;
             }
 
-            Logic.AddPlayer(account);
+            _logic.AddPlayer(account);
         }
         finally
         {
@@ -1579,7 +1577,7 @@ public class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPro
                 player.Delete.CanBeExecuted = canDelete;
             }
 
-            Logic.RemovePlayerAt(index);
+            _logic.RemovePlayerAt(index);
         }
         finally
         {

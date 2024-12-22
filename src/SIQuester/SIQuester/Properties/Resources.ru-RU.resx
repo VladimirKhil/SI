@@ -1140,6 +1140,9 @@
   <data name="Theme" xml:space="preserve">
     <value>Тема</value>
   </data>
+  <data name="ThemeList" xml:space="preserve">
+    <value>Список тем</value>
+  </data>
   <data name="ThemeNameFontSize" xml:space="preserve">
     <value>Размер шрифта в названии темы</value>
   </data>

@@ -71,7 +71,7 @@
             Background="#FFA1C2DE"
             Grid.Row="1"
             Grid.ColumnSpan="2"
-            Visibility="{Binding Data.PersonDataExtensions.AreAnswersShown, Converter={StaticResource BooleanToVisibilityConverter1}}">
+            Visibility="{Binding AreAnswersShown, Converter={StaticResource BooleanToVisibilityConverter1}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -128,7 +128,7 @@
                 Background="#22000000" />
 
             <ToggleButton
-                IsChecked="{Binding Data.PersonDataExtensions.AreAnswersShown}"
+                IsChecked="{Binding AreAnswersShown}"
                 Width="40"
                 Height="40"
                 Margin="0,0,0,0"

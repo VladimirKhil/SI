@@ -297,8 +297,8 @@
             </DataTemplate>
 
             <siqcv:StringDictionary x:Key="RTypes">
-                <x:Static x:Key="{x:Static pc:RoundTypes.Standart}" Member="lp:Resources.Common" />
-                <x:Static x:Key="{x:Static pc:RoundTypes.Final}" Member="lp:Resources.Final" />
+                <x:Static x:Key="{x:Static pc:RoundTypes.Standart}" Member="lp:Resources.Table" />
+                <x:Static x:Key="{x:Static pc:RoundTypes.Final}" Member="lp:Resources.ThemeList" />
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="RoundTypeConverter" Map="{StaticResource RTypes}" />
