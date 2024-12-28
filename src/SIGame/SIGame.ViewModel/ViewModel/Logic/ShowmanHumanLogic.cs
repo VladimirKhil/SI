@@ -35,12 +35,6 @@ internal sealed class ShowmanHumanLogic : IPersonLogic
         _localizer = localizer;
     }
 
-    public void Cat()
-    {
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectCatPlayerForPlayer)];
-        _data.Host.OnFlash();
-    }
-
     public void Stake()
     {
         _gameViewModel.SendNominal.CanBeExecuted = _data.PersonDataExtensions.Var[0];

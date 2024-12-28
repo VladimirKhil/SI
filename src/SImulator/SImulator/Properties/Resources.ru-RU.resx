@@ -492,9 +492,6 @@
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>Вопрос для всех</value>
   </data>
-  <data name="QuestionTypeNoRisk" xml:space="preserve">
-    <value>Вопрос без риска</value>
-  </data>
   <data name="QuestionTypeSecret" xml:space="preserve">
     <value>Вопрос с секретом</value>
   </data>

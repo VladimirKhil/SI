@@ -50,10 +50,17 @@ public partial class StudiaCommandPanel : UserControl
 
     private void Studia_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        var gameViewModel = (GameViewModel)DataContext;
+        if (e.OldValue is GameViewModel oldGameViewModel)
+        {
+            oldGameViewModel.GameButtonPressed -= Game_Clicked;
+            oldGameViewModel.NextButtonPressed -= Next_Clicked;
+        }
 
-        gameViewModel.GameButtonPressed += Game_Clicked;
-        gameViewModel.NextButtonPressed += Next_Clicked;
+        if (e.NewValue is GameViewModel gameViewModel)
+        {
+            gameViewModel.GameButtonPressed += Game_Clicked;
+            gameViewModel.NextButtonPressed += Next_Clicked;
+        }
     }
 
     public void OnMouseRightButtonDown()

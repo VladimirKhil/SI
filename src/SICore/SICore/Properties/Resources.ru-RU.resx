@@ -508,7 +508,7 @@
     <value>Ожидаем решение ведущего...</value>
   </data>
   <data name="SponsoredQuestion" xml:space="preserve">
-    <value>Вам достаётся Вопрос без риска!</value>
+    <value>Вам достаётся Вопрос для себя без риска!</value>
   </data>
   <data name="SponsoredQuestionInfo" xml:space="preserve">
     <value>вопрос звучит только для вас. В случае верного ответа вы получите {0}, в случае неверного ничего не потеряете</value>
@@ -646,7 +646,7 @@
     <value>ВОПРОС С СЕКРЕТОМ</value>
   </data>
   <data name="Label_Sponsored" xml:space="preserve">
-    <value>ВОПРОС БЕЗ РИСКА</value>
+    <value>ВОПРОС ДЛЯ СЕБЯ БЕЗ РИСКА</value>
   </data>
   <data name="LogTitle" xml:space="preserve">
     <value>Протокол "SIGame"</value>

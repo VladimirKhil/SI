@@ -787,7 +787,7 @@
     <value>No answers sound</value>
   </data>
   <data name="Sound_NoRiskQuestion" xml:space="preserve">
-    <value>No risk question sound</value>
+    <value>Question for yourself without risk sound</value>
   </data>
   <data name="Sound_RoundThemes" xml:space="preserve">
     <value>Round themes sound</value>

@@ -82,6 +82,16 @@ public partial class App : Application
             _settings.SpellChecking = false;
         }
 
+        if (_settings.Language != null)
+        {
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(_settings.Language);
+        }
+        else
+        {
+            var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+            _settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
+        }
+
         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
         _host = new HostBuilder()
@@ -124,16 +134,6 @@ public partial class App : Application
 
         try
         {
-            if (_settings.Language != null)
-            {
-                Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(_settings.Language);
-            }
-            else
-            {
-                var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
-                _settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
-            }
-
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
             var clipboardService = _host.Services.GetRequiredService<IClipboardService>();
             var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();

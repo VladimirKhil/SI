@@ -37,9 +37,8 @@ public sealed class Showman : Viewer
                     ClearSelections(true);
                     break;
 
-                case Messages.AskSelectPlayer: // Uncomment later
-                    //OnAskSelectPlayer(mparams);
-                    //_logic.SelectPlayer();
+                case Messages.AskSelectPlayer:
+                    OnAskSelectPlayer(mparams);
                     break;
 
                 case Messages.AskValidate:
@@ -54,59 +53,10 @@ public sealed class Showman : Viewer
                     Logic.ValidateAnswer(playerIndex, mparams[2]);
                     break;
 
-                case Messages.First:
-                    {
-                        #region First
-
-                        for (int i = 0; i < ClientData.Players.Count; i++)
-                        {
-                            ClientData.Players[i].CanBeSelected = i + 1 < mparams.Length && mparams[i + 1] == "+";
-                            int num = i;
-                            ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.First, num); ClearSelections(); };
-                        }
-
-                        Logic.StarterChoose();
-                        break;
-
-                        #endregion
-                    }
-                case Messages.FirstStake:
-                    {
-                        #region FirstStake
-
-                        for (int i = 0; i < ClientData.Players.Count; i++)
-                        {
-                            ClientData.Players[i].CanBeSelected = i + 1 < mparams.Length && mparams[i + 1] == "+";
-                            int num = i;
-                            ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Next, num); ClearSelections(); };
-                        }
-
-                        Logic.FirstStake();
-                        break;
-
-                        #endregion
-                    }
-
                 case Messages.Validation2:
                     OnValidation2(mparams);
                     break;
 
-                case Messages.FirstDelete:
-                    {
-                        #region FirstDelete
-
-                        for (int i = 0; i < ClientData.Players.Count; i++)
-                        {
-                            ClientData.Players[i].CanBeSelected = i + 1 < mparams.Length && mparams[i + 1] == "+";
-                            int num = i;
-                            ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.NextDelete, num); ClearSelections(); };
-                        }
-
-                        Logic.FirstDelete();
-                        break;
-
-                        #endregion
-                    }
                 case Messages.Hint:
                     {
                         if (mparams.Length < 2)
@@ -145,17 +95,6 @@ public sealed class Showman : Viewer
                     }
 
                     #endregion
-                    break;
-
-                case Messages.Cat:
-                    for (int i = 0; i < ClientData.Players.Count; i++)
-                    {
-                        ClientData.Players[i].CanBeSelected = mparams[i + 1] == "+";
-                        int num = i;
-                        ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Cat, num); ClearSelections(); };
-                    }
-
-                    Logic.ShowmanLogic.Cat();
                     break;
 
                 case Messages.AskStake: // Uncomment later

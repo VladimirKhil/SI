@@ -157,7 +157,7 @@
     <value>Папка лицензий не найдена!</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Вопрос без риска</value>
+    <value>Вопрос для себя без риска</value>
   </data>
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Ошибка при открытии папки лицензий: {0}</value>

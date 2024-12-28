@@ -6,6 +6,7 @@
     Title="SImulator"
     mc:Ignorable="d"
     xmlns:lp="clr-namespace:SImulator.Properties"
+    xmlns:vmp="clr-namespace:SImulator.ViewModel.Properties;assembly=SImulator.ViewModel"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
@@ -65,7 +66,7 @@
                         <x:Static x:Key="{x:Static pc:QuestionTypes.Secret}" Member="lp:Resources.QuestionTypeSecret" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.SecretPublicPrice}" Member="lp:Resources.QuestionTypeSecretPublicPrice" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.SecretNoQuestion}" Member="lp:Resources.QuestionTypeSecretNoQuestion" />
-                        <x:Static x:Key="{x:Static pc:QuestionTypes.NoRisk}" Member="lp:Resources.QuestionTypeNoRisk" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.NoRisk}" Member="vmp:Resources.NoRiskQuestion" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.ForAll}" Member="lp:Resources.QuestionTypeForAll" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
@@ -1621,7 +1622,7 @@
                                 Width="Auto"
                                 Text="{Binding SpecialsAliases.SecretQuestionAlias, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <TextBlock Text="{x:Static lp:Resources.QuestionTypeNoRisk}" />
+                            <TextBlock Text="{x:Static vmp:Resources.NoRiskQuestion}" />
 
                             <TextBox
                                 HorizontalAlignment="Stretch"
@@ -1957,7 +1958,7 @@
                             Text="{Binding SettingsViewModel.Model.Sounds.StakeForAllQuestion}" />
                     </DockPanel>
 
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionTypeNoRisk}" />
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static vmp:Resources.NoRiskQuestion}" />
                     
                     <DockPanel>
                         <Button

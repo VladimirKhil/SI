@@ -1861,27 +1861,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void OnDisableButton() => _gameViewModel.DisableGameButton(true);
 
-    public void StarterChoose()
-    {
-        _gameViewModel.ClearReplic();
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectStarter)];
-        _data.Host.OnFlash();
-    }
-
-    public void FirstStake()
-    {
-        _gameViewModel.ClearReplic();
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectStaker)];
-        _data.Host.OnFlash();
-    }
-
-    public void FirstDelete()
-    {
-        _gameViewModel.ClearReplic();
-        _gameViewModel.Hint = _localizer[nameof(R.HintThemeDeleter)];
-        _data.Host.OnFlash();
-    }
-
     public void IsRight(bool voteForRight, string answer)
     {
         _gameViewModel.Hint = _localizer[nameof(R.HintCheckAnswer)];

@@ -491,9 +491,6 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>Question For All</value>
   </data>
-  <data name="QuestionTypeNoRisk" xml:space="preserve">
-    <value>No Risk question</value>
-  </data>
   <data name="QuestionTypeSecret" xml:space="preserve">
     <value>Secret question</value>
   </data>

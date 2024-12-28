@@ -22,7 +22,7 @@ namespace SImulator.ViewModel.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace SImulator.ViewModel.Properties {
         ///   Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SImulator.ViewModel.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace SImulator.ViewModel.Properties {
         ///   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Add.
         /// </summary>
-        internal static string Add {
+        public static string Add {
             get {
                 return ResourceManager.GetString("Add", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Connection error: {0}.
         /// </summary>
-        internal static string ConnectionError {
+        public static string ConnectionError {
             get {
                 return ResourceManager.GetString("ConnectionError", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Error.
         /// </summary>
-        internal static string Error {
+        public static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Game end error: {0}.
         /// </summary>
-        internal static string GameEndingError {
+        public static string GameEndingError {
             get {
                 return ResourceManager.GetString("GameEndingError", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Connection to the demonstration computer has been terminated. The game is stopped..
         /// </summary>
-        internal static string GameEndsBecauseOfConnectionLoss {
+        public static string GameEndsBecauseOfConnectionLoss {
             get {
                 return ResourceManager.GetString("GameEndsBecauseOfConnectionLoss", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Error loading game package.
         /// </summary>
-        internal static string GamePackageLoadError {
+        public static string GamePackageLoadError {
             get {
                 return ResourceManager.GetString("GamePackageLoadError", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Game start error: {0}.
         /// </summary>
-        internal static string GameStartError {
+        public static string GameStartError {
             get {
                 return ResourceManager.GetString("GameStartError", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на [Your IP address].
         /// </summary>
-        internal static string IpAddressHint {
+        public static string IpAddressHint {
             get {
                 return ResourceManager.GetString("IpAddressHint", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Log file creation error: {0}. Logging will not be performed..
         /// </summary>
-        internal static string LoggerCreationWarning {
+        public static string LoggerCreationWarning {
             get {
                 return ResourceManager.GetString("LoggerCreationWarning", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Error starting log recording.
         /// </summary>
-        internal static string LoggerInitError {
+        public static string LoggerInitError {
             get {
                 return ResourceManager.GetString("LoggerInitError", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Log directory is not specified. Logs will not be recorded..
         /// </summary>
-        internal static string LogsFolderNotSetWarning {
+        public static string LogsFolderNotSetWarning {
             get {
                 return ResourceManager.GetString("LogsFolderNotSetWarning", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Next.
         /// </summary>
-        internal static string Next {
+        public static string Next {
             get {
                 return ResourceManager.GetString("Next", resourceCulture);
             }
@@ -171,16 +171,16 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на License folder not found.
         /// </summary>
-        internal static string NoLicensesFolder {
+        public static string NoLicensesFolder {
             get {
                 return ResourceManager.GetString("NoLicensesFolder", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на No Risk question.
+        ///   Ищет локализованную строку, похожую на Question for yourself without risk.
         /// </summary>
-        internal static string NoRiskQuestion {
+        public static string NoRiskQuestion {
             get {
                 return ResourceManager.GetString("NoRiskQuestion", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Error opening license folder: {0}.
         /// </summary>
-        internal static string OpenLicensesError {
+        public static string OpenLicensesError {
             get {
                 return ResourceManager.GetString("OpenLicensesError", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Package preparation error.
         /// </summary>
-        internal static string PackagePreparationError {
+        public static string PackagePreparationError {
             get {
                 return ResourceManager.GetString("PackagePreparationError", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Pause.
         /// </summary>
-        internal static string Pause {
+        public static string Pause {
             get {
                 return ResourceManager.GetString("Pause", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Press the button.
         /// </summary>
-        internal static string PressTheButton {
+        public static string PressTheButton {
             get {
                 return ResourceManager.GetString("PressTheButton", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Question For All.
         /// </summary>
-        internal static string QuestionTypeForAll {
+        public static string QuestionTypeForAll {
             get {
                 return ResourceManager.GetString("QuestionTypeForAll", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Question with Button.
         /// </summary>
-        internal static string QuestionTypeSimple {
+        public static string QuestionTypeSimple {
             get {
                 return ResourceManager.GetString("QuestionTypeSimple", resourceCulture);
             }
@@ -243,7 +243,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Stake For All question.
         /// </summary>
-        internal static string QuestionTypeStakeForAll {
+        public static string QuestionTypeStakeForAll {
             get {
                 return ResourceManager.GetString("QuestionTypeStakeForAll", resourceCulture);
             }
@@ -252,7 +252,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
-        internal static string Round {
+        public static string Round {
             get {
                 return ResourceManager.GetString("Round", resourceCulture);
             }
@@ -261,7 +261,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Round themes.
         /// </summary>
-        internal static string RoundThemes {
+        public static string RoundThemes {
             get {
                 return ResourceManager.GetString("RoundThemes", resourceCulture);
             }
@@ -270,7 +270,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Round time has expired..
         /// </summary>
-        internal static string RoundTimeout {
+        public static string RoundTimeout {
             get {
                 return ResourceManager.GetString("RoundTimeout", resourceCulture);
             }
@@ -279,7 +279,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Start.
         /// </summary>
-        internal static string Run {
+        public static string Run {
             get {
                 return ResourceManager.GetString("Run", resourceCulture);
             }
@@ -288,7 +288,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Score.
         /// </summary>
-        internal static string Score {
+        public static string Score {
             get {
                 return ResourceManager.GetString("Score", resourceCulture);
             }
@@ -297,7 +297,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Secret question.
         /// </summary>
-        internal static string SecretQuestion {
+        public static string SecretQuestion {
             get {
                 return ResourceManager.GetString("SecretQuestion", resourceCulture);
             }
@@ -306,7 +306,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Select audio file.
         /// </summary>
-        internal static string SelectAudioFile {
+        public static string SelectAudioFile {
             get {
                 return ResourceManager.GetString("SelectAudioFile", resourceCulture);
             }
@@ -315,7 +315,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Select background image.
         /// </summary>
-        internal static string SelectBackgroundImage {
+        public static string SelectBackgroundImage {
             get {
                 return ResourceManager.GetString("SelectBackgroundImage", resourceCulture);
             }
@@ -324,7 +324,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Select background video file.
         /// </summary>
-        internal static string SelectBackgroundVideo {
+        public static string SelectBackgroundVideo {
             get {
                 return ResourceManager.GetString("SelectBackgroundVideo", resourceCulture);
             }
@@ -333,7 +333,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Select splash video file.
         /// </summary>
-        internal static string SelectIntroVideo {
+        public static string SelectIntroVideo {
             get {
                 return ResourceManager.GetString("SelectIntroVideo", resourceCulture);
             }
@@ -342,7 +342,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Select splash image.
         /// </summary>
-        internal static string SelectLogoImage {
+        public static string SelectLogoImage {
             get {
                 return ResourceManager.GetString("SelectLogoImage", resourceCulture);
             }
@@ -351,7 +351,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Stake question.
         /// </summary>
-        internal static string StakeQuestion {
+        public static string StakeQuestion {
             get {
                 return ResourceManager.GetString("StakeQuestion", resourceCulture);
             }
@@ -360,7 +360,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Start game.
         /// </summary>
-        internal static string StartGame {
+        public static string StartGame {
             get {
                 return ResourceManager.GetString("StartGame", resourceCulture);
             }
@@ -369,7 +369,7 @@ namespace SImulator.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Theme.
         /// </summary>
-        internal static string Theme {
+        public static string Theme {
             get {
                 return ResourceManager.GetString("Theme", resourceCulture);
             }

@@ -157,7 +157,7 @@
     <value>License folder not found</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>No Risk question</value>
+    <value>Question for yourself without risk</value>
   </data>
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Error opening license folder: {0}</value>

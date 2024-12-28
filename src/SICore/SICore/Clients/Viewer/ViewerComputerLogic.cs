@@ -35,12 +35,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         _showman = new ShowmanComputerLogic(data, viewerActions, computerAccount);
     }
 
-    public void StarterChoose() => _showman.StarterChoose();
-
-    public void FirstStake() => _showman.FirstStake();
-
-    public void FirstDelete() => _showman.FirstDelete();
-
     public void IsRight(bool voteForRight, string answer)
     {
         if (_role == GameRole.Showman)

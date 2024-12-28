@@ -925,7 +925,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на QUESTION WITHOUT RISK.
+        ///   Ищет локализованную строку, похожую на QUESTION FOR YOURSELF WITHOUT RISK.
         /// </summary>
         public static string Label_Sponsored {
             get {
@@ -1771,7 +1771,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Waiting for the host&apos;s decision....
+        ///   Ищет локализованную строку, похожую на Waiting for the showman&apos;s decision....
         /// </summary>
         public static string ShowmanWaiting {
             get {
@@ -1780,7 +1780,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на You got a Question withour risk!.
+        ///   Ищет локализованную строку, похожую на You got a Question for yourself without risk!.
         /// </summary>
         public static string SponsoredQuestion {
             get {

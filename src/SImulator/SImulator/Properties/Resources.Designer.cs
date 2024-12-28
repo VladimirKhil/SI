@@ -1186,15 +1186,6 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на No Risk question.
-        /// </summary>
-        public static string QuestionTypeNoRisk {
-            get {
-                return ResourceManager.GetString("QuestionTypeNoRisk", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Secret question.
         /// </summary>
         public static string QuestionTypeSecret {

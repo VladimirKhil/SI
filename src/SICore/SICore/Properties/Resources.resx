@@ -505,10 +505,10 @@
     <value>The showman has switched the game into the previous round</value>
   </data>
   <data name="ShowmanWaiting" xml:space="preserve">
-    <value>Waiting for the host's decision...</value>
+    <value>Waiting for the showman's decision...</value>
   </data>
   <data name="SponsoredQuestion" xml:space="preserve">
-    <value>You got a Question withour risk!</value>
+    <value>You got a Question for yourself without risk!</value>
   </data>
   <data name="SponsoredQuestionInfo" xml:space="preserve">
     <value>This question is only for you. If you answer correctly, you'll earn {0} points, otherwise you loose nothing!</value>
@@ -646,7 +646,7 @@
     <value>QUESTION WITH A SECRET</value>
   </data>
   <data name="Label_Sponsored" xml:space="preserve">
-    <value>QUESTION WITHOUT RISK</value>
+    <value>QUESTION FOR YOURSELF WITHOUT RISK</value>
   </data>
   <data name="LogTitle" xml:space="preserve">
     <value>SIGame log</value>

@@ -787,7 +787,7 @@
     <value>Мелодия отсутствия ответов</value>
   </data>
   <data name="Sound_NoRiskQuestion" xml:space="preserve">
-    <value>Мелодия вопроса без риска</value>
+    <value>Мелодия вопроса для себя без риска</value>
   </data>
   <data name="Sound_RoundThemes" xml:space="preserve">
     <value>Мелодия тем раунда</value>

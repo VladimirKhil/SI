@@ -432,7 +432,7 @@
     <value>Во входном файле не обнаружены вопросы! Учтите, что вопросы должны иметь стоимость, кратную 10, и каждый вопрос должен начинаться с новой строки.</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Вопрос без риска</value>
+    <value>Вопрос для себя без риска</value>
   </data>
   <data name="NoSource" xml:space="preserve">
     <value>Отсутствует источник</value>

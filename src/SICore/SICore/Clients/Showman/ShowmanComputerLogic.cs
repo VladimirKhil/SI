@@ -43,20 +43,8 @@ internal sealed class ShowmanComputerLogic : IPersonLogic
                 OnSelectPlayer();
                 break;
 
-            case ShowmanTasks.AnswerFirst:
-                AnswerFirst();
-                break;
-
-            case ShowmanTasks.AnswerNextStake:
-                AnswerNextStake();
-                break;
-
             case ShowmanTasks.AnswerRight:
                 AnswerRight((string?)arg);
-                break;
-
-            case ShowmanTasks.AnswerNextToDelete:
-                AnswerNextToDelete();
                 break;
 
             default:
@@ -78,12 +66,6 @@ internal sealed class ShowmanComputerLogic : IPersonLogic
         _viewerActions.SendMessage(message, i.ToString());
     }
 
-    private void AnswerNextToDelete() => SelectPlayer(Messages.NextDelete);
-
-    private void AnswerNextStake() => SelectPlayer(Messages.Next);
-
-    private void AnswerFirst() => SelectPlayer(Messages.First);
-
     private void OnSelectPlayer() => SelectPlayer(Messages.SelectPlayer);
 
     private void AnswerRight(string? answer)
@@ -94,23 +76,12 @@ internal sealed class ShowmanComputerLogic : IPersonLogic
 
     public void SelectPlayer() => ScheduleExecution(ShowmanTasks.SelectPlayer, 10 + Random.Shared.Next(10));
 
-    public void StarterChoose() => ScheduleExecution(ShowmanTasks.AnswerFirst, 10 + Random.Shared.Next(10));
-
-    public void FirstStake() => ScheduleExecution(ShowmanTasks.AnswerNextStake, 10 + Random.Shared.Next(10));
-
     public void IsRight(string answer) => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Random.Shared.Next(10), answer);
-
-    public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + Random.Shared.Next(10));
 
     public void OnInitialized() => ScheduleExecution(ShowmanTasks.Ready, 10);
 
 
     public void ChooseQuest()
-    {
-        
-    }
-
-    public void Cat()
     {
         
     }

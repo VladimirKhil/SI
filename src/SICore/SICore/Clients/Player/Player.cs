@@ -145,25 +145,8 @@ public sealed class Player : Viewer
                     Logic.Answer();
                     break;
 
-                case Messages.AskSelectPlayer: // Uncomment later
-                    //OnAskSelectPlayer(mparams);
-                    //_logic.SelectPlayer();
-                    break;
-
-                case Messages.Cat:
-                    for (int i = 0; i < ClientData.Players.Count; i++)
-                    {
-                        ClientData.Players[i].CanBeSelected = mparams[i + 1] == "+";
-                        int num = i;
-
-                        ClientData.Players[i].SelectionCallback = player =>
-                        {
-                            _viewerActions.SendMessageWithArgs(Messages.Cat, num);
-                            Clear();
-                        };
-                    }
-
-                    Logic.PlayerLogic.Cat();
+                case Messages.AskSelectPlayer:
+                    OnAskSelectPlayer(mparams);
                     break;
 
                 case Messages.AskStake: // Uncomment later

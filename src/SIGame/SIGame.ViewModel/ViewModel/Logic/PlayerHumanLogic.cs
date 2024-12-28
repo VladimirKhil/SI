@@ -36,12 +36,6 @@ internal sealed class PlayerHumanLogic : IPersonLogic
 
     #region PlayerInterface Members
 
-    public void Cat()
-    {
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectCatPlayer)];
-        _data.Host.OnFlash();
-    }
-
     public void Stake()
     {
         _gameViewModel.SendNominal.CanBeExecuted = _data.PersonDataExtensions.Var[0];

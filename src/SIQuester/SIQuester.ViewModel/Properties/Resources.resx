@@ -431,7 +431,7 @@ Humor</value>
     <value>No questions were found in the input file! Note that questions must have a cost multiple of 10, and each question must start on a new line.</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Question without risk</value>
+    <value>Question for yourself without risk</value>
   </data>
   <data name="NoSource" xml:space="preserve">
     <value>Source is missing</value>

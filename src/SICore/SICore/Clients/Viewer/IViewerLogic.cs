@@ -209,24 +209,6 @@ public interface IViewerLogic
     void SelectPlayer() { }
 
     /// <summary>
-    /// Selects person to select the question.
-    /// </summary>
-    [Obsolete]
-    void StarterChoose();
-
-    /// <summary>
-    /// Selects next person to make a stake.
-    /// </summary>
-    [Obsolete]
-    void FirstStake();
-
-    /// <summary>
-    /// Selects next person to delete a theme.
-    /// </summary>
-    [Obsolete]
-    void FirstDelete();
-
-    /// <summary>
     /// Validates the answer.
     /// </summary>
     void IsRight(bool voteForRight, string answer);

@@ -950,7 +950,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Question without risk.
+        ///   Ищет локализованную строку, похожую на Question for yourself without risk.
         /// </summary>
         public static string NoRiskQuestion {
             get {

@@ -7,12 +7,6 @@
 public interface IPersonLogic
 {
     /// <summary>
-    /// Отдать вопрос с секретом
-    /// </summary>
-    [Obsolete]
-    void Cat();
-
-    /// <summary>
     /// Нужно сделать ставку
     /// </summary>
     [Obsolete]

@@ -2878,7 +2878,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на No risk question sound.
+        ///   Ищет локализованную строку, похожую на Question for yourself without risk sound.
         /// </summary>
         public static string Sound_NoRiskQuestion {
             get {

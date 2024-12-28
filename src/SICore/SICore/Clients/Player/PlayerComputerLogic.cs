@@ -112,10 +112,6 @@ internal sealed class PlayerComputerLogic : IPersonLogic
                 AnswerWrong();
                 break;
 
-            case PlayerTasks.Cat:
-                OnSecretQuestionAnswererSelect(Messages.Cat);
-                break;
-
             case PlayerTasks.SelectPlayer:
                 OnSelectPlayer();
                 break;
@@ -1708,11 +1704,6 @@ internal sealed class PlayerComputerLogic : IPersonLogic
     /// </summary>
     public void Answer() => ScheduleExecution(PlayerTasks.Answer,
         _data.QuestionType == QuestionTypes.Simple ? 10 + Random.Shared.Next(10) : RealSpeed);
-
-    /// <summary>
-    /// Необходимо отдать Вопрос с секретом
-    /// </summary>
-    public void Cat() => ScheduleExecution(PlayerTasks.Cat, 10 + Random.Shared.Next(10));
 
     public void SelectPlayer() => ScheduleExecution(PlayerTasks.SelectPlayer, 10 + Random.Shared.Next(10));
 

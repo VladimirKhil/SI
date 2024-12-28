@@ -3015,15 +3015,23 @@ public sealed class QDocument : WorkspaceViewModel
                             var link = content.Value;
                             var tmpFile = System.IO.Path.Combine(tempMediaFolder, fileName);
 
-                            using (var stream = await HttpClient.GetStreamAsync(link))
-                            using (var fs = File.Create(tmpFile))
+                            try
                             {
+                                using var stream = await HttpClient.GetStreamAsync(link);
+                                using var fs = File.Create(tmpFile);
                                 await stream.CopyToAsync(fs);
+                            }
+                            catch (Exception exc)
+                            {
+                                OnError(exc);
+                                continue;
                             }
 
                             var item = collection.AddFile(tmpFile);
                             content.Value = item.Name;
                             content.IsRef = true;
+
+                            question.Info.Sources.Add(link);
 
                             downloadCounter++;
                         }

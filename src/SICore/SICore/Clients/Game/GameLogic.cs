@@ -20,9 +20,6 @@ using R = SICore.Properties.Resources;
 
 namespace SICore;
 
-// TODO: all logic based on RoundTypes.Final or GameModes.Tv/Sport must be eliminated
-// All rules must be handled by game engine
-
 /// <summary>
 /// Executes SIGame logic implemented as a state machine.
 /// </summary>
