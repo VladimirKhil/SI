@@ -1366,9 +1366,9 @@ public sealed class QDocument : WorkspaceViewModel
                                 continue;
                         }
 
-                        var media = Document.TryGetMedia(contentItem);
+                        var collection = TryGetCollectionByMediaType(contentItem.Type);
 
-                        if (media.HasValue && media.Value.HasStream)
+                        if (collection != null && collection.Files.Any(f => f.Model.Name == contentItem.Value))
                         {
                             usedFiles.Add(contentItem.Value);
                         }
@@ -2979,6 +2979,8 @@ public sealed class QDocument : WorkspaceViewModel
         var directoryCreated = false;
         var downloadCounter = 0;
 
+        var errors = new List<string>();
+
         try
         {
             using var change = OperationsManager.BeginComplexChange();
@@ -2999,11 +3001,14 @@ public sealed class QDocument : WorkspaceViewModel
                             var collection = TryGetCollectionByMediaType(content.Type);
                             var fileName = System.IO.Path.GetFileName(content.Value);
 
-                            if (collection == null
-                                || string.IsNullOrEmpty(fileName)
-                                || string.IsNullOrEmpty(System.IO.Path.GetExtension(fileName)))
+                            if (collection == null)
                             {
                                 continue;
+                            }
+
+                            if (string.IsNullOrEmpty(fileName) || string.IsNullOrEmpty(System.IO.Path.GetExtension(fileName)))
+                            {
+                                fileName = $"{Guid.NewGuid()}.{GetDefaultExtensionByContentType(content.Type)}";
                             }
 
                             if (!directoryCreated)
@@ -3023,7 +3028,7 @@ public sealed class QDocument : WorkspaceViewModel
                             }
                             catch (Exception exc)
                             {
-                                OnError(exc);
+                                errors.Add($"{round.Model.Name}:{theme.Model.Name}:{question.Model.Price}: {exc.Message}");
                                 continue;
                             }
 
@@ -3041,6 +3046,11 @@ public sealed class QDocument : WorkspaceViewModel
 
             change.Commit();
 
+            if (errors.Count > 0)
+            {
+                PlatformManager.Instance.ShowExclamationMessage(string.Join(Environment.NewLine, errors));
+            }
+
             PlatformManager.Instance.Inform(string.Format(Resources.FilesDownloaded, downloadCounter));
         }
         catch (Exception exc)
@@ -3048,6 +3058,15 @@ public sealed class QDocument : WorkspaceViewModel
             OnError(exc);
         }
     }
+
+    private static string GetDefaultExtensionByContentType(string type) => type switch
+    {
+        ContentTypes.Image => ".jpg",
+        ContentTypes.Audio => ".mp3",
+        ContentTypes.Video => ".mp4",
+        ContentTypes.Html => ".html",
+        _ => ".dat"
+    };
 
     private void Delete_Executed(object? arg) => ActiveNode?.Remove?.Execute(null);
 

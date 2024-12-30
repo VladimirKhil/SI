@@ -60,10 +60,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public bool CanSwitchType => true;
 
-    public IPersonLogic PlayerLogic { get; }
-
-    public IPersonLogic ShowmanLogic { get; }
-
     private string? _prependTableText;
     private string? _appendTableText;
 
@@ -112,9 +108,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         TInfo.AnswerSelected += TInfo_AnswerSelected;
 
         TInfo.QuestionToggled += TInfo_QuestionToggled;
-
-        PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, gameViewModel, localizer);
-        ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, gameViewModel, localizer);
 
         _localFileManager.Error += LocalFileManager_Error;
 
@@ -1984,5 +1977,21 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _gameViewModel.Hint = _localizer[nameof(R.HintSelectTheme)];
 
         _data.Host.OnFlash();
+    }
+
+    public void MakeStake()
+    {
+        _gameViewModel.SendStakeNew.CanBeExecuted = _data.PersonDataExtensions.Var[1];
+        _gameViewModel.SendPassNew.CanBeExecuted = _data.PersonDataExtensions.Var[2];
+        _gameViewModel.SendAllInNew.CanBeExecuted = _data.PersonDataExtensions.Var[3];
+
+        _gameViewModel.DialogMode = DialogModes.StakeNew;
+        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
+        _data.Host.OnFlash();
+
+        foreach (var player in _data.Players)
+        {
+            player.IsDeciding = false;
+        }
     }
 }

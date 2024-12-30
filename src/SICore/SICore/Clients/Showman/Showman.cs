@@ -1,5 +1,4 @@
 ﻿using SICore.BusinessLogic;
-using SICore.Models;
 using SICore.Network.Clients;
 using SIData;
 
@@ -14,13 +13,7 @@ public sealed class Showman : Viewer
 
     public Showman(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
-    {
-        ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
-        {
-            _viewerActions.SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
-            ClearSelections();
-        });
-    }
+    { }
 
     /// <summary>
     /// Получение сообщения
@@ -34,7 +27,7 @@ public sealed class Showman : Viewer
             switch (mparams[0])
             {
                 case Messages.Cancel:
-                    ClearSelections(true);
+                    Logic.ClearSelections(true);
                     break;
 
                 case Messages.AskSelectPlayer:
@@ -97,66 +90,8 @@ public sealed class Showman : Viewer
                     #endregion
                     break;
 
-                case Messages.AskStake: // Uncomment later
-                    //OnAskStake(mparams);
-                    //_logic.StakeNew();
-                    break;
-
-                case Messages.CatCost:
-                    ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
-                    {
-                        Minimum = int.Parse(mparams[1]),
-                        Maximum = int.Parse(mparams[2]),
-                        Step = int.Parse(mparams[3]),
-                        Stake = int.Parse(mparams[1])
-                    };
-
-                    Logic.ShowmanLogic.CatCost();
-                    break;
-
-                case Messages.Stake:
-                    for (var i = 0; i < 4; i++)
-                    {
-                        ClientData.PersonDataExtensions.Var[i] = mparams[i + 1] == "+";
-                    }
-
-                    ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
-                    {
-                        Minimum = int.Parse(mparams[5]),
-                        Maximum = mparams.Length >= 7 ? int.Parse(mparams[6]) : int.Parse(mparams[5]),
-                        Step = 100,
-                        Stake = int.Parse(mparams[5]),
-                        PlayerName = mparams.Length >= 8 ? mparams[7] : null,
-                    };
-
-                    Logic.ShowmanLogic.Stake();
-                    break;
-
-                case Messages.Stake2:
-                    if (mparams.Length < 6
-                        || !Enum.TryParse<StakeTypes>(mparams[1], out var stakeTypes)
-                        || !int.TryParse(mparams[2], out var minimumStake)
-                        || !int.TryParse(mparams[3], out var step)
-                        || !int.TryParse(mparams[4], out var maximumStake))
-                    {
-                        break;
-                    }
-
-                    ClientData.PersonDataExtensions.Var[0] = stakeTypes.HasFlag(StakeTypes.Nominal);
-                    ClientData.PersonDataExtensions.Var[1] = stakeTypes.HasFlag(StakeTypes.Stake);
-                    ClientData.PersonDataExtensions.Var[2] = stakeTypes.HasFlag(StakeTypes.Pass);
-                    ClientData.PersonDataExtensions.Var[3] = stakeTypes.HasFlag(StakeTypes.AllIn);
-
-                    ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
-                    {
-                        Minimum = minimumStake,
-                        Maximum = maximumStake,
-                        Step = step,
-                        Stake = minimumStake,
-                        PlayerName = mparams[5],
-                    };
-
-                    Logic.ShowmanLogic.Stake();
+                case Messages.AskStake:
+                    OnAskStake(mparams);
                     break;
 
                 case Messages.Answer:
@@ -226,6 +161,4 @@ public sealed class Showman : Viewer
 
         Logic.IsRight(true, mparams[2]);
     }
-
-    private void ClearSelections(bool full = false) => Logic.ClearSelections(full);
 }

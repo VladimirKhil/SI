@@ -6,7 +6,7 @@ namespace SICore;
 /// <summary>
 /// Defines a showman bot logic.
 /// </summary>
-internal sealed class ShowmanComputerLogic : IPersonLogic
+internal sealed class ShowmanComputerLogic
 {
     private readonly ViewerActions _viewerActions;
     private readonly ViewerData _data;
@@ -58,6 +58,7 @@ internal sealed class ShowmanComputerLogic : IPersonLogic
     {
         int num = _data.Players.Count(p => p.CanBeSelected);
         int i = Random.Shared.Next(num);
+        
         while (i < _data.Players.Count && !_data.Players[i].CanBeSelected)
         {
             i++;
@@ -79,25 +80,4 @@ internal sealed class ShowmanComputerLogic : IPersonLogic
     public void IsRight(string answer) => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Random.Shared.Next(10), answer);
 
     public void OnInitialized() => ScheduleExecution(ShowmanTasks.Ready, 10);
-
-
-    public void ChooseQuest()
-    {
-        
-    }
-
-    public void Stake()
-    {
-        
-    }
-
-    public void FinalStake()
-    {
-        
-    }
-
-    public void CatCost()
-    {
-        
-    }
 }

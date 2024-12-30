@@ -4,7 +4,7 @@ using SIData;
 namespace SICore;
 
 /// <summary>
-/// Defines a common game viewer actor.
+/// Defines a client controller.
 /// </summary>
 public interface IViewerClient : IActor
 {

@@ -9,10 +9,6 @@ namespace SICore;
 /// </summary>
 public sealed class PersonData : INotifyPropertyChanged
 {
-    public ICommand SendCatCost { get; set; }
-
-    public ICommand SendFinalStake { get; set; }
-
     private StakeInfo _stakeInfo = null;
 
     public StakeInfo StakeInfo

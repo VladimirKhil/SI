@@ -6,10 +6,9 @@ using SIData;
 namespace SICore;
 
 /// <summary>
-/// Обработчик сообщений
+/// Defines a message handler.
 /// </summary>
 /// <typeparam name="D">Тип данных клиента</typeparam>
-/// <typeparam name="L">Тип логики клиента</typeparam>
 public abstract class Actor<D> : IActor
     where D : Data
 {

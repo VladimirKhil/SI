@@ -1419,7 +1419,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
         if (account == me)
         {
             // Should move to viewers itself
-            SwitchToNewType(GameRole.Viewer, newAccount, me);
+            SwitchToNewType(GameRole.Viewer, newAccount);
         }
     }
 
@@ -1518,7 +1518,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
             if (account == me && newAccount != null)
             {
                 // Необходимо самого себя перевести в зрители
-                SwitchToNewType(GameRole.Viewer, newAccount, me);
+                SwitchToNewType(GameRole.Viewer, newAccount);
             }
         }
     }
@@ -1587,7 +1587,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
         if (account == me && newAccount != null && _logic.CanSwitchType)
         {
             // Необходимо самого себя перевести в зрители
-            SwitchToNewType(GameRole.Viewer, newAccount, me);
+            SwitchToNewType(GameRole.Viewer, newAccount);
         }
     }
 
@@ -1765,7 +1765,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
 
                 if (newRole != role)
                 {
-                    SwitchToNewType(role, other, me);
+                    SwitchToNewType(role, other);
                 }
             }
             else if (other == me)
@@ -1774,7 +1774,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
 
                 if (newRole != role)
                 {
-                    SwitchToNewType(newRole, account, me);
+                    SwitchToNewType(newRole, account);
                 }
             }
         }
@@ -1784,7 +1784,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
     /// Сменить тип своего аккаунта
     /// </summary>
     /// <param name="role">Целевой тип</param>
-    private void SwitchToNewType(GameRole role, ViewerAccount newAccount, ViewerAccount oldAccount)
+    private void SwitchToNewType(GameRole role, ViewerAccount newAccount)
     {
         if (newAccount == null)
         {
@@ -1793,21 +1793,8 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
 
         if (!_logic.CanSwitchType)
         {
-            static string printAccount(ViewerAccount acc) => $"{acc.Name} {acc.IsHuman} {acc.IsMale} {acc.IsConnected}";
-
-            var info = new StringBuilder()
-                .Append("Showman: ").Append(ClientData.ShowMan?.Name).AppendLine()
-                .Append("Players: ").Append(string.Join(", ", ClientData.Players.Select(p => p.Name))).AppendLine()
-                .Append("Viewers: ").Append(string.Join(", ", ClientData.Viewers.Select(v => v.Name))).AppendLine()
-                .Append("Me: ").Append(ClientData.Name).AppendLine()
-                .Append("role: ").Append(role).AppendLine()
-                .Append("newAccount: ").Append(printAccount(newAccount)).AppendLine()
-                .Append("oldAccount: ").Append(printAccount(oldAccount)).AppendLine();
-
-            throw new InvalidOperationException($"Trying to switch type of computer account:\n{info}");
+            throw new InvalidOperationException($"Trying to switch type of computer account:\n{ClientData.Name}");
         }
-
-        ClientData.PersonDataExtensions.SendCatCost = ClientData.PersonDataExtensions.SendFinalStake = null;
 
         IViewerClient viewer = role switch
         {
@@ -2136,6 +2123,8 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
             PlayerName = playerName,
             Reason = reason,
         };
+
+        _logic.MakeStake();
     }
 
     /// <summary>

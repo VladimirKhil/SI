@@ -9,10 +9,6 @@ namespace SICore;
 /// </summary>
 public interface IViewerLogic
 {
-    IPersonLogic PlayerLogic { get; }
-
-    IPersonLogic ShowmanLogic { get; }
-
     bool CanSwitchType { get; }
 
     /// <summary>
@@ -277,4 +273,6 @@ public interface IViewerLogic
     void DeleteTheme();
 
     void ValidateAnswer(int playerIndex, string answer) { }
+
+    void MakeStake();
 }

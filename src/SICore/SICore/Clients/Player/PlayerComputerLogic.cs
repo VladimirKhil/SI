@@ -14,7 +14,7 @@ namespace SICore;
 /// <summary>
 /// Defines a player computer logic.
 /// </summary>
-internal sealed class PlayerComputerLogic : IPersonLogic
+internal sealed class PlayerComputerLogic
 {
     private const int DefaultThemeQuestionCount = 5;
 
@@ -116,24 +116,12 @@ internal sealed class PlayerComputerLogic : IPersonLogic
                 OnSelectPlayer();
                 break;
 
-            case PlayerTasks.CatCost:
-                CatCostTask();
-                break;
-
             case PlayerTasks.ChooseFinal:
                 ChooseFinal();
                 break;
 
-            case PlayerTasks.FinalStake:
-                FinalStakeTask();
-                break;
-
-            case PlayerTasks.Stake:
-                StakeTask();
-                break;
-
             case PlayerTasks.StakeNew:
-                StakeTaskNew();
+                MakeStake();
                 break;
 
             case PlayerTasks.PressButton:
@@ -164,29 +152,6 @@ internal sealed class PlayerComputerLogic : IPersonLogic
 
     private void AnswerWrong() => _viewerActions.SendMessage(Messages.IsRight, "-");
 
-    private void FinalStakeTask()
-    {
-        var myIndex2 = _data.Players.IndexOf((PlayerAccount)_data.Me);
-        var sums = _data.Players.Select(p => p.Sum).ToArray();
-
-        try
-        {
-            var stake = MakeFinalStake(sums, myIndex2, _account.Style);
-            _viewerActions.SendMessageWithArgs(Messages.FinalStake, stake);
-        }
-        catch (Exception exc)
-        {
-            _data.SystemLog.AppendFormat(
-                "Final stake calculation error: {0}\r\nParameter values:\r\n" +
-                "sums = {1}. myIndex = {2}. Style = {3}",
-                exc,
-                string.Join(", ", sums),
-                myIndex2,
-                _account.Style)
-                .AppendLine();
-        }
-    }
-
     private void ChooseFinal()
     {
         try
@@ -203,7 +168,7 @@ internal sealed class PlayerComputerLogic : IPersonLogic
         }
     }
 
-    private void StakeTaskNew()
+    private void MakeStake()
     {
         var myIndex = _data.Players.IndexOf((PlayerAccount)_data.Me);
         var isCritical = IsCritical();
@@ -320,101 +285,6 @@ internal sealed class PlayerComputerLogic : IPersonLogic
             StakeMode.AllIn => StakeModes.AllIn,
             _ => StakeModes.Pass,
         };
-
-    [Obsolete]
-    private void StakeTask()
-    {
-        var myIndex = _data.Players.IndexOf((PlayerAccount)_data.Me);
-        var isCritical = IsCritical();
-
-        try
-        {
-            int stakeSum = -1;
-
-            var stakeMode = MakeStake(
-                _data.QuestionIndex,
-                _data.Players.Select(p => p.Sum).ToArray(),
-                myIndex,
-                _data.LastStakerIndex,
-                _account.Style,
-                _data.PersonDataExtensions.Var,
-                _account.N1,
-                _account.N5,
-                _account.B1,
-                _account.B5,
-                isCritical,
-                _data.PersonDataExtensions.StakeInfo.Minimum,
-                _data.PersonDataExtensions.StakeInfo.Step,
-                out stakeSum);
-
-            var msg = new StringBuilder(Messages.Stake).Append(Message.ArgsSeparatorChar).Append((int)stakeMode);
-
-            if (stakeMode == StakeMode.Sum)
-            {
-                msg.Append(Message.ArgsSeparatorChar).Append(stakeSum);
-            }
-
-            _viewerActions.SendMessage(msg.ToString());
-        }
-        catch (Exception exc)
-        {
-            _data.SystemLog.AppendFormat(
-                "Ошибка при расчёте ставки компьютерного игрока. Описание ошибки: {0}\r\nЗначения параметров.\r\n" +
-                "this.data.choiceQuest = {1}. Sums = {2}. " +
-                "MyIndex = {3}.lastStakerNum = {4}. Style = {5} Vars = {6}:{7}:{8}:{9}. " +
-                "N1 = {10}, N5 = {11}, B1 = {12}, B5 = {13}, Critical = {14}. MinCost = {15}",
-                exc,
-                _data.QuestionIndex,
-                string.Join(", ", _data.Players.Select(p => p.Sum)),
-                myIndex,
-                _data.LastStakerIndex,
-                _account.Style,
-                _data.PersonDataExtensions.Var[0],
-                _data.PersonDataExtensions.Var[1],
-                _data.PersonDataExtensions.Var[2],
-                _data.PersonDataExtensions.Var[3],
-                _account.N1,
-                _account.N5,
-                _account.B1,
-                _account.B5,
-                isCritical,
-                _data.PersonDataExtensions.StakeInfo.Minimum)
-                .AppendLine();
-        }
-    }
-
-    private void CatCostTask()
-    {
-        try
-        {
-            var stakeInfo = _data.PersonDataExtensions.StakeInfo;
-            var optionCount = stakeInfo.Step == 0 ? 2 : (stakeInfo.Maximum - stakeInfo.Minimum) / stakeInfo.Step + 1;
-            
-            var optionIndex = 0;
-
-            switch (_account.Style)
-            {
-                case PlayerStyle.Careful:
-                    optionIndex = 0;
-                    break;
-
-                case PlayerStyle.Normal:
-                    optionIndex = Random.Shared.Next(optionCount);
-                    break;
-
-                case PlayerStyle.Agressive:
-                    optionIndex = optionCount - 1;
-                    break;
-            }
-
-            var price = stakeInfo.Minimum + optionIndex * stakeInfo.Step;
-            _viewerActions.SendMessage(Messages.CatCost, price.ToString());
-        }
-        catch (Exception exc)
-        {
-            _data.SystemLog.AppendFormat("Secret question price selection error: {0}", exc).AppendLine();
-        }
-    }
 
     private void OnSelectPlayer() => OnSecretQuestionAnswererSelect(Messages.SelectPlayer);
 
@@ -1707,27 +1577,12 @@ internal sealed class PlayerComputerLogic : IPersonLogic
 
     public void SelectPlayer() => ScheduleExecution(PlayerTasks.SelectPlayer, 10 + Random.Shared.Next(10));
 
-    /// <summary>
-    /// Необходимо сделать ставку
-    /// </summary>
-    public void Stake() => ScheduleExecution(PlayerTasks.Stake, 10 + Random.Shared.Next(10));
-
     public void StakeNew() => ScheduleExecution(PlayerTasks.StakeNew, 10 + Random.Shared.Next(10));
 
     /// <summary>
     /// Необходимо выбрать финальную тему
     /// </summary>
     public void ChooseFinalTheme() => ScheduleExecution(PlayerTasks.ChooseFinal, 10 + Random.Shared.Next(10));
-
-    /// <summary>
-    /// Необходимо сделать финальную ставку
-    /// </summary>
-    public void FinalStake() => ScheduleExecution(PlayerTasks.FinalStake, 10 + Random.Shared.Next(20));
-
-    /// <summary>
-    /// Необходимо выбрать стоимость Вопроса с секретом
-    /// </summary>
-    public void CatCost() => ScheduleExecution(PlayerTasks.CatCost, 15);
 
     public void IsRight(bool voteForRight) =>
         ScheduleExecution(voteForRight ? PlayerTasks.AnswerRight : PlayerTasks.AnswerWrong, 10 + Random.Shared.Next(10));

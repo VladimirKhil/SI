@@ -17,10 +17,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     private readonly PlayerComputerLogic _player;
     private readonly ShowmanComputerLogic _showman;
 
-    public IPersonLogic PlayerLogic => _player;
-
-    public IPersonLogic ShowmanLogic => _showman;
-
     private readonly TimerInfo[] _timersInfo = new TimerInfo[] { new(), new(), new() };
 
     private readonly GameRole _role;
@@ -47,7 +43,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
-    public void SelectPlayer()
+    public void OnSelectPlayer(SelectPlayerReason reason)
     {
         if (_role == GameRole.Showman)
         {
@@ -309,4 +305,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         var isRight = AnswerChecker.IsAnswerRight(answer, _data.PersonDataExtensions.Right);
         _viewerActions.SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
     }
+
+    public void MakeStake() => _player.StakeNew();
 }
