@@ -28,7 +28,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         _role = role;
 
         _player = new PlayerComputerLogic(data, computerAccount, intelligence, viewerActions, _timersInfo);
-        _showman = new ShowmanComputerLogic(data, viewerActions, computerAccount);
+        _showman = new ShowmanComputerLogic(data, viewerActions);
     }
 
     public void IsRight(bool voteForRight, string answer)

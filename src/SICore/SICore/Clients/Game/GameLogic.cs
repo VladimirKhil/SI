@@ -144,13 +144,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void Run()
     {
-        Engine.Package += Engine_Package;
-        Engine.GameThemes += Engine_GameThemes;
-
         Engine.QuestionFinish += Engine_QuestionFinish;
         Engine.NextQuestion += Engine_NextQuestion;
-
-        Engine.EndGame += Engine_EndGame;
 
         _data.PackageDoc = Engine.Document;
 
@@ -297,7 +292,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
-    private void Engine_Package(Package package)
+    internal void OnPackage(Package package)
     {
         _data.Package = package;
 
@@ -316,7 +311,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         OnPackage(package, 1);
     }
 
-    private void Engine_GameThemes(IEnumerable<string> gameThemes)
+    internal void OnGameThemes(IEnumerable<string> gameThemes)
     {
         _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.GameThemes)]));
         var msg = new MessageBuilder(Messages.GameThemes).AddRange(gameThemes);
@@ -960,7 +955,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ProceedToThemeAndQuestion();
     }
 
-    private void Engine_EndGame()
+    internal void OnEndGame()
     {
         // Clearing the table
         _gameActions.SendMessage(Messages.Stop);

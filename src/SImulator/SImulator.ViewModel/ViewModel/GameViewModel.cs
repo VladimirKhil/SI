@@ -686,12 +686,9 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         settings.SIUISettings.PropertyChanged += Default_PropertyChanged;
         settings.Model.PropertyChanged += Settings_PropertyChanged;
 
-        _engine.Package += Engine_Package;
-        _engine.GameThemes += Engine_GameThemes;
         _engine.QuestionFinish += Engine_QuestionFinish;
         _engine.EndQuestion += Engine_EndQuestion;
         _engine.NextQuestion += Engine_NextQuestion;
-        _engine.EndGame += Engine_EndGame;
 
         _engine.PropertyChanged += Engine_PropertyChanged;
 
@@ -1420,7 +1417,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveTheme = theme;
     }
 
-    private void Engine_EndGame() => PresentationController.ClearState();
+    internal void OnEndGame() => PresentationController.ClearState();
 
     private void Stop_Executed(object? arg = null) => RequestStop?.Invoke();
 
@@ -1534,7 +1531,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         LocalInfo.TStage = TableStage.Special;
     }
 
-    private void Engine_Package(Package package)
+    internal void OnPackage(Package package)
     {
         var videoUrl = Settings.Model.VideoUrl;
         var imageUrl = Settings.SIUISettings.Model.LogoUri;
@@ -1561,7 +1558,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _buttonManager?.TryGetCommandExecutor()?.OnStage("Begin");
     }
 
-    private void Engine_GameThemes(IEnumerable<string> themes)
+    internal void OnGameThemes(IEnumerable<string> themes)
     {
         PresentationController.SetGameThemes(themes);
         LocalInfo.TStage = TableStage.GameThemes;

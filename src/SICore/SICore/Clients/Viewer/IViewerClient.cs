@@ -6,7 +6,7 @@ namespace SICore;
 /// <summary>
 /// Defines a client controller.
 /// </summary>
-public interface IViewerClient : IActor
+public interface IViewerClient : IDisposable
 {
     /// <summary>
     /// Является ли владельцем сервера

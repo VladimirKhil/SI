@@ -10,9 +10,6 @@ public sealed class HostInfo
     /// </summary>
     public string Name { get; set; } = "";
 
-    [Obsolete]
-    public string PackagesPublicBaseUrl { get; set; } = "";
-
     /// <summary>
     /// Base Urls that are considered valid for in-game content files.
     /// </summary>

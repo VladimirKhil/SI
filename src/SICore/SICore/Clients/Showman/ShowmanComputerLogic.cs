@@ -1,5 +1,4 @@
 ﻿using SICore.Clients.Showman;
-using SIData;
 
 namespace SICore;
 
@@ -11,7 +10,7 @@ internal sealed class ShowmanComputerLogic
     private readonly ViewerActions _viewerActions;
     private readonly ViewerData _data;
 
-    public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
+    public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions)
     {
         _viewerActions = viewerActions;
         _data = data;

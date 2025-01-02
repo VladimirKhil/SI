@@ -5,7 +5,6 @@ using SI.GameServer.Contract;
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,8 +19,6 @@ public sealed class GameServerClient : IGameServerClient
 
     private readonly GameServerClientOptions _options;
 
-    private readonly CookieContainer _cookieContainer;
-    private readonly HttpClientHandler _httpClientHandler;
     private readonly HttpClient _client;
 
     private HubConnection? _connection;
@@ -59,10 +56,7 @@ public sealed class GameServerClient : IGameServerClient
         _options = options.Value;
         _uIThreadExecutor = uIThreadExecutor;
 
-        _cookieContainer = new CookieContainer();
-        _httpClientHandler = new HttpClientHandler { CookieContainer = _cookieContainer };
-
-        _client = new HttpClient(_httpClientHandler)
+        _client = new HttpClient
         {
             BaseAddress = new Uri(ServiceUri),
             Timeout = _options.Timeout,
@@ -84,7 +78,6 @@ public sealed class GameServerClient : IGameServerClient
         }
 
         _client?.Dispose();
-        _httpClientHandler?.Dispose();
     }
 
     public Task JoinLobbyAsync(CancellationToken cancellationToken = default) =>
@@ -99,18 +92,6 @@ public sealed class GameServerClient : IGameServerClient
     public Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default) =>
         Connection.InvokeAsync<HostInfo>("GetGamesHostInfoNew", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
 
-    public Task<string> GetNewsAsync(CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync<string>("GetNews", cancellationToken);
-
-    public Task<string> GetNewsNewAsync(CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync<string>("GetNewsNew", cancellationToken);
-
-    public Task<ChatMessage[]> GetLatestChatMessagesAsync(CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync<ChatMessage[]>("GetLatestChatMessages", cancellationToken);
-
-    public Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync<string[]>("GetUsers", cancellationToken);
-
     public async Task OpenAsync(string userName, CancellationToken cancellationToken = default)
     {
         if (_isOpened)
@@ -119,13 +100,7 @@ public sealed class GameServerClient : IGameServerClient
         }
 
         _connection = new HubConnectionBuilder()
-            .WithUrl(
-                $"{ServiceUri}sionline",
-                options =>
-                {
-                    options.AccessTokenProvider = () => Task.FromResult<string?>(Convert.ToBase64String(Encoding.UTF8.GetBytes(userName)));
-                    options.Cookies = _cookieContainer;
-                })
+            .WithUrl($"{ServiceUri}sionline")
             .WithAutomaticReconnect(new ReconnectPolicy())
             .AddMessagePackProtocol()
             .Build();
@@ -166,8 +141,6 @@ public sealed class GameServerClient : IGameServerClient
 
         _isOpened = true;
     }
-
-    public Task SayAsync(string message) => Connection.InvokeAsync("Say", message);
 
     private Task OnConnectionClosedAsync(Exception? exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
 

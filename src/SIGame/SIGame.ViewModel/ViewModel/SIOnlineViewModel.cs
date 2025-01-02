@@ -396,7 +396,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                 try
                 {
                     await ReloadGamesAsync(cancellationToken);
-                    await ReloadUsersAsync(cancellationToken);
                 }
                 finally
                 {
@@ -596,7 +595,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             await _gameServerClient.JoinLobbyAsync(_cancellationTokenSource.Token);
 
             await ReloadGamesAsync(_cancellationTokenSource.Token);
-            await ReloadUsersAsync(_cancellationTokenSource.Token);
 
             _avatarLoadingTask = UploadUserAvatarAsync();
 
@@ -658,30 +656,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
         using var contentServiceClient = _gamesHostInfo?.ContentInfos?.Length > 0 ? GetContentClient() : null;
         return await UploadAvatarAsync(contentServiceClient, Human, _cancellationTokenSource.Token);
-    }
-
-    private async Task ReloadUsersAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var users = await _gameServerClient.GetUsersAsync(cancellationToken);
-            Array.Sort(users);
-
-            lock (_usersLock)
-            {
-                Users.Clear();
-
-                foreach (var user in users)
-                {
-                    Users.Add(user);
-                }
-            }
-        }
-        catch (Exception exc)
-        {
-            Error = exc.Message;
-            FullError = exc.ToString();
-        }
     }
 
     protected override async Task ClearConnectionAsync()
@@ -1178,14 +1152,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         }
 
         return null;
-    }
-
-    public void Say(string message, bool system = false)
-    {
-        if (!system)
-        {
-            _gameServerClient.SayAsync(message);
-        }
     }
 
     protected override void CloseContent_Executed(object? arg)

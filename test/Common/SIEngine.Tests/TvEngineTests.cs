@@ -124,7 +124,7 @@ internal sealed class TvEngineTests
         };
     }
 
-    private static void AssertMove(ISIEngine engine, GameStage stage)
+    private static void AssertMove(GameEngine engine, GameStage stage)
     {
         engine.MoveNext();
 

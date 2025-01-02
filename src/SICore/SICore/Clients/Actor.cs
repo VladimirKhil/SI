@@ -9,7 +9,7 @@ namespace SICore;
 /// Defines a message handler.
 /// </summary>
 /// <typeparam name="D">Тип данных клиента</typeparam>
-public abstract class Actor<D> : IActor
+public abstract class Actor<D> : IDisposable
     where D : Data
 {
     protected Client _client;
@@ -42,7 +42,6 @@ public abstract class Actor<D> : IActor
         try
         {
             Dispose();
-            ClientData.EventLog.Append("Client disposed");
         }
         catch (Exception exc)
         {

@@ -1,7 +1,7 @@
 ﻿namespace SIEngine;
 
 /// <summary>
-/// Provides <see cref="ISIEngine" /> options allowing them to be changed during the play.
+/// Provides <see cref="GameEngine" /> options allowing them to be changed during the play.
 /// </summary>
 public sealed class EngineOptions
 {

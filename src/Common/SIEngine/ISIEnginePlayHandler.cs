@@ -10,9 +10,26 @@ namespace SIEngine;
 public interface ISIEnginePlayHandler
 {
     /// <summary>
+    /// Handles package start.
+    /// </summary>
+    /// <param name="package">Game package.</param>
+    void OnPackage(Package package);
+
+    /// <summary>
+    /// Handles package end.
+    /// </summary>
+    void OnPackageEnd();
+
+    /// <summary>
+    /// Handles game themes.
+    /// </summary>
+    /// <param name="themes">Game themes.</param>
+    void OnGameThemes(IEnumerable<string> themes);
+
+    /// <summary>
     /// Handles round start.
     /// </summary>
-    /// <param name="round"></param>
+    /// <param name="round">Game round.</param>
     /// <param name="strategyType">Round play type.</param>
     void OnRound(Round round, QuestionSelectionStrategyType strategyType);
 

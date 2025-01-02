@@ -298,7 +298,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             gameViewModel.Host = _host;
 
             _host.Avatar = _avatarLoadingTask != null ? (await _avatarLoadingTask).AvatarUrl : null;
-            _host.Client.ConnectTo(_node);
+            _client.ConnectTo(_node);
 
             _releaseServer = false;
 

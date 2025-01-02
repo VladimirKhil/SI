@@ -32,8 +32,6 @@ public sealed class ViewerData : Data
     /// </summary>
     public string? QuestionType { get; set; }
 
-    public string AtomType { get; set; } = "";
-
     internal int LastStakerIndex { get; set; } = -1;
 
     public string Name { get; internal set; }

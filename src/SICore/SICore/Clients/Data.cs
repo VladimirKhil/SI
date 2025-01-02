@@ -50,8 +50,6 @@ public abstract class Data : INotifyPropertyChanged
         set { _stage = value; OnPropertyChanged(); }
     }
 
-    public StringBuilder EventLog { get; } = new();
-
     public StringBuilder PersonsUpdateHistory { get; } = new();
 
     public Data(IGameHost gameManager)

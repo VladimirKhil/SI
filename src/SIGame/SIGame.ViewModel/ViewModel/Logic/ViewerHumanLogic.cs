@@ -831,8 +831,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             _gameViewModel.Speaker.Replic = "";
         }
 
-        _data.AtomType = contentType;
-
         var text = contentValue.UnescapeNewLines();
 
         var currentText = TInfo.Text ?? "";
@@ -881,8 +879,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         foreach (var (contentType, contentValue, originalValue) in contentInfo)
         {
-            _data.AtomType = contentType;
-
             switch (contentType)
             {
                 case ContentTypes.Text:

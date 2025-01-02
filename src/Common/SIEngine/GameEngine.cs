@@ -1,4 +1,5 @@
-﻿using SIEngine.Models;
+﻿using SIEngine.Core;
+using SIEngine.Models;
 using SIEngine.QuestionSelectionStrategies;
 using SIEngine.Rules;
 using SIPackages;
@@ -14,92 +15,51 @@ namespace SIEngine;
 /// </remarks>
 public sealed class GameEngine : EngineBase
 {
+    private readonly IQuestionEngineFactory _questionEngineFactory;
+    private readonly ISIEnginePlayHandler _playHandler;
+    private readonly Func<EngineOptions> _optionsProvider;
+    private readonly GameRules _gameRules;
+
     private ISelectionStrategy? _selectionStrategy;
 
     private ISelectionStrategy SelectionStrategy => _selectionStrategy ?? throw new InvalidOperationException("_selectionStrategy == null");
 
-    private void SetActiveThemeQuestion()
-    {
-        _activeTheme = ActiveRound.Themes[_themeIndex];
-        _activeQuestion = _activeTheme.Questions[_questionIndex];
-    }
+    private IQuestionEngine? _questionEngine;
+
+    private IQuestionEngine QuestionEngine => _questionEngine ?? throw new InvalidOperationException("_questionEngine == null");
 
     public GameEngine(
         SIDocument document,
         GameRules gameRules,
         Func<EngineOptions> optionsProvider,
         ISIEnginePlayHandler playHandler,
-        QuestionEngineFactory questionEngineFactory)
-        : base(document, gameRules, optionsProvider, playHandler, questionEngineFactory) { }
+        IQuestionEngineFactory questionEngineFactory)
+        : base(document)
+    {
+        _gameRules = gameRules;
+        _optionsProvider = optionsProvider;
+        _playHandler = playHandler;
+        _questionEngineFactory = questionEngineFactory;
+    }
 
     /// <summary>
     /// Moves to the next game stage.
     /// </summary>
-    public override void MoveNext()
+    public void MoveNext()
     {
         switch (_stage)
         {
             case GameStage.Begin:
-                #region Begin
-                OnPackage(_document.Package);
-                UpdateCanMoveNextRound();
-
-                if (GameRules.ShowGameThemes)
-                {
-                    Stage = GameStage.GameThemes;
-                }
-                else
-                {
-                    MoveNextRoundInternal();
-                }
+                OnBegin();
                 break;
-                #endregion
 
             case GameStage.GameThemes:
-                #region GameThemes
-                var themes = new SortedSet<string>();
-
-                foreach (var round in _document.Package.Rounds)
-                {
-                    foreach (var theme in round.Themes.Where(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice)))
-                    {
-                        themes.Add(theme.Name);
-                    }
-                }
-
-                OnGameThemes(themes);
-                MoveNextRoundInternal();
+                OnGameThemes();
                 break;
-                #endregion
 
             case GameStage.Round:
-                #region Round
-                CanMoveBack = false;
-                _timeout = false;
-
-                var strategyType = GameRules.GetRulesForRoundType(ActiveRound.Type).QuestionSelectionStrategyType;
-
-                _selectionStrategy = QuestionSelectionStrategyFactory.GetStrategy(
-                    ActiveRound,
-                    OptionsProvider(),
-                    strategyType,
-                    PlayHandler,
-                    SelectQuestion,
-                    () => EndRoundAndMoveNext(RoundEndReason.Manual));
-
-                if (_selectionStrategy.ShouldPlayRound())
-                {
-                    PlayHandler.OnRound(ActiveRound, strategyType);
-                    Stage = GameStage.SelectingQuestion;
-                }
-                else
-                {
-                    PlayHandler.OnRoundSkip(strategyType); // TODO: think about providing skip reason instead of strategy here
-                    MoveNextRoundInternal();
-                }
-
+                OnRound();
                 break;
-                #endregion
 
             case GameStage.SelectingQuestion:
                 OnSelectingQuestion();
@@ -114,41 +74,71 @@ public sealed class GameEngine : EngineBase
                 break;
 
             case GameStage.EndQuestion:
-                #region EndQuestion
-                OnQuestionFinish();
-                OnEndQuestion(_themeIndex, _questionIndex);
-
-                if (_timeout) // Round timeout
-                {
-                    EndRoundAndMoveNext(RoundEndReason.Timeout);
-                }
-                else if (SelectionStrategy.CanMoveNext())
-                {
-                    Stage = GameStage.SelectingQuestion;
-                    OnNextQuestion();
-                    UpdateCanNext();
-                }
-                else
-                {
-                    EndRoundAndMoveNext(RoundEndReason.Completed);
-                }
-
+                OnEndQuestion();
                 break;
-            #endregion
 
             case GameStage.EndGame:
                 OnEndGame();
-                Stage = GameStage.None;
                 break;
         }
     }
 
-    private void OnQuestionType()
+    private void OnBegin()
     {
-        var questionTypeName = QuestionEngine.QuestionTypeName;
-        var isDefault = questionTypeName == GameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType;
-        PlayHandler.OnQuestionType(questionTypeName, isDefault);
-        Stage = GameStage.Question;
+        _playHandler.OnPackage(_document.Package);
+        UpdateCanMoveNextRound();
+
+        if (_gameRules.ShowGameThemes)
+        {
+            Stage = GameStage.GameThemes;
+        }
+        else
+        {
+            MoveNextRoundInternal();
+        }
+    }
+
+    private void OnGameThemes()
+    {
+        var themes = new SortedSet<string>();
+
+        foreach (var round in _document.Package.Rounds)
+        {
+            foreach (var theme in round.Themes.Where(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice)))
+            {
+                themes.Add(theme.Name);
+            }
+        }
+
+        _playHandler.OnGameThemes(themes);
+        MoveNextRoundInternal();
+    }
+
+    private void OnRound()
+    {
+        CanMoveBack = false;
+        _timeout = false;
+
+        var strategyType = _gameRules.GetRulesForRoundType(ActiveRound.Type).QuestionSelectionStrategyType;
+
+        _selectionStrategy = QuestionSelectionStrategyFactory.GetStrategy(
+            ActiveRound,
+            _optionsProvider(),
+            strategyType,
+            _playHandler,
+            SelectQuestion,
+            () => EndRoundAndMoveNext(RoundEndReason.Manual));
+
+        if (_selectionStrategy.ShouldPlayRound())
+        {
+            _playHandler.OnRound(ActiveRound, strategyType);
+            Stage = GameStage.SelectingQuestion;
+        }
+        else
+        {
+            _playHandler.OnRoundSkip(strategyType); // TODO: think about providing skip reason instead of strategy here
+            MoveNextRoundInternal();
+        }
     }
 
     private void OnSelectingQuestion()
@@ -157,13 +147,66 @@ public sealed class GameEngine : EngineBase
         UpdateCanNext();
     }
 
-    public override void MoveBack()
+    private void OnQuestionType()
+    {
+        var questionTypeName = QuestionEngine.QuestionTypeName;
+        var isDefault = questionTypeName == _gameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType;
+        _playHandler.OnQuestionType(questionTypeName, isDefault);
+        Stage = GameStage.Question;
+    }
+
+    private void OnQuestion()
+    {
+        if (!QuestionEngine.PlayNext())
+        {
+            _playHandler.OnQuestionEnd();
+            Stage = GameStage.EndQuestion;
+        }
+    }
+
+    private void OnEndQuestion()
+    {
+        OnQuestionFinish();
+        OnEndQuestion(_themeIndex, _questionIndex);
+
+        if (_timeout) // Round timeout
+        {
+            EndRoundAndMoveNext(RoundEndReason.Timeout);
+        }
+        else if (SelectionStrategy.CanMoveNext())
+        {
+            Stage = GameStage.SelectingQuestion;
+            OnNextQuestion();
+            UpdateCanNext();
+        }
+        else
+        {
+            EndRoundAndMoveNext(RoundEndReason.Completed);
+        }
+    }
+
+    private void OnEndGame()
+    {
+        _playHandler.OnPackageEnd();
+        Stage = GameStage.None;
+    }
+
+    /// <summary>
+    /// Moves engine to the previous game state.
+    /// </summary>
+    public void MoveBack()
     {
         SelectionStrategy.MoveBack();
         Stage = GameStage.SelectingQuestion;
 
         UpdateCanNext();
         CanMoveBack = SelectionStrategy.CanMoveBack();
+    }
+
+    private void SetActiveThemeQuestion()
+    {
+        _activeTheme = ActiveRound.Themes[_themeIndex];
+        _activeQuestion = _activeTheme.Questions[_questionIndex];
     }
 
     private void SelectQuestion(int themeIndex, int questionIndex)
@@ -195,7 +238,131 @@ public sealed class GameEngine : EngineBase
     /// </summary>
     private void EndRoundAndMoveNext(RoundEndReason reason)
     {
-        PlayHandler.OnRoundEnd(reason);
+        _playHandler.OnRoundEnd(reason);
         MoveNextRoundInternal();
+    }
+
+    /// <summary>
+    /// Moves to the next round.
+    /// </summary>
+    /// <param name="showSign">Should the logo be shown.</param>
+    public bool MoveNextRound()
+    {
+        if (!CanMoveNextRound)
+        {
+            return false;
+        }
+
+        _playHandler.OnRoundEnd(RoundEndReason.Manual);
+        MoveNextRoundInternal();
+        return true;
+    }
+
+    private void MoveNextRoundInternal()
+    {
+        _roundIndex++;
+        SetActiveRound();
+
+        CanMoveBack = false;
+        UpdateCanMoveNextRound();
+        UpdateCanMoveBackRound();
+
+        if (_roundIndex < _document.Package.Rounds.Count)
+        {
+            Stage = GameStage.Round;
+        }
+        else
+        {
+            Stage = GameStage.EndGame;
+        }
+
+        UpdateCanNext();
+    }
+
+    public bool MoveToRound(int roundIndex)
+    {
+        if (_roundIndex == roundIndex)
+        {
+            if (CanMoveBack)
+            {
+                return MoveBackRound();
+            }
+
+            return false;
+        }
+
+        if (roundIndex < 0 || roundIndex >= _document.Package.Rounds.Count)
+        {
+            return false;
+        }
+
+        _playHandler.OnRoundEnd(RoundEndReason.Manual);
+
+        _roundIndex = roundIndex;
+        SetActiveRound();
+        Stage = GameStage.Round;
+
+        CanMoveBack = false;
+        UpdateCanMoveNextRound();
+        UpdateCanMoveBackRound();
+        UpdateCanNext();
+        return true;
+    }
+
+    public bool MoveBackRound()
+    {
+        if (!CanMoveBackRound)
+        {
+            return false;
+        }
+
+        if (CanMoveBack)
+        {
+            Stage = GameStage.Round;
+        }
+        else if (_roundIndex == 0)
+        {
+            return false;
+        }
+        else
+        {
+            _roundIndex--;
+            SetActiveRound();
+            Stage = GameStage.Round;
+        }
+
+        _playHandler.OnRoundEnd(RoundEndReason.Manual);
+
+        CanMoveBack = false;
+        UpdateCanNext();
+        UpdateCanMoveNextRound();
+        UpdateCanMoveBackRound();
+        return true;
+    }
+
+    /// <summary>
+    /// Skips rest of the question and goes directly to answer.
+    /// </summary>
+    public void MoveToAnswer() => QuestionEngine.MoveToAnswer();
+
+    private void OnMoveToQuestion()
+    {
+        var options = _optionsProvider();
+
+        _questionEngine = _questionEngineFactory.CreateEngine(
+            ActiveQuestion,
+            new QuestionEngineOptions
+            {
+                FalseStarts = options.IsPressMode
+                    ? (options.IsMultimediaPressMode ? FalseStartMode.Enabled : FalseStartMode.TextContentOnly)
+                    : FalseStartMode.Disabled,
+
+                ShowSimpleRightAnswers = options.ShowRight,
+                PlaySpecials = options.PlaySpecials,
+
+                DefaultTypeName = _gameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType
+            });
+
+        Stage = GameStage.QuestionType;
     }
 }

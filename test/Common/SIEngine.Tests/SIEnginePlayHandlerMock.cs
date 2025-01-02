@@ -23,6 +23,21 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
+    public void OnGameThemes(IEnumerable<string> themes)
+    {
+        
+    }
+
+    public void OnPackage(Package package)
+    {
+        
+    }
+
+    public void OnPackageEnd()
+    {
+        
+    }
+
     public void OnQuestion(Question question)
     {
         

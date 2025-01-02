@@ -218,4 +218,10 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     }
 
     public void OnQuestionEnd() => GameLogic?.OnQuestionEnd();
+
+    public void OnPackage(Package package) => GameLogic?.OnPackage(package);
+
+    public void OnGameThemes(IEnumerable<string> themes) => GameLogic?.OnGameThemes(themes);
+
+    public void OnPackageEnd() => GameLogic?.OnEndGame();
 }

@@ -20,6 +20,8 @@ public sealed class GameRules
     /// </summary>
     public Dictionary<string, RoundRules> RoundRules { get; } = new();
 
+    // TODO: support also setting round rules per round index
+
     /// <summary>
     /// Gets rules for round type.
     /// </summary>

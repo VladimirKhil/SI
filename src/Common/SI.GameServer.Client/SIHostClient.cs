@@ -41,7 +41,6 @@ public sealed class SIHostClient : IGameClient
         _connection.On(nameof(ISIHostClient.Disconnect), async () =>
         {
             IncomingMessage?.Invoke(new Message(Resources.YourWereKicked, "@", isSystem: false));
-
             await _connection.StopAsync();
         });
 

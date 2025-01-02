@@ -7,7 +7,7 @@ namespace SImulator.ViewModel.Listeners;
 /// <inheritdoc cref="IExtendedListener" />
 public sealed class PresentationListener : IExtendedListener
 {
-    private readonly ISIEngine _engine;
+    private readonly GameEngine _engine;
 
     public bool IsMediaEnded { get; set; }
 
@@ -31,7 +31,7 @@ public sealed class PresentationListener : IExtendedListener
 
     public event Action<int>? AnswerSelected;
 
-    public PresentationListener(ISIEngine engine) => _engine = engine;
+    public PresentationListener(GameEngine engine) => _engine = engine;
 
     public void OnAnswerSelected(int answerIndex) => AnswerSelected?.Invoke(answerIndex);
 

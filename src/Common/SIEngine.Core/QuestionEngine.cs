@@ -6,7 +6,7 @@ namespace SIEngine.Core;
 /// <summary>
 /// Performs SI question playing.
 /// </summary>
-public sealed class QuestionEngine
+public sealed class QuestionEngine : IQuestionEngine
 {
     private readonly Question _question;
     private readonly QuestionEngineOptions _options;

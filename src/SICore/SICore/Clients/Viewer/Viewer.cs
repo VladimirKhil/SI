@@ -63,10 +63,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
     private void Initialize(bool isHost)
     {
         IsHost = isHost;
-
         ClientData.Name = _client.Name;
-
-        ClientData.EventLog.Append($"Initial name {ClientData.Name}");
     }
 
     private void ChangeType_Executed(object arg)
@@ -193,10 +190,8 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
                     }
 
                 case SystemMessages.GameClosed:
-                    {
-                        _logic.OnGameClosed();
-                        break;
-                    }
+                    _logic.OnGameClosed();
+                    break;
 
                 case Messages.Disconnected:
                     await OnDisconnectedAsync(mparams);
@@ -1016,9 +1011,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
 
     private void OnQuestionType(string[] mparams)
     {
-        ClientData.AtomType = ContentTypes.Text;
         ClientData.QuestionType = mparams[1];
-
         _logic.OnQuestionStart(mparams.Length > 2 && bool.TryParse(mparams[2], out var isDefault) && isDefault);
     }
 
@@ -1523,8 +1516,8 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
         }
     }
 
-    private void ThrowComputerAccountError() =>
-        throw new InvalidOperationException($"Computer account should never receive this\n{ClientData.EventLog}");
+    private static void ThrowComputerAccountError() =>
+        throw new InvalidOperationException($"Computer account should never receive this");
 
     private void OnConfigDeleteTable(string[] mparams)
     {
