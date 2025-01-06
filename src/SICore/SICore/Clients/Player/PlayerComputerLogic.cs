@@ -18,7 +18,7 @@ internal sealed class PlayerComputerLogic
 {
     private const int DefaultThemeQuestionCount = 5;
 
-    private readonly IIntelligence _intelligence;
+    private readonly IPlayerIntelligence _intelligence;
     private readonly ComputerAccount _account;
     private readonly ViewerActions _viewerActions;
     private readonly ViewerData _data;
@@ -62,7 +62,7 @@ internal sealed class PlayerComputerLogic
     /// <summary>
     /// Initializes a new instance of the <see cref="PlayerComputerLogic"/> class.
     /// </summary>
-    public PlayerComputerLogic(ViewerData data, ComputerAccount account, IIntelligence intelligence, ViewerActions viewerActions, TimerInfo[] timerInfos)
+    public PlayerComputerLogic(ViewerData data, ComputerAccount account, IPlayerIntelligence intelligence, ViewerActions viewerActions, TimerInfo[] timerInfos)
     {
         Ensure.That(account).IsNotNull();
 

@@ -14,6 +14,9 @@ internal sealed class Intelligence : IIntelligence
 
     public Intelligence(ComputerAccount account) => _account = account;
 
+    public bool ValidateAnswer(string answer, string[] rightAnswers, string[] wrongAnswers) =>
+        AnswerChecker.IsAnswerRight(answer, rightAnswers);
+
     /// <summary>
     /// Selects question from game table.
     /// </summary>

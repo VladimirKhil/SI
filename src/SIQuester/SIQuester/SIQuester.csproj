@@ -8,7 +8,6 @@
     <AssemblyTitle>SIQuester</AssemblyTitle>
     <Product>SIQuester</Product>
     <Description>Questions editor for SIGame</Description>
-    <Copyright>Copyright © Khil-soft 2005 - 2024</Copyright>
     <Version>$(SIQuesterVersion)</Version>
     <UseWPF>true</UseWPF>
 	<Nullable>enable</Nullable>

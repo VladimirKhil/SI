@@ -28,11 +28,11 @@ public sealed class AboutViewModel : WorkspaceViewModel
     }
 
     /// <summary>
-    /// Перейти на сайт программы
+    /// Opens application website.
     /// </summary>
     public ICommand OpenSite { get; private set; }
 
-    private Dictionary<string, string> _licenses = new();
+    private readonly Dictionary<string, string> _licenses = new();
 
     public Dictionary<string, string> Licenses => _licenses;
 

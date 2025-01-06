@@ -393,7 +393,7 @@
     <value>видео</value>
   </data>
   <data name="MissingFile" xml:space="preserve">
-    <value>отсутствует файл</value>
+    <value>Отсутствует файл</value>
   </data>
   <data name="MissingLink" xml:space="preserve">
     <value>Отсутствует ссылка</value>

@@ -833,7 +833,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на missing file.
+        ///   Ищет локализованную строку, похожую на Missing file.
         /// </summary>
         public static string MissingFile {
             get {

@@ -8,7 +8,6 @@
     <Product>QTxtConverter</Product>
     <Description>Text to questions converter</Description>
     <Version>$(SIQuesterVersion)</Version>
-    <Copyright>Copyright © Khil-soft 2009 - 2024</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

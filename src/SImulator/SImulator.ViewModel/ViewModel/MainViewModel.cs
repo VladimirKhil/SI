@@ -611,11 +611,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         Mode = GameMode.Start;
         Transition = ModeTransition.ModeratorToStart;
-
-        if (Settings.UsePlayersKeys == PlayerKeysModes.Web)
-        {
-            ActivePlayerButtonCommand = _addPlayerButton;
-        }
     }
 
     private async void SelectPackage_Executed(object? arg)
@@ -909,8 +904,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    public PlayerInfo? GetPlayerById(string playerId, bool strict) => throw new NotImplementedException();
 
     public bool OnKeyPressed(GameKey key)
     {

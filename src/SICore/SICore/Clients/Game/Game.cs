@@ -3616,7 +3616,14 @@ public sealed class Game : Actor<GameData>
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData(ClientData.Host);
         var actions = new ViewerActions(showmanClient, LO);
-        var logic = new ViewerComputerLogic(data, actions, account, new Intelligence(account), GameRole.Showman);
+        
+        var logic = new ViewerComputerLogic(
+            data,
+            actions,
+            account,
+            new Intelligence(account),
+            GameRole.Showman);
+        
         var showman = new Showman(showmanClient, account, false, logic, actions, LO, data);
 
         OnInfo(newAccount.Name);

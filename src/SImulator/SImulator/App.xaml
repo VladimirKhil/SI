@@ -72,57 +72,6 @@
             <Setter Property="Background" Value="Silver" />
         </Style>
 
-        <Style x:Key="SetPlayerButtonWeb" TargetType="ToggleButton" BasedOn="{StaticResource ToolButton}">
-            <Setter Property="Width" Value="23" />
-            <Setter Property="Height" Value="23" />
-            <Setter Property="ToolTip" Value="{x:Static lp:Resources.SetButton}" />
-            
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <Ellipse Width="10" Height="10" Fill="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton},Path=Foreground}" />
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-            
-            <Setter Property="IsChecked" Value="{Binding WaitForRegistration}" />
-            <Setter Property="Visibility" Value="Collapsed" />
-            
-            <Style.Triggers>
-                <DataTrigger
-                    Binding="{Binding DataContext.Settings.Model.UsePlayersKeys, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                    Value="{x:Static vmc:PlayerKeysModes.Web}">
-                    <Setter Property="Visibility" Value="Visible" />
-                </DataTrigger>
-                
-                <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="ToolTip" Value="{x:Static lp:Resources.PressButton}" />
-                    <Setter Property="ContentTemplate">
-                        <Setter.Value>
-                            <DataTemplate>
-                                <Ellipse
-                                    Width="10"
-                                    Height="10"
-                                    Stroke="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton},Path=Foreground}" />
-                            </DataTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                
-                <DataTrigger Binding="{Binding IsRegistered}" Value="True">
-                    <Setter Property="Background" Value="#FFBFFF80" />
-                </DataTrigger>
-                
-                <DataTrigger Binding="{Binding Name}" Value="{x:Null}">
-                    <Setter Property="IsEnabled" Value="False" />
-                </DataTrigger>
-                
-                <DataTrigger Binding="{Binding Name}" Value="">
-                    <Setter Property="IsEnabled" Value="False" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
         <uic:TemplateConverter x:Key="DecisionSelector">
             <uic:TemplateConverter.DefaultTemplate>
                 <DataTemplate />
@@ -326,21 +275,6 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="29" />
                         <ColumnDefinition Width="3*" />
-
-                        <ColumnDefinition>
-                            <ColumnDefinition.Style>
-                                <Style TargetType="ColumnDefinition">
-                                    <Setter Property="Width" Value="0" />
-
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Settings.Model.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
-                                            <Setter Property="Width" Value="29" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ColumnDefinition.Style>
-                        </ColumnDefinition>
-
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
@@ -357,11 +291,11 @@
                     </Grid.Resources>
 
                     <TextBlock Grid.Column="1" Text="{x:Static lp:Resources.Name}" />
-                    <TextBlock Grid.Column="3" Text="{x:Static lp:Resources.Sum}" />
-                    <TextBlock Grid.Column="4" Text="{x:Static lp:Resources.RightAnswers}" />
-                    <TextBlock Grid.Column="5" Text="{x:Static lp:Resources.WrongAnswers}" />
-                    <TextBlock Grid.Column="6" Text="{x:Static lp:Resources.Stake}" />
-                    <TextBlock Grid.Column="7" Text="{x:Static lp:Resources.Answer}" />
+                    <TextBlock Grid.Column="2" Text="{x:Static lp:Resources.Sum}" />
+                    <TextBlock Grid.Column="3" Text="{x:Static lp:Resources.RightAnswers}" />
+                    <TextBlock Grid.Column="4" Text="{x:Static lp:Resources.WrongAnswers}" />
+                    <TextBlock Grid.Column="5" Text="{x:Static lp:Resources.Stake}" />
+                    <TextBlock Grid.Column="6" Text="{x:Static lp:Resources.Answer}" />
                 </Grid>
 
                 <ScrollViewer Margin="0,3" VerticalScrollBarVisibility="Auto">
@@ -381,7 +315,6 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="29" />
                                         <ColumnDefinition Width="3*" />
-                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
@@ -422,7 +355,7 @@
                                                 Stretch="Fill"
                                                 Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                         </Button>
-                                        
+
                                         <Button
                                             Style="{StaticResource ToolButton}"
                                             DockPanel.Dock="Right"
@@ -441,7 +374,7 @@
                                                 Stretch="Uniform"
                                                 Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                         </Button>
-                                        
+
                                         <TextBox
                                             x:Name="name"
                                             FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
@@ -454,34 +387,26 @@
                                                 RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
                                                 Path=DataContext.ManagedMode}" />
                                     </DockPanel>
-                                    
-                                    <ToggleButton
-                                        Margin="1"
-                                        Grid.Column="2"
-                                        Style="{StaticResource SetPlayerButtonWeb}"
-                                        Padding="3"
-                                        VerticalContentAlignment="Center"
-                                        Height="23" />
-                                    
+
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
-                                        Grid.Column="3"
+                                        Grid.Column="2"
                                         Text="{Binding Sum}" />
                                     
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
-                                        Grid.Column="4"
+                                        Grid.Column="3"
                                         Text="{Binding Right}" />
                                     
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
-                                        Grid.Column="5"
+                                        Grid.Column="4"
                                         Text="{Binding Wrong}" />
 
-                                    <DockPanel Grid.Column="6">
+                                    <DockPanel Grid.Column="5">
                                         <Button
                                             Style="{StaticResource ToolButton}"
                                             DockPanel.Dock="Left"
@@ -528,7 +453,7 @@
 
                                     <TextBox
                                         Margin="1"
-                                        Grid.Column="7"
+                                        Grid.Column="6"
                                         IsReadOnly="True"
                                         Text="{Binding Answer}"
                                         VerticalContentAlignment="Center">
@@ -544,7 +469,7 @@
                                     </TextBox>
 
                                     <Button
-                                        Grid.Column="8"
+                                        Grid.Column="7"
                                         Padding="3"
                                         Margin="1"
                                         ToolTip="{x:Static lp:Resources.KickPlayer}"
@@ -574,7 +499,7 @@
                                     </Button>
 
                                     <Button
-                                        Grid.Column="9"
+                                        Grid.Column="8"
                                         Style="{StaticResource ToolButton}"
                                         Padding="3"
                                         Margin="1"

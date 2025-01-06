@@ -432,11 +432,31 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _oralText = false;
+
+    /// <summary>
+    /// Treat all text as oral.
+    /// </summary>
+    [DefaultValue(false)]
+    public bool OralText
+    {
+        get => _oralText;
+        set
+        {
+            if (_oralText != value)
+            {
+                _oralText = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private bool _showTextNoFalstart = false;
 
     /// <summary>
     /// Показывать текст вопросов
     /// </summary>
+    [Obsolete]
     [DefaultValue(false)]
     public bool ShowTextNoFalstart
     {

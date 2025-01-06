@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace SICore;
 
 /// <summary>
-/// Информация об игроке во время игры
+/// Defines player info.
 /// </summary>
 public sealed class PlayerAccount : PersonAccount
 {
@@ -16,6 +16,9 @@ public sealed class PlayerAccount : PersonAccount
 
     private bool _canBeSelected = false;
 
+    /// <summary>
+    /// Can the player be selected.
+    /// </summary>
     public bool CanBeSelected
     {
         get => _canBeSelected;

@@ -145,6 +145,28 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             ? null
             : $"{GameViewModel.CurrentTheme}\n{GameViewModel.Price}";
 
+        if (GameViewModel.Settings.Model.OralText)
+        {
+            // Make all text content items to be replicas
+            content = content.Select(item =>
+            {
+                if (item.Type == ContentTypes.Text)
+                {
+                    return new ContentItem
+                    {
+                        Type = ContentTypes.Text,
+                        Value = item.Value,
+                        Duration = item.Duration,
+                        WaitForFinish = item.WaitForFinish,
+                        Placement = ContentPlacements.Replic,
+                        IsRef = item.IsRef
+                    };
+                }
+
+                return item;
+            }).ToList();
+        }
+
         var hasMedia = PresentationController.OnQuestionContent(content, TryGetMediaUri, textToShow);
 
         if (hasMedia)

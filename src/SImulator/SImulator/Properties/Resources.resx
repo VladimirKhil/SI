@@ -207,9 +207,6 @@
   <data name="ButtonTypesWeb" xml:space="preserve">
     <value>Web access</value>
   </data>
-  <data name="ButtonTypesWebNew" xml:space="preserve">
-    <value>Web access (new)</value>
-  </data>
   <data name="ByDefault" xml:space="preserve">
     <value>Default</value>
   </data>
@@ -740,5 +737,11 @@ To play, you need to organize a local network.</value>
   </data>
   <data name="JoystickNotFound" xml:space="preserve">
     <value>Joystick not found</value>
+  </data>
+  <data name="OralText" xml:space="preserve">
+    <value>Oral text</value>
+  </data>
+  <data name="OralTextHint" xml:space="preserve">
+    <value>Text is read by host and is not displayed on the screen</value>
   </data>
 </root>

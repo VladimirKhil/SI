@@ -2,6 +2,7 @@
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Contracts;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
@@ -192,6 +193,9 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             _renamed.Add(tuple);
         }
 
+        var contentType = CollectionNames.TryGetContentType(_name) ?? _name;
+        _document.RenameContentReference(contentType, ext.OldValue, item.Name);
+
         OnChanged(new CustomChange(
             () =>
             {
@@ -217,11 +221,12 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                 }
 
                 SafeRename(item, ext.OldValue);
-
+                _document.RenameContentReference(contentType, item.Name, ext.OldValue);
             },
             () =>
             {
                 SafeRename(item, newValue);
+                _document.RenameContentReference(contentType, ext.OldValue, item.Name);
 
                 if (renamedExisting && tuple != null)
                 {
@@ -545,30 +550,9 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         }
 
         var localName = name ?? Path.GetFileName(file).Replace("%", "");
+        var uniqueName = FileHelper.GenerateUniqueFileName(localName, name => Files.Any(f => f.Model.Name == name));
 
-        if (Files.Any(named => named.Model.Name == localName))
-        {
-            var ind = 1;
-            var ext = Path.GetExtension(localName);
-            var baseName = Path.GetFileNameWithoutExtension(localName);
-            string? newName = null;
-
-            do
-            {
-                newName = string.Format("{0}_{1}{2}", baseName, ind++, ext);
-            } while (Files.Any(named => named.Model.Name == newName));
-
-            _logger.LogInformation(
-                "File {fileName} is already present in collection {collectionName}. Renaming it to {newFileName} ({stackTrace})",
-                localName,
-                Name,
-                newName,
-                Environment.StackTrace);
-
-            localName = newName;
-        }
-
-        var item = CreateItem(localName);
+        var item = CreateItem(uniqueName);
         PreviewAdd(item, file);
 
         OnChanged(new CustomChange(
@@ -668,6 +652,16 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     // TODO: switch from IMedia to MediaInfo struct
     internal IMedia Wrap(string link)
     {
+        // TODO: not a very effective way of handling pending renamed files, but other ways are more complex
+        foreach (var item in _renamed)
+        {
+            if (item.Item2 == link)
+            {
+                link = item.Item1;
+                break;
+            }    
+        }
+
         var pendingStream = _streams.FirstOrDefault(n => n.Key.Model.Name == link);
 
         if (pendingStream.Key != null)

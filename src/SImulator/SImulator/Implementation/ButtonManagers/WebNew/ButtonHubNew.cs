@@ -135,7 +135,14 @@ public sealed class ButtonHubNew : Hub<IButtonClient>
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await LeaveGame();
-        await base.OnDisconnectedAsync(exception);
+        try
+        {
+            await LeaveGame();
+            await base.OnDisconnectedAsync(exception);
+        }
+        catch (Exception exc)
+        {
+            Console.WriteLine(exc.ToString());
+        }
     }
 }

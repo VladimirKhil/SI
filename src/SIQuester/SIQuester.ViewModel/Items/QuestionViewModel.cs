@@ -334,4 +334,30 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
         }
     }
+
+    internal IEnumerable<ContentItemViewModel> GetContent() => GetContentFromParameters(Parameters);
+
+    private static IEnumerable<ContentItemViewModel> GetContentFromParameters(StepParametersViewModel parameters)
+    {
+        foreach (var parameter in parameters)
+        {
+            if (parameter.Value.ContentValue == null)
+            {
+                if (parameter.Value.GroupValue != null)
+                {
+                    foreach (var contentItem in GetContentFromParameters(parameter.Value.GroupValue))
+                    {
+                        yield return contentItem;
+                    }
+                }
+
+                continue;
+            }
+
+            foreach (var contentItem in parameter.Value.ContentValue)
+            {
+                yield return contentItem;
+            }
+        }
+    }
 }

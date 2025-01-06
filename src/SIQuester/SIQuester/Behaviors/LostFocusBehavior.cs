@@ -26,11 +26,7 @@ public static class LostFocusBehavior
         textBox.LostKeyboardFocus += (s, e2) =>
         {
             var expression = textBox.GetBindingExpression(TextBox.TextProperty);
-
-            if (expression != null)
-            {
-                expression.UpdateSource();
-            }
+            expression?.UpdateSource();
 
             if (button != null)
             {

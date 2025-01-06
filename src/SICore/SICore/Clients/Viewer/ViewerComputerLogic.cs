@@ -15,20 +15,25 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     public bool CanSwitchType => false;
 
     private readonly PlayerComputerLogic _player;
-    private readonly ShowmanComputerLogic _showman;
+    private readonly ShowmanComputerController _showman;
 
     private readonly TimerInfo[] _timersInfo = new TimerInfo[] { new(), new(), new() };
 
     private readonly GameRole _role;
 
-    internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount, IIntelligence intelligence, GameRole role)
+    internal ViewerComputerLogic(
+        ViewerData data,
+        ViewerActions viewerActions,
+        ComputerAccount computerAccount,
+        IIntelligence intelligence,
+        GameRole role)
         : base(data)
     {
         _viewerActions = viewerActions;
         _role = role;
 
         _player = new PlayerComputerLogic(data, computerAccount, intelligence, viewerActions, _timersInfo);
-        _showman = new ShowmanComputerLogic(data, viewerActions);
+        _showman = new ShowmanComputerController(data, viewerActions, intelligence);
     }
 
     public void IsRight(bool voteForRight, string answer)

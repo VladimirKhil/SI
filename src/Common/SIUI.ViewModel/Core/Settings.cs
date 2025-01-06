@@ -87,18 +87,6 @@ public sealed class Settings : INotifyPropertyChanged
         set { if (Math.Abs(_questionLineSpacing - value) > double.Epsilon) { _questionLineSpacing = value; OnPropertyChanged(); } }
     }
 
-    private bool _showScore = false;
-
-    [DefaultValue(false)]
-    [XmlAttribute]
-    [DataMember]
-    [Obsolete]
-    public bool ShowScore
-    {
-        get => _showScore;
-        set { if (_showScore != value) { _showScore = value; OnPropertyChanged(); } }
-    }
-
     private bool _animate3D = true;
 
     [DefaultValue(true)]
@@ -217,7 +205,6 @@ public sealed class Settings : INotifyPropertyChanged
         TableBackColorString = uiSettings._tableBackColorString;
         TableGridColorString = uiSettings.TableGridColorString;
         AnswererColorString = uiSettings.AnswererColorString;
-        ShowScore = uiSettings._showScore;
         KeyboardControl = uiSettings._keyboardControl;
         Animate3D = uiSettings._animate3D;
         LogoUri = uiSettings._logoUri;

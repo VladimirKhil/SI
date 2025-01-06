@@ -2,6 +2,7 @@
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Model;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace SIQuester.Converters;
@@ -13,6 +14,11 @@ public sealed class ContentCommandsConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
+        if (values[1] == DependencyProperty.UnsetValue)
+        {
+            return new List<UICommand>();
+        }
+
         var contentItems = (IContentCollection)values[0];
         var files = (ICollection<MediaItemViewModel>)values[1];
         var contentType = (string)values[2];

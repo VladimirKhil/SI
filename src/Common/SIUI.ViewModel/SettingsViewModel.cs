@@ -135,7 +135,6 @@ public sealed class SettingsViewModel : ViewModelBase<Settings>
         _model.TableBackColorString = uiSettings.TableBackColorString;
         _model.TableGridColorString = uiSettings.TableGridColorString;
         _model.AnswererColorString = uiSettings.AnswererColorString;
-        _model.ShowScore = uiSettings.ShowScore;
         _model.KeyboardControl = uiSettings.KeyboardControl;
         _model.Animate3D = uiSettings.Animate3D;
         _model.LogoUri = uiSettings.LogoUri;

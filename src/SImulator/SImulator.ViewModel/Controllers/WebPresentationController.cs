@@ -476,9 +476,9 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                 case ContentPlacements.Replic:
                     SendMessage(new
                     {
-                        Type = "replic",
-                        PersonCode = "s",
-                        Text = contentItem.Value
+                        Type = "content",
+                        Placement = "replic",
+                        Content = new object[] { new { Type = "text", contentItem.Value } }
                     });
                     break;
 
@@ -496,6 +496,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
                                 break;
                             }
+
 
                             screenContent.Add(new ContentInfo(ContentType.Text, contentItem.Value));
                             break;

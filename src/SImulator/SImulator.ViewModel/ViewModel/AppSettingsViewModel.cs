@@ -56,6 +56,7 @@ public sealed class AppSettingsViewModel
             Model.ShowPlayers = defaultSettings.ShowPlayers;
             Model.ShowTableCaption= defaultSettings.ShowTableCaption;
             Model.ShowTextNoFalstart = defaultSettings.ShowTextNoFalstart;
+            Model.OralText = defaultSettings.OralText;
         }
 
         if (rules)

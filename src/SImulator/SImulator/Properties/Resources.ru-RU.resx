@@ -207,9 +207,6 @@
   <data name="ButtonTypesWeb" xml:space="preserve">
     <value>Веб-доступ</value>
   </data>
-  <data name="ButtonTypesWebNew" xml:space="preserve">
-    <value>Веб-доступ (новая версия)</value>
-  </data>
   <data name="ByDefault" xml:space="preserve">
     <value>По умолчанию</value>
   </data>
@@ -741,5 +738,11 @@ Escape (правая кнопка мыши) - завершить игру</value
   </data>
   <data name="JoystickNotFound" xml:space="preserve">
     <value>Джойстик не обнаружен!</value>
+  </data>
+  <data name="OralText" xml:space="preserve">
+    <value>Устный текст</value>
+  </data>
+  <data name="OralTextHint" xml:space="preserve">
+    <value>Текст читается ведущим и не показывается на экране</value>
   </data>
 </root>

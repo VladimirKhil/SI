@@ -430,6 +430,11 @@ public sealed class QDocument : WorkspaceViewModel
                 _activeNode = value;
                 OnPropertyChanged();
                 SetActiveChain();
+                
+                if (_activeItem is ContentItemsViewModel contentItems && contentItems.Owner != _activeNode)
+                {
+                    ActiveItem = null;
+                }
             }
         }
     }
@@ -1274,7 +1279,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         CheckCommonFiles(images, audio, video, html, errors);
 
-        var (usedImages, usedAudio, usedVideo, usedHtml) = await CollectUsedFilesAsync(images, errors);
+        var (usedImages, usedAudio, usedVideo, usedHtml) = await CollectUsedFilesAsync(images, warnings);
 
         foreach (var item in images.Except(usedImages))
         {
@@ -1313,7 +1318,7 @@ public sealed class QDocument : WorkspaceViewModel
         ICollection<string> usedHtml)>
         CollectUsedFilesAsync(
         ICollection<string> images,
-        List<string> errors)
+        List<WarningViewModel> warnings)
     {
         var usedImages = new HashSet<string>();
         var usedAudio = new HashSet<string>();
@@ -1330,7 +1335,9 @@ public sealed class QDocument : WorkspaceViewModel
             }
             else
             {
-                errors.Add(string.Format(Resources.MissingLogoFile, logoItem.Value));
+                warnings.Add(new WarningViewModel(
+                    string.Format(Resources.MissingLogoFile, logoItem.Value),
+                    () => ActiveNode = Package));
             }
         }
 
@@ -1340,9 +1347,24 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 foreach (var question in theme.Questions)
                 {
-                    foreach (var contentItem in question.Model.GetContent())
+                    foreach (var contentItemViewModel in question.GetContent())
                     {
+                        var owner = contentItemViewModel.Owner;
+
+                        if (owner == null)
+                        {
+                            continue;
+                        }
+
+                        var contentItem = contentItemViewModel.Model;
                         HashSet<string> usedFiles;
+
+                        void navigateToItem()
+                        {
+                            Navigate.Execute(question);
+                            ActiveItem = owner;
+                            owner.CurrentItem = contentItemViewModel;
+                        }
 
                         switch (contentItem.Type)
                         {
@@ -1380,25 +1402,25 @@ public sealed class QDocument : WorkspaceViewModel
 
                                 if (!response.IsSuccessStatusCode)
                                 {
-                                    errors.Add(
-                                        $"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingLink} " +
-                                        $"\"{contentItem.Value}\" ({await response.Content.ReadAsStringAsync()})");
+                                    warnings.Add(new WarningViewModel(
+                                        $"{Resources.MissingLink} \"{contentItem.Value}\" ({await response.Content.ReadAsStringAsync()})",
+                                        navigateToItem));
                                 }
                             }
                             catch (HttpRequestException exc)
                             {
-                                errors.Add(
-                                    $"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingLink} " +
-                                    $"\"{contentItem.Value}\" ({exc.Message})");
+                                warnings.Add(new WarningViewModel(
+                                    $"{Resources.MissingLink} \"{contentItem.Value}\" ({exc.Message})",
+                                    navigateToItem));
                             }
 
                             continue; // External file
                         }
                         else
                         {
-                            errors.Add(
-                                $"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: {Resources.MissingFile} " +
-                                $"\"{contentItem.Value}\"");
+                            warnings.Add(new WarningViewModel(
+                                $"{Resources.MissingFile} \"{contentItem.Value}\"",
+                                navigateToItem));
                         }
                     }
                 }
@@ -1736,7 +1758,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         Directory.CreateDirectory(tempPath);
 
-        var tempFile = System.IO.Path.Combine(tempPath, mediaName);
+        var tempFile = System.IO.Path.Combine(tempPath, fileName);
 
         using (var fileStream = File.Create(tempFile))
         using (var mediaStream = media.Value.Stream!)
@@ -3312,7 +3334,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         CheckCommonFiles(images, audio, video, html, errors);
 
-        var (usedImages, usedAudio, usedVideo, usedHtml) = await CollectUsedFilesAsync(images, errors);
+        var (usedImages, usedAudio, usedVideo, usedHtml) = await CollectUsedFilesAsync(images, warnings);
 
         var unusedImages = images.Except(usedImages);
         var unusedAudio = audio.Except(usedAudio);
@@ -3400,5 +3422,25 @@ public sealed class QDocument : WorkspaceViewModel
         }
 
         return TimeSpan.Zero;
+    }
+
+    internal void RenameContentReference(string mediaType, string oldValue, string newValue)
+    {
+        foreach (var round in Package.Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    foreach (var contentItem in question.Model.GetContent())
+                    {
+                        if (contentItem.Type == mediaType && contentItem.Value == oldValue)
+                        {
+                            contentItem.Value = newValue;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

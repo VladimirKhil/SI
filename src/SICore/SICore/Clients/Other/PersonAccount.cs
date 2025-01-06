@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace SICore;
 
 /// <summary>
-/// Defines main game person.
+/// Defines main game person (player or showman).
 /// </summary>
 public class PersonAccount : ViewerAccount
 {
@@ -13,7 +13,7 @@ public class PersonAccount : ViewerAccount
     private bool _ready = false;
 
     /// <summary>
-    /// Готов ли участник к игре
+    /// Is the person ready to start the game.
     /// </summary>
     [DefaultValue(false)]
     public bool Ready

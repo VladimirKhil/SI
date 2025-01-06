@@ -45,27 +45,6 @@ public sealed class PlayerInfo : SimplePlayerInfo
     /// </summary>
     internal DateTime? BlockedTime { get; set; }
 
-    private bool _isRegistered;
-
-    /// <summary>
-    /// Is the player registered in web buttons mode.
-    /// </summary>
-    [Obsolete]
-    public bool IsRegistered
-    {
-        get => _isRegistered;
-        set { if (_isRegistered != value) { _isRegistered = value; OnPropertyChanged(); } }
-    }
-
-    private bool _waitForRegistration;
-
-    [Obsolete]
-    public bool WaitForRegistration
-    {
-        get => _waitForRegistration;
-        set { if (_waitForRegistration != value) { _waitForRegistration = value; OnPropertyChanged(); } }
-    }
-
     private string _answer = "";
 
     /// <summary>

@@ -22,7 +22,6 @@ public enum PlayerKeysModes
     Keyboard,
     Joystick,
     Com,
-    Web,
     WebNew,
 }
 

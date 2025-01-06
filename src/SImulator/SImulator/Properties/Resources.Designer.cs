@@ -340,15 +340,6 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Web access (new).
-        /// </summary>
-        public static string ButtonTypesWebNew {
-            get {
-                return ResourceManager.GetString("ButtonTypesWebNew", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Default.
         /// </summary>
         public static string ByDefault {
@@ -948,6 +939,24 @@ namespace SImulator.Properties {
         public static string Oral {
             get {
                 return ResourceManager.GetString("Oral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Oral text.
+        /// </summary>
+        public static string OralText {
+            get {
+                return ResourceManager.GetString("OralText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Text is read by host and is not displayed on the screen.
+        /// </summary>
+        public static string OralTextHint {
+            get {
+                return ResourceManager.GetString("OralTextHint", resourceCulture);
             }
         }
         

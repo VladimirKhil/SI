@@ -13,11 +13,11 @@ internal static class FileHelper
     /// Forms unique name for file.
     /// </summary>
     /// <param name="fileName">Original file name.</param>
-    /// <param name="dublicateCondition">Duplicates search condition.</param>
+    /// <param name="duplicateCondition">Duplicates search condition.</param>
     /// <exception cref="InvalidOperationException">Cannot generate unique name for file.</exception>
-    internal static string GenerateUniqueFileName(string fileName, Predicate<string> dublicateCondition)
+    internal static string GenerateUniqueFileName(string fileName, Predicate<string> duplicateCondition)
     {
-        if (!dublicateCondition(fileName))
+        if (!duplicateCondition(fileName))
         {
             return fileName;
         }
@@ -36,7 +36,7 @@ internal static class FileHelper
                 newName = Path.Combine(directoryName, newName);
             }
 
-            if (!dublicateCondition(newName))
+            if (!duplicateCondition(newName))
             {
                 return newName;
             }

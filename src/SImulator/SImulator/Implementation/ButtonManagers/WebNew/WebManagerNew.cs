@@ -45,16 +45,18 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
 
         _webApplication = builder.Build();
 
-        _webApplication.UseDefaultFiles();
-       
-        _webApplication.UseStaticFiles(new StaticFileOptions
-        {
-            FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "wwwroot2")),
-        });
+        var fileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "wwwroot2"));
 
-        _webApplication.UseRouting();
-
-        _webApplication.UseEndpoints(endpoints => endpoints.MapHub<ButtonHubNew>("/sihost"));
+        _webApplication.UseDefaultFiles(new DefaultFilesOptions
+            {
+                FileProvider = fileProvider,
+            })
+            .UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = fileProvider,
+            })
+            .UseRouting()
+            .UseEndpoints(endpoints => endpoints.MapHub<ButtonHubNew>("/sihost"));
 
         _webApplication.RunAsync($"http://+:{port}");
     }

@@ -635,7 +635,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         foreach (var player in Players)
         {
-            player.IsRegistered = false;
             player.PropertyChanged += PlayerInfo_PropertyChanged;
         }
 
@@ -904,7 +903,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     private void PlayerInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(PlayerInfo.IsSelected) || e.PropertyName == nameof(PlayerInfo.IsRegistered))
+        if (e.PropertyName == nameof(PlayerInfo.IsSelected))
         {
             return;
         }
@@ -915,23 +914,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         var player = (PlayerInfo)sender;
-
-        if (e.PropertyName == nameof(PlayerInfo.WaitForRegistration))
-        {
-            if (player.WaitForRegistration)
-            {
-                foreach (var playerInfo in Players)
-                {
-                    if (playerInfo != sender)
-                    {
-                        playerInfo.WaitForRegistration = false;
-                    }
-                }
-            }
-
-            return;
-        }
-
         PresentationController.UpdatePlayerInfo(Players.IndexOf(player), player, e.PropertyName);
     }
 
@@ -2044,40 +2026,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     }
 
     private void OnError(string error) => Error?.Invoke(error);
-
-    public PlayerInfo? GetPlayerById(string playerId, bool strict)
-    {
-        if (Settings.Model.UsePlayersKeys != PlayerKeysModes.Web)
-        {
-            return null;
-        }
-
-        lock (_playersTable)
-        {
-            if (_playersTable.TryGetValue(playerId, out var player))
-            {
-                return player;
-            }
-
-            if (!strict)
-            {
-                foreach (var playerInfo in Players)
-                {
-                    if (playerInfo.WaitForRegistration)
-                    {
-                        playerInfo.WaitForRegistration = false;
-                        playerInfo.IsRegistered = true;
-
-                        _playersTable[playerId] = playerInfo;
-
-                        return playerInfo;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
 
     public bool OnKeyPressed(GameKey key)
     {

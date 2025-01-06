@@ -92,8 +92,7 @@
                         <x:Static x:Key="Keyboard" Member="lp:Resources.ButtonTypesKeyboard" />
                         <x:Static x:Key="Joystick" Member="lp:Resources.ButtonTypesJoystick" />
                         <x:Static x:Key="Com" Member="lp:Resources.ButtonTypesCom" />
-                        <x:Static x:Key="Web" Member="lp:Resources.ButtonTypesWeb" />
-                        <x:Static x:Key="WebNew" Member="lp:Resources.ButtonTypesWebNew" />
+                        <x:Static x:Key="WebNew" Member="lp:Resources.ButtonTypesWeb" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
             </my:MappedConverter>
@@ -1373,9 +1372,19 @@
                         <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.ShowTextNoFalseStartsHint}" />
                     </CheckBox>
 
-                    <CheckBox IsChecked="{Binding Settings.ShowTableCaption}" Margin="5,0,0,0" Content="{x:Static lp:Resources.ShowTableCaption}" />
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding Settings.OralText}" Margin="5,0,0,0" Content="{x:Static lp:Resources.OralText}" />
 
-                    <CheckBox IsChecked="{Binding Settings.ShowQuestionBorder}" Margin="0,0,5,0">
+                        <Button Style="{StaticResource HelpButton}">
+                            <lb:TipBehavior.Tip>
+                                <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.OralTextHint}" />
+                            </lb:TipBehavior.Tip>
+                        </Button>
+                    </StackPanel>
+
+                    <CheckBox IsChecked="{Binding Settings.ShowTableCaption}" Margin="0,0,0,0" Content="{x:Static lp:Resources.ShowTableCaption}" />
+
+                    <CheckBox IsChecked="{Binding Settings.ShowQuestionBorder}" Margin="5,0,5,0">
                         <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.ShowQuestionBorder}" />
                     </CheckBox>
                 </UniformGrid>
@@ -1594,9 +1603,9 @@
                         </Button>
                     </StackPanel>
 
-                    <CheckBox Margin="0,0,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
+                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
                     <CheckBox Margin="5,5,0,0" IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
-                    <CheckBox Margin="0,0,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
+                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
                 </UniformGrid>
                 
                 <Expander
@@ -1721,12 +1730,8 @@
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.None}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                
+
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.External}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                                
-                                <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
 
@@ -1833,10 +1838,6 @@
                             <Setter Property="Visibility" Value="Collapsed" />
                             
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                                
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.WebNew}">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
