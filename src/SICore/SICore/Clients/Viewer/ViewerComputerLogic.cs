@@ -44,7 +44,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         }
         else
         {
-            _player.IsRight(voteForRight);
+            _player.ValidateAnswer(voteForRight);
         }
     }
 
@@ -74,7 +74,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public void OnQuestionContent() => _player.OnQuestionContent();
 
-    public void Report(string report) => _player.Report();
+    public void Report(string report) => _player.SendReport();
 
     public void ReceiveText(Message m)
     {
@@ -289,9 +289,9 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    public void SelectQuestion() => _player.ChooseQuest();
+    public void SelectQuestion() => _player.SelectQuestion();
 
-    public void DeleteTheme() => _player.ChooseFinalTheme();
+    public void DeleteTheme() => _player.DeleteTheme();
 
     public void OnInfo()
     {
@@ -311,5 +311,5 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         _viewerActions.SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
     }
 
-    public void MakeStake() => _player.StakeNew();
+    public void MakeStake() => _player.MakeStake();
 }

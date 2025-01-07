@@ -206,13 +206,13 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     public int B0 { get; set; }
 
     /// <summary>
-    /// Скорость реакции
+    /// Reaction speed.
     /// </summary>
     [XmlAttribute]
     public int S { get; set; }
 
     /// <summary>
-    /// Вероятность отдать Вопрос с секретом тому, у кого меньше денег
+    /// Probability to select the player with less money.
     /// </summary>
     [XmlAttribute]
     public int V { get; set; }

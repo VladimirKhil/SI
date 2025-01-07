@@ -1,11 +1,10 @@
-﻿namespace SICore.Special
+﻿namespace SICore.Special;
+
+internal static class ResourceHelper
 {
-    internal static class ResourceHelper
+    internal static string GetSexString(string resource, bool isMale)
     {
-        internal static string GetSexString(string resource, bool isMale)
-        {
-            var resources = resource.Split(';');
-            return resources[resources.Length == 1 || isMale ? 0 : 1];
-        }
+        var resources = resource.Split(';');
+        return resources[resources.Length == 1 || isMale ? 0 : 1];
     }
 }

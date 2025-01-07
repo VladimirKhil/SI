@@ -1,4 +1,5 @@
 ﻿using SICore.Contracts;
+using SICore.Extensions;
 
 namespace SICore;
 
@@ -57,23 +58,8 @@ internal sealed class ShowmanComputerController
 
     private void OnSelectPlayer()
     {
-        var availablePlayerCount = _data.Players.Count(p => p.CanBeSelected);
-        var selectedIndex = Random.Shared.Next(availablePlayerCount);
-        var currentIndex = 0;
-
-        for (var i = 0; i < _data.Players.Count; i++)
-        {
-            if (_data.Players[i].CanBeSelected)
-            {
-                if (currentIndex == selectedIndex)
-                {
-                    _viewerActions.SendMessage(Messages.SelectPlayer, i.ToString());
-                    break;
-                }
-
-                currentIndex++;
-            }
-        }
+        var playerIndex = _data.Players.SelectRandomIndex();
+        _viewerActions.SendMessage(Messages.SelectPlayer, playerIndex.ToString());
     }
 
     private void OnValidateAnswer(string? answer)
@@ -100,7 +86,7 @@ internal sealed class ShowmanComputerController
 
     private enum ShowmanTasks
     {
-        Ready,
+        Ready, // Internal action
         ValidateAnswer,
         SelectPlayer,
     }
