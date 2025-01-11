@@ -1,11 +1,11 @@
-﻿<Project Sdk="WixToolset.Sdk/4.0.5">
+﻿<Project Sdk="WixToolset.Sdk/5.0.2">
   <PropertyGroup>
     <OutputName>SIQuester.$(Platform)</OutputName>
     <DefineConstants>ProductVersion=$(MsiProductVersion)</DefineConstants>
-	<SuppressIces>ICE38;ICE57;ICE60;ICE91</SuppressIces>
+    <SuppressIces>ICE38;ICE57;ICE60;ICE91</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-	<DefineConstants>Debug</DefineConstants>
+    <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SIQuester\SIQuester\SIQuester.csproj">
@@ -18,7 +18,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.5" />
-    <PackageReference Include="WixToolset.UI.wixext" Version="4.0.5" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
   </ItemGroup>
 </Project>

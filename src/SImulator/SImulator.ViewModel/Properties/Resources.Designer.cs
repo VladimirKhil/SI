@@ -70,6 +70,15 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Button press.
+        /// </summary>
+        public static string ButtonPressed {
+            get {
+                return ResourceManager.GetString("ButtonPressed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Connection error: {0}.
         /// </summary>
         public static string ConnectionError {
@@ -84,6 +93,24 @@ namespace SImulator.ViewModel.Properties {
         public static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Deleting theme in the final round.
+        /// </summary>
+        public static string FinalThemeRemoval {
+            get {
+                return ResourceManager.GetString("FinalThemeRemoval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Final round thinking.
+        /// </summary>
+        public static string FinalThink {
+            get {
+                return ResourceManager.GetString("FinalThink", resourceCulture);
             }
         }
         
@@ -115,11 +142,29 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game start.
+        /// </summary>
+        public static string GameStart {
+            get {
+                return ResourceManager.GetString("GameStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Game start error: {0}.
         /// </summary>
         public static string GameStartError {
             get {
                 return ResourceManager.GetString("GameStartError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Game themes.
+        /// </summary>
+        public static string GameThemes {
+            get {
+                return ResourceManager.GetString("GameThemes", resourceCulture);
             }
         }
         
@@ -165,6 +210,15 @@ namespace SImulator.ViewModel.Properties {
         public static string Next {
             get {
                 return ResourceManager.GetString("Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на No answer.
+        /// </summary>
+        public static string NoAnswer {
+            get {
+                return ResourceManager.GetString("NoAnswer", resourceCulture);
             }
         }
         
@@ -223,11 +277,29 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question selection.
+        /// </summary>
+        public static string QuestionSelection {
+            get {
+                return ResourceManager.GetString("QuestionSelection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Question For All.
         /// </summary>
         public static string QuestionTypeForAll {
             get {
                 return ResourceManager.GetString("QuestionTypeForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Question with Secret.
+        /// </summary>
+        public static string QuestionTypeSecret {
+            get {
+                return ResourceManager.GetString("QuestionTypeSecret", resourceCulture);
             }
         }
         
@@ -241,11 +313,29 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Stake For All question.
+        ///   Ищет локализованную строку, похожую на Question with Stake.
+        /// </summary>
+        public static string QuestionTypeStake {
+            get {
+                return ResourceManager.GetString("QuestionTypeStake", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Question For All with Stake.
         /// </summary>
         public static string QuestionTypeStakeForAll {
             get {
                 return ResourceManager.GetString("QuestionTypeStakeForAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Correct answer.
+        /// </summary>
+        public static string RightAnswer {
+            get {
+                return ResourceManager.GetString("RightAnswer", resourceCulture);
             }
         }
         
@@ -255,6 +345,15 @@ namespace SImulator.ViewModel.Properties {
         public static string Round {
             get {
                 return ResourceManager.GetString("Round", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Round start.
+        /// </summary>
+        public static string RoundStart {
+            get {
+                return ResourceManager.GetString("RoundStart", resourceCulture);
             }
         }
         
@@ -372,6 +471,15 @@ namespace SImulator.ViewModel.Properties {
         public static string Theme {
             get {
                 return ResourceManager.GetString("Theme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Wrong answer.
+        /// </summary>
+        public static string WrongAnswer {
+            get {
+                return ResourceManager.GetString("WrongAnswer", resourceCulture);
             }
         }
     }

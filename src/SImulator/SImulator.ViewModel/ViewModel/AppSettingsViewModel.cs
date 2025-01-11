@@ -14,6 +14,8 @@ public sealed class AppSettingsViewModel
 
     public SettingsViewModel SIUISettings { get; private set; }
 
+    public SoundSettingsViewModel Sounds { get; }
+
     public GameModes[] Modes { get; } = new GameModes[] { GameModes.Tv, GameModes.Sport };
 
     [XmlIgnore]
@@ -23,6 +25,7 @@ public sealed class AppSettingsViewModel
     {
         Model = settings;
         SIUISettings = new SettingsViewModel(settings.SIUISettings);
+        Sounds = new SoundSettingsViewModel(settings.Sounds);
 
         Reset = new SimpleCommand(Reset_Executed);
     }
@@ -98,23 +101,7 @@ public sealed class AppSettingsViewModel
         if (sounds)
         {
             Model.PlaySounds = defaultSettings.PlaySounds;
-            Model.Sounds.BeginGame = defaultSettings.Sounds.BeginGame;
-            Model.Sounds.GameThemes = defaultSettings.Sounds.GameThemes;
-            Model.Sounds.RoundBegin = defaultSettings.Sounds.RoundBegin;
-            Model.Sounds.RoundThemes = defaultSettings.Sounds.RoundThemes;
-            Model.Sounds.QuestionSelected = defaultSettings.Sounds.QuestionSelected;
-            Model.Sounds.PlayerPressed = defaultSettings.Sounds.PlayerPressed;
-            Model.Sounds.NoRiskQuestion = defaultSettings.Sounds.NoRiskQuestion;
-            Model.Sounds.SecretQuestion = defaultSettings.Sounds.SecretQuestion;
-            Model.Sounds.StakeQuestion = defaultSettings.Sounds.StakeQuestion;
-            Model.Sounds.StakeForAllQuestion = defaultSettings.Sounds.StakeForAllQuestion;
-            Model.Sounds.ForAllQuestion = defaultSettings.Sounds.ForAllQuestion;
-            Model.Sounds.AnswerRight = defaultSettings.Sounds.AnswerRight;
-            Model.Sounds.AnswerWrong = defaultSettings.Sounds.AnswerWrong;
-            Model.Sounds.NoAnswer = defaultSettings.Sounds.NoAnswer;
-            Model.Sounds.RoundTimeout = defaultSettings.Sounds.RoundTimeout;
-            Model.Sounds.FinalDelete = defaultSettings.Sounds.FinalDelete;
-            Model.Sounds.FinalThink = defaultSettings.Sounds.FinalThink;
+            Sounds.Reset(defaultSettings.Sounds);
         }
     }
 }

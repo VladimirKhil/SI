@@ -52,17 +52,12 @@ public partial class App : Application
 
     private readonly Implementation.DesktopManager _manager = new();
 
-    private static bool IsWindows8_1OrLater = Environment.OSVersion.Version > new Version(6, 2);
+    private static readonly bool IsWindows8_1OrLater = Environment.OSVersion.Version > new Version(6, 2);
 
     /// <summary>
     /// Имя приложения
     /// </summary>
     public static string ProductName => Assembly.GetExecutingAssembly().GetName().Name ?? "SIQuester";
-
-    /// <summary>
-    /// Директория приложения
-    /// </summary>
-    public static string StartupPath => AppDomain.CurrentDomain.BaseDirectory;
 
     private MainViewModel? _mainViewModel;
 
@@ -80,16 +75,6 @@ public partial class App : Application
         if (!IsWindows8_1OrLater)
         {
             _settings.SpellChecking = false;
-        }
-
-        if (_settings.Language != null)
-        {
-            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(_settings.Language);
-        }
-        else
-        {
-            var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
-            _settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
         }
 
         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
@@ -115,15 +100,6 @@ public partial class App : Application
 
         _manager.ServiceProvider = _host.Services;
 
-#if UPDATE
-        if (_settings.SearchForUpdates)
-        {
-            SearchForUpdatesAsync();
-        }
-
-        SendDelayedReports();
-#endif
-
         _logger = _host.Services.GetRequiredService<ILogger<App>>();
         _logger.LogInformation("Application started. Version: {version}", Assembly.GetExecutingAssembly().GetName().Version);
     }
@@ -134,6 +110,25 @@ public partial class App : Application
 
         try
         {
+            if (_settings.Language != null)
+            {
+                Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(_settings.Language);
+            }
+            else
+            {
+                var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+                _settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
+            }
+
+#if UPDATE
+            if (_settings.SearchForUpdates)
+            {
+                SearchForUpdatesAsync();
+            }
+
+            SendDelayedReports();
+#endif
+
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
             var clipboardService = _host.Services.GetRequiredService<IClipboardService>();
             var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();

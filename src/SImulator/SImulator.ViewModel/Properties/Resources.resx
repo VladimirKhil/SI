@@ -120,11 +120,20 @@
   <data name="Add" xml:space="preserve">
     <value>Add</value>
   </data>
+  <data name="ButtonPressed" xml:space="preserve">
+    <value>Button press</value>
+  </data>
   <data name="ConnectionError" xml:space="preserve">
     <value>Connection error: {0}</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
+  </data>
+  <data name="FinalThemeRemoval" xml:space="preserve">
+    <value>Deleting theme in the final round</value>
+  </data>
+  <data name="FinalThink" xml:space="preserve">
+    <value>Final round thinking</value>
   </data>
   <data name="GameEndingError" xml:space="preserve">
     <value>Game end error: {0}</value>
@@ -135,8 +144,14 @@
   <data name="GamePackageLoadError" xml:space="preserve">
     <value>Error loading game package</value>
   </data>
+  <data name="GameStart" xml:space="preserve">
+    <value>Game start</value>
+  </data>
   <data name="GameStartError" xml:space="preserve">
     <value>Game start error: {0}</value>
+  </data>
+  <data name="GameThemes" xml:space="preserve">
+    <value>Game themes</value>
   </data>
   <data name="IpAddressHint" xml:space="preserve">
     <value>[Your IP address]</value>
@@ -152,6 +167,9 @@
   </data>
   <data name="Next" xml:space="preserve">
     <value>Next</value>
+  </data>
+  <data name="NoAnswer" xml:space="preserve">
+    <value>No answer</value>
   </data>
   <data name="NoLicensesFolder" xml:space="preserve">
     <value>License folder not found</value>
@@ -171,17 +189,32 @@
   <data name="PressTheButton" xml:space="preserve">
     <value>Press the button</value>
   </data>
+  <data name="QuestionSelection" xml:space="preserve">
+    <value>Question selection</value>
+  </data>
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>Question For All</value>
+  </data>
+  <data name="QuestionTypeSecret" xml:space="preserve">
+    <value>Question with Secret</value>
   </data>
   <data name="QuestionTypeSimple" xml:space="preserve">
     <value>Question with Button</value>
   </data>
+  <data name="QuestionTypeStake" xml:space="preserve">
+    <value>Question with Stake</value>
+  </data>
   <data name="QuestionTypeStakeForAll" xml:space="preserve">
-    <value>Stake For All question</value>
+    <value>Question For All with Stake</value>
+  </data>
+  <data name="RightAnswer" xml:space="preserve">
+    <value>Correct answer</value>
   </data>
   <data name="Round" xml:space="preserve">
     <value>Round</value>
+  </data>
+  <data name="RoundStart" xml:space="preserve">
+    <value>Round start</value>
   </data>
   <data name="RoundThemes" xml:space="preserve">
     <value>Round themes</value>
@@ -221,5 +254,8 @@
   </data>
   <data name="Theme" xml:space="preserve">
     <value>Theme</value>
+  </data>
+  <data name="WrongAnswer" xml:space="preserve">
+    <value>Wrong answer</value>
   </data>
 </root>

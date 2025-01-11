@@ -1535,7 +1535,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Stake question for all.
+        ///   Ищет локализованную строку, похожую на Question with stake for all.
         /// </summary>
         public static string StakeAllQuestion {
             get {
@@ -1544,7 +1544,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Stake question.
+        ///   Ищет локализованную строку, похожую на Question with stake.
         /// </summary>
         public static string StakeQuestion {
             get {

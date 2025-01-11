@@ -627,7 +627,7 @@
     <value>Ошибка при поиске вопросов</value>
   </data>
   <data name="StakeAllQuestion" xml:space="preserve">
-    <value>Вопрос со ставкой для всех</value>
+    <value>Вопрос для всех со ставкой</value>
   </data>
   <data name="StakeQuestion" xml:space="preserve">
     <value>Вопрос со ставкой</value>

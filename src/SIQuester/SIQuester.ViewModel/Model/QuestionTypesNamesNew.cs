@@ -14,12 +14,12 @@ public sealed class QuestionTypesNamesNew : Dictionary<string, string>
     {
         this[QuestionTypes.Simple] = Resources.SimpleQuestion;
         this[QuestionTypes.Stake] = Resources.StakeQuestion;
-        this[QuestionTypes.StakeAll] = Resources.StakeAllQuestion;
         this[QuestionTypes.Secret] = Resources.SecretQuestion;
         this[QuestionTypes.SecretPublicPrice] = Resources.SecretPublicPrice;
         this[QuestionTypes.SecretNoQuestion] = Resources.SecretNoQuestion;
         this[QuestionTypes.NoRisk] = Resources.NoRiskQuestion;
         this[QuestionTypes.ForAll] = Resources.QuestionForAll;
+        this[QuestionTypes.StakeAll] = Resources.StakeAllQuestion;
         this[""] = Resources.OtherTypeQuestion;
     }
 

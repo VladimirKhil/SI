@@ -680,7 +680,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async void SelectAudioFile_Executed(object? arg)
     {
-        if (!int.TryParse(arg?.ToString(), out var fileId))
+        if (arg is not SoundViewModel soundViewModel)
         {
             return;
         }
@@ -692,76 +692,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        switch (fileId)
-        {
-            case 0:
-                Settings.Sounds.BeginGame = fileUri;
-                break;
-
-            case 1:
-                Settings.Sounds.GameThemes = fileUri;
-                break;
-
-            case 2:
-                Settings.Sounds.QuestionSelected = fileUri;
-                break;
-
-            case 3:
-                Settings.Sounds.PlayerPressed = fileUri;
-                break;
-
-            case 4:
-                Settings.Sounds.SecretQuestion = fileUri;
-                break;
-
-            case 5:
-                Settings.Sounds.StakeQuestion = fileUri;
-                break;
-
-            case 6:
-                Settings.Sounds.NoRiskQuestion = fileUri;
-                break;
-
-            case 7:
-                Settings.Sounds.AnswerRight = fileUri;
-                break;
-
-            case 8:
-                Settings.Sounds.AnswerWrong = fileUri;
-                break;
-
-            case 9:
-                Settings.Sounds.NoAnswer = fileUri;
-                break;
-
-            case 10:
-                Settings.Sounds.RoundBegin = fileUri;
-                break;
-
-            case 11:
-                Settings.Sounds.RoundThemes = fileUri;
-                break;
-
-            case 12:
-                Settings.Sounds.RoundTimeout = fileUri;
-                break;
-
-            case 13:
-                Settings.Sounds.FinalDelete = fileUri;
-                break;
-
-            case 14:
-                Settings.Sounds.FinalThink = fileUri;
-                break;
-
-            case 15:
-                Settings.Sounds.StakeForAllQuestion = fileUri;
-                break;
-
-            case 16:
-                Settings.Sounds.ForAllQuestion = fileUri;
-                break;
-        }
+        soundViewModel.Value = fileUri;
     }
 
     private async void AddPlayerButton_Executed(object? arg)

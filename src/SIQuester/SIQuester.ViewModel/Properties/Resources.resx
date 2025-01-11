@@ -626,10 +626,10 @@ Humor</value>
     <value>Error searching for questions</value>
   </data>
   <data name="StakeAllQuestion" xml:space="preserve">
-    <value>Stake question for all</value>
+    <value>Question with stake for all</value>
   </data>
   <data name="StakeQuestion" xml:space="preserve">
-    <value>Stake question</value>
+    <value>Question with stake</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>

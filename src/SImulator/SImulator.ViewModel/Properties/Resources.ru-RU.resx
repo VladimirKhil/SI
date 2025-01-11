@@ -120,11 +120,20 @@
   <data name="Add" xml:space="preserve">
     <value>Добавить</value>
   </data>
+  <data name="ButtonPressed" xml:space="preserve">
+    <value>Нажатие на кнопку</value>
+  </data>
   <data name="ConnectionError" xml:space="preserve">
     <value>Ошибка связи: {0}</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Ошибка</value>
+  </data>
+  <data name="FinalThemeRemoval" xml:space="preserve">
+    <value>Удаление темы в финале</value>
+  </data>
+  <data name="FinalThink" xml:space="preserve">
+    <value>Размышление в финале</value>
   </data>
   <data name="GameEndingError" xml:space="preserve">
     <value>Ошибка завершения игры: {0}</value>
@@ -135,8 +144,14 @@
   <data name="GamePackageLoadError" xml:space="preserve">
     <value>Ошибка при загрузке игрового пакета</value>
   </data>
+  <data name="GameStart" xml:space="preserve">
+    <value>Начало игры</value>
+  </data>
   <data name="GameStartError" xml:space="preserve">
     <value>Ошибка старта игры: {0}</value>
+  </data>
+  <data name="GameThemes" xml:space="preserve">
+    <value>Темы игры</value>
   </data>
   <data name="IpAddressHint" xml:space="preserve">
     <value>[Ваш IP-адрес]</value>
@@ -152,6 +167,9 @@
   </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
+  </data>
+  <data name="NoAnswer" xml:space="preserve">
+    <value>Нет ответа</value>
   </data>
   <data name="NoLicensesFolder" xml:space="preserve">
     <value>Папка лицензий не найдена!</value>
@@ -171,17 +189,32 @@
   <data name="PressTheButton" xml:space="preserve">
     <value>Нажмите на кнопку</value>
   </data>
+  <data name="QuestionSelection" xml:space="preserve">
+    <value>Выбор вопроса</value>
+  </data>
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>Вопрос для всех</value>
+  </data>
+  <data name="QuestionTypeSecret" xml:space="preserve">
+    <value>Вопрос с секретом</value>
   </data>
   <data name="QuestionTypeSimple" xml:space="preserve">
     <value>Вопрос с кнопкой</value>
   </data>
+  <data name="QuestionTypeStake" xml:space="preserve">
+    <value>Вопрос со ставкой</value>
+  </data>
   <data name="QuestionTypeStakeForAll" xml:space="preserve">
-    <value>Вопрос со ставкой для всех</value>
+    <value>Вопрос для всех со ставкой</value>
+  </data>
+  <data name="RightAnswer" xml:space="preserve">
+    <value>Правильный ответ</value>
   </data>
   <data name="Round" xml:space="preserve">
     <value>Раунд</value>
+  </data>
+  <data name="RoundStart" xml:space="preserve">
+    <value>Начало раунда</value>
   </data>
   <data name="RoundThemes" xml:space="preserve">
     <value>Темы раунда</value>
@@ -221,5 +254,8 @@
   </data>
   <data name="Theme" xml:space="preserve">
     <value>Тема</value>
+  </data>
+  <data name="WrongAnswer" xml:space="preserve">
+    <value>Неверный ответ</value>
   </data>
 </root>

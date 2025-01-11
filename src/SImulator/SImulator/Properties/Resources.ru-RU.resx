@@ -183,9 +183,6 @@
   <data name="ButtonOrderHint" xml:space="preserve">
     <value>Соответствуют позициям игроков в списке</value>
   </data>
-  <data name="ButtonPressed" xml:space="preserve">
-    <value>Нажатие на кнопку</value>
-  </data>
   <data name="Buttons" xml:space="preserve">
     <value>Кнопки</value>
   </data>
@@ -289,12 +286,6 @@
   <data name="FileDeletionError" xml:space="preserve">
     <value>Ошибка удаления файла: {0}</value>
   </data>
-  <data name="FinalThemeRemoval" xml:space="preserve">
-    <value>Удаление темы в финале</value>
-  </data>
-  <data name="FinalThink" xml:space="preserve">
-    <value>Размышление в финале</value>
-  </data>
   <data name="FinalThinkingTime" xml:space="preserve">
     <value>Время на размышление в финале (с)</value>
   </data>
@@ -321,12 +312,6 @@
   </data>
   <data name="GameRules" xml:space="preserve">
     <value>Правила игры</value>
-  </data>
-  <data name="GameStart" xml:space="preserve">
-    <value>Начало игры</value>
-  </data>
-  <data name="GameThemes" xml:space="preserve">
-    <value>Темы игры</value>
   </data>
   <data name="GameType" xml:space="preserve">
     <value>Тип игры</value>
@@ -395,9 +380,6 @@
   </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
-  </data>
-  <data name="NoAnswer" xml:space="preserve">
-    <value>Нет ответа</value>
   </data>
   <data name="NotSelected" xml:space="preserve">
     <value>Не выбран</value>
@@ -480,17 +462,8 @@
   <data name="QuestionReadingSpeed" xml:space="preserve">
     <value>Скорость чтения вопроса</value>
   </data>
-  <data name="QuestionSelection" xml:space="preserve">
-    <value>Выбор вопроса</value>
-  </data>
   <data name="QuestionTime" xml:space="preserve">
     <value>Время на нажатие кнопки (c)</value>
-  </data>
-  <data name="QuestionTypeForAll" xml:space="preserve">
-    <value>Вопрос для всех</value>
-  </data>
-  <data name="QuestionTypeSecret" xml:space="preserve">
-    <value>Вопрос с секретом</value>
   </data>
   <data name="QuestionTypeSecretNoQuestion" xml:space="preserve">
     <value>Вопрос с секретом (деньги без вопроса)</value>
@@ -500,12 +473,6 @@
   </data>
   <data name="QuestionTypeSimple" xml:space="preserve">
     <value>Простой</value>
-  </data>
-  <data name="QuestionTypeStake" xml:space="preserve">
-    <value>Вопрос со ставкой</value>
-  </data>
-  <data name="QuestionTypeStakeForAll" xml:space="preserve">
-    <value>Вопрос со ставкой для всех</value>
   </data>
   <data name="RecentFiles" xml:space="preserve">
     <value>Последние файлы</value>
@@ -519,20 +486,11 @@
   <data name="Restriction" xml:space="preserve">
     <value>Ограничение</value>
   </data>
-  <data name="RightAnswer" xml:space="preserve">
-    <value>Правильный ответ</value>
-  </data>
   <data name="RightAnswers" xml:space="preserve">
     <value>Верных</value>
   </data>
   <data name="Round" xml:space="preserve">
     <value>Раунд</value>
-  </data>
-  <data name="RoundStart" xml:space="preserve">
-    <value>Начало раунда</value>
-  </data>
-  <data name="RoundThemes" xml:space="preserve">
-    <value>Темы раунда</value>
   </data>
   <data name="RoundTime" xml:space="preserve">
     <value>Время раунда (с)</value>
@@ -721,9 +679,6 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="Window" xml:space="preserve">
     <value>Окно (предыдущая версия)</value>
   </data>
-  <data name="WrongAnswer" xml:space="preserve">
-    <value>Неверный ответ</value>
-  </data>
   <data name="WrongAnswers" xml:space="preserve">
     <value>Неверных</value>
   </data>
@@ -744,5 +699,8 @@ Escape (правая кнопка мыши) - завершить игру</value
   </data>
   <data name="OralTextHint" xml:space="preserve">
     <value>Текст читается ведущим и не показывается на экране</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Очистить</value>
   </data>
 </root>

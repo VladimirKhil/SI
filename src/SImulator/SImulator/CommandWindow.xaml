@@ -61,13 +61,13 @@
                 <my:MappedConverter.Map>
                     <my:StringDictionary>
                         <x:Static x:Key="{x:Static pc:QuestionTypes.Simple}" Member="lp:Resources.QuestionTypeSimple" />
-                        <x:Static x:Key="{x:Static pc:QuestionTypes.Stake}" Member="lp:Resources.QuestionTypeStake" />
-                        <x:Static x:Key="{x:Static pc:QuestionTypes.StakeAll}" Member="lp:Resources.QuestionTypeStakeForAll" />
-                        <x:Static x:Key="{x:Static pc:QuestionTypes.Secret}" Member="lp:Resources.QuestionTypeSecret" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.Stake}" Member="vmp:Resources.QuestionTypeStake" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.StakeAll}" Member="vmp:Resources.QuestionTypeStakeForAll" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.Secret}" Member="vmp:Resources.QuestionTypeSecret" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.SecretPublicPrice}" Member="lp:Resources.QuestionTypeSecretPublicPrice" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.SecretNoQuestion}" Member="lp:Resources.QuestionTypeSecretNoQuestion" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.NoRisk}" Member="vmp:Resources.NoRiskQuestion" />
-                        <x:Static x:Key="{x:Static pc:QuestionTypes.ForAll}" Member="lp:Resources.QuestionTypeForAll" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.ForAll}" Member="vmp:Resources.QuestionTypeForAll" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
             </my:MappedConverter>
@@ -1018,7 +1018,7 @@
                 <Setter Property="Width" Value="120" />
                 <Setter Property="Height" Value="25" />
                 <Setter Property="Margin" Value="5,0,4,0" />
-                <Setter Property="Command" Value="{Binding SelectAudioFile}" />
+                <Setter Property="Command" Value="{Binding DataContext.SelectAudioFile, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
                 <Setter Property="DockPanel.Dock" Value="Right" />
                 <Setter Property="Content" Value="{x:Static lp:Resources.SelectHeader}" />
@@ -1026,7 +1026,7 @@
 
             <Style x:Key="AudioFile" TargetType="TextBox">
                 <Setter Property="Width" Value="Auto" />
-                <Setter Property="IsEnabled" Value="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
+                <Setter Property="IsEnabled" Value="{Binding DataContext.Mode, Converter={StaticResource IsStart}, Mode=OneWay, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
             </Style>
@@ -1617,14 +1617,14 @@
                         <UniformGrid Columns="2" Margin="3">
                             <TextBlock FontWeight="Bold" Text="{x:Static lp:Resources.Question}" />
                             <TextBlock FontWeight="Bold" Text="{x:Static lp:Resources.Alias}" />
-                            <TextBlock Text="{x:Static lp:Resources.QuestionTypeStake}" />
+                            <TextBlock Text="{x:Static vmp:Resources.QuestionTypeStake}" />
 
                             <TextBox
                                 HorizontalAlignment="Stretch"
                                 Width="Auto"
                                 Text="{Binding SpecialsAliases.StakeQuestionAlias, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <TextBlock Text="{x:Static lp:Resources.QuestionTypeSecret}" />
+                            <TextBlock Text="{x:Static vmp:Resources.QuestionTypeSecret}" />
 
                             <TextBox
                                 HorizontalAlignment="Stretch"
@@ -1853,208 +1853,32 @@
                 <StackPanel Margin="2,2,0,0">
                     <CheckBox Margin="0,5" IsChecked="{Binding SettingsViewModel.Model.PlaySounds}" Content="{x:Static lp:Resources.PlaySounds}" />
 
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GameStart}" />
-                    
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="0" />
-                        
-                        <TextBox
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.BeginGame}" />
-                    </DockPanel>
+                    <ItemsControl ItemsSource="{Binding SettingsViewModel.Sounds.Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate d:DataType="vm:SoundViewModel">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource Header}" Text="{Binding Name}" />
 
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GameThemes}" />
+                                    <DockPanel>
+                                        <Button
+                                            Style="{StaticResource SelectAudioFileButton}"
+                                            Content="{x:Static lp:Resources.Clear}"
+                                            Command="{Binding Clear}"
+                                            CommandParameter="{Binding}" />
 
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="1" />
+                                        <Button
+                                            Style="{StaticResource SelectAudioFileButton}"
+                                            CommandParameter="{Binding}" />
 
-                        <TextBox
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.GameThemes}" />
-                    </DockPanel>
+                                        <TextBox
+                                            Style="{StaticResource AudioFile}"
+                                            Text="{Binding Value}" />
+                                    </DockPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RoundStart}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="10" />
-
-                        <TextBox
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.RoundBegin}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RoundThemes}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="11" />
-
-                        <TextBox
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.RoundThemes}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionSelection}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="2" />
-
-                        <TextBox
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.QuestionSelected}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ButtonPressed}" />
-                    
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="3" />
-                        
-                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.PlayerPressed}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionTypeSecret}" />
-                    
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="4" />
-
-                        <TextBox 
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.SecretQuestion}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionTypeStake}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="5" />
-
-                        <TextBox 
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.StakeQuestion}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionTypeStakeForAll}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="15" />
-
-                        <TextBox 
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.StakeForAllQuestion}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static vmp:Resources.NoRiskQuestion}" />
-                    
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="6" />
-
-                        <TextBox 
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.NoRiskQuestion}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionTypeForAll}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="16" />
-
-                        <TextBox 
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.ForAllQuestion}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RightAnswer}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="7" />
-
-                        <TextBox 
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.AnswerRight}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.WrongAnswer}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="8" />
-
-                        <TextBox 
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.AnswerWrong}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.NoAnswer}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="9" />
-
-                        <TextBox 
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.NoAnswer}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RoundTimeout}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="12" />
-
-                        <TextBox
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.RoundTimeout}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FinalThemeRemoval}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="13" />
-
-                        <TextBox
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.FinalDelete}" />
-                    </DockPanel>
-
-                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FinalThink}" />
-
-                    <DockPanel>
-                        <Button
-                            Style="{StaticResource SelectAudioFileButton}"
-                            CommandParameter="14" />
-
-                        <TextBox
-                            Style="{StaticResource AudioFile}"
-                            Text="{Binding SettingsViewModel.Model.Sounds.FinalThink}" />
-                    </DockPanel>
-                    
                     <Button
                         Command="{Binding SettingsViewModel.Reset}"
                         CommandParameter="8"

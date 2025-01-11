@@ -183,9 +183,6 @@
   <data name="ButtonOrderHint" xml:space="preserve">
     <value>Matches positions of players in the list</value>
   </data>
-  <data name="ButtonPressed" xml:space="preserve">
-    <value>Button press</value>
-  </data>
   <data name="Buttons" xml:space="preserve">
     <value>Buttons</value>
   </data>
@@ -288,12 +285,6 @@ when using buttons to start the question timer, an additional press of the Next 
   <data name="FileDeletionError" xml:space="preserve">
     <value>Error deleting file: {0}</value>
   </data>
-  <data name="FinalThemeRemoval" xml:space="preserve">
-    <value>Deleting theme in the final round</value>
-  </data>
-  <data name="FinalThink" xml:space="preserve">
-    <value>Final round thinking</value>
-  </data>
   <data name="FinalThinkingTime" xml:space="preserve">
     <value>Final round thinking time (s)</value>
   </data>
@@ -320,12 +311,6 @@ when using buttons to start the question timer, an additional press of the Next 
   </data>
   <data name="GameRules" xml:space="preserve">
     <value>Game rules</value>
-  </data>
-  <data name="GameStart" xml:space="preserve">
-    <value>Game start</value>
-  </data>
-  <data name="GameThemes" xml:space="preserve">
-    <value>Game themes</value>
   </data>
   <data name="GameType" xml:space="preserve">
     <value>Game type</value>
@@ -394,9 +379,6 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   </data>
   <data name="Next" xml:space="preserve">
     <value>Next</value>
-  </data>
-  <data name="NoAnswer" xml:space="preserve">
-    <value>No answer</value>
   </data>
   <data name="NotSelected" xml:space="preserve">
     <value>Not selected</value>
@@ -479,17 +461,8 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   <data name="QuestionReadingSpeed" xml:space="preserve">
     <value>Question reading speed</value>
   </data>
-  <data name="QuestionSelection" xml:space="preserve">
-    <value>Question selection</value>
-  </data>
   <data name="QuestionTime" xml:space="preserve">
     <value>Button press time (s)</value>
-  </data>
-  <data name="QuestionTypeForAll" xml:space="preserve">
-    <value>Question For All</value>
-  </data>
-  <data name="QuestionTypeSecret" xml:space="preserve">
-    <value>Secret question</value>
   </data>
   <data name="QuestionTypeSecretNoQuestion" xml:space="preserve">
     <value>Secret question (money without question)</value>
@@ -499,12 +472,6 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   </data>
   <data name="QuestionTypeSimple" xml:space="preserve">
     <value>Simple</value>
-  </data>
-  <data name="QuestionTypeStake" xml:space="preserve">
-    <value>Stake question</value>
-  </data>
-  <data name="QuestionTypeStakeForAll" xml:space="preserve">
-    <value>Stake For All question</value>
   </data>
   <data name="RecentFiles" xml:space="preserve">
     <value>Recent files</value>
@@ -518,20 +485,11 @@ By installing and using the Program, you automatically accept this Agreement. Yo
   <data name="Restriction" xml:space="preserve">
     <value>Restriction</value>
   </data>
-  <data name="RightAnswer" xml:space="preserve">
-    <value>Correct answer</value>
-  </data>
   <data name="RightAnswers" xml:space="preserve">
     <value>Correct</value>
   </data>
   <data name="Round" xml:space="preserve">
     <value>Round</value>
-  </data>
-  <data name="RoundStart" xml:space="preserve">
-    <value>Round start</value>
-  </data>
-  <data name="RoundThemes" xml:space="preserve">
-    <value>Round themes</value>
   </data>
   <data name="RoundTime" xml:space="preserve">
     <value>Round time (s)</value>
@@ -720,9 +678,6 @@ To play, you need to organize a local network.</value>
   <data name="Window" xml:space="preserve">
     <value>Window (old version)</value>
   </data>
-  <data name="WrongAnswer" xml:space="preserve">
-    <value>Wrong answer</value>
-  </data>
   <data name="WrongAnswers" xml:space="preserve">
     <value>Incorrect</value>
   </data>
@@ -743,5 +698,8 @@ To play, you need to organize a local network.</value>
   </data>
   <data name="OralTextHint" xml:space="preserve">
     <value>Text is read by host and is not displayed on the screen</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Clear</value>
   </data>
 </root>
