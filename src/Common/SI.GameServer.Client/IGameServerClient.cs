@@ -12,6 +12,8 @@ public interface IGameServerClient : IAsyncDisposable
 {
     string ServiceUri { get; }
 
+    IInfoApi Info { get; }
+
     /// <summary>
     /// Reconnecting event.
     /// </summary>
@@ -31,8 +33,11 @@ public interface IGameServerClient : IAsyncDisposable
     event Action<int> GameDeleted;
     event Action<GameInfo> GameChanged;
 
+    [Obsolete]
     event Action<string> Joined;
+    [Obsolete]
     event Action<string> Leaved;
+    [Obsolete]
     event Action<string, string> Receieve;
 
     Task OpenAsync(string userName, CancellationToken token = default);
@@ -41,6 +46,7 @@ public interface IGameServerClient : IAsyncDisposable
     /// Gets game server configuration info.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>
+    [Obsolete("Use Info.GetHostInfoAsync")]
     Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default);
 
     /// <summary>

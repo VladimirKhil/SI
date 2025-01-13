@@ -20,6 +20,11 @@ public sealed class GameServerClientOptions
     public Uri? ServiceDiscoveryUri { get; set; } = new Uri("https://vladimirkhil.com/api/si/servers");
 
     /// <summary>
+    /// Requests localization culture.
+    /// </summary>
+    public string? Culture { get; set; }
+
+    /// <summary>
     /// Client timeout.
     /// </summary>
     public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(6); // Large value for uploading packages

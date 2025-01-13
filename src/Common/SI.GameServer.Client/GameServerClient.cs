@@ -5,6 +5,7 @@ using SI.GameServer.Contract;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,6 +52,8 @@ public sealed class GameServerClient : IGameServerClient
 
     private readonly IUIThreadExecutor? _uIThreadExecutor;
 
+    public IInfoApi Info { get; }
+
     public GameServerClient(IOptions<GameServerClientOptions> options, IUIThreadExecutor? uIThreadExecutor = null)
     {
         _options = options.Value;
@@ -62,6 +65,13 @@ public sealed class GameServerClient : IGameServerClient
             Timeout = _options.Timeout,
             DefaultRequestVersion = HttpVersion.Version20
         };
+
+        if (_options.Culture != null)
+        {
+            _client.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(_options.Culture));
+        }
+
+        Info = new InfoApi(_client);
     }
 
     public Task<RunGameResponse> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default) =>
@@ -89,6 +99,7 @@ public sealed class GameServerClient : IGameServerClient
     public Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default) =>
         Connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
 
+    [Obsolete]
     public Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default) =>
         Connection.InvokeAsync<HostInfo>("GetGamesHostInfoNew", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
 

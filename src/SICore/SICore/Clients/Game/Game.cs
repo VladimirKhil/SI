@@ -45,8 +45,7 @@ public sealed class Game : Actor<GameData>
 
     private readonly GameLogic _logic;
 
-	[Obsolete("Use _logic")]
-    private GameLogic Logic => _logic;
+    public GameLogic Logic => _logic;
 
     public Game(
         Client client,
