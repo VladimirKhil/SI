@@ -9,6 +9,4 @@ public interface IInfoApi
     Task<HostInfo?> GetHostInfoAsync(CancellationToken cancellationToken = default);
 
     Task<string[]?> GetBotsNamesAsync(CancellationToken cancellationToken = default);
-
-    Task<GetGameByPinResponse?> GetGameByPinAsync(int pin, CancellationToken cancellationToken = default);
 }

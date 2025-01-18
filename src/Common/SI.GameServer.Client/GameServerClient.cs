@@ -54,6 +54,8 @@ public sealed class GameServerClient : IGameServerClient
 
     public IInfoApi Info { get; }
 
+    public IGamesApi Games { get; }
+
     public GameServerClient(IOptions<GameServerClientOptions> options, IUIThreadExecutor? uIThreadExecutor = null)
     {
         _options = options.Value;
@@ -72,6 +74,7 @@ public sealed class GameServerClient : IGameServerClient
         }
 
         Info = new InfoApi(_client);
+        Games = new GamesApi(_client);
     }
 
     public Task<RunGameResponse> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default) =>

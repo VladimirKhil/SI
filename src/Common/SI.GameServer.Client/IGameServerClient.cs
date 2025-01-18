@@ -14,6 +14,8 @@ public interface IGameServerClient : IAsyncDisposable
 
     IInfoApi Info { get; }
 
+    IGamesApi Games { get; }
+
     /// <summary>
     /// Reconnecting event.
     /// </summary>
