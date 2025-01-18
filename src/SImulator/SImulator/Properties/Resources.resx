@@ -702,4 +702,7 @@ To play, you need to organize a local network.</value>
   <data name="Clear" xml:space="preserve">
     <value>Clear</value>
   </data>
+  <data name="AttachContentToTable" xml:space="preserve">
+    <value>Add theme comments and right answers to game table</value>
+  </data>
 </root>

@@ -14,7 +14,43 @@ internal sealed class Intelligence : IIntelligence
 {
     private readonly ComputerAccount _account;
 
-    public Intelligence(ComputerAccount account) => _account = account;
+    /// <summary>
+    /// Does the player know the answer.
+    /// </summary>
+    internal bool KnowsAnswer { get; set; } = false;
+
+    /// <summary>
+    /// Is the player sure in the answer.
+    /// </summary>
+    internal bool IsSure { get; set; } = false;
+
+    /// <summary>
+    /// Is the player ready to press the button.
+    /// </summary>
+    internal bool ReadyToPress { get; set; } = false;
+
+    private int _realBrave = 0;
+
+    /// <summary>
+    /// Current brave value.
+    /// </summary>
+    internal int RealBrave { get => _realBrave; set { _realBrave = Math.Max(0, value); } }
+
+    /// <summary>
+    /// Brave change speed.
+    /// </summary>
+    internal int DeltaBrave { get; set; } = 0;
+
+    /// <summary>
+    /// Current reaction speed.
+    /// </summary>
+    internal int RealSpeed { get; set; } = 0;
+
+    public Intelligence(ComputerAccount account)
+    {
+        _account = account;
+        RealBrave = _account.B0;
+    }
 
     public bool ValidateAnswer(string answer, string[] rightAnswers, string[] wrongAnswers) =>
         AnswerChecker.IsAnswerRight(answer, rightAnswers);
@@ -249,6 +285,153 @@ internal sealed class Intelligence : IIntelligence
         }
 
         return (stakeDecision, stakeSum);
+    }
+
+    public void OnQuestionStart(bool shortThink, double difficulty)
+    {
+        // Difficulty: 3 for middle question, 1 and 5 for easiest and hardest questions
+        var playerLag = _account.S * 10;
+        var playerStrength = (double)_account.F;
+
+        if (shortThink)
+        {
+            IsSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
+
+            var riskRateLimit = RealBrave > 0
+                ? (int)(100 * Math.Max(0, Math.Min(1, playerStrength / RealBrave)))
+                : 100;
+
+            try
+            {
+                var riskRate = riskRateLimit < 100 ? 1 - Random.Shared.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
+
+                KnowsAnswer = IsSure || Random.Shared.Next(100) < playerStrength * riskRate / (difficulty + 1);
+                RealSpeed = Math.Max(1, (int)((playerLag + (int)Random.Shared.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
+
+                ReadyToPress = IsSure || Random.Shared.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
+            }
+            catch (ArgumentOutOfRangeException exc)
+            {
+                throw new Exception($"CalculateAnsweringStrategy: riskRateLimit = {riskRateLimit}, playerStrength = {playerStrength}, playerData.RealBrave = {RealBrave}", exc);
+            }
+        }
+        else
+        {
+            IsSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1); // 50% for F = 200 and difficulty = 3
+            KnowsAnswer = IsSure || Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.5;
+
+            RealSpeed = Math.Max(1, playerLag + (int)Random.Shared.NextGaussian(50 - playerStrength / 20, 15)); // 5s average, 4s for strong player
+        }
+    }
+
+    public int OnStartCanPressButton()
+    {
+        if (!ReadyToPress)
+        {
+            return -1;
+        }
+
+        var realSpeed = RealSpeed;
+        RealSpeed /= 2; // Additionally speed up
+        return realSpeed;
+    }
+
+    public void OnEndCanPressButton() => RealBrave++; // TODO: cancel PressButton task if it is running
+
+    public (bool knows, bool isSure, int answerTime) OnAnswer() => (KnowsAnswer, IsSure, RealSpeed);
+
+    public void OnPlayerOutcome(
+        List<PlayerAccount> players,
+        int myIndex,
+        int playerIndex,
+        List<ThemeInfo> roundTable,
+        bool isRight,
+        int roundPassedTimePercentage)
+    {
+        var me = players[myIndex];
+        var currentScore = me.Sum;
+        var bestOpponentScore = players.Where(player => player != me).Max(player => player.Sum);
+        var isCritical = IsCritical(roundTable, currentScore, bestOpponentScore, roundPassedTimePercentage);
+
+        var isMyOutcome = playerIndex == myIndex;
+
+        if (currentScore < -2000) // Negative sum -> bravery falls
+        {
+            if (RealBrave >= _account.F + 80)
+            {
+                RealBrave -= 80;
+            }
+            else
+            {
+                RealBrave = _account.F;
+            }
+        }
+        else if (currentScore < 0)
+        {
+            if (RealBrave >= _account.F + 10)
+            {
+                RealBrave -= 10;
+            }
+            else
+            {
+                RealBrave = _account.F;
+            }
+        }
+
+        if (isMyOutcome && isRight)
+        {
+            switch (_account.Style)
+            {
+                case PlayerStyle.Agressive:
+                    RealBrave += 7;
+                    DeltaBrave = 3;
+                    break;
+
+                case PlayerStyle.Normal:
+                    RealBrave += 5;
+                    DeltaBrave = 2;
+                    break;
+
+                default:
+                    RealBrave += 3;
+                    DeltaBrave = 1;
+                    break;
+            }
+        }
+        else if (isMyOutcome) // Answered wrong
+        {
+            switch (_account.Style)
+            {
+                case PlayerStyle.Agressive:
+                    RealBrave -= 60;
+                    DeltaBrave = 3;
+                    break;
+
+                case PlayerStyle.Normal:
+                    RealBrave -= 80;
+                    DeltaBrave = 2;
+                    break;
+
+                default:
+                    RealBrave -= 100;
+                    DeltaBrave = 1;
+                    break;
+            }
+        }
+        else if (isRight) // Someone else answered right
+        {
+            RealBrave += DeltaBrave;
+
+            if (DeltaBrave < 5)
+            {
+                DeltaBrave++;
+            }
+        }
+
+        if (isCritical)
+        {
+            RealBrave += 10;
+        }
     }
 
     private static StakeModes FromStakeMode(StakeMode stakeMode) =>

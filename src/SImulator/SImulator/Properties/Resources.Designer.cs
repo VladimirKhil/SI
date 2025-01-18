@@ -178,6 +178,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Add theme comments and right answers to game table.
+        /// </summary>
+        public static string AttachContentToTable {
+            get {
+                return ResourceManager.GetString("AttachContentToTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Audio.
         /// </summary>
         public static string Audio {

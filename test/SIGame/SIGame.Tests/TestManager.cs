@@ -1,4 +1,5 @@
-﻿using SICore;
+﻿using NUnit.Framework;
+using SICore;
 using SIGame.ViewModel.PlatformSpecific;
 using System.Windows.Input;
 using Utils.Timers;
@@ -72,7 +73,7 @@ internal sealed class TestManager : PlatformManager
 
 	public override void ShowMessage(string text, MessageType messageType, bool uiThread = false)
 	{
-		throw new NotImplementedException();
+		Assert.Fail(text);
 	}
 
 	public override IAnimatableTimer GetAnimatableTimer()

@@ -42,9 +42,6 @@ public sealed class GameServerClient : IGameServerClient
     public event Action<GameInfo>? GameCreated;
     public event Action<int>? GameDeleted;
     public event Action<GameInfo>? GameChanged;
-    public event Action<string>? Joined;
-    public event Action<string>? Leaved;
-    public event Action<string, string>? Receieve;
 
     public event Func<Exception?, Task>? Closed;
     public event Func<Exception?, Task>? Reconnecting;
@@ -93,18 +90,8 @@ public sealed class GameServerClient : IGameServerClient
         _client?.Dispose();
     }
 
-    public Task JoinLobbyAsync(CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync("JoinLobby2", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
-
-    public Task LeaveLobbyAsync(CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync("LeaveLobby", cancellationToken);
-
     public Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default) =>
         Connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
-
-    [Obsolete]
-    public Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync<HostInfo>("GetGamesHostInfoNew", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
 
     public async Task OpenAsync(string userName, CancellationToken cancellationToken = default)
     {
@@ -136,20 +123,12 @@ public sealed class GameServerClient : IGameServerClient
         };
 
         _connection.Closed += OnConnectionClosedAsync;
-
         _connection.HandshakeTimeout = TimeSpan.FromMinutes(2);
 
-        _connection.On<string, string>("Say", (user, text) => OnUI(() => Receieve?.Invoke(user, text)));
         _connection.On<GameInfo>("GameCreated", (gameInfo) => OnUI(() => GameCreated?.Invoke(gameInfo)));
         _connection.On<int>("GameDeleted", (gameId) => OnUI(() => GameDeleted?.Invoke(gameId)));
         _connection.On<GameInfo>("GameChanged", (gameInfo) => OnUI(() => GameChanged?.Invoke(gameInfo)));
-        _connection.On<string>("Joined", (user) => OnUI(() => Joined?.Invoke(user)));
-        _connection.On<string>("Leaved", (user) => OnUI(() => Leaved?.Invoke(user)));
-
-        _connection.On("Disconnect", async () =>
-        {
-            await _connection.StopAsync();
-        });
+        _connection.On("Disconnect", () => _connection.StopAsync());
 
         await _connection.StartAsync(cancellationToken);
 

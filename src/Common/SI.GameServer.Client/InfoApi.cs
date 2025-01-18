@@ -13,11 +13,8 @@ internal sealed class InfoApi : IInfoApi
     public InfoApi(HttpClient client) => _client = client;
 
     public Task<HostInfo?> GetHostInfoAsync(CancellationToken cancellationToken = default) =>
-        _client.GetFromJsonAsync<HostInfo>("/api/v1/info/host", cancellationToken);
+        _client.GetFromJsonAsync<HostInfo>("api/v1/info/host", cancellationToken);
 
     public Task<string[]?> GetBotsNamesAsync(CancellationToken cancellationToken = default) =>
-        _client.GetFromJsonAsync<string[]>("/api/v1/info/bots", cancellationToken);
-
-    public Task<GetGameByPinResponse?> GetGameByPinAsync(int pin, CancellationToken cancellationToken = default) =>
-        _client.GetFromJsonAsync<GetGameByPinResponse>($"/api/v1/info/games/{pin}", cancellationToken);
+        _client.GetFromJsonAsync<string[]>("api/v1/info/bots", cancellationToken);
 }

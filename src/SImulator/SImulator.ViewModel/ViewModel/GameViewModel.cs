@@ -832,17 +832,23 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         var settings = (AppSettings)sender;
 
-        if (e.PropertyName == nameof(AppSettings.ShowPlayers))
+        switch (e.PropertyName)
         {
-            PresentationController.UpdateShowPlayers(settings.ShowPlayers);
-        }
-        else if (e.PropertyName == nameof(AppSettings.PlaySounds))
-        {
-            PresentationController.SetAppSound(settings.PlaySounds);
-        }
-        else if (e.PropertyName == nameof(AppSettings.QuestionReadingSpeed))
-        {
-            PresentationController.SetReadingSpeed(settings.QuestionReadingSpeed);
+            case nameof(AppSettings.ShowPlayers):
+                PresentationController.UpdateShowPlayers(settings.ShowPlayers);
+                break;
+            
+            case nameof(AppSettings.PlaySounds):
+                PresentationController.SetAppSound(settings.PlaySounds);
+                break;
+            
+            case nameof(AppSettings.QuestionReadingSpeed):
+                PresentationController.SetReadingSpeed(settings.QuestionReadingSpeed);
+                break;
+            
+            case nameof(AppSettings.AttachContentToTable):
+                PresentationController.SetAttachContentToTable(settings.AttachContentToTable);
+                break;
         }
     }
 
@@ -1020,7 +1026,13 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             }
         }
 
-        PresentationController.SelectionCallback?.Invoke(themeIndex, questionIndex);
+        if (PresentationController.SelectionCallback == null)
+        {
+            OnError("Cannot select the question");
+            return;
+        }
+
+        PresentationController.SelectionCallback.Invoke(themeIndex, questionIndex);
     }
 
     #endregion
@@ -1367,6 +1379,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
         PresentationController.SetReadingSpeed(Settings.Model.QuestionReadingSpeed);
+        PresentationController.SetAttachContentToTable(Settings.Model.AttachContentToTable);
         PresentationController.SetAppSound(Settings.Model.PlaySounds);
         PresentationController.UpdateSettings(Settings.SIUISettings.Model);
         PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
@@ -1544,8 +1557,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         PresentationController.SetGameThemes(themes);
         LocalInfo.TStage = TableStage.GameThemes;
-
-        SetSound(Settings.Model.Sounds.GameThemes);
     }
 
     internal void OnRound(Round round, QuestionSelectionStrategyType selectionStrategyType)
@@ -1559,7 +1570,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         PresentationController.SetRound(round.Name, selectionStrategyType);
-        SetSound(Settings.Model.Sounds.RoundBegin);
         LocalInfo.TStage = TableStage.Round;
 
         _gameLogger.Write("\r\n{0} {1}", Resources.Round, round.Name);
@@ -1597,7 +1607,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
 
         PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
-        SetSound(Settings.Model.Sounds.RoundThemes);
         LocalInfo.TStage = TableStage.RoundTable;
         Continuation = AfterRoundThemes;
     }
@@ -1831,7 +1840,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         PresentationController.PlaySelection(themeIndex);
         LocalInfo.RoundInfo[themeIndex].Name = "";
-        SetSound(Settings.Model.Sounds.FinalDelete);
         _taskRunner.ScheduleExecution(Tasks.MoveNext, 1);
     }
 

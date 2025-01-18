@@ -238,6 +238,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         {
             TInfo.TStage = TableStage.GameThemes;
         }
+
+        SetSound(_soundsSettings.GameThemes);
     }
 
     public void SetRoundTable()
@@ -344,6 +346,11 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         {
             TInfo.TStage = isFinal ? TableStage.Final : TableStage.RoundThemes;
         }
+
+        if (!isFinal)
+        {
+            SetSound(_soundsSettings.RoundThemes);
+        }
     }
 
     private void ThemeInfo_Selected(ThemeInfoViewModel theme)
@@ -399,7 +406,11 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void PlaySimpleSelection(int theme, int quest) => TInfo.PlaySimpleSelectionAsync(theme, quest);
 
-    public void PlaySelection(int theme) => TInfo.PlaySelection(theme);
+    public void PlaySelection(int theme)
+    {
+        TInfo.PlaySelection(theme);
+        SetSound(_soundsSettings.FinalDelete);
+    }
 
     public void UpdateSettings(Settings settings) => TInfo.Settings.Initialize(settings);
 
@@ -608,6 +619,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     {
         SetText(roundName);
         SetStage(TableStage.Round);
+        SetSound(_soundsSettings.RoundBegin);
     }
 
     public void SetTheme(string themeName)

@@ -15,7 +15,8 @@ internal sealed class GamesApi : IGamesApi
     public Task<GetGameByPinResponse?> GetGameByPinAsync(int pin, CancellationToken cancellationToken = default) =>
         _client.GetFromJsonAsync<GetGameByPinResponse>($"/api/v1/games?pin={pin}", cancellationToken);
 
-    public async Task<RunGameResponse?> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default) {
+    public async Task<RunGameResponse?> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default)
+    {
         var response = await _client.PostAsJsonAsync("/api/v1/games", runGameRequest, cancellationToken);
         return await response.Content.ReadFromJsonAsync<RunGameResponse>(cancellationToken: cancellationToken);
     }

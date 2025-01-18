@@ -140,6 +140,8 @@ public interface IPresentationController : IDisposable
 
     void SetReadingSpeed(int readingSpeed) { }
 
+    void SetAttachContentToTable(bool attach) { }
+
     void SetAppSound(bool isEnabled);
 
     void SetSimpleAnswer() { }

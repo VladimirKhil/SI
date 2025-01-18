@@ -5,11 +5,12 @@ using System.Xml.Serialization;
 namespace SIData;
 
 /// <summary>
-/// Настройки временных интервалов игры
+/// Defines game time settings.
 /// </summary>
 [DataContract]
 public sealed class TimeSettings
 {
+    public const int DefaultImageTime = 5;
     public const int DefaultPartialImageTime = 3;
 
     [XmlIgnore]
@@ -185,6 +186,25 @@ public sealed class TimeSettings
     }
 
     /// <summary>
+    /// Image time in seconds.
+    /// </summary>
+    [DefaultValue(DefaultImageTime)]
+    [DataMember]
+    public int ImageTime
+    {
+        get
+        {
+            if (All.TryGetValue(TimeSettingsTypes.Image, out int value))
+            {
+                return value;
+            }
+
+            return 0;
+        }
+        set { All[TimeSettingsTypes.Image] = value; }
+    }
+
+    /// <summary>
     /// Partial image time in seconds.
     /// </summary>
     [DefaultValue(DefaultPartialImageTime)]
@@ -224,6 +244,7 @@ public sealed class TimeSettings
         All[TimeSettingsTypes.ShowmanDecisions] = 30;
         All[TimeSettingsTypes.RightAnswer] = 2;
         All[TimeSettingsTypes.MediaDelay] = 0;
+        All[TimeSettingsTypes.Image] = DefaultImageTime;
         All[TimeSettingsTypes.PartialImageTime] = DefaultPartialImageTime;
     }
 

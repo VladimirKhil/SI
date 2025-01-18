@@ -141,6 +141,8 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
         _viewerActions.SendMessage(Messages.Config, MessageParams.Config_DeleteTable, ClientData.Players.IndexOf(player).ToString());
     }
 
+    private ILocalizer LO { get; }
+
     /// <summary>
     /// Initializes a new instance of <see cref="Viewer" /> class.
     /// </summary>
@@ -152,7 +154,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
         ViewerActions viewerActions,
         ILocalizer localizer,
         ViewerData data)
-        : base(client, localizer, data)
+        : base(client, data)
     {
         if (personData == null)
         {
@@ -161,6 +163,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
 
         _viewerActions = viewerActions;
         _logic = logic;
+        LO = localizer;
 
         Initialize(isHost);
 

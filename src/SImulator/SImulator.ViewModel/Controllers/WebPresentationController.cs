@@ -341,6 +341,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Type = "setSoundMap",
         SoundMap = new Dictionary<string, string>
         {
+            ["game_themes"] = GetSoundUri(_soundsSettings.GameThemes),
             ["final_delete"] = GetSoundUri(_soundsSettings.FinalDelete),
             ["final_think"] = GetSoundUri(_soundsSettings.FinalThink),
             ["round_begin"] = GetSoundUri(_soundsSettings.RoundBegin),
@@ -355,6 +356,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             ["question_all"] = GetSoundUri(_soundsSettings.ForAllQuestion),
             ["answer_wrong"] = GetSoundUri(_soundsSettings.AnswerWrong),
             ["question_noanswers"] = GetSoundUri(_soundsSettings.NoAnswer),
+            ["question_selected"] = GetSoundUri(_soundsSettings.QuestionSelected),
+            ["button_pressed"] = GetSoundUri(_soundsSettings.PlayerPressed),
         }
     });
 
@@ -568,6 +571,12 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         ReadingSpeed = readingSpeed
     });
 
+    public void SetAttachContentToTable(bool attach) => SendMessage(new
+    {
+        Type = "setAttachContentToTable",
+        Attach = attach
+    });
+
     public void SetPause(bool pause, int passedTime) => SendMessage(new
     {
         Type = "pause",
@@ -584,10 +593,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         SelectionCallback = null;
         DeletionCallback = null;
         
-        SendMessage(new
-        {
-            Type = "stop"
-        });
+        SendMessage(new { Type = "stop" });
     }
 
     public void OnQuestionEnd() => SendMessage(new

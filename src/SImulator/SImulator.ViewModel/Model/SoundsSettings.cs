@@ -6,6 +6,8 @@ namespace SImulator.ViewModel.Model;
 public sealed class SoundsSettings : INotifyPropertyChanged
 {
     private string _beginGame = "game_begin.mp3";
+
+    [Obsolete]
     public string BeginGame { get => _beginGame; set { _beginGame = value; OnPropertyChanged(); } }
 
     private string _gameThemes = "";

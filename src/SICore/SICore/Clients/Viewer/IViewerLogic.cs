@@ -5,7 +5,7 @@ using SIData;
 namespace SICore;
 
 /// <summary>
-/// Defines a viewer behavior.
+/// Defines a game person controller.
 /// </summary>
 public interface IViewerLogic
 {
@@ -229,11 +229,6 @@ public interface IViewerLogic
     /// Handles end of thinking.
     /// </summary>
     void EndThink();
-
-    /// <summary>
-    /// Handles receiving of question content part.
-    /// </summary>
-    void OnQuestionContent() { }
 
     /// <summary>
     /// Handles game report request.

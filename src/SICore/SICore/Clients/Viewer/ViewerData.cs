@@ -73,7 +73,10 @@ public sealed class ViewerData : Data
 
     public PersonData PersonDataExtensions { get; private set; } = new();
 
-    public PlayerData PlayerDataExtensions { get; private set; } = new();
+    /// <summary>
+    /// Defines time stamp when game buttons have been activated.
+    /// </summary>
+    public DateTimeOffset? TryStartTime { get; set; }
 
     private List<PlayerAccount> _players = new();
 

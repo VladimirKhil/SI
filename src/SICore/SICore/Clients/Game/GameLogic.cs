@@ -20,6 +20,8 @@ using R = SICore.Properties.Resources;
 
 namespace SICore;
 
+// TODO: split this class into aspect classes
+
 /// <summary>
 /// Executes SIGame logic implemented as a state machine.
 /// </summary>
@@ -36,7 +38,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private const int DefaultAudioVideoTime = 1200; // maximum audio/video duration (120 s)
 
-    private const int DefaultImageTime = 50;
+    private const int DefaultMediaTime = 50;
 
     /// <summary>
     /// Maximum number of oversized media notifications.
@@ -91,13 +93,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private readonly GameActions _gameActions;
 
-    private readonly ILocalizer LO;
+    private readonly ILocalizer LO; // TODO: localization must be removed from SICore
 
     internal event Action? AutoGame;
 
     private readonly HistoryLog _tasksHistory = new();
 
-    public SIEngine.GameEngine Engine { get; }
+    private TimeSettings TimeSettings => _data.Settings.AppSettings.TimeSettings;
+
+    public SIEngine.GameEngine Engine { get; } // TODO: remove dependency on GameEngine
 
     public event Action<GameLogic, GameStages, string, int, int>? StageChanged;
 
@@ -115,7 +119,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private readonly IFileShare _fileShare;
     private readonly TaskRunner<Tasks> _taskRunner;
 
-    protected StopReason _stopReason = StopReason.None;
+    private StopReason _stopReason = StopReason.None;
 
     internal StopReason StopReason => _stopReason;
 
@@ -144,6 +148,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void Run()
     {
+        // TODO: remove these last events
         Engine.QuestionFinish += Engine_QuestionFinish;
         Engine.NextQuestion += Engine_NextQuestion;
 
@@ -194,12 +199,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPartial = false;
         ShareMedia(contentItem);
 
-        var atomTime = GetContentItemDuration(contentItem, DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
+        var contentTime = GetContentItemDuration(contentItem, (TimeSettings.ImageTime + TimeSettings.TimeForMediaDelay) * 10);
 
-        _data.AtomTime = atomTime;
+        _data.AtomTime = contentTime;
         _data.AtomStart = DateTime.UtcNow;
 
-        ScheduleExecution(Tasks.MoveNext, atomTime);
+        ScheduleExecution(Tasks.MoveNext, contentTime);
 
         _data.TimeThinking = 0.0;
     }
@@ -444,6 +449,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void InitQuestionState(Question question)
     {
+        // TODO: move all to question play state
         _data.AppellationOpened = false;
         _data.AllowAppellation = false;
         _data.IsAnswer = false;
@@ -460,6 +466,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (_data.Settings.AppSettings.HintShowman)
         {
+            // TODO: use SendAnswerInfoToShowman()
             var rightAnswers = question.Right;
             var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
 
@@ -469,9 +476,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration)
     {
-        var atomTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length);
+        var contentTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length);
 
-        _data.AtomTime = atomTime;
+        _data.AtomTime = contentTime;
         _data.AtomStart = DateTime.UtcNow;
         _data.UseBackgroundAudio = !waitForFinish;
 
@@ -498,7 +505,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
         _gameActions.SystemReplic(text);
 
-        var nextTime = !waitForFinish ? 1 : atomTime;
+        var nextTime = !waitForFinish ? 1 : contentTime;
 
         ScheduleExecution(Tasks.MoveNext, nextTime);
 
@@ -533,6 +540,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.UseBackgroundAudio = !waitForFinish;
     }
 
+    // TODO: move to SIPackages and share between all the apps
     private static readonly IReadOnlyDictionary<string, string[]> AllowedExtensions = new Dictionary<string, string[]>()
     {
         [ContentTypes.Image] = new[] { ".jpg", ".jpe", ".jpeg", ".png", ".gif", ".webp" },
@@ -689,9 +697,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
         
-        var waitTime = GetContentItemDuration(
-            contentItem,
-            DefaultImageTime + appSettings.TimeSettings.TimeForMediaDelay * 10);
+        var waitTime = GetContentItemDuration(contentItem, (TimeSettings.ImageTime + TimeSettings.TimeForMediaDelay) * 10);
 
         var contentTime = renderTime + waitTime;
 
@@ -716,7 +722,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPartial = false;
         var globalUri = ShareMedia(contentItem);
 
-        var defaultTime = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
+        var defaultTime = DefaultMediaTime + TimeSettings.TimeForMediaDelay * 10;
 
         if (globalUri != null)
         {
@@ -742,7 +748,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPartial = false;
         var globalUri = ShareMedia(contentItem);
 
-        var defaultTime = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
+        var defaultTime = DefaultMediaTime + TimeSettings.TimeForMediaDelay * 10;
 
         if (globalUri != null)
         {
@@ -2768,6 +2774,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void OnQuestionType(bool isDefault)
     {
+        var isNoRisk = false;
+
         if (!isDefault) // TODO: This announcement should be handled by the client in the future
         {
             switch (_data.QuestionTypeName)
@@ -2792,6 +2800,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 case QuestionTypes.NoRisk:
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
+                    isNoRisk = true;
                     break;
 
                 case QuestionTypes.Simple:
@@ -2812,7 +2821,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
-        _gameActions.SendMessageWithArgs(Messages.QType, _data.QuestionTypeName, isDefault);
+        _gameActions.SendMessageWithArgs(Messages.QType, _data.QuestionTypeName, isDefault, isNoRisk);
         ScheduleExecution(Tasks.MoveNext, isDefault ? 1 : 22, force: true);
     }
 
@@ -3441,11 +3450,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 _gameActions.SendMessage(Messages.Answer, _data.ShowMan.Name);
             }
-            
-            if (CanPlayerAct())
-            {
-                _gameActions.SendMessage(Messages.Answer, _data.Answerer.Name);
-            }
+
+            _gameActions.SendMessage(CanPlayerAct() ? Messages.Answer : Messages.OralAnswer, _data.Answerer.Name);
         }
         else
         {
@@ -3453,6 +3459,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 // Showman accepts answer orally
                 SendAnswersInfoToShowman($"({LO[nameof(R.AnswerIsOral)]})");
+                _gameActions.SendMessage(Messages.OralAnswer, _data.Answerer.Name);
             }
             else // The only place where we do not check CanPlayerAct()
             {
@@ -5058,7 +5065,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     {
                         var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
                         messageBuilder.Add(ContentTypes.Text).Add(errorText);
-                        duration = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
+                        duration = DefaultMediaTime + TimeSettings.TimeForMediaDelay * 10;
                     }
                     else
                     {
@@ -5098,7 +5105,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private int GetContentItemDefaultDuration(ContentItem contentItem) => contentItem.Type switch
     {
         ContentTypes.Text => GetReadingDurationForTextLength(contentItem.Value.Length),
-        ContentTypes.Image or ContentTypes.Html => DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10,
+        ContentTypes.Image or ContentTypes.Html => (TimeSettings.ImageTime + TimeSettings.TimeForMediaDelay) * 10,
         ContentTypes.Audio or ContentTypes.Video => DefaultAudioVideoTime,
         _ => 0,
     };

@@ -1,5 +1,7 @@
 ﻿namespace SIData;
 
+// TODO: merge with GameStages
+
 /// <summary>
 /// Defines well-known game stages.
 /// </summary>
@@ -30,21 +32,4 @@ public enum GameStage
     /// After game finish.
     /// </summary>
     After
-}
-
-public enum TimeSettingsTypes
-{
-    ChoosingQuestion,
-    ThinkingOnQuestion,
-    PrintingAnswer,
-    GivingCat,
-    MakingStake,
-    ThinkingOnSpecial,
-    Round,
-    ChoosingFinalTheme,
-    FinalThinking,
-    ShowmanDecisions,
-    RightAnswer,
-    MediaDelay,
-    PartialImageTime
 }

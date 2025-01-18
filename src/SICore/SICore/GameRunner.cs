@@ -95,7 +95,6 @@ public sealed class GameRunner
                     : new ViewerComputerLogic(
                         data,
                         actions,
-                        (ComputerAccount)_settings.Showman,
                         new Intelligence((ComputerAccount)_settings.Showman),
                         GameRole.Showman);
                 
@@ -128,7 +127,6 @@ public sealed class GameRunner
                         : new ViewerComputerLogic(
                             data,
                             actions,
-                            (ComputerAccount)_settings.Players[i],
                             new Intelligence((ComputerAccount)_settings.Players[i]),
                             GameRole.Player);
                     

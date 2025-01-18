@@ -44,4 +44,35 @@ internal interface IPlayerIntelligence
         int previousStakerIndex,
         bool[] vars,
         int roundPassedTimePercentage);
+
+    /// <summary>
+    /// Handles question start.
+    /// </summary>
+    void OnQuestionStart(bool shortThink, double difficulty);
+
+    /// <summary>
+    /// Handles button press start.
+    /// </summary>
+    int OnStartCanPressButton();
+
+    /// <summary>
+    /// Handles button press end.
+    /// </summary>
+    void OnEndCanPressButton();
+
+    /// <summary>
+    /// Gives the answer.
+    /// </summary>
+    (bool knows, bool isSure, int answerTime) OnAnswer();
+
+    /// <summary>
+    /// Handles player outcome.
+    /// </summary>
+    void OnPlayerOutcome(
+        List<PlayerAccount> players,
+        int myIndex,
+        int playerIndex,
+        List<ThemeInfo> roundTable,
+        bool isRight,
+        int roundPassedTimePercentage);
 }

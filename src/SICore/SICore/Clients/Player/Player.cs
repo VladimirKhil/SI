@@ -58,10 +58,6 @@ public sealed class Player : Viewer
 
                         Clear();
                     }
-                    else if (mparams[1] == nameof(GameStage.Final))
-                    {
-                        ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
-                    }
 
                     #endregion
                     break;
@@ -86,7 +82,6 @@ public sealed class Player : Viewer
                     break;
 
                 case Messages.Choice:
-                    ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
                     Logic.OnQuestionSelected();
                     break;
 
@@ -97,12 +92,9 @@ public sealed class Player : Viewer
 
                 case Messages.Question:
                     ClientData.QuestionIndex++;
-                    ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
                     break;
 
                 case Messages.Content:
-                    Logic.OnQuestionContent();
-
                     if (ClientData.QuestionType == QuestionTypes.Simple)
                     {
                         Logic.OnEnableButton();
@@ -110,7 +102,7 @@ public sealed class Player : Viewer
                     break;
 
                 case Messages.Try:
-                    ClientData.PlayerDataExtensions.TryStartTime = DateTimeOffset.UtcNow;
+                    ClientData.TryStartTime = DateTimeOffset.UtcNow;
                     Logic.OnCanPressButton();
                     break;
 

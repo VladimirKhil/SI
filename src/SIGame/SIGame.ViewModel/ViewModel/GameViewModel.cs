@@ -742,7 +742,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host.Actions.PressButton(Host.MyData.PlayerDataExtensions.TryStartTime);
+        Host.Actions.PressButton(Host.MyData.TryStartTime);
         GameButtonPressed?.Invoke();
         DisableGameButton(false);
         ReleaseGameButton();

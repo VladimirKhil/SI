@@ -1387,6 +1387,10 @@
                     <CheckBox IsChecked="{Binding Settings.ShowQuestionBorder}" Margin="5,0,5,0">
                         <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.ShowQuestionBorder}" />
                     </CheckBox>
+
+                    <CheckBox IsChecked="{Binding Settings.AttachContentToTable}" Margin="0,0,5,0">
+                        <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.AttachContentToTable}" />
+                    </CheckBox>
                 </UniformGrid>
 
                 <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.PreviewImage}" />

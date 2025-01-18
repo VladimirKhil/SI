@@ -703,4 +703,7 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="Clear" xml:space="preserve">
     <value>Очистить</value>
   </data>
+  <data name="AttachContentToTable" xml:space="preserve">
+    <value>Добавлять комментарии темы и правильный ответ на табло</value>
+  </data>
 </root>

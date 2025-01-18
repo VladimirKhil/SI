@@ -2,6 +2,8 @@
 
 namespace SICore;
 
+// TODO: remove
+
 /// <summary>
 /// Represents agent logic.
 /// </summary>

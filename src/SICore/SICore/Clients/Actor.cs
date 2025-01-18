@@ -1,5 +1,4 @@
-﻿using SICore.BusinessLogic;
-using SICore.Network.Clients;
+﻿using SICore.Network.Clients;
 using SICore.Network.Contracts;
 using SIData;
 
@@ -23,18 +22,14 @@ public abstract class Actor<D> : IDisposable
 
     public abstract ValueTask OnMessageReceivedAsync(Message message);
 
-    public ILocalizer LO { get; protected set; }
-
     // TODO: Actor should be Client's handler and do not have a link to the client
-    protected Actor(Client client, ILocalizer localizer, D data)
+    protected Actor(Client client, D data)
     {
         _client = client;
         ClientData = data;
 
         _client.MessageReceived += OnMessageReceivedAsync;
         _client.Disposed += Client_Disposed;
-
-        LO = localizer;
     }
 
     private void Client_Disposed()

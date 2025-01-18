@@ -14,7 +14,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public bool CanSwitchType => false;
 
-    private readonly PlayerComputerLogic _player;
+    private readonly PlayerComputerController _player;
     private readonly ShowmanComputerController _showman;
 
     private readonly TimerInfo[] _timersInfo = new TimerInfo[] { new(), new(), new() };
@@ -24,7 +24,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     internal ViewerComputerLogic(
         ViewerData data,
         ViewerActions viewerActions,
-        ComputerAccount computerAccount,
         IIntelligence intelligence,
         GameRole role)
         : base(data)
@@ -32,7 +31,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         _viewerActions = viewerActions;
         _role = role;
 
-        _player = new PlayerComputerLogic(data, computerAccount, intelligence, viewerActions, _timersInfo);
+        _player = new PlayerComputerController(data,  intelligence, viewerActions, _timersInfo);
         _showman = new ShowmanComputerController(data, viewerActions, intelligence);
     }
 
@@ -72,7 +71,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public void OnPlayerOutcome(int playerIndex, bool isRight) => _player.PersonAnswered(playerIndex, isRight);
 
-    public void OnQuestionContent() => _player.OnQuestionContent();
+    public void OnQuestionStart(bool isDefaultType) => _player.OnQuestionStart();
 
     public void Report(string report) => _player.SendReport();
 

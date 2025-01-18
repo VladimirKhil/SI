@@ -47,6 +47,8 @@ public sealed class Game : Actor<GameData>
 
     public GameLogic Logic => _logic;
 
+    private ILocalizer LO { get; }
+
     public Game(
         Client client,
         string? documentPath,
@@ -58,10 +60,11 @@ public sealed class Game : Actor<GameData>
         ComputerAccount[] defaultShowmans,
         IFileShare fileShare,
         IAvatarHelper avatarHelper)
-        : base(client, localizer, gameData)
+        : base(client, gameData)
     {
         _gameActions = gameActions;
         _logic = gameLogic;
+        LO = localizer;
 
         _logic.AutoGame += AutoGame;
 
@@ -3586,7 +3589,7 @@ public sealed class Game : Actor<GameData>
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData(ClientData.Host);
         var actions = new ViewerActions(playerClient, LO);
-        var logic = new ViewerComputerLogic(data, actions, account, new Intelligence(account), GameRole.Player);
+        var logic = new ViewerComputerLogic(data, actions, new Intelligence(account), GameRole.Player);
         _ = new Player(playerClient, account, false, logic, actions, LO, data);
 
         OnInfo(newAccount.Name);
@@ -3619,7 +3622,6 @@ public sealed class Game : Actor<GameData>
         var logic = new ViewerComputerLogic(
             data,
             actions,
-            account,
             new Intelligence(account),
             GameRole.Showman);
         

@@ -330,8 +330,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     private readonly IGameServerClient _gameServerClient;
 
-    public ObservableCollection<string> Users { get; } = new();
-
     private readonly object _usersLock = new();
 
     private readonly SIContentClientOptions? _defaultSIContentClientOptions;
@@ -355,12 +353,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         _gameServerClient.GameCreated += GameServerClient_GameCreated;
         _gameServerClient.GameDeleted += GameServerClient_GameDeleted;
         _gameServerClient.GameChanged += GameServerClient_GameChanged;
-
-        _gameServerClient.Joined += GameServerClient_Joined;
-        _gameServerClient.Leaved += GameServerClient_Leaved;
-        _gameServerClient.Receieve += OnMessage;
-
-        _gameServerClient.Reconnecting += GameServerClient_Reconnecting;
         _gameServerClient.Reconnected += GameServerClient_Reconnected;
         _gameServerClient.Closed += GameServerClient_Closed;
 
@@ -375,17 +367,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         NewGame.CanBeExecuted = false;
     }
 
-    private Task GameServerClient_Reconnecting(Exception? exc)
-    {
-        OnMessage(Resources.App_Name, $"{Resources.ReconnectingMessage} {exc?.Message}");
-
-        return Task.CompletedTask;
-    }
-
     private Task GameServerClient_Reconnected(string? message)
     {
-        OnMessage(Resources.App_Name, Resources.ReconnectedMessage);
-
         var cancellationToken = _cancellationTokenSource.Token;
 
         UI.Execute(
@@ -420,47 +403,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         Cancel.Execute(null);
 
         return Task.CompletedTask;
-    }
-
-    public event Action<string, string>? Message;
-
-    private void OnMessage(string userName, string message) => Message?.Invoke(userName, message);
-
-    private void GameServerClient_Leaved(string userName)
-    {
-        lock (_usersLock)
-        {
-            Users.Remove(userName);
-        }
-    }
-
-    private void GameServerClient_Joined(string userName)
-    {
-        lock (_usersLock)
-        {
-            var inserted = false;
-
-            var length = Users.Count;
-            for (int i = 0; i < length; i++)
-            {
-                var comparison = Users[i].CompareTo(userName);
-                if (comparison == 0)
-                {
-                    inserted = true;
-                    break;
-                }
-
-                if (comparison > 0)
-                {
-                    Users.Insert(i, userName);
-                    inserted = true;
-                    break;
-                }                        
-            }
-
-            if (!inserted)
-                Users.Add(userName);
-        }
     }
 
     private void GameServerClient_GameChanged(SI.GameServer.Contract.GameInfo gameInfo)
@@ -582,7 +524,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         try
         {
-            _gamesHostInfo = await _gameServerClient.GetGamesHostInfoAsync(_cancellationTokenSource.Token);
+            _gamesHostInfo = await _gameServerClient.Info.GetHostInfoAsync(_cancellationTokenSource.Token);
 
             if (_gamesHostInfo.MaxPackageSizeMb == 0)
             {
@@ -591,8 +533,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             }
 
             OnPropertyChanged(nameof(ServerName));
-
-            await _gameServerClient.JoinLobbyAsync(_cancellationTokenSource.Token);
 
             await ReloadGamesAsync(_cancellationTokenSource.Token);
 
@@ -669,12 +609,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             _gameServerClient.GameCreated -= GameServerClient_GameCreated;
             _gameServerClient.GameDeleted -= GameServerClient_GameDeleted;
             _gameServerClient.GameChanged -= GameServerClient_GameChanged;
-
-            _gameServerClient.Joined -= GameServerClient_Joined;
-            _gameServerClient.Leaved -= GameServerClient_Leaved;
-            _gameServerClient.Receieve -= OnMessage;
-
-            _gameServerClient.Reconnecting -= GameServerClient_Reconnecting;
             _gameServerClient.Reconnected -= GameServerClient_Reconnected;
             _gameServerClient.Closed -= GameServerClient_Closed;
         }

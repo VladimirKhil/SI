@@ -337,6 +337,11 @@ public static class Messages
     public const string Options = "OPTIONS";
 
     /// <summary>
+    /// Informs the player that they must provide an oral answer.
+    /// </summary>
+    public const string OralAnswer = "ORAL_ANSWER";
+
+    /// <summary>
     /// Удалена финальная тема
     /// </summary>
     public const string Out = "OUT";
