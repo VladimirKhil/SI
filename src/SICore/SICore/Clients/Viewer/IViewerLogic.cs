@@ -131,8 +131,6 @@ public interface IViewerLogic
 
     void OnPersonFinalAnswer(int playerIndex);
 
-    void OnPackageLogo(string uri);
-
     void OnPersonApellated(int playerIndex);
 
     void OnPersonPass(int playerIndex);

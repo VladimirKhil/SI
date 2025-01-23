@@ -216,9 +216,6 @@
   <data name="GameRules" xml:space="preserve">
     <value>Game rules</value>
   </data>
-  <data name="GameStarted" xml:space="preserve">
-    <value>The game has started</value>
-  </data>
   <data name="GameTableNumber" xml:space="preserve">
     <value>Game table number</value>
   </data>
@@ -255,9 +252,6 @@
   <data name="Hint" xml:space="preserve">
     <value>Hint: you can press the answer button at any point of the screen using right mouse button or {0} key</value>
   </data>
-  <data name="HintCheckAnswer" xml:space="preserve">
-    <value>Define if the answer is correct</value>
-  </data>
   <data name="HintChooseCatPrice" xml:space="preserve">
     <value>Select the cost of this question</value>
   </data>
@@ -267,26 +261,8 @@
   <data name="HintMakeAStake" xml:space="preserve">
     <value>Make a bet</value>
   </data>
-  <data name="HintSelectCatPlayer" xml:space="preserve">
-    <value>Select a player to give the question to</value>
-  </data>
   <data name="HintSelectCatPlayerForPlayer" xml:space="preserve">
     <value>Select a player who the question will be given to</value>
-  </data>
-  <data name="HintSelectQuestion" xml:space="preserve">
-    <value>Select a question on the board</value>
-  </data>
-  <data name="HintSelectStaker" xml:space="preserve">
-    <value>Select a player who is making a bet</value>
-  </data>
-  <data name="HintSelectStarter" xml:space="preserve">
-    <value>Select a player who is starting the round</value>
-  </data>
-  <data name="HintSelectTheme" xml:space="preserve">
-    <value>Remove a theme on the board</value>
-  </data>
-  <data name="HintThemeDeleter" xml:space="preserve">
-    <value>Select the player who is removing the theme</value>
   </data>
   <data name="Human" xml:space="preserve">
     <value>A human</value>
@@ -443,9 +419,6 @@
   </data>
   <data name="PSources" xml:space="preserve">
     <value>Sources</value>
-  </data>
-  <data name="QuestionWithSpecialTheme" xml:space="preserve">
-    <value>A question with a special theme</value>
   </data>
   <data name="RandomThemes" xml:space="preserve">
     <value>Random theme set</value>
@@ -636,18 +609,6 @@
   <data name="ErrorWritingLogs" xml:space="preserve">
     <value>Cannot save logs. Access denied</value>
   </data>
-  <data name="ErrorWritingLogToDisc" xml:space="preserve">
-    <value>Error while writing log to disc</value>
-  </data>
-  <data name="Label_Auction" xml:space="preserve">
-    <value>QUESTION WITH A STAKE</value>
-  </data>
-  <data name="Label_CatInBag" xml:space="preserve">
-    <value>QUESTION WITH A SECRET</value>
-  </data>
-  <data name="Label_Sponsored" xml:space="preserve">
-    <value>QUESTION FOR YOURSELF WITHOUT RISK</value>
-  </data>
   <data name="LogTitle" xml:space="preserve">
     <value>SIGame log</value>
   </data>
@@ -835,7 +796,7 @@
     <value>You got Question with Button! Press button to answer the question</value>
   </data>
   <data name="QuestionTypeStakeAll" xml:space="preserve">
-    <value>You got Question with Stake for All! Everybody makes stake and plays</value>
+    <value>You got Question for All with Stake! Everybody makes stake and plays</value>
   </data>
   <data name="QuestionTypeForAll" xml:space="preserve">
     <value>You got Question for all!</value>

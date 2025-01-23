@@ -216,9 +216,6 @@
   <data name="GameRules" xml:space="preserve">
     <value>Правила игры</value>
   </data>
-  <data name="GameStarted" xml:space="preserve">
-    <value>Игра началась</value>
-  </data>
   <data name="GameTableNumber" xml:space="preserve">
     <value>игровой стол номер</value>
   </data>
@@ -255,9 +252,6 @@
   <data name="Hint" xml:space="preserve">
     <value>Подсказка: игровую кнопку можно нажимать в любой точке окна при помощи правой кнопки мыши или клавиши {0}. </value>
   </data>
-  <data name="HintCheckAnswer" xml:space="preserve">
-    <value>Определите правильность ответа игрока</value>
-  </data>
   <data name="HintChooseCatPrice" xml:space="preserve">
     <value>Выберите стоимость вопроса</value>
   </data>
@@ -267,26 +261,8 @@
   <data name="HintMakeAStake" xml:space="preserve">
     <value>Сделайте ставку</value>
   </data>
-  <data name="HintSelectCatPlayer" xml:space="preserve">
-    <value>Выберите игрока, которому вы отдаёте вопрос</value>
-  </data>
   <data name="HintSelectCatPlayerForPlayer" xml:space="preserve">
     <value>Выберите игрока, которому игрок отдаёт вопрос</value>
-  </data>
-  <data name="HintSelectQuestion" xml:space="preserve">
-    <value>Выберите вопрос на табло</value>
-  </data>
-  <data name="HintSelectStaker" xml:space="preserve">
-    <value>Выберите ставящего</value>
-  </data>
-  <data name="HintSelectStarter" xml:space="preserve">
-    <value>Выберите начинающего раунд</value>
-  </data>
-  <data name="HintSelectTheme" xml:space="preserve">
-    <value>Уберите тему на табло</value>
-  </data>
-  <data name="HintThemeDeleter" xml:space="preserve">
-    <value>Выберите убирающего тему</value>
   </data>
   <data name="Human" xml:space="preserve">
     <value>Человек</value>
@@ -443,9 +419,6 @@
   </data>
   <data name="PSources" xml:space="preserve">
     <value>Источники</value>
-  </data>
-  <data name="QuestionWithSpecialTheme" xml:space="preserve">
-    <value>Вопрос на специальную тему</value>
   </data>
   <data name="RandomThemes" xml:space="preserve">
     <value>Случайный набор тем</value>
@@ -635,18 +608,6 @@
   </data>
   <data name="ErrorWritingLogs" xml:space="preserve">
     <value>Файл лога сохранить не удалось из-за проблем доступа на запись в папку логов</value>
-  </data>
-  <data name="ErrorWritingLogToDisc" xml:space="preserve">
-    <value>Ошибка записи лога на дискs</value>
-  </data>
-  <data name="Label_Auction" xml:space="preserve">
-    <value>ВОПРОС СО СТАВКОЙ</value>
-  </data>
-  <data name="Label_CatInBag" xml:space="preserve">
-    <value>ВОПРОС С СЕКРЕТОМ</value>
-  </data>
-  <data name="Label_Sponsored" xml:space="preserve">
-    <value>ВОПРОС ДЛЯ СЕБЯ БЕЗ РИСКА</value>
   </data>
   <data name="LogTitle" xml:space="preserve">
     <value>Протокол "SIGame"</value>
@@ -838,7 +799,7 @@
     <value>Вам достаётся Вопрос для всех со ставкой! Каждый делает ставку и играет</value>
   </data>
   <data name="QuestionTypeForAll" xml:space="preserve">
-    <value>Вам достаётся Вопрос для Всех!</value>
+    <value>Вам достаётся Вопрос для всех!</value>
   </data>
   <data name="ExternalLinksForbidden" xml:space="preserve">
     <value>Вопрос содержит внешнюю ссылку. Ссылки запрещены и не будут загружаться</value>

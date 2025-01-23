@@ -1,6 +1,6 @@
 ﻿using Notions;
-using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
+using SICore.Contracts;
 using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -20,7 +20,7 @@ namespace SICore;
 /// <summary>
 /// Implements a game viewer.
 /// </summary>
-public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
+public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 {
     protected readonly ViewerActions _viewerActions;
 
@@ -66,82 +66,9 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
         ClientData.Name = _client.Name;
     }
 
-    private void ChangeType_Executed(object arg)
-    {
-        var account = (PersonAccount)arg;
-        var player = account as PlayerAccount;
-
-        _viewerActions.SendMessage(
-            Messages.Config,
-            MessageParams.Config_ChangeType,
-            player != null ? Constants.Player : Constants.Showman,
-            player != null ? ClientData.Players.IndexOf(player).ToString() : "");
-    }
-
-    private void Replace_Executed(PersonAccount person, object arg)
-    {
-        var account = (Account)arg;
-        var player = person as PlayerAccount;
-
-        string index;
-
-        if (player != null)
-        {
-            var playerIndex = ClientData.Players.IndexOf(player);
-
-            if (playerIndex == -1)
-            {
-                return;
-            }
-
-            index = playerIndex.ToString();
-        }
-        else
-        {
-            index = "";
-        }
-
-        _viewerActions.SendMessage(
-            Messages.Config,
-            MessageParams.Config_Set,
-            player != null ? Constants.Player : Constants.Showman,
-            index,
-            account.Name);
-    }
-
-    private void Free_Executed(object arg)
-    {
-        var account = (PersonAccount)arg;
-        var player = account as PlayerAccount;
-
-        var indexString = "";
-
-        if (player != null)
-        {
-            var index = ClientData.Players.IndexOf(player);
-
-            if (index < 0 || index >= ClientData.Players.Count)
-            {
-                return;
-            }
-
-            indexString = index.ToString();
-        }
-
-        _viewerActions.SendMessage(
-            Messages.Config,
-            MessageParams.Config_Free,
-            player != null ? Constants.Player : Constants.Showman,
-            indexString);
-    }
-
-    private void Delete_Executed(object arg)
-    {
-        var player = (PlayerAccount)arg;
-        _viewerActions.SendMessage(Messages.Config, MessageParams.Config_DeleteTable, ClientData.Players.IndexOf(player).ToString());
-    }
-
     private ILocalizer LO { get; }
+
+    public ViewerData ClientData { get; }
 
     /// <summary>
     /// Initializes a new instance of <see cref="Viewer" /> class.
@@ -154,16 +81,12 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
         ViewerActions viewerActions,
         ILocalizer localizer,
         ViewerData data)
-        : base(client, data)
+        : base(client)
     {
-        if (personData == null)
-        {
-            throw new ArgumentNullException(nameof(personData));
-        }
-
         _viewerActions = viewerActions;
         _logic = logic;
         LO = localizer;
+        ClientData = data;
 
         Initialize(isHost);
 
@@ -314,10 +237,6 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
                         }
                         break;
                     }
-
-                case Messages.PackageLogo:
-                    _logic.OnPackageLogo(mparams[1]);
-                    break;
 
                 case Messages.FalseStart:
                     {
@@ -1157,7 +1076,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
                 }
                 else if (personAccount is PlayerAccount player)
                 {
-                    UpdatePlayerCommands(player);
+                    UpdateOthers(player);
                 }
                 else
                 {
@@ -1321,9 +1240,9 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
                 break;
         }
 
-        foreach (var item in ClientData.Players)
+        foreach (var player in ClientData.Players)
         {
-            UpdatePlayerCommands(item);
+            UpdateOthers(player);
         }
 
         UpdateShowmanCommands();
@@ -1341,18 +1260,8 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
                 Ready = mparams[6] == "+"
             };
 
-            CreatePlayerCommands(account);
             ClientData.Players.Add(account);
-
-            UpdatePlayerCommands(account);
-
-            var canDelete = ClientData.Players.Count > 2;
-
-            foreach (var player in ClientData.Players)
-            {
-                player.Delete.CanBeExecuted = canDelete;
-            }
-
+            UpdateOthers(account);
             _logic.AddPlayer(account);
         }
         finally
@@ -1564,13 +1473,6 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
                 };
 
                 ClientData.Viewers = cloneV;
-            }
-
-            var canDelete = ClientData.Players.Count > 2;
-
-            foreach (var player in ClientData.Players)
-            {
-                player.Delete.CanBeExecuted = canDelete;
             }
 
             _logic.RemovePlayerAt(index);
@@ -1877,11 +1779,11 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
             ClientData.EndUpdatePersons();
         }
 
-        CreateShowmanCommands();
+        UpdateShowmanCommands();
 
         foreach (var account in ClientData.Players)
         {
-            CreatePlayerCommands(account);
+            UpdateOthers(account);
         }
 
         if (ClientData.Me != null)
@@ -1920,41 +1822,20 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
 
     public void RecreateCommands()
     {
-        CreateShowmanCommands();
+        UpdateShowmanCommands();
 
-        foreach (var item in ClientData.Players)
+        foreach (var player in ClientData.Players)
         {
-            CreatePlayerCommands(item);
+            UpdateOthers(player);
         }
     }
 
-    private void CreateShowmanCommands()
+    private void UpdateShowmanCommands()
     {
-        var showman = ClientData.ShowMan;
-
-        showman.Free = new CustomCommand(Free_Executed) { CanBeExecuted = showman.IsHuman && showman.IsConnected };
-        showman.Replace = new CustomCommand(arg => Replace_Executed(showman, arg)) { CanBeExecuted = showman.IsHuman };
-        showman.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
-
-        UpdateOthers(showman);
-    }
-
-    private void CreatePlayerCommands(PlayerAccount player)
-    {
-        player.Free = new CustomCommand(Free_Executed) { CanBeExecuted = player.IsHuman && player.IsConnected };
-        player.Replace = new CustomCommand(arg => Replace_Executed(player, arg)) { CanBeExecuted = true };
-        player.Delete = new CustomCommand(Delete_Executed) { CanBeExecuted = ClientData.Players.Count > 2 };
-        player.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
-
-        UpdateOthers(player);
-    }
-
-    private void UpdatePlayerCommands(PlayerAccount player)
-    {
-        player.Free.CanBeExecuted = player.IsHuman && player.IsConnected;
-        UpdateOthers(player);
-
-        player.Replace.CanBeExecuted = player.Others.Any();
+        if (ClientData.ShowMan != null)
+        {
+            UpdateOthers(ClientData.ShowMan);
+        }
     }
 
     private Account[] GetDefaultComputerPlayers() => MyData.DefaultComputerPlayers
@@ -1969,21 +1850,6 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
             : GetDefaultComputerPlayers()
                 .Where(a => !MyData.AllPersons.Values.Any(p => !p.IsHuman && p.Name == a.Name))
                 .ToArray();
-    }
-
-    private void UpdateShowmanCommands()
-    {
-        var showman = MyData.ShowMan;
-
-        if (showman == null || showman.Free == null)
-        {
-            return;
-        }
-
-        showman.Free.CanBeExecuted = showman.IsHuman && showman.IsConnected;
-        showman.Replace.CanBeExecuted = showman.Others.Any();
-
-        UpdateOthers(showman);
     }
 
     private void UpdateOthers(PersonAccount showman)
@@ -2011,7 +1877,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
                         IsShowman = true
                     };
 
-                    CreateShowmanCommands();
+                    UpdateShowmanCommands();
                     break;
 
                 case Constants.Player:
@@ -2029,7 +1895,7 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
                             Ready = false
                         };
 
-                        CreatePlayerCommands(p);
+                        UpdateOthers(p);
                         ClientData.Players.Add(p);
                         playersWereUpdated = true;
                     }
@@ -2082,9 +1948,9 @@ public class Viewer : Actor<ViewerData>, IViewerClient, INotifyPropertyChanged
         {
             UpdateShowmanCommands();
 
-            foreach (var item in ClientData.Players)
+            foreach (var player in ClientData.Players)
             {
-                UpdatePlayerCommands(item);
+                UpdateOthers(player);
             }
         }
     }

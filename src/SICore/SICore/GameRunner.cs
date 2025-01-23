@@ -1,5 +1,4 @@
-﻿using SICore.BusinessLogic;
-using SICore.Clients.Game;
+﻿using SICore.Clients.Game;
 using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -66,6 +65,7 @@ public sealed class GameRunner
         _createHost = createHost;
     }
 
+    // TODO: remove hostLogicFactory; attach host after game creation
     public (IViewerClient?, Game) Run(Func<ViewerData, ViewerActions, Localizer, IViewerLogic> hostLogicFactory)
     {
         var gameData = new GameData(_gameHost, new GamePersonAccount(_settings.Showman))
@@ -169,7 +169,7 @@ public sealed class GameRunner
         }
 
         var playHandler = new PlayHandler(gameData);
-        var questionPlayHandler = new QuestionPlayHandler();
+        var questionPlayHandler = new QuestionPlayHandler(gameData);
 
         var engine = EngineFactory.CreateEngine(
             gameData.Settings.AppSettings.GameMode == GameModes.Tv,
@@ -196,7 +196,6 @@ public sealed class GameRunner
 
         var game = new Game(
             client,
-            _documentPath,
             localizer,
             gameData, 
             gameActions, 

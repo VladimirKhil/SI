@@ -1,5 +1,4 @@
 ﻿using Notions;
-using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Contracts;
 using SICore.Extensions;
@@ -23,7 +22,7 @@ namespace SICore;
 /// <summary>
 /// Defines a game actor. Responds to all game-related messages.
 /// </summary>
-public sealed class Game : Actor<GameData>
+public sealed class Game : Actor
 {
     private const string VideoAvatarUri = "https://vdo.ninja/";
 
@@ -49,9 +48,10 @@ public sealed class Game : Actor<GameData>
 
     private ILocalizer LO { get; }
 
+    public GameData ClientData { get; }
+
     public Game(
         Client client,
-        string? documentPath,
         ILocalizer localizer,
         GameData gameData,
         GameActions gameActions,
@@ -60,18 +60,17 @@ public sealed class Game : Actor<GameData>
         ComputerAccount[] defaultShowmans,
         IFileShare fileShare,
         IAvatarHelper avatarHelper)
-        : base(client, gameData)
+        : base(client)
     {
         _gameActions = gameActions;
         _logic = gameLogic;
         LO = localizer;
+        ClientData = gameData;
 
         _logic.AutoGame += AutoGame;
 
-        gameData.DocumentPath = documentPath;
-
-        _defaultPlayers = defaultPlayers ?? throw new ArgumentNullException(nameof(defaultPlayers));
-        _defaultShowmans = defaultShowmans ?? throw new ArgumentNullException(nameof(defaultShowmans));
+        _defaultPlayers = defaultPlayers;
+        _defaultShowmans = defaultShowmans;
 
         _fileShare = fileShare;
         _avatarHelper = avatarHelper;
@@ -111,34 +110,7 @@ public sealed class Game : Actor<GameData>
         }
     }
 
-    private void CurrentServer_SerializationError(Message message, Exception exc)
-    {
-        // Это случается при выводе частичного текста. Пытаемся поймать
-        try
-        {
-            var fullText = ClientData.Text ?? "";
-
-            var errorMessage = new StringBuilder("SerializationError: ")
-                .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(fullText)))
-                .Append('\n')
-                .Append(ClientData.TextLength)
-                .Append('\n')
-                .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Sender)))
-                .Append('\n')
-                .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Receiver)))
-                .Append('\n')
-                .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Text)))
-                .Append('\n')
-                .Append((message.Text ?? "").Length)
-                .Append(' ').Append(ClientData.Settings.AppSettings.ReadingSpeed);
-
-            _client.Node.OnError(new Exception(errorMessage.ToString(), exc), true);
-        }
-        catch (Exception e)
-        {
-            _client.Node.OnError(e, true);
-        }
-    }
+    private void CurrentServer_SerializationError(Message message, Exception exc) => _client.Node.OnError(exc, true);
 
     /// <summary>
     /// Sends all current game data to the person.
@@ -543,7 +515,7 @@ public sealed class Game : Actor<GameData>
                         OnConfig(message, args);
                         break;
 
-                    case Messages.First: // TODO: merge First and SetChooser messages
+                    case Messages.First:
                         OnFirst(message, args);
                         break;
 
@@ -1521,16 +1493,7 @@ public sealed class Game : Actor<GameData>
             }
         }
 
-        var roundIndex = -1;
-
-        for (int i = 0; i < ClientData.Rounds.Length; i++)
-        {
-            if (ClientData.Rounds[i].Index == _logic.Engine.RoundIndex)
-            {
-                roundIndex = i;
-                break;
-            }
-        }
+        var roundIndex = _logic.Engine.RoundIndex;
 
         if (ClientData.Stage == GameStage.Round)
         {
@@ -1585,7 +1548,7 @@ public sealed class Game : Actor<GameData>
     private void OnDelete(Message message, string[] args)
     {
         if (!ClientData.IsWaiting ||
-            ClientData.Decision != DecisionType.FinalThemeDeleting ||
+            ClientData.Decision != DecisionType.ThemeDeleting ||
             ClientData.ActivePlayer == null ||
             message.Sender != ClientData.ActivePlayer.Name && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
         {
@@ -2390,13 +2353,47 @@ public sealed class Game : Actor<GameData>
 
     private void OnPass(Message message)
     {
-        if (!ClientData.IsQuestionAskPlaying)
+        if (!ClientData.IsQuestionAskPlaying) // TODO: this condition looks ugly and unnecessary
         {
+            return;
+        }
+
+        var nextTask = Logic.Runner.PendingTask;
+
+        if (nextTask == Tasks.AskStake
+            || ClientData.Decision == DecisionType.StakeMaking
+            || ClientData.Decision == DecisionType.NextPersonStakeMaking)
+        {
+            // Sending pass in stakes in advance
+            if (ClientData.Decision == DecisionType.StakeMaking && ClientData.ActivePlayer?.Name == message.Sender)
+            {
+                return; // Currently making stake player can pass with the standard button
+            }
+
+            // Stake making pass
+            for (var i = 0; i < ClientData.Players.Count; i++)
+            {
+                var player = ClientData.Players[i];
+
+                if (player.Name == message.Sender)
+                {
+                    if (player.StakeMaking && i != ClientData.Stakes.StakerIndex) // Current stakes winner cannot pass
+                    {
+                        player.StakeMaking = false;
+                        _gameActions.SendMessageWithArgs(Messages.Pass, i);
+                    }
+
+                    break;
+                }
+            }
+
             return;
         }
 
         var canPressChanged = false;
 
+        // Player can pass while somebody is answering
+        // so accepting pass and moving to answer are separate actions
         for (var i = 0; i < ClientData.Players.Count; i++)
         {
             var player = ClientData.Players[i];
@@ -2412,7 +2409,7 @@ public sealed class Game : Actor<GameData>
 
         if (canPressChanged
             && ClientData.Players.All(p => !p.CanPress || !p.IsConnected)
-            && ClientData.Decision == DecisionType.Pressing
+            && (ClientData.Decision == DecisionType.None || ClientData.Decision == DecisionType.Pressing) // TODO: Can this state be described in a more clear way?
             && !ClientData.TInfo.Pause
             && !ClientData.IsAnswer)
         {
@@ -2768,15 +2765,14 @@ public sealed class Game : Actor<GameData>
             DropCurrentAppelaer();
         }
 
-        if (ClientData.StakerIndex > playerIndex)
+        var stakes = ClientData.Stakes;
+
+        if (stakes.HandlePlayerDrop(playerIndex))
         {
-            ClientData.StakerIndex--;
-        }
-        else if (ClientData.StakerIndex == playerIndex)
-        {
-            DropCurrentStaker();
+            Logic.AddHistory($"StakerIndex set to {stakes.StakerIndex}");
         }
 
+        // TODO: move to stakes.HandlePlayerDrop()
         if (ClientData.Question != null
             && ClientData.QuestionTypeName == QuestionTypes.Stake
             && ClientData.Order.Length > 0)
@@ -2933,7 +2929,7 @@ public sealed class Game : Actor<GameData>
         {
             Logic.AddHistory("Last staker dropped");
             Logic.Engine.SkipQuestion();
-            PlanExecution(Tasks.MoveNext, 20, 1);
+            Logic.PlanExecution(Tasks.MoveNext, 20, 1);
         }
         else if (ClientData.OrderIndex == -1 || ClientData.Order[ClientData.OrderIndex] == -1)
         {
@@ -2973,29 +2969,6 @@ public sealed class Game : Actor<GameData>
     {
         ClientData.AppelaerIndex = -1;
         Logic.AddHistory($"AppelaerIndex dropped");
-    }
-
-    private void DropCurrentStaker()
-    {
-        var stakersCount = ClientData.Players.Count(p => p.StakeMaking);
-
-        if (stakersCount == 1)
-        {
-            for (int i = 0; i < ClientData.Players.Count; i++)
-            {
-                if (ClientData.Players[i].StakeMaking)
-                {
-                    ClientData.StakerIndex = i;
-                    Logic.AddHistory($"StakerIndex set to {i}");
-                    break;
-                }
-            }
-        }
-        else
-        {
-            ClientData.StakerIndex = -1;
-            Logic.AddHistory("StakerIndex dropped");
-        }
     }
 
     /// <summary>
@@ -3073,7 +3046,7 @@ public sealed class Game : Actor<GameData>
             {
                 if (ClientData.Players[i].StakeMaking)
                 {
-                    ClientData.StakerIndex = i;
+                    ClientData.Stakes.StakerIndex = i;
                 }
             }
 

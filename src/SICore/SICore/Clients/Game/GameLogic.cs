@@ -1,5 +1,4 @@
 ﻿using Notions;
-using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Clients.Game;
 using SICore.Contracts;
@@ -333,7 +332,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.CanMarkQuestion = false;
         _data.AnswererIndex = -1;
         _data.QuestionPlayState.Clear();
-        _data.StakerIndex = -1;
         _data.ThemeDeleters = null;
         _data.RoundStrategy = strategyType;
 
@@ -435,15 +433,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ProceedToThemeAndQuestion(20);
     }
 
-    private void ProceedToThemeAndQuestion(int delay = 10)
+    private void ProceedToThemeAndQuestion(int delay = 10, bool force = true)
     {
         if (!_data.ThemeInfoShown.Contains(_data.Theme))
         {
-            ScheduleExecution(Tasks.Theme, delay, 1, true);
+            ScheduleExecution(Tasks.Theme, delay, 1, force);
         }
         else
         {
-            ScheduleExecution(Tasks.QuestionStartInfo, delay, 1, true);
+            ScheduleExecution(Tasks.QuestionStartInfo, delay, 1, force);
         }
     }
 
@@ -769,19 +767,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.TimeThinking = 0.0;
     }
 
-    internal void AskToPress()
-    {
-        if (_data.Settings.AppSettings.FalseStart)
-        {
-            foreach (var player in _data.Players)
-            {
-                player.CanPress = true;
-            }
-        }
-
-        // Let's add a random offset so it will be difficult to press the button in advance (before the frame appears)
-        ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : Random.Shared.Next(10)), force: true);
-    }
+    // Let's add a random offset so it will be difficult to press the button in advance (before the frame appears)
+    internal void AskToPress() => ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : Random.Shared.Next(10)), force: true);
 
     internal void AskDirectAnswer()
     {
@@ -798,7 +785,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.CanMarkQuestion = false;
         _data.AnswererIndex = -1;
         _data.QuestionPlayState.Clear();
-        _data.StakerIndex = -1;
 
         ScheduleExecution(Tasks.MoveNext, 1, force: true);
     }
@@ -958,7 +944,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendThemeInfo(overridenQuestionCount: 1);
         
         InitQuestionState(question);
-        ProceedToThemeAndQuestion();
+        ProceedToThemeAndQuestion(force: false);
     }
 
     internal void OnEndGame()
@@ -973,7 +959,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         FillReport();
-        ScheduleExecution(Tasks.Winner, 15 + Random.Shared.Next(10));
+        ScheduleExecution(Tasks.Winner, 15 + Random.Shared.Next(10), force: true);
     }
 
     public void Dispose() =>
@@ -1080,7 +1066,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         DecisionType.NextPersonStakeMaking => OnDecisionNextPersonStakeMaking(),
         DecisionType.StakeMaking => OnDecisionStakeMaking(),
         DecisionType.NextPersonFinalThemeDeleting => OnNextPersonFinalThemeDeleting(),
-        DecisionType.FinalThemeDeleting => OnDecisionFinalThemeDeleting(),
+        DecisionType.ThemeDeleting => OnThemeDeleting(),
         DecisionType.HiddenStakeMaking => OnHiddenStakeMaking(),
         DecisionType.AppellationDecision => OnAppellationDecision(),
         _ => false,
@@ -1180,7 +1166,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         return true;
     }
 
-    private bool OnDecisionFinalThemeDeleting()
+    private bool OnThemeDeleting()
     {
         if (_data.ThemeIndexToDelete == -1)
         {
@@ -1188,7 +1174,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         StopWaiting();
-        ScheduleExecution(Tasks.MoveNext, 1);
+        ScheduleExecution(Tasks.MoveNext, 1, force: true);
         return true;
     }
 
@@ -1221,12 +1207,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             _gameActions.PlayerReplic(playerIndex, LO[nameof(R.Nominal)]);
             _data.Stake = _data.CurPriceRight;
-            _data.StakerIndex = playerIndex;
+            _data.Stakes.StakerIndex = playerIndex;
         }
         else if (_data.StakeType == StakeMode.Sum)
         {
             _data.Stake = _data.StakeSum;
-            _data.StakerIndex = playerIndex;
+            _data.Stakes.StakerIndex = playerIndex;
         }
         else if (_data.StakeType == StakeMode.Pass)
         {
@@ -1239,7 +1225,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             _gameActions.PlayerReplic(playerIndex, LO[nameof(R.VaBank)]);
             _data.Stake = _data.Players[playerIndex].Sum;
-            _data.StakerIndex = playerIndex;
+            _data.Stakes.StakerIndex = playerIndex;
             _data.AllIn = true;
         }
 
@@ -1260,7 +1246,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 var player = _data.Players[i];
 
-                if (i != _data.StakerIndex && player.StakeMaking && player.Sum <= _data.Stake)
+                if (i != _data.Stakes.StakerIndex && player.StakeMaking && player.Sum <= _data.Stake)
                 {
                     player.StakeMaking = false;
                     _gameActions.SendMessageWithArgs(Messages.PersonStake, i, 2);
@@ -1279,7 +1265,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 if (_data.Players[i].StakeMaking)
                 {
-                    _data.StakerIndex = i;
+                    _data.Stakes.StakerIndex = i;
                 }
             }
 
@@ -1554,6 +1540,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Decision = DecisionType.Pressing;
     }
 
+    // TODO: this should be removed
     internal bool IsSpecialQuestion() => _data.QuestionTypeName != QuestionTypes.Simple;
 
     private bool OnDecisionNextPersonStakeMaking()
@@ -2247,20 +2234,22 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void PrintStakeQuestionPlayer()
     {
-        if (_data.StakerIndex == -1)
+        var stakerIndex = _data.Stakes.StakerIndex;
+
+        if (stakerIndex == -1)
         {
-            throw new ArgumentException($"{nameof(PrintStakeQuestionPlayer)}: {nameof(_data.StakerIndex)} == -1 {_data.OrderHistory}", nameof(_data.StakerIndex));
+            throw new ArgumentException($"{nameof(PrintStakeQuestionPlayer)}: {nameof(stakerIndex)} == -1 {_data.OrderHistory}", nameof(stakerIndex));
         }
 
-        _data.ChooserIndex = _data.StakerIndex;
-        _data.AnswererIndex = _data.StakerIndex;
-        _data.QuestionPlayState.SetSingleAnswerer(_data.StakerIndex);
+        _data.ChooserIndex = stakerIndex;
+        _data.AnswererIndex = stakerIndex;
+        _data.QuestionPlayState.SetSingleAnswerer(stakerIndex);
         _data.CurPriceRight = _data.Stake;
         _data.CurPriceWrong = _data.Stake;
 
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
 
-        var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_data.Players[_data.StakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_data.Stake)}";
+        var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_data.Players[stakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_data.Stake)}";
 
         _gameActions.ShowmanReplic(msg.ToString());
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10));
@@ -2644,7 +2633,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AskToTry()
     {
-        if (ClientData.Players.All(p => !p.CanPress))
+        if (ClientData.Players.All(p => !p.CanPress || !p.IsConnected))
         {
             ScheduleExecution(Tasks.WaitTry, 3, force: true);
             return;
@@ -3020,7 +3009,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             ClientData.TimeThinking += currentTime.Subtract(startTime).TotalMilliseconds / 100;
         }
 
-        ClientData.Answerer.CanPress = false;
+        var answerer = ClientData.Answerer;
+
+        if (answerer == null)
+        {
+            DumpButtonPressError("answerer == null");
+            return false;
+        }
+
+        answerer.CanPress = false;
 
         _data.IsThinking = false;
 
@@ -3587,7 +3584,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.ThemeIndexToDelete = -1;
         ScheduleExecution(Tasks.WaitDelete, waitTime);
-        WaitFor(DecisionType.FinalThemeDeleting, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
+        WaitFor(DecisionType.ThemeDeleting, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
     }
 
     private void RequestForCurrentDeleter(ICollection<int> indicies)
@@ -3666,7 +3663,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     {
                         if (_data.Players[i].StakeMaking)
                         {
-                            _data.StakerIndex = i;
+                            _data.Stakes.StakerIndex = i;
                             break;
                         }
                     }
@@ -3786,7 +3783,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             var others = _data.Players.Where((p, index) => index != _data.Order[_data.OrderIndex]); // Те, кто сейчас не делают ставку
             
-            if (others.All(p => !p.StakeMaking) && _data.StakerIndex > -1) // Остальные не могут ставить
+            if (others.All(p => !p.StakeMaking) && _data.Stake > -1) // Остальные не могут ставить
             {
                 // Нельзя повысить ставку
                 ScheduleExecution(Tasks.PrintAuctPlayer, 10);
@@ -3816,7 +3813,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     {
                         if (_data.Players[i].StakeMaking)
                         {
-                            _data.StakerIndex = i;
+                            _data.Stakes.StakerIndex = i;
                         }
                     }
 
@@ -3839,7 +3836,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
                 _gameActions.ShowmanReplic(s.ToString());
 
-                _data.StakerIndex = playerIndex;
+                _data.Stakes.StakerIndex = playerIndex;
                 _data.Stake = cost;
                 _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
                 ScheduleExecution(Tasks.AskStake, 5, force: true);
@@ -3849,14 +3846,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + ClientData.StakeStep;
             var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / ClientData.StakeStep) * ClientData.StakeStep;
 
-            _data.StakeTypes = StakeTypes.AllIn | (_data.StakerIndex == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
+            _data.StakeTypes = StakeTypes.AllIn | (_data.Stake == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
 
             if (!_data.AllIn && playerMoney >= minimumStakeAligned)
             {
                 _data.StakeTypes |= StakeTypes.Stake;
             }
 
-            _data.StakeVariants[0] = _data.StakerIndex == -1;
+            _data.StakeVariants[0] = _data.Stake == -1;
             _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + ClientData.StakeStep;
             _data.StakeVariants[2] = !_data.StakeVariants[0];
             _data.StakeVariants[3] = true;
@@ -3908,7 +3905,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             
             _data.StakeModes = StakeModes.AllIn;
 
-            if (_data.StakerIndex != -1)
+            if (_data.Stake != -1)
             {
                 _data.StakeModes |= StakeModes.Pass;
             }
@@ -4618,11 +4615,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void OnButtonPressStart()
     {
-        foreach (var player in _data.Players)
-        {
-            player.CanPress = true;
-        }
-
         _data.Decision = DecisionType.Pressing;
         _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
 
@@ -4870,7 +4862,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessage(passMsg.ToString());
         }
 
-        _data.Stake = _data.StakerIndex = -1;
+        _data.Stake = -1;
+        _data.Stakes.Reset(_data.ChooserIndex);
         _data.Order[0] = _data.ChooserIndex;
         _data.OrderHistory.Clear();
 

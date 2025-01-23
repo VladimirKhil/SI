@@ -421,15 +421,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Error while writing log to disc.
-        /// </summary>
-        public static string ErrorWritingLogToDisc {
-            get {
-                return ResourceManager.GetString("ErrorWritingLogToDisc", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на External link: {0} . External link download could be unsafe and is disabled.
         /// </summary>
         public static string ExternalLink {
@@ -556,15 +547,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на The game has started.
-        /// </summary>
-        public static string GameStarted {
-            get {
-                return ResourceManager.GetString("GameStarted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Game statistics.
         /// </summary>
         public static string GameStatistics {
@@ -682,15 +664,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Define if the answer is correct.
-        /// </summary>
-        public static string HintCheckAnswer {
-            get {
-                return ResourceManager.GetString("HintCheckAnswer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Select the cost of this question.
         /// </summary>
         public static string HintChooseCatPrice {
@@ -718,65 +691,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Select a player to give the question to.
-        /// </summary>
-        public static string HintSelectCatPlayer {
-            get {
-                return ResourceManager.GetString("HintSelectCatPlayer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Select a player who the question will be given to.
         /// </summary>
         public static string HintSelectCatPlayerForPlayer {
             get {
                 return ResourceManager.GetString("HintSelectCatPlayerForPlayer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Select a question on the board.
-        /// </summary>
-        public static string HintSelectQuestion {
-            get {
-                return ResourceManager.GetString("HintSelectQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Select a player who is making a bet.
-        /// </summary>
-        public static string HintSelectStaker {
-            get {
-                return ResourceManager.GetString("HintSelectStaker", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Select a player who is starting the round.
-        /// </summary>
-        public static string HintSelectStarter {
-            get {
-                return ResourceManager.GetString("HintSelectStarter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Remove a theme on the board.
-        /// </summary>
-        public static string HintSelectTheme {
-            get {
-                return ResourceManager.GetString("HintSelectTheme", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Select the player who is removing the theme.
-        /// </summary>
-        public static string HintThemeDeleter {
-            get {
-                return ResourceManager.GetString("HintThemeDeleter", resourceCulture);
             }
         }
         
@@ -903,33 +822,6 @@ namespace SICore.Properties {
         public static string Kicked {
             get {
                 return ResourceManager.GetString("Kicked", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на QUESTION WITH A STAKE.
-        /// </summary>
-        public static string Label_Auction {
-            get {
-                return ResourceManager.GetString("Label_Auction", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на QUESTION WITH A SECRET.
-        /// </summary>
-        public static string Label_CatInBag {
-            get {
-                return ResourceManager.GetString("Label_CatInBag", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на QUESTION FOR YOURSELF WITHOUT RISK.
-        /// </summary>
-        public static string Label_Sponsored {
-            get {
-                return ResourceManager.GetString("Label_Sponsored", resourceCulture);
             }
         }
         
@@ -1483,20 +1375,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на You got Question with Stake for All! Everybody makes stake and plays.
+        ///   Ищет локализованную строку, похожую на You got Question for All with Stake! Everybody makes stake and plays.
         /// </summary>
         public static string QuestionTypeStakeAll {
             get {
                 return ResourceManager.GetString("QuestionTypeStakeAll", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на A question with a special theme.
-        /// </summary>
-        public static string QuestionWithSpecialTheme {
-            get {
-                return ResourceManager.GetString("QuestionWithSpecialTheme", resourceCulture);
             }
         }
         

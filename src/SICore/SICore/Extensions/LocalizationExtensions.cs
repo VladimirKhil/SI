@@ -1,5 +1,4 @@
-﻿using SICore.BusinessLogic;
-using SIPackages;
+﻿using SICore.Contracts;
 
 using R = SICore.Properties.Resources;
 

@@ -46,7 +46,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Player currently making a decision.
     /// </summary>
-    internal GamePlayerAccount ActivePlayer { get; set; }
+    internal GamePlayerAccount? ActivePlayer { get; set; }
 
     /// <summary>
     /// Current answerer info.
@@ -267,25 +267,6 @@ public sealed class GameData : Data
     /// History of making stakes in current question play.
     /// </summary>
     public StringBuilder OrderHistory { get; } = new();
-
-    private int _stakerIndex = -1;
-
-    /// <summary>
-    /// Index of player making a stake.
-    /// </summary>
-    public int StakerIndex
-    {
-        get => _stakerIndex;
-        set
-        {
-            if (value < -1 && value >= Players.Count)
-            {
-                throw new ArgumentException($"{nameof(value)} {value} must be greater or equal to -1 and less than {Players.Count}!");
-            }
-
-            _stakerIndex = value;
-        }
-    }
 
     /// <summary>
     /// Текущая ставка
@@ -586,8 +567,6 @@ public sealed class GameData : Data
 
     public bool IsPlayingMediaPaused { get; set; }
 
-    public string? DocumentPath { get; internal set; }
-
     public int ThemeIndexToDelete { get; set; } = -1;
 
     /// <summary>
@@ -664,8 +643,11 @@ public sealed class GameData : Data
     /// </summary>
     public string QuestionTypeName { get; internal set; } = QuestionTypes.Default;
 
+    internal StakesState Stakes { get; }
+
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
         _showMan = showman;
+        Stakes = new StakesState(Players);
     }
 }

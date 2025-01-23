@@ -1,7 +1,7 @@
 ﻿namespace SICore.Models;
 
 /// <summary>
-/// Defines stake modes.
+/// Defines stake modes flags.
 /// </summary>
 [Flags]
 public enum StakeModes

@@ -574,7 +574,7 @@
     <value>Question for all</value>
   </data>
   <data name="QuestionTypeStakeForAll" xml:space="preserve">
-    <value>Stake question for all</value>
+    <value>Question for all with stake</value>
   </data>
   <data name="QuestionTypeWithButton" xml:space="preserve">
     <value>Question with button</value>
@@ -587,5 +587,41 @@
   </data>
   <data name="ReportTitle" xml:space="preserve">
     <value>Game report</value>
+  </data>
+  <data name="HintSelectCatPlayer" xml:space="preserve">
+    <value>Select a player to give the question to</value>
+  </data>
+  <data name="HintSelectStarter" xml:space="preserve">
+    <value>Select a player who is starting the round</value>
+  </data>
+  <data name="HintThemeDeleter" xml:space="preserve">
+    <value>Select the player who is removing the theme</value>
+  </data>
+  <data name="HintSelectStaker" xml:space="preserve">
+    <value>Select a player who is making a bet</value>
+  </data>
+  <data name="HintSelectTheme" xml:space="preserve">
+    <value>Remove a theme on the board</value>
+  </data>
+  <data name="HintSelectQuestion" xml:space="preserve">
+    <value>Select a question on the board</value>
+  </data>
+  <data name="HintCheckAnswer" xml:space="preserve">
+    <value>Define if the answer is correct</value>
+  </data>
+  <data name="ErrorWritingLogToDisc" xml:space="preserve">
+    <value>Error while writing log to disc</value>
+  </data>
+  <data name="Label_Auction" xml:space="preserve">
+    <value>QUESTION WITH A STAKE</value>
+  </data>
+  <data name="Label_CatInBag" xml:space="preserve">
+    <value>QUESTION WITH A SECRET</value>
+  </data>
+  <data name="Label_Sponsored" xml:space="preserve">
+    <value>QUESTION FOR YOURSELF WITHOUT RISK</value>
+  </data>
+  <data name="GameStarted" xml:space="preserve">
+    <value>The game has started</value>
   </data>
 </root>

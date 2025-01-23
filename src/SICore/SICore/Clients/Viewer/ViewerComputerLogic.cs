@@ -268,11 +268,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    public void OnPackageLogo(string uri)
-    {
-
-    }
-
     public void OnPersonApellated(int playerIndex)
     {
 

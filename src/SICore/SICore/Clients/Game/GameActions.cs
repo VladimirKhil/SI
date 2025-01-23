@@ -1,5 +1,4 @@
 ﻿using Notions;
-using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Contracts;
 using SICore.Extensions;

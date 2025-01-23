@@ -1,8 +1,9 @@
-﻿using SICore.Properties;
+﻿using SICore.Contracts;
+using SICore.Properties;
 using System.Globalization;
 using System.Resources;
 
-namespace SICore.BusinessLogic;
+namespace SICore.Services;
 
 public sealed class Localizer : ILocalizer
 {
@@ -16,5 +17,5 @@ public sealed class Localizer : ILocalizer
         Culture = new CultureInfo(culture ?? "en-US");
     }
 
-    public string this[string key] => _resourceManager.GetString(key, Culture);
+    public string this[string key] => _resourceManager.GetString(key, Culture) ?? key;
 }

@@ -114,7 +114,7 @@ public static class ScriptsLibrary
         var noRiskScript = new Script();
 
         noRiskScript.Steps.Add(CreateSetAnswerTypeStep());
-        noRiskScript.Steps.Add(CreateSetAnswererNoRiskStep());
+        noRiskScript.Steps.Add(CreateSetAnswererForYouselfStep());
         noRiskScript.Steps.Add(CreateSetPriceNoRiskStep());
         noRiskScript.Steps.Add(CreateQuestionStep());
         noRiskScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
@@ -259,7 +259,7 @@ public static class ScriptsLibrary
         return setPriceStep;
     }
 
-    private static Step CreateSetAnswererNoRiskStep()
+    private static Step CreateSetAnswererForYouselfStep()
     {
         var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
         setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_Current);

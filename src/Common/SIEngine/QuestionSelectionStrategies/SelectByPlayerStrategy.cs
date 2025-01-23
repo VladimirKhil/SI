@@ -3,7 +3,7 @@
 namespace SIEngine.QuestionSelectionStrategies;
 
 /// <summary>
-/// Allows to select next question by moving player.
+/// Allows to select next question by player having a turn.
 /// </summary>
 internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableController
 {

@@ -21,12 +21,7 @@ public abstract class Logic<D>
     /// </summary>
     public D ClientData => _data;
 
-    /// <summary>
-    /// Common-typed agent data.
-    /// </summary>
-    public Data Data => _data;
-
-    public Logic(D data) => _data = data ?? throw new ArgumentNullException(nameof(data));
+    public Logic(D data) => _data = data;
 
     protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition) =>
         list.SelectRandom(condition, Random.Shared);

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace SICore.BusinessLogic;
+namespace SICore.Contracts;
 
 public interface ILocalizer
 {

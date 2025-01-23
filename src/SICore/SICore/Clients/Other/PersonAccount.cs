@@ -30,18 +30,6 @@ public class PersonAccount : ViewerAccount
         set { if (_gameStarted != value) { _gameStarted = value; OnPropertyChanged(); } }
     }
 
-    /// <summary>
-    /// Изменить тип
-    /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private CustomCommand _changeType = null;
-
-    public CustomCommand ChangeType
-    {
-        get { return _changeType; }
-        set { if (_changeType != value) { _changeType = value; OnPropertyChanged(); } }
-    }
-
     private bool _isChooser = false;
 
     public bool IsChooser
@@ -55,30 +43,6 @@ public class PersonAccount : ViewerAccount
                 OnPropertyChanged();
             }
         }
-    }
-
-    /// <summary>
-    /// Заменить
-    /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private CustomCommand _replace = null;
-
-    public CustomCommand Replace
-    {
-        get { return _replace; }
-        set { if (_replace != value) { _replace = value; OnPropertyChanged(); } }
-    }
-
-    /// <summary>
-    /// Освободить стол (перевести в зрители)
-    /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private CustomCommand _free = null;
-
-    public CustomCommand Free
-    {
-        get { return _free; }
-        set { if (_free != value) { _free = value; OnPropertyChanged(); } }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

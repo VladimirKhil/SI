@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SICore;
-using SICore.BusinessLogic;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
+using SICore.Services;
 using SIData;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;

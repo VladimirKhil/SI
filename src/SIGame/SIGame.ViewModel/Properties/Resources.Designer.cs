@@ -295,6 +295,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Error while writing log to disc.
+        /// </summary>
+        public static string ErrorWritingLogToDisc {
+            get {
+                return ResourceManager.GetString("ErrorWritingLogToDisc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Export successfully completed.
         /// </summary>
         public static string ExportOk {
@@ -646,6 +655,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на The game has started.
+        /// </summary>
+        public static string GameStarted {
+            get {
+                return ResourceManager.GetString("GameStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на https://vk.com/si_game.
         /// </summary>
         public static string GroupLink {
@@ -664,6 +682,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Define if the answer is correct.
+        /// </summary>
+        public static string HintCheckAnswer {
+            get {
+                return ResourceManager.GetString("HintCheckAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Select new active player.
         /// </summary>
         public static string HintSelectActivePlayer {
@@ -673,11 +700,65 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Select a player to give the question to.
+        /// </summary>
+        public static string HintSelectCatPlayer {
+            get {
+                return ResourceManager.GetString("HintSelectCatPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Select a player to change his score.
         /// </summary>
         public static string HintSelectPlayerForSumChange {
             get {
                 return ResourceManager.GetString("HintSelectPlayerForSumChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select a question on the board.
+        /// </summary>
+        public static string HintSelectQuestion {
+            get {
+                return ResourceManager.GetString("HintSelectQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select a player who is making a bet.
+        /// </summary>
+        public static string HintSelectStaker {
+            get {
+                return ResourceManager.GetString("HintSelectStaker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select a player who is starting the round.
+        /// </summary>
+        public static string HintSelectStarter {
+            get {
+                return ResourceManager.GetString("HintSelectStarter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove a theme on the board.
+        /// </summary>
+        public static string HintSelectTheme {
+            get {
+                return ResourceManager.GetString("HintSelectTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select the player who is removing the theme.
+        /// </summary>
+        public static string HintThemeDeleter {
+            get {
+                return ResourceManager.GetString("HintThemeDeleter", resourceCulture);
             }
         }
         
@@ -732,6 +813,33 @@ namespace SIGame.ViewModel.Properties {
         public static string JoinForbidden {
             get {
                 return ResourceManager.GetString("JoinForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на QUESTION WITH A STAKE.
+        /// </summary>
+        public static string Label_Auction {
+            get {
+                return ResourceManager.GetString("Label_Auction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на QUESTION WITH A SECRET.
+        /// </summary>
+        public static string Label_CatInBag {
+            get {
+                return ResourceManager.GetString("Label_CatInBag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на QUESTION FOR YOURSELF WITHOUT RISK.
+        /// </summary>
+        public static string Label_Sponsored {
+            get {
+                return ResourceManager.GetString("Label_Sponsored", resourceCulture);
             }
         }
         
@@ -1078,7 +1186,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Stake question for all.
+        ///   Ищет локализованную строку, похожую на Question for all with stake.
         /// </summary>
         public static string QuestionTypeStakeForAll {
             get {

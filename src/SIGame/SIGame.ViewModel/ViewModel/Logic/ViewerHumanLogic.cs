@@ -1,6 +1,6 @@
 ﻿using Notions;
-using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
+using SICore.Contracts;
 using SIData;
 using SIGame.ViewModel;
 using SIGame.ViewModel.Models;
@@ -220,16 +220,16 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void OnSelectPlayer(Models.SelectPlayerReason reason)
     {
         _gameViewModel.ClearReplic();
-        _gameViewModel.Hint = _localizer[GetSelectHint(reason)];
+        _gameViewModel.Hint = GetSelectHint(reason);
     }
 
     private static string GetSelectHint(Models.SelectPlayerReason selectionMode) => selectionMode switch
     {
-        Models.SelectPlayerReason.Answerer => nameof(R.HintSelectCatPlayer),
-        Models.SelectPlayerReason.Chooser => nameof(R.HintSelectStarter),
-        Models.SelectPlayerReason.Deleter => nameof(R.HintThemeDeleter),
-        Models.SelectPlayerReason.Staker => nameof(R.HintSelectStaker),
-        _ => string.Empty,
+        Models.SelectPlayerReason.Answerer => Resources.HintSelectCatPlayer,
+        Models.SelectPlayerReason.Chooser => Resources.HintSelectStarter,
+        Models.SelectPlayerReason.Deleter => Resources.HintThemeDeleter,
+        Models.SelectPlayerReason.Staker => Resources.HintSelectStaker,
+        _ => "",
     };
 
     private void TInfo_AnswerSelected(ItemViewModel item)
@@ -391,7 +391,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                 }
                 catch (IOException exc)
                 {
-                    _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                    _gameViewModel.OnAddString(null, $"{Resources.ErrorWritingLogToDisc}: {exc.Message}", LogMode.Log);
                 }
             }
         }
@@ -403,7 +403,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             }
             catch (IOException exc)
             {
-                _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                _gameViewModel.OnAddString(null, $"{Resources.ErrorWritingLogToDisc}: {exc.Message}", LogMode.Log);
                 
                 try
                 {
@@ -419,7 +419,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             }
             catch (EncoderFallbackException exc)
             {
-                _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                _gameViewModel.OnAddString(null, $"{Resources.ErrorWritingLogToDisc}: {exc.Message}", LogMode.Log);
             }
         }
     }
@@ -460,7 +460,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     }
                     catch (IOException exc)
                     {
-                        _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                        _gameViewModel.OnAddString(null, $"{Resources.ErrorWritingLogToDisc}: {exc.Message}", LogMode.Log);
                     }
                     catch (ArgumentException exc)
                     {
@@ -472,7 +472,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
                     }
                 }
 
-                OnReplic(ReplicCodes.Special.ToString(), $"{_localizer[nameof(R.GameStarted)]} {DateTime.Now}");
+                OnReplic(ReplicCodes.Special.ToString(), $"{Resources.GameStarted} {DateTime.Now}");
 
                 var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{ClientData.ShowMan?.Name}\"");
 
@@ -1263,7 +1263,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         {
             case QuestionTypes.Stake:
                 {
-                    TInfo.Text = _localizer[nameof(R.Label_Auction)];
+                    TInfo.Text = Resources.Label_Auction;
                     HighlightCurrentTheme();
                     TInfo.TStage = TableStage.Special;
                     _data.Sound = Sounds.QuestionStake;
@@ -1274,7 +1274,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             case QuestionTypes.SecretNoQuestion:
             case QuestionTypes.SecretPublicPrice:
                 {
-                    TInfo.Text = _localizer[nameof(R.Label_CatInBag)];
+                    TInfo.Text = Resources.Label_CatInBag;
                     HideAllThemes();
                     TInfo.TStage = TableStage.Special;
                     _data.Sound = Sounds.QuestionSecret;
@@ -1284,7 +1284,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
             case QuestionTypes.NoRisk:
                 {
-                    TInfo.Text = _localizer[nameof(R.Label_Sponsored)];
+                    TInfo.Text = Resources.Label_Sponsored;
                     HighlightCurrentTheme();
                     TInfo.TStage = TableStage.Special;
                     _data.Sound = Sounds.QuestionNoRisk;
@@ -1622,35 +1622,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
-    public void OnPackageLogo(string uri)
-    {
-        TInfo.TStage = TableStage.Question;
-
-        if (uri.Contains(Constants.GameHost))
-        {
-            if (!string.IsNullOrWhiteSpace(_serverAddress))
-            {
-                if (Uri.TryCreate(_serverAddress, UriKind.Absolute, out var hostUri))
-                {
-                    uri = uri.Replace(Constants.GameHost, hostUri.Host);
-                }
-            }
-        }
-        else if (uri.Contains(Constants.ServerHost))
-        {
-            uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
-        }
-
-        if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out _))
-        {
-            return;
-        }
-
-        TInfo.MediaSource = new MediaSource(uri);
-        TInfo.QuestionContentType = QuestionContentType.Image;
-        TInfo.Sound = false;
-    }
-
     public void OnPersonPass(int playerIndex)
     {
         if (playerIndex < 0 || playerIndex >= _data.Players.Count)
@@ -1840,7 +1811,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             _data.ThemeIndex = _data.QuestionIndex = -1;
         }
 
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectQuestion)];
+        _gameViewModel.Hint = Resources.HintSelectQuestion;
         TInfo.Selectable = true;
         TInfo.SelectQuestion.CanBeExecuted = true;
         _data.Host.OnFlash();
@@ -1852,7 +1823,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void IsRight(bool voteForRight, string answer)
     {
-        _gameViewModel.Hint = _localizer[nameof(R.HintCheckAnswer)];
+        _gameViewModel.Hint = Resources.HintCheckAnswer;
         _gameViewModel.DialogMode = DialogModes.AnswerValidation;
         _gameViewModel.Answer = answer;
         _data.Host.OnFlash();
@@ -1910,7 +1881,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             || isRight)
         {
             _gameViewModel.Apellate.CanBeExecuted = _gameViewModel.ApellationCount > 0;
-            _gameViewModel.Pass.CanBeExecuted = false;
         }
     }
 
@@ -1919,7 +1889,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void EndThink()
     {
         _gameViewModel.Apellate.CanBeExecuted = _gameViewModel.ApellationCount > 0;
-        _gameViewModel.Pass.CanBeExecuted = false;
     }
 
     public void Report(string report)
@@ -1944,7 +1913,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     public void OnCanPressButton()
     {
         _gameViewModel.Apellate.CanBeExecuted = false;
-        _gameViewModel.Pass.CanBeExecuted = _gameViewModel.IsPlayer;
     }
 
     public void OnQuestionSelected()
@@ -1970,7 +1938,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         TInfo.Selectable = true;
         TInfo.SelectTheme.CanBeExecuted = true;
-        _gameViewModel.Hint = _localizer[nameof(R.HintSelectTheme)];
+        _gameViewModel.Hint = Resources.HintSelectTheme;
 
         _data.Host.OnFlash();
     }

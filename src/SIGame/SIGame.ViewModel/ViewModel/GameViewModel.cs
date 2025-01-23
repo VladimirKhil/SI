@@ -10,6 +10,7 @@ using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.ViewModel.Data;
 using SIPackages.Core;
 using SIUI.ViewModel;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net;
@@ -609,7 +610,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         ManageTable = new SimpleCommand(ManageTable_Executed) { CanBeExecuted = false };
 
         Apellate = new SimpleCommand(Apellate_Executed) { CanBeExecuted = false };
-        Pass = new SimpleCommand(Pass_Executed) { CanBeExecuted = false };
+        Pass = new SimpleCommand(Pass_Executed) { CanBeExecuted = IsPlayer };
 
         IsRight = new SimpleCommand(IsRight_Executed);
         IsWrong = new SimpleCommand(IsWrong_Executed);
@@ -986,13 +987,101 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Kick.CanBeExecuted = Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = Host.IsHost;
     }
 
-    private void FreeTable_Executed(object? arg) => Host?.MyData.CurrentPerson?.Free.Execute(arg);
+    private void FreeTable_Executed(object? arg)
+    {
+        if (arg is not PersonAccount account)
+        {
+            return;
+        }
 
-    private void DeleteTable_Executed(object? arg) => ((PlayerAccount?)Host?.MyData.CurrentPerson)?.Delete.Execute(arg);
+        var player = account as PlayerAccount;
 
-    private void ChangeType_Executed(object? arg) => Host?.MyData.CurrentPerson?.ChangeType.Execute(arg);
+        var indexString = "";
 
-    private void Replace_Executed(object? arg) => Host?.MyData.CurrentPerson?.Replace.Execute(arg);
+        if (player != null)
+        {
+            var index = _data.Players.IndexOf(player);
+
+            if (index < 0 || index >= _data.Players.Count)
+            {
+                return;
+            }
+
+            indexString = index.ToString();
+        }
+
+        Host?.Actions.SendMessage(
+            Messages.Config,
+            MessageParams.Config_Free,
+            player != null ? Constants.Player : Constants.Showman,
+            indexString);
+    }
+
+    private void DeleteTable_Executed(object? arg)
+    {
+        if (arg is not PlayerAccount player)
+        {
+            return;
+        }
+
+        var playerIndex = _data.Players.IndexOf(player);
+
+        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+        {
+            return;
+        }
+
+        Host?.Actions.SendMessage(Messages.Config, MessageParams.Config_DeleteTable, playerIndex.ToString());
+    }
+
+    private void ChangeType_Executed(object? arg)
+    {
+        if (arg is not PlayerAccount player)
+        {
+            return;
+        }
+
+        Host?.Actions.SendMessage(
+            Messages.Config,
+            MessageParams.Config_ChangeType,
+            player != null ? Constants.Player : Constants.Showman,
+            player != null ? _data.Players.IndexOf(player).ToString() : "");
+    }
+
+    private void Replace_Executed(object? arg)
+    {
+        if (arg is not Account account)
+        {
+            return;
+        }
+
+        var player = _data.CurrentPerson as PlayerAccount;
+
+        string index;
+
+        if (player != null)
+        {
+            var playerIndex = _data.Players.IndexOf(player);
+
+            if (playerIndex == -1)
+            {
+                return;
+            }
+
+            index = playerIndex.ToString();
+        }
+        else
+        {
+            index = "";
+        }
+
+        Host?.Actions.SendMessage(
+            Messages.Config,
+            MessageParams.Config_Set,
+            player != null ? Constants.Player : Constants.Showman,
+            index,
+            account.Name);
+    }
 
     private void OpenLink_Executed(object? arg)
     {
@@ -1088,7 +1177,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         ChangePauseInGame.CanBeExecuted = Move.CanBeExecuted;
         _changeSums.CanBeExecuted = _changeActivePlayer.CanBeExecuted = IsShowman;
         ForceStart.CanBeExecuted = Host != null && Host.IsHost && Host.MyData.Stage == GameStage.Before;
-        PressGameButton.CanBeExecuted = IsPlayer;
+        PressGameButton.CanBeExecuted = Pass.CanBeExecuted = IsPlayer;
         Ready.CanBeExecuted = UnReady.CanBeExecuted = IsPlayer || IsShowman;
 
         UpdateAddTableCommand();

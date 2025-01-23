@@ -173,7 +173,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     public void AskForThemeDelete(Action<int> deleteCallback)
     {
         GameLogic?.SetContinuation(() => deleteCallback(_gameData.ThemeIndexToDelete));
-        GameLogic?.ScheduleExecution(Tasks.AskToDelete, 1);
+        GameLogic?.ScheduleExecution(Tasks.AskToDelete, 1, force: true); // TODO: why not calling AskToDelete directly?
     }
 
     public void OnThemeDeleted(int themeIndex) => GameLogic?.OnThemeDeleted(themeIndex);

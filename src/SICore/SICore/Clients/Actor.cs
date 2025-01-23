@@ -7,26 +7,18 @@ namespace SICore;
 /// <summary>
 /// Defines a message handler.
 /// </summary>
-/// <typeparam name="D">Тип данных клиента</typeparam>
-public abstract class Actor<D> : IDisposable
-    where D : Data
+public abstract class Actor : IDisposable
 {
-    protected Client _client;
-
-    /// <summary>
-    /// Данные клиента
-    /// </summary>
-    public D ClientData { get; private set; }
+    protected readonly Client _client;
 
     public IClient Client => _client;
 
     public abstract ValueTask OnMessageReceivedAsync(Message message);
 
     // TODO: Actor should be Client's handler and do not have a link to the client
-    protected Actor(Client client, D data)
+    protected Actor(Client client)
     {
         _client = client;
-        ClientData = data;
 
         _client.MessageReceived += OnMessageReceivedAsync;
         _client.Disposed += Client_Disposed;

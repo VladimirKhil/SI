@@ -9,7 +9,7 @@ namespace SICore;
 public sealed class GamePlayerAccount : GamePersonAccount
 {
     private int _sum = 0;
-    private bool _pass = false;
+    private bool _canPress = false;
     private bool _inGame = true;
 
     /// <summary>
@@ -32,8 +32,8 @@ public sealed class GamePlayerAccount : GamePersonAccount
     /// </summary>
     internal bool CanPress
     {
-        get => _pass;
-        set { _pass = value; OnPropertyChanged(); }
+        get => _canPress;
+        set { _canPress = value; OnPropertyChanged(); }
     }
 
     // TODO: Will be replaced with QuestionPlayState.PossibleAnswerers indicies collection and theme deletion strategy

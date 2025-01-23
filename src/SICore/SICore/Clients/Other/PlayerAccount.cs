@@ -1,5 +1,4 @@
 ﻿using SIData;
-using System.Diagnostics;
 
 namespace SICore;
 
@@ -89,18 +88,6 @@ public sealed class PlayerAccount : PersonAccount
     public CustomCommand Select { get; private set; }
 
     public Action<PlayerAccount>? SelectionCallback { get; set; }
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private CustomCommand delete = null;
-
-    /// <summary>
-    /// Удалить стол
-    /// </summary>
-    public CustomCommand Delete
-    {
-        get => delete;
-        set { if (delete != value) { delete = value; OnPropertyChanged(); } }
-    }
 
     private string _answer = "";
 

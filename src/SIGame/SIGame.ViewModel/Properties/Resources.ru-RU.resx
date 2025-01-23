@@ -571,7 +571,7 @@
     <value>Вопрос для всех</value>
   </data>
   <data name="QuestionTypeStakeForAll" xml:space="preserve">
-    <value>Вопрос со ставкой для всех</value>
+    <value>Вопрос для всех со ставкой</value>
   </data>
   <data name="QuestionTypeWithButton" xml:space="preserve">
     <value>Вопрос с кнопкой</value>
@@ -584,5 +584,41 @@
   </data>
   <data name="ReportTitle" xml:space="preserve">
     <value>Содержимое отчёта об игре</value>
+  </data>
+  <data name="HintSelectCatPlayer" xml:space="preserve">
+    <value>Выберите игрока, которому вы отдаёте вопрос</value>
+  </data>
+  <data name="HintSelectStarter" xml:space="preserve">
+    <value>Выберите начинающего раунд</value>
+  </data>
+  <data name="HintThemeDeleter" xml:space="preserve">
+    <value>Выберите убирающего тему</value>
+  </data>
+  <data name="HintSelectStaker" xml:space="preserve">
+    <value>Выберите ставящего</value>
+  </data>
+  <data name="HintSelectTheme" xml:space="preserve">
+    <value>Уберите тему на табло</value>
+  </data>
+  <data name="HintSelectQuestion" xml:space="preserve">
+    <value>Выберите вопрос на табло</value>
+  </data>
+  <data name="HintCheckAnswer" xml:space="preserve">
+    <value>Определите правильность ответа игрока</value>
+  </data>
+  <data name="ErrorWritingLogToDisc" xml:space="preserve">
+    <value>Ошибка записи лога на дискs</value>
+  </data>
+  <data name="Label_Auction" xml:space="preserve">
+    <value>ВОПРОС СО СТАВКОЙ</value>
+  </data>
+  <data name="Label_CatInBag" xml:space="preserve">
+    <value>ВОПРОС С СЕКРЕТОМ</value>
+  </data>
+  <data name="Label_Sponsored" xml:space="preserve">
+    <value>ВОПРОС ДЛЯ СЕБЯ БЕЗ РИСКА</value>
+  </data>
+  <data name="GameStarted" xml:space="preserve">
+    <value>Игра началась</value>
   </data>
 </root>

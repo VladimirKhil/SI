@@ -1,4 +1,4 @@
-﻿using SICore.BusinessLogic;
+﻿using SICore.Contracts;
 using SICore.Utils;
 using SIData;
 using System.Text.Json;

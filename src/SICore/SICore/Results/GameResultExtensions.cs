@@ -1,4 +1,4 @@
-﻿using SICore.BusinessLogic;
+﻿using SICore.Contracts;
 using System.Text;
 using R = SICore.Properties.Resources;
 

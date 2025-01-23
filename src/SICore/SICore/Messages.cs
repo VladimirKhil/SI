@@ -363,9 +363,8 @@ public static class Messages
     public const string PackageLogo = "PACKAGELOGO";
 
     /// <summary>
-    /// Пас на вопросе
+    /// Player passed.
     /// </summary>
-    [Obsolete("Use PlayerState instead")]
     public const string Pass = "PASS";
 
     /// <summary>

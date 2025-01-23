@@ -253,9 +253,9 @@ public enum DecisionType
     StakeMaking,
 
     /// <summary>
-    /// Удаление темы в финале
+    /// Round theme deleting.
     /// </summary>
-    FinalThemeDeleting,
+    ThemeDeleting,
     
     /// <summary>
     /// Making hidden stake.
