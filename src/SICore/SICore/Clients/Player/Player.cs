@@ -23,153 +23,150 @@ public sealed class Player : Viewer
     /// <param name="viewerActions">Player actions.</param>
     /// <param name="localizer">Resource localizer.</param>
     /// <param name="data">Player game data.</param>
-    public Player(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
+    public Player(
+        Client client,
+        Account personData,
+        bool isHost,
+        IViewerLogic logic,
+        ViewerActions viewerActions,
+        ILocalizer localizer,
+        ViewerData data)
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
     { }
 
     private void Clear() => Logic.ClearSelections(true);
 
-    /// <summary>
-    /// Получение системного сообщения
-    /// </summary>
     protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)
     {
         await base.OnSystemMessageReceivedAsync(mparams);
-
-        try
+        
+        switch (mparams[0])
         {
-            switch (mparams[0])
-            {
-                case Messages.Stage:
-                    #region STAGE
+            case Messages.Stage:
+                #region STAGE
 
-                    if (mparams.Length == 0)
-                    {
-                        break;
-                    }
-
-                    if (mparams[1] == nameof(GameStage.Round))
-                    {
-                        lock (ClientData.ChoiceLock)
-                        {
-                            ClientData.QuestionIndex = -1;
-                            ClientData.ThemeIndex = -1;
-                        }
-
-                        Clear();
-                    }
-
-                    #endregion
+                if (mparams.Length == 0)
+                {
                     break;
+                }
 
-                case Messages.Cancel:
+                if (mparams[1] == nameof(GameStage.Round))
+                {
+                    lock (ClientData.ChoiceLock)
+                    {
+                        ClientData.QuestionIndex = -1;
+                        ClientData.ThemeIndex = -1;
+                    }
+
                     Clear();
-                    break;
+                }
 
-                case Messages.Choose:
-                    #region Choose
+                #endregion
+                break;
 
-                    if (mparams[1] == "1")
-                    {
-                        Logic.SelectQuestion();
-                    }
-                    else
-                    {
-                        Logic.DeleteTheme();
-                    }
+            case Messages.Cancel:
+                Clear();
+                break;
 
-                    #endregion
-                    break;
+            case Messages.Choose:
+                #region Choose
 
-                case Messages.Choice:
-                    Logic.OnQuestionSelected();
-                    break;
+                if (mparams[1] == "1")
+                {
+                    Logic.SelectQuestion();
+                }
+                else
+                {
+                    Logic.DeleteTheme();
+                }
 
-                case Messages.Theme:
-                    ClientData.QuestionIndex = -1;
-                    Logic.OnTheme(mparams);
-                    break;
+                #endregion
+                break;
 
-                case Messages.Question:
-                    ClientData.QuestionIndex++;
-                    break;
+            case Messages.Choice:
+                Logic.OnQuestionSelected();
+                break;
 
-                case Messages.Content:
-                    if (ClientData.QuestionType == QuestionTypes.Simple)
-                    {
-                        Logic.OnEnableButton();
-                    }
-                    break;
+            case Messages.Theme:
+                ClientData.QuestionIndex = -1;
+                Logic.OnTheme(mparams);
+                break;
 
-                case Messages.Try:
-                    ClientData.TryStartTime = DateTimeOffset.UtcNow;
-                    Logic.OnCanPressButton();
-                    break;
+            case Messages.Question:
+                ClientData.QuestionIndex++;
+                break;
 
-                case Messages.YouTry:
+            case Messages.Content:
+                if (ClientData.QuestionType == QuestionTypes.Simple)
+                {
                     Logic.OnEnableButton();
-                    Logic.StartThink();
+                }
+                break;
+
+            case Messages.Try:
+                ClientData.TryStartTime = DateTimeOffset.UtcNow;
+                Logic.OnCanPressButton();
+                break;
+
+            case Messages.YouTry:
+                Logic.OnEnableButton();
+                Logic.StartThink();
+                break;
+
+            case Messages.EndTry:
+                Logic.OnDisableButton();
+
+                if (mparams[1] == MessageParams.EndTry_All)
+                {
+                    Logic.EndThink();
+                }
+                break;
+
+            case Messages.Answer:
+                Logic.Answer();
+                break;
+
+            case Messages.AskSelectPlayer:
+                OnAskSelectPlayer(mparams);
+                break;
+
+            case Messages.AskStake:
+                OnAskStake(mparams);
+                break;
+
+            case Messages.Validation2:
+                OnValidation2(mparams);
+                break;
+
+            case Messages.Person:
+                if (mparams.Length < 4)
+                {
                     break;
+                }
 
-                case Messages.EndTry:
-                    Logic.OnDisableButton();
+                var isRight = mparams[1] == "+";
 
-                    if (mparams[1] == MessageParams.EndTry_All)
-                    {
-                        Logic.EndThink();
-                    }
+                if (!int.TryParse(mparams[2], out var playerIndex) ||
+                    playerIndex < 0 ||
+                    playerIndex >= ClientData.Players.Count)
+                {
                     break;
+                }
 
-                case Messages.Answer:
-                    Logic.Answer();
-                    break;
+                Logic.OnPlayerOutcome(playerIndex, isRight);
+                break;
 
-                case Messages.AskSelectPlayer:
-                    OnAskSelectPlayer(mparams);
-                    break;
+            case Messages.Report:
+                var report = new StringBuilder();
 
-                case Messages.AskStake:
-                    OnAskStake(mparams);
-                    break;
+                for (var r = 1; r < mparams.Length; r++)
+                {
+                    report.AppendLine(mparams[r]);
+                }
 
-                case Messages.Validation2:
-                    OnValidation2(mparams);
-                    break;
-
-                case Messages.Person:
-                    if (mparams.Length < 4)
-                    {
-                        break;
-                    }
-
-                    var isRight = mparams[1] == "+";
-
-                    if (!int.TryParse(mparams[2], out var playerIndex) ||
-                        playerIndex < 0 ||
-                        playerIndex >= ClientData.Players.Count)
-                    {
-                        break;
-                    }
-
-                    Logic.OnPlayerOutcome(playerIndex, isRight);
-                    break;
-
-                case Messages.Report:
-                    var report = new StringBuilder();
-
-                    for (var r = 1; r < mparams.Length; r++)
-                    {
-                        report.AppendLine(mparams[r]);
-                    }
-
-                    ((PlayerAccount)ClientData.Me).IsDeciding = false;
-                    Logic.Report(report.ToString());
-                    break;
-            }
-        }
-        catch (Exception exc)
-        {
-            throw new Exception(string.Join("\n", mparams), exc);
+                            ((PlayerAccount)ClientData.Me).IsDeciding = false;
+                Logic.Report(report.ToString());
+                break;
         }
     }
 

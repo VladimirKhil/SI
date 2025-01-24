@@ -271,7 +271,7 @@ internal sealed class Intelligence : IIntelligence
                             break;
 
                         case PlayerStyle.Normal:
-                            stepIndex = Random.Shared.Next(optionCount);
+                            stepIndex = optionCount > 0 ? Random.Shared.Next(optionCount) : 0;
                             break;
 
                         case PlayerStyle.Agressive:
@@ -504,7 +504,7 @@ internal sealed class Intelligence : IIntelligence
                 if (!canSelectHigherPrice) maxr -= pSelectHigherPrice;
                 if (!canSelectExactPrice) maxr -= pSelectExactPrice;
 
-                var r = Random.Shared.Next(maxr);
+                var r = maxr > 0 ? Random.Shared.Next(maxr) : 0;
 
                 if (!canSelectLowerPrice) r += pSelectLowerPrice;
                 if (!canSelectHigherPrice && r >= pSelectLowerPrice) r += pSelectHigherPrice;
@@ -588,7 +588,7 @@ internal sealed class Intelligence : IIntelligence
                     canSelectPreviousTheme = true;
                 }
 
-                var r = canSelectPreviousTheme ? Random.Shared.Next(100) : pSelectPreviousTheme + Random.Shared.Next(100 - pSelectPreviousTheme);
+                var r = canSelectPreviousTheme ? Random.Shared.Next(100) : pSelectPreviousTheme + Random.Shared.Next(Math.Max(0, 100 - pSelectPreviousTheme));
 
                 if (r < pSelectPreviousTheme)
                 {
@@ -895,7 +895,7 @@ internal sealed class Intelligence : IIntelligence
         }
 
         int square = (pMin + pMax) * totalL / 2;
-        ran = Random.Shared.Next(square);
+        ran = square > 0 ? Random.Shared.Next(square) : 0;
         int c = Math.Min(pMin, pMax);
         int d = Math.Abs(pMin - pMax);
         long bb = (long)((pMin + c) / 2.0 * totalL);
@@ -903,7 +903,7 @@ internal sealed class Intelligence : IIntelligence
 
         if (d > 0)
         {
-            x = (int)((Math.Sqrt(bb * bb + 2.0 * ran * totalL * d) - bb) / d);
+            x = (int)((Math.Sqrt(Math.Max(0, bb * bb + 2.0 * ran * totalL * d)) - bb) / d);
         }
 
         stake = IntervalProbability.Locale(ref result, x);

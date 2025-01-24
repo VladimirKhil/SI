@@ -171,7 +171,7 @@ public interface IViewerLogic
     /// Clears all possible selection options.
     /// </summary>
     /// <param name="full">Should game table selection be cleared too.</param>
-    void ClearSelections(bool full = false) { }
+    void ClearSelections(bool full = false);
 
     void ClearQuestionState() { }
 

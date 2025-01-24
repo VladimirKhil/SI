@@ -25,7 +25,7 @@ internal sealed class ShowmanComputerController
 
         try
         {
-            ExecuteTask(task, arg);
+            await _data.TaskLock.WithLockAsync(() => ExecuteTask(task, arg), ViewerData.LockTimeoutMs);
         }
         catch (Exception exc)
         {

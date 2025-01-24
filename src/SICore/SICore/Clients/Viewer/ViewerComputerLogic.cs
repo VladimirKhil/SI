@@ -35,6 +35,18 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         _showman = new ShowmanComputerController(data, viewerActions, intelligence);
     }
 
+    public void ClearSelections(bool full = false)
+    {
+        if (_role == GameRole.Showman)
+        {
+            // TODO
+        }
+        else
+        {
+            _player.CancelTask();
+        }
+    }
+
     public void IsRight(bool voteForRight, string answer)
     {
         if (_role == GameRole.Showman)

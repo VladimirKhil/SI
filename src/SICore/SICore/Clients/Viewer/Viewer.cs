@@ -1,4 +1,5 @@
-﻿using Notions;
+﻿using EnsureThat;
+using Notions;
 using SICore.Clients.Viewer;
 using SICore.Contracts;
 using SICore.Models;
@@ -95,6 +96,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 
     public void Move(object arg) => _viewerActions.SendMessageWithArgs(Messages.Move, arg);
 
+    // TODO: get rid of async and await here
     /// <summary>
     /// Processes received system message.
     /// </summary>
@@ -1996,7 +1998,9 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
     {
         if (message.IsSystem)
         {
-            await OnSystemMessageReceivedAsync(message.Text.Split('\n'));
+            await ClientData.TaskLock.WithLockAsync(
+                async () => await OnSystemMessageReceivedAsync(message.Text.Split('\n')),
+                ViewerData.LockTimeoutMs);
         }
         else
         {

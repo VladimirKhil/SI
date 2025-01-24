@@ -3,6 +3,8 @@ using SICore.Helpers;
 using SICore.Models;
 using SICore.Utils;
 using SIPackages.Core;
+using System.Threading.Tasks;
+using Utils.Timers;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -10,7 +12,7 @@ namespace SICore;
 /// <summary>
 /// Defines a player computer logic.
 /// </summary>
-internal sealed class PlayerComputerController
+internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerController.PlayerTasks>
 {
     private const int DefaultThemeQuestionCount = 5;
 
@@ -22,6 +24,10 @@ internal sealed class PlayerComputerController
 
     private int _themeQuestionCount = -1;
 
+    private readonly TaskRunner<PlayerTasks> _taskRunner;
+
+    private object? _taskArg; // Currently TaskRunner does not support object task arguments
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PlayerComputerController"/> class.
     /// </summary>
@@ -31,16 +37,20 @@ internal sealed class PlayerComputerController
         _viewerActions = viewerActions;
         _data = data;
         _timersInfo = timerInfos;
+        _taskRunner = new TaskRunner<PlayerTasks>(this);
     }
 
-    // TODO: Switch to TaskRunner and support task cancellation
-    private async void ScheduleExecution(PlayerTasks task, double taskTime, object? arg = null)
+    private void ScheduleExecution(PlayerTasks task, double taskTime, object? arg = null)
     {
-        await Task.Delay((int)taskTime * 100);
+        _taskArg = arg;
+        _taskRunner.ScheduleExecution(task, taskTime);
+    }
 
+    public void ExecuteTask(PlayerTasks taskId, int arg)
+    {
         try
         {
-            ExecuteTask(task, arg);
+            _data.TaskLock.WithLock(() => ExecuteTaskCore(taskId, _taskArg), ViewerData.LockTimeoutMs);
         }
         catch (Exception exc)
         {
@@ -48,7 +58,7 @@ internal sealed class PlayerComputerController
         }
     }
 
-    private void ExecuteTask(PlayerTasks task, object? arg)
+    private void ExecuteTaskCore(PlayerTasks task, object? arg)
     {
         switch (task)
         {
@@ -208,6 +218,8 @@ internal sealed class PlayerComputerController
 
     private void OnPressButton() => _viewerActions.PressButton(_data.TryStartTime);
 
+    public void CancelTask() => _taskRunner.ScheduleExecution(PlayerTasks.None, 0, runTimer: false);
+
     private int GetTimePercentage(int timerIndex)
     {
         var now = DateTime.UtcNow;
@@ -329,8 +341,9 @@ internal sealed class PlayerComputerController
     /// </summary>
     private int MyScore() => ((PlayerAccount)_data.Me).Sum;
 
-    private enum PlayerTasks
+    internal enum PlayerTasks
     {
+        None,
         Ready, // Internal action
         Answer,
         SelectQuestion,

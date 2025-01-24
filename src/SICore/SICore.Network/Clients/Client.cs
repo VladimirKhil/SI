@@ -85,6 +85,7 @@ public sealed class Client : IClient
                 while (_inMessages.Reader.TryRead(out var message))
                 {
                     var task = MessageReceived?.Invoke(message);
+                    
                     if (task.HasValue)
                     {
                         await task.Value;

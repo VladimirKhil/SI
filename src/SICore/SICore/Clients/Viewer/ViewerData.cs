@@ -3,6 +3,7 @@ using SICore.Contracts;
 using SIData;
 using System.Collections.ObjectModel;
 using System.Text;
+using Utils;
 
 namespace SICore;
 
@@ -13,6 +14,13 @@ namespace SICore;
 /// </summary>
 public sealed class ViewerData : Data
 {
+    internal const int LockTimeoutMs = 5000;
+
+    /// <summary>
+    /// Allows to separate message handling and logic execution.
+    /// </summary>
+    internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
+
     private string _stageName = "";
 
     /// <summary>
