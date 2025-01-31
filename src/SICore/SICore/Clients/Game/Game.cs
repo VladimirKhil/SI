@@ -2299,6 +2299,14 @@ public sealed class Game : Actor
             ClientData.Answerer.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor >= 0.0 ? factor : 1.0;
             ClientData.ShowmanDecision = true;
 
+            if (ClientData.Answerer != null
+                && ClientData.IsOralNow
+                && (ClientData.QuestionPlayState.AnswerOptions == null || !ClientData.Settings.AppSettings.OralPlayersActions))
+            {
+                // Cancelling Oral Answer player mode
+                _gameActions.SendMessage(Messages.Cancel, ClientData.Answerer.Name);
+            }
+
             _logic.Stop(StopReason.Decision);
             return;
         }
@@ -2380,7 +2388,9 @@ public sealed class Game : Actor
                     if (player.StakeMaking && i != ClientData.Stakes.StakerIndex) // Current stakes winner cannot pass
                     {
                         player.StakeMaking = false;
+                        // TODO: leave only one pass message
                         _gameActions.SendMessageWithArgs(Messages.Pass, i);
+                        _gameActions.SendMessageWithArgs(Messages.PersonStake, i, 2);
                     }
 
                     break;

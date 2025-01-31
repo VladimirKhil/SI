@@ -3800,10 +3800,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var activePlayer = _data.Players[playerIndex];
             var playerMoney = activePlayer.Sum;
 
-            if (_data.Stake != -1 && playerMoney <= _data.Stake) // Could not make stakes
+            if (_data.Stake != -1 && playerMoney <= _data.Stake || !activePlayer.StakeMaking) // Could not make stakes
             {
-                activePlayer.StakeMaking = false;
-                _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
+                if (activePlayer.StakeMaking)
+                {
+                    activePlayer.StakeMaking = false;
+                    _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
+                }
 
                 var stakersCount = _data.Players.Count(p => p.StakeMaking);
 
@@ -5001,9 +5004,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             .Add(optionIndex + 1)
             .Add(answerOption.Label);
 
+        int contentDuration;
+
         if (answerOption.Content.Type == ContentTypes.Text)
         {
             messageBuilder.Add(ContentTypes.Text).Add(answerOption.Content.Value.EscapeNewLines());
+            contentDuration = Math.Min(10, GetReadingDurationForTextLength(answerOption.Content.Value.Length));
         }
         else
         {
@@ -5017,12 +5023,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             {
                 messageBuilder.Add(answerOption.Content.Type).Add(globalUri);
             }
+
+            contentDuration = 10;
         }
 
         _gameActions.SendMessage(messageBuilder.ToString());
 
         var nextTask = optionIndex + 1 < ClientData.QuestionPlayState.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
-        ScheduleExecution(nextTask, ClientData.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? 10 : 1, optionIndex + 1);
+        ScheduleExecution(nextTask, ClientData.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? contentDuration : 1, optionIndex + 1);
     }
 
     internal void OnComplexContent(Dictionary<string, List<ContentItem>> contentTable)

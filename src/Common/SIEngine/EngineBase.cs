@@ -10,26 +10,9 @@ public abstract class EngineBase : IDisposable, INotifyPropertyChanged
 {
     private bool _isDisposed = false;
 
-    protected GameStage _stage = GameStage.Begin;
-
-    /// <summary>
-    /// Current game state.
-    /// </summary>
-    public GameStage Stage
-    {
-        get => _stage;
-        protected set
-        {
-            if (_stage != value)
-            {
-                _stage = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     protected readonly SIDocument _document;
 
+    // TODO: hide
     public SIDocument Document => _document;
 
     protected int _roundIndex = -1, _themeIndex = 0, _questionIndex = 0;
