@@ -58,6 +58,11 @@ public sealed class GameServerClient : IGameServerClient
         _options = options.Value;
         _uIThreadExecutor = uIThreadExecutor;
 
+        if (!_options.ServiceUri!.EndsWith("/", StringComparison.Ordinal))
+        {
+            _options.ServiceUri += "/";
+        }
+
         _client = new HttpClient
         {
             BaseAddress = new Uri(ServiceUri),

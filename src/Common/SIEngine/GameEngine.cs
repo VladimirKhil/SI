@@ -28,6 +28,26 @@ public sealed class GameEngine : EngineBase
 
     private IQuestionEngine QuestionEngine => _questionEngine ?? throw new InvalidOperationException("_questionEngine == null");
 
+
+    private GameStage _stage = GameStage.Begin;
+
+    // TODO: hide
+    /// <summary>
+    /// Current game state.
+    /// </summary>
+    public GameStage Stage
+    {
+        get => _stage;
+        private set
+        {
+            if (_stage != value)
+            {
+                _stage = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public GameEngine(
         SIDocument document,
         GameRules gameRules,
