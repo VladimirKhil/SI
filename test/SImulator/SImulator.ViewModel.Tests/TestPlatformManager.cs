@@ -17,7 +17,7 @@ internal sealed class TestPlatformManager : PlatformManager
         throw new NotImplementedException();
     }
 
-    public override Task<string> AskSelectFileAsync(string header)
+    public override Task<string?> AskSelectFileAsync(string header)
     {
         throw new NotImplementedException();
     }
@@ -27,7 +27,7 @@ internal sealed class TestPlatformManager : PlatformManager
         throw new NotImplementedException();
     }
 
-    public override Task<IPackageSource> AskSelectPackageAsync(object arg)
+    public override Task<IPackageSource?> AskSelectPackageAsync(string arg)
     {
         throw new NotImplementedException();
     }
@@ -95,7 +95,7 @@ internal sealed class TestPlatformManager : PlatformManager
         throw new NotImplementedException();
     }
 
-    public override void PlaySound(string name, Action onFinish)
+    public override void PlaySound(string name, Action? onFinish)
     {
         
     }
