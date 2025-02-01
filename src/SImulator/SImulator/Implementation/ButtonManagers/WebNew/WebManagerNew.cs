@@ -58,6 +58,13 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
             .UseRouting()
             .UseEndpoints(endpoints => endpoints.MapHub<ButtonHubNew>("/sihost"));
 
+        _webApplication.MapGet("/api/v1/info/bots", () => Array.Empty<string>());
+        
+        _webApplication.MapGet("/api/v1/info/host", () => new 
+        {
+            ContentInfos = new[] { new { } }
+        });
+
         _webApplication.RunAsync($"http://+:{port}");
     }
 
@@ -142,12 +149,21 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
 
     public void AskTextAnswer() => SendMessage("ANSWER");
 
+    public void AskOralAnswer() => SendMessage("ORAL_ANSWER");
+
     public void Cancel() => SendMessage("CANCEL");
 
     public override void OnPlayersChanged()
     {
-        var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
-        context.Clients.Group(ButtonHubNew.SubscribersGroup).GamePersonsChanged(1, Players);
+        try
+        {
+            var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
+            context.Clients.Group(ButtonHubNew.SubscribersGroup).GamePersonsChanged(1, Players);
+        }
+        catch (ObjectDisposedException)
+        {
+            // Ignore
+        }
     }
 
     public override void DisconnectPlayerById(string id, string name)

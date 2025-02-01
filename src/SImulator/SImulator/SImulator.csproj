@@ -5,9 +5,8 @@
     <AssemblyTitle>SImulator</AssemblyTitle>
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
-    <Copyright>Copyright © Khil-soft 2010 - 2024</Copyright>
 	  <!--<Version>$(SImulatorVersion)</Version>-->
-	<Version>2.99.99</Version>
+	<Version>2.991.991</Version>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>

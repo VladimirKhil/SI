@@ -180,9 +180,9 @@ internal sealed class DesktopManager : PlatformManager
         return code;
     }
 
-    public override async Task<IPackageSource?> AskSelectPackageAsync(object arg)
+    public override async Task<IPackageSource?> AskSelectPackageAsync(string arg)
     {
-        if (arg.ToString() == "0")
+        if (arg == "0")
         {
             var dialog = new OpenFileDialog
             {
@@ -198,7 +198,7 @@ internal sealed class DesktopManager : PlatformManager
                 return new FilePackageSource(dialog.FileName);
             }
         }
-        else if (arg.ToString() == "1")
+        else if (arg == "1")
         {
             var storage = ServiceProvider.GetRequiredService<StorageViewModel>();
             storage.DefaultRestriction = ((App)Application.Current).Settings.Restriction;
@@ -241,7 +241,7 @@ internal sealed class DesktopManager : PlatformManager
         }
         else
         {
-            return new FilePackageSource(arg.ToString());
+            return new FilePackageSource(arg);
         }
 
         return null;

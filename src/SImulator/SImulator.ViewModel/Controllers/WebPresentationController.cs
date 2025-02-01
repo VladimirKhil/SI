@@ -7,6 +7,7 @@ using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Diagnostics;
+using System.Drawing;
 using System.Text.Json;
 using Utils;
 using Utils.Web;
@@ -423,10 +424,22 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     }
 
     public void OnFinalThink() => SendMessage(new { Type = "finalThink" });
-
-    public void UpdateSettings(Settings settings)
+    
+    public void UpdateSettings(Settings settings) => SendMessage(new
     {
-        // TODO: will be implemented in the future
+        Type = "setOptions",
+        TableTextColor = ConvertWpfToHtmlColor(settings.TableColorString),
+        TableBackgroundColor = ConvertWpfToHtmlColor(settings.TableBackColorString)
+    });
+
+    private static string ConvertWpfToHtmlColor(string wpfColor)
+    {
+        if (wpfColor.Length == 9 && wpfColor.StartsWith("#"))
+        {
+            return $"#{wpfColor.Substring(3)}{wpfColor.Substring(1, 2)}";
+        }
+
+        return wpfColor; // Return as-is if not in expected format
     }
 
     public void UpdateShowPlayers(bool showPlayers) => SendMessage(new

@@ -44,6 +44,11 @@ internal sealed class JoystickListener : ButtonManagerBase
 
         try
         {
+            if (_joystick == null)
+            {
+                return;
+            }
+
             _joystick.Poll();
 
             var data = _joystick.GetBufferedData();
@@ -127,7 +132,7 @@ internal sealed class JoystickListener : ButtonManagerBase
             if (_acquired)
             {
                 _timer.Change(Timeout.Infinite, Period);
-                _joystick.Unacquire();
+                _joystick?.Unacquire();
 
                 _acquired = false;
             }

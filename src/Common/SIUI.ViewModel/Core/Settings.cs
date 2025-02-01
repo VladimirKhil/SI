@@ -13,7 +13,7 @@ public sealed class Settings : INotifyPropertyChanged
 {
     public const string DefaultTableFontFamily = "_Default";
     public const string DefaultTableColorString = "White";
-    public const string DefaultTableBackColorString = "#FF000451";
+    public const string DefaultTableBackColorString = "#FF0A0E30";
     public const string DefaultTableGridColorString = null;
     public const string DefaultAnswererColorString = "#DD1D1F77";
     public const double DefaultQuestionLineSpacing = 1.5;

@@ -4,7 +4,7 @@
 	<SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Description>SIGame packages processor</Description>
-    <Version>7.10.0</Version>
+    <Version>$(SIGameVersion)</Version>
     <PackageProjectUrl>https://github.com/VladimirKhil/SI</PackageProjectUrl>
     <RepositoryUrl>https://github.com/VladimirKhil/SI</RepositoryUrl>
     <PackageTags>SIGame</PackageTags>

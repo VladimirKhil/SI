@@ -7,79 +7,7 @@ namespace SIUI.ViewModel;
 /// </summary>
 public sealed class SettingsViewModel : ViewModelBase<Settings>
 {
-    public double TableColorR
-    {
-        get => Convert.ToByte(_model.TableColorString.Substring(3, 2), 16);
-        set
-        {
-            _model.TableColorString = _model.TableColorString.Substring(0, 3)
-                + ((byte)value).ToString("x2")
-                + _model.TableColorString.Substring(5);
-
-            OnPropertyChanged(nameof(TableColorString));
-        }
-    }
-
-    public double TableColorG
-    {
-        get => Convert.ToByte(_model.TableColorString.Substring(5, 2), 16);
-        set
-        {
-            _model.TableColorString = _model.TableColorString.Substring(0, 5)
-                + ((byte)value).ToString("x2")
-                + _model.TableColorString.Substring(7);
-
-            OnPropertyChanged(nameof(TableColorString));
-        }
-    }
-
-    public double TableColorB
-    {
-        get => Convert.ToByte(_model.TableColorString.Substring(7, 2), 16);
-        set
-        {
-            _model.TableColorString = _model.TableColorString.Substring(0, 7) + ((byte)value).ToString("x2");
-            OnPropertyChanged(nameof(TableColorString));
-        }
-    }
-
     public string TableColorString => _model.TableColorString;
-
-    public double TableBackColorR
-    {
-        get => Convert.ToByte(_model.TableBackColorString.Substring(3, 2), 16);
-        set
-        {
-            _model.TableBackColorString = _model.TableBackColorString.Substring(0, 3)
-                + ((byte)value).ToString("x2")
-                + _model.TableBackColorString.Substring(5);
-
-            OnPropertyChanged(nameof(TableBackColorString));
-        }
-    }
-
-    public double TableBackColorG
-    {
-        get => Convert.ToByte(_model.TableBackColorString.Substring(5, 2), 16);
-        set
-        {
-            _model.TableBackColorString = _model.TableBackColorString.Substring(0, 5)
-                + ((byte)value).ToString("x2")
-                + _model.TableBackColorString.Substring(7);
-
-            OnPropertyChanged(nameof(TableBackColorString));
-        }
-    }
-
-    public double TableBackColorB
-    {
-        get => Convert.ToByte(_model.TableBackColorString.Substring(7, 2), 16);
-        set
-        {
-            _model.TableBackColorString = _model.TableBackColorString.Substring(0, 7) + ((byte)value).ToString("x2");
-            OnPropertyChanged(nameof(TableBackColorString));
-        }
-    }
 
     public string TableBackColorString => _model.TableBackColorString;
 

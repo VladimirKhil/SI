@@ -8,5 +8,7 @@ public interface ICommandExecutor
 
     void AskTextAnswer();
 
+    void AskOralAnswer();
+
     void Cancel();
 }

@@ -1260,7 +1260,7 @@
                 <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.Design}" />
 
                 <UniformGrid Columns="2" Margin="0,0,4,0">
-                    <StackPanel Margin="0,0,5,0" Style="{StaticResource Customizable}">
+                    <StackPanel Margin="0,0,5,0">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TextColor}" />
                         
                         <Button
@@ -1278,7 +1278,7 @@
                         </Button>
                     </StackPanel>
 
-                    <StackPanel Margin="5,0,0,0" Style="{StaticResource Customizable}">
+                    <StackPanel Margin="5,0,0,0">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.BackgroundColor}" />
                         
                         <Button
@@ -1370,25 +1370,47 @@
 
                     <CheckBox IsChecked="{Binding Settings.ShowTextNoFalstart}" Margin="0,0,5,0">
                         <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.ShowTextNoFalseStartsHint}" />
+
+                        <CheckBox.Style>
+                            <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentScreen.IsCustomizable}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </CheckBox.Style>
                     </CheckBox>
 
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Settings.OralText}" Margin="5,0,0,0" Content="{x:Static lp:Resources.OralText}" />
+                        <CheckBox IsChecked="{Binding Settings.OralText}" Margin="0,0,0,0" Content="{x:Static lp:Resources.OralText}" />
 
                         <Button Style="{StaticResource HelpButton}">
                             <lb:TipBehavior.Tip>
                                 <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.OralTextHint}" />
                             </lb:TipBehavior.Tip>
                         </Button>
+
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentScreen.IsCustomizable}" Value="False">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
                     </StackPanel>
 
-                    <CheckBox IsChecked="{Binding Settings.ShowTableCaption}" Margin="0,0,0,0" Content="{x:Static lp:Resources.ShowTableCaption}" />
+                    <CheckBox IsChecked="{Binding Settings.ShowTableCaption}" Margin="5,0,0,0" Content="{x:Static lp:Resources.ShowTableCaption}" />
 
-                    <CheckBox IsChecked="{Binding Settings.ShowQuestionBorder}" Margin="5,0,5,0">
+                    <CheckBox IsChecked="{Binding Settings.ShowQuestionBorder}" Margin="0,0,5,0">
                         <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.ShowQuestionBorder}" />
                     </CheckBox>
 
-                    <CheckBox IsChecked="{Binding Settings.AttachContentToTable}" Margin="0,0,5,0">
+                    <CheckBox IsChecked="{Binding Settings.AttachContentToTable}" Margin="5,0,5,0">
                         <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.AttachContentToTable}" />
                     </CheckBox>
                 </UniformGrid>

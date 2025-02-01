@@ -92,12 +92,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public ICommand OpenLicensesFolder { get; private set; }
 
-    private IPackageSource _packageSource;
+    private IPackageSource? _packageSource;
 
     /// <summary>
-    /// Путь к отыгрываемому документу
+    /// Package source.
     /// </summary>
-    public IPackageSource PackageSource
+    public IPackageSource? PackageSource
     {
         get => _packageSource;
         set
@@ -231,7 +231,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         OpenLicensesFolder = new SimpleCommand(OpenLicensesFolder_Executed);
 
-        ActivePlayerButtonCommand = _addPlayerButton;
+        _activePlayerButtonCommand = _addPlayerButton;
 
         UpdateStartCommand();
         UpdateCanAddPlayerButton();
@@ -378,6 +378,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async Task<SIDocument> PreparePackageAsync(CancellationToken cancellationToken = default)
     {
+        if (_packageSource == null)
+        {
+            throw new InvalidOperationException("_packageSource == null");
+        }
+
         var (filePath, isTemporary) = await _packageSource.GetPackageFileAsync(cancellationToken);
 
         var tempDir = Path.Combine(Path.GetTempPath(), AppSettings.AppName, Guid.NewGuid().ToString());
@@ -455,6 +460,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         try
         {
+            if (_packageSource == null)
+            {
+                throw new InvalidOperationException("_packageSource == null");
+            }
+
             var screenIndex = SettingsViewModel.Model.ScreenNumber;
 
             if (screenIndex < 0 || screenIndex >= Screens.Length)
@@ -615,12 +625,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async void SelectPackage_Executed(object? arg)
     {
-        if (arg == null)
-        {
-            throw new ArgumentNullException(nameof(arg));
-        }
-
-        var packageSource = await PlatformManager.Instance.AskSelectPackageAsync(arg);
+        var stringArg = (arg?.ToString()) ?? throw new ArgumentNullException(nameof(arg));
+        var packageSource = await PlatformManager.Instance.AskSelectPackageAsync(stringArg);
 
         if (packageSource != null)
         {
@@ -772,7 +778,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void RemovePlayerButton_Executed(object? arg)
     {
-        var key = (GameKey)arg;
+        if (arg is not GameKey key)
+        {
+            return;
+        }
 
         if (Settings.PlayerKeys2.Contains(key))
         {
@@ -815,6 +824,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void UpdatePlayersView()
     {
+        if (_game == null)
+        {
+            return;
+        }
+
         if (Settings.PlayersView == PlayersViewMode.Separate && _mode == GameMode.Moderator)
         {
             PlatformManager.Instance.CreatePlayersView(_game);

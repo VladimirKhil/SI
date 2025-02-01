@@ -1165,10 +1165,10 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             ThinkingTime = 0;
         }
 
+        _buttonManager?.TryGetCommandExecutor()?.Cancel();
+
         if (ActiveQuestion?.TypeName == QuestionTypes.StakeAll || ActiveQuestion?.TypeName == QuestionTypes.ForAll)
         {
-            _buttonManager?.TryGetCommandExecutor()?.Cancel();
-
             foreach (var player in Players)
             {
                 player.IsPreliminaryAnswer = false;
@@ -1493,7 +1493,12 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 break;
 
             case QuestionTypes.Stake:
-                PrintQuestionType(typeName, Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias, ActiveRound.Themes.IndexOf(ActiveTheme));
+                PrintQuestionType(
+                    typeName,
+                    Resources.StakeQuestion.ToUpper(),
+                    Settings.Model.SpecialsAliases.StakeQuestionAlias,
+                    ActiveTheme != null ? ActiveRound.Themes.IndexOf(ActiveTheme) : -1);
+                
                 break;
 
             case QuestionTypes.NoRisk:
@@ -2148,6 +2153,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         SetSound(Settings.Model.Sounds.PlayerPressed);
         PresentationController.SetActivePlayerIndex(index);
+        _buttonManager?.TryGetCommandExecutor()?.AskOralAnswer();
 
         _previousState = State;
         State = QuestionState.Pressed;
@@ -2369,6 +2375,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     internal void OnSetNoRiskPrice()
     {
+        if (_activeQuestion == null)
+        {
+            return;
+        }
+
         Price = _activeQuestion.Price * 2;
         NegativePrice = 0;
     }
@@ -2555,6 +2566,12 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         StakerIndex = _stakers[0];
         var staker = Staker;
+
+        if (staker == null)
+        {
+            return;
+        }
+
         staker.IsSelected = true;
         _selectedPlayer = staker;
         Chooser = _selectedPlayer;

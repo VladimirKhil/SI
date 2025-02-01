@@ -6,7 +6,6 @@
     <Product>SImulator.ViewModel</Product>
     <Description>SImulator view model</Description>
     <Version>$(SImulatorVersion)</Version>
-    <Copyright>Copyright © Khil-soft 2010 - 2024</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
