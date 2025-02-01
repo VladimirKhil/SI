@@ -1257,22 +1257,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var stakeMaking2 = string.Join(",", _data.Players.Select(p => p.StakeMaking));
         _data.OrderHistory.Append($"Stake making updated: {stakeMaking2}").AppendLine();
 
-        var stakersCount = _data.Players.Count(p => p.StakeMaking);
-
-        if (stakersCount == 1) // Answerer is defined
+        if (TryDetectStakesWinner())
         {
-            for (var i = 0; i < _data.Players.Count; i++)
-            {
-                if (_data.Players[i].StakeMaking)
-                {
-                    _data.Stakes.StakerIndex = i;
-                }
-            }
-
-            ScheduleExecution(Tasks.PrintAuctPlayer, 25);
             return true;
         }
-        else if (stakersCount == 0)
+
+        var stakerCount = _data.Players.Count(p => p.StakeMaking);
+
+        if (stakerCount == 0)
         {
             _tasksHistory.AddLogEntry("Skipping question");
             Engine.SkipQuestion();
@@ -1781,8 +1773,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         WaitStake();
                         break;
 
-                    case Tasks.PrintAuctPlayer:
-                        PrintStakeQuestionPlayer();
+                    case Tasks.AnnounceStakesWinner:
+                        OnAnnounceStakesWinner();
                         break;
 
                     case Tasks.AskToSelectQuestionAnswerer:
@@ -2232,13 +2224,13 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _tasksHistory.AddLogEntry($"Moved -> {Engine?.Stage}");
     }
 
-    private void PrintStakeQuestionPlayer()
+    private void OnAnnounceStakesWinner()
     {
         var stakerIndex = _data.Stakes.StakerIndex;
 
         if (stakerIndex == -1)
         {
-            throw new ArgumentException($"{nameof(PrintStakeQuestionPlayer)}: {nameof(stakerIndex)} == -1 {_data.OrderHistory}", nameof(stakerIndex));
+            throw new ArgumentException($"{nameof(OnAnnounceStakesWinner)}: {nameof(stakerIndex)} == -1 {_data.OrderHistory}", nameof(stakerIndex));
         }
 
         _data.ChooserIndex = stakerIndex;
@@ -3654,21 +3646,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(candidatesAll.Select(i => (object)i));
                 _gameActions.SendMessage(passMsg.ToString());
 
-                var stakerCount = _data.Players.Count(p => p.StakeMaking);
-
-                if (stakerCount == 1)
+                if (TryDetectStakesWinner())
                 {
-                    // Player is defined
-                    for (var i = 0; i < _data.Players.Count; i++)
-                    {
-                        if (_data.Players[i].StakeMaking)
-                        {
-                            _data.Stakes.StakerIndex = i;
-                            break;
-                        }
-                    }
-
-                    PrintStakeQuestionPlayer();
                     return false;
                 }
 
@@ -3781,16 +3760,16 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _data.OrderHistory.Append($"NextStaker = {_data.Order[_data.OrderIndex]}").AppendLine();
             }
 
-            var others = _data.Players.Where((p, index) => index != _data.Order[_data.OrderIndex]); // Те, кто сейчас не делают ставку
+            var playerIndex = _data.Order[_data.OrderIndex];
+
+            var others = _data.Players.Where((p, index) => index != playerIndex); // Other players
             
-            if (others.All(p => !p.StakeMaking) && _data.Stake > -1) // Остальные не могут ставить
+            if (others.All(p => !p.StakeMaking) && _data.Stake > -1) // Others cannot make stakes
             {
-                // Нельзя повысить ставку
-                ScheduleExecution(Tasks.PrintAuctPlayer, 10);
+                // Staker cannot raise anymore
+                ScheduleExecution(Tasks.AnnounceStakesWinner, 10);
                 return;
             }
-
-            var playerIndex = _data.Order[_data.OrderIndex];
 
             if (playerIndex < 0 || playerIndex >= _data.Players.Count)
             {
@@ -3808,19 +3787,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
                 }
 
-                var stakersCount = _data.Players.Count(p => p.StakeMaking);
-
-                if (stakersCount == 1) // Answerer is detected
+                if (TryDetectStakesWinner())
                 {
-                    for (var i = 0; i < _data.Players.Count; i++)
-                    {
-                        if (_data.Players[i].StakeMaking)
-                        {
-                            _data.Stakes.StakerIndex = i;
-                        }
-                    }
-
-                    ScheduleExecution(Tasks.PrintAuctPlayer, 10);
                     return;
                 }
 
@@ -3933,6 +3901,27 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var stakeMaking = string.Join(",", _data.Players.Select(p => p.StakeMaking));
             throw new Exception($"AskStake error {sums} {stakeMaking} {orders} {_data.Stake} {_data.OrderIndex} {_data.Players.Count} {_data.OrderHistory}", exc);
         }
+    }
+
+    internal bool TryDetectStakesWinner()
+    {
+        var stakerCount = _data.Players.Count(p => p.StakeMaking);
+
+        if (stakerCount == 1) // Answerer is detected
+        {
+            for (var i = 0; i < _data.Players.Count; i++)
+            {
+                if (_data.Players[i].StakeMaking)
+                {
+                    _data.Stakes.StakerIndex = i;
+                }
+            }
+
+            ScheduleExecution(Tasks.AnnounceStakesWinner, 10);
+            return true;
+        }
+
+        return false;
     }
 
     private void AskToMakeStake(StakeReason reason, string name, StakeSettings limit)
@@ -4873,6 +4862,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.OrderHistory.Append("Stake making. Initial state. ")
             .Append("Sums: ")
             .Append(string.Join(",", _data.Players.Select(p => p.Sum)))
+            .Append("StakeMaking: ")
+            .Append(string.Join(",", _data.Players.Select(p => p.StakeMaking)))
             .Append(" Order: ")
             .Append(string.Join(",", _data.Order))
             .Append(" Nominal: ")

@@ -2388,9 +2388,24 @@ public sealed class Game : Actor
                     if (player.StakeMaking && i != ClientData.Stakes.StakerIndex) // Current stakes winner cannot pass
                     {
                         player.StakeMaking = false;
+                        
+                        ClientData.OrderHistory.Append("Player passed on stakes making: ")
+                            .Append(i)
+                            .Append(' ')
+                            .Append(ClientData.ActivePlayer?.StakeMaking)
+                            .AppendLine();
+                        
                         // TODO: leave only one pass message
                         _gameActions.SendMessageWithArgs(Messages.Pass, i);
                         _gameActions.SendMessageWithArgs(Messages.PersonStake, i, 2);
+
+                        if (ClientData.ActivePlayer != null
+                            && ClientData.ActivePlayer.StakeMaking
+                            && (nextTask == Tasks.AskStake || ClientData.Decision == DecisionType.NextPersonStakeMaking))
+                        {
+                            // We do not interrupt DecisionType.StakeMaking of the current player
+                            Logic.TryDetectStakesWinner(); // returning despite of the call result
+                        }
                     }
 
                     break;
@@ -3050,33 +3065,23 @@ public sealed class Game : Actor
 
     private void ContinueMakingStakes()
     {
-        if (ClientData.Players.Count(p => p.StakeMaking) == 1)
+        if (Logic.TryDetectStakesWinner())
         {
-            for (var i = 0; i < ClientData.Players.Count; i++)
-            {
-                if (ClientData.Players[i].StakeMaking)
-                {
-                    ClientData.Stakes.StakerIndex = i;
-                }
-            }
-
             if (ClientData.Stake == -1)
             {
                 ClientData.Stake = ClientData.CurPriceRight;
             }
 
-            Logic.PlanExecution(Tasks.PrintAuctPlayer, 10);
+            return;
         }
-        else
-        {
-            if (ClientData.OrderIndex > -1 && ClientData.Decision == DecisionType.NextPersonStakeMaking)
-            {
-                Logic.AddHistory("Rolling order index back");
-                ClientData.OrderIndex--;
-            }
 
-            Logic.PlanExecution(Tasks.AskStake, 20);
+        if (ClientData.OrderIndex > -1 && ClientData.Decision == DecisionType.NextPersonStakeMaking)
+        {
+            Logic.AddHistory("Rolling order index back");
+            ClientData.OrderIndex--;
         }
+
+        Logic.PlanExecution(Tasks.AskStake, 20);
     }
 
     private void FreeTable(Message message, string[] args, Account host)
