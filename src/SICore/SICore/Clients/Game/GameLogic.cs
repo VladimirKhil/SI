@@ -2599,7 +2599,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AskToTry()
     {
-        if (ClientData.Players.All(p => !p.CanPress || !p.IsConnected))
+        // /*|| !p.IsConnected */ condition was removed because during package testing there are no connected players
+        // and skipping ask mode frustrates people
+        if (ClientData.Players.All(p => !p.CanPress))
         {
             ScheduleExecution(Tasks.WaitTry, 3, force: true);
             return;
