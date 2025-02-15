@@ -442,7 +442,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public PersonAccount? Speaker { get; set; }
 
-    public ObservableCollection<PlayerAccount> Players { get; } = [];
+    public ObservableCollection<PlayerAccount> Players { get; } = new();
 
     public SimpleCommand SelectPlayer { get; }
 
