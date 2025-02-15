@@ -43,10 +43,7 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
-    public void OnQuestionEnd()
-    {
-        
-    }
+    public bool OnQuestionEnd() => false;
 
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
     {

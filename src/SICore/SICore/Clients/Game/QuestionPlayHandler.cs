@@ -281,13 +281,14 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
     }
 
     // TODO: think about merging with GameLogic.InitQuestionState() and QuestionPlayState.Clear()
-    public void OnQuestionStart(bool questionRequiresButtons)
+    public void OnQuestionStart(bool questionRequiresButtons, Action skipQuestionCallback)
     {
         if (GameLogic == null)
         {
             return;
         }
 
+        _gameData.SkipQuestion = skipQuestionCallback;
         _gameData.CanMarkQuestion = true;
         _gameData.IsDeferringAnswer = false;
         _gameData.IsQuestionFinished = false;

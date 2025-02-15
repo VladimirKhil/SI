@@ -98,7 +98,7 @@ public sealed class GameServerClient : IGameServerClient
     public Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default) =>
         Connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
 
-    public async Task OpenAsync(string userName, CancellationToken cancellationToken = default)
+    public async Task OpenAsync(CancellationToken cancellationToken = default)
     {
         if (_isOpened)
         {

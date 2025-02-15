@@ -67,7 +67,7 @@ public sealed class Showman : Viewer
 
                 case Messages.Stage:
                     {
-                        for (int i = 0; i < ClientData.Players.Count; i++)
+                        for (var i = 0; i < ClientData.Players.Count; i++)
                         {
                             ClientData.Players[i].CanBeSelected = false;
                         }

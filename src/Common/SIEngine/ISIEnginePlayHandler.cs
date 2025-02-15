@@ -132,5 +132,6 @@ public interface ISIEnginePlayHandler
     /// <summary>
     /// Handles question end.
     /// </summary>
-    void OnQuestionEnd();
+    /// <returns>Has the current round timed out.</returns>
+    bool OnQuestionEnd();
 }

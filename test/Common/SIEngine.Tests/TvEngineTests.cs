@@ -43,7 +43,6 @@ internal sealed class TvEngineTests
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
-        AssertMove(engine, GameStage.EndQuestion);
         AssertMove(engine, GameStage.SelectingQuestion);
 
         engineHandler.SelectQuestion?.Invoke(0, 1);
@@ -54,7 +53,6 @@ internal sealed class TvEngineTests
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
-        AssertMove(engine, GameStage.EndQuestion);
         AssertMove(engine, GameStage.SelectingQuestion);
 
         engineHandler.SelectQuestion?.Invoke(0, 2);
@@ -65,7 +63,6 @@ internal sealed class TvEngineTests
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
-        AssertMove(engine, GameStage.EndQuestion);
 
         AssertMove(engine, GameStage.EndGame);
         AssertMove(engine, GameStage.None);

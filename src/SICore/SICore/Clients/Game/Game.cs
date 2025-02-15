@@ -2953,7 +2953,7 @@ public sealed class Game : Actor
         if (!ClientData.Players.Any(p => p.StakeMaking))
         {
             Logic.AddHistory("Last staker dropped");
-            Logic.Engine.SkipQuestion();
+            ClientData.SkipQuestion?.Invoke();
             Logic.PlanExecution(Tasks.MoveNext, 20, 1);
         }
         else if (ClientData.OrderIndex == -1 || ClientData.Order[ClientData.OrderIndex] == -1)
@@ -3041,8 +3041,8 @@ public sealed class Game : Actor
             }
         }
         else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0 && Logic.IsSpecialQuestion())
-        {
-            Logic.Engine.SkipQuestion();
+        {            
+            ClientData.SkipQuestion?.Invoke();
             Logic.PlanExecution(Tasks.MoveNext, 20, 1);
         }
         else if (nextTask == Tasks.AnnounceStake)

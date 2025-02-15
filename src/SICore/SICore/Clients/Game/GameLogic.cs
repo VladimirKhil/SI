@@ -147,10 +147,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void Run()
     {
-        // TODO: remove these last events
-        Engine.QuestionFinish += Engine_QuestionFinish;
-        Engine.NextQuestion += Engine_NextQuestion;
-
         _data.PackageDoc = Engine.Document;
 
         _data.GameResultInfo.Name = _data.GameName;
@@ -174,23 +170,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         _gameActions.ShowmanReplic(LO[nameof(R.NobodyInFinal)]);
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10), 1);
-    }
-
-    private void Engine_QuestionFinish()
-    {
-        if (_data.IsRoundEnding)
-        {
-            return;
-        }
-
-        var roundDuration = DateTime.UtcNow.Subtract(_data.TimerStartTime[0]).TotalMilliseconds / 100;
-
-        if (_data.Stage == GameStage.Round && roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
-        {
-            // Round timeout
-            _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
-            Engine.SetTimeout();
-        }
     }
 
     internal void OnContentScreenHtml(ContentItem contentItem)
@@ -287,7 +266,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
         _data.IsPlayingMedia = false;
-        _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
+        // Temporary moved to QuestSourComm
+        // _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
         ScheduleExecution(Tasks.QuestSourComm, 1, 1, force: true);
 
         if (_data.AllowAppellation && _data.PendingApellation)
@@ -461,6 +441,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.CurPriceRight = _data.CurPriceWrong = question.Price;
         _data.Order = Array.Empty<int>();
         _data.OrderIndex = -1;
+        _data.AnswererIndex = -1;
+        _data.CanMarkQuestion = false;
+        _data.QuestionPlayState.Clear();
 
         if (_data.Settings.AppSettings.HintShowman)
         {
@@ -778,15 +761,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         ScheduleExecution(Tasks.AskAnswer, 1, force: true);
-    }
-
-    private void Engine_NextQuestion()
-    {
-        _data.CanMarkQuestion = false;
-        _data.AnswererIndex = -1;
-        _data.QuestionPlayState.Clear();
-
-        ScheduleExecution(Tasks.MoveNext, 1, force: true);
     }
 
     internal void OnRoundEnded()
@@ -1267,7 +1241,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (stakerCount == 0)
         {
             _tasksHistory.AddLogEntry("Skipping question");
-            Engine.SkipQuestion();
+            _data.SkipQuestion?.Invoke();
             ScheduleExecution(Tasks.MoveNext, 10);
 
             return true;
@@ -1497,16 +1471,19 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
         }
 
+        if (ClientData.IsQuestionFinished)
+        {
+            _gameActions.SendMessage(Messages.Resume); // To resume the media
+        }
+
         if (ClientData.Settings.AppSettings.FalseStart || ClientData.IsQuestionFinished)
         {
-            if (!ClientData.Settings.AppSettings.FalseStart)
-            {
-                _gameActions.SendMessage(Messages.Resume); // To resume the media
-            }
-
             ScheduleExecution(Tasks.AskToTry, 10, force: true);
             return;
         }
+
+        _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
+        _gameActions.SendMessage(Messages.Resume);
 
         // Resume question playing
         if (_data.IsPartial)
@@ -1517,9 +1494,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
-            _gameActions.SendMessage(Messages.Resume);
-
             var waitTime = _data.IsPlayingMedia && _data.QuestionPlayState.MediaContentCompletions.All(p => p.Value.Current > 0)
                 ? 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10
                 : _data.AtomTime;
@@ -2814,7 +2788,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SpecialReplic(LO[nameof(R.GameWillResume)]);
         _gameActions.ShowmanReplic(LO[nameof(R.ManuallyPlayedQuestion)]);
 
-        Engine.SkipQuestion();
+        _data.SkipQuestion?.Invoke();
         ScheduleExecution(Tasks.MoveNext, 150, 1);
     }
 
@@ -2916,6 +2890,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
+            _gameActions.SendMessageWithArgs(Messages.QuestionEnd); // Temporary here
             ScheduleExecution(Tasks.MoveNext, 1, force: !informed);
         }
     }
@@ -4676,17 +4651,34 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
-    internal void OnQuestionEnd()
+    private bool DetectRoundTimeout()
     {
+        var roundDuration = DateTime.UtcNow.Subtract(_data.TimerStartTime[0]).TotalMilliseconds / 100;
+
+        if (_data.Stage == GameStage.Round && roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
+        {
+            // Round timeout
+            _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
+            return true;
+        }
+
+        return false;
+    }
+
+    internal bool OnQuestionEnd()
+    {
+        var timeout = DetectRoundTimeout();
+
         if (_data.QuestionPlayState.ValidateAfterRightAnswer)
         {
             if (ValidatePlayersAnswers())
             {
-                return;
+                return timeout;
             }
         }
 
         OnQuestionPostInfo();
+        return timeout;
     }
 
     private bool ValidatePlayersAnswers()
@@ -4945,7 +4937,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
         _gameActions.InformSums();
 
-        Engine.SkipQuestion();
+        _data.SkipQuestion?.Invoke();
         ScheduleExecution(Tasks.MoveNext, 20, 1);
     }
 

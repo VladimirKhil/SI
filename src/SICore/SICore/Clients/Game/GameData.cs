@@ -645,6 +645,11 @@ public sealed class GameData : Data
 
     internal StakesState Stakes { get; }
 
+    /// <summary>
+    /// Skip question action.
+    /// </summary>
+    public Action? SkipQuestion { get; internal set; }
+
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
         _showMan = showman;

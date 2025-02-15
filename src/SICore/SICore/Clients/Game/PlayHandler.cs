@@ -217,7 +217,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         GameActions?.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, price);
     }
 
-    public void OnQuestionEnd() => GameLogic?.OnQuestionEnd();
+    public bool OnQuestionEnd() => GameLogic == null || GameLogic.OnQuestionEnd();
 
     public void OnPackage(Package package) => GameLogic?.OnPackage(package);
 

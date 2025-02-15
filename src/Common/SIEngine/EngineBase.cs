@@ -49,8 +49,6 @@ public abstract class EngineBase : IDisposable, INotifyPropertyChanged
         }
     }
 
-    protected bool _timeout = false;
-
     private bool _canMoveNext = true;
 
     private bool _canMoveBack;
@@ -122,30 +120,10 @@ public abstract class EngineBase : IDisposable, INotifyPropertyChanged
         }
     }
 
-    #region Events
-
-    // TODO: investigate and eliminate duplicates
-    public event Action<int, int>? EndQuestion;
-    public event Action? QuestionFinish;
-    public event Action? NextQuestion;
-    // TODO: end
-
-    #endregion
-
     protected EngineBase(SIDocument document)
     {
-        _document = document ?? throw new ArgumentNullException(nameof(document));
+        _document = document;
     }
-
-    #region Fire events
-
-    protected void OnQuestionFinish() => QuestionFinish?.Invoke();
-
-    protected void OnEndQuestion(int themeIndex, int questionIndex) => EndQuestion?.Invoke(themeIndex, questionIndex);
-
-    protected void OnNextQuestion() => NextQuestion?.Invoke();
-
-    #endregion
 
     protected void UpdateCanMoveNextRound() => CanMoveNextRound = _roundIndex < _document.Package.Rounds.Count;
 
@@ -156,8 +134,6 @@ public abstract class EngineBase : IDisposable, INotifyPropertyChanged
     public void UpdateCanNext() => CanMoveNext = CanNext();
 
     protected void SetActiveRound() => _activeRound = _roundIndex < _document.Package.Rounds.Count ? _document.Package.Rounds[_roundIndex] : null;
-
-    public void SetTimeout() => _timeout = true;
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

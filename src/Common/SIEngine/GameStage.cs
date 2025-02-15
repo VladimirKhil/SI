@@ -36,11 +36,6 @@ public enum GameStage
     Question,
 
     /// <summary>
-    /// Question play finished.
-    /// </summary>
-    EndQuestion,
-
-    /// <summary>
     /// Final stage.
     /// </summary>
     EndGame,

@@ -58,7 +58,7 @@ public sealed class QuestionEngine : IQuestionEngine
         if (!_started)
         {
             _enableButtonsStepIndex = FalseStartHelper.GetAskAnswerStartIndex(_script, _question.Parameters, _options.FalseStarts);
-            _playHandler.OnQuestionStart(ScriptHasAskAnswerButtonsStep(_script));
+            _playHandler.OnQuestionStart(ScriptHasAskAnswerButtonsStep(_script), SkipQuestion);
             _started = true;
         }
 
@@ -414,6 +414,8 @@ public sealed class QuestionEngine : IQuestionEngine
 
         return false;
     }
+
+    private void SkipQuestion() => _stepIndex = _script?.Steps.Count ?? 0;
 
     private void MoveToContent(int stepIndex, int maxContentIndex, int contentIndex)
     {

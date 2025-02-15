@@ -768,7 +768,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         settings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
 
-        var runGameResponse = await _gameServerClient.RunGameAsync(
+        var runGameResponse = await _gameServerClient.Games.RunGameAsync(
             new SI.GameServer.Contract.RunGameRequest((
                 GameSettingsCore<AppSettingsCore>)settings,
                 packageInfo,

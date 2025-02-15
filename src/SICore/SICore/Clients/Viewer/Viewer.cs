@@ -1,5 +1,4 @@
-﻿using EnsureThat;
-using Notions;
+﻿using Notions;
 using SICore.Clients.Viewer;
 using SICore.Contracts;
 using SICore.Models;
@@ -732,21 +731,6 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                 case Messages.FinalThink:
                     _logic.FinalThink();
                     break;
-
-                case Messages.Picture:
-                    {
-                        #region Picture
-
-                        var per = ClientData.MainPersons.FirstOrDefault(person => person.Name == mparams[1]);
-
-                        if (per != null)
-                        {
-                            _logic.UpdatePicture(per, mparams[2]);
-                        }
-
-                        #endregion
-                        break;
-                    }
 
                 case Messages.Avatar:
                     OnAvatar(mparams);
@@ -2103,19 +2087,11 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         for (var i = 0; i < ClientData.Players.Count; i++)
         {
             ClientData.Players[i].CanBeSelected = i + 2 < mparams.Length && mparams[i + 2] == "+";
-            var num = i;
-            ClientData.Players[i].SelectionCallback = player => 
-            {
-                _viewerActions.SendMessageWithArgs(Messages.SelectPlayer, num);
-                ClearSelections(true);
-            };
         }
 
         _ = Enum.TryParse<SelectPlayerReason>(mparams[1], out var reason);
         _logic.OnSelectPlayer(reason);
     }
-
-    private void ClearSelections(bool full = false) => _logic.ClearSelections(full);
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -21,7 +21,7 @@ public sealed class PlayerAccount : PersonAccount
     public bool CanBeSelected
     {
         get => _canBeSelected;
-        set { if (_canBeSelected != value) { _canBeSelected = value; OnPropertyChanged(); Select.CanBeExecuted = value; } }
+        set { if (_canBeSelected != value) { _canBeSelected = value; OnPropertyChanged(); } }
     }
 
     /// <summary>
@@ -85,10 +85,6 @@ public sealed class PlayerAccount : PersonAccount
         set { if (_mediaLoaded != value) { _mediaLoaded = value; OnPropertyChanged(); } }
     }
 
-    public CustomCommand Select { get; private set; }
-
-    public Action<PlayerAccount>? SelectionCallback { get; set; }
-
     private string _answer = "";
 
     /// <summary>
@@ -110,18 +106,11 @@ public sealed class PlayerAccount : PersonAccount
     public PlayerAccount(string name, bool isMale, bool connected, bool gameStarted)
         : base(name, isMale, connected, gameStarted)
     {
-        Init();
     }
 
     public PlayerAccount(Account account)
         : base(account)
     {
-        Init();
-    }
-
-    private void Init()
-    {
-        Select = new CustomCommand(arg => SelectionCallback?.Invoke(this));
     }
 
     public void ClearState()

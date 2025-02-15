@@ -93,10 +93,6 @@ public sealed class GameEngine : EngineBase
                 OnQuestion();
                 break;
 
-            case GameStage.EndQuestion:
-                OnEndQuestion();
-                break;
-
             case GameStage.EndGame:
                 OnEndGame();
                 break;
@@ -137,7 +133,6 @@ public sealed class GameEngine : EngineBase
     private void OnRound()
     {
         CanMoveBack = false;
-        _timeout = false;
 
         var strategyType = _gameRules.GetRulesForRoundType(ActiveRound.Type).QuestionSelectionStrategyType;
 
@@ -177,26 +172,20 @@ public sealed class GameEngine : EngineBase
 
     private void OnQuestion()
     {
-        if (!QuestionEngine.PlayNext())
+        if (QuestionEngine.PlayNext())
         {
-            _playHandler.OnQuestionEnd();
-            Stage = GameStage.EndQuestion;
+            return;
         }
-    }
 
-    private void OnEndQuestion()
-    {
-        OnQuestionFinish();
-        OnEndQuestion(_themeIndex, _questionIndex);
+        var roundTimeout = _playHandler.OnQuestionEnd();
 
-        if (_timeout) // Round timeout
+        if (roundTimeout)
         {
             EndRoundAndMoveNext(RoundEndReason.Timeout);
         }
         else if (SelectionStrategy.CanMoveNext())
         {
             Stage = GameStage.SelectingQuestion;
-            OnNextQuestion();
             UpdateCanNext();
         }
         else
@@ -241,17 +230,6 @@ public sealed class GameEngine : EngineBase
     }
 
     public override bool CanNext() => _stage != GameStage.None && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
-
-    public bool SkipQuestion()
-    {
-        if (Stage != GameStage.Question)
-        {
-            return false;
-        }
-
-        Stage = GameStage.EndQuestion;
-        return true;
-    }
 
     /// <summary>
     /// Ends round and moves to the next one.

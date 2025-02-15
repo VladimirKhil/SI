@@ -440,11 +440,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    // TODO: move to ViewerHumanLogic after merging with other logics
     public PersonAccount? Speaker { get; set; }
 
-    public ObservableCollection<PlayerAccount> Players { get; } = new();
-    
+    public ObservableCollection<PlayerAccount> Players { get; } = [];
+
+    public SimpleCommand SelectPlayer { get; }
+
     public SimpleCommand SendPass { get; set; }
 
     public SimpleCommand SendStake { get; set; }
@@ -525,6 +526,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             }
         }
     }
+
+    internal SelectionMode SelectionMode { get; set; }
 
     public GameViewModel(
         ViewerData viewerData,
@@ -623,6 +626,48 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         Ready = new SimpleCommand(Ready_Executed) { CanBeExecuted = IsPlayer || IsShowman };
         UnReady = new SimpleCommand(UnReady_Executed) { CanBeExecuted = IsPlayer || IsShowman };
+
+        SelectPlayer = new SimpleCommand(SelectPlayer_Executed);
+    }
+
+    private void SelectPlayer_Executed(object? arg)
+    {
+        if (arg is not PlayerAccount player || !player.CanBeSelected)
+        {
+            return;
+        }
+
+        var playerIndex = _data.Players.IndexOf(player);
+
+        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+        {
+            return;
+        }
+
+        switch (SelectionMode)
+        {
+            case SelectionMode.SelectPlayer:
+                Host?.Actions.SendMessageWithArgs(Messages.SelectPlayer, playerIndex);
+                ClearSelections();
+                break;
+
+            case SelectionMode.SetActivePlayer:
+                Host?.Actions.SendMessageWithArgs(Messages.SetChooser, playerIndex);
+                ClearSelections();
+                break;
+
+            case SelectionMode.ChangeSums:
+                SelectedPlayer = new PlayerSumInfo { PlayerIndex = playerIndex + 1, PlayerScore = player.Sum };
+                DialogMode = DialogModes.ChangeSum;
+
+                for (int j = 0; j < Data.Players.Count; j++)
+                {
+                    Data.Players[j].CanBeSelected = false;
+                }
+
+                Hint = Resources.HintChangeSum;
+                break;
+        }
     }
 
     public void OnAddString(string? person, string text, LogMode mode) => StringAdding?.Invoke(person, text, mode);
@@ -892,19 +937,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void ChangeActivePlayer_Executed(object? arg)
     {
-        for (int i = 0; i < Data.Players.Count; i++)
+        for (var i = 0; i < Data.Players.Count; i++)
         {
             Data.Players[i].CanBeSelected = true;
-            int num = i;
-
-            Data.Players[i].SelectionCallback = player =>
-            {
-                Host?.Actions.SendMessageWithArgs(Messages.SetChooser, num);
-                ClearSelections();
-            };
         }
 
         Hint = Resources.HintSelectActivePlayer;
+        SelectionMode = SelectionMode.SetActivePlayer;
     }
 
     private void ClearSelections(bool full = false)
@@ -920,7 +959,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Hint = "";
         DialogMode = DialogModes.None;
 
-        for (int i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _data.Players.Count; i++)
         {
             _data.Players[i].CanBeSelected = false;
         }
@@ -930,26 +969,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void ChangeSums_Executed(object? arg)
     {
-        for (int i = 0; i < Data.Players.Count; i++)
+        for (var i = 0; i < Data.Players.Count; i++)
         {
             Data.Players[i].CanBeSelected = true;
-            int num = i;
-
-            Data.Players[i].SelectionCallback = player =>
-            {
-                SelectedPlayer = new PlayerSumInfo { PlayerIndex = num + 1, PlayerScore = player.Sum };
-                DialogMode = DialogModes.ChangeSum;
-
-                for (int j = 0; j < Data.Players.Count; j++)
-                {
-                    Data.Players[j].CanBeSelected = false;
-                }
-
-                Hint = Resources.HintChangeSum;
-            };
         }
 
         Hint = Resources.HintSelectPlayerForSumChange;
+        SelectionMode = SelectionMode.ChangeSums;
     }
 
     private void SendAnswer_Executed(object? arg)

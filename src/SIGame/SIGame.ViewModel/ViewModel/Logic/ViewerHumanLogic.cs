@@ -209,7 +209,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _gameViewModel.Hint = "";
         _gameViewModel.DialogMode = DialogModes.None;
 
-        for (int i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _data.Players.Count; i++)
         {
             _data.Players[i].CanBeSelected = false;
         }
@@ -221,6 +221,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
     {
         _gameViewModel.ClearReplic();
         _gameViewModel.Hint = GetSelectHint(reason);
+        _gameViewModel.SelectionMode = SelectionMode.SelectPlayer;
     }
 
     private static string GetSelectHint(Models.SelectPlayerReason selectionMode) => selectionMode switch
@@ -1735,10 +1736,10 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
     }
 
-    public void AddPlayer(PlayerAccount account) => UI.Execute(
+    public void AddPlayer(PlayerAccount player) => UI.Execute(
         () =>
         {
-            _gameViewModel.Players.Add(account);
+            _gameViewModel.Players.Add(player);
             _gameViewModel.UpdateAddTableCommand();
         },
         ClientData.Host.OnError);

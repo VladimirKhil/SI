@@ -35,7 +35,7 @@ public interface IGameServerClient : IAsyncDisposable
     event Action<int> GameDeleted;
     event Action<GameInfo> GameChanged;
 
-    Task OpenAsync(string userName, CancellationToken token = default);
+    Task OpenAsync(CancellationToken token = default);
 
     Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default);
 

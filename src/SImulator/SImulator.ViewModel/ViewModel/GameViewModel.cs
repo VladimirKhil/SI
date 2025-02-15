@@ -685,10 +685,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         settings.SIUISettings.PropertyChanged += Default_PropertyChanged;
         settings.Model.PropertyChanged += Settings_PropertyChanged;
 
-        _engine.QuestionFinish += Engine_QuestionFinish;
-        _engine.EndQuestion += Engine_EndQuestion;
-        _engine.NextQuestion += Engine_NextQuestion;
-
         _engine.PropertyChanged += Engine_PropertyChanged;
 
         _presentationListener.MediaStart += GameHost_MediaStart;
@@ -732,7 +728,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 MoveToContentCallback?.Invoke(i);
                 break;
             }
-        }        
+        }
     }
 
     public void ExecuteTask(Tasks taskId, int arg)
@@ -821,8 +817,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         PresentationController.SetAnswerState(answerIndex, ItemState.Active);
     }
 
-    private void Engine_QuestionFinish() => ClearState();
-
     private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender == null)
@@ -852,7 +846,14 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    internal async void OnQuestionEnd()
+    internal bool OnQuestionEnd()
+    {
+        ClearState();
+        QuestionEndInternal();
+        return Settings.Model.RoundTime > 0 && RoundTime >= Settings.Model.RoundTime;
+    }
+
+    private async void QuestionEndInternal()
     {
         await Task.Yield();
 
@@ -962,7 +963,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
             if (RoundTime >= Settings.Model.RoundTime)
             {
-                _engine.SetTimeout();
                 StopRoundTimer_Executed(null);
             }
         },
@@ -1702,8 +1702,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveMediaCommand = null;
     }
 
-    private void Engine_NextQuestion() => _engine.MoveNext();
-
     internal void OnEndRoundTimeout()
     {
         SetSound(Settings.Model.Sounds.RoundTimeout);
@@ -1715,19 +1713,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         StopRoundTimer_Executed(0);
         ActiveRoundCommand = null;
         PresentationController.ClearState();
-    }
-
-    private void Engine_EndQuestion(int themeIndex, int questionIndex)
-    {
-        if (themeIndex > -1 && themeIndex < LocalInfo.RoundInfo.Count)
-        {
-            var themeInfo = LocalInfo.RoundInfo[themeIndex];
-
-            if (questionIndex > -1 && questionIndex < themeInfo.Questions.Count)
-            {
-                themeInfo.Questions[questionIndex].Price = -1;
-            }
-        }
     }
 
     private void ClearState()
@@ -2023,6 +2008,16 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             _taskRunner.ScheduleExecution(Tasks.MoveNext, 17);
 
             _gameLogger.Write(ActiveQuestion.GetText());
+
+            if (themeIndex > -1 && themeIndex < LocalInfo.RoundInfo.Count)
+            {
+                var themeInfo = LocalInfo.RoundInfo[themeIndex];
+
+                if (questionIndex > -1 && questionIndex < themeInfo.Questions.Count)
+                {
+                    themeInfo.Questions[questionIndex].Price = -1;
+                }
+            }
         }
         catch (Exception exc)
         {

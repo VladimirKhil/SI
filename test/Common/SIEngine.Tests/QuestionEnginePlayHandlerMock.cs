@@ -40,7 +40,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         
     }
 
-    public void OnQuestionStart(bool buttonsRequired)
+    public void OnQuestionStart(bool buttonsRequired, Action skipQuestionCallback)
     {
         
     }

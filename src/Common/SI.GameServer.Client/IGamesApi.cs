@@ -8,5 +8,5 @@ public interface IGamesApi
 {
     Task<GetGameByPinResponse?> GetGameByPinAsync(int pin, CancellationToken cancellationToken = default);
 
-    Task<RunGameResponse?> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default);
+    Task<RunGameResponse> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default);
 }

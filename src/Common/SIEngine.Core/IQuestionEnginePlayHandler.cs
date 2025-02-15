@@ -9,6 +9,13 @@ namespace SIEngine.Core;
 public interface IQuestionEnginePlayHandler
 {
     /// <summary>
+    /// Handles question start.
+    /// </summary>
+    /// <param name="buttonsRequired">Whether the question requires buttons to play.</param>
+    /// <param name="skipQuestionCallback">Callback that allows to skip the question.</param>
+    void OnQuestionStart(bool buttonsRequired, Action skipQuestionCallback);
+
+    /// <summary>
     /// Sets answer options.
     /// </summary>
     /// <param name="answerOptions">Answer options.</param>
@@ -64,12 +71,6 @@ public interface IQuestionEnginePlayHandler
     /// Accepts the question as answered right even if no answer has been provided.
     /// </summary>
     bool OnAccept();
-
-    /// <summary>
-    /// Handles question start.
-    /// </summary>
-    /// <param name="buttonsRequired">Whether the question requires buttons to play.</param>
-    void OnQuestionStart(bool buttonsRequired);
 
     /// <summary>
     /// Handles content start.

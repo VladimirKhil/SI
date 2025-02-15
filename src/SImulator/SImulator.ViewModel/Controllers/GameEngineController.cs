@@ -278,7 +278,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return media?.Uri?.OriginalString;
     }
 
-    public void OnQuestionStart(bool buttonsRequired)
+    public void OnQuestionStart(bool buttonsRequired, Action skipQuestionCallback)
     {
         if (GameViewModel == null)
         {
@@ -438,7 +438,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnQuestionType(string typeName, bool isDefault) => GameViewModel?.PlayQuestionType(typeName, isDefault);
 
-    public void OnQuestionEnd() => GameViewModel?.OnQuestionEnd();
+    public bool OnQuestionEnd() => GameViewModel == null || GameViewModel.OnQuestionEnd();
 
     public void OnPackage(Package package) => GameViewModel?.OnPackage(package);
 

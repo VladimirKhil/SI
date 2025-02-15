@@ -136,7 +136,8 @@
         </ControlTemplate>
 
         <Style x:Key="PersonAreaStyle" TargetType="Button">
-            <Setter Property="Command" Value="{Binding Select}" />
+            <Setter Property="Command" Value="{Binding DataContext.SelectPlayer, RelativeSource={RelativeSource AncestorType=Grid, AncestorLevel=3}}" />
+            <Setter Property="CommandParameter" Value="{Binding}" />
             <Setter Property="BorderBrush" Value="#FF111111" />
             <Setter Property="BorderThickness" Value="2" />
             <Setter Property="Template" Value="{StaticResource PersonArea}" />
