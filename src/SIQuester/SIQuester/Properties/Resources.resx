@@ -613,8 +613,20 @@ By following these steps, you help maintain a responsible and collaborative envi
   <data name="FullUpdates" xml:space="preserve">
     <value>Program update to version {0} detected. Additional installation will be performed. Install the update now?</value>
   </data>
+  <data name="GenerateQuestions" xml:space="preserve">
+    <value>Generate questions with GPT</value>
+  </data>
   <data name="Goto" xml:space="preserve">
     <value>Go to</value>
+  </data>
+  <data name="GPTApiKey" xml:space="preserve">
+    <value>API key</value>
+  </data>
+  <data name="GPTModel" xml:space="preserve">
+    <value>GPT model</value>
+  </data>
+  <data name="GPTPrompt" xml:space="preserve">
+    <value>Prompt</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
@@ -1191,6 +1203,9 @@ By following these steps, you help maintain a responsible and collaborative envi
   </data>
   <data name="UpdatePricesOnDragAndDropHint" xml:space="preserve">
     <value>Questions will be moved, but the cost distribution will remain the same</value>
+  </data>
+  <data name="UseGPT" xml:space="preserve">
+    <value>Use GPT for generating questions</value>
   </data>
   <data name="UseImageDuration" xml:space="preserve">
     <value>Set default image duration</value>

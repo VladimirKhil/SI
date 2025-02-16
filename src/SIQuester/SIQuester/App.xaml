@@ -1194,6 +1194,13 @@
                                                         Style="{StaticResource MenuButton}" />
 
                                                     <Button
+                                                        ToolTip="{x:Static lp:Resources.GenerateQuestions}"
+                                                        Content="{StaticResource GenerateQuestionsImage}"
+                                                        Command="{Binding GenerateQuestions}"
+                                                        Style="{StaticResource MenuButton}"
+                                                        IsEnabled="{Binding DataContext.Settings.UseGPT, RelativeSource={RelativeSource AncestorType=TreeView}}" />
+
+                                                    <Button
                                                         ToolTip="{x:Static lp:Resources.CloneTheme}"
                                                         Content="{StaticResource CloneImage}"
                                                         Command="{Binding Clone}"
@@ -2310,7 +2317,7 @@
                         Style="{StaticResource LightTextBox}"
                         MinWidth="90"
                         Padding="0,2"
-                        Text="{Binding Model.Name}" />
+                        Text="{Binding Model.Name, UpdateSourceTrigger=PropertyChanged}" />
                     
                     <ContentControl Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />                    
                 </StackPanel>

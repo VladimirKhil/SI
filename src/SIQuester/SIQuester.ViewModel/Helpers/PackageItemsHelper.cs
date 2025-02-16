@@ -12,7 +12,9 @@ internal static class PackageItemsHelper
     /// Creates a question with provided price.
     /// </summary>
     /// <param name="price">Question price.</param>
-    internal static Question CreateQuestion(int price)
+    /// <param name="text">Question text.</param>
+    /// <param name="answer">Question answer.</param>
+    internal static Question CreateQuestion(int price, string text = "", string answer = "")
     {
         var question = new Question
         {
@@ -24,11 +26,11 @@ internal static class PackageItemsHelper
             Type = StepParameterTypes.Content,
             ContentValue = new List<ContentItem>
             {
-                new() { Type = ContentTypes.Text, Value = "" },
+                new() { Type = ContentTypes.Text, Value = text },
             }
         };
 
-        question.Right.Add("");
+        question.Right.Add(answer);
 
         return question;
     }

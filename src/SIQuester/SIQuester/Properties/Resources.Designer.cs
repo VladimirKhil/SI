@@ -1466,11 +1466,47 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Generate questions with GPT.
+        /// </summary>
+        public static string GenerateQuestions {
+            get {
+                return ResourceManager.GetString("GenerateQuestions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Go to.
         /// </summary>
         public static string Goto {
             get {
                 return ResourceManager.GetString("Goto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на API key.
+        /// </summary>
+        public static string GPTApiKey {
+            get {
+                return ResourceManager.GetString("GPTApiKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на GPT model.
+        /// </summary>
+        public static string GPTModel {
+            get {
+                return ResourceManager.GetString("GPTModel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Prompt.
+        /// </summary>
+        public static string GPTPrompt {
+            get {
+                return ResourceManager.GetString("GPTPrompt", resourceCulture);
             }
         }
         
@@ -3193,6 +3229,15 @@ namespace SIQuester.Properties {
         public static string UpdatePricesOnDragAndDropHint {
             get {
                 return ResourceManager.GetString("UpdatePricesOnDragAndDropHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Use GPT for generating questions.
+        /// </summary>
+        public static string UseGPT {
+            get {
+                return ResourceManager.GetString("UseGPT", resourceCulture);
             }
         }
         

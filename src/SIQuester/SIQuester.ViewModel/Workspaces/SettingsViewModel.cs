@@ -21,6 +21,8 @@ public sealed class SettingsViewModel : WorkspaceViewModel
 
     public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
 
+    public string[] GPTModels { get; } = new string[] { "gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06" };
+
     public AppSettings Model => AppSettings.Default;
 
     public SettingsViewModel() => Reset = new SimpleCommand(Reset_Executed);

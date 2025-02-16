@@ -613,8 +613,20 @@
   <data name="FullUpdates" xml:space="preserve">
     <value>Обнаружено обновление программы до версии {0}. Будет произведена дополнительная установка. Установить обновление сейчас?</value>
   </data>
+  <data name="GenerateQuestions" xml:space="preserve">
+    <value>Сгенерировать вопросы при помощи GPT</value>
+  </data>
   <data name="Goto" xml:space="preserve">
     <value>Перейти</value>
+  </data>
+  <data name="GPTApiKey" xml:space="preserve">
+    <value>Ключ API</value>
+  </data>
+  <data name="GPTModel" xml:space="preserve">
+    <value>Модель GPT</value>
+  </data>
+  <data name="GPTPrompt" xml:space="preserve">
+    <value>Запрос</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Помощь</value>
@@ -1187,6 +1199,9 @@
   </data>
   <data name="UpdatePricesOnDragAndDropHint" xml:space="preserve">
     <value>Вопросы будут перемещаться, а распределение стоимостей останется прежним</value>
+  </data>
+  <data name="UseGPT" xml:space="preserve">
+    <value>Использовать GPT для генерации вопросов</value>
   </data>
   <data name="UseImageDuration" xml:space="preserve">
     <value>Задавать длительность показа изображений по умолчанию</value>

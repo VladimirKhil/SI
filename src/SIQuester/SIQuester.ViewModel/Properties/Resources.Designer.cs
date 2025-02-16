@@ -304,6 +304,17 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Tou need to create questions for quiz topic.
+        ///
+        ///1. Pick popular topic (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, gen z fashion, trends, food and drinks, celebrities, fun facts, tv shows, music. Periodically pick less popular ones for diversity. The best way of crafting topics is to use topic names that could be connected to answers in different ways (like Stones topic could relate to some info about stones and also about Emma Stone). Topic name could be [остаток строки не уместился]&quot;;.
+        /// </summary>
+        public static string DefaultGPTPrompt {
+            get {
+                return ResourceManager.GetString("DefaultGPTPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cars
         ///Alphabet
         ///Anime

@@ -53,6 +53,11 @@ public sealed class AppSettings : INotifyPropertyChanged
     private const int DefaultImageDurationSeconds = 5;
     private const bool DefaultUseQualityControl = true;
 
+    private const bool DefaultUseGPT = false;
+    private const string DefaultGPTApiKey = "";
+    private const string DefaultGPTModel = "gpt-4o-mini-2024-07-18";
+    private const string DefaultGPTPrompt = "";
+
     /// <summary>
     /// Auto-save interval.
     /// </summary>
@@ -564,6 +569,73 @@ public sealed class AppSettings : INotifyPropertyChanged
     /// </summary>
     [DefaultValue(DefaultUseQualityControl)]
     public bool UseQualityControl { get; set; } = DefaultUseQualityControl;
+
+    private bool _useGPT = DefaultUseGPT;
+
+    /// <summary>
+    /// Use GPT transformer.
+    /// </summary>
+    [DefaultValue(DefaultUseGPT)]
+    public bool UseGPT
+    {
+        get => _useGPT;
+        set
+        {
+            if (_useGPT != value)
+            {
+                _useGPT = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string _gptApiKey = DefaultGPTApiKey;
+
+    [DefaultValue(DefaultGPTApiKey)]
+    public string GPTApiKey
+    {
+        get => _gptApiKey;
+        set
+        {
+            if (_gptApiKey != value)
+            {
+                _gptApiKey = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string _gptModel = DefaultGPTModel;
+    
+    [DefaultValue(DefaultGPTModel)]
+    public string GPTModel
+    {
+        get => _gptModel;
+        set
+        {
+            if (_gptModel != value)
+            {
+                _gptModel = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string _gptPrompt = DefaultGPTPrompt;
+
+    [DefaultValue(DefaultGPTPrompt)]
+    public string GPTPrompt
+    {
+        get => _gptPrompt;
+        set
+        {
+            if (_gptPrompt != value)
+            {
+                _gptPrompt = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     /// <summary>
     /// Loads settings from stream.

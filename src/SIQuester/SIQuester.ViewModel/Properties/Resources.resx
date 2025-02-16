@@ -198,6 +198,36 @@
   <data name="DBStorageComment" xml:space="preserve">
     <value>The package is stored in the Database {0} under the name {1}</value>
   </data>
+  <data name="DefaultGPTPrompt" xml:space="preserve">
+    <value>Tou need to create questions for quiz topic.
+
+1. Pick popular topic (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, gen z fashion, trends, food and drinks, celebrities, fun facts, tv shows, music. Periodically pick less popular ones for diversity. The best way of crafting topics is to use topic names that could be connected to answers in different ways (like Stones topic could relate to some info about stones and also about Emma Stone). Topic name could be a famous quote.
+
+2. Topic could have an optional description explaining it (short, around 5 words) - only when the topic name is not clear enough. Examples: Guess movie by emojis, Topic "Who is the culptic?" - description "name the murderer by a novel".
+
+3. Craft topic questions having increasing difficulty. Easy example: What is the capital of France? Hard example: One of his wives was Serbian scientist Mileva Maric. Questions should be based on some interesting facts, they could be a general (school) knowlege or a riddle.
+
+Each question should contain several (up to 5) sentences of text (try to keep them very as short as possible). Direct question ("Who is it") is not needed, just mention the fact.
+
+4. Question answer could be a text (up to 5 words) or could contain multiple choice (1 of 4-5 with choice letter as the right answer). For simple text answer, leave answer options empty. For multiple choice, skip letters in answer options and provide a single letter as the answer. Also do not include answer options in question text.
+Each question should have exactly one right answer.
+
+5. If answer is unclear, put short explanation in question comment section (1 sentence). Leave comment empty if it is not needed, skip well-known facts (mostly for the easiest questions).
+
+6. For statistics based questions (like "who is the most popular...") and for any time-bound information provide website url as the source.
+
+Examples:
+
+- topic "Which language is this", question "Bonjour", answer "French";
+- topic "Book by emoji", question "👴🌊", answer "The Old Man and the Sea";
+- topic "Chemical element by symbol", question "O", answer options "Gold", "Oxygen", "Tin", "Mercury", answer "B";
+- topic "End of story", question: "His last words were Open the second shutter in the living room so that more light comes in", answer "Johann Wolfgang von Goethe";
+- topic "Hasta la vista, baby", question: "Released in November 2006, it became one of the biggest failures for its developers", answer "Windows Vista", comment: "It was not widely used and got a lot of negative reviews", source: "https://en.wikipedia.org/wiki/Windows_Vista"
+
+
+
+</value>
+  </data>
   <data name="DefaultTags" xml:space="preserve">
     <value>Cars
 Alphabet
