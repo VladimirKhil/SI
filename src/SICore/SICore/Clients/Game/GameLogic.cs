@@ -4994,7 +4994,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (answerOption.Content.Type == ContentTypes.Text)
         {
             messageBuilder.Add(ContentTypes.Text).Add(answerOption.Content.Value.EscapeNewLines());
-            contentDuration = Math.Min(10, GetReadingDurationForTextLength(answerOption.Content.Value.Length));
+            contentDuration = Math.Max(10, GetReadingDurationForTextLength(answerOption.Content.Value.Length));
         }
         else
         {

@@ -138,6 +138,125 @@ public sealed class Game : Actor
         _gameActions.SendMessageToWithArgs(person, Messages.Hostname, ClientData.HostName ?? "");
     }
 
+    private void OnSetOptions(Message message, string[] mparams)
+    {
+        if (message.Sender != ClientData.HostName)
+        {
+            return;
+        }
+
+        var appSettings = ClientData.Settings.AppSettings;
+        var msg = new MessageBuilder(Messages.Options2, ClientData.HostName);
+        var changed = false;
+
+        for (var i = 1; i + 1 < mparams.Length; i += 2)
+        {
+            var optionName = mparams[i];
+            var optionValue = mparams[i + 1];
+
+            switch (optionName)
+            {
+                case nameof(AppSettingsCore.Oral):
+                    if (bool.TryParse(optionValue, out var oral) && oral != appSettings.Oral)
+                    {
+                        appSettings.Oral = oral;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.Managed):
+                    if (bool.TryParse(optionValue, out var managed) && managed != appSettings.Managed)
+                    {
+                        appSettings.Managed = managed;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.DisplayAnswerOptionsLabels):
+                    if (bool.TryParse(optionValue, out var displayAnswerOptionsLabels) && displayAnswerOptionsLabels != appSettings.DisplayAnswerOptionsLabels)
+                    {
+                        appSettings.DisplayAnswerOptionsLabels = displayAnswerOptionsLabels;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.FalseStart):
+                    if (bool.TryParse(optionValue, out var falseStart) && falseStart != appSettings.FalseStart)
+                    {
+                        appSettings.FalseStart = falseStart;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.ReadingSpeed):
+                    if (int.TryParse(optionValue, out var readingSpeed) && readingSpeed != appSettings.ReadingSpeed)
+                    {
+                        appSettings.ReadingSpeed = readingSpeed;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+                    
+                    break;
+
+                case nameof(AppSettingsCore.PartialText):
+                    if (bool.TryParse(optionValue, out var partialText) && partialText != appSettings.PartialText)
+                    {
+                        appSettings.PartialText = partialText;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.PartialImages):
+                    if (bool.TryParse(optionValue, out var partialImages) && partialImages != appSettings.PartialImages)
+                    {
+                        appSettings.PartialImages = partialImages;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
+                    if (int.TryParse(optionValue, out var value) && value != appSettings.TimeSettings.PartialImageTime)
+                    {
+                        appSettings.TimeSettings.PartialImageTime = value;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.UseApellations):
+                    if (bool.TryParse(optionValue, out var useApellations) && useApellations != appSettings.UseApellations)
+                    {
+                        appSettings.UseApellations = useApellations;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+                    
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        if (changed)
+        {
+            _gameActions.SendMessage(msg.Build());
+        }
+    }
+
     private void InformSettings(string person)
     {
         _gameActions.SendMessageToWithArgs(
@@ -161,12 +280,34 @@ public sealed class Game : Actor
 
         _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, ClientData.JoinMode);
 
-        _gameActions.SendMessageToWithArgs(person, Messages.Options,
+        _gameActions.SendMessageToWithArgs(
+            person,
+            Messages.Options,
+            nameof(appSettings.Oral), appSettings.Oral,
+            nameof(appSettings.Managed), appSettings.Managed,
             nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels,
             nameof(appSettings.FalseStart), appSettings.FalseStart,
+            nameof(appSettings.ReadingSpeed), appSettings.Managed ? 0 : appSettings.ReadingSpeed,
             nameof(appSettings.PartialText), appSettings.PartialText,
             nameof(appSettings.PartialImages), appSettings.PartialImages,
-            nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime);
+            nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime,
+            nameof(appSettings.UseApellations), appSettings.UseApellations,
+            nameof(appSettings.TimeSettings.TimeForBlockingButton), appSettings.TimeSettings.TimeForBlockingButton);
+
+        _gameActions.SendMessageToWithArgs(
+            person,
+            Messages.Options2,
+            "",
+            nameof(appSettings.Oral), appSettings.Oral,
+            nameof(appSettings.Managed), appSettings.Managed,
+            nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels,
+            nameof(appSettings.FalseStart), appSettings.FalseStart,
+            nameof(appSettings.ReadingSpeed), appSettings.Managed ? 0 : appSettings.ReadingSpeed,
+            nameof(appSettings.PartialText), appSettings.PartialText,
+            nameof(appSettings.PartialImages), appSettings.PartialImages,
+            nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime,
+            nameof(appSettings.UseApellations), appSettings.UseApellations,
+            nameof(appSettings.TimeSettings.TimeForBlockingButton), appSettings.TimeSettings.TimeForBlockingButton);
     }
 
     private void InformBanned(string person)
@@ -513,6 +654,10 @@ public sealed class Game : Actor
 
                     case Messages.Config:
                         OnConfig(message, args);
+                        break;
+
+                    case Messages.SetOptions:
+                        OnSetOptions(message, args);
                         break;
 
                     case Messages.First:
@@ -2575,6 +2720,7 @@ public sealed class Game : Actor
                 {
                     player.LastBadTryTime = DateTime.UtcNow;
                     _gameActions.SendMessageWithArgs(Messages.WrongTry, i);
+                    _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, i);
                 }
 
                 return;
