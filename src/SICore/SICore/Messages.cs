@@ -44,6 +44,7 @@ public static class Messages
     /// Marks apellation option flag.
     /// </summary>
     [IdempotencyRequired]
+    [Obsolete("Use Options")]
     public const string ApellationEnabled = "APELLATION_ENABLES";
 
     /// <summary>
@@ -97,6 +98,7 @@ public static class Messages
     /// Время блокировки Игровой кнопки
     /// </summary>
     [IdempotencyRequired]
+    [Obsolete("Use Options")]
     public const string ButtonBlockingTime = "BUTTON_BLOCKING_TIME";
 
     /// <summary>
@@ -337,6 +339,12 @@ public static class Messages
     public const string Options = "OPTIONS";
 
     /// <summary>
+    /// Game options.
+    /// </summary>
+    [IdempotencyRequired]
+    public const string Options2 = "OPTIONS2";
+
+    /// <summary>
     /// Informs the player that they must provide an oral answer.
     /// </summary>
     public const string OralAnswer = "ORAL_ANSWER";
@@ -420,6 +428,7 @@ public static class Messages
     /// Скорость чтения вопроса
     /// </summary>
     [IdempotencyRequired]
+    [Obsolete("Use Options")]
     public const string ReadingSpeed = "READINGSPEED";
 
     /// <summary>
@@ -520,6 +529,11 @@ public static class Messages
     /// Set game join mode.
     /// </summary>
     public const string SetJoinMode = "SETJOINMODE";
+
+    /// <summary>
+    /// Set game options.
+    /// </summary>
+    public const string SetOptions = "SET_OPTIONS";
 
     /// <summary>
     /// Sets stake.
