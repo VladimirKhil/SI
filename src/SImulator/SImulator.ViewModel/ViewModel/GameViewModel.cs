@@ -1797,7 +1797,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveQuestionCommand = null;
         ActiveMediaCommand = null;
 
-        _engine.UpdateCanNext();
+        _engine.UpdateCanNext(); // TODO: remove and make method private
 
         if (Settings.Model.DropStatsOnBack)
         {

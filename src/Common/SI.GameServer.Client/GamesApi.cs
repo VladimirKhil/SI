@@ -14,11 +14,11 @@ internal sealed class GamesApi : IGamesApi
     public GamesApi(HttpClient client) => _client = client;
 
     public Task<GetGameByPinResponse?> GetGameByPinAsync(int pin, CancellationToken cancellationToken = default) =>
-        _client.GetFromJsonAsync<GetGameByPinResponse>($"/api/v1/games?pin={pin}", cancellationToken);
+        _client.GetFromJsonAsync<GetGameByPinResponse>($"api/v1/games?pin={pin}", cancellationToken);
 
     public async Task<RunGameResponse> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default)
     {
-        var response = await _client.PostAsJsonAsync("/api/v1/games", runGameRequest, cancellationToken);
+        var response = await _client.PostAsJsonAsync("api/v1/games", runGameRequest, cancellationToken);
         
         return await response.Content.ReadFromJsonAsync<RunGameResponse>(cancellationToken: cancellationToken)
             ?? throw new InvalidOperationException("Unknown run game error");

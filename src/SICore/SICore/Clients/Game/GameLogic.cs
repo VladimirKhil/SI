@@ -268,7 +268,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPlayingMedia = false;
         // Temporary moved to QuestSourComm
         // _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
-        ScheduleExecution(Tasks.QuestSourComm, 1, 1, force: true);
+        ScheduleExecution(Tasks.QuestionPostInfo, 1, 1, force: true);
 
         if (_data.AllowAppellation && _data.PendingApellation)
         {
@@ -1807,7 +1807,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         ContinueQuestion();
                         break;
 
-                    case Tasks.QuestSourComm:
+                    case Tasks.QuestionPostInfo:
                         QuestionSourcesAndComments(arg);
                         break;
 
@@ -2888,7 +2888,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (arg < 3)
         {
-            ScheduleExecution(Tasks.QuestSourComm, textTime, arg + 1);
+            ScheduleExecution(Tasks.QuestionPostInfo, textTime, arg + 1);
         }
         else
         {

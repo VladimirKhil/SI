@@ -48,6 +48,8 @@ public sealed class GameEngine : EngineBase
         }
     }
 
+    private RoundEndReason _roundEndReason;
+
     public GameEngine(
         SIDocument document,
         GameRules gameRules,
@@ -91,6 +93,10 @@ public sealed class GameEngine : EngineBase
 
             case GameStage.Question:
                 OnQuestion();
+                break;
+
+            case GameStage.EndRound:
+                OnEndRound();
                 break;
 
             case GameStage.EndGame:
@@ -181,7 +187,8 @@ public sealed class GameEngine : EngineBase
 
         if (roundTimeout)
         {
-            EndRoundAndMoveNext(RoundEndReason.Timeout);
+            _roundEndReason = RoundEndReason.Timeout;
+            Stage = GameStage.EndRound;
         }
         else if (SelectionStrategy.CanMoveNext())
         {
@@ -190,9 +197,12 @@ public sealed class GameEngine : EngineBase
         }
         else
         {
-            EndRoundAndMoveNext(RoundEndReason.Completed);
+            _roundEndReason = RoundEndReason.Completed;
+            Stage = GameStage.EndRound;
         }
     }
+
+    private void OnEndRound() => EndRoundAndMoveNext(_roundEndReason);
 
     private void OnEndGame()
     {
@@ -229,7 +239,9 @@ public sealed class GameEngine : EngineBase
         CanMoveBack = SelectionStrategy.CanMoveBack();
     }
 
-    public override bool CanNext() => _stage != GameStage.None && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
+    public bool CanNext() => _stage != GameStage.None && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
+
+    public void UpdateCanNext() => CanMoveNext = CanNext();
 
     /// <summary>
     /// Ends round and moves to the next one.

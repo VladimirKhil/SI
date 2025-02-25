@@ -53,6 +53,10 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         {
             GameLogic?.OnFinalRoundSkip();
         }
+        else
+        {
+            GameLogic?.ScheduleExecution(Tasks.MoveNext, 10);
+        }
     }
 
     public static bool DefaultPlayersValidator() => true;

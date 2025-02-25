@@ -36,6 +36,11 @@ public enum GameStage
     Question,
 
     /// <summary>
+    /// Round end.
+    /// </summary>
+    EndRound,
+
+    /// <summary>
     /// Final stage.
     /// </summary>
     EndGame,

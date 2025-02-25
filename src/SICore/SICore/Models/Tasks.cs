@@ -73,9 +73,10 @@ public enum Tasks
     WaitTry,
 
     /// <summary>
-    /// Объявление источников и комментариев вопроса
+    /// Display information after question.
     /// </summary>
-    QuestSourComm,
+    QuestionPostInfo,
+    
     /// <summary>
     /// Выяснение ответа игрока
     /// </summary>

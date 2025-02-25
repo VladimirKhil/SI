@@ -129,10 +129,6 @@ public abstract class EngineBase : IDisposable, INotifyPropertyChanged
 
     protected void UpdateCanMoveBackRound() => CanMoveBackRound = _roundIndex > 0 || CanMoveBack;
 
-    public abstract bool CanNext();
-
-    public void UpdateCanNext() => CanMoveNext = CanNext();
-
     protected void SetActiveRound() => _activeRound = _roundIndex < _document.Package.Rounds.Count ? _document.Package.Rounds[_roundIndex] : null;
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
