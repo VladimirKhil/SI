@@ -3,7 +3,6 @@ using SICore.Helpers;
 using SICore.Models;
 using SICore.Utils;
 using SIPackages.Core;
-using System.Threading.Tasks;
 using Utils.Timers;
 using R = SICore.Properties.Resources;
 
@@ -104,6 +103,13 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void OnAnswer(bool knows, bool isSure)
     {
+        var me = (PlayerAccount?)_data.Me;
+
+        if (me == null)
+        {
+            return;
+        }
+
         try
         {
             var ans = new MessageBuilder(Messages.Answer, knows ? MessageParams.Answer_Right : MessageParams.Answer_Wrong);
@@ -114,7 +120,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 ans.Add(
                     string.Format(
                         Random.Shared.GetRandomString(_viewerActions.LO[nameof(R.Sure)]),
-                        _data.Me.IsMale ? "" : _viewerActions.LO[nameof(R.SureFemaleEnding)]));
+                        me.IsMale ? "" : _viewerActions.LO[nameof(R.SureFemaleEnding)]));
             }
             else
             {
@@ -131,6 +137,13 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void OnSelectQuestion()
     {
+        var me = (PlayerAccount?)_data.Me;
+
+        if (me == null)
+        {
+            return;
+        }
+
         try
         {
             lock (_data.TInfoLock)
@@ -138,7 +151,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 var (themeIndex, questionIndex) = _intelligence.SelectQuestion(
                     _data.TInfo.RoundInfo,
                     (_data.ThemeIndex, _data.QuestionIndex),
-                    MyScore(),
+                    me.Sum,
                     BestOpponentScore(),
                     GetTimePercentage(0));
 
@@ -155,11 +168,25 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void OnSelectPlayer()
     {
+        var me = (PlayerAccount?)_data.Me;
+
+        if (me == null)
+        {
+            return;
+        }
+
+        var myIndex = _data.Players.IndexOf(me);
+
+        if (myIndex == -1)
+        {
+            return;
+        }
+
         try
         {
             var playerIndex = _intelligence.SelectPlayer(
                 _data.Players,
-                _data.Players.IndexOf((PlayerAccount)_data.Me),
+                myIndex,
                 _data.TInfo.RoundInfo,
                 GetTimePercentage(0));
 
@@ -189,11 +216,25 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void OnMakeStake()
     {
+        var me = (PlayerAccount?)_data.Me;
+
+        if (me == null)
+        {
+            return;
+        }
+
+        var myIndex = _data.Players.IndexOf(me);
+
+        if (myIndex == -1)
+        {
+            return;
+        }
+
         try
         {
             var (stakeDecision, stakeSum) = _intelligence.MakeStake(
                 _data.Players,
-                _data.Players.IndexOf((PlayerAccount)_data.Me),
+                myIndex,
                 _data.TInfo.RoundInfo,
                 _data.PersonDataExtensions.StakeInfo,
                 _data.QuestionIndex,
@@ -335,11 +376,6 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     /// Returns the maximum opponent score.
     /// </summary>
     private int BestOpponentScore() => _data.Players.Where(player => player.Name != _viewerActions.Client.Name).Max(player => player.Sum);
-
-    /// <summary>
-    /// Returns the current player score.
-    /// </summary>
-    private int MyScore() => ((PlayerAccount)_data.Me).Sum;
 
     internal enum PlayerTasks
     {

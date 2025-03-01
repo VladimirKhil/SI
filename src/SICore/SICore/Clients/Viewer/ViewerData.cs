@@ -44,7 +44,7 @@ public sealed class ViewerData : Data
 
     public string Name { get; internal set; }
 
-    public ViewerAccount Me
+    public ViewerAccount? Me
     {
         get
         {

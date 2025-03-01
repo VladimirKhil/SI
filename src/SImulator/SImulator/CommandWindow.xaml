@@ -1165,67 +1165,20 @@
                     </ComboBox>
                 </StackPanel>
                 
-                <DockPanel Grid.Row="2" Margin="0,10,0,0">
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" Text="{x:Static lp:Resources.Players}" />
+                <StackPanel Grid.Row="2" Margin="0,10,0,0">
+                    <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" Text="{x:Static lp:Resources.Players}" />
 
-                        <Button
-                            Command="{Binding AddPlayer}"
-                            VerticalAlignment="Center"
-                            Margin="6,4,0,0"
-                            Padding="4"
-                            ToolTip="Добавить"
-                            Style="{StaticResource ToolButton}"
-                            Height="25">
-                            <Image>
-                                <Image.Source>
-                                    <DrawingImage>
-                                        <DrawingImage.Drawing>
-                                            <GeometryDrawing
-                                                Geometry="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z"
-                                                Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                        </DrawingImage.Drawing>
-                                    </DrawingImage>
-                                </Image.Source>
-                            </Image>
-                        </Button>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Slider
+                             Width="200"
+                             Minimum="0"
+                             Maximum="20"
+                             Value="{Binding Settings.PlayerCount}"
+                             VerticalAlignment="Center" />
+
+                        <TextBlock Margin="10,0,0,2" FontSize="16" VerticalAlignment="Center" Text="{Binding Settings.PlayerCount}" />
                     </StackPanel>
-                    
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Padding="0,0,5,0" Margin="0,0,0,-40">
-                        <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding Players}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBox
-                                            FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
-                                            Margin="1"
-                                            Width="200"
-                                            Height="23"
-                                            Text="{Binding Name}" />
-                                        
-                                        <Button
-                                            Grid.Column="5"
-                                            Style="{StaticResource ToolButton}"
-                                            Padding="3"
-                                            Margin="1"
-                                            ToolTip="{x:Static lp:Resources.RemovePlayer}"
-                                            VerticalContentAlignment="Center"
-                                            Height="23"
-                                            Width="23"
-                                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}, Path=DataContext.RemovePlayer}"
-                                            CommandParameter="{Binding}">
-                                            <Path
-                                                Data="M0,0L1,1M0,1L1,0"
-                                                Stretch="Fill"
-                                                Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}"
-                                                StrokeThickness="4" />
-                                        </Button>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </DockPanel>
+                </StackPanel>
                 
                 <DockPanel Grid.Row="3" Margin="0,0,4,5">
                     <Button

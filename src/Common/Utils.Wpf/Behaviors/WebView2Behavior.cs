@@ -1,6 +1,8 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
+using Microsoft.Win32;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 using Utils.Web;
 
@@ -108,7 +110,17 @@ public static class WebView2Behavior
             var options = new CoreWebView2EnvironmentOptions("--autoplay-policy=no-user-gesture-required" + (allowLocalFilesAccess ? " --allow-file-access-from-files" : ""));
             var environment = await CoreWebView2Environment.CreateAsync(null, null, options);
 
-            await webView2.EnsureCoreWebView2Async(environment);
+            try
+            {
+                await webView2.EnsureCoreWebView2Async(environment);
+            }
+            catch (COMException exc) when ((uint)exc.HResult == 0x8007139F)
+            {
+                // Delete the registry key that prevents WebView2 from loading
+                // See https://github.com/MicrosoftEdge/WebView2Feedback/issues/3008#issuecomment-1916313157
+                DeleteHighDpiAwareKey();
+                await webView2.EnsureCoreWebView2Async(environment);
+            }
 
             if (webView2.DataContext is IWebInterop webInterop)
             {
@@ -119,7 +131,47 @@ public static class WebView2Behavior
         }
         catch (Exception exc)
         {
-            Trace.TraceError(exc.ToString());
+            MessageBox.Show(exc.ToString(), "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private static void DeleteHighDpiAwareKey()
+    {
+        const string problemFolder = @"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers";
+        const string problemSuffix = "msedgewebview2.exe";
+        const string problemValue = "HIGHDPIAWARE";
+
+        try
+        {
+            using var baseKey = Registry.CurrentUser.OpenSubKey(problemFolder, true);
+            
+            if (baseKey == null)
+            {
+                Trace.WriteLine($"Registry key not found: {problemFolder}");
+                return;
+            }
+
+            var valueNames = baseKey.GetValueNames();
+
+            foreach (var valueName in valueNames)
+            {
+                if (!valueName.EndsWith(problemSuffix, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                
+                var value = baseKey.GetValue(valueName)?.ToString();
+                
+                if (value != null && value.Contains(problemValue))
+                {
+                    baseKey.DeleteValue(valueName);
+                    Trace.WriteLine($"Deleted registry key: {valueName}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"An error occurred: {ex.Message}");
         }
     }
 
@@ -127,7 +179,7 @@ public static class WebView2Behavior
     {
         if (sender is CoreWebView2)
         {
-            MessageBox.Show($"Browser error: {e.ExitCode} {e.Reason} {e.ExitCode}");
+            MessageBox.Show($"{e.ExitCode} {e.Reason} {e.ExitCode}", "Browser error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

@@ -17,17 +17,17 @@ internal sealed class Intelligence : IIntelligence
     /// <summary>
     /// Does the player know the answer.
     /// </summary>
-    internal bool KnowsAnswer { get; set; } = false;
+    internal bool _knowsAnswer = false;
 
     /// <summary>
     /// Is the player sure in the answer.
     /// </summary>
-    internal bool IsSure { get; set; } = false;
+    internal bool _isSure = false;
 
     /// <summary>
     /// Is the player ready to press the button.
     /// </summary>
-    internal bool ReadyToPress { get; set; } = false;
+    internal bool _readyToPress = false;
 
     private int _realBrave = 0;
 
@@ -39,12 +39,12 @@ internal sealed class Intelligence : IIntelligence
     /// <summary>
     /// Brave change speed.
     /// </summary>
-    internal int DeltaBrave { get; set; } = 0;
+    internal int _deltaBrave = 0;
 
     /// <summary>
     /// Current reaction speed.
     /// </summary>
-    internal int RealSpeed { get; set; } = 0;
+    internal int _realSpeed = 0;
 
     public Intelligence(ComputerAccount account)
     {
@@ -295,7 +295,7 @@ internal sealed class Intelligence : IIntelligence
 
         if (shortThink)
         {
-            IsSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
+            _isSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
 
             var riskRateLimit = RealBrave > 0
                 ? (int)(100 * Math.Max(0, Math.Min(1, playerStrength / RealBrave)))
@@ -305,10 +305,10 @@ internal sealed class Intelligence : IIntelligence
             {
                 var riskRate = riskRateLimit < 100 ? 1 - Random.Shared.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
 
-                KnowsAnswer = IsSure || Random.Shared.Next(100) < playerStrength * riskRate / (difficulty + 1);
-                RealSpeed = Math.Max(1, (int)((playerLag + (int)Random.Shared.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
+                _knowsAnswer = _isSure || Random.Shared.Next(100) < playerStrength * riskRate / (difficulty + 1);
+                _realSpeed = Math.Max(1, (int)((playerLag + (int)Random.Shared.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
 
-                ReadyToPress = IsSure || Random.Shared.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
+                _readyToPress = _isSure || Random.Shared.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
             }
             catch (ArgumentOutOfRangeException exc)
             {
@@ -317,28 +317,28 @@ internal sealed class Intelligence : IIntelligence
         }
         else
         {
-            IsSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1); // 50% for F = 200 and difficulty = 3
-            KnowsAnswer = IsSure || Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.5;
+            _isSure = Random.Shared.Next(100) < playerStrength / (difficulty + 1); // 50% for F = 200 and difficulty = 3
+            _knowsAnswer = _isSure || Random.Shared.Next(100) < playerStrength / (difficulty + 1) * 0.5;
 
-            RealSpeed = Math.Max(1, playerLag + (int)Random.Shared.NextGaussian(50 - playerStrength / 20, 15)); // 5s average, 4s for strong player
+            _realSpeed = Math.Max(1, playerLag + (int)Random.Shared.NextGaussian(50 - playerStrength / 20, 15)); // 5s average, 4s for strong player
         }
     }
 
     public int OnStartCanPressButton()
     {
-        if (!ReadyToPress)
+        if (!_readyToPress)
         {
             return -1;
         }
 
-        var realSpeed = RealSpeed;
-        RealSpeed /= 2; // Additionally speed up
+        var realSpeed = _realSpeed;
+        _realSpeed /= 2; // Additionally speed up
         return realSpeed;
     }
 
     public void OnEndCanPressButton() => RealBrave++; // TODO: cancel PressButton task if it is running
 
-    public (bool knows, bool isSure, int answerTime) OnAnswer() => (KnowsAnswer, IsSure, RealSpeed);
+    public (bool knows, bool isSure, int answerTime) OnAnswer() => (_knowsAnswer, _isSure, _realSpeed);
 
     public void OnPlayerOutcome(
         List<PlayerAccount> players,
@@ -384,17 +384,17 @@ internal sealed class Intelligence : IIntelligence
             {
                 case PlayerStyle.Agressive:
                     RealBrave += 7;
-                    DeltaBrave = 3;
+                    _deltaBrave = 3;
                     break;
 
                 case PlayerStyle.Normal:
                     RealBrave += 5;
-                    DeltaBrave = 2;
+                    _deltaBrave = 2;
                     break;
 
                 default:
                     RealBrave += 3;
-                    DeltaBrave = 1;
+                    _deltaBrave = 1;
                     break;
             }
         }
@@ -404,27 +404,27 @@ internal sealed class Intelligence : IIntelligence
             {
                 case PlayerStyle.Agressive:
                     RealBrave -= 60;
-                    DeltaBrave = 3;
+                    _deltaBrave = 3;
                     break;
 
                 case PlayerStyle.Normal:
                     RealBrave -= 80;
-                    DeltaBrave = 2;
+                    _deltaBrave = 2;
                     break;
 
                 default:
                     RealBrave -= 100;
-                    DeltaBrave = 1;
+                    _deltaBrave = 1;
                     break;
             }
         }
         else if (isRight) // Someone else answered right
         {
-            RealBrave += DeltaBrave;
+            RealBrave += _deltaBrave;
 
-            if (DeltaBrave < 5)
+            if (_deltaBrave < 5)
             {
-                DeltaBrave++;
+                _deltaBrave++;
             }
         }
 

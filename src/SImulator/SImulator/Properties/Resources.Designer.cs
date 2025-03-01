@@ -70,6 +70,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Add.
+        /// </summary>
+        public static string Add {
+            get {
+                return ResourceManager.GetString("Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Add player.
         /// </summary>
         public static string AddPlayer {
@@ -84,15 +93,6 @@ namespace SImulator.Properties {
         public static string AddressToConnect {
             get {
                 return ResourceManager.GetString("AddressToConnect", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Add stake.
-        /// </summary>
-        public static string AddStake {
-            get {
-                return ResourceManager.GetString("AddStake", resourceCulture);
             }
         }
         
@@ -1123,6 +1123,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question price.
+        /// </summary>
+        public static string QuestionPrice {
+            get {
+                return ResourceManager.GetString("QuestionPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Question reading speed.
         /// </summary>
         public static string QuestionReadingSpeed {
@@ -1582,11 +1591,11 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Subtract stake.
+        ///   Ищет локализованную строку, похожую на Subtract.
         /// </summary>
-        public static string SubtractStake {
+        public static string Subtract {
             get {
-                return ResourceManager.GetString("SubtractStake", resourceCulture);
+                return ResourceManager.GetString("Subtract", resourceCulture);
             }
         }
         

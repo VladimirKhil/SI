@@ -224,6 +224,25 @@ public sealed class AppSettings : INotifyPropertyChanged
         set { if (_showPlayers != value) { _showPlayers = value; OnPropertyChanged(); } }
     }
 
+    private int _playerCount = 0;
+
+    /// <summary>
+    /// Initial player count.
+    /// </summary>
+    [DefaultValue(0)]
+    public int PlayerCount
+    {
+        get => _playerCount;
+        set
+        {
+            if (_playerCount != value)
+            {
+                _playerCount = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private bool _showTableCaption = true;
 
     /// <summary>
@@ -610,7 +629,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
-    private string _logsFolder;
+    private string _logsFolder = "";
 
     public string LogsFolder
     {

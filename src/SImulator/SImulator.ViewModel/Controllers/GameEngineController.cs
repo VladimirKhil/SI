@@ -201,6 +201,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return false;
         }
 
+        GameViewModel.IsCommonPrice = true;
+
         if (mode == StepParameterValues.SetAnswererMode_Stake
             && select == StepParameterValues.SetAnswererSelect_Highest
             && stakeVisibility == StepParameterValues.SetAnswererStakeVisibility_Visible)
@@ -211,6 +213,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             && select == StepParameterValues.SetAnswererSelect_AllPossible
             && stakeVisibility == StepParameterValues.SetAnswererStakeVisibility_Hidden)
         {
+            GameViewModel.IsCommonPrice = false;
             return GameViewModel.OnAskHiddenStakes();
         }
         else if (mode == StepParameterValues.SetAnswererMode_ByCurrent)

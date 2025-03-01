@@ -172,16 +172,6 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="ManagedColumn3" TargetType="ColumnDefinition">
-            <Setter Property="Width" Value="100" />
-
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding DataContext.ManagedMode, RelativeSource={RelativeSource AncestorType=DockPanel}}" Value="False">
-                    <Setter Property="Width" Value="0" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
         <DataTemplate x:Key="PlayersTable">
             <DockPanel Margin="1,3,1,1">
                 <DockPanel.Resources>
@@ -237,48 +227,17 @@
                             StrokeThickness="0" />
                     </Button>
 
-                    <TextBlock Text="{x:Static lp:Resources.Sum}" Margin="5,5,5,5" VerticalAlignment="Center" />
-                    <TextBox lb:NumericBehavior.IsAttached="True" Text="{Binding Price}" VerticalContentAlignment="Center" Width="50" Height="20" />
-
-                    <Button
-                        Style="{StaticResource ToolButton}"
-                        Height="23"
-                        Width="23"
-                        Padding="3"
-                        Margin="1"
-                        Command="{Binding AddRight}"
-                        ToolTip="{x:Static lp:Resources.AddSumForActivePlayer}">
-                        <Path
-                            Data="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z"
-                            Stretch="Fill"
-                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                    </Button>
-
-                    <Button
-                        Style="{StaticResource ToolButton}"
-                        Height="23"
-                        Width="23"
-                        Padding="3"
-                        Margin="1"
-                        Command="{Binding AddWrong}"
-                        ToolTip="{x:Static lp:Resources.SubtractSumForActivePlayer}">
-                        <Path
-                            Data="M0,0L30,0L30,10L0,10z"
-                            Stretch="Uniform"
-                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                    </Button>
-
                     <ContentControl Content="{Binding}" ContentTemplate="{Binding DecisionMode, Converter={StaticResource DecisionSelector}}" />
                 </DockPanel>
 
-                <Grid DockPanel.Dock="Top">
+                <Grid DockPanel.Dock="Top" Margin="0,0,17,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="29" />
                         <ColumnDefinition Width="3*" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="100" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Style="{StaticResource ManagedColumn3}" />
                         <ColumnDefinition Style="{StaticResource ManagedColumn}" />
                         <ColumnDefinition Style="{StaticResource ManagedColumn2}" />
                         <ColumnDefinition Width="29" />
@@ -292,13 +251,23 @@
 
                     <TextBlock Grid.Column="1" Text="{x:Static lp:Resources.Name}" />
                     <TextBlock Grid.Column="2" Text="{x:Static lp:Resources.Sum}" />
-                    <TextBlock Grid.Column="3" Text="{x:Static lp:Resources.RightAnswers}" />
-                    <TextBlock Grid.Column="4" Text="{x:Static lp:Resources.WrongAnswers}" />
-                    <TextBlock Grid.Column="5" Text="{x:Static lp:Resources.Stake}" />
+                    <TextBlock Grid.Column="4" Text="{x:Static lp:Resources.RightAnswers}" />
+                    <TextBlock Grid.Column="5" Text="{x:Static lp:Resources.WrongAnswers}" />
                     <TextBlock Grid.Column="6" Text="{x:Static lp:Resources.Answer}" />
+
+                    <TextBox
+                        Grid.Column="3"
+                        Margin="26,0,26,0"
+                        lb:NumericBehavior.IsAttached="True"
+                        Text="{Binding Price}"
+                        ToolTip="{x:Static lp:Resources.QuestionPrice}"
+                        IsEnabled="{Binding IsCommonPrice}"
+                        VerticalContentAlignment="Center"
+                        Width="48"
+                        Height="23" />
                 </Grid>
 
-                <ScrollViewer Margin="0,3" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Margin="0,3" VerticalScrollBarVisibility="Visible">
                     <ItemsControl ItemsSource="{Binding Players}">
                         <ItemsControl.Resources>
                             <Style TargetType="TextBox">
@@ -316,9 +285,9 @@
                                         <ColumnDefinition Width="29" />
                                         <ColumnDefinition Width="3*" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="100" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Style="{StaticResource ManagedColumn3}" />
                                         <ColumnDefinition Style="{StaticResource ManagedColumn}" />
                                         <ColumnDefinition Style="{StaticResource ManagedColumn2}" />
                                         <ColumnDefinition Width="29" />
@@ -336,83 +305,32 @@
                                         <Image Source="/Images/active_player.png" />
                                     </Button>
 
-                                    <DockPanel Grid.Column="1">
-                                        <Button
-                                            Style="{StaticResource ToolButton}"
-                                            DockPanel.Dock="Left"
-                                            Padding="3"
-                                            Margin="1"
-                                            ToolTip="{x:Static lp:Resources.AddSum}"
-                                            VerticalContentAlignment="Center"
-                                            Height="23"
-                                            Width="23"
-                                            Command="{Binding
-                                                RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
-                                                Path=DataContext.AddRight}"
-                                            CommandParameter="{Binding}">
-                                            <Path
-                                                Data="M10,10L20,10L20,0L30,0L30,10L40,10L40,20L30,20L30,30L20,30L20,20L10,20z"
-                                                Stretch="Fill"
-                                                Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                        </Button>
-
-                                        <Button
-                                            Style="{StaticResource ToolButton}"
-                                            DockPanel.Dock="Right"
-                                            Padding="3"
-                                            Margin="1"
-                                            ToolTip="{x:Static lp:Resources.SubtractSum}"
-                                            VerticalContentAlignment="Center"
-                                            Height="23"
-                                            Width="23"
-                                            Command="{Binding
-                                                RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
-                                                Path=DataContext.AddWrong}"
-                                            CommandParameter="{Binding}">
-                                            <Path
-                                                Data="M0,0L30,0L30,10L0,10z"
-                                                Stretch="Uniform"
-                                                Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                        </Button>
-
-                                        <TextBox
-                                            x:Name="name"
-                                            FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
-                                            Margin="1"
-                                            Width="Auto"
-                                            HorizontalAlignment="Stretch"
-                                            Height="23"
-                                            Text="{Binding Name}"
-                                            IsReadOnly="{Binding
-                                                RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
-                                                Path=DataContext.ManagedMode}" />
-                                    </DockPanel>
+                                    <TextBox
+                                        x:Name="name"
+                                        Grid.Column="1"
+                                        FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+                                        Margin="1"
+                                        Width="Auto"
+                                        HorizontalAlignment="Stretch"
+                                        Height="23"
+                                        Text="{Binding Name}"
+                                        IsReadOnly="{Binding
+                                            RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                            Path=DataContext.ManagedMode}" />
 
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
                                         Grid.Column="2"
                                         Text="{Binding Sum}" />
-                                    
-                                    <TextBox
-                                        lb:NumericBehavior.IsAttached="True"
-                                        Margin="1"
-                                        Grid.Column="3"
-                                        Text="{Binding Right}" />
-                                    
-                                    <TextBox
-                                        lb:NumericBehavior.IsAttached="True"
-                                        Margin="1"
-                                        Grid.Column="4"
-                                        Text="{Binding Wrong}" />
 
-                                    <DockPanel Grid.Column="5">
+                                    <DockPanel Grid.Column="3">
                                         <Button
                                             Style="{StaticResource ToolButton}"
-                                            DockPanel.Dock="Left"
+                                            DockPanel.Dock="Right"
                                             Padding="3"
                                             Margin="1"
-                                            ToolTip="{x:Static lp:Resources.AddStake}"
+                                            ToolTip="{x:Static lp:Resources.Add}"
                                             VerticalContentAlignment="Center"
                                             Height="23"
                                             Width="23"
@@ -421,17 +339,17 @@
                                                 Path=DataContext.AddStake}"
                                             CommandParameter="{Binding}">
                                             <Path
-                                                Data="M10,10L20,10L20,0L30,0L30,10L40,10L40,20L30,20L30,30L20,30L20,20L10,20z"
+                                                Data="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z"
                                                 Stretch="Fill"
                                                 Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                         </Button>
 
                                         <Button
                                             Style="{StaticResource ToolButton}"
-                                            DockPanel.Dock="Right"
+                                            DockPanel.Dock="Left"
                                             Padding="3"
                                             Margin="1"
-                                            ToolTip="{x:Static lp:Resources.SubtractStake}"
+                                            ToolTip="{x:Static lp:Resources.Subtract}"
                                             VerticalContentAlignment="Center"
                                             Height="23"
                                             Width="23"
@@ -447,9 +365,22 @@
 
                                         <TextBox
                                             Margin="1"
+                                            Name="stake"
                                             Text="{Binding Stake}"
                                             VerticalContentAlignment="Center" />
                                     </DockPanel>
+
+                                    <TextBox
+                                        lb:NumericBehavior.IsAttached="True"
+                                        Margin="1"
+                                        Grid.Column="4"
+                                        Text="{Binding Right}" />
+                                    
+                                    <TextBox
+                                        lb:NumericBehavior.IsAttached="True"
+                                        Margin="1"
+                                        Grid.Column="5"
+                                        Text="{Binding Wrong}" />
 
                                     <TextBox
                                         Margin="1"
@@ -611,6 +542,11 @@
 
                                         <Setter TargetName="name" Property="Background" Value="LightGray" />
                                     </MultiDataTrigger>
+
+                                    <DataTrigger Binding="{Binding DataContext.IsCommonPrice, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="True">
+                                        <Setter TargetName="stake" Property="IsEnabled" Value="False" />
+                                        <Setter TargetName="stake" Property="Text" Value="{Binding DataContext.Price, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                    </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

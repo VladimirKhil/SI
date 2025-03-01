@@ -74,10 +74,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public ICommand SelectColor { get; private set; }
 
-    public ICommand AddPlayer { get; private set; }
-
-    public ICommand RemovePlayer { get; private set; }
-
     private ICommand _activePlayerButtonCommand;
 
     public ICommand ActivePlayerButtonCommand
@@ -85,10 +81,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         get => _activePlayerButtonCommand;
         set { if (_activePlayerButtonCommand != value) { _activePlayerButtonCommand = value; OnPropertyChanged(); } }
     }
-
-    public ICommand AddRight { get; private set; }
-
-    public ICommand AddWrong { get; private set; }
 
     public ICommand OpenLicensesFolder { get; private set; }
 
@@ -186,11 +178,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public string Host => Resources.IpAddressHint;
 
-    /// <summary>
-    /// Список игроков, отображаемых на табло в особом режиме игры
-    /// </summary>
-    public ObservableCollection<SimplePlayerInfo> Players { get; set; }
-
     public IEnumerable<PlayerInfo> GamePlayers => throw new NotImplementedException();
 
     public int ButtonBlockTime => (int)(Settings.BlockingTime * 1000);
@@ -223,20 +210,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         NavigateToSite = new SimpleCommand(NavigateToSite_Executed);
         SelectColor = new SimpleCommand(SelectColor_Executed);
 
-        AddPlayer = new SimpleCommand(AddPlayer_Executed);
-        RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
-
-        AddRight = new SimpleCommand(AddRight_Executed);
-        AddWrong = new SimpleCommand(AddWrong_Executed);
-
         OpenLicensesFolder = new SimpleCommand(OpenLicensesFolder_Executed);
 
         _activePlayerButtonCommand = _addPlayerButton;
 
         UpdateStartCommand();
         UpdateCanAddPlayerButton();
-
-        Players = new ObservableCollection<SimplePlayerInfo>();
 
         Screens = PlatformManager.Instance.GetScreens();
         _comPorts = new Lazy<string[]>(LoadComPorts);
@@ -271,32 +250,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         Links = links.ToArray();
 
         _navigateTo = new SimpleCommand(PerformNavigateTo);
-    }
-
-    private void AddPlayer_Executed(object? arg)
-    {
-        var info = new PlayerInfo();
-        Players.Add(info);
-    }
-
-    private void RemovePlayer_Executed(object? arg)
-    {
-        if (arg is not SimplePlayerInfo player)
-        {
-            return;
-        }
-
-        Players.Remove(player);
-    }
-
-    private void AddRight_Executed(object? arg)
-    {
-        _game?.AddRight.Execute(null);
-    }
-
-    private void AddWrong_Executed(object? arg)
-    {
-        _game?.AddWrong.Execute(null);
     }
 
     private void OpenLicensesFolder_Executed(object? arg)
@@ -533,7 +486,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 engine,
                 presentationListener,
                 presentationController,
-                Players,
                 gameLogger);
 
             Game = game;

@@ -685,11 +685,11 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="KickPlayer" xml:space="preserve">
     <value>Выгнать игрока</value>
   </data>
-  <data name="AddStake" xml:space="preserve">
-    <value>Добавить ставку</value>
+  <data name="Add" xml:space="preserve">
+    <value>Добавить</value>
   </data>
-  <data name="SubtractStake" xml:space="preserve">
-    <value>Удалить ставку</value>
+  <data name="Subtract" xml:space="preserve">
+    <value>Вычесть</value>
   </data>
   <data name="JoystickNotFound" xml:space="preserve">
     <value>Джойстик не обнаружен!</value>
@@ -705,5 +705,8 @@ Escape (правая кнопка мыши) - завершить игру</value
   </data>
   <data name="AttachContentToTable" xml:space="preserve">
     <value>Добавлять комментарии темы и правильный ответ на табло</value>
+  </data>
+  <data name="QuestionPrice" xml:space="preserve">
+    <value>Цена вопроса</value>
   </data>
 </root>

@@ -121,9 +121,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     private readonly SimpleUICommand _next;
     private readonly SimpleCommand _back;
 
-    private readonly SimpleCommand _addRight;
-    private readonly SimpleCommand _addWrong;
-
     private readonly SimpleCommand _nextRound;
     private readonly SimpleCommand _previousRound;
 
@@ -153,9 +150,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     public SimpleCommand Pass { get; private set; }
 
     public ICommand MakeStake { get; private set; }
-
-    public ICommand AddRight => _addRight;
-    public ICommand AddWrong => _addWrong;
 
     public ICommand AddStake { get; }
 
@@ -238,6 +232,21 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
                 _price = value;
                 OnPropertyChanged();
                 UpdateCaption();
+            }
+        }
+    }
+
+    private bool _isCommonPrice = true;
+
+    public bool IsCommonPrice
+    {
+        get => _isCommonPrice;
+        set
+        {
+            if (_isCommonPrice != value)
+            {
+                _isCommonPrice = value;
+                OnPropertyChanged();
             }
         }
     }
@@ -620,7 +629,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         GameEngine engine,
         IExtendedListener presentationListener,
         IPresentationController presentationController,
-        IList<SimplePlayerInfo> players,
         IGameLogger gameLogger)
     {
         Settings = settings;
@@ -631,11 +639,13 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         _taskRunner = new TaskRunner<Tasks>(this);
 
         LocalInfo = new TableInfoViewModel();
-        Players = new ObservableCollection<PlayerInfo>(players.Cast<PlayerInfo>());
+        Players = new ObservableCollection<PlayerInfo>();
 
-        foreach (var player in Players)
+        for (var i = 0; i < settings.Model.PlayerCount; i++)
         {
+            var player = new PlayerInfo();
             player.PropertyChanged += PlayerInfo_PropertyChanged;
+            Players.Add(player);
         }
 
         LocalInfo.QuestionSelected += QuestionInfo_Selected;
@@ -654,8 +664,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         GiveTurn = new SimpleCommand(GiveTurn_Executed);
         Pass = new SimpleCommand(Pass_Executed);
         MakeStake = new SimpleCommand(MakeStake_Executed);
-        _addRight = new SimpleCommand(AddRight_Executed);
-        _addWrong = new SimpleCommand(AddWrong_Executed);
         AddStake = new SimpleCommand(AddStake_Executed);
         SubtractStake = new SimpleCommand(SubtractStake_Executed);
         MoveToContent = new ContextCommand(MoveToContent_Executed);
@@ -701,7 +709,43 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             return;
         }
 
-        player.Sum += player.Stake;
+        try
+        {
+            var increment = IsCommonPrice ? Price : player.Stake;
+
+            player.Sum += increment;
+            player.Right++;
+
+            _gameLogger.Write("{0} +{1}", player.Name, increment);
+
+            if (_activeQuestion == null)
+            {
+                return;
+            }
+
+            _answeringHistory.Push(Tuple.Create(player, increment, true));
+            PresentationController.PlayerIsRight(Players.IndexOf(player));
+
+            if (IsCommonPrice)
+            {
+                StopThinkingTimer_Executed(0);
+                Chooser = player;
+
+                if (Settings.Model.EndQuestionOnRightAnswer)
+                {
+                    _engine.MoveToAnswer();
+                    Next_Executed();
+                }
+                else
+                {
+                    ReturnToQuestion();
+                }
+            }
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
+        }
     }
 
     private void SubtractStake_Executed(object? arg)
@@ -711,7 +755,45 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             return;
         }
 
-        player.Sum -= player.Stake;
+        try
+        {
+            var decrement = IsCommonPrice ? (NegativePrice ?? Price) : player.Stake;
+            var substract = Settings.Model.SubstractOnWrong ? decrement : 0;
+
+            player.Sum -= substract;
+            player.Wrong++;
+
+            if (_activeQuestion == null)
+            {
+                return;
+            }
+
+            _gameLogger.Write("{0} -{1}", player.Name, substract);
+            PresentationController.PlayerIsWrong(Players.IndexOf(player));
+
+            if (IsCommonPrice)
+            {
+                StopThinkingTimer_Executed(0);
+
+                if (LocalInfo.LayoutMode == LayoutMode.AnswerOptions && _selectedAnswerIndex > -1)
+                {
+                    if (_selectedAnswerIndex < LocalInfo.AnswerOptions.Options.Length)
+                    {
+                        LocalInfo.AnswerOptions.Options[_selectedAnswerIndex].State = ItemState.Wrong;
+                    }
+
+                    PresentationController.SetAnswerState(_selectedAnswerIndex, ItemState.Wrong);
+                }
+
+                _answeringHistory.Push(Tuple.Create(player, Price, false));
+
+                ReturnToQuestion();
+            }
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
+        }
     }
 
     private void MoveToContent_Executed(object? arg)
@@ -1190,7 +1272,15 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         ActiveMediaCommand = RunMediaTimer;
     }
 
-    private void AddPlayer_Executed(object? arg) => OnPlayerAdded(null);
+    private void AddPlayer_Executed(object? arg)
+    {
+        var playerInfo = new PlayerInfo();
+        playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
+
+        Players.Add(playerInfo);
+        PresentationController.AddPlayer(playerInfo.Name);
+        _buttonManager?.OnPlayersChanged();
+    }
 
     private void RemovePlayer_Executed(object? arg)
     {
@@ -1259,90 +1349,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
-    private void AddRight_Executed(object? arg)
-    {
-        try
-        {
-            if (arg is not PlayerInfo player)
-            {
-                if (_selectedPlayer == null)
-                {
-                    return;
-                }
-
-                player = _selectedPlayer;
-            }
-
-            StopThinkingTimer_Executed(0);
-
-            player.Right++;
-            player.Sum += Price;
-
-            Chooser = player;
-
-            _gameLogger.Write("{0} +{1}", player.Name, Price);
-
-            if (_activeQuestion == null)
-            {
-                return;
-            }
-
-            _answeringHistory.Push(Tuple.Create(player, Price, true));
-            PresentationController.PlayerIsRight(Players.IndexOf(player));
-
-            if (Settings.Model.EndQuestionOnRightAnswer)
-            {
-                _engine.MoveToAnswer();
-                Next_Executed();
-            }
-            else
-            {
-                ReturnToQuestion();
-            }
-
-        }
-        catch (Exception exc)
-        {
-            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
-        }
-    }
-
-    private void AddWrong_Executed(object? arg)
-    {
-        if (arg is not PlayerInfo player)
-        {
-            if (_selectedPlayer == null)
-            {
-                return;
-            }
-
-            player = _selectedPlayer;
-        }
-
-        StopThinkingTimer_Executed(0);
-
-        player.Wrong++;
-
-        var substract = Settings.Model.SubstractOnWrong ? (NegativePrice ?? Price) : 0;
-        player.Sum -= substract;
-
-        if (LocalInfo.LayoutMode == LayoutMode.AnswerOptions && _selectedAnswerIndex > -1)
-        {
-            if (_selectedAnswerIndex < LocalInfo.AnswerOptions.Options.Length)
-            {
-                LocalInfo.AnswerOptions.Options[_selectedAnswerIndex].State = ItemState.Wrong;
-            }
-
-            PresentationController.SetAnswerState(_selectedAnswerIndex, ItemState.Wrong);
-        }
-
-        _gameLogger.Write("{0} -{1}", player.Name, substract);
-        _answeringHistory.Push(Tuple.Create(player, Price, false));
-        PresentationController.PlayerIsWrong(Players.IndexOf(player));
-
-        ReturnToQuestion();
-    }
-
     internal async Task StartAsync()
     {
         UpdateNextCommand();
@@ -1351,7 +1357,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
         {
-            Players.Clear();
             ManagedMode = true;
         }
 
@@ -2223,16 +2228,6 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             default:
                 throw new InvalidOperationException($"_state has an invalid value of {_state}");
         }
-    }
-
-    public void OnPlayerAdded(string? id, string playerName = "")
-    {
-        var playerInfo = new PlayerInfo { Id = id, Name = playerName };
-        playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
-
-        Players.Add(playerInfo);
-        PresentationController.AddPlayer(playerName);
-        _buttonManager?.OnPlayersChanged();
     }
 
     public bool TryConnectPlayer(string playerName, string connectionId)

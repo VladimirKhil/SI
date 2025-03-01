@@ -62,7 +62,8 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
         
         _webApplication.MapGet("/api/v1/info/host", () => new 
         {
-            ContentInfos = new[] { new { } }
+            ContentInfos = new[] { new { } },
+            StorageInfos = Array.Empty<object>(),
         });
 
         _webApplication.RunAsync($"http://+:{port}");
