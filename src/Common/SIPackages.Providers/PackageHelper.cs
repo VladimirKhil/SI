@@ -154,11 +154,11 @@ public static class PackageHelper
         CancellationToken cancellationToken = default)
     {
         var fIndex = Random.Shared.Next(files.Count);
-        var doc2 = await provider.GetPackageAsync(culture, files[fIndex], cancellationToken) ?? throw new PackageNotFoundException(files[fIndex]);
+        var sourceDocument = await provider.GetPackageAsync(culture, files[fIndex], cancellationToken) ?? throw new PackageNotFoundException(files[fIndex]);
 
-        using (doc2)
+        using (sourceDocument)
         {
-            var normal = doc2.Package.Rounds.Where(predicate).ToList();
+            var normal = sourceDocument.Package.Rounds.Where(predicate).ToList();
             var count = normal.Count;
 
             if (count == 0)
@@ -176,29 +176,30 @@ public static class PackageHelper
             // Исключим повторения имён тем
             if (doc.Package.Rounds.Any(round => round.Themes.Any(th => th.Name == theme.Name)))
             {
+                files.RemoveAt(fIndex);
                 return false;
             }
 
             // Нужно перенести в пакет необходимых авторов, источники, медиаконтент
-            InheritAuthors(doc2, r, theme);
-            InheritSources(doc2, r, theme);
+            InheritAuthors(sourceDocument, r, theme);
+            InheritSources(sourceDocument, r, theme);
 
             for (int i = 0; i < theme.Questions.Count; i++)
             {
                 theme.Questions[i].Price = (roundIndex + 1) * (i + 1) * baseCost;
 
-                InheritAuthors(doc2, theme.Questions[i]);
-                InheritSources(doc2, theme.Questions[i]);
-                await InheritContentAsync(doc, doc2, theme.Questions[i], cancellationToken);
+                InheritAuthors(sourceDocument, theme.Questions[i]);
+                InheritSources(sourceDocument, theme.Questions[i]);
+                await InheritContentAsync(doc, sourceDocument, theme.Questions[i], cancellationToken);
             }
 
             doc.Package.Rounds[roundIndex].Themes.Add(theme);
-            packageComments.AppendFormat("{0}:{1}:{2};", files[fIndex], doc2.Package.Rounds.IndexOf(r), tIndex);
+            packageComments.AppendFormat("{0}:{1}:{2};", files[fIndex], sourceDocument.Package.Rounds.IndexOf(r), tIndex);
             return true;
         }
     }
 
-    private static void InheritAuthors(SIDocument doc2, Question question)
+    private static void InheritAuthors(SIDocument sourceDocument, Question question)
     {
         var authors = question.Info.Authors;
 
@@ -206,7 +207,7 @@ public static class PackageHelper
         {
             for (int i = 0; i < authors.Count; i++)
             {
-                var link = doc2.GetLink(question.Info.Authors, i, out string tail);
+                var link = sourceDocument.GetLink(question.Info.Authors, i, out string tail);
 
                 if (link != null)
                 {
@@ -216,7 +217,7 @@ public static class PackageHelper
         }
     }
 
-    private static void InheritSources(SIDocument doc2, Question question)
+    private static void InheritSources(SIDocument sourceDocument, Question question)
     {
         var sources = question.Info.Sources;
 
@@ -224,7 +225,7 @@ public static class PackageHelper
         {
             for (int i = 0; i < sources.Count; i++)
             {
-                var link = doc2.GetLink(question.Info.Sources, i, out string tail);
+                var link = sourceDocument.GetLink(question.Info.Sources, i, out string tail);
 
                 if (link != null)
                 {
@@ -236,33 +237,33 @@ public static class PackageHelper
 
     private static async Task InheritContentAsync(
         SIDocument doc,
-        SIDocument doc2,
+        SIDocument sourceDocument,
         Question question,
         CancellationToken cancellationToken = default)
     {
         foreach (var contentItem in question.GetContent())
         {
-            if (contentItem.Type == ContentTypes.Text)
+            if (contentItem.Type == ContentTypes.Text || !contentItem.IsRef)
             {
                 continue;
             }
 
-            var link = doc2.TryGetMedia(contentItem);
+            var link = sourceDocument.TryGetMedia(contentItem);
 
-            if (link.HasValue && link.Value.Uri != null && link.Value.HasStream)
+            if (link.HasValue && link.Value.HasStream)
             {
                 var collection = doc.TryGetCollection(contentItem.Type);
 
                 if (collection != null)
                 {
-                    using var stream = link.Value.Stream!;
-                    await collection.AddFileAsync(link.Value.Uri.ToString(), stream, cancellationToken);
+                    using var stream = link.Value.Stream!;// TODO: think about conflict names resolution here
+                    await collection.AddFileAsync(contentItem.Value, stream, cancellationToken);
                 }
             }
         }
     }
 
-    private static void InheritAuthors(SIDocument doc2, Round round, Theme theme)
+    private static void InheritAuthors(SIDocument sourceDocument, Round round, Theme theme)
     {
         var authors = theme.Info.Authors;
 
@@ -272,12 +273,12 @@ public static class PackageHelper
 
             if (authors.Count == 0)
             {
-                authors = doc2.Package.Info.Authors;
+                authors = sourceDocument.Package.Info.Authors;
             }
 
             if (authors.Count > 0)
             {
-                var realAuthors = doc2.GetRealAuthors(authors);
+                var realAuthors = sourceDocument.GetRealAuthors(authors);
                 theme.Info.Authors.Clear();
 
                 foreach (var item in realAuthors)
@@ -290,7 +291,7 @@ public static class PackageHelper
         {
             for (int i = 0; i < authors.Count; i++)
             {
-                var link = doc2.GetLink(theme.Info.Authors, i, out string tail);
+                var link = sourceDocument.GetLink(theme.Info.Authors, i, out string tail);
 
                 if (link != null)
                 {
@@ -300,7 +301,7 @@ public static class PackageHelper
         }
     }
 
-    private static void InheritSources(SIDocument doc2, Round round, Theme theme)
+    private static void InheritSources(SIDocument sourceDocument, Round round, Theme theme)
     {
         var sources = theme.Info.Sources;
 
@@ -310,12 +311,12 @@ public static class PackageHelper
 
             if (sources.Count == 0)
             {
-                sources = doc2.Package.Info.Sources;
+                sources = sourceDocument.Package.Info.Sources;
             }
 
             if (sources.Count > 0)
             {
-                var realSources = doc2.GetRealSources(sources);
+                var realSources = sourceDocument.GetRealSources(sources);
                 theme.Info.Sources.Clear();
 
                 foreach (var item in realSources)
@@ -328,7 +329,7 @@ public static class PackageHelper
         {
             for (int i = 0; i < sources.Count; i++)
             {
-                var link = doc2.GetLink(theme.Info.Sources, i, out string tail);
+                var link = sourceDocument.GetLink(theme.Info.Sources, i, out string tail);
 
                 if (link != null)
                 {

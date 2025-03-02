@@ -1,4 +1,4 @@
-﻿namespace SICore.Clients.Viewer;
+﻿namespace SICore.Models;
 
 /// <summary>
 /// Defaines a banned user info.

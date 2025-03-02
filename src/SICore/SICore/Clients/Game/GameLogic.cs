@@ -1710,6 +1710,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         OnRound(_data.Round, arg);
                         break;
 
+                    case Tasks.RoundTheme:
+                        OnRoundTheme(arg);
+                        break;
+
                     case Tasks.AskFirst:
                         GiveMoveToPlayerWithMinimumScore();
                         break;
@@ -1875,6 +1879,34 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
     }
 
+    private void OnRoundTheme(int themeIndex)
+    {
+        if (themeIndex < 0 || themeIndex >= _data.TInfo.RoundInfo.Count)
+        {
+            throw new ArgumentException($"{nameof(themeIndex)} {themeIndex} must be in [0;{_data.TInfo.RoundInfo.Count - 1}]");
+        }
+
+        _gameActions.SendThemeInfo(themeIndex, true);
+
+        if (themeIndex + 1 < _data.TInfo.RoundInfo.Count)
+        {
+            ScheduleExecution(Tasks.RoundTheme, 19, themeIndex + 1);
+        }
+        else
+        {
+            InformTable();
+            ScheduleExecution(Tasks.AskFirst, 19);
+        }
+    }
+
+    private void InformTable() => _data.TableInformStageLock.WithLock(
+        () =>
+        {
+            _gameActions?.InformTable();
+            _data.TableInformStage = 2;
+        },
+        5000);
+
     private void AskAnswerDeferred()
     {
         _data.Decision = DecisionType.None;
@@ -2001,6 +2033,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                             _gameActions.SystemReplic(subText);
 
                             newTask = Tasks.MoveNext;
+                        }
+                        else if (task == Tasks.RoundTheme) // Skip all round themes
+                        {
+                            InformTable();
+                            newTask = Tasks.AskFirst;
                         }
 
                         break;

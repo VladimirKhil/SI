@@ -16,8 +16,7 @@
     <None Include="key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
-    <PackageReference Include="VKhil.SIStorage.Client" Version="1.2.2" />
+    <PackageReference Include="VKhil.SIStorage.Client" Version="1.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SIPackages\SIPackages.csproj" />

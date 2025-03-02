@@ -1667,10 +1667,12 @@ public sealed class Game : Actor
             {
                 if (ClientData.TableInformStage > 0)
                 {
+                    // TODO: can 2 messages be replaced with 1?
                     _gameActions.InformRoundThemes(person);
 
                     if (ClientData.TableInformStage > 1)
                     {
+                        // TODO: what about sequential play and theme deletion? There is no table there
                         _gameActions.InformTable(person);
                     }
                 }

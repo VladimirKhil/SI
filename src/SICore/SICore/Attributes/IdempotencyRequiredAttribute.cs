@@ -1,4 +1,4 @@
-﻿namespace SICore;
+﻿namespace SICore.Attributes;
 
 /// <summary>
 /// Marks messages which could be resent several times, so their processing should be idempotent.

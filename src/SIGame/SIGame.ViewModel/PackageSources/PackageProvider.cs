@@ -10,10 +10,7 @@ public sealed class PackageProvider : IPackagesProvider
 {
     private readonly string _folder;
 
-    public PackageProvider(string folder)
-    {
-        _folder = folder;
-    }
+    public PackageProvider(string folder) => _folder = folder;
 
     public Task<IEnumerable<string>> GetPackagesAsync(string culture, CancellationToken cancellationToken = default)
     {

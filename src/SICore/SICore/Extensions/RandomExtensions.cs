@@ -1,4 +1,4 @@
-﻿namespace SICore.Utils;
+﻿namespace SICore.Extensions;
 
 internal static class RandomExtensions
 {

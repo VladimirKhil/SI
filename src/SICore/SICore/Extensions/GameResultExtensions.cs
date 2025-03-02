@@ -1,8 +1,9 @@
 ﻿using SICore.Contracts;
+using SICore.Results;
 using System.Text;
 using R = SICore.Properties.Resources;
 
-namespace SICore.Results;
+namespace SICore.Extensions;
 
 /// <summary>
 /// Provides extension method for converting game result to string.

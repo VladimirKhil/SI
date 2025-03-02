@@ -64,13 +64,18 @@ public sealed class RandomStoragePackageSource : PackageSource
             var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
 
             var language = languages.FirstOrDefault(l => l.Code == currentLanguage);
+            var settings = UserSettings.Default.GameSettings.AppSettings;
 
             var package = await _storageServiceClient.Packages.GetRandomPackageAsync(
                 new RandomPackageParameters
                 {
                     RestrictionIds = new int[] { -1 },
                     TagIds = new int[] { -1 },
-                    LanguageId = language?.Id
+                    LanguageId = language?.Id,
+                    RoundCount = settings.RandomRoundsCount,
+                    TableThemeCount = settings.RandomThemesCount,
+                    ThemeListThemeCount = 7,
+                    BaseQuestionPrice = settings.RandomQuestionsBasePrice
                 },
                 cancellationToken);
 

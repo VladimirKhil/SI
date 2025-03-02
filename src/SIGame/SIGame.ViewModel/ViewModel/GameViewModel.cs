@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SICore;
-using SICore.Clients.Viewer;
 using SICore.Contracts;
+using SICore.Models;
 using SICore.Network.Servers;
 using SIData;
 using SIGame.ViewModel.Models;
@@ -226,6 +226,42 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         set { _answer = value; OnPropertyChanged(); }
     }
 
+    public Queue<ValidationInfo> ValidationQueue { get; } = new();
+
+    private ValidationInfo? _validationInfo = null;
+
+    public ValidationInfo? ValidationInfo
+    {
+        get => _validationInfo;
+        set
+        {
+            if (_validationInfo != value)
+            {
+                _validationInfo = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public void AddValidation(string name, string answer)
+    {
+        ValidationQueue.Enqueue(new ValidationInfo(name, answer));
+        ValidationInfo = ValidationQueue.Peek();
+    }
+
+    public ValidationInfo PopValidation()
+    {
+        var info = ValidationQueue.Dequeue();
+        ValidationInfo = ValidationQueue.Count > 0 ? ValidationQueue.Peek() : null;
+        return info;
+    }
+
+    public void ClearValidation()
+    {
+        ValidationQueue.Clear();
+        ValidationInfo = null;
+    }
+
     private SimpleCommand _changeSums;
 
     /// <summary>
@@ -421,6 +457,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public Uri? HostUri { get; set; }
 
+    internal string? HostKey { get; set; }
+
     private SICore.Models.JoinMode _joinMode = SICore.Models.JoinMode.AnyRole;
 
     /// <summary>
@@ -528,6 +566,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     }
 
     internal SelectionMode SelectionMode { get; set; }
+
+    public bool NewValidation { get; internal set; }
 
     public GameViewModel(
         ViewerData viewerData,
@@ -680,14 +720,42 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void IsRight_Executed(object? arg)
     {
-        Host?.Actions.SendMessage(Messages.IsRight, "+", arg?.ToString() ?? "1");
-        ClearSelections();
+        var validation = PopValidation();
+        
+        if (NewValidation)
+        {
+            Host?.Actions.SendMessage(Messages.Validate, validation.Answer, "+");
+
+            if (ValidationInfo == null)
+            {
+                ClearSelections();
+            }
+        }
+        else
+        {
+            Host?.Actions.SendMessage(Messages.IsRight, "+", arg?.ToString() ?? "1");
+            ClearSelections();
+        }
     }
 
     private void IsWrong_Executed(object? arg)
     {
-        Host?.Actions.SendMessage(Messages.IsRight, "-", arg?.ToString() ?? "1");
-        ClearSelections();
+        var validation = PopValidation();
+        
+        if (NewValidation)
+        {
+            Host?.Actions.SendMessage(Messages.Validate, validation.Answer, "-");
+
+            if (ValidationInfo == null)
+            {
+                ClearSelections();
+            }
+        }
+        else
+        {
+            Host?.Actions.SendMessage(Messages.IsRight, "-", arg?.ToString() ?? "1");
+            ClearSelections();
+        }
     }
 
     private void Pass_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Pass);
@@ -946,7 +1014,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         SelectionMode = SelectionMode.SetActivePlayer;
     }
 
-    private void ClearSelections(bool full = false)
+    internal void ClearSelections(bool full = false)
     {
         if (full)
         {
@@ -958,6 +1026,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         Hint = "";
         DialogMode = DialogModes.None;
+        ClearValidation();
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
@@ -1229,6 +1298,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     {
         DialogMode = DialogModes.None;
         Hint = "";
+        ClearValidation();
     }
 
     private void ChangePauseInGame_Executed(object? arg) => Host?.Pause();
@@ -1258,8 +1328,23 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         try
         {
-            var hostInfo = HostUri != null ? "&host=" + Uri.EscapeDataString(HostUri.ToString()) : "";
-            AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.NewOnlineGameUrl}{GameId}{hostInfo}&invite=true");
+            string uriParams;
+            
+            if (HostKey != null)
+            {
+                uriParams = $"_{ HostKey}{GameId}";
+            }
+            else if (HostUri != null)
+            {
+                var hostInfo = "&host=" + Uri.EscapeDataString(HostUri.ToString());
+                uriParams = $"gameId={GameId}{hostInfo}";
+            }
+            else
+            {
+                uriParams = $"gameId={GameId}";
+            }
+
+            AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.NewOnlineGameUrl}{uriParams}");
         }
         catch (Exception exc)
         {
@@ -1311,7 +1396,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public async ValueTask DisposeAsync()
     {
         // For correct WebView2 disposal (https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136)
-        TInfo.TStage = TableStage.Void;
+        TInfo.TStage = SIUI.ViewModel.TableStage.Void;
 
         await _node.DisposeAsync();
 

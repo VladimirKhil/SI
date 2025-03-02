@@ -1,4 +1,6 @@
-﻿namespace SICore;
+﻿using SICore.Attributes;
+
+namespace SICore;
 
 /// <summary>
 /// Defines well-known game messages.
@@ -608,6 +610,11 @@ public static class Messages
     /// Current theme.
     /// </summary>
     public const string Theme = "THEME";
+
+    /// <summary>
+    /// Current theme (temporary copy of <see cref="Theme" />).
+    /// </summary>
+    public const string Theme2 = "THEME2";
 
     /// <summary>
     /// Theme comments.

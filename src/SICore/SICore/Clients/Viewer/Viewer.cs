@@ -1,5 +1,4 @@
 ﻿using Notions;
-using SICore.Clients.Viewer;
 using SICore.Contracts;
 using SICore.Models;
 using SICore.Network;

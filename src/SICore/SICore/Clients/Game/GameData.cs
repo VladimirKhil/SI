@@ -650,6 +650,11 @@ public sealed class GameData : Data
     /// </summary>
     public Action? SkipQuestion { get; internal set; }
 
+    /// <summary>
+    /// Round themes.
+    /// </summary>
+    public IReadOnlyList<Theme> Themes { get; internal set; }
+
     public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
         _showMan = showman;

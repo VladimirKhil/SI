@@ -1,7 +1,6 @@
-﻿using SICore.Models;
-using SIPackages.Core;
+﻿using SIPackages.Core;
 
-namespace SICore;
+namespace SICore.Models;
 
 public sealed class StakeInfo : NumberSet
 {

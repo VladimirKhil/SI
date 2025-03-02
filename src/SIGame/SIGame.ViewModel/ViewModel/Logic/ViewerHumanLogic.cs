@@ -196,26 +196,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         ClearSelections(true);
     }
 
-    public void ClearSelections(bool full = false)
-    {
-        if (full)
-        {
-            TInfo.Selectable = false;
-            TInfo.SelectQuestion.CanBeExecuted = false;
-            TInfo.SelectTheme.CanBeExecuted = false;
-            TInfo.SelectAnswer.CanBeExecuted = false;
-        }
-
-        _gameViewModel.Hint = "";
-        _gameViewModel.DialogMode = DialogModes.None;
-
-        for (var i = 0; i < _data.Players.Count; i++)
-        {
-            _data.Players[i].CanBeSelected = false;
-        }
-
-        _data.Host.OnFlash(false);
-    }
+    public void ClearSelections(bool full = false) => _gameViewModel.ClearSelections(full);
 
     public void OnSelectPlayer(Models.SelectPlayerReason reason)
     {
@@ -509,6 +490,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         _gameViewModel.Hint = "";
         _gameViewModel.UpdateCommands();
+        _gameViewModel.ClearValidation();
         OnAd();
     }
 
@@ -1695,7 +1677,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             },
             exc => ClientData.Host.OnError(exc));
 
-    public void OnBanned(BannedInfo bannedInfo) =>
+    public void OnBanned(Models.BannedInfo bannedInfo) =>
         UI.Execute(
             () =>
             {
@@ -1703,7 +1685,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
             },
             exc => ClientData.Host.OnError(exc));
 
-    public void OnBannedList(IEnumerable<BannedInfo> banned) =>
+    public void OnBannedList(IEnumerable<Models.BannedInfo> banned) =>
         UI.Execute(() =>
         {
             ClientData.Banned.Clear();
@@ -1822,11 +1804,28 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void OnDisableButton() => _gameViewModel.DisableGameButton(true);
 
-    public void IsRight(bool voteForRight, string answer)
+    public void IsRight(string name, bool voteForRight, string answer)
     {
         _gameViewModel.Hint = Resources.HintCheckAnswer;
+        _gameViewModel.NewValidation = false;
         _gameViewModel.DialogMode = DialogModes.AnswerValidation;
-        _gameViewModel.Answer = answer;
+        _gameViewModel.AddValidation(name, answer);
+        _data.Host.OnFlash();
+    }
+
+    public void ValidateAnswer(int playerIndex, string answer)
+    {
+        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+        {
+            return;
+        }
+
+        var playerName = _data.Players[playerIndex].Name;
+        _gameViewModel.NewValidation = true;
+        ClientData.PersonDataExtensions.ShowExtraRightButtons = false;
+        _gameViewModel.Hint = Resources.HintCheckAnswer;
+        _gameViewModel.AddValidation(playerName, answer);
+        _gameViewModel.DialogMode = DialogModes.AnswerValidation;
         _data.Host.OnFlash();
     }
 

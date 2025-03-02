@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using SICore.Models;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace SICore;
@@ -54,11 +55,6 @@ public sealed class PersonData : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
-    /// <summary>
-    /// Имя игрока, чей ответ валидируется
-    /// </summary>
-    public string ValidatorName { get; set; }
 
     private bool _showExtraRightButtons;
 

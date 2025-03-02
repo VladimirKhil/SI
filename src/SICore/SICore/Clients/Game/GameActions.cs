@@ -124,13 +124,13 @@ public sealed class GameActions
         SystemReplic(s.ToString());
     }
 
-    public void SendThemeInfo(bool animate = false, int? overridenQuestionCount = null)
+    public void SendThemeInfo(int themeIndex = -1, bool animate = false, int? overridenQuestionCount = null)
     {
-        var theme = _gameData.Theme;
+        var theme = themeIndex > -1 ? _gameData.Themes[themeIndex] : _gameData.Theme;
         var themeInfo = theme.Info;
 
         var message = new MessageBuilder(
-            Messages.Theme,
+            themeIndex > -1 ? Messages.Theme2 : Messages.Theme,
             theme.Name,
             overridenQuestionCount ?? theme.Questions.Count,
             animate ? '+' : '-',

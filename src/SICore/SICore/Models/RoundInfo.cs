@@ -1,4 +1,4 @@
-﻿namespace SICore.Clients.Game;
+﻿namespace SICore.Models;
 
 /// <summary>
 /// Provides active round info.

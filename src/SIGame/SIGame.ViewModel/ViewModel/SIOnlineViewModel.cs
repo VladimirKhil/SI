@@ -439,16 +439,31 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         }
     }
 
+    private static bool TryParseNumberAtTheEndOfString(string str, out int number)
+    {
+        var length = str.Length;
+        var i = length - 1;
+        
+        while (i >= 0 && char.IsDigit(str[i]))
+        {
+            i--;
+        }
+        
+        if (i < length - 1)
+        {
+            return int.TryParse(str.AsSpan(i + 1), out number);
+        }
+        
+        number = 0;
+        return false;
+    }
+
     private bool FilteredOk(GameInfo game) =>
         string.IsNullOrWhiteSpace(SearchFilter)
-        || !SearchFilter.StartsWith(CommonSettings.OnlineGameUrl)
-            && CultureInfo.CurrentUICulture.CompareInfo.IndexOf(game.GameName, SearchFilter.Trim(), CompareOptions.IgnoreCase) >= 0
-        || SearchFilter.StartsWith(CommonSettings.OnlineGameUrl)
-            && int.TryParse(SearchFilter.AsSpan(CommonSettings.OnlineGameUrl.Length), out int gameId)
-            && game.GameID == gameId
-        || SearchFilter.StartsWith(CommonSettings.NewOnlineGameUrl)
-            && int.TryParse(SearchFilter.AsSpan(CommonSettings.NewOnlineGameUrl.Length), out int gameId2)
-            && game.GameID == gameId2;
+        || CultureInfo.CurrentUICulture.CompareInfo.IndexOf(game.GameName, SearchFilter.Trim(), CompareOptions.IgnoreCase) >= 0
+        || SearchFilter.StartsWith(CommonSettings.NewOnlineGameUrl + "_")
+            && TryParseNumberAtTheEndOfString(SearchFilter, out int gameId)
+            && game.GameID == gameId;
 
     private bool FilterGame(GameInfo gameInfo)
     {
@@ -1071,6 +1086,13 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
             gameViewModel.GameId = gameInfo.GameID;
             gameViewModel.HostUri = gameInfo.HostUri;
+
+            var uriValue = gameInfo.HostUri?.ToString();
+
+            if (_gamesHostInfo != null && uriValue != null && _gamesHostInfo.SIHosts.TryGetValue(uriValue, out var hostKey))
+            {
+                gameViewModel.HostKey = hostKey;
+            }
 
             return gameViewModel;
         }

@@ -54,13 +54,13 @@
                 <TextBlock Margin="5,5,0,0" FontSize="18">
                     <Run Text="{x:Static lp:Resources.Validate_IsTrue}" />
                     <Run Text=" " />
-                    <Run FontWeight="Bold" Text="{Binding Data.PersonDataExtensions.ValidatorName}" />
+                    <Run FontWeight="Bold" Text="{Binding ValidationInfo.Name}" />
                     <Run Text="?" />
                 </TextBlock>
             </GroupBox.Header>
             
             <TextBlock
-                Text="{Binding Answer, Converter={StaticResource trim}}"
+                Text="{Binding ValidationInfo.Answer, Converter={StaticResource trim}}"
                 FontSize="17"
                 HorizontalAlignment="Center"
                 TextAlignment="Center"

@@ -1,5 +1,5 @@
-﻿using SICore.Clients.Viewer;
-using SICore.Contracts;
+﻿using SICore.Contracts;
+using SICore.Models;
 using SIData;
 using System.Collections.ObjectModel;
 using System.Text;

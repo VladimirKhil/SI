@@ -47,7 +47,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
-    public void IsRight(bool voteForRight, string answer)
+    public void IsRight(string name, bool voteForRight, string answer)
     {
         if (_role == GameRole.Showman)
         {

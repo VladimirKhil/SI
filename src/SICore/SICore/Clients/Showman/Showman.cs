@@ -51,30 +51,26 @@ public sealed class Showman : Viewer
                     break;
 
                 case Messages.Hint:
+                    if (mparams.Length < 2)
                     {
-                        if (mparams.Length < 2)
-                        {
-                            break;
-                        }
-
-                        Logic.OnHint(mparams[1]);
                         break;
                     }
+
+                    Logic.OnHint(mparams[1]);
+                    break;
 
                 case Messages.QuestionAnswers:
                     OnQuestionAnswers(mparams);
                     break;
 
                 case Messages.Stage:
+                    for (var i = 0; i < ClientData.Players.Count; i++)
                     {
-                        for (var i = 0; i < ClientData.Players.Count; i++)
-                        {
-                            ClientData.Players[i].CanBeSelected = false;
-                        }
-                        break;
+                        ClientData.Players[i].CanBeSelected = false;
                     }
+                    break;
 
-                // Oral game commands (the showman performs actions announced by players)
+                // Oral game commands (showman performs actions announced by players)
                 case Messages.Choose:
                     #region Choose
 
@@ -135,7 +131,11 @@ public sealed class Showman : Viewer
 
     private void OnValidation2(string[] mparams)
     {
-        ClientData.PersonDataExtensions.ValidatorName = mparams[1];
+        if (mparams.Length < 6)
+        {
+            return;
+        }
+
         _ = int.TryParse(mparams[5], out var rightAnswersCount);
         rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 6);
 
@@ -157,8 +157,13 @@ public sealed class Showman : Viewer
         ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
         ClientData.PersonDataExtensions.ShowExtraRightButtons = mparams[4] == "+";
 
-        ((PersonAccount)ClientData.Me).IsDeciding = false;
+        var me = (PersonAccount?)ClientData.Me;
 
-        Logic.IsRight(true, mparams[2]);
+        if (me != null)
+        {
+            me.IsDeciding = false;
+        }
+
+        Logic.IsRight(mparams[1], true, mparams[2]);
     }
 }

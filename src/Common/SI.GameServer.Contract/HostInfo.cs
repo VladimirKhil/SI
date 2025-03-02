@@ -26,6 +26,11 @@ public sealed class HostInfo
     public SIStorageInfo[] StorageInfos { get; set; } = Array.Empty<SIStorageInfo>();
 
     /// <summary>
+    /// Contains information about well-known SIHost services.
+    /// </summary>
+    public Dictionary<string, string> SIHosts { get; set; } = new();
+
+    /// <summary>
     /// Server license text.
     /// </summary>
     public string License { get; set; } = "";

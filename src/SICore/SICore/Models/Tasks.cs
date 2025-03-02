@@ -25,6 +25,12 @@ public enum Tasks
     /// Объявление раунда
     /// </summary>
     Round,
+    
+    /// <summary>
+    /// Plays the round theme.
+    /// </summary>
+    RoundTheme,
+    
     /// <summary>
     /// Detect the next moving player.
     /// </summary>

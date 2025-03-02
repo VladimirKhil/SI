@@ -25,10 +25,8 @@ public sealed class CommonSettings
     public const string AppNameEn = "SIGame";
 
     public const string LogsFolderName = "Logs";
-
-    internal const string OnlineGameUrl = "https://vladimirkhil.com/si/online/?gameId=";
     
-    internal const string NewOnlineGameUrl = "https://sigame.vladimirkhil.com/?gameId=";
+    internal const string NewOnlineGameUrl = "https://sigame.vladimirkhil.com/?";
 
     /// <summary>
     /// Экземпляр общих настроек

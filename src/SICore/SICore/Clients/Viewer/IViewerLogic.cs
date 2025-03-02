@@ -1,5 +1,4 @@
-﻿using SICore.Clients.Viewer;
-using SICore.Models;
+﻿using SICore.Models;
 using SIData;
 
 namespace SICore;
@@ -205,7 +204,14 @@ public interface IViewerLogic
     /// <summary>
     /// Validates the answer.
     /// </summary>
-    void IsRight(bool voteForRight, string answer);
+    void IsRight(string name, bool voteForRight, string answer);
+
+    /// <summary>
+    /// Validates the answer.
+    /// </summary>
+    /// <param name="playerIndex">Player index.</param>
+    /// <param name="answer">Player answer.</param>
+    void ValidateAnswer(int playerIndex, string answer);
 
     /// <summary>
     /// Reacts to sending answer request.
@@ -264,8 +270,6 @@ public interface IViewerLogic
     void OnClientSwitch(IViewerClient viewer) { }
 
     void DeleteTheme();
-
-    void ValidateAnswer(int playerIndex, string answer) { }
 
     void MakeStake();
 }

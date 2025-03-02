@@ -70,6 +70,8 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
             throw new ArgumentException("Themes collection is empty", nameof(themes));
         }
 
+        _gameData.Themes = themes;
+
         // _gameData.TInfo.RoundInfo is initialized here
         GameLogic?.InitThemes(themes, false, true, Models.ThemesPlayMode.OneByOne);
 
@@ -93,17 +95,10 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
             }
         }
 
-        _gameData.TableInformStageLock.WithLock(
-            () =>
-            {
-                GameActions?.InformTable();
-                _gameData.TableInformStage = 2;
-            },
-            5000);
-
+        // TODO: think about senging theme names and comments when person joins during the round
         _gameData.TableController = tableController;
         _gameData.IsQuestionAskPlaying = false;
-        GameLogic?.ScheduleExecution(Tasks.AskFirst, 19 * _gameData.TInfo.RoundInfo.Count + Random.Shared.Next(10));
+        GameLogic?.ScheduleExecution(Tasks.RoundTheme, 1, 0, true);
     }
 
     public bool ShouldPlayRoundWithRemovableThemes()

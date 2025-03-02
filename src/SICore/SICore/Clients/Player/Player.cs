@@ -34,8 +34,6 @@ public sealed class Player : Viewer
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
     { }
 
-    private void Clear() => Logic.ClearSelections(true);
-
     protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)
     {
         await base.OnSystemMessageReceivedAsync(mparams);
@@ -58,14 +56,14 @@ public sealed class Player : Viewer
                         ClientData.ThemeIndex = -1;
                     }
 
-                    Clear();
+                    Logic.ClearSelections(true);
                 }
 
                 #endregion
                 break;
 
             case Messages.Cancel:
-                Clear();
+                Logic.ClearSelections(true);
                 break;
 
             case Messages.Choose:
@@ -164,7 +162,13 @@ public sealed class Player : Viewer
                     report.AppendLine(mparams[r]);
                 }
 
-                            ((PlayerAccount)ClientData.Me).IsDeciding = false;
+                var me = (PersonAccount?)ClientData.Me;
+
+                if (me != null)
+                {
+                    me.IsDeciding = false;
+                }
+
                 Logic.Report(report.ToString());
                 break;
         }
@@ -172,7 +176,11 @@ public sealed class Player : Viewer
 
     private void OnValidation2(string[] mparams)
     {
-        ClientData.PersonDataExtensions.ValidatorName = mparams[1];
+        if (mparams.Length < 7)
+        {
+            return;
+        }
+
         _ = int.TryParse(mparams[5], out var rightAnswersCount);
         rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 6);
 
@@ -194,7 +202,13 @@ public sealed class Player : Viewer
         ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
         ClientData.PersonDataExtensions.ShowExtraRightButtons = mparams[4] == "+";
 
-        ((PersonAccount)ClientData.Me).IsDeciding = false;
-        Logic.IsRight(mparams[3] == "+", mparams[2]);
+        var me = (PersonAccount?)ClientData.Me;
+
+        if (me != null)
+        {
+            me.IsDeciding = false;
+        }
+
+        Logic.IsRight(mparams[1], mparams[3] == "+", mparams[2]);
     }
 }
