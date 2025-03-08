@@ -9,7 +9,6 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
-	<LangVersion>12</LangVersion>
     <!--<ImplicitUsings>enable</ImplicitUsings>-->
   </PropertyGroup>
   <PropertyGroup>
