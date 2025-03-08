@@ -1,7 +1,7 @@
 ﻿using SICore.Contracts;
 using SIGame.ViewModel.Properties;
 
-namespace SICore.Utils;
+namespace SIGame.ViewModel.Services;
 
 /// <inheritdoc cref="IAvatarHelper" />
 internal sealed class AvatarHelper : IAvatarHelper

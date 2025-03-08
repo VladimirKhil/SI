@@ -4,7 +4,9 @@ using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Helpers;
+using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
+using System.ClientModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text;
@@ -103,63 +105,63 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     }
 
     private readonly BinaryData JsonSchema = BinaryData.FromBytes(
-    Encoding.UTF8.GetBytes(
-    @"{
-        ""type"": ""object"",
-        ""definitions"": {
-            ""QuestionInfo"": {
-                ""type"": ""object"",
-                ""additionalProperties"": false,
-                ""properties"": {
-                    ""Text"": {
-                        ""type"": ""string""
-                    },
-                    ""AnswerOptions"": {
-                        ""type"": ""array"",
-                        ""items"": {
+        Encoding.UTF8.GetBytes(
+        @"{
+            ""type"": ""object"",
+            ""definitions"": {
+                ""QuestionInfo"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                        ""Text"": {
+                            ""type"": ""string""
+                        },
+                        ""AnswerOptions"": {
+                            ""type"": ""array"",
+                            ""items"": {
+                                ""type"": ""string""
+                            }
+                        },
+                        ""Answer"": {
+                            ""type"": ""string""
+                        },
+                        ""Comment"": {
+                            ""type"": ""string""
+                        },
+                        ""Source"": {
                             ""type"": ""string""
                         }
                     },
-                    ""Answer"": {
-                        ""type"": ""string""
-                    },
-                    ""Comment"": {
-                        ""type"": ""string""
-                    },
-                    ""Source"": {
-                        ""type"": ""string""
-                    }
-                },
-                ""required"": [
-                    ""Text"",
-                    ""AnswerOptions"",
-                    ""Answer"",
-                    ""Comment"",
-                    ""Source""
-                ]
-            }
-        },
-        ""properties"": {
-            ""Name"": {
-                ""type"": ""string""
-            },
-            ""Description"": {
-                ""type"": ""string""
-            },
-            ""Questions"": {
-                ""type"": ""array"",
-                ""items"": {
-                    ""$ref"": ""#/definitions/QuestionInfo""
+                    ""required"": [
+                        ""Text"",
+                        ""AnswerOptions"",
+                        ""Answer"",
+                        ""Comment"",
+                        ""Source""
+                    ]
                 }
-            }
-        },
-        ""required"": [
-            ""Name"",
-            ""Description"",
-            ""Questions""
-        ],
-        ""additionalProperties"": false
-    }"));
+            },
+            ""properties"": {
+                ""Name"": {
+                    ""type"": ""string""
+                },
+                ""Description"": {
+                    ""type"": ""string""
+                },
+                ""Questions"": {
+                    ""type"": ""array"",
+                    ""items"": {
+                        ""$ref"": ""#/definitions/QuestionInfo""
+                    }
+                }
+            },
+            ""required"": [
+                ""Name"",
+                ""Description"",
+                ""Questions""
+            ],
+            ""additionalProperties"": false
+        }"));
 
     private async void GenerateQuestions_Executed(object? arg)
     {
@@ -172,7 +174,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         {
             if (string.IsNullOrEmpty(AppSettings.Default.GPTApiKey))
             {
-                throw new Exception("API key not set");
+                throw new Exception(Resources.ApiKeyNotSet);
             }
 
             var prompt = AppSettings.Default.GPTPrompt;
@@ -185,7 +187,55 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             var themeNameSet = !string.IsNullOrEmpty(Model.Name);
             var topicName = themeNameSet ? $"\"{Model.Name}\"" : "";
 
-            var userPrompt = $"Create topic {topicName} with 5 questions";
+            var questionToGenerateCount = OwnerRound.Model.Type == RoundTypes.Final ? 1 : 5;
+            var promptExamples = new StringBuilder();
+
+            for (var i = 0; i < Questions.Count; i++)
+            {
+                var question = Questions[i];
+
+                var text = question.Model.GetText();
+                var answer = question.Right.FirstOrDefault() ?? "";
+                var comment = question.Info.Comments.Text;
+
+                if (text.Length > 0 && answer.Length > 0)
+                {
+                    questionToGenerateCount--;
+                    promptExamples.AppendLine($"{i + 1}. {Resources.Question}: {text}").AppendLine($"{Resources.Answer}: {answer}");
+
+                    if (comment.Length > 0)
+                    {
+                        promptExamples.AppendLine($"{Resources.Comment}: {comment}");
+                    }
+
+                    if (questionToGenerateCount == 0)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (questionToGenerateCount  == 0)
+            {
+                PlatformManager.Instance.Inform(Resources.NoQuestionsToGenerate);
+                return;
+            }
+
+            string userPrompt;
+
+            if (OwnerRound.Model.Type == RoundTypes.Final)
+            {
+                userPrompt = string.Format(Resources.GPTCreateTopicFinalRoundPrompt, topicName, questionToGenerateCount);
+            }
+            else
+            {
+                userPrompt = string.Format(Resources.CreateTopicPrompt, topicName, questionToGenerateCount);
+
+                if (promptExamples.Length > 0)
+                {
+                    userPrompt += $" {Resources.BasedOnExamples}:\n{promptExamples}";
+                }
+            }
 
             List<ChatMessage> messages = new()
             {
@@ -202,12 +252,18 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             };
 
             var client = new ChatClient(AppSettings.Default.GPTModel, AppSettings.Default.GPTApiKey);
-            var completion = await client.CompleteChatAsync(messages, options);
+
+            ClientResult<ChatCompletion> completion;
+
+            using (var dialog = PlatformManager.Instance.ShowProgressDialog())
+            {
+                completion = await client.CompleteChatAsync(messages, options);
+            }
 
             var data = completion.Value.Content[0].Text;
-            var themeInfo = JsonSerializer.Deserialize<ThemeInfo>(data) ?? throw new Exception("Failed to parse GPT response");
+            var themeInfo = JsonSerializer.Deserialize<ThemeInfo>(data) ?? throw new Exception(Resources.FailedToParseGPTResponse);
 
-            var document = (OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("document not found");
+            var document = (OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("Document not found");
             using var change = document.OperationsManager.BeginComplexChange();
 
             for (var i = 0; i < Questions.Count; i++)
@@ -228,13 +284,12 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
 
             if (!string.IsNullOrEmpty(themeInfo.Description))
             {
-                Model.Info.Comments.Text = themeInfo.Description;
+                Model.Info.Comments.Text = themeInfo.Description.ClearPoints();
             }
 
             foreach (var questionInfo in themeInfo.Questions)
             {
                 var price = DetectNextQuestionPrice(OwnerRound);
-
                 var question = PackageItemsHelper.CreateQuestion(price, questionInfo.Text.ClearPoints(), questionInfo.Answer.ClearPoints());
 
                 if (questionInfo.AnswerOptions.Length > 0)
@@ -283,6 +338,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             }
 
             change.Commit();
+            IsExpanded = true;
         }
         catch (Exception exc)
         {

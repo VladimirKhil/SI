@@ -94,4 +94,6 @@ public abstract class PlatformManager
     public abstract void CopyInfo(object info);
 
     public abstract Dictionary<string, JsonElement>? PasteInfo();
+
+    public abstract IDisposable ShowProgressDialog();
 }

@@ -1,15 +1,15 @@
 ﻿using SICore.Properties;
+using SIGame.ViewModel.Contracts;
 using System.Diagnostics;
-using System.Net;
 using System.Threading.Channels;
 using Utils;
 
-namespace SICore.Clients.Viewer;
+namespace SIGame.ViewModel.Services;
 
 /// <inheritdoc cref="ILocalFileManager" />
 internal sealed class LocalFileManager : ILocalFileManager
 {
-    private readonly HttpClient _client = new() { DefaultRequestVersion = HttpVersion.Version20 };
+    private readonly HttpClient _client;
 
     private readonly Task _localFileManagerTask;
     private readonly CancellationTokenSource _cancellation = new();
@@ -29,17 +29,10 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     public event Action<Uri, Exception>? Error;
 
-    public LocalFileManager()
+    public LocalFileManager(HttpClient client)
     {
-        var socketsHttpHandler = new SocketsHttpHandler
-        {
-            KeepAlivePingPolicy = HttpKeepAlivePingPolicy.WithActiveRequests,
-            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
-        };
-
-        _client = new(socketsHttpHandler) { DefaultRequestVersion = HttpVersion.Version20 };
+        _client = client;
         _rootFolder = Path.Combine(Path.GetTempPath(), "SIGame", Guid.NewGuid().ToString());
-
         _localFileManagerTask = StartAsync(_cancellation.Token);
     }
 
@@ -52,6 +45,7 @@ internal sealed class LocalFileManager : ILocalFileManager
                 while (_processingQueue.Reader.TryRead(out var fileTask))
                 {
                     await ProcesFileAsync(fileTask, cancellationToken);
+                    await Task.Delay(1000, cancellationToken);
                 }
             }
         }
@@ -167,8 +161,6 @@ internal sealed class LocalFileManager : ILocalFileManager
             {
 
             }
-
-            _client.Dispose();
 
             if (Directory.Exists(_rootFolder))
             {

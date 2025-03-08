@@ -25,6 +25,9 @@ public sealed class SettingsViewModel : WorkspaceViewModel
 
     public AppSettings Model => AppSettings.Default;
 
+    public string GPTPrompt => string.IsNullOrEmpty(Model.GPTPrompt)
+        ? Resources.DefaultGPTPrompt : Model.GPTPrompt;
+
     public SettingsViewModel() => Reset = new SimpleCommand(Reset_Executed);
 
     private void Reset_Executed(object? arg) => AppSettings.Default.Reset();

@@ -1,4 +1,4 @@
-﻿namespace SICore.Clients.Viewer;
+﻿namespace SIGame.ViewModel.Contracts;
 
 /// <summary>
 /// Downloads files in background and allows to access to them after download.

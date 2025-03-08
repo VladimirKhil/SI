@@ -513,6 +513,12 @@ public static class Messages
     public const string RoundThemes2 = "ROUND_THEMES2";
 
     /// <summary>
+    /// Round themes comments.
+    /// </summary>
+    [IdempotencyRequired]
+    public const string RoundThemesComments = "ROUND_THEMES_COMMENTS";
+
+    /// <summary>
     /// Select player.
     /// </summary>
     public const string SelectPlayer = "SELECT_PLAYER";
@@ -620,6 +626,11 @@ public static class Messages
     /// Theme comments.
     /// </summary>
     public const string ThemeComments = "THEME_COMMENTS";
+
+    /// <summary>
+    /// Theme info.
+    /// </summary>
+    public const string ThemeInfo = "THEME_INFO";
 
     /// <summary>
     /// Изменения таймера

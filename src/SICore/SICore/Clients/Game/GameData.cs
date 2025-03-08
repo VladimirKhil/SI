@@ -37,6 +37,11 @@ public sealed class GameData : Data
     /// </summary>
     public Round? Round { get; set; }
 
+    /// <summary>
+    /// Round theme comments.
+    /// </summary>
+    public string[] ThemeComments { get; set; } = Array.Empty<string>();
+
     // TODO: try to remove this property
     /// <summary>
     /// Currently playing theme.
@@ -339,7 +344,7 @@ public sealed class GameData : Data
     /// </summary>
     internal bool IsQuestionAskPlaying { get; set; }
 
-    internal int TableInformStage { get; set; }
+    internal InformStages InformStages { get; set; } = InformStages.None;
 
     internal Lock TableInformStageLock { get; } = new Lock(nameof(TableInformStageLock));
 

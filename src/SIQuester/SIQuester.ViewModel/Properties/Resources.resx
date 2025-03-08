@@ -138,6 +138,9 @@
   <data name="Answer" xml:space="preserve">
     <value>Answer</value>
   </data>
+  <data name="ApiKeyNotSet" xml:space="preserve">
+    <value>API key not set</value>
+  </data>
   <data name="Audio" xml:space="preserve">
     <value>Audio</value>
   </data>
@@ -155,6 +158,9 @@
   </data>
   <data name="BaseAuthors" xml:space="preserve">
     <value>Author</value>
+  </data>
+  <data name="BasedOnExamples" xml:space="preserve">
+    <value>based on the following examples</value>
   </data>
   <data name="BaseSources" xml:space="preserve">
     <value>Source</value>
@@ -192,6 +198,9 @@
   <data name="ConversionError" xml:space="preserve">
     <value>Conversion error</value>
   </data>
+  <data name="CreateTopicPrompt" xml:space="preserve">
+    <value>Create topic {0} with {1} questions</value>
+  </data>
   <data name="DBStorage" xml:space="preserve">
     <value>Question database</value>
   </data>
@@ -199,22 +208,23 @@
     <value>The package is stored in the Database {0} under the name {1}</value>
   </data>
   <data name="DefaultGPTPrompt" xml:space="preserve">
-    <value>Tou need to create questions for quiz topic.
+    <value>You need to create questions for quiz topic.
 
-1. Pick popular topic (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, gen z fashion, trends, food and drinks, celebrities, fun facts, tv shows, music. Periodically pick less popular ones for diversity. The best way of crafting topics is to use topic names that could be connected to answers in different ways (like Stones topic could relate to some info about stones and also about Emma Stone). Topic name could be a famous quote.
+1. Pick popular topic (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, gen z fashion, trends, food and drinks, celebrities, fun facts, tv shows, music. Periodically pick less popular ones for diversity. The best way of crafting topics is to use topic names that could be connected to answers in different ways (like "Stones" topic could relate to some info about stones and also about Emma Stone). Topic name could be a famous quote.
 
-2. Topic could have an optional description explaining it (short, around 5 words) - only when the topic name is not clear enough. Examples: Guess movie by emojis, Topic "Who is the culptic?" - description "name the murderer by a novel".
+2. Topic could have an optional description explaining it (short, around 5 words) - only when the topic name is not clear enough. Examples: "Guess movie by emojis", For topic "Who is the culptic?" description could be "name the murderer by a novel".
 
-3. Craft topic questions having increasing difficulty. Easy example: What is the capital of France? Hard example: One of his wives was Serbian scientist Mileva Maric. Questions should be based on some interesting facts, they could be a general (school) knowlege or a riddle.
+3. Craft topic questions having increasing difficulty. Easy example: "What is the capital of France?" Hard example: "One of his wives was Serbian scientist Mileva Maric". Questions could be based on some interesting facts, or they could be a general (school) knowlege check or a riddle.
 
 Each question should contain several (up to 5) sentences of text (try to keep them very as short as possible). Direct question ("Who is it") is not needed, just mention the fact.
 
 4. Question answer could be a text (up to 5 words) or could contain multiple choice (1 of 4-5 with choice letter as the right answer). For simple text answer, leave answer options empty. For multiple choice, skip letters in answer options and provide a single letter as the answer. Also do not include answer options in question text.
+
 Each question should have exactly one right answer.
 
-5. If answer is unclear, put short explanation in question comment section (1 sentence). Leave comment empty if it is not needed, skip well-known facts (mostly for the easiest questions).
+5. If answer is unclear, put short explanation in question comment section (around 7-10 words). Leave comment empty if it is not needed, skip well-known facts (mostly for the easiest questions). Avoid repeating the facts from the question itself.
 
-6. For statistics based questions (like "who is the most popular...") and for any time-bound information provide website url as the source.
+6. For statistics based questions (like "who is the most popular...") and for any time-bound information provide website url as the source. Check that url is valid.
 
 Examples:
 
@@ -313,6 +323,9 @@ Humor</value>
   <data name="ExternalLinksAreForbidden" xml:space="preserve">
     <value>External links are not allowed</value>
   </data>
+  <data name="FailedToParseGPTResponse" xml:space="preserve">
+    <value>Failed to parse GPT response</value>
+  </data>
   <data name="FewQuestions" xml:space="preserve">
     <value>Insufficient number of questions</value>
   </data>
@@ -357,6 +370,9 @@ Humor</value>
   </data>
   <data name="GamePackageTooLarge" xml:space="preserve">
     <value>File size exceeds 100 MB!</value>
+  </data>
+  <data name="GPTCreateTopicFinalRoundPrompt" xml:space="preserve">
+    <value>Generate topic {0} with {1} hard quiz question that requires some time to think, some knowledge and maybe guessing. Each question has 3-4 sentences</value>
   </data>
   <data name="HasUpdates" xml:space="preserve">
     <value>Updates were found for the program from {0}. Download them now?</value>
@@ -459,6 +475,9 @@ Humor</value>
   </data>
   <data name="NoQuestionsFound" xml:space="preserve">
     <value>No questions were found in the input file! Note that questions must have a cost multiple of 10, and each question must start on a new line.</value>
+  </data>
+  <data name="NoQuestionsToGenerate" xml:space="preserve">
+    <value>No questions to generate</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
     <value>Question for yourself without risk</value>

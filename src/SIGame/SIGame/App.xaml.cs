@@ -107,6 +107,8 @@ public partial class App : Application
 
         services.AddSingleton<IUIThreadExecutor>(_manager);
         services.AddTransient<IErrorManager, ErrorManager>();
+
+        services.AddSIGame();
     }
 
     protected override void OnStartup(StartupEventArgs e)

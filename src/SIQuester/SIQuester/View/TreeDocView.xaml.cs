@@ -209,10 +209,24 @@ public partial class TreeDocView : UserControl
         {
             _insertionMark.Visibility = Visibility.Hidden;
 
-            if (e.Data.GetDataPresent(WellKnownDragFormats.FileName))
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                if (e.Data.GetData(WellKnownDragFormats.FileName) is not string[] files)
+                if (e.Data.GetData(DataFormats.FileDrop) is not string[] files)
                 {
+                    return;
+                }
+
+                var itemsControl = VisualHelper.TryFindAncestor<ItemsControl>((DependencyObject)e.OriginalSource);
+
+                if (itemsControl == null)
+                {
+                    e.Effects = DragDropEffects.None;
+                    return;
+                }
+
+                if (itemsControl.DataContext is not ContentItemsViewModel contentItemsViewModel)
+                {
+                    e.Effects = DragDropEffects.None;
                     return;
                 }
 
@@ -232,14 +246,7 @@ public partial class TreeDocView : UserControl
                             break;
 
                         default:
-                            foreach (var item in MediaOwnerViewModel.RecommendedExtensions)
-                            {
-                                if (item.Value.Contains(fileExtension))
-                                {
-                                    TryImportMedia(e, longPathString, item.Key);
-                                    break;
-                                }
-                            }
+                            contentItemsViewModel.TryImportMedia(longPathString);
                             break;
                     }
                 }
@@ -477,61 +484,7 @@ public partial class TreeDocView : UserControl
         }
         catch (Exception ex)
         {
-            Trace.TraceError($"Main_Drop error: {ex}");
-        }
-    }
-
-    private void TryImportMedia(DragEventArgs e, string filePath, string mediaType)
-    {
-        var contentType = CollectionNames.TryGetContentType(mediaType);
-
-        if (contentType == null)
-        {
-            return;
-        }
-
-        var itemsControl = VisualHelper.TryFindAncestor<ItemsControl>((DependencyObject)e.OriginalSource);
-
-        if (itemsControl == null)
-        {
-            e.Effects = DragDropEffects.None;
-            return;
-        }
-
-        if (itemsControl.DataContext is not ContentItemsViewModel contentItemsViewModel)
-        {
-            e.Effects = DragDropEffects.None;
-            return;
-        }
-
-        var document = (QDocument)DataContext;
-
-        var collection = document.GetCollection(mediaType);
-        var item = collection.AddFile(filePath);
-
-        if (contentItemsViewModel.Count > 0 && string.IsNullOrWhiteSpace(contentItemsViewModel[^1].Model.Value))
-        {
-            contentItemsViewModel.RemoveAt(contentItemsViewModel.Count - 1);
-        }
-
-        contentItemsViewModel.Add(new ContentItemViewModel(new ContentItem
-        {
-            Type = contentType,
-            IsRef = true,
-            Value = item.Model.Name,
-            Placement = contentType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
-        }));
-
-        if (AppSettings.Default.SetRightAnswerFromFileName)
-        {
-            var question = contentItemsViewModel.Owner;
-
-            if (question.Right.Last().Length == 0)
-            {
-                question.Right.RemoveAt(question.Right.Count - 1);
-            }
-
-            question.Right.Add(Path.GetFileNameWithoutExtension(item.Model.Name));
+            PlatformManager.Instance.ShowErrorMessage(ex.Message);
         }
     }
 }

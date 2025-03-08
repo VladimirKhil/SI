@@ -130,36 +130,38 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
         var manager = new XmlNamespaceManager(doc.NameTable);
 
         var siDocument = SIDocument.Create(
-            doc.SelectNodes(@"/tournament/Title", manager)[0].InnerText.GrowFirstLetter().ClearPoints(),
+            doc.SelectNodes(@"/tournament/Title", manager)[0]?.InnerText.GrowFirstLetter().ClearPoints(),
             Resources.EmptyValue);
 
-        siDocument.Package.Info.Comments.Text += string.Format(
-            Resources.DBStorageComment,
-            _chgkDbClient.ServiceUri,
-            doc["tournament"]?["FileName"]?.InnerText);
+        var tournament = doc["tournament"];
 
-        var s = doc["tournament"]?["Info"]?.InnerText ?? "";
+        var commentsBuilder = new StringBuilder()
+            .AppendFormat(Resources.DBStorageComment, _chgkDbClient.ServiceUri, tournament?["FileName"]?.InnerText);
 
-        if (s.Length > 0)
-        {
-            siDocument.Package.Info.Comments.Text += string.Format("\r\n{0}: {1}", Resources.Info, s);
-        }
-
-        s = doc["tournament"]["URL"].InnerText;
+        var s = tournament?["Info"]?.InnerText ?? "";
 
         if (s.Length > 0)
         {
-            siDocument.Package.Info.Comments.Text += string.Format("\r\nURL: {0}", s);
+            commentsBuilder.AppendFormat("\r\n{0}: {1}", Resources.Info, s);
         }
 
-        s = doc["tournament"]["PlayedAt"].InnerText;
+        s = tournament?["URL"]?.InnerText ?? "";
 
         if (s.Length > 0)
         {
-            siDocument.Package.Info.Comments.Text += string.Format("\r\n{0}: {1}", Resources.Played, s);
+            commentsBuilder.AppendFormat("\r\nURL: {0}", s);
         }
 
-        s = doc["tournament"]["Editors"].InnerText;
+        s = tournament?["PlayedAt"]?.InnerText ?? "";
+
+        if (s.Length > 0)
+        {
+            commentsBuilder.AppendFormat("\r\n{0}: {1}", Resources.Played, s);
+        }
+
+        siDocument.Package.Info.Comments.Text += commentsBuilder.ToString();
+
+        s = tournament?["Editors"]?.InnerText ?? "";
 
         if (s.Length > 0)
         {
@@ -196,7 +198,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
                 theme.Info.Authors.Add(authorsText);
             }
 
-            var themeComments = new StringBuilder(node2["Comments"].InnerText);
+            var themeComments = new StringBuilder(node2["Comments"]?.InnerText ?? "");
 
             while (i < text.Length && text[i].Length > 4 && text[i][..3] == "   " && !char.IsDigit(text[i][3]))
             {

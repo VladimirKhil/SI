@@ -13,6 +13,7 @@ using SIQuester.ViewModel.PlatformSpecific;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
@@ -1061,8 +1062,50 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         return outputPath;
     }
 
+    public override IDisposable ShowProgressDialog()
+    {
+        var progressDialog = (IProgressDialog)new ProgressDialog();
+        progressDialog.SetTitle(Resources.Processing);
+        progressDialog.SetProgress(0, 0);
+        progressDialog.StartProgressDialog(IntPtr.Zero, null, 0, IntPtr.Zero);
+
+        return new Disposable(() =>
+        {
+            progressDialog.StopProgressDialog();
+            Marshal.ReleaseComObject(progressDialog);
+        });
+    }
+
     public void Dispose()
     {
         
+    }
+
+    internal sealed class Disposable : IDisposable
+    {
+        private readonly Action _dispose;
+        public Disposable(Action dispose) => _dispose = dispose;
+        public void Dispose() => _dispose();
+    }
+
+    [ComImport]
+    [Guid("F8383852-FCD3-11d1-A6B9-006097DF5BD4")]
+    internal class ProgressDialog { }
+
+    [ComImport]
+    [Guid("EBBC7C04-315E-11d2-B62F-006097DF5BD4")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    internal interface IProgressDialog
+    {
+        void StartProgressDialog(IntPtr hwndParent, object? punkEnableModless, uint dwFlags, IntPtr pvReserved);
+        void StopProgressDialog();
+        void SetTitle([MarshalAs(UnmanagedType.LPWStr)] string pwzTitle);
+        void SetAnimation(IntPtr hInst, uint idAnimation);
+        [PreserveSig] bool HasUserCancelled();
+        void SetProgress(uint dwCompleted, uint dwTotal);
+        void SetProgress64(ulong ullCompleted, ulong ullTotal);
+        void SetLine(uint dwLineNum, [MarshalAs(UnmanagedType.LPWStr)] string pwzString, bool fCompactPath, IntPtr pvReserved);
+        void SetCancelMsg([MarshalAs(UnmanagedType.LPWStr)] string pwzCancelMsg, IntPtr pvReserved);
+        void Timer(uint dwTimerAction, IntPtr pvReserved);
     }
 }

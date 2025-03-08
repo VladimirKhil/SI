@@ -2637,14 +2637,14 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="AtomWarningBox" BasedOn="{StaticResource WarningBox}" TargetType="ContentControl">
+            <Style x:Key="ContentWarningBox" BasedOn="{StaticResource WarningBox}" TargetType="ContentControl">
                 <Setter Property="VerticalAlignment" Value="Bottom" />
                 <Setter Property="Margin" Value="-7,0,0,4" />
             </Style>
 
             <siqcv:TemplateConverter x:Key="ContentItemSelector">
                 <siqcv:TemplateConverter.DefaultTemplate>
-                    <!-- pc:AtomTypes.Text -->
+                    <!-- pc:ContentTypes.Text -->
                     <DataTemplate DataType="vm:ContentItemViewModel">
                         <TextBox
                             siq:ActivateManager.IsWatching="True"
@@ -2661,35 +2661,28 @@
                 </siqcv:TemplateConverter.DefaultTemplate>
 
                 <siqcv:TemplateConverter.Templates>
-                    <DataTemplate x:Key="{x:Static pc:AtomTypes.Image}">
+                    <DataTemplate x:Key="{x:Static pc:ContentTypes.Image}">
                         <DockPanel>
                             <ContentControl Style="{StaticResource ImageControlNewStyle}" />
-                            <ContentControl Style="{StaticResource AtomWarningBox}" />
+                            <ContentControl Style="{StaticResource ContentWarningBox}" />
                         </DockPanel>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static pc:AtomTypes.Audio}">
+                    <DataTemplate x:Key="{x:Static pc:ContentTypes.Audio}">
                         <DockPanel>
                             <ContentControl Style="{StaticResource AudioControlNewStyle}" />
-                            <ContentControl Style="{StaticResource AtomWarningBox}" />
+                            <ContentControl Style="{StaticResource ContentWarningBox}" />
                         </DockPanel>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static pc:AtomTypes.AudioNew}">
-                        <DockPanel>
-                            <ContentControl Style="{StaticResource AudioControlNewStyle}" />
-                            <ContentControl Style="{StaticResource AtomWarningBox}" />
-                        </DockPanel>
-                    </DataTemplate>
-
-                    <DataTemplate x:Key="{x:Static pc:AtomTypes.Video}">
+                    <DataTemplate x:Key="{x:Static pc:ContentTypes.Video}">
                         <DockPanel>
                             <ContentControl Style="{StaticResource VideoControlNewStyle}" />
-                            <ContentControl Style="{StaticResource AtomWarningBox}" />
+                            <ContentControl Style="{StaticResource ContentWarningBox}" />
                         </DockPanel>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static pc:AtomTypes.Html}">
+                    <DataTemplate x:Key="{x:Static pc:ContentTypes.Html}">
                         <DockPanel>
                             <ContentControl Style="{StaticResource HtmlControlNewStyle}" />
                         </DockPanel>
@@ -3148,7 +3141,7 @@
             
             <util:LinkManager x:Key="LinkManager" />
 
-            <DataTemplate x:Key="Authors">
+            <DataTemplate x:Key="Authors" DataType="{x:Type vm:AuthorsViewModel}">
                 <DockPanel>
                     <TextBlock Text="{x:Static lp:Resources.AuthorsHeader}" Style="{StaticResource BlockStyleKey}" />
                     
@@ -3162,10 +3155,22 @@
                 </DockPanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="Sources">
-                <DockPanel>
+            <DataTemplate x:Key="Sources" DataType="{x:Type vm:SourcesViewModel}">
+                <DockPanel Background="Transparent">
                     <TextBlock Text="{x:Static lp:Resources.SourcesHeader}" Style="{StaticResource BlockStyleKey}" />
-                    
+
+                    <Button
+                        x:Name="openUrl"
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Command="{Binding OpenUri}"
+                        Width="20"
+                        Height="20"
+                        Padding="1"
+                        Visibility="Hidden"
+                        ToolTip="{x:Static lp:Resources.OpenLink}">
+                        <Path Stroke="Gray" Stretch="Fill" Margin="3" StrokeThickness="2" Data="M5,15 L15,5 M15,12 V5 H8" />
+                    </Button>
+
                     <siq:TextList
                         Style="{StaticResource LightTextBox}"
                         ItemsSource="{Binding}"
@@ -3174,18 +3179,54 @@
                         CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
                         siq:ActivateManager.IsWatching="True" />
                 </DockPanel>
+
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter TargetName="openUrl" Property="Visibility" Value="Visible" />
+                    </Trigger>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="openUrl" Property="Visibility" Value="Visible" />
+                    </Trigger>
+                    
+                    <DataTrigger Binding="{Binding Url}" Value="{x:Null}">
+                        <Setter TargetName="openUrl" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate x:Key="Comments">
-                <DockPanel>
+            <DataTemplate x:Key="Comments" DataType="{x:Type vm:CommentsViewModel}">
+                <DockPanel x:Name="panel" Background="Transparent">
                     <TextBlock Text="{x:Static lp:Resources.CommentsHeader}" Style="{StaticResource BlockStyleKey}" />
+
+                    <Button
+                        x:Name="remove"
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        lb:ClearTextBehaviour.Target="{Binding ElementName=text}"
+                        Width="20"
+                        Height="20"
+                        Visibility="Hidden"
+                        ToolTip="{x:Static lp:Resources.RemoveComment}">
+                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
+                    </Button>
                     
                     <TextBox
+                        x:Name="text"
                         Style="{StaticResource LightTextBox}"
                         siq:ActivateManager.IsWatching="True"
                         Text="{Binding Text}"
                         AcceptsReturn="True" />
                 </DockPanel>
+
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter TargetName="remove" Property="Visibility" Value="Visible" />
+                    </Trigger>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="remove" Property="Visibility" Value="Visible" />
+                    </Trigger>
+                </DataTemplate.Triggers>
             </DataTemplate>
 
             <Style x:Key="AuthorsStyle" TargetType="{x:Type ContentControl}">

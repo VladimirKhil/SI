@@ -1,8 +1,10 @@
-﻿using Notions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Notions;
 using SICore.Clients.Viewer;
 using SICore.Contracts;
 using SIData;
 using SIGame.ViewModel;
+using SIGame.ViewModel.Contracts;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
@@ -50,7 +52,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     private bool _disposed = false;
 
-    private readonly ILocalFileManager _localFileManager = new LocalFileManager();
+    private readonly ILocalFileManager _localFileManager = 
+        PlatformManager.Instance.ServiceProvider!.GetRequiredService<ILocalFileManager>();
 
     private readonly ViewerActions _viewerActions;
 

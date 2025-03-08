@@ -622,6 +622,11 @@
   <data name="GPTApiKey" xml:space="preserve">
     <value>Ключ API</value>
   </data>
+  <data name="GPTHint" xml:space="preserve">
+    <value>Когда название темы пустое, название темы и вопросы будут случайным образом сгенерированы на основе популярных тем.
+Когда название темы задано, вопросы будут сгенерированы на основе этого названия.
+Когда в теме уже есть вопросы, они будут использоваться в качестве примеров.</value>
+  </data>
   <data name="GPTModel" xml:space="preserve">
     <value>Модель GPT</value>
   </data>
@@ -778,6 +783,9 @@
   <data name="OpenFileAfterSaving" xml:space="preserve">
     <value>Открыть файл после сохранения</value>
   </data>
+  <data name="OpenLink" xml:space="preserve">
+    <value>Открыть ссылку</value>
+  </data>
   <data name="OpenPackage" xml:space="preserve">
     <value>Открыть пакет</value>
   </data>
@@ -844,6 +852,9 @@
   <data name="PrintedHtml" xml:space="preserve">
     <value>HTML для печати</value>
   </data>
+  <data name="Processing" xml:space="preserve">
+    <value>Обработка...</value>
+  </data>
   <data name="Publisher" xml:space="preserve">
     <value>Издатель</value>
   </data>
@@ -896,6 +907,9 @@
   </data>
   <data name="RemoveAnswer" xml:space="preserve">
     <value>Удалить ответ</value>
+  </data>
+  <data name="RemoveComment" xml:space="preserve">
+    <value>Удалить комментарий</value>
   </data>
   <data name="RemoveComplexAnswer" xml:space="preserve">
     <value>Удалить сложный ответ</value>

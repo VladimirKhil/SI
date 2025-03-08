@@ -120,7 +120,7 @@ public sealed class Game : Actor
     {
         InformSettings(person);
         InformGameMetadata(person);
-        SendInfo(person);
+        InformPersons(person);
         InformAvatars(person);
         InformBanned(person);
     }
@@ -350,7 +350,7 @@ public sealed class Game : Actor
         }
     }
 
-    private void SendInfo(string person)
+    private void InformPersons(string person)
     {
         var info = new StringBuilder(Messages.Info2)
             .Append(Message.ArgsSeparatorChar)
@@ -1233,9 +1233,9 @@ public sealed class Game : Actor
         ClientData.TableInformStageLock.WithLock(
             () =>
             {
-                if (ClientData.TableInformStage > 1)
+                if ((ClientData.InformStages & InformStages.Table) > 0)
                 {
-                    _gameActions.InformRoundThemes(playMode: ThemesPlayMode.None);
+                    _gameActions.InformRoundThemesNames(playMode: ThemesPlayMode.None);
                     _gameActions.InformTable();
                 }
             },
@@ -1638,13 +1638,20 @@ public sealed class Game : Actor
             }
         }
 
+        _gameActions.InformSums(person);
+        InformGameStage(person);
+    }
+
+    private void InformGameStage(string person)
+    {
         var roundIndex = _logic.Engine.RoundIndex;
+        _gameActions.InformStageInfo(person, roundIndex);
 
         if (ClientData.Stage == GameStage.Round)
         {
             _gameActions.InformRound(
                 ClientData.Round?.Name ?? "",
-                roundIndex, 
+                roundIndex,
                 SIEngine.Rules.QuestionSelectionStrategyType.SelectByPlayer /* does not matter */,
                 person); // deprecated
         }
@@ -1653,35 +1660,38 @@ public sealed class Game : Actor
             _gameActions.InformStage(person); // deprecated
         }
 
-        if (ClientData.Stage != GameStage.Before)
+        if ((ClientData.InformStages & InformStages.RoundNames) > 0)
         {
             _gameActions.InformRoundsNames(person);
         }
 
-        _gameActions.InformStageInfo(person, roundIndex);
-        _gameActions.InformSums(person);
-
-        if (ClientData.Stage == GameStage.Round)
+        if ((ClientData.InformStages & InformStages.RoundContent) > 0)
         {
-            ClientData.TableInformStageLock.WithLock(() =>
-            {
-                if (ClientData.TableInformStage > 0)
-                {
-                    // TODO: can 2 messages be replaced with 1?
-                    _gameActions.InformRoundThemes(person);
-
-                    if (ClientData.TableInformStage > 1)
-                    {
-                        // TODO: what about sequential play and theme deletion? There is no table there
-                        _gameActions.InformTable(person);
-                    }
-                }
-            },
-            5000);
-
             _gameActions.InformRoundContent(person);
         }
-        else if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
+
+        if ((ClientData.InformStages & InformStages.RoundThemesNames) > 0)
+        {
+            _gameActions.InformRoundThemesNames(person);
+        }
+
+        if ((ClientData.InformStages & InformStages.RoundThemesComments) > 0)
+        {
+            _gameActions.InformRoundThemesComments(person);
+        }
+
+        if ((ClientData.InformStages & InformStages.Table) > 0)
+        {
+            _gameActions.InformTable(person);
+        }
+
+        if ((ClientData.InformStages & InformStages.Theme) > 0)
+        {
+            _gameActions.InformTheme(person);
+        }
+
+
+        if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
         {
             var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - ClientData.TimerStartTime[2]).TotalSeconds * 10;
 

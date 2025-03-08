@@ -124,6 +124,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на API key not set.
+        /// </summary>
+        public static string ApiKeyNotSet {
+            get {
+                return ResourceManager.GetString("ApiKeyNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Audio.
         /// </summary>
         public static string Audio {
@@ -174,6 +183,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string BaseAuthors {
             get {
                 return ResourceManager.GetString("BaseAuthors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на based on the following examples.
+        /// </summary>
+        public static string BasedOnExamples {
+            get {
+                return ResourceManager.GetString("BasedOnExamples", resourceCulture);
             }
         }
         
@@ -286,6 +304,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Create topic {0} with {1} questions.
+        /// </summary>
+        public static string CreateTopicPrompt {
+            get {
+                return ResourceManager.GetString("CreateTopicPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Question database.
         /// </summary>
         public static string DBStorage {
@@ -304,9 +331,9 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Tou need to create questions for quiz topic.
+        ///   Ищет локализованную строку, похожую на You need to create questions for quiz topic.
         ///
-        ///1. Pick popular topic (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, gen z fashion, trends, food and drinks, celebrities, fun facts, tv shows, music. Periodically pick less popular ones for diversity. The best way of crafting topics is to use topic names that could be connected to answers in different ways (like Stones topic could relate to some info about stones and also about Emma Stone). Topic name could be [остаток строки не уместился]&quot;;.
+        ///1. Pick popular topic (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, gen z fashion, trends, food and drinks, celebrities, fun facts, tv shows, music. Periodically pick less popular ones for diversity. The best way of crafting topics is to use topic names that could be connected to answers in different ways (like &quot;Stones&quot; topic could relate to some info about stones and also about Emma Stone). Topic name could  [остаток строки не уместился]&quot;;.
         /// </summary>
         public static string DefaultGPTPrompt {
             get {
@@ -520,6 +547,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to parse GPT response.
+        /// </summary>
+        public static string FailedToParseGPTResponse {
+            get {
+                return ResourceManager.GetString("FailedToParseGPTResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Insufficient number of questions.
         /// </summary>
         public static string FewQuestions {
@@ -651,6 +687,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string GamePackageTooLarge {
             get {
                 return ResourceManager.GetString("GamePackageTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Generate topic {0} with {1} hard quiz question that requires some time to think, some knowledge and maybe guessing. Each question has 3-4 sentences.
+        /// </summary>
+        public static string GPTCreateTopicFinalRoundPrompt {
+            get {
+                return ResourceManager.GetString("GPTCreateTopicFinalRoundPrompt", resourceCulture);
             }
         }
         
@@ -957,6 +1002,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string NoQuestionsFound {
             get {
                 return ResourceManager.GetString("NoQuestionsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на No questions to generate.
+        /// </summary>
+        public static string NoQuestionsToGenerate {
+            get {
+                return ResourceManager.GetString("NoQuestionsToGenerate", resourceCulture);
             }
         }
         

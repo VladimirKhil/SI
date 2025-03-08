@@ -226,6 +226,18 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                 // Default value; remove parameter
                 using var innerChange = document.OperationsManager.BeginComplexChange();
 
+                // Take right answer from options and put it to the right answer field
+                if (Right.Count > 0
+                    && Parameters.TryGetValue(QuestionParameterNames.AnswerOptions, out var answerOptions)
+                    && answerOptions.GroupValue != null
+                    && answerOptions.GroupValue.TryGetValue(Right[0], out var rightAnswer)
+                    && rightAnswer.ContentValue != null
+                    && rightAnswer.ContentValue.Count > 0
+                    && rightAnswer.ContentValue[0].Model.Type == ContentTypes.Text)
+                {
+                    Right[0] = rightAnswer.ContentValue[0].Model.Value;
+                }
+
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerType);
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
 
@@ -258,18 +270,21 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                     GroupValue = new StepParameters()
                 };
 
-                static StepParameter answerOptionGenerator() => new()
+                static StepParameter answerOptionGenerator(string initialValue) => new()
                 {
                     Type = StepParameterTypes.Content,
                     ContentValue = new List<ContentItem>
                     {
-                        new() { Type = ContentTypes.Text, Value = "" },
+                        new() { Type = ContentTypes.Text, Value = initialValue },
                     }
                 };
 
+                var rightAnswer = Right.FirstOrDefault();
+
                 for (var i = 0; i < AppSettings.Default.SelectOptionCount; i++)
                 {
-                    options.GroupValue.Add(IndexLabelHelper.GetIndexLabel(i), answerOptionGenerator());
+                    var option = answerOptionGenerator(i == 0 && rightAnswer != null ? rightAnswer : "");
+                    options.GroupValue.Add(IndexLabelHelper.GetIndexLabel(i), option);
                 }
 
                 var optionsViewModel = new StepParameterViewModel(this, options);

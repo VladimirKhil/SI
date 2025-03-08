@@ -1,4 +1,5 @@
-﻿using SICore.Utils;
+﻿using SICore.Models;
+using SICore.Utils;
 using SIEngine;
 using SIEngine.Models;
 using SIEngine.Rules;
@@ -73,7 +74,8 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         _gameData.Themes = themes;
 
         // _gameData.TInfo.RoundInfo is initialized here
-        GameLogic?.InitThemes(themes, false, true, Models.ThemesPlayMode.OneByOne);
+        GameLogic?.InitThemes(themes, false, true, ThemesPlayMode.OneByOne);
+        _gameData.InformStages |= InformStages.RoundThemesComments;
 
         // Filling initial questions table
         _gameData.ThemeInfoShown.Clear();
@@ -198,6 +200,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     {
         _gameData.Theme = theme;
         GameActions?.SendThemeInfo();
+        _gameData.InformStages |= InformStages.Theme;
         GameLogic?.ScheduleExecution(Tasks.ThemeInfo, 20, 1);
     }
 

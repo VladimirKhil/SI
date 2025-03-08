@@ -1,6 +1,8 @@
 ﻿using Polly;
 using SIQuester.Model;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Windows;
 
@@ -21,6 +23,8 @@ internal static class SettingsHelper
     /// </summary>
     internal const string UserSettingsFileName = "usersettings.json";
 
+    internal const string GPTKeyFileName = "gpt.key";
+
     /// <summary>
     /// Loads user settings.
     /// </summary>
@@ -40,6 +44,20 @@ internal static class SettingsHelper
                     if (settings != null)
                     {
                         settings.HasChanges = false;
+
+                        var encryptedFile = Path.Combine(SettingsFolder, GPTKeyFileName);
+                        
+                        if (File.Exists(encryptedFile))
+                        {
+                            try
+                            {
+                                var encryptedData = File.ReadAllBytes(encryptedFile);
+                                
+                                settings.GPTApiKey = Encoding.UTF8.GetString(
+                                    ProtectedData.Unprotect(encryptedData, null, DataProtectionScope.CurrentUser));
+                            }
+                            catch { }
+                        }
                     }
 
                     return settings;
@@ -71,6 +89,14 @@ internal static class SettingsHelper
                 using var stream = File.Create(settingsFile);
                 JsonSerializer.Serialize(stream, settings);
             });
+
+            var encryptedData = ProtectedData.Protect(
+                Encoding.UTF8.GetBytes(settings.GPTApiKey),
+                null,
+                DataProtectionScope.CurrentUser);
+
+            var encryptedFile = Path.Combine(SettingsFolder, GPTKeyFileName);
+            File.WriteAllBytes(encryptedFile, encryptedData);
         }
         catch (Exception exc)
         {

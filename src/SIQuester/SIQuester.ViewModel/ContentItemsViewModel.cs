@@ -394,38 +394,64 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         }
     }
 
-    public bool SelectAtomObjectCore(object? arg)
+    public void TryImportMedia(string filePath)
     {
-        var data = (Tuple<object, object>?)arg;
-        var media = data.Item1;
-        var contentType = data.Item2.ToString() ?? "";
+        var fileExtension = Path.GetExtension(filePath);
+
+        foreach (var item in MediaOwnerViewModel.RecommendedExtensions)
+        {
+            if (item.Value.Contains(fileExtension))
+            {
+                TryImportMedia(filePath, item.Key);
+                break;
+            }
+        }
+    }
+
+    public void TryImportMedia(string filePath, string mediaType)
+    {
+        var contentType = CollectionNames.TryGetContentType(mediaType);
+
+        if (contentType == null)
+        {
+            return;
+        }
 
         try
         {
-            if (media is MediaItemViewModel file)
+            var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
+
+            var collection = document.GetCollection(mediaType);
+            var item = collection.AddFile(filePath);
+
+            if (Count > 0 && string.IsNullOrWhiteSpace(this[^1].Model.Value))
             {
-                LinkExistingContentFile(contentType, file);
-                return false;
+                RemoveAt(Count - 1);
             }
 
-            if (media is not string text)
+            Add(new ContentItemViewModel(new ContentItem
             {
-                return false;
-            }
+                Type = contentType,
+                IsRef = true,
+                Value = item.Model.Name,
+                Placement = contentType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+            }));
 
-            if (text == Resources.File) // TODO: do not rely business logic on resource strings
+            if (AppSettings.Default.SetRightAnswerFromFileName)
             {
-                return AddContentFile(contentType);
-            }
-            else
-            {
-                return LinkContentUri(contentType);
+                var question = Owner;
+
+                if (question.Right.Last().Length == 0)
+                {
+                    question.Right.RemoveAt(question.Right.Count - 1);
+                }
+
+                question.Right.Add(Path.GetFileNameWithoutExtension(item.Model.Name));
             }
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowExclamationMessage(exc.Message);
-            return false;
+            PlatformManager.Instance.ShowErrorMessage(exc.Message);
         }
     }
 

@@ -5,11 +5,11 @@
     <AssemblyTitle>SImulator</AssemblyTitle>
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
-	  <!--<Version>$(SImulatorVersion)</Version>-->
-	<Version>2.991.991</Version>
+	<Version>$(SImulatorVersion)</Version>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
+	<LangVersion>12</LangVersion>
     <!--<ImplicitUsings>enable</ImplicitUsings>-->
   </PropertyGroup>
   <PropertyGroup>

@@ -425,17 +425,20 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                     OnRoundThemes(mparams);
                     break;
 
+                case Messages.RoundThemesComments:
+                    OnRoundThemesComments(mparams);
+                    break;
+
                 case Messages.RoundContent:
                     _logic.OnRoundContent(mparams);
                     break;
 
                 case Messages.Theme:
-                    if (mparams.Length > 1)
-                    {
-                        _logic.SetText(mparams[1], TableStage.Theme);
-                        OnThemeOrQuestion();
-                        ClientData.ThemeName = mparams[1];
-                    }
+                    OnTheme(mparams);
+                    break;
+
+                case Messages.ThemeInfo:
+                    OnThemeInfo(mparams);
                     break;
 
                 case Messages.Question:
@@ -751,6 +754,35 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private void OnRoundThemesComments(string[] mparams)
+    {
+        // TODO: save round themes comments
+    }
+
+    private void OnTheme(string[] mparams)
+    {
+        if (mparams.Length <= 4)
+        {
+            return;
+        }
+
+        _logic.SetText(mparams[1], TableStage.Theme);
+        OnThemeOrQuestion();
+        ClientData.ThemeName = mparams[1];
+        ClientData.ThemeComments = mparams[4];
+    }
+
+    private void OnThemeInfo(string[] mparams)
+    {
+        if (mparams.Length <= 3)
+        {
+            return;
+        }
+
+        ClientData.ThemeName = mparams[1];
+        ClientData.ThemeComments = mparams[3];
     }
 
     private void OnSetChooser(string[] mparams)

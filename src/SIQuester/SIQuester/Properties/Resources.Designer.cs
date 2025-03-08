@@ -1493,6 +1493,17 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на When theme name is empty, theme name and questions will be randomly generated based on popular topics.
+        ///When theme name is set, questions will be generated based on that name.
+        ///When there are some questions in theme, they will be used as examples.
+        /// </summary>
+        public static string GPTHint {
+            get {
+                return ResourceManager.GetString("GPTHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на GPT model.
         /// </summary>
         public static string GPTModel {
@@ -1971,6 +1982,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Open link.
+        /// </summary>
+        public static string OpenLink {
+            get {
+                return ResourceManager.GetString("OpenLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Open package.
         /// </summary>
         public static string OpenPackage {
@@ -2079,7 +2099,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Insert.
+        ///   Ищет локализованную строку, похожую на Paste.
         /// </summary>
         public static string Paste {
             get {
@@ -2165,6 +2185,15 @@ namespace SIQuester.Properties {
         public static string PrintedHtml {
             get {
                 return ResourceManager.GetString("PrintedHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Processing....
+        /// </summary>
+        public static string Processing {
+            get {
+                return ResourceManager.GetString("Processing", resourceCulture);
             }
         }
         
@@ -2320,6 +2349,15 @@ namespace SIQuester.Properties {
         public static string RemoveAnswer {
             get {
                 return ResourceManager.GetString("RemoveAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove comment.
+        /// </summary>
+        public static string RemoveComment {
+            get {
+                return ResourceManager.GetString("RemoveComment", resourceCulture);
             }
         }
         

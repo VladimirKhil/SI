@@ -292,6 +292,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
         _gameActions.InformRoundsNames();
 
+        _data.InformStages |= InformStages.RoundNames;
+
         OnPackage(package, 1);
     }
 
@@ -373,8 +375,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.TableInformStageLock.WithLock(() =>
         {
-            _gameActions.InformRoundThemes(playMode: playMode);
-            _data.TableInformStage = 1;
+            _gameActions.InformRoundThemesNames(playMode: playMode);
+            _data.ThemeComments = themes.Select(theme => theme.Info.Comments.Text).ToArray();
+            _data.InformStages |= InformStages.RoundThemesNames;
         },
         5000);
     }
@@ -778,7 +781,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Decision = DecisionType.None;
 
         _data.IsRoundEnding = true;
-        
+        _data.InformStages &= ~(InformStages.RoundContent | InformStages.RoundThemesNames | InformStages.RoundThemesComments | InformStages.Table | InformStages.Theme);
+
         // This is quite ugly bit here but as we interrupt normal flow we need to cut continuation
         // (or we could replace it with a normal move)
         ClearContinuation();
@@ -1902,8 +1906,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private void InformTable() => _data.TableInformStageLock.WithLock(
         () =>
         {
-            _gameActions?.InformTable();
-            _data.TableInformStage = 2;
+            _gameActions.InformTable();
+            _data.InformStages |= InformStages.Table;
         },
         5000);
 
@@ -2036,6 +2040,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         }
                         else if (task == Tasks.RoundTheme) // Skip all round themes
                         {
+                            for (var themeIndex = arg; themeIndex < _data.TInfo.RoundInfo.Count; themeIndex++)
+                            {
+                                _gameActions.SendThemeInfo(themeIndex, true);
+                            }
+
                             InformTable();
                             newTask = Tasks.AskFirst;
                         }
@@ -4430,8 +4439,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (stage == 1)
         {
             _gameActions.InformSums();
-
-            _data.TableInformStage = 0;
             _data.IsRoundEnding = false;
 
             var roundIndex = Engine.RoundIndex;
@@ -4443,6 +4450,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             _gameActions.InformRound(roundName, roundIndex, _data.RoundStrategy);
             _gameActions.InformRoundContent();
+            _data.InformStages |= InformStages.RoundContent;
 
             _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");
             _gameActions.SystemReplic(" "); // new line

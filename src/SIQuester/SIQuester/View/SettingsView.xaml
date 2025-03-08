@@ -169,9 +169,11 @@
                 </ToggleButton.Style>
             </ToggleButton>
 
+            <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GPTModel}" />
+
             <CheckBox Content="{x:Static lp:Resources.UseGPT}" IsChecked="{Binding Model.UseGPT}" Margin="0,20,0,0" />
 
-            <StackPanel IsEnabled="{Binding Model.UseGPT}" Width="500" HorizontalAlignment="Left" Margin="0,10,0,0">
+            <StackPanel IsEnabled="{Binding Model.UseGPT}" Width="700" HorizontalAlignment="Left" Margin="0,10,0,0">
                 <TextBlock Text="{x:Static lp:Resources.GPTModel}" />
                 <ComboBox ItemsSource="{Binding GPTModels}" SelectedItem="{Binding Model.GPTModel}" Margin="0,5,0,0" />
 
@@ -179,7 +181,17 @@
                 <TextBox Text="{Binding Model.GPTApiKey}" Margin="0,5,0,0" />
 
                 <TextBlock Text="{x:Static lp:Resources.GPTPrompt}" Margin="0,10,0,0" />
-                <TextBox Text="{Binding Model.GPTPrompt}" Margin="0,5,0,0" Height="200" />
+                
+                <TextBox
+                    Text="{Binding GPTPrompt, Mode=OneWay}"
+                    Margin="0,5,0,0"
+                    Height="200"
+                    IsReadOnly="True"
+                    Background="LightGray"
+                    TextWrapping="Wrap"
+                    VerticalScrollBarVisibility="Auto" />
+
+                <TextBlock Text="{x:Static lp:Resources.GPTHint}" Margin="0,10,0,0" TextWrapping="Wrap" />
             </StackPanel>
 
             <Button

@@ -622,6 +622,11 @@ By following these steps, you help maintain a responsible and collaborative envi
   <data name="GPTApiKey" xml:space="preserve">
     <value>API key</value>
   </data>
+  <data name="GPTHint" xml:space="preserve">
+    <value>When theme name is empty, theme name and questions will be randomly generated based on popular topics.
+When theme name is set, questions will be generated based on that name.
+When there are some questions in theme, they will be used as examples</value>
+  </data>
   <data name="GPTModel" xml:space="preserve">
     <value>GPT model</value>
   </data>
@@ -782,6 +787,9 @@ By following these steps, you help maintain a responsible and collaborative envi
   <data name="OpenFileAfterSaving" xml:space="preserve">
     <value>Open file after saving</value>
   </data>
+  <data name="OpenLink" xml:space="preserve">
+    <value>Open link</value>
+  </data>
   <data name="OpenPackage" xml:space="preserve">
     <value>Open package</value>
   </data>
@@ -819,7 +827,7 @@ By following these steps, you help maintain a responsible and collaborative envi
     <value>Package template</value>
   </data>
   <data name="Paste" xml:space="preserve">
-    <value>Insert</value>
+    <value>Paste</value>
   </data>
   <data name="PasteInfo" xml:space="preserve">
     <value>Paste info</value>
@@ -847,6 +855,9 @@ By following these steps, you help maintain a responsible and collaborative envi
   </data>
   <data name="PrintedHtml" xml:space="preserve">
     <value>HTML for printing</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>Processing...</value>
   </data>
   <data name="Publisher" xml:space="preserve">
     <value>Publisher</value>
@@ -900,6 +911,9 @@ By following these steps, you help maintain a responsible and collaborative envi
   </data>
   <data name="RemoveAnswer" xml:space="preserve">
     <value>Remove answer</value>
+  </data>
+  <data name="RemoveComment" xml:space="preserve">
+    <value>Remove comment</value>
   </data>
   <data name="RemoveComplexAnswer" xml:space="preserve">
     <value>Remove complex answer</value>

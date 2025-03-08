@@ -1,6 +1,8 @@
 ﻿using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using SIPackages.Core;
+using SIQuester.Model;
 using SIQuester.ViewModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -382,5 +384,71 @@ public partial class MainWindow : MetroWindow
 
     private void Copy_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel)DataContext).ActiveDocument?.Copy.Execute(null);
 
-    private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel)DataContext).ActiveDocument?.Paste.Execute(null);
+    private void Paste_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        var doc = ((MainViewModel)DataContext).ActiveDocument;
+
+        if (doc == null)
+        {
+            return;
+        }
+
+        var activeNode = doc.ActiveNode;
+        var activeItem = doc.ActiveItem;
+
+        var contentItemViewModel = activeItem as ContentItemsViewModel;
+
+        if (contentItemViewModel == null && activeNode is QuestionViewModel question)
+        {
+            foreach (var parameterRecord in question.Parameters)
+            {
+                if (parameterRecord.Key == QuestionParameterNames.Question)
+                {
+                    contentItemViewModel = parameterRecord.Value.ContentValue;
+                    break;
+                }
+            }
+        }
+
+        if (contentItemViewModel == null)
+        {
+            doc.Paste.Execute(null);
+            return;
+        }
+
+        var files = Clipboard.GetFileDropList();
+
+        if (files.Count > 0)
+        {
+            foreach (var file in files)
+            {
+                if (file != null)
+                {
+                    contentItemViewModel.TryImportMedia(file);
+                }
+            }
+
+            return;
+        }
+
+        if (Clipboard.ContainsImage())
+        {
+            var bitmap = Clipboard.GetImage();
+            var stream = new MemoryStream();
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bitmap));
+            encoder.Save(stream);
+
+            var tempMediaDirectory = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName);
+            Directory.CreateDirectory(tempMediaDirectory);
+
+            var fileName = Path.Combine(tempMediaDirectory, $"{Guid.NewGuid()}.png");
+            File.WriteAllBytes(fileName, stream.ToArray());
+
+            contentItemViewModel.TryImportMedia(fileName);
+            return;
+        }
+
+        doc.Paste.Execute(null);
+    }
 }

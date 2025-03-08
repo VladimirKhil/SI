@@ -310,6 +310,8 @@ public sealed class ViewerData : Data
 
     public string ThemeName { get; internal set; }
 
+    public string ThemeComments { get; internal set; }
+
     private bool _apellationEnabled = true;
 
     /// <summary>

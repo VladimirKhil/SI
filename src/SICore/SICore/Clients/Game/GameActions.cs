@@ -88,7 +88,7 @@ public sealed class GameActions
     }
 
     /// <summary>
-    /// Sends all rounds names to person. Only rounds with at least one question are taken into account.
+    /// Sends all rounds names to person.
     /// </summary>
     /// <param name="person">Person name.</param>
     public void InformRoundsNames(string person = NetworkConstants.Everybody)
@@ -144,6 +144,20 @@ public sealed class GameActions
         SendMessage(message);
     }
 
+    internal void InformTheme(string person)
+    {
+        var theme = _gameData.Theme;
+
+        var message = new MessageBuilder(
+            Messages.ThemeInfo,
+            theme.Name,
+            theme.Questions.Count,
+            theme.Info.Comments.Text.EscapeNewLines())
+            .ToString();
+
+        SendMessage(message, person);
+    }
+
     /// <summary>
     /// Informs receiver about round table state.
     /// </summary>
@@ -187,7 +201,7 @@ public sealed class GameActions
     public void InformStageInfo(string person, int stageIndex) =>
         SendMessageToWithArgs(person, Messages.StageInfo, _gameData.Stage.ToString(), _gameData.Round?.Name ?? "", stageIndex);
 
-    internal void InformRoundThemes(string person = NetworkConstants.Everybody, ThemesPlayMode playMode = ThemesPlayMode.None)
+    internal void InformRoundThemesNames(string person = NetworkConstants.Everybody, ThemesPlayMode playMode = ThemesPlayMode.None)
     {
         var msg = new StringBuilder(Messages.RoundThemes)
             .Append(Message.ArgsSeparatorChar)
@@ -198,6 +212,17 @@ public sealed class GameActions
         SendMessage(msg.ToString(), person);
 
         var messageBuilder = new MessageBuilder(Messages.RoundThemes2, playMode).AddRange(_gameData.TInfo.RoundInfo.Select(info => info.Name));
+        SendMessage(messageBuilder.ToString(), person);
+    }
+
+    internal void InformRoundThemesComments(string person = NetworkConstants.Everybody)
+    {
+        if (_gameData.ThemeComments.All(comment => comment.Length == 0))
+        {
+            return;
+        }
+
+        var messageBuilder = new MessageBuilder(Messages.RoundThemesComments).AddRange(_gameData.ThemeComments);
         SendMessage(messageBuilder.ToString(), person);
     }
 

@@ -592,6 +592,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     private string _gptApiKey = DefaultGPTApiKey;
 
     [DefaultValue(DefaultGPTApiKey)]
+    [JsonIgnore]
     public string GPTApiKey
     {
         get => _gptApiKey;

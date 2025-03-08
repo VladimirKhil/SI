@@ -9,7 +9,7 @@ public abstract class LinksViewModel : ItemsViewModel<string>
 
     public ICommand LinkItem { get; private set; }
 
-    public override QDocument OwnerDocument
+    public override QDocument? OwnerDocument
     {
         get
         {
@@ -36,6 +36,11 @@ public abstract class LinksViewModel : ItemsViewModel<string>
 
     private void LinkItem_Executed(object? arg)
     {
+        if (arg == null)
+        {
+            return;
+        }
+
         var index = CurrentPosition;
         LinkTo(index, arg);
     }
