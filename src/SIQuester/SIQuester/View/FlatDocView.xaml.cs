@@ -267,7 +267,6 @@ public partial class FlatDocView : UserControl
             DragManager.DoDrag(
                 host,
                 active,
-                item,
                 itemData,
                 () =>
                 {

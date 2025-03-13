@@ -90,7 +90,7 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
             return null;
         }
 
-        return new StreamInfo { Length = file.Length, Stream = read ? file.OpenRead() : file.Open(FileMode.Open) };
+        return new StreamInfo(read ? file.OpenRead() : file.Open(FileMode.Open), file.Length);
     }
 
     public StreamInfo? GetStream(string category, string name, bool read = true) => GetStream($"{category}/{name}", read);

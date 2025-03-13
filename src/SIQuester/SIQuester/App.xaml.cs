@@ -129,6 +129,11 @@ public partial class App : Application
             SendDelayedReports();
 #endif
 
+            if (_host == null)
+            {
+                throw new InvalidOperationException("Host is not initialized");
+            }
+
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
             var clipboardService = _host.Services.GetRequiredService<IClipboardService>();
             var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();

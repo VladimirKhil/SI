@@ -1089,9 +1089,10 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
             var uriValue = gameInfo.HostUri?.ToString();
 
-            if (_gamesHostInfo != null && uriValue != null && _gamesHostInfo.SIHosts.TryGetValue(uriValue, out var hostKey))
+            if (_gamesHostInfo != null && uriValue != null)
             {
-                gameViewModel.HostKey = hostKey;
+                var hostEntry = _gamesHostInfo.SIHosts.FirstOrDefault(h => h.Value == uriValue);
+                gameViewModel.HostKey = hostEntry.Key;
             }
 
             return gameViewModel;

@@ -13,13 +13,20 @@ public sealed class RandomStoragePackageSource : PackageSource
     private static readonly HttpClient Client = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
     private readonly ISIStorageServiceClient _storageServiceClient;
+    private readonly UserSettings _userSettings;
     private Uri? _packageUri;
 
     public override PackageSourceKey Key => new() { Type = PackageSourceTypes.RandomServer };
 
     public override string Source => Resources.RandomServerThemes;
 
-    public RandomStoragePackageSource(ISIStorageServiceClient storageServiceClient) => _storageServiceClient = storageServiceClient;
+    public RandomStoragePackageSource(
+        ISIStorageServiceClient storageServiceClient,
+        UserSettings userSettings)
+    {
+        _storageServiceClient = storageServiceClient;
+        _userSettings = userSettings;
+    }
 
     public override async Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default)
     {
@@ -64,7 +71,7 @@ public sealed class RandomStoragePackageSource : PackageSource
             var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
 
             var language = languages.FirstOrDefault(l => l.Code == currentLanguage);
-            var settings = UserSettings.Default.GameSettings.AppSettings;
+            var settings = _userSettings.GameSettings.AppSettings;
 
             var package = await _storageServiceClient.Packages.GetRandomPackageAsync(
                 new RandomPackageParameters

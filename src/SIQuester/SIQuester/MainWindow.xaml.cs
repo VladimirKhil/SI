@@ -1,6 +1,5 @@
 ﻿using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAPICodePack.Taskbar;
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel;
@@ -8,13 +7,11 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Utils;
@@ -26,8 +23,6 @@ namespace SIQuester;
 /// </summary>
 public partial class MainWindow : MetroWindow
 {
-    private bool _closingFromThumbnail = false;
-
     public MainWindow() => InitializeComponent();
 
     /// <summary>
@@ -38,6 +33,11 @@ public partial class MainWindow : MetroWindow
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
+                if (e.NewItems == null || e.NewItems.Count == 0)
+                {
+                    break;
+                }
+
                 var tabContent = new ContentControl
                 {
                     Content = e.NewItems[0],
@@ -57,11 +57,6 @@ public partial class MainWindow : MetroWindow
                 tabItem.DragOver += TabItem_DragOver;
                 tabItem.Loaded += TabItem_Loaded;
 
-                tabContent.Loaded += (sender2, e2) =>
-                {
-                    UpdateCurrentPreview();
-                };
-
                 tabControl1.Items.Add(tabItem);
 
                 if (sender != null)
@@ -71,35 +66,27 @@ public partial class MainWindow : MetroWindow
                 break;
 
             case NotifyCollectionChangedAction.Remove:
+                if (e.OldItems == null || e.OldItems.Count == 0)
+                {
+                    break;
+                }
+
                 for (int i = 0; i < tabControl1.Items.Count; i++)
                 {
-                    var tabItem2 = tabControl1.Items[i] as TabItem;
-                    var contentControl = tabItem2.Content as ContentControl;
-
-                    if (contentControl.Content == e.OldItems[0])
+                    if (tabControl1.Items[i] is TabItem tabItem2
+                        && tabItem2?.Content is ContentControl contentControl
+                        && contentControl.Content == e.OldItems[0])
                     {
                         tabControl1.Items.RemoveAt(i--);
-
-                        if (TaskbarManager.IsPlatformSupported
-                            && !_closingFromThumbnail
-                            && TaskbarManager.Instance.TabbedThumbnail.IsThumbnailPreviewAdded(tabItem2))
-                        {
-                            try
-                            {
-                                TaskbarManager.Instance.TabbedThumbnail.RemoveThumbnailPreview(tabItem2);
-                            }
-                            catch
-                            {
-                            }
-                        }
 
                         contentControl.Content = null;
                         contentControl.ContentTemplateSelector = null;
 
-                        var headerControl = tabItem2.Header as ContentControl;
-
-                        headerControl.Content = null;
-                        headerControl.ContentTemplateSelector = null;
+                        if (tabItem2.Header is ContentControl headerControl)
+                        {
+                            headerControl.Content = null;
+                            headerControl.ContentTemplateSelector = null;
+                        }
 
                         tabItem2.Header = null;
                         tabItem2.Content = null;
@@ -121,170 +108,16 @@ public partial class MainWindow : MetroWindow
         e.Handled = true;
     }
 
-    #region Thumbnails
-
     private void TabItem_Loaded(object sender, RoutedEventArgs e)
     {
         var tabItem = (TabItem)sender;
         tabItem.Loaded -= TabItem_Loaded;
 
-        if (TaskbarManager.IsPlatformSupported)
-        {
-            var data = (WorkspaceViewModel)((TabItem)sender).DataContext;
-            var point = tabItem.TranslatePoint(new Point(), this);
-            var preview = new TabbedThumbnail(this, tabItem, new Vector(0, point.Y)) { Title = data.Header };
-
-            if (data is QDocument doc && doc.Document != null)
-            {
-                preview.Tooltip = doc.Document.Package.Name;
-            }
-
-            preview.TabbedThumbnailMinimized += Preview_TabbedThumbnailMinimized;
-            preview.TabbedThumbnailMaximized += Preview_TabbedThumbnailMaximized;
-            preview.TabbedThumbnailActivated += Preview_TabbedThumbnailActivated;
-            preview.TabbedThumbnailClosed += Preview_TabbedThumbnailClosed;
-            preview.TabbedThumbnailBitmapRequested += Preview_TabbedThumbnailBitmapRequested;
-
-            try
-            {
-                preview.SetWindowIcon(Properties.Resources.Icon.GetHicon());
-            }
-            catch (FileLoadException exc)
-            {
-                Trace.TraceError(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-
-            try
-            {
-                TaskbarManager.Instance.TabbedThumbnail.AddThumbnailPreview(preview);
-            }
-            catch (COMException exc)
-            {
-                Trace.TraceError(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-            catch (ArgumentNullException exc)
-            {
-                Trace.TraceError(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-        }
-
         tabControl1.SelectedItem = tabItem;
     }
 
-    private void Preview_TabbedThumbnailBitmapRequested(object? sender, TabbedThumbnailBitmapRequestedEventArgs e)
-    {
-        e.Handled = UpdateCurrentPreview(sender as TabbedThumbnail);
-    }
-
-    private void Preview_TabbedThumbnailClosed(object? sender, TabbedThumbnailEventArgs e)
-    {
-        if (e.WindowsControl is TabItem tabItem)
-        {
-            _closingFromThumbnail = true;
-            ((tabItem.Content as ContentControl).Content as WorkspaceViewModel).Close.Execute(false);
-            _closingFromThumbnail = false;
-
-            var preview = sender as TabbedThumbnail;
-            preview.TabbedThumbnailMinimized -= Preview_TabbedThumbnailMinimized;
-            preview.TabbedThumbnailMaximized -= Preview_TabbedThumbnailMaximized;
-            preview.TabbedThumbnailActivated -= Preview_TabbedThumbnailActivated;
-            preview.TabbedThumbnailClosed -= Preview_TabbedThumbnailClosed;
-            preview.TabbedThumbnailBitmapRequested -= Preview_TabbedThumbnailBitmapRequested;
-        }
-    }
-
-    private void Preview_TabbedThumbnailActivated(object? sender, TabbedThumbnailEventArgs e)
-    {
-        if (e.WindowsControl is TabItem tabItem)
-        {
-            tabControl1.SelectedItem = tabItem;
-        }
-
-        if (WindowState == WindowState.Minimized)
-        {
-            WindowState = WindowState.Normal;
-        }
-
-        Activate();
-    }
-
-    private void Preview_TabbedThumbnailMaximized(object? sender, TabbedThumbnailEventArgs e)
-    {
-        WindowState = WindowState.Maximized;
-        UpdateCurrentPreview();
-    }
-
-    private void Preview_TabbedThumbnailMinimized(object? sender, TabbedThumbnailEventArgs e) => WindowState = WindowState.Minimized;
-
-    private void TabControl1_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        CollectionViewSource.GetDefaultView((DataContext as MainViewModel).DocList).MoveCurrentToPosition(tabControl1.SelectedIndex);
-
-        if (TaskbarManager.IsPlatformSupported)
-        {
-            if (tabControl1.SelectedItem is TabItem tabItem && TaskbarManager.Instance.TabbedThumbnail.IsThumbnailPreviewAdded(tabItem))
-            {
-                TaskbarManager.Instance.TabbedThumbnail.SetActiveTab(tabItem);
-            }
-        }
-    }
-
-    private void Main_SizeChanged(object? sender, SizeChangedEventArgs e) => UpdateCurrentPreview();
-
-    /// <summary>
-    /// Обновить можно только текущий открытый thumbnail
-    /// </summary>
-    private bool UpdateCurrentPreview(TabbedThumbnail? thumbnail = null)
-    {
-        if (!TaskbarManager.IsPlatformSupported)
-        {
-            return false;
-        }
-
-        if (tabControl1.SelectedItem is TabItem tabItem)
-        {
-            var preview = TaskbarManager.Instance.TabbedThumbnail.GetThumbnailPreview(tabItem);
-
-            if (preview != null && (preview == thumbnail || thumbnail == null))
-            {
-                if (tabItem.Content is not FrameworkElement element || element.ActualWidth < 1.0 || element.ActualHeight < 1.0)
-                {
-                    return false;
-                }
-
-                var image = new RenderTargetBitmap((int)element.ActualWidth, (int)element.ActualHeight, 96, 96, PixelFormats.Default);
-
-                var dv = new DrawingVisual();
-
-                using (DrawingContext dc = dv.RenderOpen())
-                {
-                    var vb = new VisualBrush(element) { Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top };
-                    var rect = new Rect(new Point(), new Size((int)element.ActualWidth, (int)element.ActualHeight));
-                    dc.DrawRectangle(new SolidColorBrush(Colors.White), null, rect);
-                    dc.DrawRectangle(vb, null, rect);
-                }
-
-                image.Render(dv);
-
-                try
-                {
-                    preview.SetImage(image);
-                    var point = element.TranslatePoint(new Point(), this);
-                    preview.PeekOffset = new Vector(point.X, point.Y + 1);
-
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    #endregion
+    private void TabControl1_SelectionChanged(object? sender, SelectionChangedEventArgs e) =>
+        CollectionViewSource.GetDefaultView(((MainViewModel)DataContext).DocList).MoveCurrentToPosition(tabControl1.SelectedIndex);
 
     private void TabItem_DragEnter(object sender, DragEventArgs e)
     {

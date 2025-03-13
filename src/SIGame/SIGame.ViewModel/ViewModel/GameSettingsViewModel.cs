@@ -452,7 +452,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                         break;
 
                     case PackageSourceTypes.RandomServer:
-                        Package = new RandomStoragePackageSource(PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageServiceClient>());
+                        Package = new RandomStoragePackageSource(PlatformManager.Instance.ServiceProvider!.GetRequiredService<ISIStorageServiceClient>(), _userSettings);
                         break;
 
                     case PackageSourceTypes.Local:
@@ -529,7 +529,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
             if (storageParameters.IsRandom)
             {
-                Package = new RandomStoragePackageSource(siStorageClient);
+                Package = new RandomStoragePackageSource(siStorageClient, _userSettings);
             }
             else
             {

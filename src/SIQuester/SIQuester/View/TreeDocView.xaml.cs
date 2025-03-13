@@ -1,12 +1,10 @@
 ﻿using SIPackages;
-using SIPackages.Core;
 using SIQuester.Contracts;
 using SIQuester.Helpers;
 using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using SIQuester.ViewModel.PlatformSpecific;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Windows;
@@ -50,7 +48,7 @@ public partial class TreeDocView : UserControl
 
     private void MainWindow_PreviewMouseMove(object sender, MouseEventArgs e)
     {
-        FrameworkElement host;
+        FrameworkElement? host;
 
         lock (_dragLock)
         {
@@ -98,7 +96,7 @@ public partial class TreeDocView : UserControl
         try
         {
             itemData = new InfoOwnerData(active, (IItemViewModel)host.DataContext);
-            DragManager.DoDrag(host, active, item, itemData);
+            DragManager.DoDrag(host, active, itemData);
         }
         catch (OutOfMemoryException)
         {

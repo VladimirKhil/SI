@@ -86,7 +86,7 @@ internal sealed class ZipSIPackageContainer : ISIPackageContainer
             stream.SetLength(0);
         }
 
-        return new StreamInfo { Stream = stream, Length = _zipArchive.Mode == ZipArchiveMode.Read ? entry.Length : 0 };
+        return new StreamInfo(stream, _zipArchive.Mode == ZipArchiveMode.Read ? entry.Length : 0);
     }
 
     public StreamInfo? GetStream(string category, string name, bool read = true)

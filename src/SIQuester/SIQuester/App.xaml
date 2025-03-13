@@ -2647,6 +2647,7 @@
                     <!-- pc:ContentTypes.Text -->
                     <DataTemplate DataType="vm:ContentItemViewModel">
                         <TextBox
+                            lb:PasteBehavior.IsAttached="True"
                             siq:ActivateManager.IsWatching="True"
                             TextWrapping="Wrap"
                             AcceptsReturn="True"

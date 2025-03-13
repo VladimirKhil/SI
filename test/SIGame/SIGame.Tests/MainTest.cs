@@ -55,6 +55,8 @@ public class MainTest
         services.AddSIStorageServiceClient(configuration);
         services.AddSIStatisticsServiceClient(configuration);
 
+        services.AddSIGame();
+
         var serviceProvider = services.BuildServiceProvider();
         manager.ServiceProvider = serviceProvider;
 

@@ -342,7 +342,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         }
         catch (Exception exc)
         {
-            PlatformSpecific.PlatformManager.Instance.ShowErrorMessage(exc.Message);
+            PlatformManager.Instance.ShowErrorMessage(exc.Message);
         }
     }
 
@@ -476,7 +476,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         }
         catch (Exception exc)
         {
-            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+            PlatformManager.Instance.Inform(exc.Message, true);
         }
     }
 
@@ -531,7 +531,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         }
         catch (Exception exc)
         {
-            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+            PlatformManager.Instance.Inform(exc.Message, true);
         }
     }
 
@@ -559,7 +559,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         }
         catch (Exception exc)
         {
-            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+            PlatformManager.Instance.Inform(exc.Message, true);
         }
     }
 
@@ -575,7 +575,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         }
         catch (Exception exc)
         {
-            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+            PlatformManager.Instance.Inform(exc.Message, true);
         }
     }
 

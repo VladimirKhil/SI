@@ -24,7 +24,6 @@
     Loaded="Main_Loaded"
     SnapsToDevicePixels="True"
     TextOptions.TextFormattingMode="Display"
-    SizeChanged="Main_SizeChanged"
     PreviewKeyDown="Main_PreviewKeyDown">
     <Window.Resources>
         <siqcv:UnionConverter x:Key="UnionConverter" />
