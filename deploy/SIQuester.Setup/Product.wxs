@@ -146,6 +146,9 @@
 			<Component Guid="{b108abbc-642a-4b49-9f33-e11b3e071fd3}">
 				<File Id="Polly.LICENSE.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\Polly.LICENSE.txt" />
 			</Component>
+			<Component Guid="{783e9603-f541-4707-a79d-d1828438c2ec}">
+				<File Id="OpenAI.LICENSE.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\OpenAI.LICENSE.txt" />
+			</Component>
 			<Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
 				<File Id="LICENSE" KeyPath="yes" Source="$(var.SolutionDir)LICENSE" />
 			</Component>

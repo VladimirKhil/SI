@@ -182,14 +182,14 @@
     <None Include="Resources\arrow_down.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
-    <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
     <ProjectReference Include="..\..\Common\Utils.Wpf\Utils.Wpf.csproj" />
-    <ProjectReference Include="..\QTxtConverter\QTxtConverter.csproj" />
     <ProjectReference Include="..\SIQuester.ViewModel\SIQuester.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="licenses\Ben.Demystifier.LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="licenses\OpenAI.LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\Polly.LICENSE.txt">

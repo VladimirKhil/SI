@@ -117,7 +117,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         return result.HasValue && result.Value ? openDialog.FileNames : null;
     }
 
-    public override string[]? ShowMediaOpenUI(string mediaCategory, bool allowAnyFile)
+    public override string[]? ShowMediaOpenUI(string mediaCategory, bool allowAnyFile, bool multiselect = true)
     {
         var filter = mediaCategory switch
         {
@@ -135,7 +135,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
         var dialog = new OpenFileDialog
         {
-            Multiselect = true,
+            Multiselect = multiselect,
             Filter = filter
         };
 

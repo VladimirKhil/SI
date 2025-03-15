@@ -126,6 +126,11 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     internal ContentItemViewModel Add(string contentType, string value, string placement)
     {
+        if (!IsTopLevel)
+        {
+            ClearItems();
+        }
+
         var contentItem = new ContentItemViewModel(new ContentItem { Type = contentType, Value = value, Placement = placement });
         Add(contentItem);
 
@@ -570,7 +575,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         {
             using var change = document.OperationsManager.BeginComplexChange();
 
-            collection.AddItem.Execute(null);
+            collection.AddItem.Execute(IsTopLevel);
 
             if (!collection.HasPendingChanges)
             {
@@ -633,6 +638,14 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                     }
 
                     question.Right.Add(Path.GetFileNameWithoutExtension(file.Model.Name));
+                }
+            }
+
+            if (!IsTopLevel)
+            {
+                while (Count > 1)
+                {
+                    RemoveAt(0);
                 }
             }
 

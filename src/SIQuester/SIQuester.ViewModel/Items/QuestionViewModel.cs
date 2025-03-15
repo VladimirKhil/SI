@@ -50,11 +50,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public ICommand ClearType { get; private set; }
 
-    public override ICommand Add
-    {
-        get => null;
-        protected set { }
-    }
+    public override ICommand Add { get; protected set; }
 
     public override ICommand Remove { get; protected set; }
 
@@ -93,6 +89,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         BindHelper.Bind(Right, question.Right);
         BindHelper.Bind(Wrong, question.Wrong);
 
+        Add = new SimpleCommand(Add_Executed);
+
         AddComplexAnswer = new SimpleCommand(AddComplexAnswer_Executed);
         RemoveComplexAnswer = new SimpleCommand(RemoveComplexAnswer_Executed);
         AddWrongAnswers = new SimpleCommand(AddWrongAnswers_Executed);
@@ -109,6 +107,14 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         Wrong.CollectionChanged += Wrong_CollectionChanged;
     }
 
+    private void Add_Executed(object? arg)
+    {
+        if (Parameters.TryGetValue(QuestionParameterNames.Question, out var questionParameter))
+        {
+            questionParameter.ContentValue?.AddText.Execute(arg);
+        }
+    }
+
     private void ClearType_Executed(object? arg) => TypeName = QuestionTypes.Default;
 
     private void Wrong_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
@@ -118,7 +124,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     {
         try
         {
-            Parameters?.AddAnswer(new StepParameterViewModel(this, new StepParameter
+            Parameters.AddAnswer(new StepParameterViewModel(this, new StepParameter
             {
                 Type = StepParameterTypes.Content,
                 ContentValue = new List<ContentItem>(new[]
@@ -133,7 +139,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         }
     }
 
-    private void RemoveComplexAnswer_Executed(object? arg) => Parameters?.RemoveAnswer();
+    private void RemoveComplexAnswer_Executed(object? arg) => Parameters.RemoveAnswer();
 
     private void AddWrongAnswers_Executed(object? arg)
     {

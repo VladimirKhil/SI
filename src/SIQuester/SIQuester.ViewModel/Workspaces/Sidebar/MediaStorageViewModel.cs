@@ -520,7 +520,8 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     private void AddItem_Executed(object? arg)
     {
-        var files = PlatformManager.Instance.ShowMediaOpenUI(_name, !_document.Package.HasQualityControl);
+        var multiselect = arg is not bool b || b;
+        var files = PlatformManager.Instance.ShowMediaOpenUI(_name, !_document.Package.HasQualityControl, multiselect);
 
         if (files == null)
         {

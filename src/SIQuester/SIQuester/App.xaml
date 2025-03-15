@@ -1068,7 +1068,7 @@
                                                         Style="{StaticResource MenuButton}" />
                                                     
                                                     <Separator Style="{StaticResource MenuSeparator}" />
-                                                    
+
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             Header="{StaticResource SumImage}"
@@ -1077,23 +1077,7 @@
                                                             Style="{StaticResource MenuMenuHeader}"
                                                             ItemContainerStyle="{StaticResource SubMenuItem}" />
                                                     </Menu>
-                                                    
-                                                    <Button
-                                                        ToolTip="{x:Static lp:Resources.SetTags}"
-                                                        Command="{Binding AddTags}"
-                                                        Style="{StaticResource MenuButton}">
-                                                        <Button.ContentTemplate>
-                                                            <DataTemplate>
-                                                                <Path
-                                                                    Width="20"
-                                                                    Height="20"
-                                                                    Stretch="Uniform"
-                                                                    Fill="Black"
-                                                                    Data="{Binding Source={StaticResource app_at},Path=Data}" />
-                                                            </DataTemplate>
-                                                        </Button.ContentTemplate>
-                                                    </Button>
-                                                    
+
                                                     <Button
                                                         ToolTip="{x:Static lp:Resources.ChangeLanguage}"
                                                         Command="{Binding ChangeLanguage}"
@@ -1259,6 +1243,12 @@
 
                                             <DataTemplate DataType="{x:Type vm:QuestionViewModel}">
                                                 <StackPanel Orientation="Horizontal">
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.AddText}"
+                                                        Content="{StaticResource AddImage}"
+                                                        Command="{Binding Add}"
+                                                        Style="{StaticResource MenuButton}" />
+
                                                     <Button
                                                         ToolTip="{x:Static lp:Resources.CloneQuestion}"
                                                         Content="{StaticResource CloneImage}"
@@ -2336,6 +2326,7 @@
                 <Setter Property="Padding" Value="2,0" />
                 <Setter Property="Width" Value="20" />
                 <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
 
             <DataTemplate x:Key="SelectionModeTemplate" DataType="vm:StepParameterViewModel">
@@ -2691,6 +2682,54 @@
                 </siqcv:TemplateConverter.Templates>
             </siqcv:TemplateConverter>
 
+            <Style x:Key="ContentListItemStyle" TargetType="ListBoxItem">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="border"
+                                Margin="{TemplateBinding Margin}"
+                                Background="{TemplateBinding Background}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                                <ContentPresenter />
+                            </Border>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SecondHighlightColor}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Background" Value="#F3F3F3" />
+                <Setter Property="Margin" Value="1" />
+            </Style>
+
+            <Style x:Key="ContentListStyle" TargetType="ListBox">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="ItemContainerStyle" Value="{StaticResource ContentListItemStyle}" />
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <ItemsPresenter />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <siqcv:TemplateConverter x:Key="GroupParameterSelector">
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <!-- pc:StepParameterTypes.Simple -->
@@ -2701,12 +2740,13 @@
 
                 <siqcv:TemplateConverter.Templates>
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Content}" DataType="vm:StepParameterViewModel">
-                        <ItemsControl
+                        <ListBox
                             DataContext="{Binding ContentValue}"
                             ItemsSource="{Binding}"
                             siq:SmartMenuManager.SecondMenu="True"
-                            vm1:ItemsControlWatcher.IsWatching="True">
-                            <ItemsControl.ItemTemplate>
+                            vm1:ItemsControlWatcher.IsWatching="True"
+                            Style="{StaticResource ContentListStyle}">
+                            <ListBox.ItemTemplate>
                                 <DataTemplate DataType="vm:ContentItemViewModel">
                                     <DockPanel>
                                         <ContentControl Style="{StaticResource ContentItemWaitForFinishStyle}" KeyboardNavigation.IsTabStop="False" />
@@ -2718,8 +2758,14 @@
                                             ContentTemplate="{Binding Model.Type, Converter={StaticResource ContentItemSelector}}" />
                                     </DockPanel>
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            </ListBox.ItemTemplate>
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource ContentListItemStyle}">
+                                    <Setter Property="Background" Value="Transparent" />
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="vm:StepParameterViewModel">
@@ -2842,48 +2888,7 @@
                             siq:SmartMenuManager.SecondMenu="True"
                             vm1:ItemsControlWatcher.IsWatching="True"
                             SelectedItem="{Binding CurrentItem}"
-                            Background="Transparent"
-                            BorderThickness="0">
-                            <ListBox.Template>
-                                <ControlTemplate>
-                                    <ItemsPresenter />
-                                </ControlTemplate>
-                            </ListBox.Template>
-
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel />
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-
-                            <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="ListBoxItem">
-                                                <Border x:Name="border"
-                                                    Margin="{TemplateBinding Margin}"
-                                                    Background="{TemplateBinding Background}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}">
-                                                    <ContentPresenter />
-                                                </Border>
-
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsSelected" Value="True">
-                                                        <Setter TargetName="border" Property="Background" Value="{StaticResource SecondHighlightColor}" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-
-                                    <Setter Property="BorderThickness" Value="0" />
-                                    <Setter Property="Background" Value="#F3F3F3" />
-                                    <Setter Property="Margin" Value="1" />
-                                </Style>
-                            </ListBox.ItemContainerStyle>
-
+                            Style="{StaticResource ContentListStyle}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="vm:ContentItemViewModel">
                                     <DockPanel>
