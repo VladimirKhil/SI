@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SI.GameServer.Client;
+﻿namespace SI.GameServer.Client;
 
 /// <summary>
 /// Defines SIHost client options.

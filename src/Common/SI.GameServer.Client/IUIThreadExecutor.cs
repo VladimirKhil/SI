@@ -1,12 +1,9 @@
-﻿using System;
+﻿namespace SI.GameServer.Client;
 
-namespace SI.GameServer.Client
+/// <summary>
+/// Allows to execute an action in the UI thread.
+/// </summary>
+public interface IUIThreadExecutor
 {
-    /// <summary>
-    /// Allows to execute an action in the UI thread.
-    /// </summary>
-    public interface IUIThreadExecutor
-    {
-        void ExecuteOnUIThread(Action action);
-    }
+    void ExecuteOnUIThread(Action action);
 }

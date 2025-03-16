@@ -126,7 +126,7 @@ public sealed class GameEngine : EngineBase
 
         foreach (var round in _document.Package.Rounds)
         {
-            foreach (var theme in round.Themes.Where(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice)))
+            foreach (var theme in round.Themes.Where(theme => theme.Questions.Any(q => q.Price != Question.InvalidPrice)))
             {
                 themes.Add(theme.Name);
             }

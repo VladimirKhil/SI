@@ -3,9 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using SI.GameServer.Client.Properties;
 using SI.GameServer.Contract;
 using SIData;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SI.GameServer.Client;
 

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SI.GameServer.Client.Discovery;
 
