@@ -10,7 +10,6 @@ using SIData;
 using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
-using SIPackages.Providers;
 using SIUI.Model;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -283,11 +282,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.Rounds = _data.Package.Rounds
             .Select((round, index) => new RoundInfo { Index = index, Name = round.Name })
             .ToArray();
-
-        if (_data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator))
-        {
-            _data.GameResultInfo.PackageName += string.Concat("\n", _data.Package.Info.Comments.Text.AsSpan(8));
-        }
 
         _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
         _gameActions.InformRoundsNames();
@@ -4293,54 +4287,46 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private void OnPackage(Package package, int stage)
     {
         var informed = false;
-        var isRandomPackage = package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
 
         var baseTime = 0;
 
         if (stage == 1)
         {
-            if (!isRandomPackage)
+            var packageName = package.Name == RandomIndicator ? LO[nameof(R.RandomPackageName)] : package.Name;
+
+            _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], packageName));
+            informed = true;
+
+            var messageBuilder = new MessageBuilder(Messages.Package).Add(packageName);
+
+            var logoItem = package.LogoItem;
+
+            if (logoItem != null)
             {
-                var packageName = package.Name == RandomIndicator ? LO[nameof(R.RandomPackageName)] : package.Name;
+                // Old
+                ShareMedia(logoItem);
 
-                _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], packageName));
-                informed = true;
+                // New
+                var (success, globalUri, _, error) = TryShareContent(logoItem);
 
-                var messageBuilder = new MessageBuilder(Messages.Package).Add(packageName);
-
-                var logoItem = package.LogoItem;
-
-                if (logoItem != null)
+                if (success && globalUri != null)
                 {
-                    // Old
-                    ShareMedia(logoItem);
-
-                    // New
-                    var (success, globalUri, _, error) = TryShareContent(logoItem);
-
-                    if (success && globalUri != null)
-                    {
-                        messageBuilder.Add(ContentTypes.Image).Add(globalUri);
-                    }
-                    else if (error != null)
-                    {
-                        messageBuilder.Add(ContentTypes.Text).Add(error);
-                    }
+                    messageBuilder.Add(ContentTypes.Image).Add(globalUri);
                 }
+                else if (error != null)
+                {
+                    messageBuilder.Add(ContentTypes.Text).Add(error);
+                }
+            }
 
-                _gameActions.SendMessage(messageBuilder.ToString());
-            }
-            else
-            {
-                stage++;
-            }
+            _gameActions.SendMessage(messageBuilder.ToString());
         }
 
         if (stage == 2)
         {
             var authors = _data.PackageDoc.GetRealAuthors(package.Info.Authors);
 
-            if (!isRandomPackage && package.Name != RandomIndicator && authors.Length > 0)
+            if (package.Name != RandomIndicator && authors.Length > 0)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4372,7 +4358,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (stage == 4)
         {
-            if (package.Info.Comments.Text.Length > 0 && !isRandomPackage && package.Name != RandomIndicator)
+            if (package.Info.Comments.Text.Length > 0 && package.Name != RandomIndicator)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4404,7 +4390,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (stage == 6)
         {
-            if (!string.IsNullOrWhiteSpace(package.Date) && !isRandomPackage)
+            if (!string.IsNullOrWhiteSpace(package.Date))
             {
                 informed = true;
                 var res = new StringBuilder();

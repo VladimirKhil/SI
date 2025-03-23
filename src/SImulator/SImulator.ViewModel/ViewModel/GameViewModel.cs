@@ -545,7 +545,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
             _isLoadingAddresses = true;
         }
 
-        _ipAddresses = await NetworkHelper.GetIdAddressesAsync();
+        _ipAddresses = await NetworkHelper.GetIpAddressesAsync();
         OnPropertyChanged(nameof(IpAddresses));
 
         CurrentIpAddress = NetworkHelper.FindLocalNetworkAddress(_ipAddresses);
@@ -1249,7 +1249,7 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         _buttonManager?.TryGetCommandExecutor()?.Cancel();
 
-        if (ActiveQuestion?.TypeName == QuestionTypes.StakeAll || ActiveQuestion?.TypeName == QuestionTypes.ForAll)
+        if (QuestionForAll)
         {
             foreach (var player in Players)
             {
@@ -1664,13 +1664,13 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
     public void AskAnswerDirect()
     {
-        if (ActiveQuestion?.TypeName == QuestionTypes.StakeAll)
+        if (QuestionForAll)
         {
-            PresentationController.OnFinalThink();
-        }
-        
-        if (ActiveQuestion?.TypeName == QuestionTypes.StakeAll || ActiveQuestion?.TypeName == QuestionTypes.ForAll)
-        {
+            if (!IsCommonPrice)
+            {
+                PresentationController.OnFinalThink();
+            }    
+
             _buttonManager?.TryGetCommandExecutor()?.AskTextAnswer();
 
             var time = Settings.Model.FinalQuestionThinkingTime;
@@ -1976,6 +1976,8 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
         }
     }
 
+    public bool QuestionForAll { get; internal set; }
+
     private void UpdateCaption()
     {
         if (_currentTheme == null)
@@ -2153,7 +2155,11 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
 
         SetSound(Settings.Model.Sounds.PlayerPressed);
         PresentationController.SetActivePlayerIndex(index);
-        _buttonManager?.TryGetCommandExecutor()?.AskOralAnswer();
+
+        if (player.Id != null)
+        {
+            _buttonManager?.TryGetCommandExecutor()?.AskOralAnswer(player.Id);
+        }
 
         _previousState = State;
         State = QuestionState.Pressed;
@@ -2234,9 +2240,16 @@ public sealed class GameViewModel : ITaskRunHandler<Tasks>, INotifyPropertyChang
     {
         foreach (var player in Players)
         {
-            if (player.IsConnected && player.Name == playerName)
+            if (player.Name == playerName)
             {
-                return false;
+                if (player.IsConnected)
+                {
+                    return false;
+                }
+
+                player.Id = connectionId;
+                player.IsConnected = true;
+                return true;
             }
         }
 

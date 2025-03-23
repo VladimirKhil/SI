@@ -27,12 +27,8 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
-    <ProjectReference Include="..\..\Common\SIPackages.Providers\SIPackages.Providers.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.Model\SIUI.Model.csproj" />
-    <ProjectReference Include="..\..\SICore\SIData\SIData.csproj" />
-    <ProjectReference Include="..\SICore.Connections\SICore.Connections.csproj" />
     <ProjectReference Include="..\SICore.Network\SICore.Network.csproj" />
   </ItemGroup>
   <ItemGroup>

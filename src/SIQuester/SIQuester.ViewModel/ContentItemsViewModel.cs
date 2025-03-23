@@ -126,13 +126,16 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     internal ContentItemViewModel Add(string contentType, string value, string placement)
     {
-        if (!IsTopLevel)
-        {
-            ClearItems();
-        }
-
         var contentItem = new ContentItemViewModel(new ContentItem { Type = contentType, Value = value, Placement = placement });
         Add(contentItem);
+
+        if (!IsTopLevel)
+        {
+            while (Count > 1)
+            {
+                RemoveAt(0);
+            }
+        }
 
         return contentItem;
     }

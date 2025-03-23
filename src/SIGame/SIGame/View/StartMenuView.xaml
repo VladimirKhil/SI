@@ -418,6 +418,16 @@
                     </Style>
                 </Button.Style>
             </Button>
+
+            <Button
+                Padding="5"
+                Width="48"
+                Height="48"
+                Style="{StaticResource SIToolButtonStyle}"
+                Command="{Binding NavigateToSteam}"
+                ToolTip="Steam">
+                <Image Source="/SIGame;component/Resources/steam_logo.png" />
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -150,7 +150,7 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
 
     public void AskTextAnswer() => SendMessage("ANSWER");
 
-    public void AskOralAnswer() => SendMessage("ORAL_ANSWER");
+    public void AskOralAnswer(string connectionId) => SendMessageTo(connectionId, "ORAL_ANSWER");
 
     public void Cancel() => SendMessage("CANCEL");
 

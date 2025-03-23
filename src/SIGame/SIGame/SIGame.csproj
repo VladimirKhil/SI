@@ -54,6 +54,7 @@
     <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
     <Resource Include="Resources\patreon_logo.png" />
     <Resource Include="Resources\simulator-logo.png" />
+    <Resource Include="Resources\steam_logo.png" />
     <Resource Include="Resources\twitch_logo.png" />
     <Resource Include="Resources\yoomoney_logo.png" />
   </ItemGroup>
@@ -251,6 +252,7 @@
     <None Remove="Resources\settings.png" />
     <None Remove="Resources\simulator-logo.png" />
     <None Remove="Resources\sound.png" />
+    <None Remove="Resources\steam_logo.png" />
     <None Remove="Resources\sums.png" />
     <None Remove="Resources\twitch_logo.png" />
     <None Remove="Resources\yoomoney_logo.png" />

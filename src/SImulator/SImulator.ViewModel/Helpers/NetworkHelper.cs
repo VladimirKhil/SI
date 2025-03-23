@@ -7,7 +7,7 @@ internal static class NetworkHelper
 {   
     private static string[]? _ipAddresses = null;
 
-    internal static async Task<string[]> GetIdAddressesAsync()
+    internal static async Task<string[]> GetIpAddressesAsync()
     {
         if (_ipAddresses != null)
         {

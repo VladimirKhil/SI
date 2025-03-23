@@ -202,27 +202,31 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
 
         GameViewModel.IsCommonPrice = true;
+        GameViewModel.QuestionForAll = false;
 
-        if (mode == StepParameterValues.SetAnswererMode_Stake
-            && select == StepParameterValues.SetAnswererSelect_Highest
-            && stakeVisibility == StepParameterValues.SetAnswererStakeVisibility_Visible)
+        switch (mode)
         {
-            return GameViewModel.OnSetAnswererByHighestStake();
-        }
-        else if (mode == StepParameterValues.SetAnswererMode_Stake
-            && select == StepParameterValues.SetAnswererSelect_AllPossible
-            && stakeVisibility == StepParameterValues.SetAnswererStakeVisibility_Hidden)
-        {
-            GameViewModel.IsCommonPrice = false;
-            return GameViewModel.OnAskHiddenStakes();
-        }
-        else if (mode == StepParameterValues.SetAnswererMode_ByCurrent)
-        {
-            return GameViewModel.OnSetAnswererDirectly(select == StepParameterValues.SetAnswererSelect_Any);
-        }
-        else if (mode == StepParameterValues.SetAnswererMode_Current)
-        {
-            return GameViewModel.OnSetAnswererAsCurrent();
+            case StepParameterValues.SetAnswererMode_Stake
+                when select == StepParameterValues.SetAnswererSelect_Highest
+                    && stakeVisibility == StepParameterValues.SetAnswererStakeVisibility_Visible:
+                return GameViewModel.OnSetAnswererByHighestStake();
+            
+            case StepParameterValues.SetAnswererMode_Stake
+                when select == StepParameterValues.SetAnswererSelect_AllPossible
+                    && stakeVisibility == StepParameterValues.SetAnswererStakeVisibility_Hidden:
+                GameViewModel.IsCommonPrice = false;
+                GameViewModel.QuestionForAll = true;
+                return GameViewModel.OnAskHiddenStakes();
+            
+            case StepParameterValues.SetAnswererMode_ByCurrent:
+                return GameViewModel.OnSetAnswererDirectly(select == StepParameterValues.SetAnswererSelect_Any);
+            
+            case StepParameterValues.SetAnswererMode_Current:
+                return GameViewModel.OnSetAnswererAsCurrent();
+            
+            case StepParameterValues.SetAnswererMode_All:
+                GameViewModel.QuestionForAll = true;
+                break;
         }
 
         return false;
