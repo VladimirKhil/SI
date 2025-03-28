@@ -127,16 +127,7 @@
     <None Include="key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
-    <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
-    <ProjectReference Include="..\..\Common\SIPackages.Providers\SIPackages.Providers.csproj" />
-    <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\SIUI\SIUI.csproj" />
-    <ProjectReference Include="..\..\Common\Utils.Wpf\Utils.Wpf.csproj" />
-    <ProjectReference Include="..\..\SICore\SICore.Connections\SICore.Connections.csproj" />
-    <ProjectReference Include="..\..\SICore\SICore.Network\SICore.Network.csproj" />
-    <ProjectReference Include="..\..\SICore\SICore\SICore.csproj" />
-    <ProjectReference Include="..\..\SICore\SIData\SIData.csproj" />
     <ProjectReference Include="..\SIGame.ViewModel\SIGame.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>

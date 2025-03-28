@@ -1131,16 +1131,32 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void ChangeType_Executed(object? arg)
     {
-        if (arg is not PlayerAccount player)
+        if (arg is not PersonAccount account)
         {
             return;
+        }
+
+        var player = account as PlayerAccount;
+
+        var indexString = "";
+
+        if (player != null)
+        {
+            var index = _data.Players.IndexOf(player);
+
+            if (index < 0 || index >= _data.Players.Count)
+            {
+                return;
+            }
+
+            indexString = index.ToString();
         }
 
         Host?.Actions.SendMessage(
             Messages.Config,
             MessageParams.Config_ChangeType,
             player != null ? Constants.Player : Constants.Showman,
-            player != null ? _data.Players.IndexOf(player).ToString() : "");
+            indexString);
     }
 
     private void Replace_Executed(object? arg)

@@ -1707,6 +1707,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         var gameInfo = new StringBuilder();
 
         var coersedGameName = gameName.Length > 0 ? gameName : R.LocalGame;
+        
+        if (packageName == Constants.RandomIndicator)
+        {
+            packageName = R.RandomPackageName;
+        }
 
         gameInfo.AppendFormat(R.GameName).Append(": ").Append(coersedGameName).AppendLine();
         gameInfo.AppendFormat(R.PackageName).Append(": ").Append(packageName).AppendLine();

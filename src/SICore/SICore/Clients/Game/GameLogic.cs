@@ -25,11 +25,6 @@ namespace SICore;
 /// </summary>
 public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDisposable
 {
-    /// <summary>
-    /// Random package marker.
-    /// </summary>
-    private const string RandomIndicator = "@{random}";
-
     private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
     private const int MaxAnswerLength = 350;
@@ -4292,7 +4287,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (stage == 1)
         {
-            var packageName = package.Name == RandomIndicator ? LO[nameof(R.RandomPackageName)] : package.Name;
+            var packageName = package.Name == Constants.RandomIndicator ? LO[nameof(R.RandomPackageName)] : package.Name;
 
             _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], packageName));
             informed = true;
@@ -4326,7 +4321,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             var authors = _data.PackageDoc.GetRealAuthors(package.Info.Authors);
 
-            if (package.Name != RandomIndicator && authors.Length > 0)
+            if (package.Name != Constants.RandomIndicator && authors.Length > 0)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4358,7 +4353,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (stage == 4)
         {
-            if (package.Info.Comments.Text.Length > 0 && package.Name != RandomIndicator)
+            if (package.Info.Comments.Text.Length > 0 && package.Name != Constants.RandomIndicator)
             {
                 informed = true;
                 var res = new StringBuilder();

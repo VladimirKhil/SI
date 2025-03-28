@@ -64,4 +64,9 @@ public static class Constants
     /// Number of ingame timers.
     /// </summary>
     public const int TimersCount = 3;
+
+    /// <summary>
+    /// Random package marker.
+    /// </summary>
+    public const string RandomIndicator = "@{random}";
 }
