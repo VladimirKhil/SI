@@ -61,15 +61,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Advertisment.
-        /// </summary>
-        public static string Ads {
-            get {
-                return ResourceManager.GetString("Ads", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на All the questions are taken; So, we are done with all the question.
         /// </summary>
         public static string AllQuestions {
@@ -655,15 +646,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Hint: you can press the answer button at any point of the screen using right mouse button or {0} key.
-        /// </summary>
-        public static string Hint {
-            get {
-                return ResourceManager.GetString("Hint", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Select the cost of this question.
         /// </summary>
         public static string HintChooseCatPrice {
@@ -678,15 +660,6 @@ namespace SICore.Properties {
         public static string HintInitError {
             get {
                 return ResourceManager.GetString("HintInitError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Make a bet.
-        /// </summary>
-        public static string HintMakeAStake {
-            get {
-                return ResourceManager.GetString("HintMakeAStake", resourceCulture);
             }
         }
         
@@ -1078,87 +1051,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на At the eighth table.
-        /// </summary>
-        public static string OnTheEigthTable {
-            get {
-                return ResourceManager.GetString("OnTheEigthTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на At the fifth table.
-        /// </summary>
-        public static string OnTheFifthTable {
-            get {
-                return ResourceManager.GetString("OnTheFifthTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на At the first table.
-        /// </summary>
-        public static string OnTheFirstTable {
-            get {
-                return ResourceManager.GetString("OnTheFirstTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на At the fourth table.
-        /// </summary>
-        public static string OnTheForthTable {
-            get {
-                return ResourceManager.GetString("OnTheForthTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на At the ninth table.
-        /// </summary>
-        public static string OnTheNinethTable {
-            get {
-                return ResourceManager.GetString("OnTheNinethTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на At the second table.
-        /// </summary>
-        public static string OnTheSecondTable {
-            get {
-                return ResourceManager.GetString("OnTheSecondTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на At the seventh table.
-        /// </summary>
-        public static string OnTheSeventhTable {
-            get {
-                return ResourceManager.GetString("OnTheSeventhTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на At the sixth table.
-        /// </summary>
-        public static string OnTheSixthTable {
-            get {
-                return ResourceManager.GetString("OnTheSixthTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на At the third table.
-        /// </summary>
-        public static string OnTheThirdTable {
-            get {
-                return ResourceManager.GetString("OnTheThirdTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на or.
         /// </summary>
         public static string Or {
@@ -1299,15 +1191,6 @@ namespace SICore.Properties {
         public static string PositionNotFoundByIndex {
             get {
                 return ResourceManager.GetString("PositionNotFoundByIndex", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Please, press the button right after the frame around the board appears.
-        /// </summary>
-        public static string PressButton {
-            get {
-                return ResourceManager.GetString("PressButton", resourceCulture);
             }
         }
         
@@ -1699,7 +1582,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Is making a bet.
+        ///   Ищет локализованную строку, похожую на Makes a stake.
         /// </summary>
         public static string StakeMakes {
             get {
@@ -1789,7 +1672,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Is removing a theme.
+        ///   Ищет локализованную строку, похожую на Removes a theme.
         /// </summary>
         public static string ThemeDeletes {
             get {

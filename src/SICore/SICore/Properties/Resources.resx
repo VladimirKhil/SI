@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Ads" xml:space="preserve">
-    <value>Advertisment</value>
-  </data>
   <data name="AllQuestions" xml:space="preserve">
     <value>All the questions are taken; So, we are done with all the question</value>
   </data>
@@ -249,17 +246,11 @@
   <data name="HeGave" xml:space="preserve">
     <value>he gave</value>
   </data>
-  <data name="Hint" xml:space="preserve">
-    <value>Hint: you can press the answer button at any point of the screen using right mouse button or {0} key</value>
-  </data>
   <data name="HintChooseCatPrice" xml:space="preserve">
     <value>Select the cost of this question</value>
   </data>
   <data name="HintInitError" xml:space="preserve">
     <value>Player information initialization error!</value>
-  </data>
-  <data name="HintMakeAStake" xml:space="preserve">
-    <value>Make a bet</value>
   </data>
   <data name="HintSelectCatPlayerForPlayer" xml:space="preserve">
     <value>Select a player who the question will be given to</value>
@@ -345,33 +336,6 @@
   <data name="OfTheme" xml:space="preserve">
     <value>of the theme</value>
   </data>
-  <data name="OnTheEigthTable" xml:space="preserve">
-    <value>At the eighth table</value>
-  </data>
-  <data name="OnTheFifthTable" xml:space="preserve">
-    <value>At the fifth table</value>
-  </data>
-  <data name="OnTheFirstTable" xml:space="preserve">
-    <value>At the first table</value>
-  </data>
-  <data name="OnTheForthTable" xml:space="preserve">
-    <value>At the fourth table</value>
-  </data>
-  <data name="OnTheNinethTable" xml:space="preserve">
-    <value>At the ninth table</value>
-  </data>
-  <data name="OnTheSecondTable" xml:space="preserve">
-    <value>At the second table</value>
-  </data>
-  <data name="OnTheSeventhTable" xml:space="preserve">
-    <value>At the seventh table</value>
-  </data>
-  <data name="OnTheSixthTable" xml:space="preserve">
-    <value>At the sixth table</value>
-  </data>
-  <data name="OnTheThirdTable" xml:space="preserve">
-    <value>At the third table</value>
-  </data>
   <data name="Or" xml:space="preserve">
     <value>or</value>
   </data>
@@ -410,9 +374,6 @@
   </data>
   <data name="PositionNotFoundByIndex" xml:space="preserve">
     <value>Position with such number was not found</value>
-  </data>
-  <data name="PressButton" xml:space="preserve">
-    <value>Please, press the button right after the frame around the board appears</value>
   </data>
   <data name="Private" xml:space="preserve">
     <value>privately</value>
@@ -493,7 +454,7 @@
     <value>Stake of</value>
   </data>
   <data name="StakeMakes" xml:space="preserve">
-    <value>Is making a bet</value>
+    <value>Makes a stake</value>
   </data>
   <data name="StakeTo" xml:space="preserve">
     <value>to</value>
@@ -514,7 +475,7 @@
     <value>Theme</value>
   </data>
   <data name="ThemeDeletes" xml:space="preserve">
-    <value>Is removing a theme</value>
+    <value>Removes a theme</value>
   </data>
   <data name="To" xml:space="preserve">
     <value>to</value>

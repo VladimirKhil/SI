@@ -2,7 +2,6 @@
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using SIData;
-using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers;
 
@@ -31,8 +30,7 @@ public class PrimaryNode : Node, IPrimaryNode
 
     public event Action<string>? Unbanned;
 
-    public PrimaryNode(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-        : base(serverConfiguration, localizer) { }
+    public PrimaryNode(NodeConfiguration nodeOptions) : base(nodeOptions) { }
 
     public override async ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default)
     {
@@ -47,13 +45,9 @@ public class PrimaryNode : Node, IPrimaryNode
         {
             if (bannedEntry.BannedUntil > DateTime.UtcNow)
             {
-                var bannedUntil = bannedEntry.BannedUntil == DateTime.MaxValue
-                    ? ""
-                    : $" {_localizer[nameof(R.Until)]} {bannedEntry.BannedUntil.ToString(_localizer.Culture)}";
-
                 await connection.SendMessageAsync(
                     new Message(
-                        $"{SystemMessages.Refuse}\n{_localizer[nameof(R.ConnectionDenied)]}{bannedUntil}\r\n",
+                        $"{SystemMessages.Refuse}\nBANNED\r\n",
                         NetworkConstants.GameName));
 
                 DropConnection(connection);

@@ -50,6 +50,11 @@ public static class Messages
     public const string ApellationEnabled = "APELLATION_ENABLES";
 
     /// <summary>
+    /// Defines appellation current status.
+    /// </summary>
+    public const string Appellation = "APPELLATION";
+
+    /// <summary>
     /// Asks to select a player.
     /// </summary>
     public const string AskSelectPlayer = "ASK_SELECT_PLAYER";

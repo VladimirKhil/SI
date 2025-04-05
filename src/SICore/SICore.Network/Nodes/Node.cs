@@ -2,12 +2,12 @@
 using SICore.Connections;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
+using SICore.Network.Exceptions;
 using SIData;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.WebSockets;
 using Utils;
-using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers;
 
@@ -16,7 +16,7 @@ public abstract class Node : INode
 {
     private const char AnonymousSenderPrefix = '\n';
 
-    private readonly NodeConfiguration _serverConfiguration;
+    private readonly NodeConfiguration _options;
 
     /// <summary>
     /// Contains a list of node clients.
@@ -71,13 +71,7 @@ public abstract class Node : INode
         connection.SerializationError -= Connection_SerializationError;
     }
 
-    protected readonly INetworkLocalizer _localizer;
-
-    protected Node(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-    {
-        _serverConfiguration = serverConfiguration;
-        _localizer = localizer;
-    }
+    protected Node(NodeConfiguration nodeOptions) => _options = nodeOptions;
 
     protected async void Connection_ConnectionClosed(IConnection connection, bool withError)
     {
@@ -141,7 +135,7 @@ public abstract class Node : INode
                 if (!IsMain)
                 {
                     Trace.TraceError($"emptySender: {m.Sender}|{m.Receiver}|{m.Text}");
-                    OnError(new Exception($"{_localizer[nameof(R.UnknownSenderMessage)]}: {m.Text}"), true);
+                    OnError(new UnknownSenderMessageException(m.Text), true);
                     return;
                 }
 
@@ -167,7 +161,7 @@ public abstract class Node : INode
 
             if (!m.IsSystem && messageText != null)
             {
-                messageText = messageText.Shorten(_serverConfiguration.MaxChatMessageLength);
+                messageText = messageText.Shorten(_options.MaxChatMessageLength);
             }
 
             if (sender != m.Sender || receiver != m.Receiver || messageText != m.Text)
@@ -198,7 +192,7 @@ public abstract class Node : INode
             else if (!IsMain && !_wrongUserMessageShown)
             {
                 _wrongUserMessageShown = true;
-                OnError(new Exception(string.Format(_localizer["WrongReceiver"], message.Receiver, client.Name)), true);
+                OnError(new InvalidReceiverMessageException(message.Receiver ?? ""), true);
             }
         }
 
@@ -288,7 +282,7 @@ public abstract class Node : INode
 
         if (_clients.ContainsKey(client.Name))
         {
-            throw new Exception(_localizer[nameof(R.ClientWithThisNameAlreadyExists)]);
+            throw new ClientNameConflictException();
         }
 
         _clients.AddOrUpdate(client.Name, client, (key, oldValue) => oldValue);

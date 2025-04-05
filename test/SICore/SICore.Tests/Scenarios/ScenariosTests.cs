@@ -3,7 +3,6 @@ using NUnit.Framework;
 using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
-using SICore.Network.Contracts;
 using SICore.Network.Servers;
 using SICore.Utils;
 using SIData;
@@ -23,8 +22,7 @@ public sealed class ScenariosTests
     [Test]
     public async Task MainTest()
     {
-        var networkLocalizer = Substitute.For<INetworkLocalizer>();
-        var node = new PrimaryNode(new Network.Configuration.NodeConfiguration(), networkLocalizer);
+        var node = new PrimaryNode(new Network.Configuration.NodeConfiguration());
 
         var gameSettings = new GameSettingsCore<AppSettingsCore>
         {

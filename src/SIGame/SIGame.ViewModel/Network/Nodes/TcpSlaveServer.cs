@@ -1,7 +1,6 @@
 ﻿using SICore.Connections;
 using SICore.Connections.Errors;
 using SICore.Network.Configuration;
-using SICore.Network.Contracts;
 using SIGame.ViewModel.Properties;
 using System.Net.Sockets;
 
@@ -19,8 +18,8 @@ public sealed class TcpSlaveServer : SecondaryNode
     /// </summary>
     /// <param name="port">Имя порта для подключения</param>
     /// <param name="serverAddress">Адрес сервера</param>
-    public TcpSlaveServer(int port, string serverAddress, NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-        : base(serverConfiguration, localizer)
+    public TcpSlaveServer(int port, string serverAddress, NodeConfiguration serverConfiguration)
+        : base(serverConfiguration)
     {
         _serverAddress = serverAddress;
         _port = port;

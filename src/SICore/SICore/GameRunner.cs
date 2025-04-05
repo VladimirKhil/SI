@@ -66,7 +66,7 @@ public sealed class GameRunner
     }
 
     // TODO: remove hostLogicFactory; attach host after game creation
-    public (IViewerClient?, Game) Run(Func<ViewerData, ViewerActions, Localizer, IViewerLogic> hostLogicFactory)
+    public (IViewerClient?, Game) Run(Func<ViewerData, ViewerActions, Localizer, IPersonController> hostLogicFactory)
     {
         var gameData = new GameData(_gameHost, new GamePersonAccount(_settings.Showman))
         {
@@ -88,7 +88,7 @@ public sealed class GameRunner
             {
                 var showmanClient = new Client(_settings.Showman.Name);
                 var data = new ViewerData(_gameHost);
-                var actions = new ViewerActions(showmanClient, localizer);
+                var actions = new ViewerActions(showmanClient);
 
                 var logic = isHost
                     ? hostLogicFactory(data, actions, localizer)
@@ -120,7 +120,7 @@ public sealed class GameRunner
                 {
                     var playerClient = new Client(_settings.Players[i].Name);
                     var data = new ViewerData(_gameHost);
-                    var actions = new ViewerActions(playerClient, localizer);
+                    var actions = new ViewerActions(playerClient);
 
                     var logic = isHost
                         ? hostLogicFactory(data, actions, localizer)
@@ -153,7 +153,7 @@ public sealed class GameRunner
                     
                     var viewerClient = new Client(_settings.Viewers[i].Name);
                     var data = new ViewerData(_gameHost);
-                    var actions = new ViewerActions(viewerClient, localizer);
+                    var actions = new ViewerActions(viewerClient);
                     var logic = hostLogicFactory(data, actions, localizer);
                     var viewer = new Viewer(viewerClient, _settings.Viewers[i], isHost, logic, actions, localizer, data);
                     viewerClient.ConnectTo(_node);

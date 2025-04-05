@@ -2,14 +2,13 @@
 using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
-using SICore.Network;
 using SIData;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.Properties;
 using SIUI.ViewModel;
 using System.Text.RegularExpressions;
-using Utils.Commands;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -119,8 +118,7 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
         _node = new TcpSlaveServer(
             port,
             address,
-            NodeConfiguration.Default,
-            new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
+            NodeConfiguration.Default);
 
         _client.ConnectTo(_node);
     }

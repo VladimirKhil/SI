@@ -8,7 +8,7 @@ namespace SICore;
 /// <summary>
 /// Defines a computer viewer logic.
 /// </summary>
-internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
+internal class ViewerComputerLogic : Logic<ViewerData>, IPersonController
 {
     protected readonly ViewerActions _viewerActions;
 
@@ -107,14 +107,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         // Do nothing
     }
 
-    public void Choice()
-    {
-        lock (_data.ChoiceLock)
-            lock (_data.TInfoLock)
-            {
-                _data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = Question.InvalidPrice;
-            }
-    }
+    public void Choice() => _data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = Question.InvalidPrice;
 
     public void OnRightAnswer(string answer) { }
 
@@ -140,14 +133,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    public void Out(int themeIndex)
-    {
-        lock (_data.ChoiceLock)
-            lock (_data.TInfoLock)
-            {
-                _data.TInfo.RoundInfo[themeIndex].Name = null;
-            }
-    }
+    public void Out(int themeIndex) => _data.TInfo.RoundInfo[themeIndex].Name = "";
 
     public void TimeOut()
     {
@@ -294,6 +280,8 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     {
 
     }
+
+    public void AddLog(string message) => _player.AddLog(message);
 
     public void SelectQuestion() => _player.SelectQuestion();
 

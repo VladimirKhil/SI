@@ -621,4 +621,13 @@
   <data name="GameStarted" xml:space="preserve">
     <value>Игра началась</value>
   </data>
+  <data name="Hint" xml:space="preserve">
+    <value>Подсказка: игровую кнопку можно нажимать в любой точке окна при помощи правой кнопки мыши или клавиши {0}. </value>
+  </data>
+  <data name="PressButton" xml:space="preserve">
+    <value>Старайтесь жать на кнопку сразу после загорания рамки на экране, пожалуйста</value>
+  </data>
+  <data name="HintMakeAStake" xml:space="preserve">
+    <value>Сделайте ставку</value>
+  </data>
 </root>

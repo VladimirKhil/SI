@@ -624,4 +624,13 @@
   <data name="GameStarted" xml:space="preserve">
     <value>The game has started</value>
   </data>
+  <data name="Hint" xml:space="preserve">
+    <value>Hint: you can press the answer button at any point of the screen using right mouse button or {0} key</value>
+  </data>
+  <data name="PressButton" xml:space="preserve">
+    <value>Please, press the button right after the frame around the board appears</value>
+  </data>
+  <data name="HintMakeAStake" xml:space="preserve">
+    <value>Make a stake</value>
+  </data>
 </root>

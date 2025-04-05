@@ -22,7 +22,7 @@ namespace SICore;
 /// <summary>
 /// Defines a human viewer logic.
 /// </summary>
-public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDisposable
+public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAsyncDisposable
 {
     private record struct ContentInfo(string Type, string Uri, string OriginalUri);
 
@@ -492,6 +492,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         }
 
         _gameViewModel.Hint = "";
+        _gameViewModel.DialogMode = DialogModes.None;
         _gameViewModel.UpdateCommands();
         _gameViewModel.ClearValidation();
         OnAd();
@@ -511,7 +512,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     private void RoundThemesUI(Models.ThemesPlayMode playMode)
     {
-        lock (_data.TInfoLock)
         lock (TInfo.RoundInfoLock)
         {
             TInfo.RoundInfo.Clear();
@@ -552,17 +552,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
         var select = false;
 
-        lock (_data.ChoiceLock)
+        lock (TInfo.RoundInfoLock)
         {
-            lock (TInfo.RoundInfoLock)
+            if (_data.ThemeIndex > -1 &&
+                _data.ThemeIndex < TInfo.RoundInfo.Count &&
+                _data.QuestionIndex > -1 &&
+                _data.QuestionIndex < TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
             {
-                if (_data.ThemeIndex > -1 &&
-                    _data.ThemeIndex < TInfo.RoundInfo.Count &&
-                    _data.QuestionIndex > -1 &&
-                    _data.QuestionIndex < TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
-                {
-                    select = true;
-                }
+                select = true;
             }
         }
 
@@ -1346,6 +1343,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void Out(int themeIndex)
     {
+        if (themeIndex < 0 || themeIndex >= TInfo.RoundInfo.Count)
+        {
+            return;
+        }
+
         TInfo.PlaySelection(themeIndex);
         _data.Sound = Sounds.FinalDelete;
     }
@@ -1775,8 +1777,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         {
             await Task.Delay(2000);
 
-            _gameViewModel.OnAddString(null, string.Format(_viewerActions.LO[nameof(R.Hint)], _data.Host.GameButtonKey), LogMode.Log);
-            _gameViewModel.OnAddString(null, _viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine, LogMode.Log);
+            _gameViewModel.OnAddString(null, string.Format(Resources.Hint, _data.Host.GameButtonKey), LogMode.Log);
+            _gameViewModel.OnAddString(null, Resources.PressButton + Environment.NewLine, LogMode.Log);
         }
         catch (ObjectDisposedException)
         {
@@ -1797,11 +1799,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
 
     public void SelectQuestion()
     {
-        lock (_data.ChoiceLock)
-        {
-            _data.ThemeIndex = _data.QuestionIndex = -1;
-        }
-
+        _data.ThemeIndex = _data.QuestionIndex = -1;
         _gameViewModel.Hint = Resources.HintSelectQuestion;
         TInfo.Selectable = true;
         TInfo.SelectQuestion.CanBeExecuted = true;
@@ -1958,7 +1956,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic, IAsyncDi
         _gameViewModel.SendAllInNew.CanBeExecuted = _data.PersonDataExtensions.Var[3];
 
         _gameViewModel.DialogMode = DialogModes.StakeNew;
-        _gameViewModel.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
+        _gameViewModel.Hint = Resources.HintMakeAStake;
         _data.Host.OnFlash();
 
         foreach (var player in _data.Players)

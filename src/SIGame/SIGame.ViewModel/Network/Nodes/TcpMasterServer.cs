@@ -1,6 +1,5 @@
 ﻿using SICore.Connections;
 using SICore.Network.Configuration;
-using SICore.Network.Contracts;
 using SIGame.ViewModel.Properties;
 using System.Net;
 using System.Net.Sockets;
@@ -22,7 +21,7 @@ public sealed class TcpMasterServer : PrimaryNode
     /// <summary>
     /// Слушатель внешней сети
     /// </summary>
-    private TcpListener _listener;
+    private TcpListener? _listener;
 
     /// <summary>
     /// Поток прослушивания
@@ -35,8 +34,7 @@ public sealed class TcpMasterServer : PrimaryNode
     /// Создание основного сервера
     /// </summary>
     /// <param name="port">Порт для прослушивания</param>
-    public TcpMasterServer(int port, NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-        : base(serverConfiguration, localizer)
+    public TcpMasterServer(int port, NodeConfiguration serverConfiguration) : base(serverConfiguration)
     {
         _port = port;
     }
@@ -103,8 +101,7 @@ public sealed class TcpMasterServer : PrimaryNode
                 _disposing = true;
 
                 _cancellation.Cancel();
-                if (_listener != null)
-                    _listener.Stop();
+                _listener?.Stop();
 
                 _cancellation.Dispose();
             }
@@ -117,6 +114,6 @@ public sealed class TcpMasterServer : PrimaryNode
     {
         var connection = new Connection(tcpClient, null);
         await AddConnectionAsync(connection, cancellationToken);
-        connection.StartRead(false);
+        connection.StartRead(false, cancellationToken);
     }
 }

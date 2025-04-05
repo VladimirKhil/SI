@@ -1,5 +1,4 @@
 ﻿using SICore.Network.Configuration;
-using SICore.Network.Contracts;
 
 namespace SICore.Network.Servers;
 
@@ -8,6 +7,5 @@ namespace SICore.Network.Servers;
 /// </summary>
 public sealed class LocalNode : PrimaryNode
 {
-    public LocalNode(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-        : base(serverConfiguration, localizer) { }
+    public LocalNode(NodeConfiguration serverConfiguration) : base(serverConfiguration) { }
 }

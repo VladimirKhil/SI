@@ -1036,12 +1036,9 @@ public sealed class Game : Actor
         {
             return;
         }
-        
-        lock (ClientData.ChoiceLock)
-        {
-            ClientData.ThemeIndex = themeIndex;
-            ClientData.QuestionIndex = questionIndex;
-        }
+
+        ClientData.ThemeIndex = themeIndex;
+        ClientData.QuestionIndex = questionIndex;
 
         if (ClientData.IsOralNow)
         {
@@ -2330,6 +2327,8 @@ public sealed class Game : Actor
 
         if (!ClientData.Answerer.IsHuman)
         {
+            var isSure = args.Length > 2 && args[2] == "+";
+
             if (args[1] == MessageParams.Answer_Right)
             {
                 if (ClientData.QuestionPlayState.AnswerOptions != null)
@@ -2339,7 +2338,7 @@ public sealed class Game : Actor
                 }
                 else
                 {
-                    ClientData.Answerer.Answer = args[2].Replace(Constants.AnswerPlaceholder, ClientData.Question.Right.FirstOrDefault() ?? "(...)").GrowFirstLetter();
+                    ClientData.Answerer.Answer = (ClientData.Question.Right.FirstOrDefault() ?? "(...)").GrowFirstLetter();
                     ClientData.Answerer.AnswerIsWrong = false;
                 }
             }
@@ -2399,7 +2398,7 @@ public sealed class Game : Actor
                     ClientData.UsedWrongVersions.Add(restwrong[wrongIndex]);
                 }
 
-                ClientData.Answerer.Answer = args[2].Replace("#", restwrong[wrongIndex]).GrowFirstLetter();
+                ClientData.Answerer.Answer = restwrong[wrongIndex].GrowFirstLetter();
             }
         }
         else
@@ -2997,8 +2996,15 @@ public sealed class Game : Actor
             return;
         }
 
+        Logic.AddHistory($"ThemeDeleters before remove: {themeDeleters}");
         themeDeleters.RemoveAt(playerIndex);
-        
+        Logic.AddHistory($"ThemeDeleters removed: {playerIndex}; result: {themeDeleters}");
+
+        if (!ClientData.IsWaiting)
+        {
+            return;
+        }
+
         if (ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting)
         {
             if (themeDeleters.IsEmpty())
@@ -3022,6 +3028,15 @@ public sealed class Game : Actor
                 {
                     _logic.PlanExecution(Tasks.AskToDelete, 10);
                 }
+            }
+        }
+        else if (ClientData.Decision == DecisionType.ThemeDeleting)
+        {
+            if (themeDeleters.IsEmpty())
+            {
+                _logic.StopWaiting();
+                ClientData.MoveDirection = MoveDirections.RoundNext;
+                _logic.Stop(StopReason.Move);
             }
         }
     }
@@ -3734,7 +3749,7 @@ public sealed class Game : Actor
 
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData(ClientData.Host);
-        var actions = new ViewerActions(playerClient, LO);
+        var actions = new ViewerActions(playerClient);
         var logic = new ViewerComputerLogic(data, actions, new Intelligence(account), GameRole.Player);
         _ = new Player(playerClient, account, false, logic, actions, LO, data);
 
@@ -3763,7 +3778,7 @@ public sealed class Game : Actor
 
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData(ClientData.Host);
-        var actions = new ViewerActions(showmanClient, LO);
+        var actions = new ViewerActions(showmanClient);
         
         var logic = new ViewerComputerLogic(
             data,

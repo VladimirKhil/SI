@@ -27,7 +27,7 @@ public sealed class Player : Viewer
         Client client,
         Account personData,
         bool isHost,
-        IViewerLogic logic,
+        IPersonController logic,
         ViewerActions viewerActions,
         ILocalizer localizer,
         ViewerData data)
@@ -50,11 +50,8 @@ public sealed class Player : Viewer
 
                 if (mparams[1] == nameof(GameStage.Round))
                 {
-                    lock (ClientData.ChoiceLock)
-                    {
-                        ClientData.QuestionIndex = -1;
-                        ClientData.ThemeIndex = -1;
-                    }
+                    ClientData.QuestionIndex = -1;
+                    ClientData.ThemeIndex = -1;
 
                     Logic.ClearSelections(true);
                 }

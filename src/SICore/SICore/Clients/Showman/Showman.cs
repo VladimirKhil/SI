@@ -11,7 +11,7 @@ public sealed class Showman : Viewer
 {
     public override GameRole Role => GameRole.Showman;
 
-    public Showman(Client client, Account personData, bool isHost, IViewerLogic logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
+    public Showman(Client client, Account personData, bool isHost, IPersonController logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
         : base(client, personData, isHost, logic, viewerActions, localizer, data)
     { }
 

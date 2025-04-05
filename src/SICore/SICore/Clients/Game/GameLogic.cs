@@ -1464,10 +1464,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
         }
 
-        if (ClientData.IsQuestionFinished)
-        {
-            _gameActions.SendMessage(Messages.Resume); // To resume the media
-        }
+        _gameActions.SendMessage(Messages.Resume); // To resume the media
 
         if (ClientData.Settings.AppSettings.FalseStart || ClientData.IsQuestionFinished)
         {
@@ -1476,7 +1473,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
-        _gameActions.SendMessage(Messages.Resume);
 
         // Resume question playing
         if (_data.IsPartial)
@@ -1611,6 +1607,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     }
 
     internal string PrintHistory() => _tasksHistory.ToString();
+
+    // TODO: currently PlanExecution() is used for interruprions and ScheduleExecution() for normal tasks flow
+    // Think about using a universal scheduler which will be able to handle both cases
 
     internal void PlanExecution(Tasks task, double taskTime, int arg = 0)
     {
@@ -2702,11 +2701,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         do if (theme.Questions[++j].IsActive()) k2--; while (k2 >= 0);
 
-        lock (_data.ChoiceLock)
-        {
-            _data.ThemeIndex = i;
-            _data.QuestionIndex = j;
-        }
+        _data.ThemeIndex = i;
+        _data.QuestionIndex = j;
 
         OnDecision();
     }
@@ -3137,11 +3133,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _gameActions.ShowmanReplic(msg.ToString());
 
-        lock (_data.ChoiceLock)
-        {
-            _data.ThemeIndex = -1;
-            _data.QuestionIndex = -1;
-        }
+        _data.ThemeIndex = -1;
+        _data.QuestionIndex = -1;
 
         _data.UsedWrongVersions.Clear();
 
@@ -3929,7 +3922,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 }
             }
 
-            ScheduleExecution(Tasks.AnnounceStakesWinner, 10);
+            PlanExecution(Tasks.AnnounceStakesWinner, 10); // Using PlanExecution() as we could be interrupting normal flow
             return true;
         }
 
@@ -4018,6 +4011,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return;
         }
 
+        _gameActions.SendMessageWithArgs(Messages.Appellation, '+');
+
         var appelaer = _data.Players[_data.AppelaerIndex];
 
         var given = LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
@@ -4078,40 +4073,45 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void CheckAppellation()
     {
-        if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
+        try
         {
-            _tasksHistory.AddLogEntry($"CheckAppellation resumed ({_taskRunner.PrintOldTasks()})");
+            if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
+            {
+                _tasksHistory.AddLogEntry($"CheckAppellation resumed ({_taskRunner.PrintOldTasks()})");
+                return;
+            }
+
+            var votingForRight = _data.IsAppelationForRightAnswer;
+            var positiveVoteCount = _data.AppellationPositiveVoteCount;
+            var negativeVoteCount = _data.AppellationNegativeVoteCount;
+
+            if (votingForRight && positiveVoteCount <= negativeVoteCount || !votingForRight && positiveVoteCount >= negativeVoteCount)
+            {
+                _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
+                _tasksHistory.AddLogEntry($"CheckAppellation denied and resumed normally ({_taskRunner.PrintOldTasks()})");
+                return;
+            }
+
+            // Commit appellation
+            _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
+
+            if (votingForRight)
+            {
+                ApplyAppellationForRightAnswer();
+            }
+
+            UpdatePlayersSumsAfterAppellation(votingForRight);
+
+            _gameActions.InformSums();
+            _gameActions.AnnounceSums();
+
+            _tasksHistory.AddLogEntry($"CheckAppellation resumed normally ({_taskRunner.PrintOldTasks()})");
+        }
+        finally
+        {
+            _gameActions.SendMessageWithArgs(Messages.Appellation, '-');
             ResumeExecution(40);
-            return;
         }
-
-        var votingForRight = _data.IsAppelationForRightAnswer;
-        var positiveVoteCount = _data.AppellationPositiveVoteCount;
-        var negativeVoteCount = _data.AppellationNegativeVoteCount;
-
-        if (votingForRight && positiveVoteCount <= negativeVoteCount || !votingForRight && positiveVoteCount >= negativeVoteCount)
-        {
-            _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
-            _tasksHistory.AddLogEntry($"CheckAppellation denied and resumed normally ({_taskRunner.PrintOldTasks()})");
-            ResumeExecution(40);
-            return;
-        }
-
-        // Commit appellation
-        _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
-
-        if (votingForRight)
-        {
-            ApplyAppellationForRightAnswer();
-        }
-
-        UpdatePlayersSumsAfterAppellation(votingForRight);
-
-        _gameActions.InformSums();
-        _gameActions.AnnounceSums();
-
-        _tasksHistory.AddLogEntry($"CheckAppellation resumed normally ({_taskRunner.PrintOldTasks()})");
-        ResumeExecution(40);
     }
 
     private void ApplyAppellationForRightAnswer()
@@ -4500,10 +4500,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 if (!string.IsNullOrEmpty(ad))
                 {
                     informed = true;
-                    var res = new StringBuilder(LO[nameof(R.Ads)]).Append(": ").Append(ad);
-
-                    _gameActions.ShowmanReplic(res.ToString());
-                    _gameActions.SpecialReplic(res.ToString());
 
                     _gameActions.SendMessageWithArgs(Messages.Ads, ad);
 

@@ -673,6 +673,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Hint: you can press the answer button at any point of the screen using right mouse button or {0} key.
+        /// </summary>
+        public static string Hint {
+            get {
+                return ResourceManager.GetString("Hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Change the sum.
         /// </summary>
         public static string HintChangeSum {
@@ -687,6 +696,15 @@ namespace SIGame.ViewModel.Properties {
         public static string HintCheckAnswer {
             get {
                 return ResourceManager.GetString("HintCheckAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Make a stake.
+        /// </summary>
+        public static string HintMakeAStake {
+            get {
+                return ResourceManager.GetString("HintMakeAStake", resourceCulture);
             }
         }
         
@@ -1164,6 +1182,15 @@ namespace SIGame.ViewModel.Properties {
         public static string Preparing {
             get {
                 return ResourceManager.GetString("Preparing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Please, press the button right after the frame around the board appears.
+        /// </summary>
+        public static string PressButton {
+            get {
+                return ResourceManager.GetString("PressButton", resourceCulture);
             }
         }
         

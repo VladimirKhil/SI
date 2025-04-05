@@ -34,11 +34,6 @@ public abstract class Data : INotifyPropertyChanged
     /// </summary>
     public int QuestionIndex { get; set; } = -1;
 
-    /// <summary>
-    /// Объект синхронизации для choiceTheme и choiceQuest
-    /// </summary>
-    public object ChoiceLock { get; } = new object();
-
     private GameStage _stage = GameStage.Before;
 
     /// <summary>

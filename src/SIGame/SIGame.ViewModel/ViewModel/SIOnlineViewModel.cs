@@ -3,7 +3,6 @@ using SI.GameServer.Client;
 using SIContentService.Client;
 using SIContentService.Contract;
 using SICore;
-using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
@@ -890,9 +889,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     private async Task InitNodeAndClientNewAsync(IGameClient gameClient, CancellationToken cancellationToken = default)
     {
-        _node = new GameServerSlave(
-            NodeConfiguration.Default,
-            new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
+        _node = new GameServerSlave(NodeConfiguration.Default);
 
         await _node.AddConnectionAsync(new GameServerConnection(gameClient) { IsAuthenticated = true }, cancellationToken);
 

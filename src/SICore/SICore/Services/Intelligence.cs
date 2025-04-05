@@ -140,7 +140,7 @@ internal sealed class Intelligence : IIntelligence
         return (themeIndex, questionIndex);
     }
 
-    public int DeleteTheme(List<ThemeInfo> roundTable) => roundTable.SelectRandom(theme => theme.Name != null, Random.Shared);
+    public int DeleteTheme(List<ThemeInfo> roundTable) => roundTable.SelectRandom(theme => theme.Name != "", Random.Shared);
 
     public int SelectPlayer(
         List<PlayerAccount> players,
@@ -657,6 +657,21 @@ internal sealed class Intelligence : IIntelligence
         int stakeStep,
         out int stakeSum)
     {
+        if (myIndex < 0 || myIndex >= sums.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(myIndex), myIndex, "Player index is out of range");
+        }
+
+        if (lastStakerIndex < 0 || lastStakerIndex >= sums.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(lastStakerIndex), lastStakerIndex, "Last staker index is out of range");
+        }
+
+        if (vars.Length != 3)
+        {
+            throw new ArgumentException("Stake variables must have 3 elements", nameof(vars));
+        }
+
         int i = 0;
         int ran = 0, stake = 0;
 
@@ -714,10 +729,16 @@ internal sealed class Intelligence : IIntelligence
             stakeStep,
             ref result);
 
+        if (result.Count == 0 || result[0].Probabilities.Count == 0)
+        {
+            stakeMode = StakeMode.Pass;
+            return stakeMode;
+        }
+
         int maxL = result[0].Probabilities.Count;
         int li;
 
-        for (int ind = 0; ind < maxL; ind++)
+        for (var ind = 0; ind < maxL; ind++)
         {
             li = style switch
             {
@@ -746,7 +767,7 @@ internal sealed class Intelligence : IIntelligence
                                 break;
                             }
                         }
-                        else
+                        else if (li < prob.Probabilities.Count && li < result[k].Probabilities.Count)
                         {
                             if (prob.Probabilities[li] < result[k].Probabilities[li])
                             {
@@ -783,30 +804,24 @@ internal sealed class Intelligence : IIntelligence
             switch (style)
             {
                 case PlayerStyle.Agressive:
-
                     N1 -= 30;
                     N5 -= 30;
                     B1 += 30;
                     B5 += 30;
-
                     break;
 
                 case PlayerStyle.Normal:
-
                     N1 -= 20;
                     N5 -= 20;
                     B1 += 20;
                     B5 += 20;
-
                     break;
 
                 default:
-
                     N1 -= 10;
                     N5 -= 10;
                     B1 += 10;
                     B5 += 10;
-
                     break;
             }
         }
@@ -822,7 +837,7 @@ internal sealed class Intelligence : IIntelligence
         {
             totalL = 0;
 
-            foreach (IntervalProbability interval in result)
+            foreach (var interval in result)
             {
                 totalL += interval.Length;
             }

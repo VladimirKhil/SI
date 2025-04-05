@@ -1,4 +1,5 @@
-﻿using SICore.Contracts;
+﻿using SICore.Clients.Game;
+using SICore.Contracts;
 using SICore.Extensions;
 using SICore.Helpers;
 using SICore.Models;
@@ -28,6 +29,8 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private object? _taskArg; // Currently TaskRunner does not support object task arguments
 
+    private readonly HistoryLog _historyLog = new();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PlayerComputerController"/> class.
     /// </summary>
@@ -42,9 +45,12 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void ScheduleExecution(PlayerTasks task, double taskTime, object? arg = null)
     {
+        _historyLog.AddLogEntry($"Sheduled {task}:{arg}");
         _taskArg = arg;
         _taskRunner.ScheduleExecution(task, taskTime);
     }
+
+    public void AddLog(string message) => _historyLog.AddLogEntry(message);
 
     public void ExecuteTask(PlayerTasks taskId, int arg)
     {
@@ -60,6 +66,8 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void ExecuteTaskCore(PlayerTasks task, object? arg)
     {
+        _historyLog.AddLogEntry($"Executing {task}:{arg}");
+
         switch (task)
         {
             case PlayerTasks.Ready:
@@ -113,26 +121,12 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
         try
         {
-            var ans = new MessageBuilder(Messages.Answer, knows ? MessageParams.Answer_Right : MessageParams.Answer_Wrong);
-
-            // TODO: remove localization
-            if (isSure)
-            {
-                ans.Add(
-                    string.Format(
-                        Random.Shared.GetRandomString(_viewerActions.LO[nameof(R.Sure)]),
-                        me.IsMale ? "" : _viewerActions.LO[nameof(R.SureFemaleEnding)]));
-            }
-            else
-            {
-                ans.Add(Random.Shared.GetRandomString(_viewerActions.LO[nameof(R.NotSure)]));
-            }
-
+            var ans = new MessageBuilder(Messages.Answer, knows ? MessageParams.Answer_Right : MessageParams.Answer_Wrong, isSure ? '+' : '-');
             _viewerActions.SendMessage(ans.ToString());
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Answering error: {0}", exc).AppendLine();
+            _data.SystemLog.AppendFormat("Answering error: {0} {1}", exc, _historyLog).AppendLine();
         }
     }
 
@@ -147,21 +141,18 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
         try
         {
-            lock (_data.TInfoLock)
-            {
-                var (themeIndex, questionIndex) = _intelligence.SelectQuestion(
-                    _data.TInfo.RoundInfo,
-                    (_data.ThemeIndex, _data.QuestionIndex),
-                    me.Sum,
-                    BestOpponentScore(),
-                    GetTimePercentage(0));
+            var (themeIndex, questionIndex) = _intelligence.SelectQuestion(
+                _data.TInfo.RoundInfo,
+                (_data.ThemeIndex, _data.QuestionIndex),
+                me.Sum,
+                BestOpponentScore(),
+                GetTimePercentage(0));
 
-                _viewerActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
-            }
+            _viewerActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Question selection error: {0}", exc.ToString()).AppendLine();
+            _data.SystemLog.AppendFormat("Question selection error: {0} {1}", exc.ToString(), _historyLog).AppendLine();
         }
     }
 
@@ -195,7 +186,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Select player error: {0}", exc).AppendLine();
+            _data.SystemLog.AppendFormat("Select player error: {0} {1}", exc, _historyLog).AppendLine();
         }
     }
 
@@ -203,15 +194,12 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     {
         try
         {
-            lock (_data.TInfoLock)
-            {
-                var themeIndex = _intelligence.DeleteTheme(_data.TInfo.RoundInfo);
-                _viewerActions.SendMessageWithArgs(Messages.Delete, themeIndex);
-            }
+            var themeIndex = _intelligence.DeleteTheme(_data.TInfo.RoundInfo);
+            _viewerActions.SendMessageWithArgs(Messages.Delete, themeIndex);
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Theme delete error: {0}", exc).AppendLine();
+            _data.SystemLog.AppendFormat("Theme delete error: {0} {1}", exc, _historyLog).AppendLine();
         }
     }
 
@@ -254,7 +242,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Stake task error: {0}", exc).AppendLine();
+            _data.SystemLog.AppendFormat("Stake task error: {0} {1}", exc, _historyLog).AppendLine();
         }
     }
 

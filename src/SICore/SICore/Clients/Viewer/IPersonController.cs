@@ -6,7 +6,7 @@ namespace SICore;
 /// <summary>
 /// Defines a game person controller.
 /// </summary>
-public interface IViewerLogic
+public interface IPersonController
 {
     bool CanSwitchType { get; }
 
@@ -272,4 +272,6 @@ public interface IViewerLogic
     void DeleteTheme();
 
     void MakeStake();
+
+    void AddLog(string message) { }
 }

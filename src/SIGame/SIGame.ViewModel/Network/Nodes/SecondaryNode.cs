@@ -23,8 +23,7 @@ public abstract class SecondaryNode : Node, ISecondaryNode
         }
     }
 
-    protected SecondaryNode(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-        : base(serverConfiguration, localizer) { }
+    protected SecondaryNode(NodeConfiguration serverConfiguration) : base(serverConfiguration) { }
 
     public override ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default) =>
         ConnectionsLock.WithLockAsync(

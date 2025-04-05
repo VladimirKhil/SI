@@ -27,9 +27,9 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 
     public virtual GameRole Role => GameRole.Viewer;
 
-    private readonly IViewerLogic _logic;
+    private readonly IPersonController _logic;
 
-    protected IViewerLogic Logic => _logic;
+    protected IPersonController Logic => _logic;
 
     private bool _isHost;
 
@@ -51,7 +51,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         }
     }
 
-    public IViewerLogic MyLogic => _logic;
+    public IPersonController MyLogic => _logic;
 
     public ViewerData MyData => ClientData;
 
@@ -76,7 +76,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         Client client,
         Account personData,
         bool isHost,
-        IViewerLogic logic,
+        IPersonController logic,
         ViewerActions viewerActions,
         ILocalizer localizer,
         ViewerData data)
@@ -455,35 +455,32 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                     {
                         #region Table
 
-                        lock (ClientData.TInfoLock)
+                        // TODO: clear existing table and renew it
+                        if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
                         {
-                            // TODO: clear existing table and renew it
-                            if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
+                            break;
+                        }
+
+                        var index = 1;
+
+                        for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
+                        {
+                            if (index == mparams.Length)
                             {
                                 break;
                             }
 
-                            var index = 1;
-
-                            for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
+                            while (index < mparams.Length && mparams[index].Length > 0) // empty value separates the themes content
                             {
-                                if (index == mparams.Length)
+                                if (!int.TryParse(mparams[index++], out int price))
                                 {
-                                    break;
+                                    price = -1;
                                 }
 
-                                while (index < mparams.Length && mparams[index].Length > 0) // empty value separates the themes content
-                                {
-                                    if (!int.TryParse(mparams[index++], out int price))
-                                    {
-                                        price = -1;
-                                    }
-
-                                    ClientData.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
-                                }
-
-                                index++;
+                                ClientData.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
                             }
+
+                            index++;
                         }
 
                         _logic.TableLoaded();
@@ -696,23 +693,9 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                     break;
 
                 case Messages.Out:
-                    {
-                        #region Out
+                    OnOut(mparams);
+                    break;
 
-                        lock (ClientData.ChoiceLock)
-                        lock (ClientData.TInfoLock)
-                        {
-                            ClientData.ThemeIndex = int.Parse(mparams[1]);
-
-                            if (ClientData.ThemeIndex > -1 && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count)
-                            {
-                                _logic.Out(ClientData.ThemeIndex);
-                            }
-                        }
-
-                        #endregion
-                        break;
-                    }
                 case Messages.Winner:
                     if (mparams.Length > 1 && int.TryParse(mparams[1], out int winnerIndex))
                     {
@@ -753,6 +736,21 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         catch (Exception exc)
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
+        }
+    }
+
+    private void OnOut(string[] mparams)
+    {
+        if (mparams.Length < 2 || !int.TryParse(mparams[1], out var themeIndex))
+        {
+            return;
+        }
+
+        ClientData.ThemeIndex = themeIndex;
+
+        if (ClientData.ThemeIndex > -1 && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count)
+        {
+            _logic.Out(ClientData.ThemeIndex);
         }
     }
 
@@ -956,21 +954,17 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 
     private void OnChoice(string[] mparams)
     {
-        lock (ClientData.ChoiceLock)
-        lock (ClientData.TInfoLock)
-        {
-            ClientData.ThemeIndex = int.Parse(mparams[1]);
-            ClientData.QuestionIndex = int.Parse(mparams[2]);
+        ClientData.ThemeIndex = int.Parse(mparams[1]);
+        ClientData.QuestionIndex = int.Parse(mparams[2]);
 
-            if (ClientData.ThemeIndex > -1
-                && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count
-                && ClientData.QuestionIndex > -1
-                && ClientData.QuestionIndex < ClientData.TInfo.RoundInfo[ClientData.ThemeIndex].Questions.Count)
-            {
-                var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
-                var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
-                _logic.SetCaption($"{selectedTheme.Name}, {selectedQuestion.Price}");
-            }
+        if (ClientData.ThemeIndex > -1
+            && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count
+            && ClientData.QuestionIndex > -1
+            && ClientData.QuestionIndex < ClientData.TInfo.RoundInfo[ClientData.ThemeIndex].Questions.Count)
+        {
+            var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
+            var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
+            _logic.SetCaption($"{selectedTheme.Name}, {selectedQuestion.Price}");
         }
 
         foreach (var player in ClientData.Players.ToArray())
@@ -1135,18 +1129,15 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
             return;
         }
 
-        lock (ClientData.TInfoLock)
+        ClientData.TInfo.RoundInfo.Clear();
+
+        for (var i = 2; i < mparams.Length; i++)
         {
-            ClientData.TInfo.RoundInfo.Clear();
+            ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
 
-            for (var i = 2; i < mparams.Length; i++)
+            if (playMode != ThemesPlayMode.None)
             {
-                ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
-
-                if (playMode != ThemesPlayMode.None)
-                {
-                    _logic.OnReplic(ReplicCodes.System.ToString(), mparams[i]);
-                }
+                _logic.OnReplic(ReplicCodes.System.ToString(), mparams[i]);
             }
         }
 
@@ -1726,7 +1717,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 
         _logic.OnClientSwitch(viewer);
 
-        SendPicture();
+        SendAvatar();
     }
 
     private async ValueTask ProcessInfoAsync(string[] mparams)
@@ -1833,7 +1824,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
             }
         }
 
-        SendPicture();
+        SendAvatar();
         _viewerActions.SendMessage(Messages.Moveable);
     }
 
@@ -2013,6 +2004,8 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
     {
         if (message.IsSystem)
         {
+            _logic.AddLog($"[{message.Text}]");
+
             await ClientData.TaskLock.WithLockAsync(
                 async () => await OnSystemMessageReceivedAsync(message.Text.Split('\n')),
                 ViewerData.LockTimeoutMs);
@@ -2029,24 +2022,17 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
     /// <param name="text">Текст сообщения</param>
     /// <param name="whom">Кому</param>
     /// <param name="isPrivate">Приватно ли</param>
-    public void Say(string text, string whom = NetworkConstants.Everybody, bool isPrivate = false)
+    public void Say(string text, string whom = NetworkConstants.Everybody)
     {
         if (whom != NetworkConstants.Everybody)
         {
             text = $"{whom}, {text}";
         }
 
-        if (!isPrivate)
-        {
-            whom = NetworkConstants.Everybody;
-        }
-        else
-        {
-            text = $"({LO[nameof(R.Private)]}) {text}";
-        }
+        whom = NetworkConstants.Everybody;
 
-        _client.SendMessage(text, false, whom, isPrivate);
-        _logic.ReceiveText(new Message(text, _client.Name, whom, false, isPrivate));
+        _client.SendMessage(text, false, whom);
+        _logic.ReceiveText(new Message(text, _client.Name, whom, false));
     }
 
     public void Pause() => _viewerActions.SendMessage(Messages.Pause, ClientData.TInfo.Pause ? "-" : "+");
@@ -2054,7 +2040,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
     /// <summary>
     /// Sends user avatar (file or uri) to server.
     /// </summary>
-    public void SendPicture()
+    public void SendAvatar()
     {
         if (Avatar != null)
         {

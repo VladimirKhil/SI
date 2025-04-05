@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using SI.GameServer.Contract;
 using SICore;
 using SICore.Clients;
-using SICore.Network;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
 using SICore.Services;
@@ -718,8 +717,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
     private void BeginNewGameCompleted(SIDocument document, string documentPath)
     {
-        var localizer = new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name);
-
         var fileShare = new WebManager(
             _model.AppSettings.MultimediaPort,
             new Dictionary<ResourceKind, string>
@@ -733,12 +730,12 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         if (NetworkGame)
         {
-            node = new TcpMasterServer(NetworkPort, NodeConfiguration.Default, localizer);
+            node = new TcpMasterServer(NetworkPort, NodeConfiguration.Default);
             ((TcpMasterServer)node).StartListen();
         }
         else
         {
-            node = new LocalNode(NodeConfiguration.Default, localizer);
+            node = new LocalNode(NodeConfiguration.Default);
         }
 
         node.Error += Server_Error;

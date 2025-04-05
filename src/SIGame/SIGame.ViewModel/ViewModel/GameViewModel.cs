@@ -10,7 +10,6 @@ using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.ViewModel.Data;
 using SIPackages.Core;
 using SIUI.ViewModel;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net;
@@ -720,6 +719,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void IsRight_Executed(object? arg)
     {
+        if (ValidationQueue.Count == 0)
+        {
+            return;
+        }
+
         var validation = PopValidation();
         
         if (NewValidation)
@@ -740,6 +744,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void IsWrong_Executed(object? arg)
     {
+        if (ValidationQueue.Count == 0)
+        {
+            return;
+        }
+
         var validation = PopValidation();
         
         if (NewValidation)

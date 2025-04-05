@@ -20,7 +20,7 @@
         <local:NumericTextBox
             Style="{StaticResource {x:Type TextBox}}"
             Text="{Binding SelectedPlayer.PlayerScore, UpdateSourceTrigger=PropertyChanged}"
-            Maximum="100000"
+            Maximum="1000000"
             Margin="20,15"
             Width="100"
             VerticalAlignment="Center"

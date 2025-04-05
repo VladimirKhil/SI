@@ -17,7 +17,7 @@ public interface IViewerClient : IDisposable
 
     ViewerData MyData { get; }
 
-    IViewerLogic MyLogic { get; }
+    IPersonController MyLogic { get; }
 
     ViewerActions Actions { get; }
 
@@ -29,7 +29,7 @@ public interface IViewerClient : IDisposable
 
     void RecreateCommands();
 
-    void Say(string text, string whom = NetworkConstants.Everybody, bool isPrivate = false);
+    void Say(string text, string whom = NetworkConstants.Everybody);
 
     void Move(object arg);
 }

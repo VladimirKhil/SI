@@ -1,5 +1,4 @@
-﻿using SICore.Contracts;
-using SICore.Network;
+﻿using SICore.Network;
 using SICore.Network.Clients;
 using SIData;
 
@@ -7,15 +6,9 @@ namespace SICore;
 
 public sealed class ViewerActions
 {
-    public ILocalizer LO { get; }
-
     public Client Client { get; }
 
-    public ViewerActions(Client client, ILocalizer localizer)
-    {
-        Client = client;
-        LO = localizer;
-    }
+    public ViewerActions(Client client) => Client = client;
 
     /// <summary>
     /// Отправить сообщение всем

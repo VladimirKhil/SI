@@ -32,8 +32,6 @@ public sealed class ViewerData : Data
         set { if (_stageName != value) { _stageName = value; OnPropertyChanged(); } }
     }
 
-    public object TInfoLock { get; } = new object();
-
     // TODO: maybe client logic should not rely on this property
     /// <summary>
     /// Current question type.

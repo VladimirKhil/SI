@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Ads" xml:space="preserve">
-    <value>Рекламное сообщение</value>
-  </data>
   <data name="AllQuestions" xml:space="preserve">
     <value>Разыграны все вопросы;Итак, мы разыграли все вопросы</value>
   </data>
@@ -249,17 +246,11 @@
   <data name="HeGave" xml:space="preserve">
     <value>он дал</value>
   </data>
-  <data name="Hint" xml:space="preserve">
-    <value>Подсказка: игровую кнопку можно нажимать в любой точке окна при помощи правой кнопки мыши или клавиши {0}. </value>
-  </data>
   <data name="HintChooseCatPrice" xml:space="preserve">
     <value>Выберите стоимость вопроса</value>
   </data>
   <data name="HintInitError" xml:space="preserve">
     <value>Ошибка инициализации информации об игроке!</value>
-  </data>
-  <data name="HintMakeAStake" xml:space="preserve">
-    <value>Сделайте ставку</value>
   </data>
   <data name="HintSelectCatPlayerForPlayer" xml:space="preserve">
     <value>Выберите игрока, которому игрок отдаёт вопрос</value>
@@ -345,33 +336,6 @@
   <data name="OfTheme" xml:space="preserve">
     <value>темы</value>
   </data>
-  <data name="OnTheEigthTable" xml:space="preserve">
-    <value>за восьмым игровым столом —</value>
-  </data>
-  <data name="OnTheFifthTable" xml:space="preserve">
-    <value>за пятым игровым столом —</value>
-  </data>
-  <data name="OnTheFirstTable" xml:space="preserve">
-    <value>За первым игровым столом —</value>
-  </data>
-  <data name="OnTheForthTable" xml:space="preserve">
-    <value>за четвёртым игровым столом —</value>
-  </data>
-  <data name="OnTheNinethTable" xml:space="preserve">
-    <value>за девятым игровым столом —</value>
-  </data>
-  <data name="OnTheSecondTable" xml:space="preserve">
-    <value>за вторым игровым столом —</value>
-  </data>
-  <data name="OnTheSeventhTable" xml:space="preserve">
-    <value>за седьмым игровым столом —</value>
-  </data>
-  <data name="OnTheSixthTable" xml:space="preserve">
-    <value>за шестым игровым столом —</value>
-  </data>
-  <data name="OnTheThirdTable" xml:space="preserve">
-    <value>за третьим игровым столом —</value>
-  </data>
   <data name="Or" xml:space="preserve">
     <value>или</value>
   </data>
@@ -410,9 +374,6 @@
   </data>
   <data name="PositionNotFoundByIndex" xml:space="preserve">
     <value>Позиция с данным номером не обнаружена!</value>
-  </data>
-  <data name="PressButton" xml:space="preserve">
-    <value>Старайтесь жать на кнопку сразу после загорания рамки на экране, пожалуйста</value>
   </data>
   <data name="Private" xml:space="preserve">
     <value>лично</value>
