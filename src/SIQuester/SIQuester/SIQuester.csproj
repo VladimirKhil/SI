@@ -33,6 +33,9 @@
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="Resources\logo.jpg" />
+    <None Remove="Resources\steam_logo.png" />
+    <None Remove="steam_appid.txt" />
+    <None Remove="View\steam_logo.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Remove="Resources\Icons.xaml" />
@@ -66,10 +69,19 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="steam_api.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="steam_api64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Help.ru-RU.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Help.en-US.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="steam_appid.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -131,6 +143,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\mircIcon.png" />
+    <Resource Include="Resources\steam_logo.png" />
+    <Resource Include="View\steam_logo.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Plus.png" />
@@ -193,6 +207,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\Polly.LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="licenses\Steamworks.NET.LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\WindowsAPICodePack.LICENSE.txt">

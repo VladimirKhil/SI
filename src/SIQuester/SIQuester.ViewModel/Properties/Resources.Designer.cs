@@ -538,6 +538,24 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Export to Steam.
+        /// </summary>
+        public static string ExportToSteam {
+            get {
+                return ResourceManager.GetString("ExportToSteam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Enable package quality control for Steam export.
+        /// </summary>
+        public static string ExportToSteamWarning {
+            get {
+                return ResourceManager.GetString("ExportToSteamWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на External links are not allowed.
         /// </summary>
         public static string ExternalLinksAreForbidden {
@@ -772,6 +790,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Initial upload.
+        /// </summary>
+        public static string InitialUpload {
+            get {
+                return ResourceManager.GetString("InitialUpload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Enter the address of the multimedia object.
         /// </summary>
         public static string InputMediaUri {
@@ -804,6 +831,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string InvalidFileSize {
             get {
                 return ResourceManager.GetString("InvalidFileSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Invalid update handle.
+        /// </summary>
+        public static string InvalidUpdateHandle {
+            get {
+                return ResourceManager.GetString("InvalidUpdateHandle", resourceCulture);
             }
         }
         
@@ -1294,6 +1330,33 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Preview upload.
+        /// </summary>
+        public static string PreviewUpload {
+            get {
+                return ResourceManager.GetString("PreviewUpload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to submit Workshop preview.
+        /// </summary>
+        public static string PreviewUploadError {
+            get {
+                return ResourceManager.GetString("PreviewUploadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Preview uploaded successfully.
+        /// </summary>
+        public static string PreviewUploadSuccess {
+            get {
+                return ResourceManager.GetString("PreviewUploadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на SIQuester.
         /// </summary>
         public static string ProgramName {
@@ -1326,6 +1389,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Question {
             get {
                 return ResourceManager.GetString("Question", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Question count.
+        /// </summary>
+        public static string QuestionCount {
+            get {
+                return ResourceManager.GetString("QuestionCount", resourceCulture);
             }
         }
         
@@ -1627,6 +1699,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Starting upload....
+        /// </summary>
+        public static string StartingUpload {
+            get {
+                return ResourceManager.GetString("StartingUpload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Statistics.
         /// </summary>
         public static string Statistic {
@@ -1636,11 +1717,29 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Steam is not running. Export is not possible.
+        /// </summary>
+        public static string SteamNotRunning {
+            get {
+                return ResourceManager.GetString("SteamNotRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The input file has been completely read! The entire file header is placed in the package comments. Please sort its content yourself. Total imported themes:.
         /// </summary>
         public static string Success {
             get {
                 return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Tags.
+        /// </summary>
+        public static string Tags {
+            get {
+                return ResourceManager.GetString("Tags", resourceCulture);
             }
         }
         
@@ -1659,6 +1758,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string TemplateWithThisNameAlreadyExists {
             get {
                 return ResourceManager.GetString("TemplateWithThisNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Text.
+        /// </summary>
+        public static string Text {
+            get {
+                return ResourceManager.GetString("Text", resourceCulture);
             }
         }
         
@@ -1843,11 +1951,38 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Error during upload.
+        /// </summary>
+        public static string UploadError {
+            get {
+                return ResourceManager.GetString("UploadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Workshop item created successfully.
+        /// </summary>
+        public static string UploadSuccess {
+            get {
+                return ResourceManager.GetString("UploadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Video.
         /// </summary>
         public static string Video {
             get {
                 return ResourceManager.GetString("Video", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to create Workshop item.
+        /// </summary>
+        public static string WorkshopItemCreationError {
+            get {
+                return ResourceManager.GetString("WorkshopItemCreationError", resourceCulture);
             }
         }
         

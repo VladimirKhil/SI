@@ -478,6 +478,9 @@
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
   </data>
+  <data name="Description" xml:space="preserve">
+    <value>Описание</value>
+  </data>
   <data name="Difficulty" xml:space="preserve">
     <value>Сложность</value>
   </data>
@@ -567,6 +570,9 @@
   </data>
   <data name="ExportMediaCommand" xml:space="preserve">
     <value>Выгрузить медиа…</value>
+  </data>
+  <data name="ExportToSteam" xml:space="preserve">
+    <value>Экспорт в Steam</value>
   </data>
   <data name="FileExistReplace" xml:space="preserve">
     <value>Файл {0} существует, заменить?</value>
@@ -1136,6 +1142,9 @@
   <data name="StartImport" xml:space="preserve">
     <value>Начать импорт</value>
   </data>
+  <data name="Steam" xml:space="preserve">
+    <value>Steam</value>
+  </data>
   <data name="SubfolderSearch" xml:space="preserve">
     <value>Искать в подпапках</value>
   </data>
@@ -1213,6 +1222,9 @@
   </data>
   <data name="UpdatePricesOnDragAndDropHint" xml:space="preserve">
     <value>Вопросы будут перемещаться, а распределение стоимостей останется прежним</value>
+  </data>
+  <data name="UploadToSteamWorkshop" xml:space="preserve">
+    <value>Отправить в Мастерскую Steam</value>
   </data>
   <data name="UseGPT" xml:space="preserve">
     <value>Использовать GPT для генерации вопросов</value>

@@ -478,6 +478,9 @@ By following these steps, you help maintain a responsible and collaborative envi
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
   <data name="Difficulty" xml:space="preserve">
     <value>Difficulty</value>
   </data>
@@ -567,6 +570,9 @@ By following these steps, you help maintain a responsible and collaborative envi
   </data>
   <data name="ExportMediaCommand" xml:space="preserve">
     <value>Unload media…</value>
+  </data>
+  <data name="ExportToSteam" xml:space="preserve">
+    <value>Export to Steam</value>
   </data>
   <data name="FileExistReplace" xml:space="preserve">
     <value>File {0} exists, replace it?</value>
@@ -1140,6 +1146,9 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="StartImport" xml:space="preserve">
     <value>Start import</value>
   </data>
+  <data name="Steam" xml:space="preserve">
+    <value>Steam</value>
+  </data>
   <data name="SubfolderSearch" xml:space="preserve">
     <value>Search in subfolders</value>
   </data>
@@ -1217,6 +1226,9 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="UpdatePricesOnDragAndDropHint" xml:space="preserve">
     <value>Questions will be moved, but the cost distribution will remain the same</value>
+  </data>
+  <data name="UploadToSteamWorkshop" xml:space="preserve">
+    <value>Upload to Steam Workshop</value>
   </data>
   <data name="UseGPT" xml:space="preserve">
     <value>Use GPT for generating questions</value>

@@ -192,7 +192,6 @@ public sealed class SearchFolderViewModel : WorkspaceViewModel
         var folders = directoryInfo.GetDirectories();
         var total = files.Length + (subfoldersSearch ? folders.Length : 0);
         var done = 0;
-        SearchMatch? found = null;
 
         foreach (var file in files)
         {
@@ -204,58 +203,15 @@ public sealed class SearchFolderViewModel : WorkspaceViewModel
                 }
             }
 
-            found = null;
-
             try
             {
-                using (var stream = File.OpenRead(file.FullName))
+                var fileNameLocal = file.FullName;
+
+                using var stream = File.OpenRead(fileNameLocal);
+                using var doc = SIDocument.Load(stream);
+                
+                foreach (var searchResult in SearchDocument(searchText, doc.Package))
                 {
-                    using var doc = SIDocument.Load(stream);
-                    var package = doc.Package;
-
-                    if ((found = package.SearchFragment(searchText)) == null)
-                    {
-                        foreach (var round in package.Rounds)
-                        {
-                            if ((found = round.SearchFragment(searchText)) != null)
-                            {
-                                break;
-                            }
-
-                            foreach (var theme in round.Themes)
-                            {
-                                if ((found = theme.SearchFragment(searchText)) != null)
-                                {
-                                    break;
-                                }
-
-                                foreach (var quest in theme.Questions)
-                                {
-                                    if ((found = quest.SearchFragment(searchText)) != null)
-                                    {
-                                        break;
-                                    }
-                                }
-
-                                if (found != null)
-                                {
-                                    break;
-                                }
-                            }
-
-                            if (found != null)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (found != null)
-                {
-                    var fileNameLocal = file.FullName;
-                    var foundLocal = found;
-
                     UI.Execute(
                         () =>
                         {
@@ -269,7 +225,7 @@ public sealed class SearchFolderViewModel : WorkspaceViewModel
                                 SearchResults.Add(new SearchResult
                                 {
                                     FileName = fileNameLocal,
-                                    Fragment = foundLocal
+                                    Fragment = searchResult.AsMatch(searchText.Length)
                                 });
                             }
                         },
@@ -316,6 +272,38 @@ public sealed class SearchFolderViewModel : WorkspaceViewModel
                         }
 
                         SearchProgress = (byte)(100 * done / total);
+                    }
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<SearchData> SearchDocument(string searchText, Package package)
+    {
+        foreach (var match in package.SearchInfoOwner(searchText))
+        {
+            yield return match;
+        }
+
+        foreach (var round in package.Rounds)
+        {
+            foreach (var match in round.SearchInfoOwner(searchText))
+            {
+                yield return match;
+            }
+
+            foreach (var theme in round.Themes)
+            {
+                foreach (var match in theme.SearchInfoOwner(searchText))
+                {
+                    yield return match;
+                }
+                
+                foreach (var quest in theme.Questions)
+                {
+                    foreach (var match in quest.SearchQuestion(searchText))
+                    {
+                        yield return match;
                     }
                 }
             }

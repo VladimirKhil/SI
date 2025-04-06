@@ -9,6 +9,7 @@
     xmlns:siqsel="clr-namespace:SIQuester.Selectors"
     xmlns:lc="clr-namespace:SIQuester.Controls"
     xmlns:lb="clr-namespace:SIQuester.Behaviors"
+    xmlns:lvd="clr-namespace:SIQuester.View.Dialogs"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:vmd="clr-namespace:SIQuester.ViewModel.Workspaces.Dialogs;assembly=SIQuester.ViewModel"
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
@@ -132,7 +133,15 @@
                 <Button ToolTip="{x:Static lp:Resources.ExportAndPrint}" Command="{Binding ExportDinabank}" Padding="4,3">
                     <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_export},Path=Data}" />
                 </Button>
-                
+
+                <Button ToolTip="{x:Static lp:Resources.Preview}" Command="{Binding ExportPreview}" VerticalAlignment="Stretch">
+                    <Image Source="{StaticResource AddImageImage}" Stretch="Uniform" />
+                </Button>
+
+                <Button ToolTip="{x:Static lp:Resources.ExportToSteam}" Command="{Binding ExportToSteam}" VerticalAlignment="Stretch">
+                    <Image Source="/SIQuester;component/Resources/steam_logo.png" Stretch="Uniform" />
+                </Button>
+
                 <siq:DropDownButton
                     ToolTip="{x:Static lp:Resources.SaveAndExport}"
                     IsEnabled="{Binding ElementName=bExpand,Path=IsEnabled}"
@@ -154,10 +163,10 @@
                                 Command="{Binding SaveAsTemplate}" />
 
                             <Separator />
-                            <MenuItem Header="{x:Static lp:Resources.Preview}" Command="{Binding ExportPreview}" />
 
                             <MenuItem Header="{x:Static lp:Resources.TableFormat}" Command="{Binding ExportTable}" />
                             <MenuItem Header="YAML" Command="{Binding ExportYaml}" />
+
                             <Separator />
                             
                             <MenuItem
@@ -781,6 +790,10 @@
 
                     <DataTemplate DataType="{x:Type vmd:QuestionPlayViewModel}">
                         <siq:QuestionPlayView />
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type vmd:ExportToSteamViewModel}">
+                        <lvd:ExportToSteamView />
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>

@@ -310,6 +310,12 @@
   <data name="ExportToSns" xml:space="preserve">
     <value>Экспорт в формат СНС</value>
   </data>
+  <data name="ExportToSteam" xml:space="preserve">
+    <value>Экспорт в Steam</value>
+  </data>
+  <data name="ExportToSteamWarning" xml:space="preserve">
+    <value>Для экспорта в Steam необходимо включить контроль качества</value>
+  </data>
   <data name="ExternalLinksAreForbidden" xml:space="preserve">
     <value>Внешние ссылки не допускаются</value>
   </data>
@@ -388,6 +394,9 @@
   <data name="Info" xml:space="preserve">
     <value>Инфо</value>
   </data>
+  <data name="InitialUpload" xml:space="preserve">
+    <value>Начальная загрузка</value>
+  </data>
   <data name="InputMediaUri" xml:space="preserve">
     <value>Введите адрес мультимедиа-объекта</value>
   </data>
@@ -399,6 +408,9 @@
   </data>
   <data name="InvalidFileSize" xml:space="preserve">
     <value>Размер файла {0} превышает допустимое значение {1} МБ</value>
+  </data>
+  <data name="InvalidUpdateHandle" xml:space="preserve">
+    <value>Неверный update handle</value>
   </data>
   <data name="Left" xml:space="preserve">
     <value>ОСТАТОК</value>
@@ -562,6 +574,15 @@
   <data name="Played" xml:space="preserve">
     <value>Играно</value>
   </data>
+  <data name="PreviewUpload" xml:space="preserve">
+    <value>Отправка превью</value>
+  </data>
+  <data name="PreviewUploadError" xml:space="preserve">
+    <value>Ошибка отправки превью</value>
+  </data>
+  <data name="PreviewUploadSuccess" xml:space="preserve">
+    <value>Превью успешно отправлено</value>
+  </data>
   <data name="ProgramName" xml:space="preserve">
     <value>SIQuester</value>
   </data>
@@ -573,6 +594,9 @@
   </data>
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
+  </data>
+  <data name="QuestionCount" xml:space="preserve">
+    <value>Число вопросов</value>
   </data>
   <data name="QuestionForAll" xml:space="preserve">
     <value>Вопрос для всех</value>
@@ -673,17 +697,29 @@
   <data name="Start" xml:space="preserve">
     <value>Старт</value>
   </data>
+  <data name="StartingUpload" xml:space="preserve">
+    <value>Загрузка началась...</value>
+  </data>
   <data name="Statistic" xml:space="preserve">
     <value>Статистика</value>
   </data>
+  <data name="SteamNotRunning" xml:space="preserve">
+    <value>Steam не запущен. Экспорт невозможен</value>
+  </data>
   <data name="Success" xml:space="preserve">
     <value>Входной файл считан полностью! Весь заголовок файла помещён в комментарии к пакету. Просьба самостоятельно рассортировать его содержимое. Всего импортировано тем:</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Теги</value>
   </data>
   <data name="TemplateName" xml:space="preserve">
     <value>Имя шаблона</value>
   </data>
   <data name="TemplateWithThisNameAlreadyExists" xml:space="preserve">
     <value>Шаблон с таким именем уже существует!</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>Текст</value>
   </data>
   <data name="TextFiles" xml:space="preserve">
     <value>Текстовые файлы</value>
@@ -745,8 +781,17 @@
   <data name="UnusedFile" xml:space="preserve">
     <value>Файл {0} не используется. Удалите его</value>
   </data>
+  <data name="UploadError" xml:space="preserve">
+    <value>Ошибка при оправке</value>
+  </data>
+  <data name="UploadSuccess" xml:space="preserve">
+    <value>Объект Мастерской успешно создан</value>
+  </data>
   <data name="Video" xml:space="preserve">
     <value>Видео</value>
+  </data>
+  <data name="WorkshopItemCreationError" xml:space="preserve">
+    <value>Не удалось создать объект в Мастерской</value>
   </data>
   <data name="WrongBrackets" xml:space="preserve">
     <value>Некорректная расстановка скобок</value>

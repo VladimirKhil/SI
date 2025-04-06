@@ -320,6 +320,12 @@ Humor</value>
   <data name="ExportToSns" xml:space="preserve">
     <value>Export to CNS format</value>
   </data>
+  <data name="ExportToSteam" xml:space="preserve">
+    <value>Export to Steam</value>
+  </data>
+  <data name="ExportToSteamWarning" xml:space="preserve">
+    <value>Enable package quality control for Steam export</value>
+  </data>
   <data name="ExternalLinksAreForbidden" xml:space="preserve">
     <value>External links are not allowed</value>
   </data>
@@ -398,6 +404,9 @@ Humor</value>
   <data name="Info" xml:space="preserve">
     <value>Info</value>
   </data>
+  <data name="InitialUpload" xml:space="preserve">
+    <value>Initial upload</value>
+  </data>
   <data name="InputMediaUri" xml:space="preserve">
     <value>Enter the address of the multimedia object</value>
   </data>
@@ -409,6 +418,9 @@ Humor</value>
   </data>
   <data name="InvalidFileSize" xml:space="preserve">
     <value>File {0} exceeds maximum size {1} MB</value>
+  </data>
+  <data name="InvalidUpdateHandle" xml:space="preserve">
+    <value>Invalid update handle</value>
   </data>
   <data name="Left" xml:space="preserve">
     <value>REMAINDER</value>
@@ -572,6 +584,15 @@ Humor</value>
   <data name="Played" xml:space="preserve">
     <value>Played</value>
   </data>
+  <data name="PreviewUpload" xml:space="preserve">
+    <value>Preview upload</value>
+  </data>
+  <data name="PreviewUploadError" xml:space="preserve">
+    <value>Failed to submit Workshop preview</value>
+  </data>
+  <data name="PreviewUploadSuccess" xml:space="preserve">
+    <value>Preview uploaded successfully</value>
+  </data>
   <data name="ProgramName" xml:space="preserve">
     <value>SIQuester</value>
   </data>
@@ -583,6 +604,9 @@ Humor</value>
   </data>
   <data name="Question" xml:space="preserve">
     <value>Question</value>
+  </data>
+  <data name="QuestionCount" xml:space="preserve">
+    <value>Question count</value>
   </data>
   <data name="QuestionForAll" xml:space="preserve">
     <value>Question for all</value>
@@ -683,17 +707,29 @@ Humor</value>
   <data name="Start" xml:space="preserve">
     <value>Start</value>
   </data>
+  <data name="StartingUpload" xml:space="preserve">
+    <value>Starting upload...</value>
+  </data>
   <data name="Statistic" xml:space="preserve">
     <value>Statistics</value>
   </data>
+  <data name="SteamNotRunning" xml:space="preserve">
+    <value>Steam is not running. Export is not possible</value>
+  </data>
   <data name="Success" xml:space="preserve">
     <value>The input file has been completely read! The entire file header is placed in the package comments. Please sort its content yourself. Total imported themes:</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Tags</value>
   </data>
   <data name="TemplateName" xml:space="preserve">
     <value>Template name</value>
   </data>
   <data name="TemplateWithThisNameAlreadyExists" xml:space="preserve">
     <value>Template with this name already exists!</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>Text</value>
   </data>
   <data name="TextFiles" xml:space="preserve">
     <value>Text files</value>
@@ -755,8 +791,17 @@ Humor</value>
   <data name="UnusedFile" xml:space="preserve">
     <value>File {0} is not used. Delete it</value>
   </data>
+  <data name="UploadError" xml:space="preserve">
+    <value>Error during upload</value>
+  </data>
+  <data name="UploadSuccess" xml:space="preserve">
+    <value>Workshop item created successfully</value>
+  </data>
   <data name="Video" xml:space="preserve">
     <value>Video</value>
+  </data>
+  <data name="WorkshopItemCreationError" xml:space="preserve">
+    <value>Failed to create Workshop item</value>
   </data>
   <data name="WrongBrackets" xml:space="preserve">
     <value>Incorrect bracket placement</value>

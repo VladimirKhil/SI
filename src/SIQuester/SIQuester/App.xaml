@@ -46,6 +46,7 @@
             <siqcv:FalseToVisiblityConverter x:Key="FalseToVisiblityConverter" />
             <siqcv:EqualsMultiConverter x:Key="EqualsMultiConverter" />
             <lc:ContentCommandsConverter x:Key="ContentCommandsConverter" />
+            <lc:NotConverter x:Key="NotConverter" />
 
             <Style x:Key="WarningBox" TargetType="ContentControl">
                 <Setter Property="Content" Value="{Binding ErrorMessage}" />

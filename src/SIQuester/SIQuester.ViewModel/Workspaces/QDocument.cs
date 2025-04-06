@@ -350,7 +350,12 @@ public sealed class QDocument : WorkspaceViewModel
     /// Экспорт в формат Динабанка
     /// </summary>
     public ICommand ExportDinabank { get; private set; }
-    
+
+    /// <summary>
+    /// Exports package to Steam Workshop.
+    /// </summary>
+    public ICommand ExportToSteam { get; }
+
     /// <summary>
     /// Экспорт в табличный формат
     /// </summary>
@@ -1162,6 +1167,7 @@ public sealed class QDocument : WorkspaceViewModel
         ExportPreview = new SimpleCommand(ExportPreview_Executed);
         ExportBase = new SimpleCommand(ExportBase_Executed);
         ExportDinabank = new SimpleCommand(ExportDinabank_Executed);
+        ExportToSteam = new SimpleCommand(ExportToSteam_Executed);
         ExportTable = new SimpleCommand(ExportTable_Executed);
         ExportYaml = new SimpleCommand(ExportYaml_Executed);
 
@@ -1931,6 +1937,25 @@ public sealed class QDocument : WorkspaceViewModel
     private void ExportBase_Executed(object? arg) => Dialog = new ExportViewModel(this, ExportFormats.Db);
 
     private void ExportDinabank_Executed(object? arg) => Dialog = new ExportViewModel(this, ExportFormats.Dinabank);
+
+    private async void ExportToSteam_Executed(object? arg)
+    {
+        try
+        {
+            if (!Package.HasQualityControl)
+            {
+                PlatformManager.Instance.ShowExclamationMessage(Resources.ExportToSteamWarning);
+                return;
+            }
+
+            await Save.ExecuteAsync(null);
+            Dialog = new ExportToSteamViewModel(this);
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
+    }
 
     private async void ExportTable_Executed(object? arg)
     {

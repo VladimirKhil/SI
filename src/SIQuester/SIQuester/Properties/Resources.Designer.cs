@@ -1061,6 +1061,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Description.
+        /// </summary>
+        public static string Description {
+            get {
+                return ResourceManager.GetString("Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Difficulty.
         /// </summary>
         public static string Difficulty {
@@ -1327,6 +1336,15 @@ namespace SIQuester.Properties {
         public static string ExportMediaCommand {
             get {
                 return ResourceManager.GetString("ExportMediaCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Export to Steam.
+        /// </summary>
+        public static string ExportToSteam {
+            get {
+                return ResourceManager.GetString("ExportToSteam", resourceCulture);
             }
         }
         
@@ -3037,6 +3055,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Steam.
+        /// </summary>
+        public static string Steam {
+            get {
+                return ResourceManager.GetString("Steam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Search in subfolders.
         /// </summary>
         public static string SubfolderSearch {
@@ -3267,6 +3294,15 @@ namespace SIQuester.Properties {
         public static string UpdatePricesOnDragAndDropHint {
             get {
                 return ResourceManager.GetString("UpdatePricesOnDragAndDropHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Upload to Steam Workshop.
+        /// </summary>
+        public static string UploadToSteamWorkshop {
+            get {
+                return ResourceManager.GetString("UploadToSteamWorkshop", resourceCulture);
             }
         }
         

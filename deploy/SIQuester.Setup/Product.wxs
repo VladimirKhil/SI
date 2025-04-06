@@ -115,6 +115,15 @@
 			<Component Guid="3b169511-36e4-4d4a-b0d3-128175610b1f">
 				<File Id="Help.en_US.pdf" KeyPath="yes" Source="$(var.PublishFolder)Help.en-US.pdf" />
 			</Component>
+			<Component Guid="70738ef9-1178-4497-bc28-866a92ae3e2a">
+				<File Id="steam_api.dll" KeyPath="yes" Source="$(var.PublishFolder)steam_api.dll" />
+			</Component>
+			<Component Guid="1939ddb5-80f4-4dbf-8098-84a5869550b4">
+				<File Id="steam_api64.dll" KeyPath="yes" Source="$(var.PublishFolder)steam_api64.dll" />
+			</Component>
+			<Component Guid="6c3e86e8-47ab-4dd9-bf74-04cc14f3d03f">
+				<File Id="steam_appid.txt" KeyPath="yes" Source="$(var.PublishFolder)steam_appid.txt" />
+			</Component>
 			<Component Id="RegistryPath" Guid="88aa1365-b38f-4c3d-ad27-a9aeb64154f2">
 				<RegistryValue Id="InstallFolder" Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="InstallDir" Action="write" Type="string" Value="[INSTALLLOCATION]" />
 
@@ -148,6 +157,9 @@
 			</Component>
 			<Component Guid="{783e9603-f541-4707-a79d-d1828438c2ec}">
 				<File Id="OpenAI.LICENSE.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\OpenAI.LICENSE.txt" />
+			</Component>
+			<Component Guid="{7dd5bb51-7ec0-485f-8595-228a2ebd14c3}">
+				<File Id="Steamworks.NET.LICENSE.txt" KeyPath="yes" Source="$(var.PublishFolder)licenses\Steamworks.NET.LICENSE.txt" />
 			</Component>
 			<Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
 				<File Id="LICENSE" KeyPath="yes" Source="$(var.SolutionDir)LICENSE" />

@@ -107,27 +107,20 @@ public static class SearchExtensions
     }
 
     /// <summary>
-    /// Searches a value inside the object.
+    /// Converts search result to search match.
     /// </summary>
-    /// <param name="item">Object to search within.</param>
-    /// <param name="value">Value to search.</param>
-    /// <returns>Search result or null.</returns>
-    public static SearchMatch? SearchFragment(this InfoOwner item, string value)
+    /// <param name="result">Search result.</param>
+    /// <param name="length">Original value length.</param>
+    /// <returns>Search match or null.</returns>
+    public static SearchMatch AsMatch(this SearchData result, int length)
     {
-        var result = item.SearchInfoOwner(value).FirstOrDefault();
-
-        if (result == null)
-        {
-            return null;
-        }
-
         var match = result.Item;
-        var diff = match.Length - result.StartIndex - value.Length;
+        var diff = match.Length - result.StartIndex - length;
 
         return new SearchMatch(
             result.StartIndex > 0 ? match[..result.StartIndex] : "",
-            match.Substring(result.StartIndex, value.Length),
-            diff > 0 ? match.Substring(result.StartIndex + value.Length, diff) : "");
+            match.Substring(result.StartIndex, length),
+            diff > 0 ? match.Substring(result.StartIndex + length, diff) : "");
     }
 
     public static IEnumerable<SearchData> SearchInfoOwner(this InfoOwner infoOwner, string value)
