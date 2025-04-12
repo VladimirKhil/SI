@@ -97,7 +97,6 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
             }
         }
 
-        // TODO: think about senging theme names and comments when person joins during the round
         _gameData.TableController = tableController;
         _gameData.IsQuestionAskPlaying = false;
         GameLogic?.ScheduleExecution(Tasks.RoundTheme, 1, 0, true);

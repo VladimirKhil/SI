@@ -667,9 +667,9 @@ internal sealed class Intelligence : IIntelligence
             throw new ArgumentOutOfRangeException(nameof(lastStakerIndex), lastStakerIndex, "Last staker index is out of range");
         }
 
-        if (vars.Length != 3)
+        if (vars.Length < 3)
         {
-            throw new ArgumentException("Stake variables must have 3 elements", nameof(vars));
+            throw new ArgumentException("Stake variables must have at least 3 elements", nameof(vars));
         }
 
         int i = 0;

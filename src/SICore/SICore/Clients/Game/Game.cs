@@ -2729,9 +2729,13 @@ public sealed class Game : Actor
             {
                 if (ClientData.Answerer != player)
                 {
-                    player.LastBadTryTime = DateTime.UtcNow;
                     _gameActions.SendMessageWithArgs(Messages.WrongTry, i);
-                    _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, i);
+                    
+                    if (player.CanPress)
+                    {
+                        player.LastBadTryTime = DateTime.UtcNow;
+                        _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, i);
+                    }
                 }
 
                 return;

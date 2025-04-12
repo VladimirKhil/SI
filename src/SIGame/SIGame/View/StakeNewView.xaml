@@ -78,7 +78,7 @@
             Maximum="{Binding Maximum}"
             Text="{Binding Path=Stake, UpdateSourceTrigger=PropertyChanged}"
             IsEnabled="{Binding ElementName=bStake, Path=IsEnabled}"
-            Step="100"
+            Step="{Binding Step}"
             VerticalContentAlignment="Center"
             Padding="1" />
     </Grid>
