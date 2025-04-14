@@ -662,7 +662,7 @@ internal sealed class Intelligence : IIntelligence
             throw new ArgumentOutOfRangeException(nameof(myIndex), myIndex, "Player index is out of range");
         }
 
-        if (lastStakerIndex < 0 || lastStakerIndex >= sums.Length)
+        if (lastStakerIndex < -1 || lastStakerIndex >= sums.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(lastStakerIndex), lastStakerIndex, "Last staker index is out of range");
         }
@@ -698,6 +698,8 @@ internal sealed class Intelligence : IIntelligence
         var max = new List<Interval>();
         var result = new List<IntervalProbability>();
 
+        var stakerScore = lastStakerIndex == -1 ? 0 : sums[lastStakerIndex];
+
         // Сначала просчитаем оптимальную реакцию нашего противника на все возможные наши ставки
         StakeDecisions(
             style,
@@ -710,7 +712,7 @@ internal sealed class Intelligence : IIntelligence
             ref min,
             ref max,
             true /*т.к. он второй, то он всегда может спасовать*/,
-            vars[2] ? sums[lastStakerIndex] : 0,
+            vars[2] ? stakerScore : 0,
             stakeStep,
             ref result);
 
@@ -725,7 +727,7 @@ internal sealed class Intelligence : IIntelligence
             ref min,
             ref max,
             vars[2],
-            vars[2] ? sums[lastStakerIndex] : 0,
+            vars[2] ? stakerScore : 0,
             stakeStep,
             ref result);
 
