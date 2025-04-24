@@ -21,6 +21,11 @@ public enum PackageType
     ThemesCollection,
 
     /// <summary>
+    /// Demo package.
+    /// </summary>
+    Demo,
+
+    /// <summary>
     /// Empty package.
     /// </summary>
     Empty

@@ -222,12 +222,6 @@ public partial class TreeDocView : UserControl
                     return;
                 }
 
-                if (itemsControl.DataContext is not ContentItemsViewModel contentItemsViewModel)
-                {
-                    e.Effects = DragDropEffects.None;
-                    return;
-                }
-
                 foreach (var file in files)
                 {
                     var longPathString = FileHelper.GetLongPathName(file);
@@ -244,7 +238,15 @@ public partial class TreeDocView : UserControl
                             break;
 
                         default:
-                            contentItemsViewModel.TryImportMedia(longPathString);
+                            if (itemsControl.DataContext is ContentItemsViewModel contentItemsViewModel)
+                            {
+                                contentItemsViewModel.TryImportMedia(longPathString);
+                            }
+                            else if (itemsControl.DataContext is ThemeViewModel themeViewModel)
+                            {
+                                themeViewModel.TryImportMedia(longPathString);
+                            }
+
                             break;
                     }
                 }

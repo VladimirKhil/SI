@@ -11,6 +11,8 @@ using System.Windows.Markup;
 
 namespace SIQuester;
 
+// TODO: remove
+
 /// <summary>
 /// Represents text editor that allows to modify collections.
 /// </summary>
@@ -262,7 +264,7 @@ public sealed class TextList : TextBox
 
     private void OnItemsAdded(NotifyCollectionChangedEventArgs e)
     {
-        if (e.NewItems == null)
+        if (e.NewItems == null || ItemsSource == null)
         {
             return;
         }
@@ -283,7 +285,7 @@ public sealed class TextList : TextBox
                     text.Append(ItemsSeparator);
                 }
 
-                var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeSpecified, out string tail);
+                var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeSpecified, out var _);
                 text.Append(toAdd);
                 _infos.Insert(index++, new ItemInfo(toAdd.Length, isLink ? toAdd.Length : -1, canBeSpecified));
             }
@@ -317,9 +319,9 @@ public sealed class TextList : TextBox
         }
     }
 
-    private string CheckIsLink(int index, object item, out bool isLink, out bool canBeSpecified, out string tail)
+    private string CheckIsLink(int index, object item, out bool isLink, out bool canBeSpecified, out string? tail)
     {
-        var toAdd = item.ToString();
+        var toAdd = item.ToString() ?? "";
 
         if (LinkManager != null)
         {

@@ -1,6 +1,7 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
 using SIPackages.Models;
+using SIPackages.Serializers;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml;
@@ -41,7 +42,7 @@ public sealed class Round : InfoOwner, IEquatable<Round>
 
         if (reader.MoveToAttribute("type"))
         {
-            _type = reader.Value.LimitLengthBy(limits?.TextLength);
+            Type = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.IsEmptyElement)
@@ -62,7 +63,7 @@ public sealed class Round : InfoOwner, IEquatable<Round>
                     switch (reader.LocalName)
                     {
                         case "info":
-                            base.ReadXml(reader, limits);
+                            Info.ReadXml(reader, limits);
                             read = false;
                             break;
 
@@ -101,12 +102,12 @@ public sealed class Round : InfoOwner, IEquatable<Round>
         writer.WriteStartElement("round");
         writer.WriteAttributeString("name", Name);
 
-        if (_type != RoundTypes.Standart)
+        if (Type != RoundTypes.Standart)
         {
-            writer.WriteAttributeString("type", _type);
+            writer.WriteAttributeString("type", Type);
         }
 
-        base.WriteXml(writer);
+        Info.WriteXml(writer);
 
         if (Themes.Any())
         {
@@ -131,7 +132,7 @@ public sealed class Round : InfoOwner, IEquatable<Round>
         var round = new Round
         {
             Name = Name,
-            _type = _type
+            Type = Type
         };
 
         round.SetInfoFromOwner(this);

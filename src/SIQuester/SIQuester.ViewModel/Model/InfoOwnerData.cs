@@ -18,9 +18,9 @@ public sealed class InfoOwnerData
 
     public string ItemData { get; set; }
 
-    public AuthorInfo[] Authors { get; set; }
+    public AuthorInfo[] Authors { get; set; } = Array.Empty<AuthorInfo>();
 
-    public SourceInfo[] Sources { get; set; }
+    public SourceInfo[] Sources { get; set; } = Array.Empty<SourceInfo>();
 
     public Dictionary<string, string> Images { get; set; } = new();
 

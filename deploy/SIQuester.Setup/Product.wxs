@@ -43,6 +43,7 @@
 			<ComponentGroupRef Id="ManufacturerProgramMenu" />
 			<ComponentGroupRef Id="ApplicationProgramMenu" />
 			<ComponentGroupRef Id="Licenses" />
+			<ComponentGroupRef Id="templates" />
 			<ComponentGroupRef Id="wwwroot" />
 			<ComponentGroupRef Id="native" />
 			<ComponentGroupRef Id="runtimes" />
@@ -55,6 +56,7 @@
 			<Directory Id="ManufacturerFolder" Name="$(var.Manufacturer)">
 				<Directory Id="INSTALLLOCATION" Name="$(var.ProductName)">
 					<Directory Id="LicensesFolder" Name="Licenses" />
+					<Directory Id="TemplatesFolder" Name="templates" />
 					<Directory Id="WWWRootFolder" Name="wwwroot" />
 					<Directory Id="RuntimesFolder" Name="runtimes">
 						<Directory Id="PlatformFolder" Name="win-$(var.Platform)">
@@ -168,6 +170,21 @@
 				<RegistryValue Id="LicensesFolderReg" Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="licenses" Type="integer" Value="1" KeyPath="yes" />
 
 				<RemoveFolder Id="LicensesFolder" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="templates" Directory="TemplatesFolder">
+			<Component Guid="{CA9990D6-BEF9-4D08-AAA9-AB098536587F}">
+				<File Id="SIGameTestNew.siq" KeyPath="yes" Source="$(var.PublishFolder)templates\SIGameTestNew.siq" />
+			</Component>
+			<Component Guid="{95F4A3A8-23B4-40B3-AF98-6C05758DD736}">
+				<File Id="SIGameTestEn.siq" KeyPath="yes" Source="$(var.PublishFolder)templates\SIGameTestEn.siq" />
+			</Component>
+			<Component Id="TemplatesReg" Guid="{ED562E93-9236-4A9D-ADEF-AD9ECCC8DD90}">
+				<RegistryValue Id="TemplatesFolderReg" Root="HKMU" Key="Software\$(var.Manufacturer)\$(var.ProductName)" Name="templates" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="TemplatesFolder" On="uninstall" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>

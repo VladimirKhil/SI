@@ -1,6 +1,7 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
 using SIPackages.Models;
+using SIPackages.Serializers;
 using SIPackages.TypeConverters;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -116,7 +117,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     switch (reader.LocalName)
                     {
                         case "info":
-                            base.ReadXml(reader, limits);
+                            Info.ReadXml(reader, limits);
                             read = false;
                             break;
 
@@ -231,7 +232,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             writer.WriteAttributeString("type", _typeName.ToString());
         }
 
-        base.WriteXml(writer);
+        Info.WriteXml(writer);
 
         if (Script != null)
         {
@@ -442,8 +443,8 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     private static string GetContentType(string type) =>
         type switch
         {
-            AtomTypes.Oral => AtomTypes.Text,
-            AtomTypes.Audio => AtomTypes.AudioNew,
+            AtomTypes.Oral => ContentTypes.Text,
+            AtomTypes.Audio => ContentTypes.Audio,
             _ => type,
         };
 

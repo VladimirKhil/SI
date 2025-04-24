@@ -586,4 +586,43 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             Questions[i].Model.Price = costSetter.BaseValue + costSetter.Increment * i;
         }
     }
+
+    public void TryImportMedia(string filePath)
+    {
+        try
+        {
+            for (var i = 0; i < Questions.Count; i++)
+            {
+                if (Questions[i].Parameters.TryGetValue(QuestionParameterNames.Question, out var existingQuestionParameter)
+                    && existingQuestionParameter.ContentValue != null
+                    && existingQuestionParameter.ContentValue.Count == 1
+                    && existingQuestionParameter.ContentValue[0].Type == ContentTypes.Text
+                    && existingQuestionParameter.ContentValue[0].Model.Value.Length == 0)
+                {
+                    existingQuestionParameter.ContentValue.TryImportMedia(filePath);
+                    IsExpanded = true;
+                    return;
+                }
+            }
+
+            var document = (OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("document not found");
+            var price = DetectNextQuestionPrice(OwnerRound);
+
+            var question = PackageItemsHelper.CreateQuestion(price);
+
+            var questionViewModel = new QuestionViewModel(question);
+            Questions.Add(questionViewModel);
+
+            if (questionViewModel.Parameters.TryGetValue(QuestionParameterNames.Question, out var questionParameter))
+            {
+                questionParameter.ContentValue?.TryImportMedia(filePath);
+            }
+
+            IsExpanded = true;
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.Inform(exc.Message, true);
+        }
+    }
 }

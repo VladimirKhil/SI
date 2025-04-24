@@ -189,7 +189,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     {
         if (reader.MoveToAttribute("type"))
         {
-            _type = reader.Value.LimitLengthBy(limits?.TextLength);
+            Type = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("isRef"))
@@ -221,33 +221,33 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     {
         writer.WriteStartElement("item");
 
-        if (_type != DefaultType)
+        if (Type != DefaultType)
         {
-            writer.WriteAttributeString("type", _type);
+            writer.WriteAttributeString("type", Type);
         }
 
-        if (_isRef != DefaultIsRef)
+        if (IsRef != DefaultIsRef)
         {
-            writer.WriteAttributeString("isRef", _isRef.ToString());
+            writer.WriteAttributeString("isRef", IsRef.ToString());
         }
 
         if (_placement != null && _placement != GetDefaultPlacement())
         {
             writer.WriteAttributeString("placement", _placement);
         }
-        else if (_type == ContentTypes.Audio)
+        else if (Type == ContentTypes.Audio)
         {
             writer.WriteAttributeString("placement", GetDefaultPlacement());
         }
 
-        if (_duration != DefaultDuration)
+        if (Duration != DefaultDuration)
         {
-            writer.WriteAttributeString("duration", _duration.ToString());
+            writer.WriteAttributeString("duration", Duration.ToString());
         }
 
-        if (_waitForFinish != DefaultWaitForFinish)
+        if (WaitForFinish != DefaultWaitForFinish)
         {
-            writer.WriteAttributeString("waitForFinish", _waitForFinish.ToString());
+            writer.WriteAttributeString("waitForFinish", WaitForFinish.ToString());
         }
 
         writer.WriteValue(_value);

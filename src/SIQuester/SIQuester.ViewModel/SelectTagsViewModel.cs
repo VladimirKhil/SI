@@ -1,7 +1,6 @@
-﻿using SIQuester.ViewModel.Properties;
+﻿using SIQuester.ViewModel.Helpers;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using Utils.Commands;
 
@@ -12,37 +11,9 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class SelectTagsViewModel : INotifyPropertyChanged
 {
-    public static TagGroup[] TagsGroups { get; private set; }
+    public static TagsRepository.TagGroup[] TagsGroups { get; private set; }
 
-    static SelectTagsViewModel()
-    {
-        var tagGroups = new List<TagGroup>();
-        
-        var lines = Resources.DefaultTags.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        var comparer = CultureInfo.CurrentUICulture.CompareInfo.GetStringComparer(CompareOptions.None);
-
-        var commonTags = new List<string>();
-        tagGroups.Add(new TagGroup(Resources.CommonTag, new[] {new Tag(Resources.CommonTag) }));
-
-        foreach (var line in lines)
-        {
-            if (line.Contains(':'))
-            {
-                var lineParts = line.Split(':');
-                var groupName = lineParts[0].Trim();
-                var tags = lineParts[1].Split(',').Union(new[] { groupName }).OrderBy(t => t, comparer).Select(t => new Tag(t)).ToArray();
-                tagGroups.Add(new TagGroup(groupName, tags));
-            }
-            else
-            {
-                commonTags.Add(line);
-            }
-        }
-
-        tagGroups.Insert(1, new TagGroup(Resources.CommonTags, commonTags.OrderBy(t => t, comparer).Select(t => new Tag(t)).ToArray()));
-
-        TagsGroups = tagGroups.ToArray();
-    }
+    static SelectTagsViewModel() => TagsGroups = TagsRepository.Instance.TagsGroups;
 
     private string _newItem = "";
 
@@ -139,8 +110,4 @@ public sealed class SelectTagsViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    public sealed record Tag(string Name);
-
-    public sealed record TagGroup(string Name, Tag[] Tags);
 }

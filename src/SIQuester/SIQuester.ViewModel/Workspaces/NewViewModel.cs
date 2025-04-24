@@ -157,6 +157,12 @@ public sealed class NewViewModel : WorkspaceViewModel
         },
         new PackageTemplate
         {
+            Name = Resources.PackageDemoName,
+            Description = Resources.PackageDemoDescription,
+            Type = PackageType.Demo
+        },
+        new PackageTemplate
+        {
             Name = Resources.PackageEmptyName,
             Description = Resources.PackageEmptyDescription,
             Type = PackageType.Empty
@@ -227,12 +233,17 @@ public sealed class NewViewModel : WorkspaceViewModel
                 doc.Package.CreateRound(RoundTypes.Standart, Resources.ThemesCollection);
                 break;
 
+            case PackageType.Demo:
+                var templateName = AppSettings.Default.Language == "ru-RU" ? "SIGameTestNew.siq" : "SIGameTestEn.siq";
+                var customTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", templateName);
+                return CreateFromCustomTemplate(customTemplatePath);
+
             case PackageType.Empty:
             default:
                 break;
         }
 
-        doc.HasQualityControl = _qualityControl;
+        doc.Package.HasQualityControl = _qualityControl;
         return doc;
     }
 

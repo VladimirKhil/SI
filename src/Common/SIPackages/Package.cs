@@ -2,6 +2,7 @@
 using SIPackages.Exceptions;
 using SIPackages.Helpers;
 using SIPackages.Models;
+using SIPackages.Serializers;
 using System.ComponentModel;
 using System.Xml;
 
@@ -194,6 +195,14 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     }
 
     /// <summary>
+    /// Does this package have additional quality control:
+    /// - maximum size: 150 MB;
+    /// - limited media files size and extensions;
+    /// - forbidden external links.
+    /// </summary>
+    public bool HasQualityControl { get; set; }
+
+    /// <summary>
     /// Package tags.
     /// </summary>
     public List<string> Tags { get; } = new List<string>();
@@ -235,22 +244,22 @@ public sealed class Package : InfoOwner, IEquatable<Package>
 
         if (reader.MoveToAttribute("restriction"))
         {
-            _restriction = reader.Value.LimitLengthBy(limits?.TextLength);
+            Restriction = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("date"))
         {
-            _date = reader.Value.LimitLengthBy(limits?.TextLength);
+            Date = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("publisher"))
         {
-            _publisher = reader.Value.LimitLengthBy(limits?.TextLength);
+            Publisher = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("contactUri"))
         {
-            _contactUri = reader.Value.LimitLengthBy(limits?.TextLength);
+            ContactUri = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("difficulty"))
@@ -260,12 +269,12 @@ public sealed class Package : InfoOwner, IEquatable<Package>
 
         if (reader.MoveToAttribute("logo"))
         {
-            _logo = reader.Value;
+            Logo = reader.Value;
         }
 
         if (reader.MoveToAttribute("language"))
         {
-            _language = reader.Value.LimitLengthBy(limits?.TextLength);
+            Language = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.IsEmptyElement)
@@ -294,7 +303,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                             break;
 
                         case "info":
-                            base.ReadXml(reader, limits);
+                            Info.ReadXml(reader, limits);
                             read = false;
                             break;
 
@@ -339,39 +348,39 @@ public sealed class Package : InfoOwner, IEquatable<Package>
             writer.WriteAttributeString("id", ID);
         }
 
-        if (!string.IsNullOrEmpty(_restriction))
+        if (!string.IsNullOrEmpty(Restriction))
         {
-            writer.WriteAttributeString("restriction", _restriction);
+            writer.WriteAttributeString("restriction", Restriction);
         }
 
-        if (!string.IsNullOrEmpty(_date))
+        if (!string.IsNullOrEmpty(Date))
         {
-            writer.WriteAttributeString("date", _date);
+            writer.WriteAttributeString("date", Date);
         }
 
-        if (!string.IsNullOrEmpty(_publisher))
+        if (!string.IsNullOrEmpty(Publisher))
         {
-            writer.WriteAttributeString("publisher", _publisher);
+            writer.WriteAttributeString("publisher", Publisher);
         }
 
-        if (!string.IsNullOrEmpty(_contactUri))
+        if (!string.IsNullOrEmpty(ContactUri))
         {
-            writer.WriteAttributeString("contactUri", _contactUri);
+            writer.WriteAttributeString("contactUri", ContactUri);
         }
 
-        if (_difficulty > 0)
+        if (Difficulty > 0)
         {
-            writer.WriteAttributeString("difficulty", _difficulty.ToString());
+            writer.WriteAttributeString("difficulty", Difficulty.ToString());
         }
 
-        if (!string.IsNullOrEmpty(_logo))
+        if (!string.IsNullOrEmpty(Logo))
         {
-            writer.WriteAttributeString("logo", _logo);
+            writer.WriteAttributeString("logo", Logo);
         }
 
-        if (!string.IsNullOrEmpty(_language))
+        if (!string.IsNullOrEmpty(Language))
         {
-            writer.WriteAttributeString("language", _language);
+            writer.WriteAttributeString("language", Language);
         }
         
         if (Tags.Count > 0)
@@ -393,7 +402,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
             writer.WriteEndElement();
         }
 
-        base.WriteXml(writer);
+        Info.WriteXml(writer);
 
         if (Rounds.Any())
         {

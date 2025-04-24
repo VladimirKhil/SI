@@ -526,7 +526,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         if (!contentItem.IsRef) // External link
         {
-            if (_data.PackageDoc.HasQualityControl)
+            if (_data.Package.HasQualityControl)
             {
                 return (false, null, null, LO[nameof(R.ExternalLinksForbidden)]);
             }
@@ -544,7 +544,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             return (false, link, null, null);
         }
 
-        if (_data.PackageDoc.HasQualityControl)
+        if (_data.Package.HasQualityControl)
         {
             var fileExtension = Path.GetExtension(contentItem.Value)?.ToLowerInvariant();
 
@@ -637,7 +637,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
 
-        if (_data.PackageDoc.HasQualityControl)
+        if (_data.Package.HasQualityControl)
         {
             var error = string.Format(LO[nameof(R.OversizedFileForbidden)], R.File, fileLocation, maxRecommendedFileLength);
             return (false, error);

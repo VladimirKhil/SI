@@ -57,6 +57,12 @@
 	<PackageReference Include="MahApps.Metro" Version="2.4.10" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\test\SIGame\SIGame.Tests\SIGameTestEn.siq" Link="templates\SIGameTestEn.siq">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\SIGame\SIGame.Tests\SIGameTestNew.siq" Link="templates\SIGameTestNew.siq">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="licenses\MahApps.Metro.LICENSE">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -260,6 +266,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\" />
+    <Folder Include="templates\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

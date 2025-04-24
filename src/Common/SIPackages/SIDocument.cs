@@ -86,14 +86,6 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     public DataCollection Html => _html;
 
-    /// <summary>
-    /// Does this document have additional quality control:
-    /// - maximum size: 150 MB;
-    /// - limited media files size and extensions;
-    /// - forbidden external links.
-    /// </summary>
-    public bool HasQualityControl { get; set; }
-
     #region Document Functions
 
     private SIDocument(ISIPackageContainer packageContainer)
@@ -315,7 +307,7 @@ public sealed class SIDocument : IDisposable
 
         if (qualityStreamLength > -1) // 0 is OK
         {
-            HasQualityControl = true;
+            _package.HasQualityControl = true;
         }
     }
 
@@ -387,11 +379,11 @@ public sealed class SIDocument : IDisposable
 
         var qualityStreamLength = packageContainer.GetStreamLength(QualityMarkerName);
 
-        if (HasQualityControl && qualityStreamLength == -1)
+        if (_package.HasQualityControl && qualityStreamLength == -1)
         {
             packageContainer.CreateStream(QualityMarkerName);
         }
-        else if (!HasQualityControl && qualityStreamLength != -1)
+        else if (!_package.HasQualityControl && qualityStreamLength != -1)
         {
             packageContainer.DeleteStream(QualityMarkerName);
         }
@@ -468,7 +460,7 @@ public sealed class SIDocument : IDisposable
                 newContainer.CreateStream(CollectionNames.TextsStorageName, SourcesFileName);
             }
 
-            if (HasQualityControl)
+            if (_package.HasQualityControl)
             {
                 newContainer.CreateStream(QualityMarkerName);
             }

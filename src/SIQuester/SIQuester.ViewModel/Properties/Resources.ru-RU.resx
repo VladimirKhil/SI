@@ -228,32 +228,32 @@
 тема "Hasta la vista, baby", вопрос: "Выпущенная в ноябре 2006 года, она стала одной из самых больших неудач для своих разработчиков", ответ "Windows Vista", комментарий: "Она не получила широкого распространения и получила много негативных отзывов", источник: "https://en.wikipedia.org/wiki/Windows_Vista"</value>
   </data>
   <data name="DefaultTags" xml:space="preserve">
-    <value>Автомобили
-Алфавит
-Аниме
-Астрономия
-Биология
-География
-Игры: Консоли, Саундтреки, Настольные игры
-Искусство
-История
-Кино: Режиссёры, Актёры, Премии
-Книги: Комиксы
-Мемы
-Математика
-Музыка: Рок, Поп, Рэп, Джаз, Металл, Электроника, Каверы, Русская музыка, Классическая музыка
-Мультфильмы
-Ребусы
-Комиксы
-Сериалы
-Смешанная (солянка)
-Спорт: Футбол
-ТВ
-Фантастика
-Физика
-Химия
-Эрудиция: ЧГК, Политика, Личности
-Юмор</value>
+    <value>Автомобили|Cars
+Алфавит|Alphabet
+Аниме|Anime
+Астрономия|Astronomy
+Биология|Biology
+География|Geography
+Игры|Games: Консоли|Consoles, Саундтреки|Soundtracks, Настольные игры|Board games
+Искусство|Art
+История|History
+Кино|Movies: Режиссёры|Directors, Актёры|Actors, Премии|Awards
+Книги|Books: Комиксы|Comics
+Мемы|Memes
+Математика|Mathematics
+Музыка|Music: Рок|Rock, Поп|Pop, Рэп|Rap, Джаз|Jazz, Металл|Metal, Электроника|Electronic, Каверы|Covers, Русская музыка, Классическая музыка|Classical music
+Мультфильмы|Cartoons
+Ребусы|Rebuses
+Комиксы|Comics
+Сериалы|TV series
+Смешанная (солянка)| Mixed  (hodgepodge)
+Спорт|Sport: Футбол|Football
+ТВ|TV
+Фантастика|Science fiction
+Физика|Physics
+Химия|Chemistry
+Эрудиция|Erudition: ЧГК|Intellectual games, Политика|Politics, Личности|Personalities
+Юмор|Humor</value>
   </data>
   <data name="DocumentLoading" xml:space="preserve">
     <value>Загрузка документа</value>
@@ -543,6 +543,12 @@
   </data>
   <data name="PackageCorruptedHintLogs" xml:space="preserve">
     <value>Если не получится, отправьте автору программы логи, чтобы можно было избежать проблемы в будущем</value>
+  </data>
+  <data name="PackageDemoDescription" xml:space="preserve">
+    <value>Пакет, показывающий различные возможности игры</value>
+  </data>
+  <data name="PackageDemoName" xml:space="preserve">
+    <value>Демонстрационный пакет</value>
   </data>
   <data name="PackageEmptyDescription" xml:space="preserve">
     <value>Пакет, изначально ничего не содержащий</value>

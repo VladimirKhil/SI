@@ -86,10 +86,10 @@ public sealed class PackageViewModel : ItemViewModel<Package>
     /// </summary>
     public bool HasQualityControl
     {
-        get => Document.Document.HasQualityControl;
+        get => Model.HasQualityControl;
         set
         {
-            if (Document.Document.HasQualityControl != value)
+            if (Model.HasQualityControl != value)
             {
                 if (value)
                 {
@@ -99,7 +99,7 @@ public sealed class PackageViewModel : ItemViewModel<Package>
                     }
                 }
 
-                Document.Document.HasQualityControl = value;
+                Model.HasQualityControl = value;
                 OnPropertyChanged();
             }
         }
@@ -311,7 +311,7 @@ public sealed class PackageViewModel : ItemViewModel<Package>
                 {
                     if (Rounds[i].OwnerPackage != null)
                     {
-                        throw new Exception("Попытка вставить привязанный раунд!");
+                        throw new Exception("An attempt to add bound round");
                     }
 
                     Rounds[i].OwnerPackage = this;

@@ -1,8 +1,10 @@
 ﻿using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Properties;
 using Steamworks;
 using System.Text;
+using System.Text.Json;
 using System.Windows.Input;
 using Utils.Commands;
 
@@ -93,12 +95,19 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
     private string? _tempFolder;
 
+    private readonly Dictionary<string, object> _metadata = new();
+
     public ExportToSteamViewModel(QDocument document)
     {
         var initResult = SteamAPI.InitEx(out var error);
 
         if (initResult != ESteamAPIInitResult.k_ESteamAPIInitResult_OK)
         {
+            if (initResult == ESteamAPIInitResult.k_ESteamAPIInitResult_NoSteamClient)
+            {
+                throw new Exception(Resources.SteamNotRunning);
+            }
+
             throw new Exception($"{initResult}: {error}");
         }
 
@@ -132,6 +141,9 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         }
 
         Description = description.ToString();
+
+        _metadata["questionCount"] = preview.QuestionCount;
+        _metadata["content"] = preview.Content;
 
         Upload = new SimpleCommand(Upload_Executed);
 
@@ -207,13 +219,35 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
             File.Copy(_document.Path, Path.Combine(contentFolder, "package.siq"), true);
 
-            var language = AppSettings.Default.Language == "ru-RU" ? "Russian" : "English";
+            var tags = new List<string>();
+
+            var docLanguage = _document.Package.Model.Language;
+
+            if (docLanguage != null)
+            {
+                tags.Add(docLanguage == "ru-RU" ? "Russian" : "English");
+            }
+
+            var language = (docLanguage ?? AppSettings.Default.Language) == "ru-RU" ? "Russian" : "English";
+            var localizeTags = language != "English";
+
+            foreach (var tag in _document.Package.Tags)
+            {
+                if (!localizeTags)
+                {
+                    tags.Add(tag);
+                }
+                else if (TagsRepository.Instance.Translation.TryGetValue(tag, out var englishTag))
+                {
+                    tags.Add(englishTag);
+                }
+            }
 
             SteamUGC.SetItemContent(updateHandle, contentFolder);
             SteamUGC.SetItemTitle(updateHandle, Title);
             SteamUGC.SetItemDescription(updateHandle, Description);
-            SteamUGC.SetItemTags(updateHandle, new[] { language });
-            SteamUGC.AddItemKeyValueTag(updateHandle, "Difficulty", "Intermediate"); // For test purposes
+            SteamUGC.SetItemTags(updateHandle, tags);
+            SteamUGC.SetItemMetadata(updateHandle, JsonSerializer.Serialize(_metadata));
             SteamUGC.SetItemUpdateLanguage(updateHandle, language.ToLower());
             SteamUGC.SetItemVisibility(updateHandle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPublic);
             

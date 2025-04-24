@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Notions;
+using Polly.Retry;
+using Polly;
 using SIPackages;
 using SIPackages.Containers;
 using SIPackages.Core;
@@ -1998,16 +2000,11 @@ public sealed class QDocument : WorkspaceViewModel
 
             if (PlatformManager.Instance.ShowSaveUI(null, "yaml", filter, ref filename))
             {
+                var baseFolder = System.IO.Path.GetDirectoryName(filename) ?? throw new InvalidOperationException($"Wrong filename {filename} for exporting YAML");
+
                 using (var textWriter = new StreamWriter(filename, false, Encoding.UTF8))
                 {
                     YamlSerializer.SerializePackage(textWriter, Document.Package);
-                }
-
-                var baseFolder = System.IO.Path.GetDirectoryName(filename);
-
-                if (baseFolder == null)
-                {
-                    throw new InvalidOperationException($"Wrong filename {filename} for exporting YAML");
                 }
 
                 ExportMediaCollection(Images, baseFolder);
@@ -2111,6 +2108,10 @@ public sealed class QDocument : WorkspaceViewModel
         ActiveNode = infoOwner;
     }
 
+    private static readonly RetryPolicy Retry = Policy
+        .Handle<IOException>(ex => ex.Message.Contains("The process cannot access the file because it is being used by another process"))
+        .WaitAndRetry(3, retryAttempt => TimeSpan.FromMilliseconds(500 * retryAttempt));
+
     internal ValueTask SaveInternalAsync() =>
          Lock.WithLockAsync(async () =>
          {
@@ -2168,14 +2169,22 @@ public sealed class QDocument : WorkspaceViewModel
              {
                  try
                  {
-                     File.Replace(tempPath, _path, null); // It is possible to provide backup file on save here
+                     Retry.Execute(() => File.Replace(tempPath, _path, null)); // It is possible to provide backup file on save here
+                 }
+                 catch (IOException exc) when (exc.Message.Contains("The process cannot access the file because it is being used by another process"))
+                 {
+                     _logger.LogWarning(exc, "SaveInternalAsync error. Switching to old saving method: {error}", exc.Message);
+
+                     // Fallback to old unsafe method
+                     File.Copy(tempPath, _path, true); // File.Copy is not atomic and could corrupt target file
+                     File.Delete(tempPath);
                  }
                  catch (UnauthorizedAccessException exc)
                  {
                      _logger.LogWarning(exc, "SaveInternalAsync error. Switching to old saving method: {error}", exc.Message);
 
                      // Fallback to old unsafe method
-                     File.Copy(tempPath, _path, true);
+                     File.Copy(tempPath, _path, true); // File.Copy is not atomic and could corrupt target file
                      File.Delete(tempPath);
                  }
 
@@ -2259,12 +2268,12 @@ public sealed class QDocument : WorkspaceViewModel
 
     private string? GetFileSizeErrorMessage()
     {
-        if (!AppSettings.Default.CheckFileSize && !Document.HasQualityControl)
+        if (!AppSettings.Default.CheckFileSize && !Document.Package.HasQualityControl)
         {
             return null;
         }
 
-        var sizeLimit = Document.HasQualityControl ? GameServerFileSizeQualityLimitMB : GameServerFileSizeLimitMB;
+        var sizeLimit = Document.Package.HasQualityControl ? GameServerFileSizeQualityLimitMB : GameServerFileSizeLimitMB;
 
         if (!string.IsNullOrEmpty(_path) && new FileInfo(_path).Length > sizeLimit * 1024 * 1024)
         {
@@ -2808,77 +2817,84 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void ConvertToMillionaire_Executed(object? arg)
     {
-        using var change = OperationsManager.BeginComplexChange();
-        var allq = new List<QuestionViewModel>();
-
-        foreach (var round in Package.Rounds)
+        try
         {
-            foreach (var theme in round.Themes)
-            {
-                allq.AddRange(theme.Questions);
+            using var change = OperationsManager.BeginComplexChange();
+            var allq = new List<QuestionViewModel>();
 
-                theme.Questions.ClearOneByOne();
+            foreach (var round in Package.Rounds)
+            {
+                foreach (var theme in round.Themes)
+                {
+                    allq.AddRange(theme.Questions);
+
+                    theme.Questions.ClearOneByOne();
+                }
+
+                round.Themes.ClearOneByOne();
             }
 
-            round.Themes.ClearOneByOne();
-        }
+            Package.Rounds.ClearOneByOne();
 
-        Package.Rounds.ClearOneByOne();
+            var ind = 0;
 
-        var ind = 0;
+            var gamesCount = (int)Math.Floor((double)allq.Count / 15);
 
-        var gamesCount = (int)Math.Floor((double)allq.Count / 15);
-
-        var roundViewModel = new RoundViewModel(new Round { Type = RoundTypes.Standart, Name = Resources.ThemesCollection })
-        {
-            IsExpanded = true
-        };
-
-        Package.Rounds.Add(roundViewModel);
-
-        for (int i = 0; i < gamesCount; i++)
-        {
-            var themeViewModel = new ThemeViewModel(new Theme { Name = string.Format(Resources.GameNumber, i + 1) });
-            roundViewModel.Themes.Add(themeViewModel);
-
-            for (int j = 0; j < 15; j++)
+            var roundViewModel = new RoundViewModel(new Round { Type = RoundTypes.Standart, Name = Resources.ThemesCollection })
             {
-                int price;
-                if (j == 0) price = 500;
-                else if (j == 1) price = 1000;
-                else if (j == 2) price = 2000;
-                else if (j == 3) price = 3000;
-                else if (j == 4) price = 5000;
-                else if (j == 5) price = 10000;
-                else if (j == 6) price = 15000;
-                else if (j == 7) price = 25000;
-                else if (j == 8) price = 50000;
-                else if (j == 9) price = 100000;
-                else if (j == 10) price = 200000;
-                else if (j == 11) price = 400000;
-                else if (j == 12) price = 800000;
-                else if (j == 13) price = 1500000;
-                else price = 3000000;
+                IsExpanded = true
+            };
 
-                allq[ind + j].Model.Price = price;
-                themeViewModel.Questions.Add(allq[ind + j]);
+            Package.Rounds.Add(roundViewModel);
+
+            for (int i = 0; i < gamesCount; i++)
+            {
+                var themeViewModel = new ThemeViewModel(new Theme { Name = string.Format(Resources.GameNumber, i + 1) });
+                roundViewModel.Themes.Add(themeViewModel);
+
+                for (int j = 0; j < 15; j++)
+                {
+                    int price;
+                    if (j == 0) price = 500;
+                    else if (j == 1) price = 1000;
+                    else if (j == 2) price = 2000;
+                    else if (j == 3) price = 3000;
+                    else if (j == 4) price = 5000;
+                    else if (j == 5) price = 10000;
+                    else if (j == 6) price = 15000;
+                    else if (j == 7) price = 25000;
+                    else if (j == 8) price = 50000;
+                    else if (j == 9) price = 100000;
+                    else if (j == 10) price = 200000;
+                    else if (j == 11) price = 400000;
+                    else if (j == 12) price = 800000;
+                    else if (j == 13) price = 1500000;
+                    else price = 3000000;
+
+                    allq[ind + j].Model.Price = price;
+                    themeViewModel.Questions.Add(allq[ind + j]);
+                }
+
+                ind += 15;
             }
 
-            ind += 15;
-        }
-
-        if (ind < allq.Count)
-        {
-            var themeViewModel = new ThemeViewModel(new Theme { Name = Resources.Left });
-            roundViewModel.Themes.Add(themeViewModel);
-
-            while (ind < allq.Count)
+            if (ind < allq.Count)
             {
-                themeViewModel.Questions.Add(allq[ind++]);
-            }
-        }
+                var themeViewModel = new ThemeViewModel(new Theme { Name = Resources.Left });
+                roundViewModel.Themes.Add(themeViewModel);
 
-        change.Commit();
+                while (ind < allq.Count)
+                {
+                    themeViewModel.Questions.Add(allq[ind++]);
+                }
+            }
+
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
     }
 
     #endregion

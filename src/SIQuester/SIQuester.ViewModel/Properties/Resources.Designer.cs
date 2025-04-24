@@ -1240,6 +1240,24 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Package that shows different game features.
+        /// </summary>
+        public static string PackageDemoDescription {
+            get {
+                return ResourceManager.GetString("PackageDemoDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Demo package.
+        /// </summary>
+        public static string PackageDemoName {
+            get {
+                return ResourceManager.GetString("PackageDemoName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Package without initial content.
         /// </summary>
         public static string PackageEmptyDescription {

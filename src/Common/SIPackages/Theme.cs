@@ -1,5 +1,6 @@
 ﻿using SIPackages.Helpers;
 using SIPackages.Models;
+using SIPackages.Serializers;
 using System.Xml;
 
 namespace SIPackages;
@@ -40,7 +41,7 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
                     switch (reader.LocalName)
                     {
                         case "info":
-                            base.ReadXml(reader, limits);
+                            Info.ReadXml(reader, limits);
                             read = false;
                             break;
 
@@ -81,7 +82,7 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
     {
         writer.WriteStartElement("theme");
         writer.WriteAttributeString("name", Name);
-        base.WriteXml(writer);
+        Info.WriteXml(writer);
 
         if (Questions.Any())
         {
