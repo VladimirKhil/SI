@@ -1145,6 +1145,9 @@
   <data name="Steam" xml:space="preserve">
     <value>Steam</value>
   </data>
+  <data name="SteamWarning" xml:space="preserve">
+    <value>Публикуйте только созданные вами пакеты. Если вы не сможете доказать авторство пакетов (или если пакеты нарушают законодательство), они будут удалены</value>
+  </data>
   <data name="SubfolderSearch" xml:space="preserve">
     <value>Искать в подпапках</value>
   </data>

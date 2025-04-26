@@ -3064,6 +3064,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Only publish packages that you have created yourself. If you are unable to prove authorship of the packages (or if the packages violate the law), they will be removed.
+        /// </summary>
+        public static string SteamWarning {
+            get {
+                return ResourceManager.GetString("SteamWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Search in subfolders.
         /// </summary>
         public static string SubfolderSearch {

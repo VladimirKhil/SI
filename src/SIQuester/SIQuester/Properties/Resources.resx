@@ -1149,6 +1149,9 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="Steam" xml:space="preserve">
     <value>Steam</value>
   </data>
+  <data name="SteamWarning" xml:space="preserve">
+    <value>Only publish packages that you have created yourself. If you are unable to prove authorship of the packages (or if the packages violate the law), they will be removed</value>
+  </data>
   <data name="SubfolderSearch" xml:space="preserve">
     <value>Search in subfolders</value>
   </data>
