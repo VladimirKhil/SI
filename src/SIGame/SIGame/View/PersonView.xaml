@@ -12,11 +12,12 @@
     xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     xmlns:uwb="clr-namespace:Utils.Wpf.Behaviors;assembly=Utils.Wpf"
     xmlns:vmm="clr-namespace:SIGame.ViewModel.Models;assembly=SIGame.ViewModel"
+    xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     mc:Ignorable="d"
     Name="root"
     d:DesignHeight="300"
     d:DesignWidth="206"
-    d:DataContext="{d:DesignInstance sc:PlayerAccount}">
+    d:DataContext="{d:DesignInstance lvm:PlayerViewModel}">
     <UserControl.Resources>
         <ControlTemplate x:Key="PersonArea" TargetType="{x:Type Button}">
             <Border
@@ -27,11 +28,11 @@
                 VerticalAlignment="Stretch"
                 Cursor="{TemplateBinding Cursor}">
                 <Grid>
-                    <Image Name="image" lb:ImageLoader.ImageSource="{Binding}" Stretch="Uniform" />
+                    <Image Name="image" lb:ImageLoader.ImageSource="{Binding Model}" Stretch="Uniform" />
 
                     <ContentControl
                         x:Name="video"
-                        Content="{Binding}"
+                        Content="{Binding Model}"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch"
                         VerticalContentAlignment="Stretch"
@@ -42,7 +43,7 @@
                                     <Setter.Value>
                                         <DataTemplate>
                                             <wv2:WebView2
-                                                Source="{Binding AvatarVideoUri}"
+                                                Source="{Binding Model.AvatarVideoUri}"
                                                 uwb:WebView2Behavior.IsAttached="True"
                                                 HorizontalAlignment="Stretch"
                                                 VerticalAlignment="Stretch" />
@@ -53,7 +54,7 @@
                                 <Setter Property="Visibility" Value="Collapsed" />
 
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding HasVideoAvatar}" Value="False">
+                                    <DataTrigger Binding="{Binding Model.HasVideoAvatar}" Value="False">
                                         <Setter Property="ContentTemplate">
                                             <Setter.Value>
                                                 <DataTemplate />
@@ -85,7 +86,7 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Padding="3"
-                        Visibility="{Binding IsChooser, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                        Visibility="{Binding Model.IsChooser, Converter={StaticResource BooleanToVisibilityConverter1}}"
                         ToolTip="{x:Static lp:Resources.HasMove}">
                         <Image
                             Source="/SIGame;component/Resources/active_player.png"
@@ -101,7 +102,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Bottom"
                         ToolTip="{x:Static lp:Resources.MediaLoaded}"
-                        Visibility="{Binding MediaLoaded, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+                        Visibility="{Binding Model.MediaLoaded, Converter={StaticResource BooleanToVisibilityConverter1}}" />
 
                     <ProgressBar
                         VerticalAlignment="Top"
@@ -112,12 +113,12 @@
                         Minimum="0"
                         Maximum="100"
                         Value="{Binding Mode=OneWay, RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}, Path=DataContext.Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
-                        Visibility="{Binding IsDeciding, Converter={StaticResource BooleanToVisibilityConverter1}, Delay=500}" />
+                        Visibility="{Binding Model.IsDeciding, Converter={StaticResource BooleanToVisibilityConverter1}, Delay=500}" />
                 </Grid>
             </Border>
 
             <ControlTemplate.Triggers>
-                <DataTrigger Binding="{Binding AvatarVideoUri}" Value="{x:Null}">
+                <DataTrigger Binding="{Binding Model.AvatarVideoUri}" Value="{x:Null}">
                     <Setter TargetName="border" Property="HorizontalAlignment" Value="Center" />
                     <Setter TargetName="border" Property="VerticalAlignment" Value="Center" />
                 </DataTrigger>
@@ -143,42 +144,42 @@
             <Setter Property="Template" Value="{StaticResource PersonArea}" />
 
             <Style.Triggers>
-                <DataTrigger Binding="{Binding State}" Value="Answering">
+                <DataTrigger Binding="{Binding Model.State}" Value="Answering">
                     <Setter Property="BorderBrush" Value="Yellow" />
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding State}" Value="Lost">
+                <DataTrigger Binding="{Binding Model.State}" Value="Lost">
                     <Setter Property="BorderBrush" Value="#FFF7820C" />
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding State}" Value="Right">
+                <DataTrigger Binding="{Binding Model.State}" Value="Right">
                     <Setter Property="BorderBrush" Value="Lime" />
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding State}" Value="Wrong">
+                <DataTrigger Binding="{Binding Model.State}" Value="Wrong">
                     <Setter Property="BorderBrush" Value="DarkRed" />
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding State}" Value="HasAnswered">
+                <DataTrigger Binding="{Binding Model.State}" Value="HasAnswered">
                     <Setter Property="BorderBrush" Value="DarkViolet" />
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding State}" Value="Pass">
+                <DataTrigger Binding="{Binding Model.State}" Value="Pass">
                     <Setter Property="BorderBrush" Value="Gray" />
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding CanBeSelected}" Value="False">
+                <DataTrigger Binding="{Binding Model.CanBeSelected}" Value="False">
                     <Setter Property="IsEnabled" Value="False" />
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding CanBeSelected}" Value="True">
+                <DataTrigger Binding="{Binding Model.CanBeSelected}" Value="True">
                     <Setter Property="BorderBrush" Value="Cyan" />
                     <Setter Property="Cursor" Value="Hand" />
                 </DataTrigger>
 
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding CanBeSelected}" Value="True" />
+                        <Condition Binding="{Binding Model.CanBeSelected}" Value="True" />
                         <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
                     </MultiDataTrigger.Conditions>
 
@@ -221,7 +222,7 @@
 
         <TextBlock
             Grid.ColumnSpan="3"
-            Text="{Binding Answer}"
+            Text="{Binding Model.Answer}"
             Foreground="Orange"
             FontSize="20"
             FontWeight="SemiBold"
@@ -233,7 +234,7 @@
                     <Setter Property="Background" Value="#AA000000" />
                     
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Answer.Length}" Value="0">
+                        <DataTrigger Binding="{Binding Model.Answer.Length}" Value="0">
                             <Setter Property="Background" Value="{x:Null}" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -242,7 +243,7 @@
         </TextBlock>
 
         <Border Grid.Row="1" Grid.ColumnSpan="3" Background="{StaticResource PersonGradient}" Margin="3">
-            <TextBlock Style="{StaticResource PersonTextStyle}" Text="{Binding Name}" TextWrapping="Wrap" />
+            <TextBlock Style="{StaticResource PersonTextStyle}" Text="{Binding Model.Name}" TextWrapping="Wrap" />
         </Border>
         
         <Border
@@ -250,8 +251,8 @@
             Grid.ColumnSpan="3"
             Style="{StaticResource nonShowmanRev}"
             Margin="3,2"
-            Visibility="{Binding GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=False}">
-            <TextBlock Style="{StaticResource sumTB}" Text="{Binding Sum}" />
+            Visibility="{Binding Model.GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=False}">
+            <TextBlock Style="{StaticResource sumTB}" Text="{Binding Model.Sum}" />
         </Border>
         
         <Border
@@ -259,15 +260,15 @@
             Grid.ColumnSpan="3"
             Style="{StaticResource ReadyStyle}"
             Margin="3,2"
-            Visibility="{Binding GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=True}">
+            Visibility="{Binding Model.GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=True}">
             <TextBlock
                 Style="{StaticResource PersonTextStyle}"
-                Text="{Binding IsMale, ConverterParameter=Ready, Converter={StaticResource SexConverter}}"
+                Text="{Binding Model.IsMale, ConverterParameter=Ready, Converter={StaticResource SexConverter}}"
                 uib:FillManager.Fill="True" />
         </Border>
 
         <Border Grid.Row="3" Grid.ColumnSpan="3" Style="{StaticResource stakeBorder}" Margin="3">
-            <TextBlock Style="{StaticResource stakeTB}" Text="{Binding Stake, Converter={StaticResource AuctionStakes}}" />
+            <TextBlock Style="{StaticResource stakeTB}" Text="{Binding Model.Stake, Converter={StaticResource AuctionStakes}}" />
         </Border>
         
         <Canvas>
@@ -277,7 +278,11 @@
                 BorderThickness="1"
                 CornerRadius="10"
                 Effect="{StaticResource Effect}">
-                <TextBlock uib:FillManager.Fill="True" uib:FillManager.MaxFontSize="26" Style="{StaticResource ReplicText}" />
+                <TextBlock
+                    uib:FillManager.Fill="True"
+                    uib:FillManager.MaxFontSize="26"
+                    Style="{StaticResource ReplicText}"
+                    Text="{Binding Model.Replic}" />
             </Border>
         </Canvas>
     </Grid>

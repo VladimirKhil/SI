@@ -7,6 +7,7 @@ using SImulator.ViewModel.Listeners;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
+using SImulator.ViewModel.Services;
 using SIPackages;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -439,9 +440,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 throw new Exception(Resources.PackagePreparationError, exc);
             }
 
-            GameEngine engine;
+            var mediaProvider = new MediaProvider(document);
+            var gameEngineController = new GameEngineController(mediaProvider);
 
-            var gameEngineController = new GameEngineController(document);
+            GameEngine engine;
 
             try
             {
@@ -479,9 +481,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 throw new Exception(Resources.LoggerInitError, exc);
             }
 
+            var gameActions = new GameActions(engine);
+
             var game = new GameViewModel(
                 SettingsViewModel,
                 engine,
+                gameActions,
+                mediaProvider,
                 presentationListener,
                 presentationController,
                 gameLogger);

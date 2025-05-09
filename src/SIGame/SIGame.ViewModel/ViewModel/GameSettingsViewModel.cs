@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using SI.GameServer.Contract;
 using SICore;
 using SICore.Clients;
+using SICore.Contracts;
+using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
 using SICore.Services;
@@ -746,9 +748,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         var avatarHelper = new AvatarHelper(Path.Combine(documentPath, "avatars"));
 
-        GameViewModel? gameViewModel = null;
-
-        var (host, _) = new GameRunner(
+        var game = GameRunner.CreateGame(
             node,
             _model,
             document,
@@ -756,35 +756,72 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             fileShare,
             _computerPlayers.ToArray(),
             _computerShowmans.ToArray(),
-            documentPath,
             avatarHelper,
-            null)
-            .Run((data, actions, localizer) =>
-            {
-                // TODO: (refactor) quite ugly way to create GameViewModel but it's the only way to pass all the required parameters
-                gameViewModel = new GameViewModel(data, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
-                {
-                    NetworkGame = NetworkGame,
-                    NetworkGamePort = NetworkPort,
-                    IsOnline = false,
-                    TempDocFolder = documentPath
-                };
+            null);
 
-                return new ViewerHumanLogic(gameViewModel, data, actions, localizer, LocalAddress);
-            });
+        var data = new ViewerData(BackLink.Default);
 
-        if (gameViewModel == null)
+        var gameViewModel = new GameViewModel(data, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
         {
-            return;
+            NetworkGame = NetworkGame,
+            NetworkGamePort = NetworkPort,
+            IsOnline = false,
+            TempDocFolder = documentPath
+        };
+
+        var localizer = new Localizer(_model.AppSettings.Culture);
+
+        var client = new Client(_model.HumanPlayerName);
+        var actions = new ViewerActions(client);
+        var logic = new ViewerHumanLogic(gameViewModel, data, actions, LocalAddress);
+
+        IViewerClient? host = null;
+
+        // TODO: consider using Join() method
+        game.ClientData.BeginUpdatePersons("Add human host");
+
+        try
+        {
+            if (_model.HumanPlayerName == _model.Showman.Name)
+            {
+                host = new Showman(client, _model.Showman, true, logic, actions, localizer, data);
+                game.ClientData.ShowMan.IsConnected = true;
+            }
+            else
+            {
+                for (var i = 0; i < _model.Players.Length; i++)
+                {
+                    if (_model.Players[i].Name == _model.HumanPlayerName)
+                    {
+                        host = new Player(client, _model.Players[i], true, logic, actions, localizer, data);
+                        game.ClientData.Players[i].IsConnected = true;
+                        break;
+                    }
+                }
+
+                if (host == null)
+                {
+                    host = new Viewer(client, _model.Viewers[0], true, logic, actions, localizer, data);
+                    game.ClientData.Viewers.Add(new ViewerAccount(_model.Viewers[0]) { IsConnected = true });
+                }
+            }
+        }
+        finally
+        {
+            game.ClientData.EndUpdatePersons();
         }
 
+        client.ConnectTo(node);
+
         gameViewModel.Host = host;
-        host!.MyData.IsNetworkGame = NetworkGame;
+        host.MyData.IsNetworkGame = NetworkGame;
 
         if (!NetworkGame)
         {
             host.MyData.IsChatOpened = false;
         }
+
+        game.Run();
 
         MoveToGame(gameViewModel, (ViewerHumanLogic)host.MyLogic);
     }
@@ -841,7 +878,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         
         if (e.PropertyName == nameof(GameAccount.SelectedAccount))
         {
-            if (_showman.SelectedAccount == _computerShowmans.Last()) // Новый ведущий
+            if (_showman.SelectedAccount == _computerShowmans.Last()) // New showman
             {
                 var account = new ComputerAccount { CanBeDeleted = true };
                 var newShowmanAccount = new ShowmanViewModel(account);

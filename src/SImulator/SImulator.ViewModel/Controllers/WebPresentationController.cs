@@ -7,9 +7,10 @@ using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Diagnostics;
-using System.Drawing;
 using System.Text.Json;
+using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 using Utils.Web;
 
 namespace SImulator.ViewModel.Controllers;
@@ -48,12 +49,22 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private readonly SoundsSettings _soundsSettings;
 
     public bool CanControlMedia => false;
+    
+    public ICommand Stop { get; private set; }
 
     public WebPresentationController(IDisplayDescriptor displayDescriptor, IPresentationListener presentationListener, SoundsSettings soundsSettings)
     {
         _displayDescriptor = displayDescriptor;
         _presentationListener = presentationListener;
         _soundsSettings = soundsSettings;
+
+        Stop = new SimpleCommand(arg =>
+        {
+            if (presentationListener != null)
+            {
+                UI.Execute(presentationListener.AskStop, OnError);
+            }
+        });
     }
 
     public void AddPlayer(string playerName)

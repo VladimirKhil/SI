@@ -619,7 +619,7 @@
     <value>QUESTION WITH A SECRET</value>
   </data>
   <data name="Label_Sponsored" xml:space="preserve">
-    <value>QUESTION FOR YOURSELF WITHOUT RISK</value>
+    <value>QUESTION FOR YOURSELF</value>
   </data>
   <data name="GameStarted" xml:space="preserve">
     <value>The game has started</value>
@@ -632,5 +632,53 @@
   </data>
   <data name="HintMakeAStake" xml:space="preserve">
     <value>Make a stake</value>
+  </data>
+  <data name="DisconnectMessage" xml:space="preserve">
+    <value>You have disconnected</value>
+  </data>
+  <data name="HostChanged" xml:space="preserve">
+    <value>Game host was set {0} to {1}</value>
+  </data>
+  <data name="MediaFileNotSupported" xml:space="preserve">
+    <value>Media file is not supported</value>
+  </data>
+  <data name="MediaLoadError" xml:space="preserve">
+    <value>Media load error</value>
+  </data>
+  <data name="FileLoadError" xml:space="preserve">
+    <value>File "{0}" loading error</value>
+  </data>
+  <data name="LogTitle" xml:space="preserve">
+    <value>SIGame log</value>
+  </data>
+  <data name="ExternalLink" xml:space="preserve">
+    <value>External link: {0} . External link download could be unsafe and is disabled</value>
+  </data>
+  <data name="Greeting" xml:space="preserve">
+    <value>Welcome to SIGame! The game will begin as soon as all the players and the showman press "Ready" button</value>
+  </data>
+  <data name="RightAnswer" xml:space="preserve">
+    <value>The right answer</value>
+  </data>
+  <data name="UserUnbanned" xml:space="preserve">
+    <value>User {0} was unbanned</value>
+  </data>
+  <data name="LocalGame" xml:space="preserve">
+    <value>Local game</value>
+  </data>
+  <data name="RandomPackageName" xml:space="preserve">
+    <value>Random themes</value>
+  </data>
+  <data name="GameName" xml:space="preserve">
+    <value>Game name</value>
+  </data>
+  <data name="PackageName" xml:space="preserve">
+    <value>Package name</value>
+  </data>
+  <data name="ContactUri" xml:space="preserve">
+    <value>Authors contact</value>
+  </data>
+  <data name="VoiceChatLink" xml:space="preserve">
+    <value>Voice chat (Discord)</value>
   </data>
 </root>

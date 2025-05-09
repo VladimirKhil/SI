@@ -9,7 +9,6 @@
     xmlns:lp="clr-namespace:SIUI.Properties"
     xmlns:lb="clr-namespace:SIUI.Behaviors"
     xmlns:localc="clr-namespace:SIUI.Converters"
-    xmlns:locals="clr-namespace:SIUI.Selectors"
     xmlns:vm="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
@@ -435,57 +434,6 @@
 
                     <BitmapCache x:Key="cache" RenderAtScale="3" />
 
-                    <locals:QuestionTemplateSelector x:Key="QuestionTextSelector">
-                        <locals:QuestionTemplateSelector.Simple>
-                            <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
-                                <TextBlock Text="{Binding Text}" Style="{StaticResource QuestionText}" Margin="10" />
-                            </DataTemplate>
-                        </locals:QuestionTemplateSelector.Simple>
-                        
-                        <locals:QuestionTemplateSelector.Animated>
-                            <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
-                                <TextBlock
-                                    Text="{Binding Text}"
-                                    Style="{StaticResource QuestionText}"
-                                    Margin="10"
-                                    TextOptions.TextFormattingMode="Ideal"
-                                    lb:QuestionReading.TextSpeed="{Binding TextSpeed}">
-                                    <TextBlock.CacheMode>
-                                        <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
-                                    </TextBlock.CacheMode>
-                                    
-                                    <TextBlock.TextEffects>
-                                        <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
-                                    </TextBlock.TextEffects>
-                                </TextBlock>
-                            </DataTemplate>
-                        </locals:QuestionTemplateSelector.Animated>
-                        
-                        <locals:QuestionTemplateSelector.Partial>
-                            <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
-                                <TextBlock
-                                    Text="{Binding Text}"
-                                    Style="{StaticResource QuestionText}"
-                                    Foreground="Transparent"
-                                    Margin="10"
-                                    TextWrapping="Wrap"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
-                                    TextAlignment="Left"
-                                    lb:QuestionReading.IsAttachedPartial="True"
-                                    lb:FillManager.HandleTextChange="False">
-                                    <TextBlock.CacheMode>
-                                        <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
-                                    </TextBlock.CacheMode>
-                                    
-                                    <TextBlock.TextEffects>
-                                        <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
-                                    </TextBlock.TextEffects>
-                                </TextBlock>
-                            </DataTemplate>
-                        </locals:QuestionTemplateSelector.Partial>
-                    </locals:QuestionTemplateSelector>
-
                     <Style x:Key="QuestionTextStyle" TargetType="ContentControl">
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
@@ -629,7 +577,73 @@
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Clef}" />
 
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Text}">
-                                <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource QuestionTextSelector}" />
+                                <ContentControl Name="content" Content="{Binding}">
+                                    <ContentControl.ContentTemplate>
+                                        <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
+                                            <TextBlock Name="text" Text="{Binding Text}" Style="{StaticResource QuestionText}" Margin="10" />
+
+                                            <!-- TODO: Single TextBlock could be styled here for all 3 cases -->
+                                            <!--<DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.AnimateText, RelativeSource={RelativeSource AncestorType=Grid}}" Value="True">
+                                                    <Setter TargetName="text" Property="TextOptions.TextFormattingMode" Value="Ideal" />
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>-->
+                                        </DataTemplate>
+                                    </ContentControl.ContentTemplate>
+                                </ContentControl>
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.AnimateText, RelativeSource={RelativeSource AncestorType=Grid}}" Value="True">
+                                        <Setter TargetName="content" Property="ContentTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
+                                                    <TextBlock
+                                                        Text="{Binding Text}"
+                                                        Style="{StaticResource QuestionText}"
+                                                        Margin="10"
+                                                        TextOptions.TextFormattingMode="Ideal"
+                                                        lb:QuestionReading.TextSpeed="{Binding TextSpeed}">
+                                                        <TextBlock.CacheMode>
+                                                            <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
+                                                        </TextBlock.CacheMode>
+
+                                                        <TextBlock.TextEffects>
+                                                            <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
+                                                        </TextBlock.TextEffects>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding DataContext.PartialText, RelativeSource={RelativeSource AncestorType=Grid}}" Value="True">
+                                        <Setter TargetName="content" Property="ContentTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
+                                                    <TextBlock
+                                                        Text="{Binding Text}"
+                                                        Style="{StaticResource QuestionText}"
+                                                        Foreground="Transparent"
+                                                        Margin="10"
+                                                        TextWrapping="Wrap"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Top"
+                                                        TextAlignment="Left"
+                                                        lb:QuestionReading.IsAttachedPartial="True"
+                                                        lb:FillManager.HandleTextChange="False">
+                                                        <TextBlock.CacheMode>
+                                                            <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
+                                                        </TextBlock.CacheMode>
+
+                                                        <TextBlock.TextEffects>
+                                                            <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
+                                                        </TextBlock.TextEffects>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Image}">
@@ -640,7 +654,7 @@
                                     lb:ImageController.LoadHandler="{Binding}" />
 
                                 <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding DataContext.PartialImage, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}" Value="True">
+                                    <DataTrigger Binding="{Binding DataContext.PartialImage, RelativeSource={RelativeSource AncestorType=Grid}}" Value="True">
                                         <Setter TargetName="image" Property="Clip">
                                             <Setter.Value>
                                                 <RectangleGeometry>
@@ -649,7 +663,7 @@
                                                             <MultiBinding.Bindings>
                                                                 <Binding
                                                                     Path="DataContext.PartialImageVisibility"
-                                                                    RelativeSource="{RelativeSource AncestorType=ItemsControl, AncestorLevel=2}" />
+                                                                    RelativeSource="{RelativeSource AncestorType=Grid}" />
                                                                 
                                                                 <Binding Path="ActualWidth" ElementName="image" />
                                                                 <Binding Path="ActualHeight" ElementName="image" />

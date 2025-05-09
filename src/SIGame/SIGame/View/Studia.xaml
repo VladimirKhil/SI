@@ -337,29 +337,7 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <ContentControl Grid.Row="2" Content="{Binding}">
-                    <ContentControl.Style>
-                        <Style TargetType="ContentControl">
-                            <Setter Property="ContentTemplate">
-                                <Setter.Value>
-                                    <DataTemplate>
-                                        <local:ShowmanView DataContext="{Binding Data.ShowMan}" />
-                                    </DataTemplate>
-                                </Setter.Value>
-                            </Setter>
-
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Data.ShowMan}" Value="{x:Null}">
-                                    <Setter Property="ContentTemplate">
-                                        <Setter.Value>
-                                            <DataTemplate />
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContentControl.Style>
-                </ContentControl>
+                <local:ShowmanView Grid.Row="2" DataContext="{Binding Showman}" />
             </Grid>
 
             <Expander Grid.Column="4" IsExpanded="{Binding Data.IsChatOpened}" Style="{DynamicResource ExpanderStyle1}">

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIPackages;
 using SIPackages.Core;
+using SIPackages.Models;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Model;
@@ -573,7 +574,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     private void ValidateFileExtensionAndSize(string fileName)
     {
-        var fileExtensions = MediaOwnerViewModel.RecommendedExtensions[_name];
+        var fileExtensions = Quality.FileExtensions[_name];
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
 
         if (!fileExtensions.Contains(extension))
@@ -586,15 +587,15 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                     string.Join(", ", fileExtensions)));
         }
 
-        var maximumSize = MediaOwnerViewModel.RecommendedSizeMb[_name] * 1024 * 1024;
+        var maximumSize = Quality.FileSizeMb[_name];
 
-        if (new FileInfo(fileName).Length > maximumSize)
+        if (new FileInfo(fileName).Length > maximumSize * 1024 * 1024)
         {
             throw new InvalidOperationException(
                 string.Format(
                     Resources.InvalidFileSize,
                     fileName,
-                    MediaOwnerViewModel.RecommendedSizeMb[_name]));
+                    maximumSize));
         }
     }
 

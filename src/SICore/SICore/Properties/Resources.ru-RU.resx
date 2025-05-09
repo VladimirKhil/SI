@@ -237,9 +237,6 @@
   <data name="GoodMorning" xml:space="preserve">
     <value>Доброе утро!</value>
   </data>
-  <data name="Greeting" xml:space="preserve">
-    <value>Добро пожаловать в «SIGame»! Игра начнется, как только все игроки и ведущий нажмут кнопку «Готов»</value>
-  </data>
   <data name="GreetingNew" xml:space="preserve">
     <value>, приветствую!</value>
   </data>
@@ -442,7 +439,7 @@
     <value>Ожидаем решение ведущего...</value>
   </data>
   <data name="SponsoredQuestion" xml:space="preserve">
-    <value>Вам достаётся Вопрос для себя без риска!</value>
+    <value>Вам достаётся Вопрос для себя!</value>
   </data>
   <data name="SponsoredQuestionInfo" xml:space="preserve">
     <value>вопрос звучит только для вас. В случае верного ответа вы получите {0}, в случае неверного ничего не потеряете</value>
@@ -570,9 +567,6 @@
   <data name="ErrorWritingLogs" xml:space="preserve">
     <value>Файл лога сохранить не удалось из-за проблем доступа на запись в папку логов</value>
   </data>
-  <data name="LogTitle" xml:space="preserve">
-    <value>Протокол "SIGame"</value>
-  </data>
   <data name="CannotConnectToServer" xml:space="preserve">
     <value>Не удалось подключиться к серверу</value>
   </data>
@@ -585,9 +579,6 @@
   <data name="UnknownSenderMessage" xml:space="preserve">
     <value>Сообщение от неизвестного отправителя</value>
   </data>
-  <data name="DisconnectMessage" xml:space="preserve">
-    <value>Разрыв соединения с игрой</value>
-  </data>
   <data name="NetworkOpeningError" xml:space="preserve">
     <value>Ошибка при открытии сетевого подключения: {0}. Сетевые подключения невозможны.</value>
   </data>
@@ -597,9 +588,6 @@
   <data name="DeleteTableHint" xml:space="preserve">
     <value>Выберите стол для удаления</value>
   </data>
-  <data name="ExternalLink" xml:space="preserve">
-    <value>Внешняя ссылка: {0} . Загрузка внешних ссылок может быть небезопасной и отключена</value>
-  </data>
   <data name="ApellatedAnswers" xml:space="preserve">
     <value>Апеллированные ответы</value>
   </data>
@@ -608,9 +596,6 @@
   </data>
   <data name="ErrorMessages" xml:space="preserve">
     <value>Сообщения об ошибках</value>
-  </data>
-  <data name="PackageName" xml:space="preserve">
-    <value>Имя пакета</value>
   </data>
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
@@ -624,20 +609,11 @@
   <data name="MediaNotFound" xml:space="preserve">
     <value>Файл {0} не найден в пакете!</value>
   </data>
-  <data name="MediaFileNotSupported" xml:space="preserve">
-    <value>Медиафайл не поддерживается</value>
-  </data>
-  <data name="MediaLoadError" xml:space="preserve">
-    <value>Ошибка загрузки медиа</value>
-  </data>
   <data name="SureFemaleEnding" xml:space="preserve">
     <value>а</value>
   </data>
   <data name="ByGame" xml:space="preserve">
     <value>игрой</value>
-  </data>
-  <data name="HostChanged" xml:space="preserve">
-    <value>Хост игры был изменён {0} на {1}</value>
   </data>
   <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
     <value>Ведущий перевёл игру в другой раунд</value>
@@ -654,29 +630,14 @@
   <data name="OversizedFile" xml:space="preserve">
     <value>{0} в вопросе {1} превышает рекомендуемый размер {2} КБ и может загружаться с задержкой</value>
   </data>
-  <data name="FileLoadError" xml:space="preserve">
-    <value>Ошибка загрузки файла "{0}"</value>
-  </data>
   <data name="PersonAlreadyExists" xml:space="preserve">
     <value>Участник {0} уже есть в игре!</value>
   </data>
   <data name="MediaFiltered" xml:space="preserve">
     <value>Медиафайл превышает допустимый размер и будет пропущен</value>
   </data>
-  <data name="UserUnbanned" xml:space="preserve">
-    <value>Пользователь {0} был разбанен</value>
-  </data>
   <data name="FailedToAppellateForWrongAnswer" xml:space="preserve">
     <value>Игрок {0} попытался оспорить последний правильный ответ, но в настоящий момент в игре недостаточно других игроков для оспаривания ответа</value>
-  </data>
-  <data name="ContactUri" xml:space="preserve">
-    <value>Контакты авторов</value>
-  </data>
-  <data name="GameName" xml:space="preserve">
-    <value>Название игры</value>
-  </data>
-  <data name="LocalGame" xml:space="preserve">
-    <value>Локальная игра</value>
   </data>
   <data name="QuestionRemoved" xml:space="preserve">
     <value>{0} удалил вопрос {1}, {2}</value>
@@ -689,9 +650,6 @@
   </data>
   <data name="Cost2" xml:space="preserve">
     <value>Стоимость</value>
-  </data>
-  <data name="VoiceChatLink" xml:space="preserve">
-    <value>Голосовой чат (Discord)</value>
   </data>
   <data name="LetsPlayNextTheme" xml:space="preserve">
     <value>Давайте сыграем остальные темы</value>
@@ -728,9 +686,6 @@
   </data>
   <data name="ScoreChanged" xml:space="preserve">
     <value>{0} изменил{4} сумму на счёте {1} с {2} на {3}</value>
-  </data>
-  <data name="RandomPackageName" xml:space="preserve">
-    <value>Случайный набор тем</value>
   </data>
   <data name="RoundName" xml:space="preserve">
     <value>{0}-й раунд</value>
@@ -770,5 +725,11 @@
   </data>
   <data name="InvalidFileExtension" xml:space="preserve">
     <value>У файла {0} неподдерживаемое расширение {1}</value>
+  </data>
+  <data name="PackageName" xml:space="preserve">
+    <value>Имя пакета</value>
+  </data>
+  <data name="RandomPackageName" xml:space="preserve">
+    <value>Случайный набор тем</value>
   </data>
 </root>

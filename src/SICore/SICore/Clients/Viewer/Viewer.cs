@@ -110,10 +110,8 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                     break;
 
                 case SystemMessages.Disconnect:
-                    {
-                        _logic.OnReplic(ReplicCodes.System.ToString(), LO[nameof(R.DisconnectMessage)]);
-                        break;
-                    }
+                    _logic.OnSelfDisconnected();
+                    break;
 
                 case SystemMessages.GameClosed:
                     _logic.OnGameClosed();
@@ -193,11 +191,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 
                         if (mparams.Length > 2) // Host has been changed
                         {
-                            _logic.OnReplic(
-                                ReplicCodes.Special.ToString(),
-                                string.Format(LO[nameof(R.HostChanged)],
-                                    mparams[2].Length > 0 ? mparams[2] : LO[nameof(R.ByGame)],
-                                    mparams[1]));
+                            _logic.OnHostChangedBy(mparams[2].Length > 0 ? mparams[2] : LO[nameof(R.ByGame)], mparams[1]);
                         }
                     }
                     break;
@@ -294,17 +288,12 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                     {
                         #region Ready
 
-                        if (ClientData == null || ClientData.Players.Count == 0)
+                        if (ClientData.Players.Count == 0)
                         {
                             return;
                         }
 
                         var ready = mparams.Length == 2 || mparams[2] == "+";
-
-                        if (ClientData.ShowMan == null)
-                        {
-                            return;
-                        }
 
                         var person = ClientData.MainPersons.FirstOrDefault(item => item.Name == mparams[1]);
                         
@@ -335,10 +324,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                                 ClientData.Players[i].GameStarted = true;
                             }
 
-                            if (ClientData.ShowMan != null)
-                            {
-                                ClientData.ShowMan.GameStarted = true;
-                            }
+                            ClientData.ShowMan.GameStarted = true;
                         }
 
                         if (mparams.Length > 3)
@@ -1497,7 +1483,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         }
     }
 
-    private PersonAccount GetAccountByType(bool isPlayer, string indexString)
+    private PersonAccount? GetAccountByType(bool isPlayer, string indexString)
     {
         if (isPlayer)
         {
@@ -1722,8 +1708,8 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 
     private async ValueTask ProcessInfoAsync(string[] mparams)
     {
-        _ = int.TryParse(mparams[1], out var numOfPlayers);
-        var numOfViewers = (mparams.Length - 2) / 5 - 1 - numOfPlayers;
+        _ = int.TryParse(mparams[1], out var playerCount);
+        var viewerCount = (mparams.Length - 2) / 5 - 1 - playerCount;
 
         var gameStarted = ClientData.Stage != GameStage.Before;
 
@@ -1732,16 +1718,18 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 
         try
         {
-            ClientData.ShowMan = new PersonAccount(mparams[mIndex++], mparams[mIndex++] == "+", mparams[mIndex++] == "+", gameStarted)
-            {
-                IsShowman = true,
-                IsHuman = mparams[mIndex++] == "+",
-                Ready = mparams[mIndex++] == "+"
-            };
+            var showman = ClientData.ShowMan;
+
+            showman.Name = mparams[mIndex++];
+            showman.IsMale = mparams[mIndex++] == "+";
+            showman.IsConnected = mparams[mIndex++] == "+";
+            showman.GameStarted = gameStarted;
+            showman.IsHuman = mparams[mIndex++] == "+";
+            showman.Ready = mparams[mIndex++] == "+";
 
             var newPlayers = new List<PlayerAccount>();
 
-            for (int i = 0; i < numOfPlayers; i++)
+            for (var i = 0; i < playerCount; i++)
             {
                 var account = new PlayerAccount(mparams[mIndex++], mparams[mIndex++] == "+", mparams[mIndex++] == "+", gameStarted)
                 {
@@ -1757,7 +1745,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
 
             var newViewers = new List<ViewerAccount>();
 
-            for (int i = 0; i < numOfViewers; i++)
+            for (var i = 0; i < viewerCount; i++)
             {
                 var viewerName = mparams[mIndex++];
                 var isMale = mparams[mIndex++] == "+";
@@ -1838,13 +1826,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         }
     }
 
-    private void UpdateShowmanCommands()
-    {
-        if (ClientData.ShowMan != null)
-        {
-            UpdateOthers(ClientData.ShowMan);
-        }
-    }
+    private void UpdateShowmanCommands() => UpdateOthers(ClientData.ShowMan);
 
     private Account[] GetDefaultComputerPlayers() => MyData.DefaultComputerPlayers
         ?? StoredPersonsRegistry.GetDefaultPlayers(LO, MyData.Host.PhotoUri);
@@ -1876,14 +1858,15 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
             switch (role)
             {
                 case Constants.Showman:
-                    ClientData.ShowMan = new PersonAccount(account)
-                    {
-                        IsHuman = true,
-                        IsConnected = true,
-                        Ready = false,
-                        GameStarted = ClientData.Stage != GameStage.Before,
-                        IsShowman = true
-                    };
+                    var showman = ClientData.ShowMan;
+
+                    showman.Name = account.Name;
+                    showman.IsMale = account.IsMale;
+                    showman.Picture = account.Picture;
+                    showman.IsHuman = true;
+                    showman.IsConnected = true;
+                    showman.Ready = false;
+                    showman.GameStarted = ClientData.Stage != GameStage.Before;
 
                     UpdateShowmanCommands();
                     break;

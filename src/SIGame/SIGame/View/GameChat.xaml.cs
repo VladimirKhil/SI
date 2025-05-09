@@ -99,7 +99,7 @@ public partial class GameChat : UserControl
     {
         playerTables.SelectedItem = null;
         var label = (Label)sender;
-        var data = ((GameViewModel)label.DataContext).Data;
-        data.CurrentPerson = data.ShowMan;
+        var viewModel = (GameViewModel)label.DataContext;
+        viewModel.CurrentPerson = viewModel.Showman;
     }
 }

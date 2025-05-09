@@ -284,7 +284,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         var localizer = new Localizer(Thread.CurrentThread.CurrentUICulture.Name);
         var actions = new ViewerActions(_client);
-        var logic = new ViewerHumanLogic(gameViewModel, data, actions, localizer, ServerAddress, ContentPublicBaseUrls?.FirstOrDefault(), ContentPublicBaseUrls);
+        var logic = new ViewerHumanLogic(gameViewModel, data, actions, ServerAddress, ContentPublicBaseUrls?.FirstOrDefault(), ContentPublicBaseUrls);
 
         try
         {
@@ -304,7 +304,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
             if (!isHost && Ready != null)
             {
-                Ready(gameViewModel, logic); // Here is happening moving to game view
+                Ready(gameViewModel, logic); // Moving to game view is happening here
             }
 
             await ClearConnectionAsync();

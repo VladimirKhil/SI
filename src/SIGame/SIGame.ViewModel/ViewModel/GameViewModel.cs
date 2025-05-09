@@ -479,7 +479,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public PersonAccount? Speaker { get; set; }
 
-    public ObservableCollection<PlayerAccount> Players { get; } = new();
+    public ObservableCollection<PlayerViewModel> Players { get; } = new();
+
+    public ShowmanVM Showman { get; }
 
     public SimpleCommand SelectPlayer { get; }
 
@@ -568,6 +570,17 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public bool NewValidation { get; internal set; }
 
+    private IPersonViewModel? _currentPerson;
+
+    /// <summary>
+    /// Currently selected person.
+    /// </summary>
+    public IPersonViewModel? CurrentPerson
+    {
+        get => _currentPerson;
+        set { if (_currentPerson != value) { _currentPerson = value; OnPropertyChanged(); UpdateCurrentPlayerCommands(); } }
+    }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -581,7 +594,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _logger = logger;
 
         _data = viewerData;
-        _data.CurrentPlayerChanged += UpdateCurrentPlayerCommands;
 
         TInfo = new TableInfoViewModel(Data.TInfo, settings)
         {
@@ -592,6 +604,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         IsShowman = Host?.Role == GameRole.Showman;
         IsPlayer = Host?.Role == GameRole.Player;
+
+        Showman = new ShowmanVM(viewerData.ShowMan);
 
         _node.Reconnecting += Server_Reconnecting;
         _node.Reconnected += Server_Reconnected;
@@ -671,12 +685,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void SelectPlayer_Executed(object? arg)
     {
-        if (arg is not PlayerAccount player || !player.CanBeSelected)
+        if (arg is not PlayerViewModel player || !player.Model.CanBeSelected)
         {
             return;
         }
 
-        var playerIndex = _data.Players.IndexOf(player);
+        var playerIndex = _data.Players.IndexOf(player.Model);
 
         if (playerIndex < 0 || playerIndex >= _data.Players.Count)
         {
@@ -696,7 +710,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
                 break;
 
             case SelectionMode.ChangeSums:
-                SelectedPlayer = new PlayerSumInfo { PlayerIndex = playerIndex + 1, PlayerScore = player.Sum };
+                SelectedPlayer = new PlayerSumInfo { PlayerIndex = playerIndex + 1, PlayerScore = player.Model.Sum };
                 DialogMode = DialogModes.ChangeSum;
 
                 for (int j = 0; j < Data.Players.Count; j++)
@@ -1084,27 +1098,27 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        FreeTable.CanBeExecuted = Host.IsHost && Host.MyData.CurrentPerson != null && Host.MyData.CurrentPerson.IsHuman && Host.MyData.CurrentPerson.IsConnected;
-        DeleteTable.CanBeExecuted = Host.IsHost && Host.MyData.Players.Count > 2 && Host.MyData.CurrentPerson is PlayerAccount;
+        FreeTable.CanBeExecuted = Host.IsHost && CurrentPerson != null && CurrentPerson.IsHuman && CurrentPerson.IsConnected;
+        DeleteTable.CanBeExecuted = Host.IsHost && Host.MyData.Players.Count > 2 && CurrentPerson != null && CurrentPerson.IsPlayer;
         ChangeType.CanBeExecuted = Host.IsHost;
-        Replace.CanBeExecuted = Host.IsHost && Host.MyData.CurrentPerson != null && Host.MyData.CurrentPerson.Others != null && Host.MyData.CurrentPerson.Others.Any();
+        Replace.CanBeExecuted = Host.IsHost && CurrentPerson != null && CurrentPerson.Others != null && CurrentPerson.Others.Any();
         Kick.CanBeExecuted = Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = Host.IsHost;
     }
 
     private void FreeTable_Executed(object? arg)
     {
-        if (arg is not PersonAccount account)
+        if (arg is not IPersonViewModel account)
         {
             return;
         }
 
-        var player = account as PlayerAccount;
+        var player = account as PlayerViewModel;
 
         var indexString = "";
 
         if (player != null)
         {
-            var index = _data.Players.IndexOf(player);
+            var index = _data.Players.IndexOf(player.Model);
 
             if (index < 0 || index >= _data.Players.Count)
             {
@@ -1123,12 +1137,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void DeleteTable_Executed(object? arg)
     {
-        if (arg is not PlayerAccount player)
+        if (arg is not PlayerViewModel player)
         {
             return;
         }
 
-        var playerIndex = _data.Players.IndexOf(player);
+        var playerIndex = _data.Players.IndexOf(player.Model);
 
         if (playerIndex < 0 || playerIndex >= _data.Players.Count)
         {
@@ -1140,18 +1154,18 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void ChangeType_Executed(object? arg)
     {
-        if (arg is not PersonAccount account)
+        if (arg is not IPersonViewModel account)
         {
             return;
         }
 
-        var player = account as PlayerAccount;
+        var player = account as PlayerViewModel;
 
         var indexString = "";
 
         if (player != null)
         {
-            var index = _data.Players.IndexOf(player);
+            var index = _data.Players.IndexOf(player.Model);
 
             if (index < 0 || index >= _data.Players.Count)
             {
@@ -1175,13 +1189,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        var player = _data.CurrentPerson as PlayerAccount;
+        var player = CurrentPerson as PlayerViewModel;
 
         string index;
 
         if (player != null)
         {
-            var playerIndex = _data.Players.IndexOf(player);
+            var playerIndex = _data.Players.IndexOf(player.Model);
 
             if (playerIndex == -1)
             {
@@ -1299,6 +1313,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         ForceStart.CanBeExecuted = Host != null && Host.IsHost && Host.MyData.Stage == GameStage.Before;
         PressGameButton.CanBeExecuted = Pass.CanBeExecuted = IsPlayer;
         Ready.CanBeExecuted = UnReady.CanBeExecuted = IsPlayer || IsShowman;
+        Apellate.CanBeExecuted &= IsPlayer;
 
         UpdateAddTableCommand();
         UpdateCurrentPlayerCommands();

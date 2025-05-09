@@ -1,8 +1,8 @@
-﻿using SICore;
-using SIData;
+﻿using SIData;
 using SIGame.ViewModel.Properties;
 using System.ComponentModel;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -16,10 +16,10 @@ public sealed class ShowmanViewModel : AccountViewModel<ComputerAccount>, INavig
         set { _haErrorMessage = value; OnPropertyChanged(); }
     }
 
-    public event Action<ComputerAccount> Add;
-    public event Action Close;
+    public event Action<ComputerAccount>? Add;
+    public event Action? Close;
 
-    private CustomCommand _addNewAccount;
+    private SimpleCommand _addNewAccount;
 
     public ICommand AddNewAccount => _addNewAccount;
 
@@ -35,12 +35,12 @@ public sealed class ShowmanViewModel : AccountViewModel<ComputerAccount>, INavig
     {
         base.Initialize();
 
-        _addNewAccount = new CustomCommand(AddNewAccount_Executed);
+        _addNewAccount = new SimpleCommand(AddNewAccount_Executed);
         _model.PropertyChanged += Model_PropertyChanged;
         CheckHumanAccount();
     }
 
-    private void AddNewAccount_Executed(object arg)
+    private void AddNewAccount_Executed(object? arg)
     {
         Add?.Invoke(_model);
         Close?.Invoke();

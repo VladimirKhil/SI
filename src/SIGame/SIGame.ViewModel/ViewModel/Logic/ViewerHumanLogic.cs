@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Notions;
 using SICore.Clients.Viewer;
-using SICore.Contracts;
 using SIData;
 using SIGame.ViewModel;
 using SIGame.ViewModel.Contracts;
@@ -15,7 +14,6 @@ using System.Diagnostics;
 using System.Text;
 using Utils;
 using Utils.Timers;
-using R = SICore.Properties.Resources;
 
 namespace SICore;
 
@@ -57,8 +55,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
     private readonly ViewerActions _viewerActions;
 
-    private readonly ILocalizer _localizer;
-
     public TableInfoViewModel TInfo { get; }
 
     public bool CanSwitchType => true;
@@ -87,7 +83,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         GameViewModel gameViewModel,
         ViewerData data,
         ViewerActions viewerActions,
-        ILocalizer localizer,
         string serverAddress,
         string? serverPublicUrl = null,
         string[]? contentPublicUrls = null)
@@ -95,7 +90,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     {
         _gameViewModel = gameViewModel;
         _viewerActions = viewerActions;
-        _localizer = localizer;
 
         _gameViewModel.Logic = this;
         _gameViewModel.Disposed += GameViewModel_Disposed;
@@ -226,7 +220,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     private void LocalFileManager_Error(Uri mediaUri, Exception e) =>
         _gameViewModel.OnAddString(
             null,
-            $"\n{string.Format(R.FileLoadError, Path.GetFileName(mediaUri.ToString()))}: {e.Message}\n",
+            $"\n{string.Format(Resources.FileLoadError, Path.GetFileName(mediaUri.ToString()))}: {e.Message}\n",
             LogMode.Log);
 
     private void TInfo_MediaLoad() => _viewerActions.SendMessage(Messages.MediaLoaded);
@@ -237,14 +231,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         if (exc.InnerException is NotSupportedException)
         {
-            error = $"{_localizer[nameof(R.MediaFileNotSupported)]}: {exc.InnerException.Message}";
+            error = $"{Resources.MediaFileNotSupported}: {exc.InnerException.Message}";
         }
         else
         {
             error = (exc.InnerException ?? exc).ToString();
         }
 
-        _gameViewModel.OnAddString(null, $"{_localizer[nameof(R.MediaLoadError)]} {exc.MediaUri}: {error}{Environment.NewLine}", LogMode.Log);
+        _gameViewModel.OnAddString(null, $"{Resources.MediaLoadError} {exc.MediaUri}: {error}{Environment.NewLine}", LogMode.Log);
     }
 
     private void TInfo_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -297,11 +291,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         if (replicCode == ReplicCodes.Showman.ToString())
         {
-            if (_data.ShowMan == null)
-            {
-                return;
-            }
-
             _gameViewModel.ClearReplic();
             _gameViewModel.Speaker = _data.ShowMan;
             _gameViewModel.Speaker.Replic = TrimReplic(text);
@@ -439,7 +428,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                         var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out string path);
                         _logFilePath = path;
                         _gameLogger = new StreamWriter(stream);
-                        _gameLogger.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title>");
+                        _gameLogger.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + Resources.LogTitle + "</title>");
                         _gameLogger.Write("<style>.sr { font-weight:bold; color: #00FFFF; } .n0 { color: #EF21A9; } .n1 { color: #0BE6CF; } .n2 { color: #EF9F21; } .n3 { color: #FF0000; } .n4 { color: #00FF00; } .n5 { color: #0000FF; } .sp, .sl { font-style: italic; font-weight: bold; } .sh { color: #0AEA2A; font-weight: bold; } .l { color: #646464; font-weight: bold; } .r { font-weight: bold; } .s { font-style: italic; } </style>");
                         _gameLogger.Write("</head><body>");
                     }
@@ -592,12 +581,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             }
         }
 
-        if (TInfo.TStage == TableStage.Question)
-        {
-            // Toggle TStage change to reapply QuestionTemplateSelector template
-            TInfo.TStage = TableStage.Void;
-        }
-
         TInfo.TextLength = 0;
         TInfo.PartialText = true;
         TInfo.Text = text.ToString();
@@ -607,12 +590,6 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
     public void OnContentShape(string shape)
     {
-        if (TInfo.TStage == TableStage.Question)
-        {
-            // Toggle TStage change to reapply QuestionTemplateSelector template
-            TInfo.TStage = TableStage.Void;
-        }
-
         TInfo.TextLength = 0;
         TInfo.PartialText = true;
         TInfo.Text = shape;
@@ -890,7 +867,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                         && !_data.Host.LoadExternalMedia
                         && !ExternalUrlOk(uri))
                     {
-                        currentGroup.Content.Add(new ContentViewModel(ContentType.Text, string.Format(_localizer[nameof(R.ExternalLink)], uri)));
+                        currentGroup.Content.Add(new ContentViewModel(ContentType.Text, string.Format(Resources.ExternalLink, uri)));
                         _data.EnableMediaLoadButton = true;
                         _data.ExternalContent.Add((contentType, uri));
                         return;
@@ -971,7 +948,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         if (!uri.StartsWith("http://localhost") && !_data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
         {
-            TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
+            TInfo.Text = string.Format(Resources.ExternalLink, uri);
             TInfo.QuestionContentType = QuestionContentType.SpecialText;
             _data.EnableMediaLoadButton = true;
             _data.ExternalContent.Add((ContentTypes.Audio, uri));
@@ -1093,7 +1070,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
             if (rightIndex == -1)
             {
-                OnReplic(ReplicCodes.Showman.ToString(), $"{_localizer[nameof(R.RightAnswer)]}: {answer}");
+                OnReplic(ReplicCodes.Showman.ToString(), $"{Resources.RightAnswer}: {answer}");
                 return;
             }
 
@@ -1535,7 +1512,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         try
         {
             await Task.Delay(1000);
-            _gameViewModel.OnAddString(null, _localizer[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
+            _gameViewModel.OnAddString(null, Resources.Greeting + Environment.NewLine, LogMode.Protocol);
         }
         catch (Exception exc)
         {
@@ -1572,10 +1549,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                         {
                             if (personIndex == -1)
                             {
-                                if (_data.ShowMan != null)
-                                {
-                                    _data.ShowMan.IsDeciding = true;
-                                }
+                                _data.ShowMan.IsDeciding = true;
                             }
                             else if (personIndex > -1 && personIndex < _data.Players.Count)
                             {
@@ -1593,20 +1567,15 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                 }
 
             case MessageParams.Timer_Stop:
+                _data.ShowMan.IsDeciding = false;
+
+                foreach (var player in _data.Players)
                 {
-                    if (_data.ShowMan != null)
-                    {
-                        _data.ShowMan.IsDeciding = false;
-                    }
-
-                    foreach (var player in _data.Players)
-                    {
-                        player.IsDeciding = false;
-                    }
-
-                    _data.ShowMainTimer = false;
-                    break;
+                    player.IsDeciding = false;
                 }
+
+                _data.ShowMainTimer = false;
+                break;
         }
     }
 
@@ -1677,7 +1646,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                 if (banned != null)
                 {
                     ClientData.Banned.Remove(banned);
-                    OnSpecialReplic(string.Format(_localizer[nameof(R.UserUnbanned)], banned.UserName));
+                    OnSpecialReplic(string.Format(Resources.UserUnbanned, banned.UserName));
                 }
             },
             exc => ClientData.Host.OnError(exc));
@@ -1708,17 +1677,17 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     {
         var gameInfo = new StringBuilder();
 
-        var coersedGameName = gameName.Length > 0 ? gameName : R.LocalGame;
+        var coersedGameName = gameName.Length > 0 ? gameName : Resources.LocalGame;
         
         if (packageName == Constants.RandomIndicator)
         {
-            packageName = R.RandomPackageName;
+            packageName = Resources.RandomPackageName;
         }
 
-        gameInfo.AppendFormat(R.GameName).Append(": ").Append(coersedGameName).AppendLine();
-        gameInfo.AppendFormat(R.PackageName).Append(": ").Append(packageName).AppendLine();
-        gameInfo.AppendFormat(R.ContactUri).Append(": ").Append(contactUri).AppendLine();
-        gameInfo.AppendFormat(R.VoiceChatLink).Append(": ").Append(voiceChatUri).AppendLine();
+        gameInfo.AppendFormat(Resources.GameName).Append(": ").Append(coersedGameName).AppendLine();
+        gameInfo.AppendFormat(Resources.PackageName).Append(": ").Append(packageName).AppendLine();
+        gameInfo.AppendFormat(Resources.ContactUri).Append(": ").Append(contactUri).AppendLine();
+        gameInfo.AppendFormat(Resources.VoiceChatLink).Append(": ").Append(voiceChatUri).AppendLine();
 
         _gameViewModel.GameMetadata = gameInfo.ToString();
 
@@ -1731,7 +1700,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     public void AddPlayer(PlayerAccount player) => UI.Execute(
         () =>
         {
-            _gameViewModel.Players.Add(player);
+            _gameViewModel.Players.Add(new PlayerViewModel(player));
             _gameViewModel.UpdateAddTableCommand();
         },
         ClientData.Host.OnError);
@@ -1753,7 +1722,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
                 foreach (var player in ClientData.Players)
                 {
-                    _gameViewModel.Players.Add(player);
+                    _gameViewModel.Players.Add(new PlayerViewModel(player));
                 }
 
                 _gameViewModel.UpdateAddTableCommand();
@@ -1890,7 +1859,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         }
     }
 
-    public void OnHint(string hint) => _gameViewModel.Hint = $"{_localizer[nameof(R.RightAnswer)].ToUpperInvariant()} : {hint}";
+    public void OnHint(string hint) => _gameViewModel.Hint = $"{Resources.RightAnswer.ToUpperInvariant()} : {hint}";
 
     public void EndThink()
     {
@@ -1916,15 +1885,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         OnReplic(ReplicCodes.Special.ToString(), Resources.GameClosedMessage);
     }
 
-    public void OnCanPressButton()
-    {
-        _gameViewModel.Apellate.CanBeExecuted = false;
-    }
+    public void OnCanPressButton() => _gameViewModel.Apellate.CanBeExecuted = false;
 
-    public void OnQuestionSelected()
-    {
-        _gameViewModel.Apellate.CanBeExecuted = false;
-    }
+    public void OnQuestionSelected() => _gameViewModel.Apellate.CanBeExecuted = false;
 
     public void OnPersonConnected() => _gameViewModel.UpdateCommands();
 
@@ -1964,4 +1927,10 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             player.IsDeciding = false;
         }
     }
+
+    public void OnSelfDisconnected() => OnReplic(ReplicCodes.System.ToString(), Resources.DisconnectMessage);
+
+    public void OnHostChangedBy(string whom, string newHost) => OnReplic(
+        ReplicCodes.Special.ToString(),
+        string.Format(Resources.HostChanged, whom, newHost));
 }

@@ -3,6 +3,8 @@ using SIEngine.Models;
 using SIEngine.QuestionSelectionStrategies;
 using SIEngine.Rules;
 using SIPackages;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace SIEngine;
 
@@ -13,7 +15,7 @@ namespace SIEngine;
 /// Uses selection strategy to select questions in each game round. Then tranfers question play to question engine.
 /// The strategy is selected by game rules and round type.
 /// </remarks>
-public sealed class GameEngine : EngineBase
+public sealed class GameEngine : EngineBase, INotifyPropertyChanged
 {
     private readonly IQuestionEngineFactory _questionEngineFactory;
     private readonly ISIEnginePlayHandler _playHandler;
@@ -49,6 +51,113 @@ public sealed class GameEngine : EngineBase
     }
 
     private RoundEndReason _roundEndReason;
+
+    private bool _canMoveNext = true;
+
+    private bool _canMoveBack;
+
+    private bool _canMoveNextRound;
+
+    private bool _canMoveBackRound;
+
+    public bool CanMoveNext
+    {
+        get => _canMoveNext;
+        private set
+        {
+            if (_canMoveNext != value)
+            {
+                _canMoveNext = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool CanMoveBack
+    {
+        get => _canMoveBack;
+        private set
+        {
+            if (_canMoveBack != value)
+            {
+                _canMoveBack = value;
+                OnPropertyChanged();
+                UpdateCanMoveBackRound();
+            }
+        }
+    }
+
+    public bool CanMoveNextRound
+    {
+        get => _canMoveNextRound;
+        private set
+        {
+            if (_canMoveNextRound != value)
+            {
+                _canMoveNextRound = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool CanMoveBackRound
+    {
+        get => _canMoveBackRound;
+        private set
+        {
+            if (_canMoveBackRound != value)
+            {
+                _canMoveBackRound = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private Round? _activeRound;
+
+    private Round ActiveRound
+    {
+        get
+        {
+            if (_activeRound == null)
+            {
+                throw new InvalidOperationException("_activeRound == null");
+            }
+
+            return _activeRound;
+        }
+    }
+
+    private Theme? _activeTheme;
+
+    private Question? _activeQuestion;
+
+    private Question ActiveQuestion
+    {
+        get
+        {
+            if (_activeQuestion == null)
+            {
+                throw new InvalidOperationException("_activeQuestion == null");
+            }
+
+            return _activeQuestion;
+        }
+    }
+
+    private int _roundIndex = -1, _themeIndex = 0, _questionIndex = 0;
+
+    public string PackageName => _document.Package.Name;
+
+    public string ContactUri => _document.Package.ContactUri;
+
+    public int RoundIndex => _roundIndex;
+
+    public int ThemeIndex => _themeIndex;
+
+    public int QuestionIndex => _questionIndex;
 
     public GameEngine(
         SIDocument document,
@@ -210,6 +319,10 @@ public sealed class GameEngine : EngineBase
         Stage = GameStage.None;
     }
 
+    private void UpdateCanMoveNextRound() => CanMoveNextRound = _roundIndex < _document.Package.Rounds.Count;
+
+    private void UpdateCanMoveBackRound() => CanMoveBackRound = _roundIndex > 0 || CanMoveBack;
+
     /// <summary>
     /// Moves engine to the previous game state.
     /// </summary>
@@ -241,7 +354,7 @@ public sealed class GameEngine : EngineBase
 
     public bool CanNext() => _stage != GameStage.None && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
 
-    public void UpdateCanNext() => CanMoveNext = CanNext();
+    private void UpdateCanNext() => CanMoveNext = CanNext();
 
     /// <summary>
     /// Ends round and moves to the next one.
@@ -350,6 +463,8 @@ public sealed class GameEngine : EngineBase
         return true;
     }
 
+    private void SetActiveRound() => _activeRound = _roundIndex < _document.Package.Rounds.Count ? _document.Package.Rounds[_roundIndex] : null;
+
     /// <summary>
     /// Skips rest of the question and goes directly to answer.
     /// </summary>
@@ -375,4 +490,7 @@ public sealed class GameEngine : EngineBase
 
         Stage = GameStage.QuestionType;
     }
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

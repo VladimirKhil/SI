@@ -1,4 +1,5 @@
 ﻿using SIPackages;
+using SIPackages.Models;
 using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Properties;
@@ -14,22 +15,6 @@ namespace SIQuester.ViewModel;
 /// <inheritdoc cref="ModelViewBase" />
 public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
 {
-    public static readonly Dictionary<string, int> RecommendedSizeMb = new()
-    {
-        [CollectionNames.ImagesStorageName] = 1,
-        [CollectionNames.AudioStorageName] = 5,
-        [CollectionNames.VideoStorageName] = 10,
-        [CollectionNames.HtmlStorageName] = 1,
-    };
-
-    public static readonly IReadOnlyDictionary<string, string[]> RecommendedExtensions = new Dictionary<string, string[]>()
-    {
-        [CollectionNames.ImagesStorageName] = new[] { ".jpg", ".jpe", ".jpeg", ".png", ".gif", ".webp" },
-        [CollectionNames.AudioStorageName] = new[] { ".mp3" },
-        [CollectionNames.VideoStorageName] = new[] { ".mp4" },
-        [CollectionNames.HtmlStorageName] = new[] { ".html" },
-    };
-
     private IMedia? _mediaSource = null;
 
     private Task<IMedia?>? _mediaLoading = null;
@@ -104,12 +89,12 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
     {
         var extension = Path.GetExtension(media.Uri).ToLowerInvariant();
 
-        var sizeWarning = AppSettings.Default.CheckFileSize && RecommendedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
+        var sizeWarning = AppSettings.Default.CheckFileSize && Quality.FileSizeMb.TryGetValue(Type, out var recommendedMaxSize)
             && media.StreamLength > recommendedMaxSize * 1024 * 1024
                 ? string.Format(Resources.MediaFileSizeExceedsRecommendedValue, recommendedMaxSize)
                 : null;
 
-        var extensionWarning = RecommendedExtensions.TryGetValue(Type, out var recommendedExtensions)
+        var extensionWarning = Quality.FileExtensions.TryGetValue(Type, out var recommendedExtensions)
             && !recommendedExtensions.Contains(extension)
                 ? string.Format(Resources.MediaFileExtensionIsNotRecommended, string.Join(',', recommendedExtensions))
                 : null;

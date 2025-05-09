@@ -10,6 +10,7 @@ using SIData;
 using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
+using SIPackages.Models;
 using SIUI.Model;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -513,15 +514,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.UseBackgroundAudio = !waitForFinish;
     }
 
-    // TODO: move to SIPackages and share between all the apps
-    private static readonly IReadOnlyDictionary<string, string[]> AllowedExtensions = new Dictionary<string, string[]>()
-    {
-        [ContentTypes.Image] = new[] { ".jpg", ".jpe", ".jpeg", ".png", ".gif", ".webp" },
-        [ContentTypes.Audio] = new[] { ".mp3" },
-        [ContentTypes.Video] = new[] { ".mp4" },
-        [ContentTypes.Html] = new[] { ".html" },
-    };
-
     private (bool success, string? globalUri, string? localUri, string? error) TryShareContent(ContentItem contentItem)
     {
         if (!contentItem.IsRef) // External link
@@ -548,7 +540,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             var fileExtension = Path.GetExtension(contentItem.Value)?.ToLowerInvariant();
 
-            if (AllowedExtensions.TryGetValue(contentItem.Type, out var allowedExtensions) && !allowedExtensions.Contains(fileExtension))
+            if (Quality.FileExtensions.TryGetValue(contentItem.Type, out var allowedExtensions) && !allowedExtensions.Contains(fileExtension))
             {
                 return (false, null, null, string.Format(LO[nameof(R.InvalidFileExtension)], contentItem.Value, fileExtension));
             }
@@ -761,7 +753,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPlayingMedia = false;
 
         _gameActions.InformSums();
-        _gameActions.AnnounceSums();
         _gameActions.SendMessage(Messages.Stop); // Timers STOP
 
         _data.IsThinking = false;
@@ -3108,7 +3099,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private void AskToChoose()
     {
         _gameActions.InformSums();
-        _gameActions.AnnounceSums();
         _gameActions.SendMessage(Messages.ShowTable);
 
         if (_data.Chooser == null)
@@ -4103,7 +4093,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             UpdatePlayersSumsAfterAppellation(votingForRight);
 
             _gameActions.InformSums();
-            _gameActions.AnnounceSums();
 
             _tasksHistory.AddLogEntry($"CheckAppellation resumed normally ({_taskRunner.PrintOldTasks()})");
         }
@@ -4423,7 +4412,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.IsRoundEnding = false;
 
             var roundIndex = Engine.RoundIndex;
-            var roundName = LO.GetRoundName(round.Name);
+            var roundName = round.Name;
 
             _data.Stage = GameStage.Round;
             _data.LegacyStage = round.Type == RoundTypes.Final ? GameStages.Final : GameStages.Round;

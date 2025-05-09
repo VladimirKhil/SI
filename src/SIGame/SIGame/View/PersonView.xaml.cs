@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIGame
+namespace SIGame;
+
+/// <summary>
+/// Defines interaction logic for PersonView.xaml.
+/// </summary>
+public partial class PersonView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для PersonView.xaml
-    /// </summary>
-    public partial class PersonView : UserControl
-    {
-        public PersonView()
-        {
-            InitializeComponent();
-        }
-    }
+    public PersonView() => InitializeComponent();
 }

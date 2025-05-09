@@ -295,15 +295,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Authors contact.
-        /// </summary>
-        public static string ContactUri {
-            get {
-                return ResourceManager.GetString("ContactUri", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Cost.
         /// </summary>
         public static string Cost {
@@ -367,15 +358,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на You have disconnected.
-        /// </summary>
-        public static string DisconnectMessage {
-            get {
-                return ResourceManager.GetString("DisconnectMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Downloading file error.
         /// </summary>
         public static string DownloadFileError {
@@ -408,15 +390,6 @@ namespace SICore.Properties {
         public static string ErrorWritingLogs {
             get {
                 return ResourceManager.GetString("ErrorWritingLogs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на External link: {0} . External link download could be unsafe and is disabled.
-        /// </summary>
-        public static string ExternalLink {
-            get {
-                return ResourceManager.GetString("ExternalLink", resourceCulture);
             }
         }
         
@@ -457,15 +430,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на File &quot;{0}&quot; loading error.
-        /// </summary>
-        public static string FileLoadError {
-            get {
-                return ResourceManager.GetString("FileLoadError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Final.
         /// </summary>
         public static string Final {
@@ -498,15 +462,6 @@ namespace SICore.Properties {
         public static string GameBeginning {
             get {
                 return ResourceManager.GetString("GameBeginning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Game name.
-        /// </summary>
-        public static string GameName {
-            get {
-                return ResourceManager.GetString("GameName", resourceCulture);
             }
         }
         
@@ -619,15 +574,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Welcome to SIGame! The game will begin as soon as all the players and the showman press &quot;Ready&quot; button.
-        /// </summary>
-        public static string Greeting {
-            get {
-                return ResourceManager.GetString("Greeting", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на , greetings!.
         /// </summary>
         public static string GreetingNew {
@@ -669,15 +615,6 @@ namespace SICore.Properties {
         public static string HintSelectCatPlayerForPlayer {
             get {
                 return ResourceManager.GetString("HintSelectCatPlayerForPlayer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Game host was set {0} to {1}.
-        /// </summary>
-        public static string HostChanged {
-            get {
-                return ResourceManager.GetString("HostChanged", resourceCulture);
             }
         }
         
@@ -826,24 +763,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Local game.
-        /// </summary>
-        public static string LocalGame {
-            get {
-                return ResourceManager.GetString("LocalGame", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на SIGame log.
-        /// </summary>
-        public static string LogTitle {
-            get {
-                return ResourceManager.GetString("LogTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Dear players, make your stakes, please;Ladies and gentlemen, make your stakes, please.
         /// </summary>
         public static string MakeStake {
@@ -862,29 +781,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Media file is not supported.
-        /// </summary>
-        public static string MediaFileNotSupported {
-            get {
-                return ResourceManager.GetString("MediaFileNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Media file is too large and will be skipped.
         /// </summary>
         public static string MediaFiltered {
             get {
                 return ResourceManager.GetString("MediaFiltered", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Media load error.
-        /// </summary>
-        public static string MediaLoadError {
-            get {
-                return ResourceManager.GetString("MediaLoadError", resourceCulture);
             }
         }
         
@@ -1546,7 +1447,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на You got a Question for yourself without risk!.
+        ///   Ищет локализованную строку, похожую на You got a Question for yourself!.
         /// </summary>
         public static string SponsoredQuestion {
             get {
@@ -1816,29 +1717,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на User {0} was unbanned.
-        /// </summary>
-        public static string UserUnbanned {
-            get {
-                return ResourceManager.GetString("UserUnbanned", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на ALL-IN!!!.
         /// </summary>
         public static string VaBank {
             get {
                 return ResourceManager.GetString("VaBank", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Voice chat (Discord).
-        /// </summary>
-        public static string VoiceChatLink {
-            get {
-                return ResourceManager.GetString("VoiceChatLink", resourceCulture);
             }
         }
         

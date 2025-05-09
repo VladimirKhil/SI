@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIPackages.Core;
+using SIPackages.Models;
 using SIQuester.Contracts;
 using SIQuester.Helpers;
 using SIQuester.Implementation;
@@ -483,12 +484,16 @@ public partial class FlatDocView : UserControl
 
             if (e.Data.GetDataPresent(WellKnownDragFormats.FileName))
             {
-                var files = e.Data.GetData(WellKnownDragFormats.FileName) as string[];
+                if (e.Data.GetData(WellKnownDragFormats.FileName) is not string[] files || files.Length == 0)
+                {
+                    e.Effects = DragDropEffects.None;
+                    return;
+                }
 
                 foreach (var file in files)
                 {
                     var longPathString = FileHelper.GetLongPathName(file);
-                    var fileExtension = Path.GetExtension(longPathString);
+                    var fileExtension = Path.GetExtension(longPathString).ToLowerInvariant();
 
                     switch (fileExtension)
                     {
@@ -501,7 +506,7 @@ public partial class FlatDocView : UserControl
                             break;
 
                         default:
-                            foreach (var item in MediaOwnerViewModel.RecommendedExtensions)
+                            foreach (var item in Quality.FileExtensions)
                             {
                                 if (item.Value.Contains(fileExtension))
                                 {

@@ -7,6 +7,7 @@
     xmlns:l="clr-namespace:SIGame"
     xmlns:lm="clr-namespace:SIGame.ViewModel.Models;assembly=SIGame.ViewModel"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    xmlns:vmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
     xmlns:lb="clr-namespace:SIGame.Behaviors"
     xmlns:lc="clr-namespace:SIGame.Converters"
     xmlns:lp="clr-namespace:SIGame.Properties"
@@ -380,7 +381,7 @@
                 Grid.Row="2"
                 VerticalAlignment="Center"
                 FontWeight="Medium"
-                Text="{x:Static scp:Resources.VoiceChatLink}">
+                Text="{x:Static vmp:Resources.VoiceChatLink}">
 
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource GameServerOnlyHeader}">

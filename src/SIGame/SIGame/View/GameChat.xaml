@@ -185,7 +185,7 @@
                             Margin="-1,-1,0,-1"
                             Padding="20,4"
                             Command="{Binding FreeTable}"
-                            CommandParameter="{Binding Data.CurrentPerson}"
+                            CommandParameter="{Binding CurrentPerson}"
                             FontSize="14"
                             TextBlock.LineHeight="18"
                             Content="{x:Static lp:Resources.Free}" />
@@ -196,7 +196,7 @@
                             Margin="-1,-1,-1,-1"
                             Padding="20,4"
                             Command="{Binding DeleteTable}"
-                            CommandParameter="{Binding Data.CurrentPerson}"
+                            CommandParameter="{Binding CurrentPerson}"
                             FontSize="14"
                             TextBlock.LineHeight="18"
                             Content="{x:Static lp:Resources.DeleteTable}" />
@@ -214,10 +214,10 @@
                             Margin="-1,-1,0,-1"
                             Padding="2"
                             Command="{Binding ChangeType}"
-                            CommandParameter="{Binding Data.CurrentPerson}"
+                            CommandParameter="{Binding CurrentPerson}"
                             FontSize="10"
                             Height="30"
-                            Content="{Binding Data.CurrentPerson.IsHuman, Converter={StaticResource ChangeTypeConverter}}" />
+                            Content="{Binding CurrentPerson.IsHuman, Converter={StaticResource ChangeTypeConverter}}" />
 
                         <Button
                             Background="{StaticResource WindowBackground}"
@@ -227,7 +227,7 @@
                             TextBlock.LineHeight="18"
                             Content="{x:Static lp:Resources.ReplaceTo}">
                             <lb:DropDownBehavior.DropDown>
-                                <ContextMenu Style="{StaticResource SIContextMenuStyle}" ItemsSource="{Binding Data.CurrentPerson.Others}">
+                                <ContextMenu Style="{StaticResource SIContextMenuStyle}" ItemsSource="{Binding CurrentPerson.Others}">
                                     <ContextMenu.ItemContainerStyle>
                                         <Style TargetType="MenuItem">
                                             <Setter
@@ -246,7 +246,7 @@
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource SIButtonSimple}">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Data.CurrentPerson.Others.Length}" Value="0">
+                                        <DataTrigger Binding="{Binding CurrentPerson.Others.Length}" Value="0">
                                             <Setter Property="IsEnabled" Value="False" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -273,8 +273,8 @@
                                 <DataTrigger Value="True">
                                     <DataTrigger.Binding>
                                         <MultiBinding Converter="{StaticResource Equals}">
-                                            <Binding Path="Data.ShowMan" />
-                                            <Binding Path="Data.CurrentPerson" />
+                                            <Binding Path="Showman" />
+                                            <Binding Path="CurrentPerson" />
                                         </MultiBinding>
                                     </DataTrigger.Binding>
 
@@ -302,14 +302,14 @@
                 <ListBox
                     IsSynchronizedWithCurrentItem="True"
                     ItemsSource="{Binding Players}"
-                    SelectedItem="{Binding Data.CurrentPerson}"
+                    SelectedItem="{Binding CurrentPerson}"
                     Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}"
                     FontSize="16"
                     Name="playerTables">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Margin="0,5">
-                                <Run Text="{Binding Name, Mode=OneWay}" />
+                                <Run Text="{Binding Model.Name, Mode=OneWay}" />
                             </TextBlock>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

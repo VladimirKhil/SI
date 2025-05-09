@@ -395,7 +395,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Game showman.
     /// </summary>
-    internal GamePersonAccount ShowMan
+    public GamePersonAccount ShowMan
     {
         get => _showMan;
         set
@@ -470,10 +470,10 @@ public sealed class GameData : Data
         + Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
         + (ShowMan.IsHuman && ShowMan.IsConnected ? 1 : 0);
 
-    internal void BeginUpdatePersons(string reason) =>
+    public void BeginUpdatePersons(string reason) =>
         PersonsUpdateHistory.AppendLine("===").Append($"Before ({reason}): ").Append(PrintPersons());
 
-    internal void EndUpdatePersons()
+    public void EndUpdatePersons()
     {
         OnMainPersonsChanged();
         OnAllPersonsChanged();

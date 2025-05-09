@@ -1042,14 +1042,14 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
 
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsConnected}" Value="False">
+                    <DataTrigger Binding="{Binding Model.IsConnected}" Value="False">
                         <Setter Property="Foreground" Value="Gray" />
                     </DataTrigger>
                     
                     <DataTrigger Value="True">
                         <DataTrigger.Binding>
                             <MultiBinding Converter="{StaticResource Equals}">
-                                <Binding Path="Name" />
+                                <Binding Path="Model.Name" />
                                 <Binding RelativeSource="{RelativeSource AncestorType=l:Studia}" Path="DataContext.Data.Name" />
                             </MultiBinding>
                         </DataTrigger.Binding>
@@ -1061,7 +1061,7 @@
 
             <Style x:Key="sumTB" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource PersonTextStyle}">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Sum}" Value="{x:Null}">
+                    <DataTrigger Binding="{Binding Model.Sum}" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -1071,7 +1071,7 @@
                 <Setter Property="Background" Value="{StaticResource PersonGradient}" />
                 
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Sum}" Value="{x:Null}">
+                    <DataTrigger Binding="{Binding Model.Sum}" Value="{x:Null}">
                         <Setter Property="Background" Value="{x:Null}" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -1081,7 +1081,7 @@
                 <Setter Property="Background" Value="{StaticResource GradientRev}" />
                 
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsShowman}" Value="True">
+                    <DataTrigger Binding="{Binding Model.IsShowman}" Value="True">
                         <Setter Property="Height" Value="0" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -1089,15 +1089,15 @@
 
             <Style x:Key="stakeBorder" TargetType="Border" BasedOn="{StaticResource nonShowman}">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Stake}" Value="0">
+                    <DataTrigger Binding="{Binding Model.Stake}" Value="0">
                         <Setter Property="Visibility" Value="Hidden" />
                     </DataTrigger>
-                    
-                    <DataTrigger Binding="{Binding Stake}" Value="-2">
+
+                    <DataTrigger Binding="{Binding Model.Stake}" Value="-2">
                         <Setter Property="Visibility" Value="Hidden" />
                     </DataTrigger>
-                    
-                    <DataTrigger Binding="{Binding Stake}" Value="{x:Null}">
+
+                    <DataTrigger Binding="{Binding Model.Stake}" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Hidden" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -1107,7 +1107,7 @@
                 <Setter Property="Foreground" Value="#ffa000" />
 
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding SafeStake}" Value="True">
+                    <DataTrigger Binding="{Binding Model.SafeStake}" Value="True">
                         <Setter Property="Foreground" Value="{StaticResource MainColor}" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -1178,7 +1178,6 @@
                 <Setter Property="TextAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="Text" Value="{Binding Replic}" />
                 <Setter Property="Margin" Value="6" />
             </Style>
 
@@ -1206,7 +1205,7 @@
                     Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.08}" />
                 
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Replic.Length, Mode=OneWay, Converter={StaticResource GreaterThan}, ConverterParameter=0}" Value="True">
+                    <DataTrigger Binding="{Binding Model.Replic.Length, Mode=OneWay, Converter={StaticResource GreaterThan}, ConverterParameter=0}" Value="True">
                         <DataTrigger.EnterActions>
                             <BeginStoryboard>
                                 <Storyboard>
@@ -1234,7 +1233,7 @@
                 <Setter Property="Canvas.Bottom" Value="{x:Static sys:Double.NaN}" />
 
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Replic.Length, Mode=OneWay, Converter={StaticResource GreaterThan}, ConverterParameter=0}" Value="True">
+                    <DataTrigger Binding="{Binding Model.Replic.Length, Mode=OneWay, Converter={StaticResource GreaterThan}, ConverterParameter=0}" Value="True">
                         <DataTrigger.EnterActions>
                             <BeginStoryboard>
                                 <Storyboard>

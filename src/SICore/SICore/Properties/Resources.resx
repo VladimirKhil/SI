@@ -237,9 +237,6 @@
   <data name="GoodMorning" xml:space="preserve">
     <value>Good morning!</value>
   </data>
-  <data name="Greeting" xml:space="preserve">
-    <value>Welcome to SIGame! The game will begin as soon as all the players and the showman press "Ready" button</value>
-  </data>
   <data name="GreetingNew" xml:space="preserve">
     <value>, greetings!</value>
   </data>
@@ -442,7 +439,7 @@
     <value>Waiting for the showman's decision...</value>
   </data>
   <data name="SponsoredQuestion" xml:space="preserve">
-    <value>You got a Question for yourself without risk!</value>
+    <value>You got a Question for yourself!</value>
   </data>
   <data name="SponsoredQuestionInfo" xml:space="preserve">
     <value>This question is only for you. If you answer correctly, you'll earn {0} points, otherwise you loose nothing!</value>
@@ -570,9 +567,6 @@
   <data name="ErrorWritingLogs" xml:space="preserve">
     <value>Cannot save logs. Access denied</value>
   </data>
-  <data name="LogTitle" xml:space="preserve">
-    <value>SIGame log</value>
-  </data>
   <data name="CannotConnectToServer" xml:space="preserve">
     <value>Cannot connect to server</value>
   </data>
@@ -585,9 +579,6 @@
   <data name="UnknownSenderMessage" xml:space="preserve">
     <value>Message from unknown sender</value>
   </data>
-  <data name="DisconnectMessage" xml:space="preserve">
-    <value>You have disconnected</value>
-  </data>
   <data name="NetworkOpeningError" xml:space="preserve">
     <value>Error while starting listening network: {0}. Network connections are unavailable.</value>
   </data>
@@ -597,9 +588,6 @@
   <data name="DeleteTableHint" xml:space="preserve">
     <value>Select table to delete</value>
   </data>
-  <data name="ExternalLink" xml:space="preserve">
-    <value>External link: {0} . External link download could be unsafe and is disabled</value>
-  </data>
   <data name="ApellatedAnswers" xml:space="preserve">
     <value>Apellated answers</value>
   </data>
@@ -608,9 +596,6 @@
   </data>
   <data name="ErrorMessages" xml:space="preserve">
     <value>Error messages</value>
-  </data>
-  <data name="PackageName" xml:space="preserve">
-    <value>Package name</value>
   </data>
   <data name="Question" xml:space="preserve">
     <value>Question</value>
@@ -624,20 +609,11 @@
   <data name="MediaNotFound" xml:space="preserve">
     <value>File {0} was not found in the game package!</value>
   </data>
-  <data name="MediaFileNotSupported" xml:space="preserve">
-    <value>Media file is not supported</value>
-  </data>
-  <data name="MediaLoadError" xml:space="preserve">
-    <value>Media load error</value>
-  </data>
   <data name="SureFemaleEnding" xml:space="preserve">
     <value />
   </data>
   <data name="ByGame" xml:space="preserve">
     <value>by game</value>
-  </data>
-  <data name="HostChanged" xml:space="preserve">
-    <value>Game host was set {0} to {1}</value>
   </data>
   <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
     <value>The showman has switched the game into other round</value>
@@ -654,29 +630,14 @@
   <data name="OversizedFile" xml:space="preserve">
     <value>{0} in question {1} exceeds recommended size of {2} KB and could be loaded with delay</value>
   </data>
-  <data name="FileLoadError" xml:space="preserve">
-    <value>File "{0}" loading error</value>
-  </data>
   <data name="PersonAlreadyExists" xml:space="preserve">
     <value>Person {0} already exists in the game!</value>
   </data>
   <data name="MediaFiltered" xml:space="preserve">
     <value>Media file is too large and will be skipped</value>
   </data>
-  <data name="UserUnbanned" xml:space="preserve">
-    <value>User {0} was unbanned</value>
-  </data>
   <data name="FailedToAppellateForWrongAnswer" xml:space="preserve">
     <value>Player {0} tried to appellate the last right answer, but there are not enough players to win the appellation currently in the game</value>
-  </data>
-  <data name="ContactUri" xml:space="preserve">
-    <value>Authors contact</value>
-  </data>
-  <data name="GameName" xml:space="preserve">
-    <value>Game name</value>
-  </data>
-  <data name="LocalGame" xml:space="preserve">
-    <value>Local game</value>
   </data>
   <data name="QuestionRemoved" xml:space="preserve">
     <value>{0} removes question {1}, {2}</value>
@@ -689,9 +650,6 @@
   </data>
   <data name="Cost2" xml:space="preserve">
     <value>Cost</value>
-  </data>
-  <data name="VoiceChatLink" xml:space="preserve">
-    <value>Voice chat (Discord)</value>
   </data>
   <data name="LetsPlayNextTheme" xml:space="preserve">
     <value>Let's play next theme</value>
@@ -728,9 +686,6 @@
   </data>
   <data name="ScoreChanged" xml:space="preserve">
     <value>{0} changed {1} score from {2} to {3}</value>
-  </data>
-  <data name="RandomPackageName" xml:space="preserve">
-    <value>Random themes</value>
   </data>
   <data name="RoundName" xml:space="preserve">
     <value>Round {0}</value>
@@ -770,5 +725,11 @@
   </data>
   <data name="InvalidFileExtension" xml:space="preserve">
     <value>File {0} has invalid extension {1}</value>
+  </data>
+  <data name="PackageName" xml:space="preserve">
+    <value>Package name</value>
+  </data>
+  <data name="RandomPackageName" xml:space="preserve">
+    <value>Random themes</value>
   </data>
 </root>

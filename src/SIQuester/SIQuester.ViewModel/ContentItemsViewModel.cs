@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIPackages.Core;
+using SIPackages.Models;
 using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -404,9 +405,9 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     public void TryImportMedia(string filePath)
     {
-        var fileExtension = Path.GetExtension(filePath);
+        var fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
 
-        foreach (var item in MediaOwnerViewModel.RecommendedExtensions)
+        foreach (var item in Quality.FileExtensions)
         {
             if (item.Value.Contains(fileExtension))
             {

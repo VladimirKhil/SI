@@ -232,6 +232,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Authors contact.
+        /// </summary>
+        public static string ContactUri {
+            get {
+                return ResourceManager.GetString("ContactUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Create.
         /// </summary>
         public static string Create {
@@ -264,6 +273,15 @@ namespace SIGame.ViewModel.Properties {
         public static string DeleteConfirm {
             get {
                 return ResourceManager.GetString("DeleteConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на You have disconnected.
+        /// </summary>
+        public static string DisconnectMessage {
+            get {
+                return ResourceManager.GetString("DisconnectMessage", resourceCulture);
             }
         }
         
@@ -313,11 +331,29 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на External link: {0} . External link download could be unsafe and is disabled.
+        /// </summary>
+        public static string ExternalLink {
+            get {
+                return ResourceManager.GetString("ExternalLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на https://vk.com/topic-135725718_34967839.
         /// </summary>
         public static string FeedbackLink {
             get {
                 return ResourceManager.GetString("FeedbackLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на File &quot;{0}&quot; loading error.
+        /// </summary>
+        public static string FileLoadError {
+            get {
+                return ResourceManager.GetString("FileLoadError", resourceCulture);
             }
         }
         
@@ -493,6 +529,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game name.
+        /// </summary>
+        public static string GameName {
+            get {
+                return ResourceManager.GetString("GameName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Game name is required.
         /// </summary>
         public static string GameNameRequired {
@@ -664,6 +709,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Welcome to SIGame! The game will begin as soon as all the players and the showman press &quot;Ready&quot; button.
+        /// </summary>
+        public static string Greeting {
+            get {
+                return ResourceManager.GetString("Greeting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на https://vk.com/si_game.
         /// </summary>
         public static string GroupLink {
@@ -781,6 +835,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game host was set {0} to {1}.
+        /// </summary>
+        public static string HostChanged {
+            get {
+                return ResourceManager.GetString("HostChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Import successfully completed.
         /// </summary>
         public static string ImportOk {
@@ -853,7 +916,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на QUESTION FOR YOURSELF WITHOUT RISK.
+        ///   Ищет локализованную строку, похожую на QUESTION FOR YOURSELF.
         /// </summary>
         public static string Label_Sponsored {
             get {
@@ -867,6 +930,15 @@ namespace SIGame.ViewModel.Properties {
         public static string LinkError {
             get {
                 return ResourceManager.GetString("LinkError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Local game.
+        /// </summary>
+        public static string LocalGame {
+            get {
+                return ResourceManager.GetString("LocalGame", resourceCulture);
             }
         }
         
@@ -885,6 +957,15 @@ namespace SIGame.ViewModel.Properties {
         public static string LogsMovingError {
             get {
                 return ResourceManager.GetString("LogsMovingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SIGame log.
+        /// </summary>
+        public static string LogTitle {
+            get {
+                return ResourceManager.GetString("LogTitle", resourceCulture);
             }
         }
         
@@ -957,6 +1038,24 @@ namespace SIGame.ViewModel.Properties {
         public static string MaximumFileSize {
             get {
                 return ResourceManager.GetString("MaximumFileSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Media file is not supported.
+        /// </summary>
+        public static string MediaFileNotSupported {
+            get {
+                return ResourceManager.GetString("MediaFileNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Media load error.
+        /// </summary>
+        public static string MediaLoadError {
+            get {
+                return ResourceManager.GetString("MediaLoadError", resourceCulture);
             }
         }
         
@@ -1123,6 +1222,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Package name.
+        /// </summary>
+        public static string PackageName {
+            get {
+                return ResourceManager.GetString("PackageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на package not selected.
         /// </summary>
         public static string PackageNotSelected {
@@ -1231,6 +1339,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Random themes.
+        /// </summary>
+        public static string RandomPackageName {
+            get {
+                return ResourceManager.GetString("RandomPackageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Random server themes.
         /// </summary>
         public static string RandomServerThemes {
@@ -1290,6 +1407,15 @@ namespace SIGame.ViewModel.Properties {
         public static string ReportTitle {
             get {
                 return ResourceManager.GetString("ReportTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The right answer.
+        /// </summary>
+        public static string RightAnswer {
+            get {
+                return ResourceManager.GetString("RightAnswer", resourceCulture);
             }
         }
         
@@ -1582,11 +1708,29 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на User {0} was unbanned.
+        /// </summary>
+        public static string UserUnbanned {
+            get {
+                return ResourceManager.GetString("UserUnbanned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на An error occured while following the web-site ({0}). Make sure you have a default browser.
         /// </summary>
         public static string VKThemesError {
             get {
                 return ResourceManager.GetString("VKThemesError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Voice chat (Discord).
+        /// </summary>
+        public static string VoiceChatLink {
+            get {
+                return ResourceManager.GetString("VoiceChatLink", resourceCulture);
             }
         }
         

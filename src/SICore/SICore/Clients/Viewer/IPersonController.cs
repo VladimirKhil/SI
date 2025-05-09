@@ -274,4 +274,8 @@ public interface IPersonController
     void MakeStake();
 
     void AddLog(string message) { }
+
+    void OnSelfDisconnected() { }
+
+    void OnHostChangedBy(string whom, string newHost) { }
 }

@@ -3,6 +3,7 @@ using SIPackages.Containers;
 using SIPackages.Core;
 using SIPackages.Helpers;
 using SIPackages.Models;
+using SIPackages.Serializers;
 using System.Diagnostics;
 using System.Xml;
 using ZipUtils;

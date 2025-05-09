@@ -1,7 +1,6 @@
 ﻿using Notions;
 using SICore.Clients;
 using SICore.Contracts;
-using SICore.Extensions;
 using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -11,7 +10,6 @@ using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
 using System.Text;
-using R = SICore.Properties.Resources;
 
 namespace SICore;
 
@@ -22,17 +20,14 @@ public sealed class GameActions
 {
     private readonly GameData _gameData;
 
-    private readonly ILocalizer LO;
-
     public Client Client { get; }
 
     private readonly IFileShare _fileShare;
 
-    public GameActions(Client client, GameData gameData, ILocalizer localizer, IFileShare fileShare)
+    public GameActions(Client client, GameData gameData, IFileShare fileShare)
     {
         Client = client;
         _gameData = gameData;
-        LO = localizer;
         _fileShare = fileShare;
     }
 
@@ -97,31 +92,10 @@ public sealed class GameActions
 
         for (var i = 0; i < _gameData.Rounds.Length; i++)
         {
-            message.Append(Message.ArgsSeparatorChar).Append(LO.GetRoundName(_gameData.Rounds[i].Name));
+            message.Append(Message.ArgsSeparatorChar).Append(_gameData.Rounds[i].Name);
         }
 
         SendMessage(message.ToString(), person);
-    }
-
-    /// <summary>
-    /// Объявить суммы
-    /// </summary>
-    public void AnnounceSums()
-    {
-        var s = new StringBuilder(LO[nameof(R.Score)]).Append(": ");
-        var playerCount = _gameData.Players.Count;
-
-        for (var i = 0; i < playerCount; i++)
-        {
-            s.Append(Notion.FormatNumber(_gameData.Players[i].Sum));
-
-            if (i < playerCount - 1)
-            {
-                s.Append("; ");
-            }
-        }
-
-        SystemReplic(s.ToString());
     }
 
     public void SendThemeInfo(int themeIndex = -1, bool animate = false, int? overridenQuestionCount = null)

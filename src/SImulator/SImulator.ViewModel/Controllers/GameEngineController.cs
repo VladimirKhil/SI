@@ -22,11 +22,11 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public IPresentationController PresentationController => GameViewModel!.PresentationController;
 
-    private readonly SIDocument _document;
+    private readonly IMediaProvider _mediaProvider;
 
     private bool? _optionsShown = null;
 
-    public GameEngineController(SIDocument document) => _document = document;
+    public GameEngineController(IMediaProvider mediaProvider) => _mediaProvider = mediaProvider;
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {
@@ -281,7 +281,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     private string? TryGetMediaUri(ContentItem contentItem)
     {
-        var media = _document.TryGetMedia(contentItem);
+        var media = _mediaProvider.TryGetMedia(contentItem);
         return media?.Uri?.OriginalString;
     }
 

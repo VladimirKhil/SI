@@ -16,6 +16,11 @@
     WindowState="Normal"
     WindowStyle="None"
     Closing="Window_Closing">
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding Stop}" />
+        <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding Stop}" />
+    </Window.InputBindings>
+    
     <wv2:WebView2
         x:Name="webView"
         Source="{Binding Source}"

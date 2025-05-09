@@ -63,7 +63,7 @@ public sealed class ScenariosTests
         var fileShare = Substitute.For<IFileShare>();
         var avatarHelper = Substitute.For<IAvatarHelper>();
 
-        var gameRunner = new GameRunner(
+        var game = GameRunner.CreateGame(
             node,
             gameSettings,
             document,
@@ -71,11 +71,10 @@ public sealed class ScenariosTests
             fileShare,
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
-            null,
             avatarHelper,
             null);
 
-        var (_, game) = gameRunner.Run((data, actions, localizer) => throw new InvalidOperationException());
+        game.Run();
 
         var showmanClient = new Client("Showman");
         var showmanListener = new MessageListener(showmanClient);

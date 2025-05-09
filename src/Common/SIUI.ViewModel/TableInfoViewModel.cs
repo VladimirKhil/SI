@@ -156,21 +156,6 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         }
     }
 
-    private int _playerIndex = -1;
-
-    /// <summary>
-    /// Index of player who wins the button competition.
-    /// </summary>
-    [Obsolete("Implement players view model outside the table")]
-    public int PlayerIndex
-    {
-        get => _playerIndex;
-        set { _playerIndex = value; OnPropertyChanged(nameof(ActivePlayer)); }
-    }
-
-    [Obsolete("Implement players view model outside the table")]
-    public string? ActivePlayer => (_playerIndex < 0 || _playerIndex >= Players.Count) ? "" : Players[_playerIndex].Name;
-
     /// <summary>
     /// Players lost the button chase.
     /// </summary>
@@ -391,12 +376,6 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
 
     public object RoundInfoLock { get; } = new object();
 
-    /// <summary>
-    /// Game players.
-    /// </summary>
-    [Obsolete("Implement players view model outside the table")]
-    public IList<SimplePlayerInfo> Players { get; private set; } = new ObservableCollection<SimplePlayerInfo>();
-
     private SettingsViewModel _settings;
 
     public SettingsViewModel Settings { get => _settings; set { _settings = value; OnPropertyChanged(); } }
@@ -450,15 +429,6 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public TableInfoViewModel()
     {
         _settings = new SettingsViewModel();
-
-        Init();
-    }
-
-    [Obsolete("Implement players view model outside the table")]
-    public TableInfoViewModel(IList<SimplePlayerInfo> players)
-    {
-        _settings = new SettingsViewModel();
-        Players = players;
 
         Init();
     }

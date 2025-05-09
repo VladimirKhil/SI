@@ -616,7 +616,7 @@
     <value>ВОПРОС С СЕКРЕТОМ</value>
   </data>
   <data name="Label_Sponsored" xml:space="preserve">
-    <value>ВОПРОС ДЛЯ СЕБЯ БЕЗ РИСКА</value>
+    <value>ВОПРОС ДЛЯ СЕБЯ</value>
   </data>
   <data name="GameStarted" xml:space="preserve">
     <value>Игра началась</value>
@@ -629,5 +629,53 @@
   </data>
   <data name="HintMakeAStake" xml:space="preserve">
     <value>Сделайте ставку</value>
+  </data>
+  <data name="DisconnectMessage" xml:space="preserve">
+    <value>Разрыв соединения с игрой</value>
+  </data>
+  <data name="HostChanged" xml:space="preserve">
+    <value>Хост игры был изменён {0} на {1}</value>
+  </data>
+  <data name="MediaFileNotSupported" xml:space="preserve">
+    <value>Медиафайл не поддерживается</value>
+  </data>
+  <data name="MediaLoadError" xml:space="preserve">
+    <value>Ошибка загрузки медиа</value>
+  </data>
+  <data name="FileLoadError" xml:space="preserve">
+    <value>Ошибка загрузки файла "{0}"</value>
+  </data>
+  <data name="LogTitle" xml:space="preserve">
+    <value>Протокол "SIGame"</value>
+  </data>
+  <data name="ExternalLink" xml:space="preserve">
+    <value>Внешняя ссылка: {0} . Загрузка внешних ссылок может быть небезопасной и отключена</value>
+  </data>
+  <data name="Greeting" xml:space="preserve">
+    <value>Добро пожаловать в «SIGame»! Игра начнется, как только все игроки и ведущий нажмут кнопку «Готов»</value>
+  </data>
+  <data name="RightAnswer" xml:space="preserve">
+    <value>Правильный ответ</value>
+  </data>
+  <data name="UserUnbanned" xml:space="preserve">
+    <value>Пользователь {0} был разбанен</value>
+  </data>
+  <data name="LocalGame" xml:space="preserve">
+    <value>Локальная игра</value>
+  </data>
+  <data name="RandomPackageName" xml:space="preserve">
+    <value>Случайный набор тем</value>
+  </data>
+  <data name="GameName" xml:space="preserve">
+    <value>Название игры</value>
+  </data>
+  <data name="PackageName" xml:space="preserve">
+    <value>Имя пакета</value>
+  </data>
+  <data name="ContactUri" xml:space="preserve">
+    <value>Контакты авторов</value>
+  </data>
+  <data name="VoiceChatLink" xml:space="preserve">
+    <value>Голосовой чат (Discord)</value>
   </data>
 </root>

@@ -29,6 +29,7 @@ using System.Xml;
 using System.Xml.Xsl;
 using Utils;
 using Utils.Commands;
+using SIPackages.Models;
 
 namespace SIQuester.ViewModel;
 
@@ -1278,7 +1279,7 @@ public sealed class QDocument : WorkspaceViewModel
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
-        var recommendedSize = MediaOwnerViewModel.RecommendedSizeMb;
+        var recommendedSize = Quality.FileSizeMb;
 
         var images = FillFiles(Images, recommendedSize[CollectionNames.ImagesStorageName], warnings);
         var audio = FillFiles(Audio, recommendedSize[CollectionNames.AudioStorageName], warnings);
@@ -2936,7 +2937,7 @@ public sealed class QDocument : WorkspaceViewModel
                                 if (collectionName != null)
                                 {
                                     var media = Wrap(contentItem);
-                                    var maxFileSize = MediaOwnerViewModel.RecommendedSizeMb[collectionName];
+                                    var maxFileSize = Quality.FileSizeMb[collectionName];
 
                                     if (media.StreamLength > maxFileSize * 1024 * 1024)
                                     {
@@ -2944,7 +2945,7 @@ public sealed class QDocument : WorkspaceViewModel
                                         errors.Add($"{round.Model.Name}:{theme.Model.Name}:{question.Model.Price}: {errorMessage}");
                                     }
 
-                                    var extensions = MediaOwnerViewModel.RecommendedExtensions[collectionName];
+                                    var extensions = Quality.FileExtensions[collectionName];
                                     var extension = System.IO.Path.GetExtension(contentItem.Value)?.ToLowerInvariant();
 
                                     if (!extensions.Contains(extension))
@@ -3366,7 +3367,7 @@ public sealed class QDocument : WorkspaceViewModel
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
-        var recommendedSize = MediaOwnerViewModel.RecommendedSizeMb;
+        var recommendedSize = Quality.FileSizeMb;
 
         var images = FillFiles(Images, recommendedSize[CollectionNames.ImagesStorageName], warnings);
         var audio = FillFiles(Audio, recommendedSize[CollectionNames.AudioStorageName], warnings);

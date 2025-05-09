@@ -103,42 +103,12 @@ public sealed class ViewerData : Data
         }
     }
 
-    private PersonAccount? _currentPerson;
-
-    // TODO: move to GameViewModel
-    /// <summary>
-    /// Currently selected person.
-    /// </summary>
-    public PersonAccount? CurrentPerson
-    {
-        get => _currentPerson;
-        set { if (_currentPerson != value) { _currentPerson = value; OnPropertyChanged(); CurrentPlayerChanged?.Invoke(); } }
-    }
-
-    public event Action? CurrentPlayerChanged;
-
-    private PersonAccount? _showMan = null;
+    private readonly PersonAccount _showMan = new(Constants.FreePlace, true, false, false) { IsShowman = true };
 
     /// <summary>
-    /// Ведущий
+    /// Game showman.
     /// </summary>
-    public PersonAccount? ShowMan
-    {
-        get => _showMan;
-        set
-        {
-            _showMan = value;
-            OnPropertyChanged();
-
-            if (_isUpdating)
-            {
-                return;
-            }
-
-            OnMainPersonsChanged();
-            OnAllPersonsChanged();
-        }
-    }
+    public PersonAccount ShowMan => _showMan;
 
     private bool _showMainTimer;
 
