@@ -15,7 +15,7 @@ public abstract class Actor : IDisposable
 
     public abstract ValueTask OnMessageReceivedAsync(Message message);
 
-    // TODO: Actor should be Client's handler and do not have a link to the client
+    // TODO: Actor should be Client's handler and shouldn't have a link to client
     protected Actor(Client client)
     {
         _client = client;

@@ -90,10 +90,11 @@ public enum DecisionType
     /// Выбор следущего игрока, удаляющего тему в финале
     /// </summary>
     NextPersonFinalThemeDeleting,
+    
     /// <summary>
-    /// Решение игроков о правильности ответа
+    /// Appellating answer.
     /// </summary>
-    AppellationDecision,
+    Appellation,
 
     /// <summary>
     /// Waiting for the players reviews.

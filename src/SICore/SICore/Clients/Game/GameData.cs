@@ -1,4 +1,5 @@
 ﻿using SICore.Clients.Game;
+using SICore.Clients.Game.Plugins.Stakes;
 using SICore.Contracts;
 using SICore.Models;
 using SICore.Results;
@@ -91,7 +92,7 @@ public sealed class GameData : Data
     internal GameState GameState { get; } = new();
 
     /// <summary>
-    /// Question play state.
+    /// Question play state. This state is reset before each question.
     /// </summary>
     internal QuestionPlayState QuestionPlayState { get; } = new();
 
@@ -282,11 +283,6 @@ public sealed class GameData : Data
     /// Пошёл ли кто-нибудь ва-банк
     /// </summary>
     internal bool AllIn { get; set; } = false;
-
-    /// <summary>
-    /// Завершаем ли раунд
-    /// </summary>
-    internal bool IsRoundEnding { get; set; } = false;
 
     /// <summary>
     /// Допустимые варианты ставок: 
@@ -643,6 +639,7 @@ public sealed class GameData : Data
     /// </summary>
     public Func<bool>? PlayersValidator { get; internal set; }
 
+    // TODO: try to remove this property
     /// <summary>
     /// Question type name.
     /// </summary>

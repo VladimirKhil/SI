@@ -1,6 +1,7 @@
 ﻿using Notions;
 using SICore.Clients;
 using SICore.Clients.Game;
+using SICore.Clients.Game.Plugins.Stakes;
 using SICore.Contracts;
 using SICore.Extensions;
 using SICore.Models;
@@ -123,6 +124,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal IPinHelper? PinHelper { get; }
 
+    internal StakesPlugin Stakes { get; }
+
     public GameLogic(
         GameData data,
         GameActions gameActions,
@@ -138,6 +141,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _fileShare = fileShare;
         _taskRunner = new(this);
         PinHelper = pinHelper;
+        Stakes = new StakesPlugin(data);
     }
 
     internal void Run()
@@ -760,7 +764,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsWaiting = false;
         _data.Decision = DecisionType.None;
 
-        _data.IsRoundEnding = true;
         _data.InformStages &= ~(InformStages.RoundContent | InformStages.RoundThemesNames | InformStages.RoundThemesComments | InformStages.Table | InformStages.Theme);
 
         // This is quite ugly bit here but as we interrupt normal flow we need to cut continuation
@@ -1016,21 +1019,21 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private bool OnDecision() => _data.Decision switch
     {
         DecisionType.StarterChoosing => OnDecisionStarterChoosing(),
-        DecisionType.QuestionSelection => OnQuestionSelection(),
+        DecisionType.QuestionSelection => OnDecisionQuestionSelection(),
         DecisionType.Answering => OnDecisionAnswering(),
         DecisionType.AnswerValidating => OnDecisionAnswerValidating(),
-        DecisionType.QuestionAnswererSelection => QuestionAnswererSelection(),
-        DecisionType.QuestionPriceSelection => OnQuestionPriceSelection(),
+        DecisionType.QuestionAnswererSelection => OnDecisionQuestionAnswererSelection(),
+        DecisionType.QuestionPriceSelection => OnDecisionQuestionPriceSelection(),
         DecisionType.NextPersonStakeMaking => OnDecisionNextPersonStakeMaking(),
         DecisionType.StakeMaking => OnDecisionStakeMaking(),
-        DecisionType.NextPersonFinalThemeDeleting => OnNextPersonFinalThemeDeleting(),
-        DecisionType.ThemeDeleting => OnThemeDeleting(),
-        DecisionType.HiddenStakeMaking => OnHiddenStakeMaking(),
-        DecisionType.AppellationDecision => OnAppellationDecision(),
+        DecisionType.NextPersonFinalThemeDeleting => OnDecisionNextPersonFinalThemeDeleting(),
+        DecisionType.ThemeDeleting => OnDecisionThemeDeleting(),
+        DecisionType.HiddenStakeMaking => OnDecisionHiddenStakeMaking(),
+        DecisionType.Appellation => OnDecisionAppellation(),
         _ => false,
     };
 
-    private bool OnQuestionSelection()
+    private bool OnDecisionQuestionSelection()
     {
         if (_data.ThemeIndex == -1
             || _data.ThemeIndex >= ClientData.TInfo.RoundInfo.Count
@@ -1046,7 +1049,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         return true;
     }
 
-    private bool QuestionAnswererSelection()
+    private bool OnDecisionQuestionAnswererSelection()
     {
         if (_data.Answerer == null)
         {
@@ -1064,7 +1067,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         return true;
     }
 
-    private bool OnQuestionPriceSelection()
+    private bool OnDecisionQuestionPriceSelection()
     {
         if (_data.CurPriceRight == -1)
         {
@@ -1074,7 +1077,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         StopWaiting();
 
         _data.CurPriceWrong = _data.CurPriceRight;
-        _gameActions.PlayerReplic(_data.AnswererIndex, _data.CurPriceRight.ToString());
 
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
@@ -1084,7 +1086,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         return true;
     }
 
-    private bool OnHiddenStakeMaking()
+    private bool OnDecisionHiddenStakeMaking()
     {
         if (_data.HiddenStakerCount != 0)
         {
@@ -1103,7 +1105,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, 20);
     }
 
-    private bool OnNextPersonFinalThemeDeleting()
+    private bool OnDecisionNextPersonFinalThemeDeleting()
     {
         if (_data.ThemeDeleters == null || _data.ThemeDeleters.Current.PlayerIndex == -1)
         {
@@ -1117,14 +1119,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         return true;
     }
 
-    private bool OnAppellationDecision()
+    private bool OnDecisionAppellation()
     {
         StopWaiting();
         ScheduleExecution(Tasks.CheckAppellation, 10);
         return true;
     }
 
-    private bool OnThemeDeleting()
+    private bool OnDecisionThemeDeleting()
     {
         if (_data.ThemeIndexToDelete == -1)
         {
@@ -1163,7 +1165,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (_data.StakeType == StakeMode.Nominal)
         {
-            _gameActions.PlayerReplic(playerIndex, LO[nameof(R.Nominal)]);
             _data.Stake = _data.CurPriceRight;
             _data.Stakes.StakerIndex = playerIndex;
         }
@@ -4056,7 +4057,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
         ScheduleExecution(Tasks.WaitAppellationDecision, waitTime);
-        WaitFor(DecisionType.AppellationDecision, waitTime, -2);
+        WaitFor(DecisionType.Appellation, waitTime, -2);
     }
 
     internal int ResumeExecution(int resumeTime = 0) => _taskRunner.ResumeExecution(resumeTime, ShouldRunTimer());
@@ -4409,7 +4410,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (stage == 1)
         {
             _gameActions.InformSums();
-            _data.IsRoundEnding = false;
 
             var roundIndex = Engine.RoundIndex;
             var roundName = round.Name;
@@ -4860,7 +4860,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _data.Stake = -1;
-        _data.Stakes.Reset(_data.ChooserIndex);
+        Stakes.Reset(_data.ChooserIndex);
         _data.Order[0] = _data.ChooserIndex;
         _data.OrderHistory.Clear();
 

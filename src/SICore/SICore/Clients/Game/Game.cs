@@ -889,7 +889,7 @@ public sealed class Game : Actor
                         break;
 
                     case Messages.Apellate:
-                        OnApellation(message, args);
+                        OnAppellation(message, args);
                         break;
 
                     case Messages.Change:
@@ -1968,7 +1968,7 @@ public sealed class Game : Actor
         _gameActions.SendMessageWithArgs(Messages.Hostname, newHostName ?? "", source);
     }
 
-    private void OnApellation(Message message, string[] args)
+    private void OnAppellation(Message message, string[] args)
     {
         ClientData.IsAppelationForRightAnswer = args.Length == 1 || args[1] == "+";
         ClientData.AppellationSource = message.Sender;
@@ -1989,6 +1989,7 @@ public sealed class Game : Actor
         _logic.ProcessApellationRequest();
     }
 
+    [Obsolete]
     private void OnCatCost(Message message, string[] args)
     {
         if (!ClientData.IsWaiting ||
@@ -2467,7 +2468,7 @@ public sealed class Game : Actor
             return;
         }
 
-        if (ClientData.Decision == DecisionType.AppellationDecision)
+        if (ClientData.Decision == DecisionType.Appellation)
         {
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
@@ -2631,7 +2632,7 @@ public sealed class Game : Actor
         switch (buttonPressMode)
         {
             case ButtonPressMode.FirstWins:
-                ProcessAnswerer_FirstWins(answererIndex);
+                ProcessAnswerer_FirstWinsServer(answererIndex);
                 break;
 
             case ButtonPressMode.RandomWithinInterval:
@@ -2647,7 +2648,7 @@ public sealed class Game : Actor
         }
     }
 
-    private void ProcessAnswerer_FirstWins(int answererIndex)
+    private void ProcessAnswerer_FirstWinsServer(int answererIndex)
     {
         ClientData.PendingAnswererIndex = answererIndex;
 
@@ -2951,11 +2952,9 @@ public sealed class Game : Actor
             DropCurrentAppelaer();
         }
 
-        var stakes = ClientData.Stakes;
-
-        if (stakes.HandlePlayerDrop(playerIndex))
+        if (Logic.Stakes.HandlePlayerDrop(playerIndex))
         {
-            Logic.AddHistory($"StakerIndex set to {stakes.StakerIndex}");
+            Logic.AddHistory($"StakerIndex set to {ClientData.Stakes.StakerIndex}");
         }
 
         // TODO: move to stakes.HandlePlayerDrop()
