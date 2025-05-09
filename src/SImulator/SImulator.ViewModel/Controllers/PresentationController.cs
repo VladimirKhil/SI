@@ -486,11 +486,6 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void SetActivePlayerIndex(int playerIndex)
     {
-        if (!ShowPlayers)
-        {
-            TInfo.PlayerIndex = playerIndex;
-        }
-
         for (var i = 0; i < Players.Count; i++)
         {
             Players[i].State = i == playerIndex ? PlayerState.Active : PlayerState.None;
