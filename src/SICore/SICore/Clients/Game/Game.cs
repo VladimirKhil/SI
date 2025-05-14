@@ -2472,7 +2472,7 @@ public sealed class Game : Actor
         {
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
-                if (ClientData.Players[i].ApellationFlag && ClientData.Players[i].Name == message.Sender)
+                if (ClientData.Players[i].AppellationFlag && ClientData.Players[i].Name == message.Sender)
                 {
                     if (args[1] == "+")
                     {
@@ -2483,7 +2483,7 @@ public sealed class Game : Actor
                         ClientData.AppellationNegativeVoteCount++;
                     }
 
-                    ClientData.Players[i].ApellationFlag = false;
+                    ClientData.Players[i].AppellationFlag = false;
                     ClientData.AppellationAwaitedVoteCount--;
                     _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
                     break;
@@ -2495,21 +2495,21 @@ public sealed class Game : Actor
                 _logic.Stop(StopReason.Decision);
             }
 
-            var halfVotesCount = ClientData.AppellationTotalVoteCount / 2;
+            var halfVoteCount = ClientData.AppellationTotalVoteCount / 2;
 
-            if (ClientData.AppellationPositiveVoteCount > halfVotesCount || ClientData.AppellationNegativeVoteCount > halfVotesCount)
+            if (ClientData.AppellationPositiveVoteCount > halfVoteCount || ClientData.AppellationNegativeVoteCount > halfVoteCount)
             {
-                SendCancellationsToActivePlayers();
+                SendAppellationCancellationsToActivePlayers();
                 _logic.Stop(StopReason.Decision);
             }
         }
     }
 
-    private void SendCancellationsToActivePlayers()
+    private void SendAppellationCancellationsToActivePlayers()
     {
         foreach (var player in ClientData.Players)
         {
-            if (player.Flag)
+            if (player.AppellationFlag)
             {
                 _gameActions.SendMessage(Messages.Cancel, player.Name);
             }

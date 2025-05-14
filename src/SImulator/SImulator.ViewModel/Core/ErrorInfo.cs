@@ -6,11 +6,13 @@ namespace SImulator.ViewModel.Core;
 public sealed class ErrorInfo
 {
     [DataMember]
-    public string Version { get; set; }
+    public string Version { get; set; } = "";
+    
     [DataMember]
     public DateTime Time { get; set; }
+    
     [DataMember]
-    public string Error { get; set; }
+    public string Error { get; set; } = "";
 }
 
 [DataContract]

@@ -30,7 +30,7 @@ internal sealed class KeyboardHook : ButtonManagerBase
         using (var process = Process.GetCurrentProcess())
         using (var module = process.MainModule)
         {
-            _hookPtr = Win32.SetWindowsHookEx(Win32.WH_KEYBOARD_LL, _callbackPtr, module.BaseAddress, 0);
+            _hookPtr = Win32.SetWindowsHookEx(Win32.WH_KEYBOARD_LL, _callbackPtr, module?.BaseAddress ?? IntPtr.Zero, 0);
         }
 
         if (_hookPtr == IntPtr.Zero)

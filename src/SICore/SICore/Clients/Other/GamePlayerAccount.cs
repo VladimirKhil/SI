@@ -82,9 +82,9 @@ public sealed class GamePlayerAccount : GamePersonAccount
     internal bool Flag { get; set; }
 
     /// <summary>
-    /// Marks that player is participating in apellation.
+    /// Marks that player is participating in appellation.
     /// </summary>
-    internal bool ApellationFlag { get; set; }
+    internal bool AppellationFlag { get; set; }
 
     // TODO: Will be moved to Stake strategy implementation
     /// <summary>

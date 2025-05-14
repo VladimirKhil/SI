@@ -218,7 +218,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            if (ClientData.Players.Count <= 3)
+            if (ClientData.Players.Count(p => p.IsConnected) <= 3)
             {
                 // If there are 2 or 3 players, there are already 2 positive votes for the answer
                 // from answered player and showman. And only 1 or 2 votes left.
@@ -2625,9 +2625,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AskToTry()
     {
-        // /*|| !p.IsConnected */ condition was removed because during package testing there are no connected players
-        // and skipping ask mode frustrates people
-        if (ClientData.Players.All(p => !p.CanPress))
+        var hasConnectedPlayers = _data.Players.Any(p => p.IsConnected);
+
+        if (ClientData.Players.All(p => !p.CanPress || (hasConnectedPlayers && !p.IsConnected)))
         {
             ScheduleExecution(Tasks.WaitTry, 3, force: true);
             return;
@@ -4019,7 +4019,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, _data.IsAppelationForRightAnswer);
 
         _data.AppellationAwaitedVoteCount = 0;
-        _data.AppellationTotalVoteCount = _data.Players.Count + 1; // players and showman
+        _data.AppellationTotalVoteCount = _data.Players.Count(p => p.IsConnected) + 1; // players and showman
         _data.AppellationPositiveVoteCount = 0;
         _data.AppellationNegativeVoteCount = 0;
 
@@ -4037,19 +4037,19 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             if (i == _data.AppelaerIndex)
             {
-                _data.Players[i].ApellationFlag = false;
+                _data.Players[i].AppellationFlag = false;
                 _data.AppellationPositiveVoteCount++;
             }
             else if (!_data.IsAppelationForRightAnswer && i == _data.AppellationCallerIndex)
             {
-                _data.Players[i].ApellationFlag = false;
+                _data.Players[i].AppellationFlag = false;
                 _data.AppellationNegativeVoteCount++;
                 _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
             }
-            else
+            else if (_data.Players[i].IsConnected)
             {
                 _data.AppellationAwaitedVoteCount++;
-                _data.Players[i].ApellationFlag = true;
+                _data.Players[i].AppellationFlag = true;
                 _gameActions.SendMessage(validationMessage, _data.Players[i].Name);
                 _gameActions.SendMessage(validation2Message, _data.Players[i].Name);
             }
@@ -4584,11 +4584,33 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void SetAnswerersAll()
     {
-        var allIndicies = Enumerable.Range(0, _data.Players.Count).ToArray();
-        _data.QuestionPlayState.SetMultipleAnswerers(allIndicies);
+        var allConnectedIndicies = new List<int>();
+        var allDisconnectedIndicies = new List<object>();
+
+        var hasConnectedPlayers = _data.Players.Any(p => p.IsConnected);
+
+        for (var i = 0; i < _data.Players.Count; i++)
+        {
+            if (_data.Players[i].IsConnected || !hasConnectedPlayers)
+            {
+                allConnectedIndicies.Add(i);
+            }
+            else
+            {
+                allDisconnectedIndicies.Add(i);
+            }
+        }
+
+        _data.QuestionPlayState.SetMultipleAnswerers(allConnectedIndicies);
         
-        var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(allIndicies.Select(i => (object)i));
+        var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(allConnectedIndicies.Select(i => (object)i));
         _gameActions.SendMessage(msg.ToString());
+
+        if (allDisconnectedIndicies.Count > 0)
+        {
+            msg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(allDisconnectedIndicies);
+            _gameActions.SendMessage(msg.ToString());
+        }
 
         ScheduleExecution(Tasks.MoveNext, 5);
     }
@@ -4891,9 +4913,12 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var answerers = new List<int>();
         var passes = new List<object>();
 
+        var hasConnectedPlayers = _data.Players.Any(p => p.IsConnected);
+
         for (var i = 0; i < ClientData.Players.Count; i++)
         {
-            if (ClientData.Players[i].Sum > 0 || ClientData.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes)
+            if ((!hasConnectedPlayers || ClientData.Players[i].IsConnected) &&
+                (ClientData.Players[i].Sum > 0 || ClientData.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes))
             {
                 answerers.Add(i);
             }

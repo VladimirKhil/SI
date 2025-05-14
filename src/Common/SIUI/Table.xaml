@@ -28,7 +28,6 @@
 
                     <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" />
 
-                    <localc:HeightToThicknessConverter x:Key="HeightToThickness" />
                     <localc:RoundTabloConverter x:Key="RTConverter" />
                     <localc:UriToImageSourceConverter x:Key="UriConverter" />
                     <localc:LengthToDurationConverter x:Key="dur" />

@@ -198,12 +198,19 @@ public sealed class TextList : TextBox
 
         if (_infos.Count != ItemsSource.Count)
         {
-            throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems.Count}");
+            throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems?.Count}");
         }
     }
 
     private void OnItemsRemoved(NotifyCollectionChangedEventArgs e)
     {
+        var oldCount = e.OldItems?.Count ?? 0;
+
+        if (oldCount == 0 || ItemsSource == null)
+        {
+            return;
+        }
+
         _blockChanges = true;
 
         try
@@ -213,7 +220,7 @@ public sealed class TextList : TextBox
             try
             {
                 var start = ConvertLocalOffsetToGlobalOffset(e.OldStartingIndex);
-                var end = ConvertLocalOffsetToGlobalOffset(e.OldStartingIndex + e.OldItems.Count);
+                var end = ConvertLocalOffsetToGlobalOffset(e.OldStartingIndex + oldCount);
 
                 if (e.OldStartingIndex == 0)
                 {
@@ -221,7 +228,7 @@ public sealed class TextList : TextBox
                 }
 
                 Select(start, end - start);
-                _infos.RemoveRange(e.OldStartingIndex, e.OldItems.Count);
+                _infos.RemoveRange(e.OldStartingIndex, oldCount);
             }
             finally
             {
@@ -252,9 +259,14 @@ public sealed class TextList : TextBox
 
     private void Check()
     {
+        if (_infos.Count == 0 || ItemsSource == null || ItemsSource.Count == 0)
+        {
+            return;
+        }
+
         if (ItemsSource.Count == 1 && _infos.Count == 1 && _infos[0]._readOnlyLength == -1)
         {
-            if (Text != ItemsSource[0].ToString())
+            if (Text != ItemsSource[0]?.ToString())
             {
                 MessageBox.Show("Editing error. Send message to author");
                 SetText();
@@ -682,7 +694,7 @@ public sealed class TextList : TextBox
                     text.Append(ItemsSeparator);
                 }
 
-                var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeExtended, out string tail);
+                var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeExtended, out var tail);
                 text.Append(toAdd);
 
                 var length = toAdd.Length;

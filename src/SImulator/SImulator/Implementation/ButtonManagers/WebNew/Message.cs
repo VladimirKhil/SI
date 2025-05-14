@@ -5,7 +5,7 @@ public sealed class Message
     /// <summary>
     /// Message text.
     /// </summary>
-    public string Text { get; set; }
+    public string Text { get; set; } = "";
 
     /// <summary>
     /// Is the message a system message (not a chat message).
@@ -20,7 +20,7 @@ public sealed class Message
     /// <summary>
     /// Message sender.
     /// </summary>
-    public string Sender { get; set; }
+    public string Sender { get; set; } = "";
 
     /// <summary>
     /// Message reveiver.

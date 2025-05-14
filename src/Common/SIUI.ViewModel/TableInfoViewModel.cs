@@ -1,6 +1,7 @@
 ﻿using SIUI.Model;
 using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using Utils.Commands;
 
 namespace SIUI.ViewModel;
@@ -255,11 +256,29 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public event Action<QuestionInfoViewModel>? QuestionToggled;
     public event Action<ItemViewModel>? AnswerSelected;
 
-    public void SelectQuestion_Executed(object? arg) => QuestionSelected?.Invoke((QuestionInfoViewModel)arg);
+    public void SelectQuestion_Executed(object? arg)
+    {
+        if (arg is QuestionInfoViewModel questionInfo)
+        {
+            QuestionSelected?.Invoke(questionInfo);
+        }
+    }
 
-    public void SelectTheme_Executed(object? arg) => ThemeSelected?.Invoke((ThemeInfoViewModel)arg);
+    public void SelectTheme_Executed(object? arg)
+    {
+        if (arg is ThemeInfoViewModel themeInfo)
+        {
+            ThemeSelected?.Invoke(themeInfo);
+        }
+    }
 
-    public void ToggleQuestion_Executed(object? arg) => QuestionToggled?.Invoke((QuestionInfoViewModel)arg);
+    public void ToggleQuestion_Executed(object? arg)
+    {
+        if (arg is QuestionInfoViewModel questionInfo)
+        {
+            QuestionToggled?.Invoke(questionInfo);
+        }
+    }
 
     public void SelectAnswer_Executed(object? arg)
     {
@@ -441,6 +460,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         Init();
     }
 
+    [MemberNotNull(nameof(SelectQuestion), nameof(SelectTheme), nameof(ToggleQuestion), nameof(SelectAnswer))]
     private void Init()
     {
         SelectQuestion = new SimpleCommand(SelectQuestion_Executed);
@@ -508,7 +528,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
 
     public bool HasMediaProgress() => MediaProgress != null;
 
-    public void OnMediaProgress(double? progress) => MediaProgress?.Invoke(progress.Value);
+    public void OnMediaProgress(double progress) => MediaProgress?.Invoke(progress);
 
     public void OnMediaSeek(int position) => MediaSeek?.Invoke(position);
 

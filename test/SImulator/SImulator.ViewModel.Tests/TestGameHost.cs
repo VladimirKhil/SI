@@ -9,11 +9,11 @@ internal sealed class TestGameHost : IExtendedListener
     private readonly EngineBase _engine;
 
     public bool IsMediaEnded { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public ICommand Next { get => throw new NotImplementedException(); set { } }
-    public ICommand Back { get => throw new NotImplementedException(); set { } }
-    public ICommand NextRound { get => throw new NotImplementedException(); set { } }
-    public ICommand PreviousRound { get => throw new NotImplementedException(); set { } }
-    public ICommand Stop { get => throw new NotImplementedException(); set { } }
+    public ICommand? Next { get => throw new NotImplementedException(); set { } }
+    public ICommand? Back { get => throw new NotImplementedException(); set { } }
+    public ICommand? NextRound { get => throw new NotImplementedException(); set { } }
+    public ICommand? PreviousRound { get => throw new NotImplementedException(); set { } }
+    public ICommand? Stop { get => throw new NotImplementedException(); set { } }
 
     public event Action MediaStart { add { } remove { } }
     public event Action MediaEnd { add { } remove { } }

@@ -9,7 +9,7 @@ internal sealed class TestLogger : IGameLogger
         
     }
 
-    public void Write(string message, params object[] args)
+    public void Write(string message, params object?[] args)
     {
         
     }

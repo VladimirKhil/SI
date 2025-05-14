@@ -4,8 +4,8 @@
 		<Company>Khil-soft</Company>
 		<Copyright>Copyright © Khil-soft 2002 - 2025</Copyright>
 		<SIGameVersion>7.13.5</SIGameVersion>
-		<SIQuesterVersion>6.4.0</SIQuesterVersion>
-		<SImulatorVersion>3.3.1</SImulatorVersion>
+		<SIQuesterVersion>6.4.2</SIQuesterVersion>
+		<SImulatorVersion>3.3.3</SImulatorVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup>

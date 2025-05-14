@@ -264,10 +264,10 @@ internal sealed class DesktopManager : PlatformManager
     public override Task<string?> AskSelectFileAsync(string header)
     {
         var dialog = new OpenFileDialog { Title = header };
-
-        if (dialog.ShowDialog().Value)
+        
+        if (dialog.ShowDialog() == true)
         {
-            return Task.FromResult(dialog.FileName);
+            return Task.FromResult<string?>(dialog.FileName);
         }
 
         return Task.FromResult<string?>(null);

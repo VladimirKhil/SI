@@ -1535,15 +1535,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    public void OnRoundThemes(IReadOnlyList<Theme> roundThemes)
+    public void OnRoundThemes(IReadOnlyList<Theme> roundThemes) => UI.Execute(() =>
     {
         _roundThemes = roundThemes;
         LocalInfo.RoundInfo.Clear();
 
         _gameLogger.Write($"{Resources.RoundThemes}:");
 
-        int maxQuestion = roundThemes.Max(theme => theme.Questions.Count);
-        
+        var maxQuestionCount = roundThemes.Max(theme => theme.Questions.Count);
+
         foreach (var theme in roundThemes)
         {
             var themeInfo = new ThemeInfoViewModel { Name = theme.Name };
@@ -1551,7 +1551,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             _gameLogger.Write(theme.Name);
 
-            for (int i = 0; i < maxQuestion; i++)
+            for (var i = 0; i < maxQuestionCount; i++)
             {
                 var questionInfo = new QuestionInfoViewModel { Price = i < theme.Questions.Count ? theme.Questions[i].Price : -1 };
                 themeInfo.Questions.Add(questionInfo);
@@ -1561,7 +1561,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
         LocalInfo.TStage = TableStage.RoundTable;
         Continuation = AfterRoundThemes;
-    }
+    },
+    exc => OnError(exc.Message));
 
     private bool AfterRoundThemes()
     {
@@ -1701,7 +1702,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _previousState = QuestionState.Normal;
     }
 
-    internal void OnFinalThemes(IReadOnlyList<Theme> finalThemes)
+    internal void OnFinalThemes(IReadOnlyList<Theme> finalThemes) => UI.Execute(() =>
     {
         LocalInfo.RoundInfo.Clear();
 
@@ -1720,7 +1721,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.SetSound();
         LocalInfo.TStage = TableStage.Final;
         _gameActions.MoveNext();
-    }
+    },
+    exc => OnError(exc.Message));
 
     /// <summary>
     /// Moves back.

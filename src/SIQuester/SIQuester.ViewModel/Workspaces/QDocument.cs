@@ -1935,7 +1935,17 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private void ExportPreview_Executed(object? arg) => PlatformManager.Instance.CreatePreview(Document);
+    private void ExportPreview_Executed(object? arg)
+    {
+        try
+        {
+            PlatformManager.Instance.CreatePreview(Document);
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
+    }
 
     private void ExportBase_Executed(object? arg) => Dialog = new ExportViewModel(this, ExportFormats.Db);
 

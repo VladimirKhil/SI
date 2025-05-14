@@ -48,7 +48,7 @@ public static class HyperlinkBehavior
 
             var link = new Hyperlink(new Run(match.Value))
             {
-                NavigateUri = Uri.TryCreate(match.Value, UriKind.Absolute, out Uri uri) ? uri : null,
+                NavigateUri = Uri.TryCreate(match.Value, UriKind.Absolute, out var uri) ? uri : null,
                 TextDecorations = null
             };
 

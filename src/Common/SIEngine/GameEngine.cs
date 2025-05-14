@@ -491,6 +491,6 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
         Stage = GameStage.QuestionType;
     }
 
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
