@@ -675,6 +675,9 @@
   <data name="Increase" xml:space="preserve">
     <value>Приращение</value>
   </data>
+  <data name="Info" xml:space="preserve">
+    <value>Инфо</value>
+  </data>
   <data name="InstallUpdates" xml:space="preserve">
     <value>Устанавливать обновления</value>
   </data>

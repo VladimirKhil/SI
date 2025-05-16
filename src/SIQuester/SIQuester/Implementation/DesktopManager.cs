@@ -476,13 +476,13 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
                     if (authorsCount > 0 && !(authorsCount == 1 && doc.Package.Info.Authors[0] == Resources.Empty))
                     {
-                        info.AppendLine(string.Join(Environment.NewLine, doc.GetRealAuthors(doc.Package.Info.Authors)).Trim());
+                        info.AppendLine(string.Join(Environment.NewLine, doc.ResolveAuthors(doc.Package.Info.Authors)).Trim());
                         info.AppendLine();
                     }
 
                     if (doc.Package.Info.Sources.Count > 0)
                     {
-                        info.AppendLine(string.Join(Environment.NewLine, doc.GetRealSources(doc.Package.Info.Sources)).Trim());
+                        info.AppendLine(string.Join(Environment.NewLine, doc.ResolveSources(doc.Package.Info.Sources)).Trim());
                         info.AppendLine();
                     }
 
@@ -494,7 +494,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
                     if (info.Length > 0)
                     {
-                        text.AppendLine("Инфо:");
+                        text.Append(Resources.Info).AppendLine(":");
                         text.Append(info);
                     }
 
@@ -516,14 +516,14 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                         if (round.Info.Authors.Count > 0)
                         {
                             text.AppendLine(string.Format("{0}:", Resources.BaseAuthors));
-                            text.AppendLine(string.Join(Environment.NewLine, doc.GetRealAuthors(round.Info.Authors)).Trim());
+                            text.AppendLine(string.Join(Environment.NewLine, doc.ResolveAuthors(round.Info.Authors)).Trim());
                             text.AppendLine();
                         }
 
                         if (round.Info.Sources.Count > 0)
                         {
                             text.AppendLine(string.Format("{0}:", Resources.BaseSources));
-                            text.AppendLine(string.Join(Environment.NewLine, doc.GetRealSources(round.Info.Sources)).Trim());
+                            text.AppendLine(string.Join(Environment.NewLine, doc.ResolveSources(round.Info.Sources)).Trim());
                             text.AppendLine();
                         }
 
@@ -629,28 +629,28 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                                             text.Append($"   {Resources.Reserve}.");
                                         }
 
-                                        text.AppendLine(string.Join(", ", doc.GetRealSources(theme.Questions[j].Info.Sources)).EndWithPoint().Trim());
+                                        text.AppendLine(string.Join(", ", doc.ResolveSources(theme.Questions[j].Info.Sources)).EndWithPoint().Trim());
                                     }
                                 }
                             }
 
                             text.AppendLine();
 
-                            var authors = new List<string>(doc.GetRealAuthors(theme.Info.Authors));
+                            var authors = new List<string>(doc.ResolveAuthors(theme.Info.Authors));
 
                             foreach (var quest in theme.Questions)
                             {
-                                authors.AddRange(doc.GetRealAuthors(quest.Info.Authors));
+                                authors.AddRange(doc.ResolveAuthors(quest.Info.Authors));
                             }
 
                             if (authors.Count == 0)
                             {
-                                authors.AddRange(doc.GetRealAuthors(round.Info.Authors));
+                                authors.AddRange(doc.ResolveAuthors(round.Info.Authors));
                             }
 
                             if (authors.Count == 0)
                             {
-                                authors.AddRange(doc.GetRealAuthors(doc.Package.Info.Authors));
+                                authors.AddRange(doc.ResolveAuthors(doc.Package.Info.Authors));
                             }
 
                             authorsCount = authors.Count;
@@ -664,7 +664,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                             if (theme.Info.Sources.Count > 0)
                             {
                                 text.AppendLine(string.Format("{0}:", Resources.BaseSources));
-                                text.AppendLine(string.Join(Environment.NewLine, doc.GetRealSources(theme.Info.Sources)).Trim());
+                                text.AppendLine(string.Join(Environment.NewLine, doc.ResolveSources(theme.Info.Sources)).Trim());
                                 text.AppendLine();
                             }
 
@@ -766,7 +766,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         if (count > 0)
         {
             paragraph.AppendLine().Append(string.Format("{0}{1}: ", Resources.BaseAuthors, count > 1 ? "ы" : ""));
-            paragraph.Append(string.Join(", ", doc.GetRealAuthors(owner.Info.Authors)).EndWithPoint());
+            paragraph.Append(string.Join(", ", doc.ResolveAuthors(owner.Info.Authors)).EndWithPoint());
         }
 
         count = owner.Info.Sources.Count;
@@ -774,7 +774,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         if (count > 0)
         {
             paragraph.AppendLine().Append(string.Format("{0}{1}: ", Resources.BaseSources, count > 1 ? "и" : ""));
-            paragraph.Append(string.Join(", ", doc.GetRealSources(owner.Info.Sources)).EndWithPoint());
+            paragraph.Append(string.Join(", ", doc.ResolveSources(owner.Info.Sources)).EndWithPoint());
         }
 
         if (owner.Info.Comments.Text.Length > 0)

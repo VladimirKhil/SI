@@ -36,9 +36,8 @@ public static class GameRunner
         IPinHelper? pinHelper,
         string? gameName = null)
     {
-        var gameData = new GameData(gameHost, new GamePersonAccount(settings.Showman))
+        var gameData = new GameData(gameHost, new GamePersonAccount(settings.Showman), settings)
         {
-            Settings = settings,
             HostName = settings.IsAutomatic ? null : settings.HumanPlayerName,
             GameName = gameName ?? "",
         };

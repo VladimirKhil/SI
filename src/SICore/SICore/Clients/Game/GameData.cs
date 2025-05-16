@@ -21,17 +21,17 @@ public sealed class GameData : Data
     /// <summary>
     /// Настройки игры
     /// </summary>
-    public IGameSettingsCore<AppSettingsCore> Settings { get; set; }
+    public IGameSettingsCore<AppSettingsCore> Settings { get; }
 
     /// <summary>
     /// Game package document.
     /// </summary>
-    internal SIDocument PackageDoc { get; set; }
+    internal SIDocument? PackageDoc { get; set; }
 
     /// <summary>
     /// Game package.
     /// </summary>
-    internal Package Package { get; set; }
+    internal Package? Package { get; set; }
 
     /// <summary>
     /// Currently playing round.
@@ -47,7 +47,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Currently playing theme.
     /// </summary>
-    internal Theme Theme { get; set; }
+    internal Theme? Theme { get; set; }
 
     /// <summary>
     /// Player currently making a decision.
@@ -208,7 +208,7 @@ public sealed class GameData : Data
 
     public bool IsAppelationForRightAnswer { get; set; }
 
-    public string AppellationSource { get; set; }
+    public string AppellationSource { get; set; } = "";
 
     /// <summary>
     /// Писать ли сообщение ожидания
@@ -496,8 +496,6 @@ public sealed class GameData : Data
 
     public int AtomTime { get; set; }
 
-    public string AtomType { get; set; }
-
     public DateTime AtomStart { get; set; }
 
     /// <summary>
@@ -537,7 +535,7 @@ public sealed class GameData : Data
     /// </summary>
     public CustomEnumerator<int>? AnnouncedAnswerersEnumerator { get; internal set; }
 
-    public string Text { get; internal set; }
+    public string Text { get; internal set; } = "";
 
     /// <summary>
     /// Is question text being printed partially.
@@ -606,7 +604,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Current answer mode.
     /// </summary>
-    public string AnswerMode { get; internal set; }
+    public string? AnswerMode { get; internal set; }
 
     /// <summary>
     /// Allowed join game mode.
@@ -623,7 +621,7 @@ public sealed class GameData : Data
     /// </summary>
     public int AnswerCount { get; internal set; }
 
-    public string RightOptionLabel { get; internal set; }
+    public string? RightOptionLabel { get; internal set; }
 
     public QuestionSelectionStrategyType RoundStrategy { get; internal set; }
 
@@ -655,11 +653,12 @@ public sealed class GameData : Data
     /// <summary>
     /// Round themes.
     /// </summary>
-    public IReadOnlyList<Theme> Themes { get; internal set; }
+    public IReadOnlyList<Theme>? Themes { get; internal set; }
 
-    public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
+    public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings) : base(gameHost)
     {
         _showMan = showman;
         Stakes = new StakesState(Players);
+        Settings = settings;
     }
 }

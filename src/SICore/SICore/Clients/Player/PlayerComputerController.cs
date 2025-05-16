@@ -1,12 +1,10 @@
 ﻿using SICore.Clients.Game;
 using SICore.Contracts;
-using SICore.Extensions;
 using SICore.Helpers;
 using SICore.Models;
 using SICore.Utils;
 using SIPackages.Core;
 using Utils.Timers;
-using R = SICore.Properties.Resources;
 
 namespace SICore;
 
@@ -45,7 +43,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void ScheduleExecution(PlayerTasks task, double taskTime, object? arg = null)
     {
-        _historyLog.AddLogEntry($"Sheduled {task}:{arg}");
+        _historyLog.AddLogEntry($"Scheduled {task}:{arg}");
         _taskArg = arg;
         _taskRunner.ScheduleExecution(task, taskTime);
     }

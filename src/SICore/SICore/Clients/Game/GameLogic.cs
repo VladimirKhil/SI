@@ -151,7 +151,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.GameResultInfo.Name = _data.GameName;
         _data.GameResultInfo.Language = _data.Settings.AppSettings.Culture;
         _data.GameResultInfo.PackageName = Engine.PackageName;
-        _data.GameResultInfo.PackageHash = ""; // Will not use hash for now
         _data.GameResultInfo.PackageAuthors = Engine.Document.Package.Info.Authors.ToArray();
         _data.GameResultInfo.PackageAuthorsContacts = Engine.Document.Package.ContactUri;
 
@@ -520,6 +519,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private (bool success, string? globalUri, string? localUri, string? error) TryShareContent(ContentItem contentItem)
     {
+        if (_data.PackageDoc == null || _data.Package == null)
+        {
+            throw new InvalidOperationException("_data.Package == null; game not running");
+        }
+
         if (!contentItem.IsRef) // External link
         {
             if (_data.Package.HasQualityControl)
@@ -2710,7 +2714,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (arg == 1)
         {
-            var authors = _data.PackageDoc.GetRealAuthors(_data.Question.Info.Authors);
+            var authors = _data.PackageDoc.ResolveAuthors(_data.Question.Info.Authors);
 
             if (authors.Length > 0)
             {
@@ -2874,9 +2878,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (arg == 1)
         {
-            var sources = _data.PackageDoc.GetRealSources(_data.Question.Info.Sources);
+            var sources = _data.PackageDoc.ResolveSources(_data.Question.Info.Sources);
 
-            if (sources.Length > 0 && _data.Settings.AppSettings.DisplaySources)
+            if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
                 _gameActions.ShowmanReplic(text);
@@ -4045,6 +4049,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _data.Players[i].AppellationFlag = false;
                 _data.AppellationNegativeVoteCount++;
                 _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
+                _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
             }
             else if (_data.Players[i].IsConnected)
             {
@@ -4055,7 +4060,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
         }
 
-        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+        var waitTime = _data.AppellationAwaitedVoteCount > 0 ? _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10 : 1;
         ScheduleExecution(Tasks.WaitAppellationDecision, waitTime);
         WaitFor(DecisionType.Appellation, waitTime, -2);
     }
@@ -4207,7 +4212,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (arg == 1)
         {
-            var authors = _data.PackageDoc.GetRealAuthors(theme.Info.Authors);
+            var authors = _data.PackageDoc.ResolveAuthors(theme.Info.Authors);
 
             if (authors.Length > 0)
             {
@@ -4224,9 +4229,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (arg == 2)
         {
-            var sources = _data.PackageDoc.GetRealSources(theme.Info.Sources);
+            var sources = _data.PackageDoc.ResolveSources(theme.Info.Sources);
 
-            if (sources.Length > 0 && _data.Settings.AppSettings.DisplaySources)
+            if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4309,7 +4314,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (stage == 2)
         {
-            var authors = _data.PackageDoc.GetRealAuthors(package.Info.Authors);
+            var authors = _data.PackageDoc.ResolveAuthors(package.Info.Authors);
 
             if (package.Name != Constants.RandomIndicator && authors.Length > 0)
             {
@@ -4326,9 +4331,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (stage == 3)
         {
-            var sources = _data.PackageDoc.GetRealSources(package.Info.Sources);
+            var sources = _data.PackageDoc.ResolveSources(package.Info.Sources);
 
-            if (sources.Length > 0 && _data.Settings.AppSettings.DisplaySources)
+            if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4428,7 +4433,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else if (stage == 2)
         {
-            var authors = _data.PackageDoc.GetRealAuthors(round.Info.Authors);
+            var authors = _data.PackageDoc.ResolveAuthors(round.Info.Authors);
 
             if (authors.Length > 0)
             {
@@ -4445,9 +4450,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (stage == 3)
         {
-            var sources = _data.PackageDoc.GetRealSources(round.Info.Sources);
+            var sources = _data.PackageDoc.ResolveSources(round.Info.Sources);
 
-            if (sources.Length > 0 && _data.Settings.AppSettings.DisplaySources)
+            if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 informed = true;
                 var res = new StringBuilder();

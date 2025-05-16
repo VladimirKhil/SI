@@ -544,11 +544,10 @@ public sealed class SIDocument : IDisposable
     #region Link Functions
 
     /// <summary>
-    /// Выделить настоящих авторов
+    /// Resolves links in authors and returns resolved collection.
     /// </summary>
-    /// <param name="authors">Список авторов</param>
-    /// <returns>Набор авторов, где вычислены все ссылки</returns>
-    public string[] GetRealAuthors(Authors authors)
+    /// <param name="authors">Package item authors.</param>
+    public string[] ResolveAuthors(Authors authors)
     {
         var result = new List<string>();
 
@@ -561,22 +560,40 @@ public sealed class SIDocument : IDisposable
         return result.ToArray();
     }
 
-    /// <summary>
-    /// Выделить настоящие источники
-    /// </summary>
-    /// <param name="sources">Список источников</param>
-    /// <returns>Набор источников, где вычислены все ссылки</returns>
-    public string[] GetRealSources(Sources sources)
+    /// <summary>  
+    /// Resolves links in sources and returns resolved collection.
+    /// </summary>  
+    /// <param name="sources">Package item sources.</param>  
+    public IList<string> ResolveSources(Sources sources)
     {
-        var result = new List<string>();
+        if (sources.Count == 0)
+        {
+            return sources;
+        }
+
+        List<string>? result = null;
 
         for (var i = 0; i < sources.Count; i++)
         {
-            var source = GetLink(sources, i, out var tail);
-            result.Add(source == null ? sources[i] : source.ToString() + tail);
+            var sourceLink = GetLink(sources, i, out var tail);
+
+            if (sourceLink != null)
+            {
+                if (result == null)
+                {
+                    result = new List<string>(sources.Count);
+                    result.AddRange(sources.Take(i));
+                }
+
+                result.Add($"{sourceLink}{tail}");
+            }
+            else
+            {
+                result?.Add(sources[i]);
+            }
         }
 
-        return result.ToArray();
+        return result ?? sources;
     }
 
     /// <summary>

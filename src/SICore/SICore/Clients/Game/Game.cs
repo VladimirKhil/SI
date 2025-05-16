@@ -2486,6 +2486,7 @@ public sealed class Game : Actor
                     ClientData.Players[i].AppellationFlag = false;
                     ClientData.AppellationAwaitedVoteCount--;
                     _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
+                    _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
                     break;
                 }
             }

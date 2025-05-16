@@ -62,7 +62,7 @@ public sealed class SIHostClient : IGameClient
         }
     }
 
-    public static async Task<SIHostClient> CreateAsync(SIHostClientOptions options, CancellationToken cancellationToken)
+    public static async Task<SIHostClient> CreateAsync(SIHostClientOptions options, CancellationToken cancellationToken = default)
     {
         var serviceUri = options.ServiceUri?.ToString() ?? "";
 

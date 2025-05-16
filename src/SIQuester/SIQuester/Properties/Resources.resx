@@ -679,6 +679,9 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="Increase" xml:space="preserve">
     <value>Increment</value>
   </data>
+  <data name="Info" xml:space="preserve">
+    <value>Info</value>
+  </data>
   <data name="InstallUpdates" xml:space="preserve">
     <value>Install updates</value>
   </data>

@@ -278,7 +278,7 @@ public static class PackageHelper
 
             if (authors.Count > 0)
             {
-                var realAuthors = sourceDocument.GetRealAuthors(authors);
+                var realAuthors = sourceDocument.ResolveAuthors(authors);
                 theme.Info.Authors.Clear();
 
                 foreach (var item in realAuthors)
@@ -316,7 +316,7 @@ public static class PackageHelper
 
             if (sources.Count > 0)
             {
-                var realSources = sourceDocument.GetRealSources(sources);
+                var realSources = sourceDocument.ResolveSources(sources);
                 theme.Info.Sources.Clear();
 
                 foreach (var item in realSources)

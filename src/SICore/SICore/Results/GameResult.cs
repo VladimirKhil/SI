@@ -26,14 +26,9 @@ public sealed class GameResult
     public TimeSpan Duration { get; set; } = TimeSpan.Zero;
 
     /// <summary>
-    /// Имя пакета
+    /// Game package name.
     /// </summary>
     public string? PackageName { get; set; }
-
-    /// <summary>
-    /// Game package hash.
-    /// </summary>
-    public string? PackageHash { get; set; }
 
     /// <summary>
     /// Game package authors.

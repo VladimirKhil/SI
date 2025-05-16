@@ -36,7 +36,7 @@ internal static class GameResultExtensions
         return new GameReport
         {
             Info = new GameResultInfo(
-                new PackageInfo(gameResult.PackageName, gameResult.PackageHash, gameResult.PackageAuthors, gameResult.PackageAuthorsContacts),
+                new PackageInfo(gameResult.PackageName, "", gameResult.PackageAuthors, gameResult.PackageAuthorsContacts),
                 gameResult.Language)
             {
                 FinishTime = DateTimeOffset.UtcNow,
