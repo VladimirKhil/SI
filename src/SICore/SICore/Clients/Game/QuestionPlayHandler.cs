@@ -1,7 +1,6 @@
 ﻿using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
-using System.Xml.Linq;
 
 namespace SICore.Clients.Game;
 
@@ -82,7 +81,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
         GameLogic.AddHistory("Appellation opened");
 
-        _gameData.IsAnswer = true;
+        _gameData.QuestionPlayState.IsAnswer = true;
         _gameData.AppellationOpened = _gameData.Settings.AppSettings.UseApellations;
         _gameData.PendingApellation = false;
         _gameData.IsPlayingMedia = false;
@@ -127,10 +126,10 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
             _gameData.QuestionPlayState.LayoutShown = true;
         }
 
-        if (_gameData.IsAnswer && !_gameData.IsAnswerSimple)
+        if (_gameData.QuestionPlayState.IsAnswer && !_gameData.QuestionPlayState.IsAnswerSimple && !_gameData.QuestionPlayState.IsAnswerAnnounced)
         {
             GameLogic?.OnComplexAnswer();
-            _gameData.IsAnswer = false;
+            _gameData.QuestionPlayState.IsAnswerAnnounced = true;
         }
     }
 
@@ -225,7 +224,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                 switch (contentItem.Type)
                 {
                     case ContentTypes.Text:
-                        if (_gameData.IsAnswerSimple)
+                        if (_gameData.QuestionPlayState.IsAnswerSimple)
                         {
                             GameLogic.OnSimpleAnswer(contentItem.Value);
                             break;
@@ -292,9 +291,8 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         _gameData.CanMarkQuestion = true;
         _gameData.IsDeferringAnswer = false;
         _gameData.IsQuestionFinished = false;
-        _gameData.IsAnswer = false;
-        _gameData.IsAnswerSimple = false;
         _gameData.UseBackgroundAudio = false;
+        _gameData.QuestionPlayState.UseButtons = questionRequiresButtons;
 
         foreach (var player in _gameData.Players)
         {
@@ -397,7 +395,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         return true;
     }
 
-    public void OnSimpleRightAnswerStart() => _gameData.IsAnswerSimple = true;
+    public void OnSimpleRightAnswerStart() => _gameData.QuestionPlayState.IsAnswerSimple = true;
 
     public bool OnRightAnswerOption(string rightOptionLabel)
     {

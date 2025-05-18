@@ -1856,7 +1856,7 @@ public sealed class Game : Actor
             case Constants.Player:
                 accountsToSearch = ClientData.Players;
 
-                if (ClientData.HostName == name) // Подключение организатора
+                if (ClientData.HostName == name) // Host is connecting
                 {
                     var defaultPlayers = ClientData.Settings.Players;
                     for (var i = 0; i < defaultPlayers.Length; i++)
@@ -2594,7 +2594,7 @@ public sealed class Game : Actor
             && ClientData.Players.All(p => !p.CanPress || !p.IsConnected)
             && (ClientData.Decision == DecisionType.None || ClientData.Decision == DecisionType.Pressing) // TODO: Can this state be described in a more clear way?
             && !ClientData.TInfo.Pause
-            && !ClientData.IsAnswer)
+            && !ClientData.QuestionPlayState.IsAnswer)
         {
             _logic.MoveToAnswer();
             _logic.ScheduleExecution(Tasks.WaitTry, 1, force: true);

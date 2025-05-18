@@ -140,7 +140,7 @@ internal sealed class Intelligence : IIntelligence
         return (themeIndex, questionIndex);
     }
 
-    public int DeleteTheme(List<ThemeInfo> roundTable) => roundTable.SelectRandom(theme => theme.Name != "", Random.Shared);
+    public int DeleteTheme(List<ThemeInfo> roundTable) => roundTable.SelectRandom(theme => theme.Name != "");
 
     public int SelectPlayer(
         List<PlayerAccount> players,

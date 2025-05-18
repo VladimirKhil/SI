@@ -97,11 +97,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IPersonController
         // Do nothing
     }
 
-    public void GameThemes()
-    {
-        // Do nothing
-    }
-
     public void RoundThemes(bool print)
     {
         // Do nothing

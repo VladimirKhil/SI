@@ -146,7 +146,7 @@ public sealed class TimeSettings
     }
 
     /// <summary>
-    /// Время на просмотр правильного ответа
+    /// Defines time in 0.1 s for showing right answer.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(2)]

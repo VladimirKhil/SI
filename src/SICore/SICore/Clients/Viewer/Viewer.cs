@@ -9,8 +9,6 @@ using SICore.Special;
 using SIData;
 using SIPackages.Core;
 using SIUI.Model;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -19,7 +17,7 @@ namespace SICore;
 /// <summary>
 /// Implements a game viewer.
 /// </summary>
-public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
+public class Viewer : Actor, IViewerClient
 {
     protected readonly ViewerActions _viewerActions;
 
@@ -46,7 +44,6 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
             {
                 _isHost = value;
                 _logic.OnHostChanged();
-                OnPropertyChanged();
             }
         }
     }
@@ -56,8 +53,6 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
     public ViewerData MyData => ClientData;
 
     public string? Avatar { get; set; }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void Initialize(bool isHost)
     {
@@ -398,7 +393,6 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                         for (var i = 1; i < mparams.Length; i++)
                         {
                             ClientData.TInfo.GameThemes.Add(mparams[i]);
-                            _logic.OnReplic(ReplicCodes.System.ToString(), mparams[i]);
                         }
 
                         _logic.GameThemes();
@@ -1120,11 +1114,6 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         for (var i = 2; i < mparams.Length; i++)
         {
             ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
-
-            if (playMode != ThemesPlayMode.None)
-            {
-                _logic.OnReplic(ReplicCodes.System.ToString(), mparams[i]);
-            }
         }
 
         try
@@ -1551,8 +1540,8 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
             var ready = account.Ready;
             var isOnline = account.IsConnected;
 
-            // Кто садится на его место
-            ViewerAccount other = null;
+            // Replacer
+            ViewerAccount? other = null;
             GameRole role = GameRole.Viewer;
 
             ClientData.BeginUpdatePersons($"Config_Set {string.Join(" ", mparams)}");
@@ -1561,7 +1550,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
             {
                 if (isPlayer && ClientData.ShowMan.Name == replacer)
                 {
-                    // Ведущего сажаем на место игрока
+                    // Put the showman in the place of the player
                     var showman = ClientData.ShowMan;
                     other = showman;
                     role = GameRole.Showman;
@@ -1634,7 +1623,7 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
                                 }
                                 else
                                 {
-                                    // место было пустым, зрителя нужо удалить
+                                    // the place was empty, the viewer needs to be deleted
                                     ClientData.Viewers.Remove(item);
                                     account.IsConnected = true;
                                 }
@@ -1649,6 +1638,11 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
             finally
             {
                 ClientData.EndUpdatePersons();
+            }
+
+            if (other == null)
+            {
+                return;
             }
 
             if (account == me)
@@ -2004,7 +1998,6 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
     /// </summary>
     /// <param name="text">Текст сообщения</param>
     /// <param name="whom">Кому</param>
-    /// <param name="isPrivate">Приватно ли</param>
     public void Say(string text, string whom = NetworkConstants.Everybody)
     {
         if (whom != NetworkConstants.Everybody)
@@ -2092,7 +2085,4 @@ public class Viewer : Actor, IViewerClient, INotifyPropertyChanged
         _ = Enum.TryParse<SelectPlayerReason>(mparams[1], out var reason);
         _logic.OnSelectPlayer(reason);
     }
-
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

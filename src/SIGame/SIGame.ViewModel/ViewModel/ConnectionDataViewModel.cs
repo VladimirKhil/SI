@@ -284,7 +284,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         var localizer = new Localizer(Thread.CurrentThread.CurrentUICulture.Name);
         var actions = new ViewerActions(_client);
-        var logic = new ViewerHumanLogic(gameViewModel, data, actions, ServerAddress, ContentPublicBaseUrls?.FirstOrDefault(), ContentPublicBaseUrls);
+        var logic = new ViewerHumanLogic(gameViewModel, data, actions, _userSettings, ServerAddress, ContentPublicBaseUrls?.FirstOrDefault(), ContentPublicBaseUrls);
 
         try
         {

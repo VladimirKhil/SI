@@ -22,14 +22,6 @@ public interface IGameHost
 
     bool MakeLogs { get; }
 
-    string LogsFolder { get; }
-
-    Stream CreateLog(string userName, out string logUri);
-
-    bool AttachContentToTable { get; }
-
-    bool TranslateGameToChat { get; }
-
     string GameButtonKey { get; }
 
     bool SendReport { get; }

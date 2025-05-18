@@ -69,6 +69,26 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal bool ValidateAfterRightAnswer => AnswerOptions != null;
 
+    /// <summary>
+    /// Is the question in answer display mode.
+    /// </summary>
+    internal bool IsAnswer { get; set; }
+
+    /// <summary>
+    /// Has the answer stage been announced.
+    /// </summary>
+    internal bool IsAnswerAnnounced { get; set; }
+
+    /// <summary>
+    /// Marks simple (text-only) answer.
+    /// </summary>
+    internal bool IsAnswerSimple { get; set; }
+
+    /// <summary>
+    /// Should the question be answered by pressing button.
+    /// </summary>
+    internal bool UseButtons { get; set; }
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -80,6 +100,10 @@ internal sealed class QuestionPlayState
         HiddenStakes = false;
         MediaContentCompletions.Clear();
         Validations.Clear();
+        IsAnswer = false;
+        IsAnswerAnnounced = false;
+        IsAnswerSimple = false;
+        UseButtons = false;
     }
 
     internal void RemovePlayer(int playerIndex)

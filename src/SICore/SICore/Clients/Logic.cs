@@ -1,6 +1,4 @@
-﻿using SICore.Extensions;
-
-namespace SICore;
+﻿namespace SICore;
 
 // TODO: remove
 
@@ -22,12 +20,4 @@ public abstract class Logic<D>
     public D ClientData => _data;
 
     public Logic(D data) => _data = data;
-
-    protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition) =>
-        list.SelectRandom(condition, Random.Shared);
-
-    protected int SelectRandomOnIndex<T>(IEnumerable<T> list, Predicate<int> condition) =>
-        list.SelectRandomOnIndex(condition, Random.Shared);
-
-    public string GetRandomString(string resource) => Random.Shared.GetRandomString(resource);
 }
