@@ -2600,14 +2600,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void Winner()
     {
-        var big = _data.Players.Max(player => player.Sum);
-        var winnersCount = _data.Players.Count(player => player.Sum == big);
+        var winnerScore = _data.Players.Max(player => player.Sum);
+        var winnerCount = _data.Players.Count(player => player.Sum == winnerScore);
 
-        if (winnersCount == 1)
+        if (winnerCount == 1)
         {
             for (var i = 0; i < _data.Players.Count; i++)
             {
-                if (_data.Players[i].Sum == big)
+                if (_data.Players[i].Sum == winnerScore)
                 {
                     var s = new StringBuilder(_data.Players[i].Name).Append(", ");
                     s.Append(GetRandomString(LO[nameof(R.YouWin)]));
@@ -2629,9 +2629,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AskToTry()
     {
-        var hasConnectedPlayers = _data.Players.Any(p => p.IsConnected);
-
-        if (ClientData.Players.All(p => !p.CanPress || (hasConnectedPlayers && !p.IsConnected)))
+        if (ClientData.Players.All(p => !p.CanPress))
         {
             ScheduleExecution(Tasks.WaitTry, 3, force: true);
             return;
