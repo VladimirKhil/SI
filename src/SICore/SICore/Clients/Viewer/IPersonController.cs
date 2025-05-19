@@ -21,9 +21,9 @@ public interface IPersonController
     void Stage();
 
     /// <summary>
-    /// Получены темы игры
+    /// Game themes received.
     /// </summary>
-    void GameThemes();
+    void GameThemes() { }
 
     /// <summary>
     /// Handles round themes.

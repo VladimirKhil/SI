@@ -38,6 +38,7 @@ public sealed class GameActions
     public void SendMessageToWithArgs(string receiver, params object[] args) =>
         SendMessage(string.Join(Message.ArgsSeparator, args), receiver);
 
+    [Obsolete]
     internal void SystemReplic(string text) => UserMessage(MessageTypes.System, text);
 
     internal void SpecialReplic(string text) => UserMessage(MessageTypes.Special, text);

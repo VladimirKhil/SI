@@ -11,7 +11,7 @@ internal static class RandomExtensions
         return y1 * stddev + mean;
     }
 
-    internal static int SelectRandom<T>(this IEnumerable<T> list, Predicate<T> condition, Random random)
+    internal static int SelectRandom<T>(this IEnumerable<T> list, Predicate<T> condition)
     {
         var goodItems = list
             .Select((item, index) => new { Item = item, Index = index })
@@ -22,17 +22,17 @@ internal static class RandomExtensions
             throw new Exception("goodItems.Length == 0");
         }
 
-        var ind = random.Next(goodItems.Length);
+        var ind = Random.Shared.Next(goodItems.Length);
         return goodItems[ind].Index;
     }
 
-    internal static int SelectRandomOnIndex<T>(this IEnumerable<T> list, Predicate<int> condition, Random random)
+    internal static int SelectRandomOnIndex<T>(this IEnumerable<T> list, Predicate<int> condition)
     {
         var goodItems = list
             .Select((item, index) => new { Item = item, Index = index })
             .Where(item => condition(item.Index)).ToArray();
 
-        var ind = random.Next(goodItems.Length);
+        var ind = Random.Shared.Next(goodItems.Length);
         return goodItems[ind].Index;
     }
 

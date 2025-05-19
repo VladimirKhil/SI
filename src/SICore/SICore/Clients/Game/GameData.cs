@@ -379,8 +379,6 @@ public sealed class GameData : Data
     /// </summary>
     public int AppellationNegativeVoteCount { get; set; }
 
-    internal bool IsAnswer { get; set; }
-
     /// <summary>
     /// Game players info.
     /// </summary>
@@ -590,11 +588,6 @@ public sealed class GameData : Data
     /// Game name.
     /// </summary>
     public string GameName { get; set; } = "";
-
-    /// <summary>
-    /// Marks simple (text-only) answer.
-    /// </summary>
-    public bool IsAnswerSimple { get; internal set; }
 
     /// <summary>
     /// Should audio content be played along with on-screen content in background.

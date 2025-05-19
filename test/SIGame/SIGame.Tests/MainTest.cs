@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SI.GameServer.Client;
-using SICore;
 using SICore.PlatformSpecific;
 using SIData;
 using SIGame.ViewModel;

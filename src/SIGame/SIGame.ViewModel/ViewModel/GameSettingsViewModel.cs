@@ -773,7 +773,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         var client = new Client(_model.HumanPlayerName);
         var actions = new ViewerActions(client);
-        var logic = new ViewerHumanLogic(gameViewModel, data, actions, LocalAddress);
+        var logic = new ViewerHumanLogic(gameViewModel, data, actions, _userSettings, LocalAddress);
 
         IViewerClient? host = null;
 

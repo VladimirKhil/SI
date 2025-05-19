@@ -2,6 +2,7 @@
 using Notions;
 using SICore.Clients.Viewer;
 using SIData;
+using SIGame;
 using SIGame.ViewModel;
 using SIGame.ViewModel.Contracts;
 using SIGame.ViewModel.Models;
@@ -12,6 +13,7 @@ using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using Utils;
 using Utils.Timers;
 
@@ -79,10 +81,13 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
     private readonly List<string> _chatTable = new();
 
+    private readonly UserSettings _userSettings;
+
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
         ViewerData data,
         ViewerActions viewerActions,
+        UserSettings userSettings,
         string serverAddress,
         string? serverPublicUrl = null,
         string[]? contentPublicUrls = null)
@@ -90,6 +95,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     {
         _gameViewModel = gameViewModel;
         _viewerActions = viewerActions;
+        _userSettings = userSettings;
 
         _gameViewModel.Logic = this;
         _gameViewModel.Disposed += GameViewModel_Disposed;
@@ -253,7 +259,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     }
 
     /// <summary>
-    /// Adds mesage to the game chat.
+    /// Adds message to the game chat.
     /// </summary>
     /// <param name="message">Message to add.</param>
     private void AddToChat(Message message)
@@ -288,6 +294,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     public void OnReplic(string replicCode, string text)
     {
         string? logString = null;
+        var translateGameToChat = _userSettings.GameSettings.AppSettings.TranslateGameToChat;
 
         if (replicCode == ReplicCodes.Showman.ToString())
         {
@@ -297,7 +304,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
             logString = $"<span class=\"sh\">{_gameViewModel.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
-            if (_data.Host.TranslateGameToChat)
+            if (translateGameToChat)
             {
                 AddToChat(new Message(text, _gameViewModel.Speaker.Name));
             }
@@ -314,7 +321,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
                 logString = $"<span class=\"sr n{index}\">{_gameViewModel.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
-                if (_data.Host.TranslateGameToChat)
+                if (translateGameToChat)
                 {
                     AddToChat(new Message(text, _gameViewModel.Speaker.Name));
                 }
@@ -327,7 +334,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         }
         else
         {
-            if (_data.Host.TranslateGameToChat)
+            if (translateGameToChat)
             {
                 _gameViewModel.OnAddString(null, text, LogMode.Protocol);
             }
@@ -358,7 +365,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             {
                 try
                 {
-                    var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out var path);
+                    var stream = CreateLog(_viewerActions.Client.Name, out var path);
                     _logFilePath = path;
                     _gameLogger = new StreamWriter(stream);
                     _gameLogger.Write(text);
@@ -411,6 +418,20 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         }
     }
 
+    private Stream CreateLog(string userName, out string logUri)
+    {
+        var name = Regex.Replace(userName, @"[^\d\w]", "");
+
+        var userFolder = Path.Combine(_userSettings.GameSettings.AppSettings.LogsFolder, name);
+        Directory.CreateDirectory(userFolder);
+
+        var now = DateTimeOffset.Now;
+        var protoFileName = $"{now.Year}.{now.Month}.{now.Day}_{now.Hour}.{now.Minute}.{now.Second}_{now.Offset.TotalMinutes}_log.html";
+        logUri = Path.Combine(userFolder, protoFileName);
+
+        return File.Create(logUri);
+    }
+
     public void Stage()
     {
         switch (_data.Stage)
@@ -425,7 +446,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                 {
                     try
                     {
-                        var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out string path);
+                        var stream = CreateLog(_viewerActions.Client.Name, out string path);
                         _logFilePath = path;
                         _gameLogger = new StreamWriter(stream);
                         _gameLogger.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + Resources.LogTitle + "</title>");
@@ -491,6 +512,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     {
         TInfo.TStage = TableStage.GameThemes;
         _data.EnableMediaLoadButton = false;
+
+        for (var i = 0; i < ClientData.TInfo.GameThemes.Count; i++)
+        {
+            OnReplic(ReplicCodes.System.ToString(), ClientData.TInfo.GameThemes[i]);
+        }
     }
 
     public void RoundThemes(Models.ThemesPlayMode playMode)
@@ -505,9 +531,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         {
             TInfo.RoundInfo.Clear();
 
-            foreach (var item in _data.TInfo.RoundInfo.Select(themeInfo => new ThemeInfoViewModel(themeInfo)))
+            foreach (var theme in _data.TInfo.RoundInfo.Select(themeInfo => new ThemeInfoViewModel(themeInfo)))
             {
-                TInfo.RoundInfo.Add(item);
+                TInfo.RoundInfo.Add(theme);
+
+                if (playMode != Models.ThemesPlayMode.None)
+                {
+                    OnReplic(ReplicCodes.System.ToString(), theme.Name);
+                }
             }
         }
 
@@ -911,7 +942,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             groups.Add(currentGroup);
         }
 
-        if (_data.Host.AttachContentToTable && groups.Count == 1 && groups[0].Content.Count == 1 && groups[0].Content[0].Type != ContentType.Text)
+        if (_userSettings.GameSettings.AppSettings.AttachContentToTable && groups.Count == 1 && groups[0].Content.Count == 1 && groups[0].Content[0].Type != ContentType.Text)
         {
             if (_prependTableText != null)
             {
@@ -969,7 +1000,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         {
             var additionalText = _appendTableText ?? _prependTableText;
 
-            if (_data.Host.AttachContentToTable && additionalText != null)
+            if (_userSettings.GameSettings.AppSettings.AttachContentToTable && additionalText != null)
             {
                 var groups = new List<ContentGroup>();
                 var group = new ContentGroup();
@@ -1812,7 +1843,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         {
             _gameViewModel.Answer = "";
             _gameViewModel.DialogMode = DialogModes.Answer;
-            ((PlayerAccount)_data.Me).IsDeciding = false;
+            var me = (PlayerAccount?)_data.Me;
+            
+            if (me != null)
+            {
+                me.IsDeciding = false;
+            }
 
             StartSendingVersion(_cancellationTokenSource.Token);
         }

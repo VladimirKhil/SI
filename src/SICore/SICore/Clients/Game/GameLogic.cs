@@ -426,7 +426,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         // TODO: move all to question play state
         _data.AppellationOpened = false;
         _data.AllowAppellation = false;
-        _data.IsAnswer = false;
         _data.QuestionHistory.Clear();
         _data.PendingAnswererIndex = -1;
         _data.AnswererPressDuration = -1;
@@ -493,11 +492,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     /// Should the question be displayed partially.
     /// </summary>
     private bool IsPartial() =>
-        !IsSpecialQuestion()
-            && _data.Settings != null
+        _data.QuestionPlayState.UseButtons
             && !_data.Settings.AppSettings.FalseStart
             && _data.Settings.AppSettings.PartialText
-            && !_data.IsAnswer;
+            && !_data.QuestionPlayState.IsAnswer;
 
     internal void OnContentReplicText(string text, bool waitForFinish, TimeSpan duration)
     {
@@ -666,7 +664,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var appSettings = _data.Settings.AppSettings;
         // TODO: provide this flag to client as part of the CONTENT message
-        var partialImage = appSettings.PartialImages && !appSettings.FalseStart && !IsSpecialQuestion() && !_data.IsAnswer;
+        var partialImage = appSettings.PartialImages && !appSettings.FalseStart && _data.QuestionPlayState.UseButtons && !_data.QuestionPlayState.IsAnswer;
 
         var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
         
@@ -1799,6 +1797,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         ContinueQuestion();
                         break;
 
+                    case Tasks.AfterQuestionEnd:
+                        OnAfterQuestionEnd();
+                        break;
+
                     case Tasks.QuestionPostInfo:
                         QuestionSourcesAndComments(arg);
                         break;
@@ -2363,7 +2365,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (_data.ChooserIndex == -1)
         {
-            _data.ChooserIndex = SelectRandom(_data.Players, p => p.Flag);
+            _data.ChooserIndex = _data.Players.SelectRandom(p => p.Flag);
         }
 
         OnDecision();
@@ -2425,7 +2427,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
         }
 
-        var index = SelectRandomOnIndex(_data.Players, index => index != _data.ChooserIndex);
+        var index = _data.Players.SelectRandomOnIndex(index => index != _data.ChooserIndex);
 
         _data.AnswererIndex = index;
         _data.QuestionPlayState.SetSingleAnswerer(index);
@@ -2593,7 +2595,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
-        _data.ThemeIndexToDelete = SelectRandom(_data.TInfo.RoundInfo, item => item.Name != null);
+        _data.ThemeIndexToDelete = _data.TInfo.RoundInfo.SelectRandom(item => item.Name != null);
 
         OnDecision();
     }
@@ -4642,29 +4644,19 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, 15);
     }
 
+    // TODO: think about always using only complex answers as simple answer is a subset of complex
     internal void OnSimpleAnswer(string answer)
     {
-        var normalizedAnswer = (answer ?? LO[nameof(R.AnswerNotSet)]).LeaveFirst(MaxAnswerLength);
-
+        var normalizedAnswer = answer.LeaveFirst(MaxAnswerLength);
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
 
-        var answerTime = Math.Max(
-            GetReadingDurationForTextLength(normalizedAnswer.Length),
-            _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10);
-
+        var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length);
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
     internal void OnComplexAnswer()
     {
-        var last = _data.QuestionHistory.LastOrDefault();
-        var answer = _data.Question?.Right.FirstOrDefault() ?? "";
-
-        if (last == null || !last.IsRight) // There has been no right answer
-        {
-            var printedAnswer = answer.Length > 0 ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
-            _gameActions.ShowmanReplic(printedAnswer);
-        }
+        var answer = _data.Question?.Right.FirstOrDefault() ?? ""; // TODO: this value should come from engine
 
         if (_data.QuestionPlayState.AnswerOptions != null)
         {
@@ -4684,9 +4676,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         _data.RightOptionLabel = rightOptionLabel;
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
-        var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
-        answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
-        ScheduleExecution(Tasks.MoveNext, answerTime);
+        ScheduleExecution(Tasks.MoveNext, 10);
     }
 
     private bool DetectRoundTimeout()
@@ -4706,17 +4696,22 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     internal bool OnQuestionEnd()
     {
         var timeout = DetectRoundTimeout();
+        var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
+        ScheduleExecution(Tasks.AfterQuestionEnd, (answerTime == 0 ? 2 : answerTime) * 10);
+        return timeout;
+    }
 
+    internal void OnAfterQuestionEnd()
+    {
         if (_data.QuestionPlayState.ValidateAfterRightAnswer)
         {
             if (ValidatePlayersAnswers())
             {
-                return timeout;
+                return;
             }
         }
-
+        
         OnQuestionPostInfo();
-        return timeout;
     }
 
     private bool ValidatePlayersAnswers()
@@ -5126,6 +5121,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, contentTime);
         _data.TimeThinking = 0.0;
     }
+
+    private static string GetRandomString(string resource) => Random.Shared.GetRandomString(resource);
 
     private int GetContentItemDefaultDuration(ContentItem contentItem) => contentItem.Type switch
     {
