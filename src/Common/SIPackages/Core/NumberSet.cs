@@ -39,7 +39,7 @@ public class NumberSet : IEquatable<NumberSet>, INotifyPropertyChanged
     private int _step = 0;
 
     /// <summary>
-    /// Step (a minimum distance between two possible nubmbers) value.
+    /// Step (a minimum distance between two possible numbers) value.
     /// </summary>
     [DefaultValue(0)]
     public int Step

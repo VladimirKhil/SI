@@ -152,20 +152,10 @@ public sealed class GameData : Data
 
     internal List<string> DecisionMakers { get; } = new();
 
-    private NumberSet? _catInfo = null;
-
-    public NumberSet? CatInfo
-    {
-        get => _catInfo;
-        set
-        {
-            if (_catInfo != value)
-            {
-                _catInfo = value;
-                OnPropertyChanged();
-            }
-        }
-    }
+    /// <summary>
+    /// Possible stakes to select.
+    /// </summary>
+    public StakeSettings? StakeRange { get; set; }
 
     /// <summary>
     /// Game host name.

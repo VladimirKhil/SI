@@ -678,4 +678,7 @@
   <data name="VoiceChatLink" xml:space="preserve">
     <value>Голосовой чат (Discord)</value>
   </data>
+  <data name="TimeSettings_ImageTime" xml:space="preserve">
+    <value>Вывод изображения</value>
+  </data>
 </root>

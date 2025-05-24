@@ -681,4 +681,7 @@
   <data name="VoiceChatLink" xml:space="preserve">
     <value>Voice chat (Discord)</value>
   </data>
+  <data name="TimeSettings_ImageTime" xml:space="preserve">
+    <value>Image display</value>
+  </data>
 </root>

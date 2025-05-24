@@ -356,13 +356,8 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         }
     }
 
-    public bool OnAnnouncePrice(NumberSet? availableRange)
+    public bool OnAnnouncePrice(NumberSet availableRange)
     {
-        if (availableRange == null)
-        {
-            return false;
-        }
-
         GameLogic?.OnAnnouncePrice(availableRange);
         return true;
     }

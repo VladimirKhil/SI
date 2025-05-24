@@ -175,7 +175,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.IsPartial = false;
         ShareMedia(contentItem);
 
-        var contentTime = GetContentItemDuration(contentItem, (TimeSettings.ImageTime + TimeSettings.TimeForMediaDelay) * 10);
+        var contentTime = GetContentItemDuration(contentItem, TimeSettings.ImageTime * 10);
 
         _data.AtomTime = contentTime;
         _data.AtomStart = DateTime.UtcNow;
@@ -454,6 +454,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         var contentTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length);
 
+        if (_data.QuestionPlayState.IsAnswer)
+        {
+            contentTime += _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10;
+        }
+
         _data.AtomTime = contentTime;
         _data.AtomStart = DateTime.UtcNow;
         _data.UseBackgroundAudio = !waitForFinish;
@@ -596,7 +601,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         try
         {
-            var (success, globalUri, localUri, error) = TryShareContent(contentItem);
+            var (success, globalUri, _, error) = TryShareContent(contentItem);
 
             if (!success || globalUri == null)
             {
@@ -668,7 +673,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
         
-        var waitTime = GetContentItemDuration(contentItem, (TimeSettings.ImageTime + TimeSettings.TimeForMediaDelay) * 10);
+        var waitTime = GetContentItemDuration(contentItem, TimeSettings.ImageTime * 10);
 
         var contentTime = renderTime + waitTime;
 
@@ -1797,10 +1802,6 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         ContinueQuestion();
                         break;
 
-                    case Tasks.AfterQuestionEnd:
-                        OnAfterQuestionEnd();
-                        break;
-
                     case Tasks.QuestionPostInfo:
                         QuestionSourcesAndComments(arg);
                         break;
@@ -2186,8 +2187,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
         }
 
-        _data.CurPriceRight = _data.CatInfo.Minimum;
-        _data.CurPriceWrong = _data.CatInfo.Minimum;
+        _data.CurPriceRight = _data.StakeRange.Minimum;
+        _data.CurPriceWrong = _data.StakeRange.Minimum;
 
         OnDecision();
     }
@@ -2331,7 +2332,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         var answerer = _data.Answerer ?? throw new InvalidOperationException("Answerer not defined");
 
-        var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.CatInfo.Minimum, _data.CatInfo.Maximum, _data.CatInfo.Step);
+        var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.StakeRange.Minimum, _data.StakeRange.Maximum, _data.StakeRange.Step);
 
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
 
@@ -2353,7 +2354,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _data.StakeModes = StakeModes.Stake;
-        AskToMakeStake(StakeReason.Simple, answerer.Name, new (_data.CatInfo.Minimum, _data.CatInfo.Maximum, _data.CatInfo.Step));
+        AskToMakeStake(StakeReason.Simple, answerer.Name, _data.StakeRange);
 
         ScheduleExecution(Tasks.WaitSelectQuestionPrice, waitTime);
         WaitFor(DecisionType.QuestionPriceSelection, waitTime, _data.AnswererIndex);
@@ -4644,13 +4645,15 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ScheduleExecution(Tasks.MoveNext, 15);
     }
 
-    // TODO: think about always using only complex answers as simple answer is a subset of complex
+    // TODO: think about always using only complex answers as simple answer is a subset of a complex one
     internal void OnSimpleAnswer(string answer)
     {
         var normalizedAnswer = answer.LeaveFirst(MaxAnswerLength);
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
 
-        var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length);
+        var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length)
+            + _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10;
+        
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
@@ -4676,7 +4679,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         _data.RightOptionLabel = rightOptionLabel;
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
-        ScheduleExecution(Tasks.MoveNext, 10);
+        var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
+        answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
+        ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
     private bool DetectRoundTimeout()
@@ -4696,22 +4701,17 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     internal bool OnQuestionEnd()
     {
         var timeout = DetectRoundTimeout();
-        var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
-        ScheduleExecution(Tasks.AfterQuestionEnd, (answerTime == 0 ? 2 : answerTime) * 10);
-        return timeout;
-    }
 
-    internal void OnAfterQuestionEnd()
-    {
         if (_data.QuestionPlayState.ValidateAfterRightAnswer)
         {
             if (ValidatePlayersAnswers())
             {
-                return;
+                return timeout;
             }
         }
-        
+
         OnQuestionPostInfo();
+        return timeout;
     }
 
     private bool ValidatePlayersAnswers()
@@ -4776,8 +4776,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.InformSums();
     }
 
+    // TODO: OnAnnouncePrice and OnSelectPrice should utilize the same selection strategy
     internal void OnAnnouncePrice(NumberSet availableRange)
     {
+        // TODO: send QUESTION_PRICE_RANGE message instead of this
         var s = new StringBuilder(LO[nameof(R.Cost2)]).Append(": ");
 
         if (availableRange.Maximum == 0)
@@ -4790,7 +4792,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            if (availableRange.Step > 0 && availableRange.Step < availableRange.Maximum - availableRange.Minimum)
+            if (availableRange.Step > 0)
             {
                 s.Append(
                     $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Maximum)} " +
@@ -4803,24 +4805,16 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _gameActions.ShowmanReplic(s.ToString());
-        ScheduleExecution(Tasks.MoveNext, 10);
+        ScheduleExecution(Tasks.MoveNext, 20);
     }
 
     internal void OnSelectPrice(NumberSet availableRange)
     {
-        _data.CatInfo = availableRange;
-
         if (availableRange.Maximum == 0)
         {
-            var possiblePrices = _data.CatInfo;
-
-            possiblePrices.Minimum = _minRoundPrice;
-            possiblePrices.Maximum = _maxRoundPrice;
-            possiblePrices.Step = possiblePrices.Maximum - possiblePrices.Minimum;
-
-            if (possiblePrices.Step == 0)
+            if (_minRoundPrice == _maxRoundPrice)
             {
-                _data.CurPriceRight = possiblePrices.Maximum;
+                _data.CurPriceRight = _minRoundPrice;
                 _data.CurPriceWrong = _data.CurPriceRight;
                 _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
                 ScheduleExecution(Tasks.MoveNext, 1);
@@ -4828,6 +4822,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             else
             {
                 _data.CurPriceRight = -1;
+                _data.StakeRange = new StakeSettings(_minRoundPrice, _maxRoundPrice, _maxRoundPrice - _minRoundPrice);
+
                 ScheduleExecution(Tasks.AskToSelectQuestionPrice, 1, force: true);
             }
         }
@@ -4840,6 +4836,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         else
         {
             _data.CurPriceRight = -1;
+            _data.StakeRange = new StakeSettings(availableRange.Minimum, availableRange.Maximum, availableRange.Step);
+
             ScheduleExecution(Tasks.AskToSelectQuestionPrice, 1, force: true);
         }
     }
@@ -5076,6 +5074,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     duration = contentItem.Duration > TimeSpan.Zero
                         ? (int)(contentItem.Duration.TotalMilliseconds / 100)
                         : GetContentItemDefaultDuration(contentItem);
+
+                    if (_data.QuestionPlayState.IsAnswer)
+                    {
+                        duration += _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10;
+                    }
                 }
                 else
                 {
@@ -5127,7 +5130,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private int GetContentItemDefaultDuration(ContentItem contentItem) => contentItem.Type switch
     {
         ContentTypes.Text => GetReadingDurationForTextLength(contentItem.Value.Length),
-        ContentTypes.Image or ContentTypes.Html => (TimeSettings.ImageTime + TimeSettings.TimeForMediaDelay) * 10,
+        ContentTypes.Image or ContentTypes.Html => TimeSettings.ImageTime * 10,
         ContentTypes.Audio or ContentTypes.Video => DefaultAudioVideoTime,
         _ => 0,
     };

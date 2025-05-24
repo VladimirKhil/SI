@@ -1582,6 +1582,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Image display.
+        /// </summary>
+        public static string TimeSettings_ImageTime {
+            get {
+                return ResourceManager.GetString("TimeSettings_ImageTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Making a bet in an &quot;Stake question&quot; and in a final question.
         /// </summary>
         public static string TimeSettings_MakingStake {

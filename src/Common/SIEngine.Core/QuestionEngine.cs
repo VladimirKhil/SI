@@ -104,7 +104,13 @@ public sealed class QuestionEngine : IQuestionEngine
                     {
                         var availableRange = TryGetParameter(step, StepParameterNames.Content)?.NumberSetValue;
 
-                        var announcePriceResult = _playHandler.OnAnnouncePrice(availableRange);
+                        if (availableRange == null)
+                        {
+                            _stepIndex++;
+                            continue;
+                        }
+
+                        var announcePriceResult = _playHandler.OnAnnouncePrice(PreprocessRange(availableRange));
                         _stepIndex++;
 
                         if (announcePriceResult)
@@ -128,6 +134,11 @@ public sealed class QuestionEngine : IQuestionEngine
                         var availableRange = mode == StepParameterValues.SetPriceMode_Select
                             ? TryGetParameter(step, StepParameterNames.Content)?.NumberSetValue
                             : null;
+
+                        if (availableRange != null)
+                        {
+                            availableRange = PreprocessRange(availableRange);
+                        }
 
                         var setPriceResult = _playHandler.OnSetPrice(mode, availableRange);
                         _stepIndex++;
@@ -413,6 +424,31 @@ public sealed class QuestionEngine : IQuestionEngine
         }
 
         return false;
+    }
+
+    private static NumberSet PreprocessRange(NumberSet range)
+    {
+        if (range.Maximum < 0)
+        {
+            return new NumberSet { Minimum = 0, Maximum = 0, Step = 0 };
+        }
+
+        if (range.Minimum < 0)
+        {
+            return new NumberSet { Minimum = 0, Maximum = range.Maximum, Step = 0 };
+        }
+
+        if (range.Maximum < range.Minimum)
+        {
+            return new NumberSet { Minimum = range.Minimum, Maximum = range.Minimum, Step = 0 };
+        }
+
+        if (range.Step < 0 || range.Step > range.Maximum - range.Minimum)
+        {
+            return new NumberSet { Minimum = range.Minimum, Maximum = range.Maximum, Step = 0 };
+        }
+
+        return range;
     }
 
     private void SkipQuestion() => _stepIndex = _script?.Steps.Count ?? 0;

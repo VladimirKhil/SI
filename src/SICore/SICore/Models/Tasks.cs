@@ -130,11 +130,6 @@ public enum Tasks
     WaitSelectQuestionPrice,
 
     /// <summary>
-    /// Waiting for the answer to be displayed.
-    /// </summary>
-    AfterQuestionEnd,
-
-    /// <summary>
     /// Ожидание решения ведущего о том, кто будет следующим делать ставку
     /// </summary>
     WaitNext,

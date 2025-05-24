@@ -208,7 +208,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public void OnAnswerStart() => OnMessage(new { Type = "replic", PersonCode = "s", Text = "" });
 
-    public bool OnAnnouncePrice(NumberSet? availableRange) => false;
+    public bool OnAnnouncePrice(NumberSet availableRange) => false;
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {

@@ -232,7 +232,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return false;
     }
 
-    public bool OnAnnouncePrice(NumberSet? availableRange) => false;
+    public bool OnAnnouncePrice(NumberSet availableRange) => false;
 
     public bool OnSetPrice(string mode, NumberSet? availableRange)
     {

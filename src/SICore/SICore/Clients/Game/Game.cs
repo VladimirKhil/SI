@@ -2001,9 +2001,9 @@ public sealed class Game : Actor
         }
 
         if (int.TryParse(args[1], out var sum)
-            && sum >= ClientData.CatInfo.Minimum
-            && sum <= ClientData.CatInfo.Maximum
-            && (ClientData.CatInfo.Step == 0 || (sum - ClientData.CatInfo.Minimum) % ClientData.CatInfo.Step == 0))
+            && sum >= ClientData.StakeRange.Minimum
+            && sum <= ClientData.StakeRange.Maximum
+            && (ClientData.StakeRange.Step == 0 || (sum - ClientData.StakeRange.Minimum) % ClientData.StakeRange.Step == 0))
         {
             ClientData.CurPriceRight = sum;
         }

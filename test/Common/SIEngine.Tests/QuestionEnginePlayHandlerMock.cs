@@ -11,7 +11,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         throw new NotImplementedException();
     }
 
-    public bool OnAnnouncePrice(NumberSet? availableRange)
+    public bool OnAnnouncePrice(NumberSet availableRange)
     {
         throw new NotImplementedException();
     }

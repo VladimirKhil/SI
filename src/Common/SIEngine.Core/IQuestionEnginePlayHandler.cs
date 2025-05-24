@@ -51,7 +51,7 @@ public interface IQuestionEnginePlayHandler
     /// Announces question price.
     /// </summary>
     /// <param name="availableRange">Alavilable prices to select.</param>
-    bool OnAnnouncePrice(NumberSet? availableRange);
+    bool OnAnnouncePrice(NumberSet availableRange);
 
     /// <summary>
     /// Sets price for the answerers. Positive and negative prices could be set separately.

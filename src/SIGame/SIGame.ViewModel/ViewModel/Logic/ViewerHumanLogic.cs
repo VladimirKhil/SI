@@ -824,14 +824,19 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         var text = contentValue.UnescapeNewLines();
 
-        var currentText = TInfo.Text ?? "";
+        var currentText = TInfo.Text;
         var newTextLength = text.Length;
+
+        if (TInfo.TextLength > currentText.Length)
+        {
+            TInfo.TextLength = currentText.Length;
+        }
 
         var tailIndex = TInfo.TextLength + newTextLength;
 
         TInfo.Text = currentText[..TInfo.TextLength]
             + text
-            + (currentText.Length > tailIndex ? currentText[tailIndex..] : "");
+            + ((currentText.Length > tailIndex) ? currentText[tailIndex..] : "");
 
         TInfo.TextLength += newTextLength;
     }
