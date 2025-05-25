@@ -3309,6 +3309,7 @@ public sealed class Game : Actor
             if (isPlayer)
             {
                 ClientData.Players[index] = new GamePlayerAccount(newAccount);
+                InheritAccountState(ClientData.Players[index], account);
             }
             else
             {
@@ -3336,6 +3337,21 @@ public sealed class Game : Actor
         _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Free)], host.IsMale)} {account.Name} {LO[nameof(R.FromTable)]}");
 
         OnPersonsChanged();
+    }
+
+    private static void InheritAccountState(GamePlayerAccount gamePlayerAccount, ViewerAccount account)
+    {
+        if (account is not GamePlayerAccount playerAccount)
+        {
+            return;
+        }
+
+        gamePlayerAccount.Flag = playerAccount.Flag;
+        gamePlayerAccount.AppellationFlag = playerAccount.AppellationFlag;
+        gamePlayerAccount.StakeMaking = playerAccount.StakeMaking;
+        gamePlayerAccount.CanPress = playerAccount.CanPress;
+        gamePlayerAccount.InGame = playerAccount.InGame;
+        // TODO: think about inheriting other properties
     }
 
     private void SetPerson(string[] args, Account host)
@@ -3501,6 +3517,8 @@ public sealed class Game : Actor
                             Sum = ClientData.Players[i].Sum
                         };
 
+                        InheritAccountState(ClientData.Players[i], otherAccount);
+
                         otherIndex = i;
                         break;
                     }
@@ -3545,13 +3563,16 @@ public sealed class Game : Actor
 
             if (isPlayer)
             {
+                var previousPlayer = ClientData.Players[index];
+
                 ClientData.Players[index] = new GamePlayerAccount(otherAccount)
                 {
                     IsConnected = otherAccount.IsConnected,
                     IsMoveable = otherAccount.IsMoveable,
-                    Flag = ClientData.Players[index].Flag,
-                    Sum = ClientData.Players[index].Sum
+                    Sum = previousPlayer.Sum
                 };
+
+                InheritAccountState(ClientData.Players[index], previousPlayer);
 
                 if (otherPerson != null)
                 {
