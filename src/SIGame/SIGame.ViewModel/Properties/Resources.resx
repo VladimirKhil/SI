@@ -684,4 +684,7 @@
   <data name="TimeSettings_ImageTime" xml:space="preserve">
     <value>Image display</value>
   </data>
+  <data name="ByGame" xml:space="preserve">
+    <value>by game</value>
+  </data>
 </root>

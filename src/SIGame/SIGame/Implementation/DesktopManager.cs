@@ -262,11 +262,11 @@ public sealed class DesktopManager : PlatformManager
         return dialog.FileName;
     }
 
-    public override void Activate() => Application.Current.Dispatcher.BeginInvoke(
+    public override void Activate(bool flash = true) => Application.Current.Dispatcher.BeginInvoke(
         () =>
         {
             var main = (MainWindow)Application.Current.MainWindow;
-            main?.FlashIfNeeded(true);
+            main?.FlashIfNeeded(flash);
         });
 
     public override void PlaySound(string? sound = null, double speed = 1, bool loop = false)

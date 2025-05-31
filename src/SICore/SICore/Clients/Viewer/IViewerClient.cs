@@ -9,7 +9,7 @@ namespace SICore;
 public interface IViewerClient : IDisposable
 {
     /// <summary>
-    /// Является ли владельцем сервера
+    /// Host marker.
     /// </summary>
     bool IsHost { get; }
 
@@ -26,8 +26,6 @@ public interface IViewerClient : IDisposable
     void GetInfo();
 
     void Pause();
-
-    void RecreateCommands();
 
     void Say(string text, string whom = NetworkConstants.Everybody);
 

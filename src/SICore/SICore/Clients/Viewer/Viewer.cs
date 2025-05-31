@@ -1,16 +1,13 @@
 ﻿using Notions;
-using SICore.Contracts;
 using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
-using SICore.Special;
 using SIData;
 using SIPackages.Core;
 using SIUI.Model;
 using System.Text;
-using R = SICore.Properties.Resources;
 
 namespace SICore;
 
@@ -60,8 +57,6 @@ public class Viewer : Actor, IViewerClient
         ClientData.Name = _client.Name;
     }
 
-    private ILocalizer LO { get; }
-
     public ViewerData ClientData { get; }
 
     /// <summary>
@@ -73,13 +68,11 @@ public class Viewer : Actor, IViewerClient
         bool isHost,
         IPersonController logic,
         ViewerActions viewerActions,
-        ILocalizer localizer,
         ViewerData data)
         : base(client)
     {
         _viewerActions = viewerActions;
         _logic = logic;
-        LO = localizer;
         ClientData = data;
 
         Initialize(isHost);
@@ -128,12 +121,7 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.Config:
-                    if (ClientData.Me == null)
-                    {
-                        break;
-                    }
-
-                    ProcessConfig(mparams);
+                    OnConfig(mparams);
                     break;
 
                 case Messages.Options:
@@ -179,16 +167,7 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.Hostname:
-                    if (mparams.Length > 1)
-                    {
-                        ClientData.HostName = mparams[1];
-                        IsHost = _client.Name == ClientData.HostName;
-
-                        if (mparams.Length > 2) // Host has been changed
-                        {
-                            _logic.OnHostChangedBy(mparams[2].Length > 0 ? mparams[2] : LO[nameof(R.ByGame)], mparams[1]);
-                        }
-                    }
+                    OnHostName(mparams);
                     break;
 
                 case Messages.BannedList:
@@ -561,7 +540,6 @@ public class Viewer : Actor, IViewerClient
 
                         if (mparams.Length > 1 && mparams[1] == MessageParams.Try_NotFinished)
                         {
-                            // Здесь можно не показывать рамку
                             if (!ClientData.Host.ShowBorderOnFalseStart)
                             {
                                 return;
@@ -716,6 +694,22 @@ public class Viewer : Actor, IViewerClient
         catch (Exception exc)
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
+        }
+    }
+
+    private void OnHostName(string[] mparams)
+    {
+        if (mparams.Length <= 1)
+        {
+            return;
+        }
+
+        ClientData.HostName = mparams[1];
+        IsHost = _client.Name == ClientData.HostName;
+
+        if (mparams.Length > 2) // Host has been changed
+        {
+            _logic.OnHostChanged(mparams[2], mparams[1]);
         }
     }
 
@@ -1065,14 +1059,6 @@ public class Viewer : Actor, IViewerClient
                 {
                     ClientData.Viewers.Remove(person);
                 }
-                else if (personAccount is PlayerAccount player)
-                {
-                    UpdateOthers(player);
-                }
-                else
-                {
-                    UpdateShowmanCommands();
-                }
             }
             finally
             {
@@ -1116,14 +1102,7 @@ public class Viewer : Actor, IViewerClient
             ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
         }
 
-        try
-        {
-            _logic.RoundThemes(playMode);
-        }
-        catch (InvalidProgramException exc)
-        {
-            ClientData.Host.SendError(exc, true);
-        }
+        _logic.RoundThemes(playMode);
     }
 
     private void OnThemeOrQuestion()
@@ -1198,7 +1177,7 @@ public class Viewer : Actor, IViewerClient
         _logic.OnReplic(personCode, text.ToString().Trim());
     }
 
-    private void ProcessConfig(string[] mparams)
+    private void OnConfig(string[] mparams)
     {
         switch (mparams[1])
         {
@@ -1223,12 +1202,7 @@ public class Viewer : Actor, IViewerClient
                 break;
         }
 
-        foreach (var player in ClientData.Players)
-        {
-            UpdateOthers(player);
-        }
-
-        UpdateShowmanCommands();
+        _logic.OnPersonsUpdated();
     }
 
     private void OnConfigAddTable(string[] mparams)
@@ -1244,7 +1218,6 @@ public class Viewer : Actor, IViewerClient
             };
 
             ClientData.Players.Add(account);
-            UpdateOthers(account);
             _logic.AddPlayer(account);
         }
         finally
@@ -1405,7 +1378,7 @@ public class Viewer : Actor, IViewerClient
 
             if (account == me && newAccount != null)
             {
-                // Необходимо самого себя перевести в зрители
+                // Needs to switch to viewer type
                 SwitchToNewType(GameRole.Viewer, newAccount);
             }
         }
@@ -1684,16 +1657,14 @@ public class Viewer : Actor, IViewerClient
 
         IViewerClient viewer = role switch
         {
-            GameRole.Viewer => new Viewer(_client, newAccount, IsHost, _logic, _viewerActions, LO, ClientData),
-            GameRole.Player => new Player(_client, newAccount, IsHost, _logic, _viewerActions, LO, ClientData),
-            _ => new Showman(_client, newAccount, IsHost, _logic, _viewerActions, LO, ClientData),
+            GameRole.Viewer => new Viewer(_client, newAccount, IsHost, _logic, _viewerActions, ClientData),
+            GameRole.Player => new Player(_client, newAccount, IsHost, _logic, _viewerActions, ClientData),
+            _ => new Showman(_client, newAccount, IsHost, _logic, _viewerActions, ClientData),
         };
 
         viewer.Avatar = Avatar;
 
         Dispose(); // TODO: do not dispose anything here
-
-        viewer.RecreateCommands();
 
         _logic.OnClientSwitch(viewer);
 
@@ -1756,7 +1727,7 @@ public class Viewer : Actor, IViewerClient
                     IsHuman = isHuman
                 });
 
-                mIndex++; // пропускаем Ready
+                mIndex++; // skipping "Ready" status
             }
 
             ClientData.Viewers = newViewers;
@@ -1767,13 +1738,6 @@ public class Viewer : Actor, IViewerClient
         finally
         {
             ClientData.EndUpdatePersons();
-        }
-
-        UpdateShowmanCommands();
-
-        foreach (var account in ClientData.Players)
-        {
-            UpdateOthers(account);
         }
 
         if (ClientData.Me != null)
@@ -1810,39 +1774,6 @@ public class Viewer : Actor, IViewerClient
         _viewerActions.SendMessage(Messages.Moveable);
     }
 
-    public void RecreateCommands()
-    {
-        UpdateShowmanCommands();
-
-        foreach (var player in ClientData.Players)
-        {
-            UpdateOthers(player);
-        }
-    }
-
-    private void UpdateShowmanCommands() => UpdateOthers(ClientData.ShowMan);
-
-    private Account[] GetDefaultComputerPlayers() => MyData.DefaultComputerPlayers
-        ?? StoredPersonsRegistry.GetDefaultPlayers(LO, MyData.Host.PhotoUri);
-
-    private void UpdateOthers(PlayerAccount player)
-    {
-        player.Others = player.IsHuman ?
-            MyData.AllPersons.Values.Where(p => p.IsHuman)
-                .Except(new ViewerAccount[] { player })
-                .ToArray()
-            : GetDefaultComputerPlayers()
-                .Where(a => !MyData.AllPersons.Values.Any(p => !p.IsHuman && p.Name == a.Name))
-                .ToArray();
-    }
-
-    private void UpdateOthers(PersonAccount showman)
-    {
-        showman.Others = showman.IsHuman ?
-            MyData.AllPersons.Values.Where(p => p.IsHuman).Except(new ViewerAccount[] { showman }).ToArray()
-            : Array.Empty<ViewerAccount>();
-    }
-
     private void InsertPerson(string role, Account account, int index)
     {
         ClientData.BeginUpdatePersons($"InsertPerson {role} {account.Name} {index}");
@@ -1861,8 +1792,6 @@ public class Viewer : Actor, IViewerClient
                     showman.IsConnected = true;
                     showman.Ready = false;
                     showman.GameStarted = ClientData.Stage != GameStage.Before;
-
-                    UpdateShowmanCommands();
                     break;
 
                 case Constants.Player:
@@ -1880,7 +1809,6 @@ public class Viewer : Actor, IViewerClient
                             Ready = false
                         };
 
-                        UpdateOthers(p);
                         ClientData.Players.Add(p);
                         playersWereUpdated = true;
                     }
@@ -1927,16 +1855,6 @@ public class Viewer : Actor, IViewerClient
         finally
         {
             ClientData.EndUpdatePersons();
-        }
-
-        if (ClientData.Stage == GameStage.Before)
-        {
-            UpdateShowmanCommands();
-
-            foreach (var player in ClientData.Players)
-            {
-                UpdateOthers(player);
-            }
         }
     }
 
@@ -2052,7 +1970,7 @@ public class Viewer : Actor, IViewerClient
 
                 if (data == null)
                 {
-                    _logic.OnReplic(ReplicCodes.Special.ToString(), string.Format(LO[nameof(R.AvatarNotFound)], ClientData.Picture));
+                    ClientData.Host.OnError(new Exception($"Avatar file not found: {ClientData.Picture}"));
                     return;
                 }
 

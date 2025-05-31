@@ -187,15 +187,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на by game.
-        /// </summary>
-        public static string ByGame {
-            get {
-                return ResourceManager.GetString("ByGame", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Cannot connect to server.
         /// </summary>
         public static string CannotConnectToServer {

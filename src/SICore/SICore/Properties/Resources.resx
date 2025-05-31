@@ -612,9 +612,6 @@
   <data name="SureFemaleEnding" xml:space="preserve">
     <value />
   </data>
-  <data name="ByGame" xml:space="preserve">
-    <value>by game</value>
-  </data>
   <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
     <value>The showman has switched the game into other round</value>
   </data>

@@ -277,5 +277,7 @@ public interface IPersonController
 
     void OnSelfDisconnected() { }
 
-    void OnHostChangedBy(string whom, string newHost) { }
+    void OnHostChanged(string initiator, string newHost) { }
+
+    void OnPersonsUpdated() { }
 }

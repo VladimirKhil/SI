@@ -282,17 +282,25 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             IsOnline = IsOnline
         };
 
-        var localizer = new Localizer(Thread.CurrentThread.CurrentUICulture.Name);
         var actions = new ViewerActions(_client);
-        var logic = new ViewerHumanLogic(gameViewModel, data, actions, _userSettings, ServerAddress, ContentPublicBaseUrls?.FirstOrDefault(), ContentPublicBaseUrls);
+        
+        var logic = new ViewerHumanLogic(
+            gameViewModel,
+            data,
+            actions,
+            _userSettings,
+            ServerAddress,
+            loggerFactory.CreateLogger<ViewerHumanLogic>(),
+            ContentPublicBaseUrls?.FirstOrDefault(),
+            ContentPublicBaseUrls);
 
         try
         {
             _host = role switch
             {
-                GameRole.Showman => new Showman(_client, humanPlayer, isHost, logic, actions, localizer, data),
-                GameRole.Player => new Player(_client, humanPlayer, isHost, logic, actions, localizer, data),
-                _ => new Viewer(_client, humanPlayer, isHost, logic, actions, localizer, data),
+                GameRole.Showman => new Showman(_client, humanPlayer, isHost, logic, actions, data),
+                GameRole.Player => new Player(_client, humanPlayer, isHost, logic, actions, data),
+                _ => new Viewer(_client, humanPlayer, isHost, logic, actions, data),
             };
 
             gameViewModel.Host = _host;

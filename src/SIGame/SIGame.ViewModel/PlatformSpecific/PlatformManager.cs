@@ -49,7 +49,7 @@ public abstract class PlatformManager : IUIThreadExecutor
 
     public abstract string SelectSound();
 
-    public abstract void Activate();
+    public abstract void Activate(bool flash = true);
 
     public abstract void PlaySound(string? sound = null, double speed = 1.0, bool loop = false);
 

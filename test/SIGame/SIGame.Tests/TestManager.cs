@@ -1,18 +1,18 @@
 ﻿using NUnit.Framework;
-using SICore;
 using SIGame.ViewModel.PlatformSpecific;
 using System.Windows.Input;
+using Utils.Commands;
 using Utils.Timers;
 
 namespace SIGame.Tests;
 
 internal sealed class TestManager : PlatformManager
 {
-	public override ICommand Close { get; } = new CustomCommand((arg) => { });
+	public override ICommand Close { get; } = new SimpleCommand((arg) => { });
 
 	public override double Volume => 0.5;
 
-	public override void Activate() { }
+	public override void Activate(bool flash = true) { }
 
 	public override bool Ask(string text) => throw new NotImplementedException();
 

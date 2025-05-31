@@ -166,7 +166,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void OnFinalRoundSkip()
     {
-        _gameActions.ShowmanReplic(LO[nameof(R.NobodyInFinal)]);
+        _gameActions.ShowmanReplic(LO[nameof(R.NobodyInFinal)]); // TODO: REMOVE (localized by MessageCode)
+        _gameActions.ShowmanReplicNew(MessageCode.RoundSkippedNoPlayers);
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10), 1);
     }
 
@@ -484,7 +485,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
-        _gameActions.SystemReplic(text);
+        _gameActions.SystemReplic(text); // TODO: REMOVE: replaced by CONTENT message
 
         var nextTime = !waitForFinish ? 1 : contentTime;
 
@@ -862,7 +863,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             RescheduleTask(); // Decision could be ready
         }
 
-        _gameActions.SystemReplic(LO[nameof(R.GameResumed)]);
+        _gameActions.SystemReplic(LO[nameof(R.GameResumed)]); // TODO: REMOVE: replaced by PAUSE message
         _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
     }
 
@@ -901,7 +902,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var playerIndex = _data.ThemeDeleters.Current.PlayerIndex;
         var themeName = _data.TInfo.RoundInfo[themeIndex].Name;
 
-        _gameActions.PlayerReplic(playerIndex, themeName);
+        _gameActions.PlayerReplic(playerIndex, themeName); // TODO: REMOVE: replaced by OUT message
         ScheduleExecution(Tasks.MoveNext, 10);
     }
 
@@ -919,11 +920,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         // Clearing the table
         _gameActions.SendMessage(Messages.Stop);
-        _gameActions.SystemReplic($"{LO[nameof(R.GameResults)]}: ");
+        _gameActions.SystemReplic($"{LO[nameof(R.GameResults)]}: "); // TODO: REMOVE: replaced by WINNER message
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
-            _gameActions.SystemReplic($"{_data.Players[i].Name}: {Notion.FormatNumber(_data.Players[i].Sum)}");
+            _gameActions.SystemReplic($"{_data.Players[i].Name}: {Notion.FormatNumber(_data.Players[i].Sum)}"); // TODO: REMOVE: replaced by WINNER message
         }
 
         FillReport();
@@ -1066,7 +1067,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         StopWaiting();
 
         var s = _data.ChooserIndex == _data.AnswererIndex ? LO[nameof(R.ToMyself)] : _data.Answerer.Name;
-        _gameActions.PlayerReplic(_data.ChooserIndex, s);
+        _gameActions.PlayerReplic(_data.ChooserIndex, s); // TODO: REMOVE: replaced by SETCHOOSER message
 
         _data.ChooserIndex = _data.AnswererIndex;
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
@@ -1182,14 +1183,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else if (_data.StakeType == StakeMode.Pass)
         {
-            _gameActions.PlayerReplic(playerIndex, LO[nameof(R.Pass)]);
+            _gameActions.PlayerReplic(playerIndex, LO[nameof(R.Pass)]); // TODO: REMOVE: replaced by PERSONSTAKE message
             _data.Players[playerIndex].StakeMaking = false;
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass, playerIndex);
             _gameActions.SendMessage(passMsg.ToString());
         }
         else
         {
-            _gameActions.PlayerReplic(playerIndex, LO[nameof(R.VaBank)]);
+            _gameActions.PlayerReplic(playerIndex, LO[nameof(R.VaBank)]); // TODO: REMOVE: replaced by PERSONSTAKE message
             _data.Stake = _data.Players[playerIndex].Sum;
             _data.Stakes.StakerIndex = playerIndex;
             _data.AllIn = true;
@@ -1569,7 +1570,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
             else
             {
-                _gameActions.PlayerReplic(_data.AnswererIndex, _data.Answerer.Answer);
+                _gameActions.PlayerReplic(_data.AnswererIndex, _data.Answerer.Answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
+                _gameActions.SendMessageWithArgs(Messages.PlayerAnswer, _data.AnswererIndex, _data.Answerer.Answer);
             }
 
             if (_data.IsOralNow)
@@ -1954,7 +1956,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
                 }
 
-                _gameActions.SystemReplic(LO[nameof(R.PauseInGame)]);
+                _gameActions.SystemReplic(LO[nameof(R.PauseInGame)]); // TODO: REMOVE: replaced by PAUSE message
                 _gameActions.SendMessageWithArgs(Messages.Pause, '+', times[0], times[1], times[2]);
                 break;
 
@@ -2021,7 +2023,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                             var subText = _data.Text[_data.TextLength..];
 
                             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
-                            _gameActions.SystemReplic(subText);
+                            _gameActions.SystemReplic(subText); // TODO: REMOVE: replaced by CONTENT_APPEND message
 
                             newTask = Tasks.MoveNext;
                         }
@@ -2710,7 +2712,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (_data.Question == null)
         {
-            throw new Exception(string.Format(LO[nameof(R.StrangeError)] + " {0} {1}", _data.Round?.Type, _data.Settings.AppSettings.GameMode));
+            throw new Exception($"_data.Question == null: {_data.Round?.Type} {_data.Settings.AppSettings.GameMode}");
         }
 
         if (arg == 1)
@@ -2722,7 +2724,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 informed = true;
                 var res = new StringBuilder();
                 res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfQuestion)], string.Join(", ", authors));
-                _gameActions.ShowmanReplic(res.ToString());
+                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE: replaced by QUESTION_AUTHORS message
+                _gameActions.SendMessageWithArgs(Messages.QuestionAuthors, authors);
             }
             else
             {
@@ -2737,8 +2740,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             if (themeComments.Length > 0)
             {
                 informed = true;
-                _gameActions.ShowmanReplic(themeComments);
-                _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines());
+                _gameActions.ShowmanReplic(themeComments); // TODO: REMOVE: replaced by THEME message
+                _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines()); // TODO: REMOVE: replaced by THEME message
             }
             else
             {
@@ -2766,7 +2769,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             switch (_data.QuestionTypeName)
             {
                 case QuestionTypes.Stake:
-                    _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
+                    _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)])); // TODO: REMOVE: replaced by QTYPE message
                     break;
 
                 case QuestionTypes.Secret:
@@ -2780,24 +2783,24 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         replic.Append($". {LO[nameof(R.YouCanKeepCat)]}");
                     }
 
-                    _gameActions.ShowmanReplic(replic.ToString());
+                    _gameActions.ShowmanReplic(replic.ToString()); // TODO: REMOVE: replaced by QTYPE message
                     break;
 
                 case QuestionTypes.NoRisk:
-                    _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
+                    _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]); // TODO: REMOVE: replaced by QTYPE message
                     isNoRisk = true;
                     break;
 
                 case QuestionTypes.Simple:
-                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeSimple)]);
+                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeSimple)]); // TODO: REMOVE: replaced by QTYPE message
                     break;
 
                 case QuestionTypes.StakeAll:
-                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeStakeAll)]);
+                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeStakeAll)]); // TODO: REMOVE: replaced by QTYPE message
                     break;
 
                 case QuestionTypes.ForAll:
-                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeForAll)]);
+                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeForAll)]); // TODO: REMOVE: replaced by QTYPE message
                     break;
 
                 default:
@@ -2854,7 +2857,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var subText = text.Substring(_data.TextLength, printingLength);
 
             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
-            _gameActions.SystemReplic(subText);
+            _gameActions.SystemReplic(subText); // TODO: REMOVE: replaced by CONTENT_APPEND message
 
             _data.TextLength += printingLength;
         }
@@ -2884,7 +2887,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
-                _gameActions.ShowmanReplic(text);
+                _gameActions.ShowmanReplic(text); // TODO: REMOVE: replaced by QUESTION_SOURCES message
+                _gameActions.SendMessageWithArgs(Messages.QuestionSources, sources);
                 textTime = GetReadingDurationForTextLength(text.Length);
                 informed = true;
             }
@@ -2904,7 +2908,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     LO[nameof(R.OfQuestion)],
                     _data.Question.Info.Comments.Text);
                 
-                _gameActions.ShowmanReplic(text);
+                _gameActions.ShowmanReplic(text); // TODO: REMOVE: replaced by QUESTION_COMMENTS message
+                _gameActions.SendMessageWithArgs(Messages.QuestionComments, _data.Question.Info.Comments.Text.EscapeNewLines());
                 textTime = GetReadingDurationForTextLength(text.Length);
                 informed = true;
             }
@@ -2951,7 +2956,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         var playerAnswer = _data.Answerer?.Answer;
         var answer = string.IsNullOrEmpty(playerAnswer) ? LO[nameof(R.IDontKnow)] : playerAnswer;
 
-        _gameActions.PlayerReplic(answererIndex, answer);
+        _gameActions.PlayerReplic(answererIndex, answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
+        _gameActions.SendMessageWithArgs(Messages.PlayerAnswer, answererIndex, playerAnswer ?? "");
 
         if (_data.QuestionPlayState.ValidateAfterRightAnswer)
         {
@@ -3040,7 +3046,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         switch (arg)
         {
             case 1:
-                _gameActions.ShowmanReplic(LO[nameof(R.ShowmanGreeting)]);
+                _gameActions.ShowmanReplic(LO[nameof(R.ShowmanGreeting)]); // TODO: REMOVE (localized by MessageCode)
+                _gameActions.ShowmanReplicNew(MessageCode.ShowmanGreeting);
                 nextArg = 2;
                 break;
 
@@ -4429,8 +4436,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.InformStages |= InformStages.RoundContent;
 
             _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!");
-            _gameActions.SystemReplic(" "); // new line
-            _gameActions.SystemReplic(roundName);
+            _gameActions.SystemReplic(" "); // new line // TODO: REMOVE: replaced by STAGE message
+            _gameActions.SystemReplic(roundName); // TODO: REMOVE: replaced by STAGE message
         }
         else if (stage == 2)
         {
@@ -4564,9 +4571,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.Chooser.Flag = false;
         }
 
-        var variantsCount = _data.Players.Count(player => player.Flag);
+        var optionCount = _data.Players.Count(player => player.Flag);
 
-        if (variantsCount == 1)
+        if (optionCount == 1)
         {
             for (var i = 0; i < _data.Players.Count; i++)
             {

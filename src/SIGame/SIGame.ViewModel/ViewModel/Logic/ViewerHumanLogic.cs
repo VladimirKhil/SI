@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Notions;
 using SICore.Clients.Viewer;
 using SIData;
@@ -82,6 +83,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     private readonly List<string> _chatTable = new();
 
     private readonly UserSettings _userSettings;
+    private readonly ILogger<ViewerHumanLogic> _logger;
 
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
@@ -89,6 +91,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         ViewerActions viewerActions,
         UserSettings userSettings,
         string serverAddress,
+        ILogger<ViewerHumanLogic> logger,
         string? serverPublicUrl = null,
         string[]? contentPublicUrls = null)
         : base(data)
@@ -96,6 +99,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         _gameViewModel = gameViewModel;
         _viewerActions = viewerActions;
         _userSettings = userSettings;
+        _logger = logger;
 
         _gameViewModel.Logic = this;
         _gameViewModel.Disposed += GameViewModel_Disposed;
@@ -253,7 +257,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         {
             if (TInfo.TStage == TableStage.RoundTable)
             {
-                _data.Host.PlaySound();
+                PlatformManager.Instance.PlaySound();
             }
         }
     }
@@ -280,7 +284,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     {
         AddToChat(m);
 
-        if (_data.Host.MakeLogs)
+        if (_userSettings.GameSettings.AppSettings.MakeLogs)
         {
             AddToFileLog(m);
         }
@@ -343,14 +347,14 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             logString = $"<span class=\"s\">{text}</span>";
         }
 
-        if (logString != null && _data.Host.MakeLogs)
+        if (logString != null && _userSettings.GameSettings.AppSettings.MakeLogs)
         {
             logString += "<br/>";
             AddToFileLog(logString);
         }
     }
 
-    private string TrimReplic(string text) => text.Shorten(_data.Host.MaximumReplicTextLength, "…");
+    private string TrimReplic(string text) => text.Shorten(_userSettings.GameSettings.AppSettings.ThemeSettings.MaximumReplicTextLength, "…");
 
     internal void AddToFileLog(Message message) =>
         AddToFileLog(
@@ -442,7 +446,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             case GameStage.Begin:
                 TInfo.TStage = TableStage.Sign;
 
-                if (_data.Host.MakeLogs && _gameLogger == null)
+                if (_userSettings.GameSettings.AppSettings.MakeLogs && _gameLogger == null)
                 {
                     try
                     {
@@ -483,7 +487,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             case GameStage.Final:
                 TInfo.TStage = TableStage.Round;
                 TInfo.Selectable = false;
-                _data.Sound = Sounds.RoundBegin;
+                PlatformManager.Instance.PlaySound(Sounds.RoundBegin);
 
                 foreach (var player in _data.Players)
                 {
@@ -546,7 +550,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         {
             case Models.ThemesPlayMode.OneByOne:
                 TInfo.TStage = TableStage.RoundThemes;
-                _data.Host.PlaySound(Sounds.RoundThemes);
+                PlatformManager.Instance.PlaySound(Sounds.RoundThemes);
                 break;
             
             case Models.ThemesPlayMode.AllTogether:
@@ -885,7 +889,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                         currentGroup = null;
                     }
 
-                    var text = contentValue.UnescapeNewLines().Shorten(_data.Host.MaximumTableTextLength, "…");
+                    var text = contentValue.UnescapeNewLines().Shorten(_userSettings.GameSettings.AppSettings.ThemeSettings.MaximumTableTextLength, "…");
                     var group = new ContentGroup { Weight = Math.Max(SmallContentWeight, Math.Min(LargeContentWeight, (double)text.Length / TextLengthWithBasicWeight)) };
                     group.Content.Add(new ContentViewModel(ContentType.Text, text, groups.Count == 0 ? TInfo.TextSpeed : 0.0));
                     groups.Add(group);
@@ -900,7 +904,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
                     if (contentType != ContentTypes.Html
                         && !uri.StartsWith("http://localhost")
-                        && !_data.Host.LoadExternalMedia
+                        && !_userSettings.LoadExternalMedia
                         && !ExternalUrlOk(uri))
                     {
                         currentGroup.Content.Add(new ContentViewModel(ContentType.Text, string.Format(Resources.ExternalLink, uri)));
@@ -916,7 +920,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                     }
 
                     var localUri = _localFileManager.TryGetFile(mediaUri) ?? uri;
-                    _data.Host.Log($"Media uri conversion: {mediaUri} => {localUri}");
+                    _logger.LogInformation($"Media uri conversion: {mediaUri} => {localUri}");
 
                     var tableContentType = contentType == ContentTypes.Image
                         ? ContentType.Image
@@ -982,7 +986,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             TInfo.QuestionContentType = QuestionContentType.Void;
         }
 
-        if (!uri.StartsWith("http://localhost") && !_data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
+        if (!uri.StartsWith("http://localhost") && !_userSettings.LoadExternalMedia && !ExternalUrlOk(uri))
         {
             TInfo.Text = string.Format(Resources.ExternalLink, uri);
             TInfo.QuestionContentType = QuestionContentType.SpecialText;
@@ -1173,7 +1177,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         if (!int.TryParse(text, out int number))
         {
-            _data.Sound = Sounds.QuestionNoAnswers;
+            PlatformManager.Instance.PlaySound(Sounds.QuestionNoAnswers);
             return;
         }
 
@@ -1196,12 +1200,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     {
         if (isRight)
         {
-            _data.Sound = sum >= 2000 ? Sounds.ApplauseBig : Sounds.ApplauseSmall;
+            PlatformManager.Instance.PlaySound(sum >= 2000 ? Sounds.ApplauseBig : Sounds.ApplauseSmall);
             _data.Players[playerIndex].State = PlayerState.Right;
         }
         else
         {
-            _data.Sound = Sounds.AnswerWrong;
+            PlatformManager.Instance.PlaySound(Sounds.AnswerWrong);
             _data.Players[playerIndex].Pass = true;
             _data.Players[playerIndex].State = PlayerState.Wrong;
         }
@@ -1262,7 +1266,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                     TInfo.Text = Resources.Label_Auction;
                     HighlightCurrentTheme();
                     TInfo.TStage = TableStage.Special;
-                    _data.Sound = Sounds.QuestionStake;
+                    PlatformManager.Instance.PlaySound(Sounds.QuestionStake);
                     break;
                 }
 
@@ -1273,7 +1277,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                     TInfo.Text = Resources.Label_CatInBag;
                     HideAllThemes();
                     TInfo.TStage = TableStage.Special;
-                    _data.Sound = Sounds.QuestionSecret;
+                    PlatformManager.Instance.PlaySound(Sounds.QuestionSecret);
                     _prependTableText = null;
                     break;
                 }
@@ -1283,7 +1287,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                     TInfo.Text = Resources.Label_Sponsored;
                     HighlightCurrentTheme();
                     TInfo.TStage = TableStage.Special;
-                    _data.Sound = Sounds.QuestionNoRisk;
+                    PlatformManager.Instance.PlaySound(Sounds.QuestionNoRisk);
                     break;
                 }
 
@@ -1303,7 +1307,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                     HighlightCurrentTheme();
                     TInfo.Text = Resources.QuestionTypeStakeForAll.ToUpper();
                     TInfo.TStage = TableStage.Special;
-                    _data.Sound = Sounds.QuestionStakeAll;
+                    PlatformManager.Instance.PlaySound(Sounds.QuestionStakeAll);
                 }
                 break;
 
@@ -1313,7 +1317,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                     HighlightCurrentTheme();
                     TInfo.Text = Resources.QuestionTypeForAll.ToUpper();
                     TInfo.TStage = TableStage.Special;
-                    _data.Sound = Sounds.QuestionAll;
+                    PlatformManager.Instance.PlaySound(Sounds.QuestionAll);
                 }
                 break;
 
@@ -1362,7 +1366,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         }
 
         TInfo.PlaySelection(themeIndex);
-        _data.Sound = Sounds.FinalDelete;
+        PlatformManager.Instance.PlaySound(Sounds.FinalDelete);
     }
 
     public void OnWinner(int winnerIndex) => UI.Execute(() => WinnerUI(winnerIndex), exc => _data.Host.SendError(exc));
@@ -1371,14 +1375,35 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     {
         if (winnerIndex > -1)
         {
-            _data.Sound = Sounds.ApplauseFinal;
+            PlatformManager.Instance.PlaySound(Sounds.ApplauseFinal);
         }
 
-        // Лучшие игроки
-        _data.Host.SaveBestPlayers(_data.Players);
+        SaveBestPlayers(_data.Players);
     }
 
-    public void TimeOut() => _data.Sound = Sounds.RoundTimeout;
+    private static void SaveBestPlayers(IEnumerable<PlayerAccount> players)
+    {
+        var bestPlayers = CommonSettings.Default.BestPlayers;
+
+        foreach (var player in players)
+        {
+            var d = bestPlayers.Count - 1;
+
+            while (d > -1 && player.Sum >= bestPlayers[d].Result)
+            {
+                d--;
+            }
+
+            bestPlayers.Insert(d + 1, new BestPlayer { Name = player.Name, Result = player.Sum });
+
+            if (bestPlayers.Count > BestPlayer.Total)
+            {
+                bestPlayers.RemoveAt(bestPlayers.Count - 1);
+            }
+        }
+    }
+
+    public void TimeOut() => PlatformManager.Instance.PlaySound(Sounds.RoundTimeout);
 
     public async ValueTask DisposeAsync()
     {
@@ -1399,7 +1424,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         await _localFileManager.DisposeAsync();
     }
 
-    public void FinalThink() => _data.Host.PlaySound(Sounds.FinalThink);
+    public void FinalThink() => PlatformManager.Instance.PlaySound(Sounds.FinalThink);
 
     public void UpdatePicture(Account account, string path)
     {
@@ -1413,7 +1438,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                 }
                 else
                 {
-                    _data.Host.OnPictureError(_serverAddress);
+                    OnPictureError(_serverAddress);
                 }
             }
         }
@@ -1454,6 +1479,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         }
     }
 
+    private void OnPictureError(string remoteUri) =>
+        PlatformManager.Instance.ShowMessage(
+            string.Format(Resources.Error_UploadingAvatar + ": {0}", remoteUri),
+            MessageType.Warning,
+            true);
+
     private string? PreprocessUri(string uri)
     {
         if (uri.Contains(Constants.GameHost))
@@ -1466,7 +1497,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                 }
                 else
                 {
-                    _data.Host.OnPictureError(_serverAddress);
+                    OnPictureError(_serverAddress);
                 }
             }
         }
@@ -1649,7 +1680,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             {
                 uri = uri.Replace(Constants.ServerHost, _serverPublicUrl);
             }
-            else if (!uri.StartsWith("http://localhost") && !_data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
+            else if (!uri.StartsWith("http://localhost") && !_userSettings.LoadExternalMedia && !ExternalUrlOk(uri))
             {
                 Interlocked.Decrement(ref fileCounter);
                 continue;
@@ -1749,6 +1780,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         },
         ClientData.Host.OnError);
 
+    public void OnPersonsUpdated() => _gameViewModel.UpdatePersons();
+
     public void OnInfo()
     {
         UI.Execute(
@@ -1762,6 +1795,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                 }
 
                 _gameViewModel.UpdateAddTableCommand();
+                _gameViewModel.UpdatePersons();
             },
             ClientData.Host.OnError);
 
@@ -1782,7 +1816,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         {
             await Task.Delay(2000);
 
-            _gameViewModel.OnAddString(null, string.Format(Resources.Hint, _data.Host.GameButtonKey), LogMode.Log);
+            var gameButtonKey = PlatformManager.Instance.GetKeyName(_userSettings.GameSettings.AppSettings.GameButtonKey2);
+            _gameViewModel.OnAddString(null, string.Format(Resources.Hint, gameButtonKey), LogMode.Log);
             _gameViewModel.OnAddString(null, Resources.PressButton + Environment.NewLine, LogMode.Log);
         }
         catch (ObjectDisposedException)
@@ -1808,7 +1843,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         _gameViewModel.Hint = Resources.HintSelectQuestion;
         TInfo.Selectable = true;
         TInfo.SelectQuestion.CanBeExecuted = true;
-        _data.Host.OnFlash();
+        PlatformManager.Instance.Activate();
     }
 
     public void OnEnableButton() => _gameViewModel.EnableGameButton(true);
@@ -1821,7 +1856,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         _gameViewModel.NewValidation = false;
         _gameViewModel.DialogMode = DialogModes.AnswerValidation;
         _gameViewModel.AddValidation(name, answer);
-        _data.Host.OnFlash();
+        PlatformManager.Instance.Activate();
     }
 
     public void ValidateAnswer(int playerIndex, string answer)
@@ -1837,12 +1872,12 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         _gameViewModel.Hint = Resources.HintCheckAnswer;
         _gameViewModel.AddValidation(playerName, answer);
         _gameViewModel.DialogMode = DialogModes.AnswerValidation;
-        _data.Host.OnFlash();
+        PlatformManager.Instance.Activate();
     }
 
     public void Answer()
     {
-        _data.Host.OnFlash();
+        PlatformManager.Instance.Activate();
 
         if (TInfo.LayoutMode == LayoutMode.Simple)
         {
@@ -1909,7 +1944,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
     public void Report(string report)
     {
-        if (!_data.Host.SendReport)
+        if (!_userSettings.SendReport)
         {
             _gameViewModel.Report.SendNoReport.Execute(null);
             return;
@@ -1917,7 +1952,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         _gameViewModel.Report.Report = report;
         _gameViewModel.DialogMode = DialogModes.Report;
-        _data.Host.OnFlash();
+        PlatformManager.Instance.Activate();
     }
 
     public void OnGameClosed()
@@ -1950,7 +1985,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         TInfo.SelectTheme.CanBeExecuted = true;
         _gameViewModel.Hint = Resources.HintSelectTheme;
 
-        _data.Host.OnFlash();
+        PlatformManager.Instance.Activate();
     }
 
     public void MakeStake()
@@ -1961,7 +1996,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         _gameViewModel.DialogMode = DialogModes.StakeNew;
         _gameViewModel.Hint = Resources.HintMakeAStake;
-        _data.Host.OnFlash();
+        PlatformManager.Instance.Activate();
 
         foreach (var player in _data.Players)
         {
@@ -1971,7 +2006,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
     public void OnSelfDisconnected() => OnReplic(ReplicCodes.System.ToString(), Resources.DisconnectMessage);
 
-    public void OnHostChangedBy(string whom, string newHost) => OnReplic(
+    public void OnHostChanged(string initiator, string newHost) => OnReplic(
         ReplicCodes.Special.ToString(),
-        string.Format(Resources.HostChanged, whom, newHost));
+        string.Format(Resources.HostChanged, initiator.Length > 0 ? initiator : Resources.ByGame, newHost));
 }

@@ -73,8 +73,6 @@ public sealed class ViewerData : Data
     /// </summary>
     internal string Picture { get; set; }
 
-    public string Sound { set => Host.PlaySound(value); }
-
     internal bool FalseStart { get; set; } = true;
 
     public PersonData PersonDataExtensions { get; private set; } = new();

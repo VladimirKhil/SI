@@ -1,5 +1,4 @@
-﻿using SICore.Contracts;
-using SICore.Network.Clients;
+﻿using SICore.Network.Clients;
 using SIData;
 
 namespace SICore;
@@ -11,13 +10,11 @@ public sealed class Showman : Viewer
 {
     public override GameRole Role => GameRole.Showman;
 
-    public Showman(Client client, Account personData, bool isHost, IPersonController logic, ViewerActions viewerActions, ILocalizer localizer, ViewerData data)
-        : base(client, personData, isHost, logic, viewerActions, localizer, data)
+    public Showman(Client client, Account personData, bool isHost, IPersonController logic, ViewerActions viewerActions, ViewerData data)
+        : base(client, personData, isHost, logic, viewerActions, data)
     { }
 
-    /// <summary>
-    /// Получение сообщения
-    /// </summary>
+    /// <inheritdoc />
     protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)
     {
         await base.OnSystemMessageReceivedAsync(mparams);

@@ -54,14 +54,6 @@ public class PersonAccount : ViewerAccount
         set { if (_replic != value) { _replic = value; OnPropertyChanged(); } }
     }
 
-    private Account[] _others;
-
-    public Account[] Others
-    {
-        get { return _others; }
-        set { _others = value; OnPropertyChanged(); }
-    }
-
     public bool IsShowman { get; set; }
 
     private bool _isDeciding;

@@ -21,7 +21,6 @@ public sealed class Player : Viewer
     /// <param name="isHost">Is the player a game host.</param>
     /// <param name="logic">Player logic.</param>
     /// <param name="viewerActions">Player actions.</param>
-    /// <param name="localizer">Resource localizer.</param>
     /// <param name="data">Player game data.</param>
     public Player(
         Client client,
@@ -29,9 +28,8 @@ public sealed class Player : Viewer
         bool isHost,
         IPersonController logic,
         ViewerActions viewerActions,
-        ILocalizer localizer,
         ViewerData data)
-        : base(client, personData, isHost, logic, viewerActions, localizer, data)
+        : base(client, personData, isHost, logic, viewerActions, data)
     { }
 
     protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)

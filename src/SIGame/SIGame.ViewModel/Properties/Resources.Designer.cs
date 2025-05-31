@@ -124,6 +124,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на by game.
+        /// </summary>
+        public static string ByGame {
+            get {
+                return ResourceManager.GetString("ByGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на You can&apos;t ban bots.
         /// </summary>
         public static string CannotBanBots {

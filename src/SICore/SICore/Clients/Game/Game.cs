@@ -3083,6 +3083,8 @@ public sealed class Game : Actor
     private void DropPlayerFromStakes(int playerIndex)
     {
         var currentOrder = ClientData.Order;
+        var currentOrderIndex = ClientData.OrderIndex;
+        var currentStaker = currentOrderIndex == -1 ? -1 : currentOrder[currentOrderIndex];
 
         ClientData.OrderHistory
             .Append("DropPlayerFromStakes. Before ")
@@ -3133,13 +3135,14 @@ public sealed class Game : Actor
             ClientData.SkipQuestion?.Invoke();
             Logic.PlanExecution(Tasks.MoveNext, 20, 1);
         }
-        else if (ClientData.OrderIndex == -1 || ClientData.Order[ClientData.OrderIndex] == -1)
+        else if (currentOrderIndex != -1 && ClientData.OrderIndex == -1
+            || currentStaker != -1 && ClientData.Order[ClientData.OrderIndex] == -1)
         {
             Logic.AddHistory("Current staker dropped");
 
             if (ClientData.Decision == DecisionType.StakeMaking || ClientData.Decision == DecisionType.NextPersonStakeMaking)
             {
-                // Staker has been deleted. We need to move game futher
+                // Staker has been deleted. We need to move game further
                 Logic.StopWaiting();
 
                 if (ClientData.IsOralNow || ClientData.Decision == DecisionType.NextPersonStakeMaking)
@@ -3776,7 +3779,7 @@ public sealed class Game : Actor
         var data = new ViewerData(ClientData.Host);
         var actions = new ViewerActions(playerClient);
         var logic = new ViewerComputerLogic(data, actions, new Intelligence(account), GameRole.Player);
-        _ = new Player(playerClient, account, false, logic, actions, LO, data);
+        _ = new Player(playerClient, account, false, logic, actions, data);
 
         OnInfo(newAccount.Name);
 
@@ -3811,7 +3814,7 @@ public sealed class Game : Actor
             new Intelligence(account),
             GameRole.Showman);
         
-        var showman = new Showman(showmanClient, account, false, logic, actions, LO, data);
+        var showman = new Showman(showmanClient, account, false, logic, actions, data);
 
         OnInfo(newAccount.Name);
 

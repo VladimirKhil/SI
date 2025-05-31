@@ -1,6 +1,4 @@
-﻿using SICore.Contracts;
-using SICore.Utils;
-using SIData;
+﻿using SIData;
 using System.Text.Json;
 
 namespace SICore.Special;
@@ -40,11 +38,8 @@ public static class StoredPersonsRegistry
         }
     }
 
-    public static ComputerAccount[] GetDefaultPlayers(ILocalizer localizer, string photoPath)
-    {
-        var cultureCode = CultureHelper.GetCultureCode(localizer.Culture.Name);
-
-        return StoredPersons.Players.Select(
+    public static ComputerAccount[] GetDefaultPlayers(string cultureCode, string photoPath) =>
+        StoredPersons.Players.Select(
             player => new ComputerAccount(player)
             {
                 Name = player.GetLocalizedName(cultureCode),
@@ -53,13 +48,9 @@ public static class StoredPersonsRegistry
             })
             .OrderBy(player => player.Name)
             .ToArray();
-    }
 
-    public static ComputerAccount[] GetDefaultShowmans(ILocalizer localizer, string photoPath)
-    {
-        var cultureCode = CultureHelper.GetCultureCode(localizer.Culture.Name);
-
-        return StoredPersons.Showmans.Select(
+    public static ComputerAccount[] GetDefaultShowmans(string cultureCode, string photoPath) =>
+        StoredPersons.Showmans.Select(
             showman => new ComputerAccount(showman)
             {
                 Name = showman.GetLocalizedName(cultureCode),
@@ -68,5 +59,4 @@ public static class StoredPersonsRegistry
             })
             .OrderBy(showman => showman.Name)
             .ToArray();
-    }
 }

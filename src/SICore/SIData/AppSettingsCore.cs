@@ -224,6 +224,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     /// </summary>
     [XmlAttribute]
     [DefaultValue(DefaultDisplaySources)]
+    [Obsolete("Will be removed")]
     public bool DisplaySources
     {
         get => _displaySources;

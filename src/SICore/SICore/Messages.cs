@@ -427,6 +427,11 @@ public static class Messages
     public const string Pin = "PIN";
 
     /// <summary>
+    /// Displays player's answer to the question.
+    /// </summary>
+    public const string PlayerAnswer = "PLAYER_ANSWER";
+
+    /// <summary>
     /// Sets player state.
     /// </summary>
     public const string PlayerState = "PLAYER_STATE";
@@ -479,14 +484,29 @@ public static class Messages
     public const string QuestionAnswers = "QUESTION_ANSWERS";
 
     /// <summary>
+    /// Authors of the question (if any).
+    /// </summary>
+    public const string QuestionAuthors = "QUESTION_AUTHORS";
+
+    /// <summary>
     /// Заголовок вопроса
     /// </summary>
     public const string QuestionCaption = "QUESTIONCAPTION";
 
     /// <summary>
+    /// Comments for the question (if any).
+    /// </summary>
+    public const string QuestionComments = "QUESTION_COMMENTS";
+
+    /// <summary>
     /// Question has ended.
     /// </summary>
     public const string QuestionEnd = "QUESTION_END";
+
+    /// <summary>
+    /// Sources of the question (if any).
+    /// </summary>
+    public const string QuestionSources = "QUESTION_SOURCES";
 
     /// <summary>
     /// Реплика игры/участника
@@ -552,6 +572,11 @@ public static class Messages
     /// Sets stake.
     /// </summary>
     public const string SetStake = "SET_STAKE";
+
+    /// <summary>
+    /// Defines localizable showman replic.
+    /// </summary>
+    public const string ShowmanReplic = "SHOWMAN_REPLIC";
 
     /// <summary>
     /// Показать табло

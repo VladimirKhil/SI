@@ -3,11 +3,9 @@ using Microsoft.Extensions.Logging;
 using SI.GameServer.Contract;
 using SICore;
 using SICore.Clients;
-using SICore.Contracts;
 using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
-using SICore.Services;
 using SICore.Special;
 using SIData;
 using SIGame.ViewModel.Contracts;
@@ -206,11 +204,11 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     }
 
     private readonly ComputerAccount[] _defaultComputerPlayers = StoredPersonsRegistry.GetDefaultPlayers(
-        new Localizer(Thread.CurrentThread.CurrentUICulture.Name),
+        Thread.CurrentThread.CurrentUICulture.Name,
         Global.PhotoUri);
 
     private readonly ComputerAccount[] _defaultComputerShowmans = StoredPersonsRegistry.GetDefaultShowmans(
-        new Localizer(Thread.CurrentThread.CurrentUICulture.Name),
+        Thread.CurrentThread.CurrentUICulture.Name,
         Global.PhotoUri);
 
     private readonly ComputerAccount _newPlayerAccount = new(Resources.New + "…", true);
@@ -769,11 +767,9 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             TempDocFolder = documentPath
         };
 
-        var localizer = new Localizer(_model.AppSettings.Culture);
-
         var client = new Client(_model.HumanPlayerName);
         var actions = new ViewerActions(client);
-        var logic = new ViewerHumanLogic(gameViewModel, data, actions, _userSettings, LocalAddress);
+        var logic = new ViewerHumanLogic(gameViewModel, data, actions, _userSettings, LocalAddress, _loggerFactory.CreateLogger<ViewerHumanLogic>());
 
         IViewerClient? host = null;
 
@@ -784,7 +780,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         {
             if (_model.HumanPlayerName == _model.Showman.Name)
             {
-                host = new Showman(client, _model.Showman, true, logic, actions, localizer, data);
+                host = new Showman(client, _model.Showman, true, logic, actions, data);
                 game.ClientData.ShowMan.IsConnected = true;
             }
             else
@@ -793,7 +789,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                 {
                     if (_model.Players[i].Name == _model.HumanPlayerName)
                     {
-                        host = new Player(client, _model.Players[i], true, logic, actions, localizer, data);
+                        host = new Player(client, _model.Players[i], true, logic, actions, data);
                         game.ClientData.Players[i].IsConnected = true;
                         break;
                     }
@@ -801,7 +797,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
                 if (host == null)
                 {
-                    host = new Viewer(client, _model.Viewers[0], true, logic, actions, localizer, data);
+                    host = new Viewer(client, _model.Viewers[0], true, logic, actions, data);
                     game.ClientData.Viewers.Add(new ViewerAccount(_model.Viewers[0]) { IsConnected = true });
                 }
             }

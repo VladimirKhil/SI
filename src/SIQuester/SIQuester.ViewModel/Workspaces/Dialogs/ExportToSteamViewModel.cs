@@ -222,18 +222,17 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
             var tags = new List<string>();
 
             var docLanguage = _document.Package.Model.Language;
+            var language = docLanguage == "ru-RU" ? "Russian" : "English";
+            var localizeTags = language != "English";
 
             if (!string.IsNullOrEmpty(docLanguage))
             {
-                tags.Add(docLanguage == "ru-RU" ? "Russian" : "English");
+                tags.Add(language);
             }
             else
             {
                 docLanguage = AppSettings.Default.Language;
             }
-
-            var language = docLanguage == "ru-RU" ? "Russian" : "English";
-            var localizeTags = language != "English";
 
             foreach (var tag in _document.Package.Tags)
             {

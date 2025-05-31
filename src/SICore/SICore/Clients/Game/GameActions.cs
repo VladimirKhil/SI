@@ -45,6 +45,13 @@ public sealed class GameActions
 
     internal void ShowmanReplic(string text) => UserMessage(MessageTypes.Replic, text, GameRole.Showman);
 
+    internal void ShowmanReplicNew(MessageCode messageCode) =>
+        SendMessageWithArgs(
+            Messages.ShowmanReplic,
+            Random.Shared.Next(1, 20) /* used to select the same one of possible replics by all clients */,
+            messageCode.ToString());
+
+    [Obsolete]
     internal void PlayerReplic(int playerIndex, string text) => UserMessage(MessageTypes.Replic, text, GameRole.Player, playerIndex);
 
     /// <summary>

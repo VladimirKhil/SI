@@ -612,9 +612,6 @@
   <data name="SureFemaleEnding" xml:space="preserve">
     <value>а</value>
   </data>
-  <data name="ByGame" xml:space="preserve">
-    <value>игрой</value>
-  </data>
   <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
     <value>Ведущий перевёл игру в другой раунд</value>
   </data>

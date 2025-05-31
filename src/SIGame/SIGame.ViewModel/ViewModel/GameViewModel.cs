@@ -3,6 +3,7 @@ using SICore;
 using SICore.Contracts;
 using SICore.Models;
 using SICore.Network.Servers;
+using SICore.Special;
 using SIData;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
@@ -1056,7 +1057,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             _data.Players[i].CanBeSelected = false;
         }
 
-        _data.Host.OnFlash(false);
+        PlatformManager.Instance.Activate(false);
     }
 
     private void ChangeSums_Executed(object? arg)
@@ -1317,7 +1318,35 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         UpdateAddTableCommand();
         UpdateCurrentPlayerCommands();
+        UpdatePersons();
     }
+
+    internal void UpdatePersons()
+    {
+        UpdateShowman();
+
+        foreach (var player in Players)
+        {
+            UpdatePlayer(player);
+        }
+    }
+
+    private Account[] GetDefaultComputerPlayers() => Data.DefaultComputerPlayers
+        ?? StoredPersonsRegistry.GetDefaultPlayers(Thread.CurrentThread.CurrentUICulture.Name, Global.PhotoUri);
+
+    internal void UpdatePlayer(PlayerViewModel player) =>
+        player.Others = player.IsHuman ?
+            Data.AllPersons.Values.Where(p => p.IsHuman)
+                .Except(new ViewerAccount[] { player.Model })
+                .ToArray()
+            : GetDefaultComputerPlayers()
+                .Where(a => !Data.AllPersons.Values.Any(p => !p.IsHuman && p.Name == a.Name))
+                .ToArray();
+
+    internal void UpdateShowman() =>
+        Showman.Others = Showman.IsHuman ?
+            Data.AllPersons.Values.Where(p => p.IsHuman).Except(new ViewerAccount[] { Showman.Model }).ToArray()
+            : Array.Empty<ViewerAccount>();
 
     private void Move_Executed(object? arg)
     {

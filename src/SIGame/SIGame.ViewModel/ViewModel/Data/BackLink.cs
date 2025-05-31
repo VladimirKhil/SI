@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Notions;
-using SICore;
 using SICore.Models;
 using SICore.PlatformSpecific;
 using SICore.Results;
@@ -36,21 +34,7 @@ public sealed class BackLink : GameHostBase
         _logger = serviceProvider.GetRequiredService<ILogger<BackLink>>();
     }
 
-    public override void OnFlash(bool flash = true) => PlatformSpecific.PlatformManager.Instance.Activate();
-
-    public override void PlaySound(string sound = null, double speed = 1.0) => PlatformSpecific.PlatformManager.Instance.PlaySound(sound, speed);
-
-    public override bool MakeLogs => _userSettings.GameSettings.AppSettings.MakeLogs;
-
-    public override string GameButtonKey => PlatformSpecific.PlatformManager.Instance.GetKeyName(_userSettings.GameSettings.AppSettings.GameButtonKey2);
-
-    public override int MaximumTableTextLength => _userSettings.GameSettings.AppSettings.ThemeSettings.MaximumTableTextLength;
-
-    public override int MaximumReplicTextLength => _userSettings.GameSettings.AppSettings.ThemeSettings.MaximumReplicTextLength;
-
     public override void OnError(Exception exc) => PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Error, true);
-
-    public override void Log(string message) => _logger.LogInformation("Game info: {message}", message);
 
     public override void LogWarning(string message) => _logger.LogWarning("Game warning: {warning}", message);
 
@@ -85,40 +69,6 @@ public sealed class BackLink : GameHostBase
         }
     }
 
-    public override void OnPictureError(string remoteUri) =>
-        PlatformSpecific.PlatformManager.Instance.ShowMessage(
-            string.Format(Resources.Error_UploadingAvatar + ": {0}", remoteUri),
-            PlatformSpecific.MessageType.Warning,
-            true);
-
-    public override string PhotoUri => Global.PhotoUri;
-
-    public override string GetPhotoUri(string name) => Path.Combine(Global.PhotoUri, name.Translit() + ".jpg");
-
-    public override bool SendReport => _userSettings.SendReport;
-
-    public override void SaveBestPlayers(IEnumerable<PlayerAccount> players)
-    {
-        var bestPlayers = CommonSettings.Default.BestPlayers;
-
-        foreach (var player in players)
-        {
-            var d = bestPlayers.Count - 1;
-
-            while (d > -1 && player.Sum >= bestPlayers[d].Result)
-            {
-                d--;
-            }
-
-            bestPlayers.Insert(d + 1, new BestPlayer { Name = player.Name, Result = player.Sum });
-
-            if (bestPlayers.Count > BestPlayer.Total)
-            {
-                bestPlayers.RemoveAt(bestPlayers.Count - 1);
-            }
-        }
-    }
-
     public override void OnGameFinished(string packageId)
     {
         PlatformSpecific.PlatformManager.Instance.ExecuteOnUIThread(() =>
@@ -131,8 +81,6 @@ public sealed class BackLink : GameHostBase
     }
 
     public override bool ShowBorderOnFalseStart => _userSettings.GameSettings.AppSettings.ShowBorderOnFalseStart;
-
-    public override bool LoadExternalMedia => _userSettings.LoadExternalMedia;
 
     public override int MaxImageSizeKb => int.MaxValue;
 

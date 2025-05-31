@@ -681,4 +681,7 @@
   <data name="TimeSettings_ImageTime" xml:space="preserve">
     <value>Вывод изображения</value>
   </data>
+  <data name="ByGame" xml:space="preserve">
+    <value>игрой</value>
+  </data>
 </root>

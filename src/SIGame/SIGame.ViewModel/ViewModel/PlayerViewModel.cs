@@ -1,10 +1,11 @@
 ﻿using SICore;
 using SIData;
-using SIGame.ViewModel.ViewModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace SIGame.ViewModel;
 
-public sealed class PlayerViewModel : IPersonViewModel
+public sealed class PlayerViewModel : IPersonViewModel, INotifyPropertyChanged
 {
     public PlayerAccount Model { get; }
 
@@ -14,9 +15,27 @@ public sealed class PlayerViewModel : IPersonViewModel
 
     public bool IsConnected => Model.IsConnected;
 
-    public Account[] Others => Model.Others;
+    private Account[] _others = Array.Empty<Account>();
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public Account[] Others
+    {
+        get => _others;
+        set
+        {
+            if (_others != value)
+            {
+                _others = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public string Name => Model.Name;
 
     public PlayerViewModel(PlayerAccount model) => Model = model;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
