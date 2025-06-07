@@ -23,7 +23,7 @@ namespace SICore;
 /// <summary>
 /// Defines a human viewer logic.
 /// </summary>
-public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAsyncDisposable
+public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 {
     private record struct ContentInfo(string Type, string Uri, string OriginalUri);
 
@@ -85,6 +85,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
     private readonly UserSettings _userSettings;
     private readonly ILogger<ViewerHumanLogic> _logger;
 
+    private readonly ViewerData _data;
+
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
         ViewerData data,
@@ -94,9 +96,9 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         ILogger<ViewerHumanLogic> logger,
         string? serverPublicUrl = null,
         string[]? contentPublicUrls = null)
-        : base(data)
     {
         _gameViewModel = gameViewModel;
+        _data = data;
         _viewerActions = viewerActions;
         _userSettings = userSettings;
         _logger = logger;
@@ -436,6 +438,8 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         return File.Create(logUri);
     }
 
+    private void OnError(Exception exc) => PlatformManager.Instance.ShowMessage(exc.ToString(), MessageType.Error, true);
+
     public void Stage()
     {
         switch (_data.Stage)
@@ -463,21 +467,21 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                     }
                     catch (ArgumentException exc)
                     {
-                        _data.Host.OnError(exc);
+                        OnError(exc);
                     }
                     catch (UnauthorizedAccessException exc)
                     {
-                        _data.Host.OnError(exc);
+                        OnError(exc);
                     }
                 }
 
                 OnReplic(ReplicCodes.Special.ToString(), $"{Resources.GameStarted} {DateTime.Now}");
 
-                var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{ClientData.ShowMan?.Name}\"");
+                var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{_data.ShowMan?.Name}\"");
 
-                for (var i = 0; i < ClientData.Players.Count; i++)
+                for (var i = 0; i < _data.Players.Count; i++)
                 {
-                    gameMeta.Append($" data-player-{i}=\"{ClientData.Players[i].Name}\"");
+                    gameMeta.Append($" data-player-{i}=\"{_data.Players[i].Name}\"");
                 }
 
                 AddToFileLog(gameMeta + "></span>");
@@ -499,6 +503,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
             case GameStage.After:
                 _gameLogger?.Write("</body></html>");
+                OnGameFinished();
                 break;
 
             default:
@@ -512,20 +517,35 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         OnAd();
     }
 
+    private void OnGameFinished()
+    {
+        var packageId = _data.PackageId;
+        
+        UI.Execute(
+            () =>
+            {
+                if (!string.IsNullOrEmpty(packageId) && !_userSettings.PackageHistory.Contains(packageId))
+                {
+                    _userSettings.PackageHistory.Add(packageId);
+                }
+            },
+            OnError);
+    }
+
     public void GameThemes()
     {
         TInfo.TStage = TableStage.GameThemes;
         _data.EnableMediaLoadButton = false;
 
-        for (var i = 0; i < ClientData.TInfo.GameThemes.Count; i++)
+        for (var i = 0; i < _data.TInfo.GameThemes.Count; i++)
         {
-            OnReplic(ReplicCodes.System.ToString(), ClientData.TInfo.GameThemes[i]);
+            OnReplic(ReplicCodes.System.ToString(), _data.TInfo.GameThemes[i]);
         }
     }
 
     public void RoundThemes(Models.ThemesPlayMode playMode)
     {
-        UI.Execute(() => RoundThemesUI(playMode), exc => _data.Host.SendError(exc));
+        UI.Execute(() => RoundThemesUI(playMode), OnError);
         OnAd();
     }
 
@@ -930,7 +950,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
                     // TODO: this logic should be moved to server; client should receive just boolean flag
                     if (contentType == ContentTypes.Image
-                        && ClientData.QuestionType == QuestionTypes.Simple
+                        && _data.QuestionType == QuestionTypes.Simple
                         && !_data.IsAnswer
                         && !_appSettings.FalseStart
                         && _appSettings.PartialImages
@@ -1074,7 +1094,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             }
             catch (Exception exc)
             {
-                _data.Host.SendError(exc);
+                OnError(exc);
             }
         });
     }
@@ -1094,7 +1114,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             catch (NullReferenceException exc)
             {
                 // Strange error happened periodically in WPF bindings
-                _data.Host.SendError(exc);
+                OnError(exc);
             }
         }
         else
@@ -1150,8 +1170,13 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         _prependTableText = comments.UnescapeNewLines().LeaveFirst(MaxAdditionalTableTextLength);
     }
 
-    public void Try()
+    public void Try(bool questionNotFinished)
     {
+        if (questionNotFinished && !_userSettings.GameSettings.AppSettings.ShowBorderOnFalseStart)
+        {
+            return;
+        }
+
         TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
 
         if (_runTimer)
@@ -1294,11 +1319,11 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             case QuestionTypes.Simple:
                 TInfo.TimeLeft = 1.0;
 
-                //if (!isDefaultType)
-                //{
-                //    TInfo.Text = Resources.QuestionTypeWithButton.ToUpper();
-                //    TInfo.TStage = TableStage.Special;
-                //}
+                if (!isDefaultType)
+                {
+                    TInfo.Text = Resources.QuestionTypeWithButton.ToUpper();
+                    TInfo.TStage = TableStage.Special;
+                }
                 break;
 
             case QuestionTypes.StakeAll:
@@ -1369,7 +1394,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         PlatformManager.Instance.PlaySound(Sounds.FinalDelete);
     }
 
-    public void OnWinner(int winnerIndex) => UI.Execute(() => WinnerUI(winnerIndex), exc => _data.Host.SendError(exc));
+    public void OnWinner(int winnerIndex) => UI.Execute(() => WinnerUI(winnerIndex), OnError);
 
     private void WinnerUI(int winnerIndex)
     {
@@ -1551,7 +1576,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         _gameViewModel.OnIsPausedChanged(isPaused);
     }
 
-    public void TableLoaded() => UI.Execute(TableLoadedUI, exc => _data.Host.SendError(exc));
+    public void TableLoaded() => UI.Execute(TableLoadedUI, OnError);
 
     private void TableLoadedUI()
     {
@@ -1708,35 +1733,35 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
         UI.Execute(
             () =>
             {
-                var banned = ClientData.Banned.FirstOrDefault(p => p.Ip == ip);
+                var banned = _data.Banned.FirstOrDefault(p => p.Ip == ip);
 
                 if (banned != null)
                 {
-                    ClientData.Banned.Remove(banned);
+                    _data.Banned.Remove(banned);
                     OnSpecialReplic(string.Format(Resources.UserUnbanned, banned.UserName));
                 }
             },
-            exc => ClientData.Host.OnError(exc));
+            OnError);
 
     public void OnBanned(Models.BannedInfo bannedInfo) =>
         UI.Execute(
             () =>
             {
-                ClientData.Banned.Add(bannedInfo);
+                _data.Banned.Add(bannedInfo);
             },
-            exc => ClientData.Host.OnError(exc));
+            OnError);
 
     public void OnBannedList(IEnumerable<Models.BannedInfo> banned) =>
         UI.Execute(() =>
         {
-            ClientData.Banned.Clear();
+            _data.Banned.Clear();
 
             foreach (var item in banned)
             {
-                ClientData.Banned.Add(item);
+                _data.Banned.Add(item);
             }
         },
-        exc => ClientData.Host.OnError(exc));
+        OnError);
 
     public void SetCaption(string caption) => TInfo.Caption = caption;
 
@@ -1760,7 +1785,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         if (!string.IsNullOrEmpty(voiceChatUri) && Uri.IsWellFormedUriString(voiceChatUri, UriKind.Absolute))
         {
-            ClientData.VoiceChatUri = voiceChatUri;
+            _data.VoiceChatUri = voiceChatUri;
         }
     }
 
@@ -1770,7 +1795,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             _gameViewModel.Players.Add(new PlayerViewModel(player));
             _gameViewModel.UpdateAddTableCommand();
         },
-        ClientData.Host.OnError);
+        OnError);
 
     public void RemovePlayerAt(int index) => UI.Execute(
         () =>
@@ -1778,7 +1803,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             _gameViewModel.Players.RemoveAt(index);
             _gameViewModel.UpdateAddTableCommand();
         },
-        ClientData.Host.OnError);
+        OnError);
 
     public void OnPersonsUpdated() => _gameViewModel.UpdatePersons();
 
@@ -1789,7 +1814,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
             {
                 _gameViewModel.Players.Clear();
 
-                foreach (var player in ClientData.Players)
+                foreach (var player in _data.Players)
                 {
                     _gameViewModel.Players.Add(new PlayerViewModel(player));
                 }
@@ -1797,7 +1822,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
                 _gameViewModel.UpdateAddTableCommand();
                 _gameViewModel.UpdatePersons();
             },
-            ClientData.Host.OnError);
+            OnError);
 
         if (_gameViewModel.Host?.Role == GameRole.Player)
         {
@@ -1868,7 +1893,7 @@ public sealed class ViewerHumanLogic : Logic<ViewerData>, IPersonController, IAs
 
         var playerName = _data.Players[playerIndex].Name;
         _gameViewModel.NewValidation = true;
-        ClientData.PersonDataExtensions.ShowExtraRightButtons = false;
+        _data.PersonDataExtensions.ShowExtraRightButtons = false;
         _gameViewModel.Hint = Resources.HintCheckAnswer;
         _gameViewModel.AddValidation(playerName, answer);
         _gameViewModel.DialogMode = DialogModes.AnswerValidation;

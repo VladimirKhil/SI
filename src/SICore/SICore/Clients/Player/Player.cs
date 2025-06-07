@@ -1,5 +1,4 @@
-﻿using SICore.Contracts;
-using SICore.Network.Clients;
+﻿using SICore.Network.Clients;
 using SIData;
 using SIPackages.Core;
 using System.Text;

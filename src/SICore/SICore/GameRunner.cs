@@ -51,7 +51,7 @@ public static class GameRunner
             if (!settings.Showman.IsHuman)
             {
                 var showmanClient = new Client(settings.Showman.Name);
-                var data = new ViewerData(gameHost);
+                var data = new ViewerData();
                 var actions = new ViewerActions(showmanClient);
 
                 var logic = new ViewerComputerLogic(
@@ -75,7 +75,7 @@ public static class GameRunner
                 if (!human)
                 {
                     var playerClient = new Client(settings.Players[i].Name);
-                    var data = new ViewerData(gameHost);
+                    var data = new ViewerData();
                     var actions = new ViewerActions(playerClient);
 
                     var logic = new ViewerComputerLogic(

@@ -18,7 +18,7 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class PackageViewModel : ItemViewModel<Package>
 {
-    public override IItemViewModel Owner => null;
+    public override IItemViewModel? Owner => null;
 
     public QDocument Document { get; private set; }
 
@@ -38,7 +38,7 @@ public sealed class PackageViewModel : ItemViewModel<Package>
 
     public override string AddHeader => Resources.AddRound;
 
-    public override ICommand Remove
+    public override ICommand? Remove
     {
         get => null;
         protected set { }
@@ -307,6 +307,11 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         {
             case NotifyCollectionChangedAction.Add:
             case NotifyCollectionChangedAction.Replace:
+                if (e.NewItems == null || e.NewStartingIndex < 0)
+                {
+                    return;
+                }
+
                 for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                 {
                     if (Rounds[i].OwnerPackage != null)
@@ -320,6 +325,11 @@ public sealed class PackageViewModel : ItemViewModel<Package>
                 break;
 
             case NotifyCollectionChangedAction.Remove:
+                if (e.OldItems == null || e.OldStartingIndex < 0)
+                {
+                    return;
+                }
+
                 foreach (RoundViewModel round in e.OldItems)
                 {
                     round.OwnerPackage = null;
@@ -365,19 +375,22 @@ public sealed class PackageViewModel : ItemViewModel<Package>
     {
         var newTags = PlatformManager.Instance.AskTags(Tags);
 
-        if (newTags != null)
+        if (newTags == null)
         {
-            using var change = Document.OperationsManager.BeginComplexChange();
-
-            Tags.ClearOneByOne();
-
-            foreach (var item in newTags)
-            {
-                Tags.Add(item);
-            }
-
-            change.Commit();
+            return;
         }
+
+        using var change = Document.OperationsManager.BeginComplexChange();
+
+        Tags.ClearOneByOne();
+
+        foreach (var item in newTags)
+        {
+            Tags.Add(item);
+        }
+
+        change.Commit();
+        OnPropertyChanged(nameof(Tags));
     }
 
     private void SelectLogo_Executed(object? arg)
@@ -387,7 +400,7 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         if (model == null)
         {
             var images = Document.Images;
-            var was = images.Files.Count;
+            var previousFileCount = images.Files.Count;
 
             images.AddItem.Execute(null);
 
@@ -396,7 +409,7 @@ public sealed class PackageViewModel : ItemViewModel<Package>
                 return;
             }
 
-            if (was == images.Files.Count)
+            if (previousFileCount == images.Files.Count)
             {
                 return;
             }
@@ -404,7 +417,12 @@ public sealed class PackageViewModel : ItemViewModel<Package>
             model = images.Files.LastOrDefault();
         }
 
-        Model.Logo = "@" + model.Model.Name;
+        if (model == null)
+        {
+            return;
+        }
+
+        Model.Logo = $"@{model.Model.Name}";
         _logo = null;
         OnPropertyChanged(nameof(Logo));
     }

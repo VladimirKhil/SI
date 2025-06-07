@@ -1840,50 +1840,30 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Button
-                                Content="{x:Static lp:Resources.SetTags}"
-                                Command="{Binding AddTags}"
-                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                Background="#FFEEEEEE"
-                                Foreground="Red"
-                                FontSize="20"
-                                HorizontalAlignment="Left"
-                                Padding="8,2" />
+                            <DockPanel>
+                                <Button
+                                    DockPanel.Dock="Right"
+                                    ToolTip="{x:Static lp:Resources.SetTags}"
+                                    Command="{Binding AddTags}"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    Width="25"
+                                    Cursor="Hand"
+                                    HorizontalAlignment="Left"
+                                    Padding="2">
+                                    <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                                </Button>
+
+                                <TextBox
+                                    Text="{Binding Tags, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                                    IsReadOnly="True"
+                                    BorderThickness="0"
+                                    Background="Transparent"
+                                    TextWrapping="Wrap"
+                                    VerticalAlignment="Center" />
+                            </DockPanel>
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
-
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Tags.Count, Converter={StaticResource GreaterZero}}" Value="true">
-                        <Setter Property="ContentTemplate">
-                            <Setter.Value>
-                                <DataTemplate>
-                                    <DockPanel>
-                                        <Button
-                                            DockPanel.Dock="Right"
-                                            ToolTip="{x:Static lp:Resources.SetTags}"
-                                            Command="{Binding AddTags}"
-                                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                            Width="25"
-                                            Cursor="Hand"
-                                            HorizontalAlignment="Left"
-                                            Padding="2">
-                                            <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
-                                        </Button>
-
-                                        <TextBox
-                                            Text="{Binding Tags, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
-                                            IsReadOnly="True"
-                                            BorderThickness="0"
-                                            Background="Transparent"
-                                            TextWrapping="Wrap"
-                                            VerticalAlignment="Center" />
-                                    </DockPanel>
-                                </DataTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>
             </Style>
 
             <DataTemplate x:Key="Tags">
@@ -2171,7 +2151,7 @@
                     <ContentControl Grid.Column="1" Grid.Row="2" ContentTemplate="{StaticResource Publisher}" Content="{Binding}" />
                     <ContentControl Grid.Column="1" Grid.Row="3" Style="{StaticResource TagsStyle}" Content="{Binding}" />
                     <ContentControl Grid.Column="1" Grid.Row="4" Style="{StaticResource QualityStyle}" Content="{Binding}" />
-                    <ContentControl Grid.Column="2" Grid.Row="4" Style="{StaticResource LanguageStyle}" Content="{Binding}" />
+                    <ContentControl Grid.Column="2" Grid.Row="4" Margin="15,0,0,0" Style="{StaticResource LanguageStyle}" Content="{Binding}" />
                     <ContentControl Grid.Column="2" Grid.Row="1" Margin="15,0,0,0" ContentTemplate="{StaticResource Restrictions}" Content="{Binding}" />
                     <ContentControl Grid.Column="2" Grid.Row="2" Margin="15,0,0,0" ContentTemplate="{StaticResource Difficulty}" Content="{Binding}" />
                     <ContentControl Grid.Column="2" Grid.Row="3" Margin="15,0,0,0" Style="{StaticResource ContactUrlStyle}" Content="{Binding}" />

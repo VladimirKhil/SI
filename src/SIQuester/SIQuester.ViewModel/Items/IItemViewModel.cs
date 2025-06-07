@@ -25,5 +25,5 @@ public interface IItemViewModel
 
     ICommand Add { get; }
 
-    ICommand Remove { get; }
+    ICommand? Remove { get; }
 }

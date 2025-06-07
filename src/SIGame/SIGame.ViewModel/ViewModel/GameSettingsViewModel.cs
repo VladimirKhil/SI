@@ -38,7 +38,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     
     private readonly Random _random = new();
 
-    private string _duplicatingName = null;
+    private string? _duplicatingName = null;
 
     internal CancellationTokenSource CancellationTokenSource { get; set; }
 
@@ -757,7 +757,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             avatarHelper,
             null);
 
-        var data = new ViewerData(BackLink.Default);
+        var data = new ViewerData();
 
         var gameViewModel = new GameViewModel(data, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
         {
@@ -810,11 +810,11 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         client.ConnectTo(node);
 
         gameViewModel.Host = host;
-        host.MyData.IsNetworkGame = NetworkGame;
+        host.ClientData.IsNetworkGame = NetworkGame;
 
         if (!NetworkGame)
         {
-            host.MyData.IsChatOpened = false;
+            gameViewModel.IsChatOpened = false;
         }
 
         game.Run();
@@ -979,7 +979,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
     private void CheckUniqueAccounts()
     {
-        var accounts = new List<Account>();
+        var accounts = new List<Account?>();
         accounts.AddRange(Players.Select(acc => acc.SelectedAccount));
         accounts.AddRange(Viewers.Select(acc => acc.SelectedAccount));
 

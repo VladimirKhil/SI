@@ -25,7 +25,7 @@ namespace SICore;
 /// <summary>
 /// Executes SIGame logic implemented as a state machine.
 /// </summary>
-public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDisposable
+public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 {
     private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
@@ -109,7 +109,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         int progressTotal = 0) => StageChanged?.Invoke(this, stage, stageName, progressCurrent, progressTotal);
 
     internal void OnAdShown(int adId) =>
-        AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
+        AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, _data.AllPersons.Values.Count(p => p.IsHuman));
 
     private readonly IFileShare _fileShare;
     private readonly TaskRunner<Tasks> _taskRunner;
@@ -126,6 +126,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal StakesPlugin Stakes { get; }
 
+    private readonly GameData _data;
+
     public GameLogic(
         GameData data,
         GameActions gameActions,
@@ -133,8 +135,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         ILocalizer localizer,
         IFileShare fileShare,
         IPinHelper? pinHelper)
-        : base(data)
     {
+        _data = data;
         _gameActions = gameActions;
         Engine = engine;
         LO = localizer;
@@ -188,24 +190,24 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void ProcessApellationRequest()
     {
-        ClientData.AppellationCallerIndex = -1;
-        ClientData.AppelaerIndex = -1;
+        _data.AppellationCallerIndex = -1;
+        _data.AppelaerIndex = -1;
 
-        if (ClientData.IsAppelationForRightAnswer)
+        if (_data.IsAppelationForRightAnswer)
         {
-            for (var i = 0; i < ClientData.Players.Count; i++)
+            for (var i = 0; i < _data.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == ClientData.AppellationSource)
+                if (_data.Players[i].Name == _data.AppellationSource)
                 {
-                    for (var j = 0; j < ClientData.QuestionHistory.Count; j++)
+                    for (var j = 0; j < _data.QuestionHistory.Count; j++)
                     {
-                        var index = ClientData.QuestionHistory[j].PlayerIndex;
+                        var index = _data.QuestionHistory[j].PlayerIndex;
 
                         if (index == i)
                         {
-                            if (!ClientData.QuestionHistory[j].IsRight)
+                            if (!_data.QuestionHistory[j].IsRight)
                             {
-                                ClientData.AppelaerIndex = index;
+                                _data.AppelaerIndex = index;
                             }
 
                             break;
@@ -218,43 +220,43 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         else
         {
-            if (ClientData.Players.Count(p => p.IsConnected) <= 3)
+            if (_data.Players.Count(p => p.IsConnected) <= 3)
             {
                 // If there are 2 or 3 players, there are already 2 positive votes for the answer
                 // from answered player and showman. And only 1 or 2 votes left.
                 // So there is no chance to win a vote against the answer
-                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], ClientData.AppellationSource));
+                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], _data.AppellationSource));
                 return;
             }
 
-            for (var i = 0; i < ClientData.Players.Count; i++)
+            for (var i = 0; i < _data.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == ClientData.AppellationSource)
+                if (_data.Players[i].Name == _data.AppellationSource)
                 {
-                    ClientData.AppellationCallerIndex = i;
+                    _data.AppellationCallerIndex = i;
                     break;
                 }
             }
 
-            if (ClientData.AppellationCallerIndex == -1)
+            if (_data.AppellationCallerIndex == -1)
             {
                 // Only players can appellate
                 return;
             }
 
             // Last person has right answer and is responsible for appellation
-            var count = ClientData.QuestionHistory.Count;
+            var count = _data.QuestionHistory.Count;
 
-            if (count > 0 && ClientData.QuestionHistory[count - 1].IsRight)
+            if (count > 0 && _data.QuestionHistory[count - 1].IsRight)
             {
-                ClientData.AppelaerIndex = ClientData.QuestionHistory[count - 1].PlayerIndex;
+                _data.AppelaerIndex = _data.QuestionHistory[count - 1].PlayerIndex;
             }
         }
 
-        if (ClientData.AppelaerIndex != -1)
+        if (_data.AppelaerIndex != -1)
         {
             // Appellation started
-            ClientData.AllowAppellation = false;
+            _data.AllowAppellation = false;
             Stop(StopReason.Appellation);
         }
     }
@@ -340,7 +342,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         _minRoundPrice = Math.Max(1, _minRoundPrice);
-        ClientData.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
+        _data.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
     }
 
     internal void InitThemes(IEnumerable<Theme> themes, bool willPlayAllThemes, bool isFirstPlay, ThemesPlayMode playMode)
@@ -622,7 +624,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
         catch (Exception exc)
         {
-            ClientData.Host.OnError(exc);
+            _data.Host.SendError(exc, true);
             return null;
         }
     }
@@ -778,7 +780,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         // (or we could replace it with a normal move)
         ClearContinuation();
 
-        if (ClientData.TInfo.Pause)
+        if (_data.TInfo.Pause)
         {
             OnPauseCore(false);
         }
@@ -794,14 +796,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (isPauseEnabled)
         {
-            if (ClientData.TInfo.Pause)
+            if (_data.TInfo.Pause)
             {
                 return;
             }
 
             if (Stop(StopReason.Pause))
             {
-                ClientData.TInfo.Pause = true;
+                _data.TInfo.Pause = true;
                 AddHistory("Pause activated");
             }
 
@@ -811,46 +813,46 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         if (StopReason == StopReason.Pause)
         {
             // We are currently moving into pause mode. Resuming
-            ClientData.TInfo.Pause = false;
+            _data.TInfo.Pause = false;
             AddHistory("Immediate pause resume");
             CancelStop();
             return;
         }
 
-        if (!ClientData.TInfo.Pause)
+        if (!_data.TInfo.Pause)
         {
             return;
         }
 
-        ClientData.TInfo.Pause = false;
+        _data.TInfo.Pause = false;
 
-        var pauseDuration = DateTime.UtcNow.Subtract(ClientData.PauseStartTime);
+        var pauseDuration = DateTime.UtcNow.Subtract(_data.PauseStartTime);
 
         var times = new int[Constants.TimersCount];
 
         for (var i = 0; i < Constants.TimersCount; i++)
         {
-            times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
-            ClientData.TimerStartTime[i] = ClientData.TimerStartTime[i].Add(pauseDuration);
+            times[i] = (int)(_data.PauseStartTime.Subtract(_data.TimerStartTime[i]).TotalMilliseconds / 100);
+            _data.TimerStartTime[i] = _data.TimerStartTime[i].Add(pauseDuration);
         }
 
-        if (ClientData.IsPlayingMediaPaused)
+        if (_data.IsPlayingMediaPaused)
         {
-            ClientData.IsPlayingMediaPaused = false;
-            ClientData.IsPlayingMedia = true;
+            _data.IsPlayingMediaPaused = false;
+            _data.IsPlayingMedia = true;
         }
 
-        if (ClientData.IsThinkingPaused)
+        if (_data.IsThinkingPaused)
         {
-            ClientData.IsThinkingPaused = false;
-            ClientData.IsThinking = true;
+            _data.IsThinkingPaused = false;
+            _data.IsThinking = true;
         }
 
         AddHistory($"Pause resumed ({Runner.PrintOldTasks()} {StopReason})");
 
         try
         {
-            var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
+            var maxPressingTime = _data.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
             times[1] = maxPressingTime - ResumeExecution();
         }
         catch (Exception exc)
@@ -932,7 +934,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     }
 
     public void Dispose() =>
-        ClientData.TaskLock.WithLock(
+        _data.TaskLock.WithLock(
             () =>
             {
                 _taskRunner.Dispose();
@@ -994,9 +996,9 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         if (reason == StopReason.Decision)
         {
-            ClientData.IsWaiting = false; // Preventing double message processing
+            _data.IsWaiting = false; // Preventing double message processing
         }
-        else if (reason == StopReason.Appellation && ClientData.IsWaiting)
+        else if (reason == StopReason.Appellation && _data.IsWaiting)
         {
             StopWaiting();
         }
@@ -1044,10 +1046,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private bool OnDecisionQuestionSelection()
     {
         if (_data.ThemeIndex == -1
-            || _data.ThemeIndex >= ClientData.TInfo.RoundInfo.Count
+            || _data.ThemeIndex >= _data.TInfo.RoundInfo.Count
             || _data.QuestionIndex == -1
-            || _data.QuestionIndex >= ClientData.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count
-            || !ClientData.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].IsActive())
+            || _data.QuestionIndex >= _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count
+            || !_data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].IsActive())
         {
             return false;
         }
@@ -1070,7 +1072,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _gameActions.PlayerReplic(_data.ChooserIndex, s); // TODO: REMOVE: replaced by SETCHOOSER message
 
         _data.ChooserIndex = _data.AnswererIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, "+");
         ScheduleExecution(Tasks.MoveNext, 10);
         return true;
     }
@@ -1087,7 +1089,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.CurPriceWrong = _data.CurPriceRight;
 
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, "+");
 
         ScheduleExecution(Tasks.MoveNext, 20);
 
@@ -1299,7 +1301,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 {
                     // TODO: many of these lines are redundand in Special questions
                     _data.ChooserIndex = _data.AnswererIndex;
-                    _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                    _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
 
                     _data.IsQuestionAskPlaying = false;
 
@@ -1408,7 +1410,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     /// </summary>
     internal void MoveToAnswer()
     {
-        if (ClientData.IsQuestionFinished)
+        if (_data.IsQuestionFinished)
         {
             return;
         }
@@ -1459,14 +1461,14 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.AnswererPressDuration = -1;
         _data.PendingAnswererIndicies.Clear();
 
-        if (!ClientData.Settings.AppSettings.FalseStart)
+        if (!_data.Settings.AppSettings.FalseStart)
         {
             _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
         }
 
         _gameActions.SendMessage(Messages.Resume); // To resume the media
 
-        if (ClientData.Settings.AppSettings.FalseStart || ClientData.IsQuestionFinished)
+        if (_data.Settings.AppSettings.FalseStart || _data.IsQuestionFinished)
         {
             ScheduleExecution(Tasks.AskToTry, 10, force: true);
             return;
@@ -1484,7 +1486,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         else
         {
             var waitTime = _data.IsPlayingMedia && _data.QuestionPlayState.MediaContentCompletions.All(p => p.Value.Current > 0)
-                ? 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10
+                ? 30 + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10
                 : _data.AtomTime;
 
             ScheduleExecution(Tasks.MoveNext, waitTime, force: true);
@@ -1532,7 +1534,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var msg = string.Format(GetRandomString(LO[nameof(R.InformChooser)]), _data.Chooser.Name);
         _gameActions.ShowmanReplic(msg);
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
         
         ScheduleExecution(Tasks.MoveNext, 20);
 
@@ -1614,7 +1616,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void PlanExecution(Tasks task, double taskTime, int arg = 0)
     {
-        _tasksHistory.AddLogEntry($"PlanExecution {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
+        _tasksHistory.AddLogEntry($"PlanExecution {task} {taskTime} {arg} ({_data.TInfo.Pause})");
 
         if (_taskRunner.IsExecutionPaused)
         {
@@ -1648,7 +1650,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     {
         try
         {
-            ClientData.TaskLock.WithLock(() =>
+            _data.TaskLock.WithLock(() =>
             {
                 if (Engine == null) // disposed
                 {
@@ -1676,7 +1678,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 {
                     static string oldTaskPrinter(Tuple<Tasks, int, int> t) => $"{t.Item1}:{t.Item2}";
 
-                    ClientData.Host.SendError(
+                    _data.Host.SendError(
                         new Exception(
                             $"Hanging old tasks: {string.Join(", ", _taskRunner.OldTasks.Select(oldTaskPrinter))};" +
                             $" Task: {task}, param: {arg}, history: {_tasksHistory}"),
@@ -1867,7 +1869,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         {
             _data.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
             ScheduleExecution(Tasks.NoTask, 10);
-            ClientData.MoveNextBlocked = true;
+            _data.MoveNextBlocked = true;
             _gameActions.SpecialReplic("Game ERROR");
         }
     }
@@ -1921,7 +1923,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var stopReasonDetails = _stopReason == StopReason.Move
             ? _data.MoveDirection.ToString()
-            : (_stopReason == StopReason.Decision ? ClientData.Decision.ToString() : "");
+            : (_stopReason == StopReason.Decision ? _data.Decision.ToString() : "");
 
         _tasksHistory.AddLogEntry($"StopReason {_stopReason} {stopReasonDetails}");
 
@@ -1932,28 +1934,28 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {_taskRunner.PrintOldTasks()}");
                 _taskRunner.PauseExecution(task, arg, _leftTime);
 
-                ClientData.PauseStartTime = DateTime.UtcNow;
+                _data.PauseStartTime = DateTime.UtcNow;
 
-                if (ClientData.IsPlayingMedia)
+                if (_data.IsPlayingMedia)
                 {
-                    ClientData.IsPlayingMediaPaused = true;
-                    ClientData.IsPlayingMedia = false;
+                    _data.IsPlayingMediaPaused = true;
+                    _data.IsPlayingMedia = false;
                 }
 
-                if (ClientData.IsThinking)
+                if (_data.IsThinking)
                 {
-                    var startTime = ClientData.TimerStartTime[1];
+                    var startTime = _data.TimerStartTime[1];
 
-                    ClientData.TimeThinking += ClientData.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
-                    ClientData.IsThinkingPaused = true;
-                    ClientData.IsThinking = false;
+                    _data.TimeThinking += _data.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
+                    _data.IsThinkingPaused = true;
+                    _data.IsThinking = false;
                 }
 
                 var times = new int[Constants.TimersCount];
 
                 for (var i = 0; i < Constants.TimersCount; i++)
                 {
-                    times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
+                    times[i] = (int)(_data.PauseStartTime.Subtract(_data.TimerStartTime[i]).TotalMilliseconds / 100);
                 }
 
                 _gameActions.SystemReplic(LO[nameof(R.PauseInGame)]); // TODO: REMOVE: replaced by PAUSE message
@@ -2060,7 +2062,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                     case MoveDirections.Round:
                         if (Engine.CanMoveNextRound || Engine.CanMoveBackRound)
                         {
-                            stop = Engine.MoveToRound(ClientData.TargetRoundIndex);
+                            stop = Engine.MoveToRound(_data.TargetRoundIndex);
 
                             if (!stop)
                             {
@@ -2228,7 +2230,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         }
 
         Engine?.MoveNext();
-        ClientData.MoveNextBlocked = false;
+        _data.MoveNextBlocked = false;
 
         _tasksHistory.AddLogEntry($"Moved -> {Engine?.Stage}");
     }
@@ -2248,7 +2250,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.CurPriceRight = _data.Stake;
         _data.CurPriceWrong = _data.Stake;
 
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, "+");
 
         var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_data.Players[stakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_data.Stake)}";
 
@@ -2634,7 +2636,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void AskToTry()
     {
-        if (ClientData.Players.All(p => !p.CanPress))
+        if (_data.Players.All(p => !p.CanPress))
         {
             ScheduleExecution(Tasks.WaitTry, 3, force: true);
             return;
@@ -2971,36 +2973,36 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal bool PrepareForAskAnswer()
     {
-        var buttonPressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = _data.Settings.AppSettings.ButtonPressMode;
 
         if (buttonPressMode == ButtonPressMode.RandomWithinInterval)
         {
-            if (ClientData.PendingAnswererIndicies.Count == 0)
+            if (_data.PendingAnswererIndicies.Count == 0)
             {
-                DumpButtonPressError("ClientData.PendingAnswererIndicies.Count == 0");
+                DumpButtonPressError("_data.PendingAnswererIndicies.Count == 0");
                 return false;
             }
 
-            var index = ClientData.PendingAnswererIndicies.Count == 1 ? 0 : Random.Shared.Next(ClientData.PendingAnswererIndicies.Count);
-            ClientData.PendingAnswererIndex = ClientData.PendingAnswererIndicies[index];
+            var index = _data.PendingAnswererIndicies.Count == 1 ? 0 : Random.Shared.Next(_data.PendingAnswererIndicies.Count);
+            _data.PendingAnswererIndex = _data.PendingAnswererIndicies[index];
         }
 
-        if (ClientData.PendingAnswererIndex < 0 || ClientData.PendingAnswererIndex >= ClientData.Players.Count)
+        if (_data.PendingAnswererIndex < 0 || _data.PendingAnswererIndex >= _data.Players.Count)
         {
-            DumpButtonPressError($"ClientData.PendingAnswererIndex = {ClientData.PendingAnswererIndex}; ClientData.Players.Count = {ClientData.Players.Count}");
+            DumpButtonPressError($"_data.PendingAnswererIndex = {_data.PendingAnswererIndex}; _data.Players.Count = {_data.Players.Count}");
             return false;
         }
 
-        ClientData.AnswererIndex = ClientData.PendingAnswererIndex;
-        ClientData.QuestionPlayState.SetSingleAnswerer(ClientData.PendingAnswererIndex);
+        _data.AnswererIndex = _data.PendingAnswererIndex;
+        _data.QuestionPlayState.SetSingleAnswerer(_data.PendingAnswererIndex);
 
-        if (!ClientData.Settings.AppSettings.FalseStart)
+        if (!_data.Settings.AppSettings.FalseStart)
         {
             // Stop question reading
-            if (!ClientData.IsQuestionFinished)
+            if (!_data.IsQuestionFinished)
             {
-                var timeDiff = (int)DateTime.UtcNow.Subtract(ClientData.AtomStart).TotalSeconds * 10;
-                ClientData.AtomTime = Math.Max(1, ClientData.AtomTime - timeDiff);
+                var timeDiff = (int)DateTime.UtcNow.Subtract(_data.AtomStart).TotalSeconds * 10;
+                _data.AtomTime = Math.Max(1, _data.AtomTime - timeDiff);
             }
         }
 
@@ -3009,10 +3011,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             var startTime = _data.TimerStartTime[1];
             var currentTime = DateTime.UtcNow;
 
-            ClientData.TimeThinking += currentTime.Subtract(startTime).TotalMilliseconds / 100;
+            _data.TimeThinking += currentTime.Subtract(startTime).TotalMilliseconds / 100;
         }
 
-        var answerer = ClientData.Answerer;
+        var answerer = _data.Answerer;
 
         if (answerer == null)
         {
@@ -3024,7 +3026,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.IsThinking = false;
 
-        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Pause, (int)ClientData.TimeThinking);
+        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Pause, (int)_data.TimeThinking);
 
         _data.IsPlayingMediaPaused = _data.IsPlayingMedia;
         _data.IsPlayingMedia = false;
@@ -3034,7 +3036,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void DumpButtonPressError(string reason)
     {
-        var pressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+        var pressMode = _data.Settings.AppSettings.ButtonPressMode;
         _data.Host.SendError(new Exception($"{reason} {pressMode}"));
     }
 
@@ -3052,7 +3054,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 break;
 
             case 2:
-                _gameActions.ShowmanReplic($"{LO[nameof(R.GameRules)]}: {BuildRulesString(ClientData.Settings.AppSettings)}");
+                _gameActions.ShowmanReplic($"{LO[nameof(R.GameRules)]}: {BuildRulesString(_data.Settings.AppSettings)}");
                 nextArg = -1;
                 extraTime = 20;
                 break;
@@ -3303,7 +3305,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _data.IsWaiting = true;
             _data.Decision = DecisionType.AnswerValidating;
 
-            var rightLabel = ClientData.Question?.Right.FirstOrDefault();
+            var rightLabel = _data.Question?.Right.FirstOrDefault();
 
             _data.Answerer.AnswerIsRight = _data.Answerer.Answer == rightLabel;
             _data.Answerer.AnswerValidationFactor = 1.0;
@@ -3469,7 +3471,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.Answerer.Answer = "";
 
-        var buttonPressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = _data.Settings.AppSettings.ButtonPressMode;
 
         if (buttonPressMode != ButtonPressMode.FirstWins)
         {
@@ -3498,11 +3500,11 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     private void InformWrongTries()
     {
-        for (var i = 0; i < ClientData.PendingAnswererIndicies.Count; i++)
+        for (var i = 0; i < _data.PendingAnswererIndicies.Count; i++)
         {
-            var playerIndex = ClientData.PendingAnswererIndicies[i];
+            var playerIndex = _data.PendingAnswererIndicies[i];
 
-            if (playerIndex == ClientData.PendingAnswererIndex)
+            if (playerIndex == _data.PendingAnswererIndex)
             {
                 continue;
             }
@@ -3822,8 +3824,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 return;
             }
 
-            var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + ClientData.StakeStep;
-            var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / ClientData.StakeStep) * ClientData.StakeStep;
+            var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + _data.StakeStep;
+            var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / _data.StakeStep) * _data.StakeStep;
 
             _data.StakeTypes = StakeTypes.AllIn | (_data.Stake == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
 
@@ -3833,7 +3835,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             }
 
             _data.StakeVariants[0] = _data.Stake == -1;
-            _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + ClientData.StakeStep;
+            _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + _data.StakeStep;
             _data.StakeVariants[2] = !_data.StakeVariants[0];
             _data.StakeVariants[3] = true;
 
@@ -3853,7 +3855,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
             stakeMsg.Add(minimumStakeAligned);
             stakeMsg2.Add(minimumStakeAligned);
-            stakeMsg2.Add(ClientData.StakeStep);
+            stakeMsg2.Add(_data.StakeStep);
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
 
@@ -3879,8 +3881,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 _gameActions.SendMessage(stakeMsg2.Build(), _data.ShowMan.Name);
             }
 
-            var minimumStakeNew = _data.Stake != -1 ? _data.Stake + ClientData.StakeStep : cost;
-            var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStakeNew / ClientData.StakeStep) * ClientData.StakeStep;
+            var minimumStakeNew = _data.Stake != -1 ? _data.Stake + _data.StakeStep : cost;
+            var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStakeNew / _data.StakeStep) * _data.StakeStep;
             
             _data.StakeModes = StakeModes.AllIn;
 
@@ -4191,7 +4193,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                         if (Engine.CanMoveBack) // Not the beginning of a round
                         {
                             _data.ChooserIndex = index;
-                            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                            _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
                         }
                     }
                 }
@@ -4497,7 +4499,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             // Showing advertisement
             try
             {
-                var ad = ClientData.Host.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
+                var ad = _data.Host.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
 
                 if (!string.IsNullOrEmpty(ad))
                 {
@@ -4507,7 +4509,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
 #if !DEBUG
                     // Advertisement could not be skipped
-                    ClientData.MoveNextBlocked = !ClientData.Settings.AppSettings.Managed;
+                    _data.MoveNextBlocked = !_data.Settings.AppSettings.Managed;
 #endif
                     adShown = true;
 
@@ -4544,7 +4546,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
         _data.AnswererIndex = _data.ChooserIndex;
         _data.QuestionPlayState.SetSingleAnswerer(_data.ChooserIndex);
 
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, '+');
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, '+');
 
         ScheduleExecution(Tasks.MoveNext, 5);
     }
@@ -4581,7 +4583,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
                 {
                     _data.ChooserIndex = _data.AnswererIndex = i;
                     _data.QuestionPlayState.SetSingleAnswerer(i);
-                    _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                    _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
                 }
             }
 
@@ -4908,7 +4910,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
     private int DetectPlayerIndexWithLowestSum()
     {
         var minSum = _data.Players.Min(p => p.Sum);
-        return ClientData.Players.TakeWhile(p => p.Sum != minSum).Count();
+        return _data.Players.TakeWhile(p => p.Sum != minSum).Count();
     }
 
     internal void SetAnswerersByAllHiddenStakes()
@@ -4918,10 +4920,10 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         var hasConnectedPlayers = _data.Players.Any(p => p.IsConnected);
 
-        for (var i = 0; i < ClientData.Players.Count; i++)
+        for (var i = 0; i < _data.Players.Count; i++)
         {
-            if ((!hasConnectedPlayers || ClientData.Players[i].IsConnected) &&
-                (ClientData.Players[i].Sum > 0 || ClientData.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes))
+            if ((!hasConnectedPlayers || _data.Players[i].IsConnected) &&
+                (_data.Players[i].Sum > 0 || _data.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes))
             {
                 answerers.Add(i);
             }
@@ -4940,8 +4942,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
             _gameActions.SendMessage(passMsg.ToString());
         }
 
-        ClientData.QuestionPlayState.SetMultipleAnswerers(answerers);
-        ClientData.QuestionPlayState.HiddenStakes = true;
+        _data.QuestionPlayState.SetMultipleAnswerers(answerers);
+        _data.QuestionPlayState.HiddenStakes = true;
         AskHiddenStakes();
     }
 
@@ -4975,7 +4977,7 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _data.Answerer.AddRightSum(_data.CurPriceRight);
         _data.ChooserIndex = _data.AnswererIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
         _gameActions.InformSums();
 
         _data.SkipQuestion?.Invoke();
@@ -5004,24 +5006,24 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
     internal void ShowAnswerOptions(Action? continuation)
     {
-        if (ClientData.QuestionPlayState.AnswerOptions == null)
+        if (_data.QuestionPlayState.AnswerOptions == null)
         {
             throw new InvalidOperationException("AnswerOptions == null");
         }
 
-        var nextTask = ClientData.QuestionPlayState.AnswerOptions.Length > 0 ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
+        var nextTask = _data.QuestionPlayState.AnswerOptions.Length > 0 ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
         ScheduleExecution(nextTask, 1, 0);
         _continuation = continuation;
     }
 
     internal void ShowNextAnswerOption(int optionIndex)
     {
-        if (ClientData.QuestionPlayState.AnswerOptions == null)
+        if (_data.QuestionPlayState.AnswerOptions == null)
         {
             throw new InvalidOperationException("AnswerOptions == null");
         }
 
-        var answerOption = ClientData.QuestionPlayState.AnswerOptions[optionIndex];        
+        var answerOption = _data.QuestionPlayState.AnswerOptions[optionIndex];        
 
         var messageBuilder = new MessageBuilder(Messages.Content)
             .Add(ContentPlacements.Screen)
@@ -5053,8 +5055,8 @@ public sealed class GameLogic : Logic<GameData>, ITaskRunHandler<Tasks>, IDispos
 
         _gameActions.SendMessage(messageBuilder.ToString());
 
-        var nextTask = optionIndex + 1 < ClientData.QuestionPlayState.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
-        ScheduleExecution(nextTask, ClientData.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? contentDuration : 1, optionIndex + 1);
+        var nextTask = optionIndex + 1 < _data.QuestionPlayState.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
+        ScheduleExecution(nextTask, _data.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? contentDuration : 1, optionIndex + 1);
     }
 
     internal void OnComplexContent(Dictionary<string, List<ContentItem>> contentTable)

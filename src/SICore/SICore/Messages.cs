@@ -13,11 +13,6 @@ public static class Messages
     public const string Accepted = "ACCEPTED";
 
     /// <summary>
-    /// User action error message.
-    /// </summary>
-    public const string ActionError = "ACTION_ERROR";
-
-    /// <summary>
     /// Реклама
     /// </summary>
     public const string Ads = "ADS";
@@ -728,6 +723,11 @@ public static class Messages
     /// </summary>
     [Obsolete("Use PlayerState instead")]
     public const string WrongTry = "WRONGTRY";
+
+    /// <summary>
+    /// Informs that the person has been kicked from the game.
+    /// </summary>
+    public const string YouAreKicked = "YOU_ARE_KICKED";
 
     /// <summary>
     /// Можно жать на кнопку

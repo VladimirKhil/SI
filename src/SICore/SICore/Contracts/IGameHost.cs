@@ -14,9 +14,7 @@ public interface IGameHost
     /// </summary>
     HostOptions Options { get; }
 
-    void OnError(Exception exc);
-
-    bool ShowBorderOnFalseStart { get; }
+    void SendError(Exception exc, bool isWarning = false);
 
     /// <summary>
     /// Maximum recommended image size.
@@ -35,11 +33,7 @@ public interface IGameHost
 
     bool AreCustomAvatarsSupported { get; }
 
-    void SendError(Exception exc, bool isWarning = false);
-
     void SaveReport(Results.GameResult result, CancellationToken cancellationToken = default);
-
-    void OnGameFinished(string packageId);
 
     /// <summary>
     /// Process advertisement request.

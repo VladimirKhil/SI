@@ -10,8 +10,6 @@ public abstract class GameHostBase : IGameHost
 {
     public abstract HostOptions Options { get; }
 
-    public abstract void OnError(Exception exc);
-
     public abstract void SendError(Exception exc, bool isWarning = false);
 
     public abstract void SaveReport(Results.GameResult result, CancellationToken cancellationToken = default);
@@ -22,11 +20,7 @@ public abstract class GameHostBase : IGameHost
         return null;
     }
 
-    public abstract void OnGameFinished(string packageId);
-
     public abstract void LogWarning(string message);
-
-    public abstract bool ShowBorderOnFalseStart { get; }
 
     public abstract int MaxImageSizeKb { get; }
 

@@ -482,7 +482,7 @@
     <value>Нет вопросов для генерации</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Вопрос для себя без риска</value>
+    <value>Вопрос для себя</value>
   </data>
   <data name="NoSource" xml:space="preserve">
     <value>Отсутствует источник</value>
@@ -641,7 +641,7 @@
     <value>Вопрос с секретом без вопроса</value>
   </data>
   <data name="SecretPublicPrice" xml:space="preserve">
-    <value>Вопрос с секретом и объявленной стоимостью</value>
+    <value>Вопрос с секретом и стоимостью, объявляемой до передачи</value>
   </data>
   <data name="SecretQuestion" xml:space="preserve">
     <value>Вопрос с секретом</value>
@@ -665,7 +665,7 @@
     <value>Обычный</value>
   </data>
   <data name="SimpleQuestion" xml:space="preserve">
-    <value>Простой</value>
+    <value>Вопрос с кнопкой</value>
   </data>
   <data name="SIQuestions" xml:space="preserve">
     <value>Вопросы СИ</value>

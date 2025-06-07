@@ -1,5 +1,4 @@
-﻿using SICore.Contracts;
-using SIData;
+﻿using SIData;
 using SIUI.Model;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -14,11 +13,6 @@ namespace SICore;
 /// </summary>
 public abstract class Data : INotifyPropertyChanged
 {
-    /// <summary>
-    /// Game host.
-    /// </summary>
-    public IGameHost Host { get; }
-
     /// <summary>
     /// Game table info.
     /// </summary>
@@ -46,11 +40,6 @@ public abstract class Data : INotifyPropertyChanged
     }
 
     public StringBuilder PersonsUpdateHistory { get; } = new();
-
-    public Data(IGameHost gameManager)
-    {
-        Host = gameManager;
-    }
 
     protected static string PrintAccount(ViewerAccount viewerAccount) =>
         $"{viewerAccount?.Name}@{viewerAccount?.IsHuman}:{viewerAccount?.IsConnected}";

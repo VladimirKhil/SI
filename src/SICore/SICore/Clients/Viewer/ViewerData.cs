@@ -38,8 +38,6 @@ public sealed class ViewerData : Data
     /// </summary>
     public string? QuestionType { get; set; }
 
-    internal int LastStakerIndex { get; set; } = -1;
-
     public string Name { get; internal set; }
 
     public ViewerAccount? Me
@@ -53,27 +51,10 @@ public sealed class ViewerData : Data
 
     public bool IsInfoInitialized { get; set; }
 
-    private bool _isChatOpened = true;
-
-    public bool IsChatOpened
-    {
-        get => _isChatOpened;
-        set
-        {
-            if (_isChatOpened != value)
-            {
-                _isChatOpened = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     /// <summary>
     /// Адрес изображения участника
     /// </summary>
     internal string Picture { get; set; }
-
-    internal bool FalseStart { get; set; } = true;
 
     public PersonData PersonDataExtensions { get; private set; } = new();
 
@@ -238,18 +219,13 @@ public sealed class ViewerData : Data
     /// </summary>
     public Account[] DefaultComputerPlayers { get; set; }
 
-    private bool _isUpdating = false;
-
     internal void BeginUpdatePersons(string? reason = null)
     {
-        _isUpdating = true;
         PersonsUpdateHistory.Append($"Before ({reason}): ").Append(PrintPersons());
     }
 
     internal void EndUpdatePersons()
     {
-        _isUpdating = false;
-
         OnMainPersonsChanged();
         OnAllPersonsChanged();
     }
@@ -264,11 +240,6 @@ public sealed class ViewerData : Data
     /// Contains information about system errors in the game, which would be good to send to the author, but do not lead to a system crash.
     /// </summary>
     public StringBuilder SystemLog { get; } = new();
-
-    public ViewerData(IGameHost gameHost) : base(gameHost)
-    {
-
-    }
 
     public string PackageId { get; internal set; }
 

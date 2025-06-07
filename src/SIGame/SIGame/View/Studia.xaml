@@ -340,7 +340,7 @@
                 <local:ShowmanView Grid.Row="2" DataContext="{Binding Showman}" />
             </Grid>
 
-            <Expander Grid.Column="4" IsExpanded="{Binding Data.IsChatOpened}" Style="{DynamicResource ExpanderStyle1}">
+            <Expander Grid.Column="4" IsExpanded="{Binding IsChatOpened}" Style="{DynamicResource ExpanderStyle1}">
                 <local:GameChat />
             </Expander>
 

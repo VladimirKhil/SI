@@ -244,6 +244,7 @@ public sealed class NewViewModel : WorkspaceViewModel
         }
 
         doc.Package.HasQualityControl = _qualityControl;
+        doc.Package.Language = _appSettings.Language ?? "";
         return doc;
     }
 

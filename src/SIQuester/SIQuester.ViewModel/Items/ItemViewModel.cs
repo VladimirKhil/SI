@@ -76,7 +76,7 @@ public abstract class ItemViewModel<T> : ModelViewBase, IItemViewModel
 
     public abstract ICommand Add { get; protected set; }
 
-    public abstract ICommand Remove { get; protected set; }
+    public abstract ICommand? Remove { get; protected set; }
 
     protected ItemViewModel(T model)
     {
@@ -127,7 +127,15 @@ public abstract class ItemViewModel<T> : ModelViewBase, IItemViewModel
         Info.Comments.Text = Resources.Comment;
     }
 
-    private void SetCosts_Executed(object? arg) => UpdateCosts((CostSetter)arg);
+    private void SetCosts_Executed(object? arg)
+    {
+        if (arg is not CostSetter costSetter)
+        {
+            return;
+        }
+
+        UpdateCosts(costSetter);
+    }
 
     protected virtual void UpdateCosts(CostSetter costSetter) { }
 }

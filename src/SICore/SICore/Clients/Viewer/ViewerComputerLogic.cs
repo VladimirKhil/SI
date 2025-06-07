@@ -8,7 +8,7 @@ namespace SICore;
 /// <summary>
 /// Defines a computer viewer logic.
 /// </summary>
-internal class ViewerComputerLogic : Logic<ViewerData>, IPersonController
+internal class ViewerComputerLogic : IPersonController
 {
     protected readonly ViewerActions _viewerActions;
 
@@ -21,13 +21,15 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IPersonController
 
     private readonly GameRole _role;
 
+    private readonly ViewerData _data;
+
     internal ViewerComputerLogic(
         ViewerData data,
         ViewerActions viewerActions,
         IIntelligence intelligence,
         GameRole role)
-        : base(data)
     {
+        _data = data;
         _viewerActions = viewerActions;
         _role = role;
 
@@ -108,11 +110,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IPersonController
 
     public void Resume() { }
 
-    virtual public void Try()
-    {
-        // Do nothing
-    }
-
     virtual public void EndTry(string text)
     {
         // Do nothing
@@ -162,7 +159,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IPersonController
 
     public void OnPauseChanged(bool isPaused)
     {
-        ClientData.TInfo.Pause = isPaused;
+        _data.TInfo.Pause = isPaused;
     }
 
     public void TableLoaded()
@@ -301,4 +298,8 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IPersonController
     }
 
     public void MakeStake() => _player.MakeStake();
+
+    public void OnPersonStake(int stakerIndex) => _player.OnPersonStake(stakerIndex);
+
+    public void OnPersonsUpdated() => _player.OnPersonsUpdated();
 }

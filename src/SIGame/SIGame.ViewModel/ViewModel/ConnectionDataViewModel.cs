@@ -5,7 +5,6 @@ using SICore;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
-using SICore.Services;
 using SIData;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
@@ -270,7 +269,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         var humanPlayer = Human;
         var name = humanPlayer.Name;
 
-        var data = new ViewerData(BackLink.Default)
+        var data = new ViewerData()
         {
             IsNetworkGame = true
         };

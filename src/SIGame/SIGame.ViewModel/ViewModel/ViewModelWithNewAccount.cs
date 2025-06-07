@@ -1,7 +1,6 @@
 ﻿using SICore;
-using SICore.Contracts;
-using SICore.Network.Servers;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -27,17 +26,17 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
 
     protected ICommand _closeContent;
 
-    private NavigatorViewModel _content;
+    private NavigatorViewModel? _content;
 
-    public NavigatorViewModel Content
+    public NavigatorViewModel? Content
     {
         get => _content;
         set { if (_content != value) { _content = value; OnPropertyChanged(); } }
     }
 
-    private string _fullError;
+    private string? _fullError;
 
-    public string FullError
+    public string? FullError
     {
         get => _fullError;
         set { if (_fullError != value) { _fullError = value; OnPropertyChanged(); } }
@@ -53,13 +52,13 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
 
     protected ViewModelWithNewAccount()
     {
-        ShowFullError = new CustomCommand(ShowFullError_Executed);
+        ShowFullError = new SimpleCommand(ShowFullError_Executed);
     }
 
     protected ViewModelWithNewAccount(TModel model)
         : base(model)
     {
-        ShowFullError = new CustomCommand(ShowFullError_Executed);
+        ShowFullError = new SimpleCommand(ShowFullError_Executed);
     }
 
     private void ShowFullError_Executed(object? arg)
@@ -71,7 +70,7 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
     {
         base.Initialize();
         
-        _closeContent = new CustomCommand(CloseContent_Executed);
+        _closeContent = new SimpleCommand(CloseContent_Executed);
     }
 
     protected virtual void CloseContent_Executed(object? arg)

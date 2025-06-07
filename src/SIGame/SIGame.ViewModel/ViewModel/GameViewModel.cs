@@ -582,6 +582,21 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         set { if (_currentPerson != value) { _currentPerson = value; OnPropertyChanged(); UpdateCurrentPlayerCommands(); } }
     }
 
+    private bool _isChatOpened = true;
+
+    public bool IsChatOpened
+    {
+        get => _isChatOpened;
+        set
+        {
+            if (_isChatOpened != value)
+            {
+                _isChatOpened = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -828,7 +843,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void SendStake_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.Stake, 1, Host.MyData.PersonDataExtensions.StakeInfo.Stake);
+        Host?.Actions.SendMessageWithArgs(Messages.Stake, 1, Host.ClientData.PersonDataExtensions.StakeInfo.Stake);
         ClearSelections();
     }
 
@@ -852,7 +867,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void SendStakeNew_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.SetStake, SICore.Models.StakeModes.Stake, Host.MyData.PersonDataExtensions.StakeInfo.Stake);
+        Host?.Actions.SendMessageWithArgs(Messages.SetStake, SICore.Models.StakeModes.Stake, Host.ClientData.PersonDataExtensions.StakeInfo.Stake);
         ClearSelections();
     }
 
@@ -880,7 +895,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host.Actions.PressButton(Host.MyData.TryStartTime);
+        Host.Actions.PressButton(Host.ClientData.TryStartTime);
         GameButtonPressed?.Invoke();
         DisableGameButton(false);
         ReleaseGameButton();
@@ -926,7 +941,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         try
         {
-            await Task.Delay(Host.MyData.ButtonBlockingTime * 1000);
+            await Task.Delay(Host.ClientData.ButtonBlockingTime * 1000);
             EnableGameButton(false);
         }
         catch (Exception exc)
@@ -938,7 +953,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     private void AddTable_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
 
     internal void UpdateAddTableCommand() =>
-        AddTable.CanBeExecuted = Host != null && Host.IsHost && Host.MyData.Players.Count < Constants.MaxPlayers;
+        AddTable.CanBeExecuted = Host != null && Host.IsHost && Host.ClientData.Players.Count < Constants.MaxPlayers;
 
     private void ForceStart_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Start);
 
@@ -1100,7 +1115,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
 
         FreeTable.CanBeExecuted = Host.IsHost && CurrentPerson != null && CurrentPerson.IsHuman && CurrentPerson.IsConnected;
-        DeleteTable.CanBeExecuted = Host.IsHost && Host.MyData.Players.Count > 2 && CurrentPerson != null && CurrentPerson.IsPlayer;
+        DeleteTable.CanBeExecuted = Host.IsHost && Host.ClientData.Players.Count > 2 && CurrentPerson != null && CurrentPerson.IsPlayer;
         ChangeType.CanBeExecuted = Host.IsHost;
         Replace.CanBeExecuted = Host.IsHost && CurrentPerson != null && CurrentPerson.Others != null && CurrentPerson.Others.Any();
         Kick.CanBeExecuted = Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = Host.IsHost;
@@ -1311,7 +1326,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Move.CanBeExecuted = Data.Stage != GameStage.Before && (Host != null && Host.IsHost || IsShowman);
         ChangePauseInGame.CanBeExecuted = Move.CanBeExecuted;
         _changeSums.CanBeExecuted = _changeActivePlayer.CanBeExecuted = IsShowman;
-        ForceStart.CanBeExecuted = Host != null && Host.IsHost && Host.MyData.Stage == GameStage.Before;
+        ForceStart.CanBeExecuted = Host != null && Host.IsHost && Host.ClientData.Stage == GameStage.Before;
         PressGameButton.CanBeExecuted = Pass.CanBeExecuted = IsPlayer;
         Ready.CanBeExecuted = UnReady.CanBeExecuted = IsPlayer || IsShowman;
         Apellate.CanBeExecuted &= IsPlayer;

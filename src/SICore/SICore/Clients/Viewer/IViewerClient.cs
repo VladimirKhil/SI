@@ -15,7 +15,7 @@ public interface IViewerClient : IDisposable
 
     GameRole Role { get; }
 
-    ViewerData MyData { get; }
+    ViewerData ClientData { get; }
 
     IPersonController MyLogic { get; }
 

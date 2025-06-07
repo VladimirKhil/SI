@@ -88,7 +88,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public AppSettingsViewModel Settings { get; private set; }
 
-    public CustomCommand Cancel { get; private set; }
+    public ICommand Cancel { get; private set; }
 
     private readonly StartMenuViewModel _startMenu;
 
@@ -129,17 +129,17 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         MainMenu = new MainMenuViewModel(userSettings) { IsVisible = false };
 
-        BackLink.Default = new BackLink(userSettings, appState, serviceProvider);
+        BackLink.Default = new BackLink(appState, serviceProvider);
 
-        Cancel = new CustomCommand(Cancel_Executed);
+        Cancel = new SimpleCommand(Cancel_Executed);
 
         NewGame = new SimpleCommand(New_Executed);
         Open = new AsyncCommand(OnlineGame_Executed);
-        NetworkGame = new CustomCommand(NetworkGame_Executed);
-        BestPlayers = new CustomCommand(Best_Executed);
-        About = new CustomCommand(About_Executed);
+        NetworkGame = new SimpleCommand(NetworkGame_Executed);
+        BestPlayers = new SimpleCommand(Best_Executed);
+        About = new SimpleCommand(About_Executed);
 
-        SetProfile = new CustomCommand(SetProfile_Executed);
+        SetProfile = new SimpleCommand(SetProfile_Executed);
 
         _startMenu = new StartMenuViewModel(Human, SetProfile);
 
@@ -156,8 +156,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         Human.NewAccountCreated += HumanPlayer_NewAccountCreated;
         Human.AccountEditing += Human_AccountEditing;
 
-        ShowSlideMenu = new CustomCommand(ShowSlideMenu_Executed);
-        CloseSlideMenu = new CustomCommand(CloseSlideMenu_Executed);
+        ShowSlideMenu = new SimpleCommand(ShowSlideMenu_Executed);
+        CloseSlideMenu = new SimpleCommand(CloseSlideMenu_Executed);
     }
 
     private void ShowSlideMenu_Executed(object? arg)
@@ -183,7 +183,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         {
             Data = Human,
             Title = Resources.NewAccount,
-            Cancel = new CustomCommand(arg =>
+            Cancel = new SimpleCommand(arg =>
             {
                 Human.NewAccount = null;
                 Human.HumanPlayer = _commonSettings.Humans2.Last();
@@ -200,7 +200,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         {
             Data = Human,
             Title = Resources.ChangeAccount,
-            Cancel = new CustomCommand(
+            Cancel = new SimpleCommand(
                 arg =>
                 {
                     Human.NewAccount = null;

@@ -70,6 +70,12 @@ public static class QuestionTypes
     public const string NoRisk = "noRisk";
 
     /// <summary>
+    /// Question for yourself.
+    /// </summary>
+    /// <remarks>Reserved for <see cref="NoRisk" /> question replacement.</remarks>
+    public const string ForYourself = "forYourself";
+
+    /// <summary>
     /// Question for all players.
     /// </summary>
     public const string ForAll = "forAll";

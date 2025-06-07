@@ -47,7 +47,7 @@ public class Viewer : Actor, IViewerClient
 
     public IPersonController MyLogic => _logic;
 
-    public ViewerData MyData => ClientData;
+    public ViewerData ClientData { get; }
 
     public string? Avatar { get; set; }
 
@@ -56,8 +56,6 @@ public class Viewer : Actor, IViewerClient
         IsHost = isHost;
         ClientData.Name = _client.Name;
     }
-
-    public ViewerData ClientData { get; }
 
     /// <summary>
     /// Initializes a new instance of <see cref="Viewer" /> class.
@@ -206,15 +204,6 @@ public class Viewer : Actor, IViewerClient
                         break;
                     }
 
-                case Messages.FalseStart:
-                    {
-                        if (mparams.Length > 1)
-                        {
-                            ClientData.FalseStart = mparams[1] != "-";
-                        }
-                        break;
-                    }
-
                 case Messages.Replic:
                     OnReplic(mparams);
                     break;
@@ -335,7 +324,6 @@ public class Viewer : Actor, IViewerClient
                                     break;
 
                                 case GameStage.After:
-                                    ClientData.Host.OnGameFinished(ClientData.PackageId);
                                     ClientData.StageName = "";
                                     break;
                             }
@@ -535,22 +523,8 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.Try:
-                    {
-                        #region Try
-
-                        if (mparams.Length > 1 && mparams[1] == MessageParams.Try_NotFinished)
-                        {
-                            if (!ClientData.Host.ShowBorderOnFalseStart)
-                            {
-                                return;
-                            }
-                        }
-
-                        _logic.Try();
-
-                        #endregion
-                        break;
-                    }
+                    _logic.Try(mparams.Length > 1 && mparams[1] == MessageParams.Try_NotFinished);
+                    break;
 
                 case Messages.EndTry:
                     if (mparams.Length > 1)
@@ -1116,15 +1090,13 @@ public class Viewer : Actor, IViewerClient
     private void OnPersonStake(string[] mparams)
     {
         if (mparams.Length < 3 ||
-            !int.TryParse(mparams[1], out var lastStakerIndex) ||
-            lastStakerIndex < 0 ||
-            lastStakerIndex >= ClientData.Players.Count ||
+            !int.TryParse(mparams[1], out var stakerIndex) ||
+            stakerIndex < 0 ||
+            stakerIndex >= ClientData.Players.Count ||
             !int.TryParse(mparams[2], out var stakeType))
         {
             return;
         }
-
-        ClientData.LastStakerIndex = lastStakerIndex;
 
         int stake;
 
@@ -1135,7 +1107,7 @@ public class Viewer : Actor, IViewerClient
         else if (stakeType == 2)
         {
             stake = -2;
-            ClientData.Players[ClientData.LastStakerIndex].State = PlayerState.Pass;
+            ClientData.Players[stakerIndex].State = PlayerState.Pass;
         }
         else if (stakeType == 3)
         {
@@ -1150,12 +1122,12 @@ public class Viewer : Actor, IViewerClient
 
             if (mparams.Length > 4)
             {
-                ClientData.Players[ClientData.LastStakerIndex].SafeStake = true;
+                ClientData.Players[stakerIndex].SafeStake = true;
             }
         }
 
-        ClientData.Players[ClientData.LastStakerIndex].Stake = stake;
-        _logic.OnPersonStake();
+        ClientData.Players[stakerIndex].Stake = stake;
+        _logic.OnPersonStake(stakerIndex);
     }
 
     private void OnReplic(string[] mparams)
@@ -1970,7 +1942,7 @@ public class Viewer : Actor, IViewerClient
 
                 if (data == null)
                 {
-                    ClientData.Host.OnError(new Exception($"Avatar file not found: {ClientData.Picture}"));
+                    _client.Node.OnError(new Exception($"Avatar file not found: {ClientData.Picture}"), true);
                     return;
                 }
 

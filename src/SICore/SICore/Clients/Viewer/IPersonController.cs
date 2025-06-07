@@ -53,7 +53,7 @@ public interface IPersonController
     /// <summary>
     /// Можно жать на кнопку
     /// </summary>
-    void Try();
+    void Try(bool questionNotFinished) { }
 
     /// <summary>
     /// Жать уже нельзя
@@ -265,7 +265,7 @@ public interface IPersonController
 
     void OnHostChanged() { }
 
-    void OnPersonStake() { }
+    void OnPersonStake(int stakerIndex) { }
 
     void OnClientSwitch(IViewerClient viewer) { }
 

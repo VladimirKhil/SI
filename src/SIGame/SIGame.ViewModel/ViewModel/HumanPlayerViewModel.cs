@@ -1,7 +1,7 @@
-﻿using SICore;
-using SIGame.ViewModel.PlatformSpecific;
+﻿using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -145,8 +145,8 @@ public sealed class HumanPlayerViewModel : ViewModel<GameSettings>
 
     private void InitializeCore()
     {
-        EditAccount = new CustomCommand(EditAccount_Executed);
-        RemoveAccount = new CustomCommand(RemoveAccount_Executed);
+        EditAccount = new SimpleCommand(EditAccount_Executed);
+        RemoveAccount = new SimpleCommand(RemoveAccount_Executed);
 
         UpdateHumanPlayers();
 
@@ -161,7 +161,7 @@ public sealed class HumanPlayerViewModel : ViewModel<GameSettings>
         OnHumanPlayerChanged();
     }
 
-    private void EditAccount_Executed(object arg)
+    private void EditAccount_Executed(object? arg)
     {
         var humanAccount = arg as HumanAccount;
         var humanAccountCopy = new HumanAccount(humanAccount) { CanBeDeleted = true };
@@ -175,7 +175,7 @@ public sealed class HumanPlayerViewModel : ViewModel<GameSettings>
         AccountEditing?.Invoke();
     }
 
-    private void RemoveAccount_Executed(object arg)
+    private void RemoveAccount_Executed(object? arg)
     {
         if (arg is HumanAccount humanAccount
             && humanAccount.CanBeDeleted

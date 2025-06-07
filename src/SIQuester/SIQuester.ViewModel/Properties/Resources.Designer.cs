@@ -1051,7 +1051,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Question for yourself without risk.
+        ///   Ищет локализованную строку, похожую на Question for yourself.
         /// </summary>
         public static string NoRiskQuestion {
             get {
@@ -1528,7 +1528,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Secret question with announced cost.
+        ///   Ищет локализованную строку, похожую на Secret question with cost announced before giving.
         /// </summary>
         public static string SecretPublicPrice {
             get {
@@ -1600,7 +1600,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Simple.
+        ///   Ищет локализованную строку, похожую на Question with button.
         /// </summary>
         public static string SimpleQuestion {
             get {
@@ -1690,7 +1690,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Question with stake for all.
+        ///   Ищет локализованную строку, похожую на Question for all with stake.
         /// </summary>
         public static string StakeAllQuestion {
             get {

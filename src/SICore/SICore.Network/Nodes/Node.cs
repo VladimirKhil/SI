@@ -183,10 +183,8 @@ public abstract class Node : INode
     {
         foreach (var client in _clients.Values)
         {
-            Debug.WriteLine($"Checking client: {client.Name}; message.Receiver = {message.Receiver}.");
             if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || string.IsNullOrEmpty(client.Name) || !message.IsSystem && !message.IsPrivate)
             {
-                Debug.WriteLine($"Message added to client: {client.Name}");
                 client.AddIncomingMessage(in message);
             }
             else if (!IsMain && !_wrongUserMessageShown)
@@ -198,28 +196,13 @@ public abstract class Node : INode
 
         if (IsMain)
         {
-            // Надо переслать это сообщение остальным
+            // Need to forward this message to other nodes
             await ConnectionsLock.WithLockAsync(async () =>
             {
                 foreach (var connection in Connections)
                 {
-                    bool send;
-
-                    if (IsMain)
-                    {
-                        send = (connection.UserName != message.Sender)
-                            && ((connection.UserName == message.Receiver)
-                            || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
-                    }
-                    else
-                    {
-                        lock (connection.ClientsSync)
-                        {
-                            send = !connection.Clients.Contains(message.Sender)
-                                && (connection.Clients.Contains(message.Receiver)
-                                || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
-                        }
-                    }
+                    var send = (connection.UserName != message.Sender)
+                        && ((connection.UserName == message.Receiver) || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
 
                     if (send)
                     {

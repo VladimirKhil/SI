@@ -492,7 +492,7 @@ Humor</value>
     <value>No questions to generate</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Question for yourself without risk</value>
+    <value>Question for yourself</value>
   </data>
   <data name="NoSource" xml:space="preserve">
     <value>Source is missing</value>
@@ -651,7 +651,7 @@ Humor</value>
     <value>Secret question without a question</value>
   </data>
   <data name="SecretPublicPrice" xml:space="preserve">
-    <value>Secret question with announced cost</value>
+    <value>Secret question with cost announced before giving</value>
   </data>
   <data name="SecretQuestion" xml:space="preserve">
     <value>Secret question</value>
@@ -675,7 +675,7 @@ Humor</value>
     <value>Regular</value>
   </data>
   <data name="SimpleQuestion" xml:space="preserve">
-    <value>Simple</value>
+    <value>Question with button</value>
   </data>
   <data name="SIQuestions" xml:space="preserve">
     <value>SI questions</value>
@@ -705,7 +705,7 @@ Humor</value>
     <value>Error searching for questions</value>
   </data>
   <data name="StakeAllQuestion" xml:space="preserve">
-    <value>Question with stake for all</value>
+    <value>Question for all with stake</value>
   </data>
   <data name="StakeQuestion" xml:space="preserve">
     <value>Question with stake</value>

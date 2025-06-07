@@ -19,6 +19,11 @@ namespace SICore;
 public sealed class GameData : Data
 {
     /// <summary>
+    /// Game host.
+    /// </summary>
+    public IGameHost Host { get; }
+
+    /// <summary>
     /// Настройки игры
     /// </summary>
     public IGameSettingsCore<AppSettingsCore> Settings { get; }
@@ -141,11 +146,6 @@ public sealed class GameData : Data
     public DecisionType Decision { get; set; }
 
     /// <summary>
-    /// Is any decision being awaited now.
-    /// </summary>
-    private bool _isWaiting = false;
-
-    /// <summary>
     /// Currently playing question.
     /// </summary>
     internal Question? Question { get; set; }
@@ -201,11 +201,6 @@ public sealed class GameData : Data
     public string AppellationSource { get; set; } = "";
 
     /// <summary>
-    /// Писать ли сообщение ожидания
-    /// </summary>
-    internal bool WaitingMessage = true;
-
-    /// <summary>
     /// Отвеченные неверные версии
     /// </summary>
     internal List<string> UsedWrongVersions = new();
@@ -216,23 +211,9 @@ public sealed class GameData : Data
     internal HashSet<Theme> ThemeInfoShown { get; } = new();
 
     /// <summary>
-    /// Ожидается ли решение
+    /// Is any decision being awaited now.
     /// </summary>
-    internal bool IsWaiting
-    {
-        set
-        {
-            _isWaiting = value;
-            if (_isWaiting)
-            {
-                WaitingMessage = true;
-            }
-        }
-        get
-        {
-            return _isWaiting;
-        }
-    }
+    internal bool IsWaiting { get; set; }
 
     /// <summary>
     /// Game results.
@@ -613,6 +594,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Will be removed later.
     /// </summary>
+    [Obsolete]
     public GameStages LegacyStage { get; internal set; }
 
     /// <summary>
@@ -638,8 +620,9 @@ public sealed class GameData : Data
     /// </summary>
     public IReadOnlyList<Theme>? Themes { get; internal set; }
 
-    public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings) : base(gameHost)
+    public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings)
     {
+        Host = gameHost;
         _showMan = showman;
         Stakes = new StakesState(Players);
         Settings = settings;

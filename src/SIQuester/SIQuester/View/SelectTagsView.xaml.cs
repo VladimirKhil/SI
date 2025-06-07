@@ -25,4 +25,10 @@ public partial class SelectTagsView : Window
 
         viewModel.AddItem.Execute(null);
     }
+
+    private void Button_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        DialogResult = true;
+        Close();
+    }
 }

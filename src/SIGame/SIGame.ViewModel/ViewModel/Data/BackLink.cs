@@ -17,28 +17,23 @@ public sealed class BackLink : GameHostBase
 
     internal static BackLink Default { get; set; }
 
-    private readonly UserSettings _userSettings;
     private readonly AppState _appState;
 
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<BackLink> _logger;
 
     internal BackLink(
-        UserSettings userSettings,
         AppState appState,
         IServiceProvider serviceProvider)
     {
-        _userSettings = userSettings;
         _appState = appState;
         _serviceProvider = serviceProvider;
         _logger = serviceProvider.GetRequiredService<ILogger<BackLink>>();
     }
 
-    public override void OnError(Exception exc) => PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Error, true);
+    public override void SendError(Exception exc, bool isWarning = false) => PlatformSpecific.PlatformManager.Instance.SendErrorReport(exc);
 
     public override void LogWarning(string message) => _logger.LogWarning("Game warning: {warning}", message);
-
-    public override void SendError(Exception exc, bool isWarning = false) => PlatformSpecific.PlatformManager.Instance.SendErrorReport(exc);
 
     /// <summary>
     /// Sends game results info to server.
@@ -68,19 +63,6 @@ public sealed class BackLink : GameHostBase
             }
         }
     }
-
-    public override void OnGameFinished(string packageId)
-    {
-        PlatformSpecific.PlatformManager.Instance.ExecuteOnUIThread(() =>
-        {
-            if (!string.IsNullOrEmpty(packageId) && !_userSettings.PackageHistory.Contains(packageId))
-            {
-                _userSettings.PackageHistory.Add(packageId);
-            }
-        });
-    }
-
-    public override bool ShowBorderOnFalseStart => _userSettings.GameSettings.AppSettings.ShowBorderOnFalseStart;
 
     public override int MaxImageSizeKb => int.MaxValue;
 

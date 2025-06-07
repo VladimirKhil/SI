@@ -126,6 +126,7 @@
                                             Content="{Binding Name}"
                                             Command="{Binding DataContext.AddKnownItem, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}"
                                             CommandParameter="{Binding Name}"
+                                            MouseDoubleClick="Button_MouseDoubleClick"
                                             Margin="4"
                                             Padding="4,10"
                                             Width="150"

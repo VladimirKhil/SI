@@ -814,7 +814,7 @@ public sealed class Game : Actor
                             }
                             catch (Exception ex)
                             {
-                                ClientData.Host.OnError(ex);
+                                ClientData.Host.SendError(ex, true);
                             }
 
                             #endregion
@@ -1246,36 +1246,38 @@ public sealed class Game : Actor
             return;
         }
 
-        var person = args[1];
+        var clientName = args[1];
 
-        if (!ClientData.AllPersons.TryGetValue(person, out var per))
+        if (!ClientData.AllPersons.TryGetValue(clientName, out var person))
         {
             return;
         }
 
-        if (per.Name == message.Sender)
+        if (person.Name == message.Sender)
         {
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickYouself);
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
-        if (!per.IsHuman)
+        if (!person.IsHuman)
         {
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickBots);
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
 
-        var clientId = Master.Kick(person);
+        _gameActions.SendMessageToWithArgs(message.Sender, Messages.YouAreKicked);
+        OnDisconnectRequested(clientName);
+
+        var clientId = Master.Kick(clientName);
 
         if (clientId.Length > 0)
         {
-            _gameActions.SendMessageWithArgs(Messages.Banned, clientId, person);
+            _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
         }
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, person));
-        OnDisconnectRequested(person);
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, clientName));
     }
 
     private void OnBan(Message message, string[] args)
@@ -1306,6 +1308,9 @@ public sealed class Game : Actor
             return;
         }
 
+        _gameActions.SendMessageToWithArgs(message.Sender, Messages.YouAreKicked);
+        OnDisconnectRequested(clientName);
+
         var clientId = Master.Kick(clientName, true);
 
         if (clientId.Length > 0)
@@ -1314,7 +1319,6 @@ public sealed class Game : Actor
         }
 
         _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, clientName));
-        OnDisconnectRequested(clientName);
     }
 
     private void OnSetHost(Message message, string[] args)
@@ -1808,6 +1812,7 @@ public sealed class Game : Actor
         OnPersonsChanged(false, withError);
     }
 
+    [Obsolete]
     private async ValueTask OnConnectAsync(Message message, string[] args)
     {
         if (args.Length < 4)
@@ -3776,7 +3781,7 @@ public sealed class Game : Actor
         ClientData.Players[index] = newAccount;
 
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        var data = new ViewerData(ClientData.Host);
+        var data = new ViewerData();
         var actions = new ViewerActions(playerClient);
         var logic = new ViewerComputerLogic(data, actions, new Intelligence(account), GameRole.Player);
         _ = new Player(playerClient, account, false, logic, actions, data);
@@ -3805,7 +3810,7 @@ public sealed class Game : Actor
         ClientData.ShowMan = newAccount;
 
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        var data = new ViewerData(ClientData.Host);
+        var data = new ViewerData();
         var actions = new ViewerActions(showmanClient);
         
         var logic = new ViewerComputerLogic(

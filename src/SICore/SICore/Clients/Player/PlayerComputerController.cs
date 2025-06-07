@@ -29,6 +29,8 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private readonly HistoryLog _historyLog = new();
 
+    private int _lastStakerIndex = -1;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PlayerComputerController"/> class.
     /// </summary>
@@ -225,7 +227,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 _data.TInfo.RoundInfo,
                 _data.PersonDataExtensions.StakeInfo,
                 _data.QuestionIndex,
-                _data.LastStakerIndex,
+                _lastStakerIndex,
                 _data.PersonDataExtensions.Var,
                 GetTimePercentage(0));
 
@@ -363,6 +365,16 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     /// Returns the maximum opponent score.
     /// </summary>
     private int BestOpponentScore() => _data.Players.Where(player => player.Name != _viewerActions.Client.Name).Max(player => player.Sum);
+
+    internal void OnPersonStake(int stakerIndex) => _lastStakerIndex = stakerIndex;
+
+    internal void OnPersonsUpdated()
+    {
+        if (_lastStakerIndex >= _data.Players.Count)
+        {
+            _lastStakerIndex = -1; // Reset if index is out of bounds
+        }
+    }
 
     internal enum PlayerTasks
     {

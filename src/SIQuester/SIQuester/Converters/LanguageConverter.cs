@@ -9,8 +9,16 @@ namespace SIQuester.Converters;
 [ValueConversion(typeof(string), typeof(string))]
 public sealed class LanguageConverter : IValueConverter
 {
+    private static readonly Dictionary<string, string> LanguageNames = new()
+    {
+        { "ru-RU", "Русский" },
+        { "sr-RS", "Srpski" }
+    };
+
+    private static readonly string DefaultLanguage = "English";
+
     public object Convert(object? value, Type targetType, object parameter, CultureInfo culture) =>
-        value?.ToString() == "en-US" ? "English" : "Русский";
+        value is string str && LanguageNames.TryGetValue(str, out var name) ? name : DefaultLanguage;
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         throw new NotImplementedException();

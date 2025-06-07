@@ -97,7 +97,9 @@ internal sealed class Intelligence : IIntelligence
 
         if (!hasActiveQuestions)
         {
-            throw new InvalidOperationException("No active questions on the game table");
+            return (-1, -1);
+            // TODO: bring back exception when question selection cancellation is implemented (after toggle or round switch)
+            // throw new InvalidOperationException("No active questions on the game table");
         }
 
         var maxQuestionCount = table.Max(theme => theme.Questions.Count);
