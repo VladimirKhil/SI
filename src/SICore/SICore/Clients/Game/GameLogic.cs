@@ -1329,7 +1329,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 s.Append(GetRandomString(LO[nameof(R.Wrong)])).Append(' ');
             }
 
-            var outcome = _data.Settings.AppSettings.IgnoreWrong ? 0 : _data.CurPriceWrong;
+            var outcome = _data.CurPriceWrong;
 
             if (_data.QuestionPlayState.AnswerOptions != null && _data.Answerer.Answer != null)
             {
@@ -3091,11 +3091,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         if (settings.Oral)
         {
             rules.Add(LO[nameof(R.TypeOral)]);
-        }
-
-        if (settings.IgnoreWrong)
-        {
-            rules.Add(LO[nameof(R.TypeIgnoreWrong)]);
         }
 
         if (settings.Managed)
@@ -4947,15 +4942,19 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         AskHiddenStakes();
     }
 
-    internal void OnSetNoRiskPrice()
+    internal void OnSetPriceForYourself()
     {
         if (_data.ChooserIndex == -1)
         {
             _data.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
         }
 
-        _data.CurPriceRight *= 2;
-        _data.CurPriceWrong = 0;
+        _data.CurPriceRight *= _data.Settings.AppSettings.QuestionForYourselfFactor;
+
+        if (_data.Settings.AppSettings.IgnoreWrong || _data.Settings.AppSettings.QuestionForYourselfPenalty == PenaltyType.None)
+        {
+            _data.CurPriceWrong = 0;
+        }
 
         _gameActions.ShowmanReplic(
             $"{_data.Chooser!.Name}, {string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight))}");
@@ -4963,6 +4962,22 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
 
         ScheduleExecution(Tasks.MoveNext, 20);
+    }
+
+    internal void OnSetPriceWithButton()
+    {
+        if (_data.Settings.AppSettings.IgnoreWrong || _data.Settings.AppSettings.QuestionWithButtonPenalty == PenaltyType.None)
+        {
+            _data.CurPriceWrong = 0;
+        }
+    }
+
+    internal void OnSetPriceForAll()
+    {
+        if (_data.Settings.AppSettings.IgnoreWrong || _data.Settings.AppSettings.QuestionForAllPenalty == PenaltyType.None)
+        {
+            _data.CurPriceWrong = 0;
+        }
     }
 
     internal void AcceptQuestion()

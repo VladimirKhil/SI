@@ -16,6 +16,12 @@ public static class QuestionTypes
     public const string Simple = "simple";
 
     /// <summary>
+    /// Question with button.
+    /// </summary>
+    /// <remarks>Reserved for <see cref="Simple" /> question replacement.</remarks>
+    public const string WithButton = "withButton";
+
+    /// <summary>
     /// Stake question type.
     /// </summary>
     [Obsolete("Use Stake question type")]

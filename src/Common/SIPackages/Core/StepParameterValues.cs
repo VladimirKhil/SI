@@ -80,9 +80,27 @@ public static class StepParameterValues
     public const string SetPriceMode_NoRisk = "noRisk";
 
     /// <summary>
+    /// SetPrice mode of question for yourself.
+    /// </summary>
+    /// <remarks>Reserved for <see cref="SetPriceMode_NoRisk" /> replacement.</remarks>
+    public const string SetPriceMode_ForYourself = "forYourself";
+
+    /// <summary>
     /// Select SetPrice mode.
     /// </summary>
     public const string SetPriceMode_Select = "select";
+
+    /// <summary>
+    /// SetPrice mode of question with button (default value).
+    /// </summary>
+
+    public const string SetPriceMode_WithButton = "withButton";
+
+    /// <summary>
+    /// SetPrice mode of question for all players (everybody will play).
+    /// </summary>
+
+    public const string SetPriceMode_ForAll = "forAll";
 
     /// <summary>
     /// SetAnswerType text type (default value).

@@ -20,8 +20,11 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultOralPlayersActions = true;
     public const bool DefaultManaged = false;
     public const bool DefaultIgnoreWrong = false;
+    public const PenaltyType DefaultQuestionWithButtonPenalty = PenaltyType.SubtractPoints;
+    public const PenaltyType DefaultQuestionForYourselfPenalty = PenaltyType.None;
+    public const PenaltyType DefaultQuestionForAllPenalty = PenaltyType.SubtractPoints;
+    public const int DefaultQuestionForYourselfFactor = 2;
     public const bool DefaultDisplaySources = false;
-    public const bool DefaultUsePingPenalty = false;
     public const ButtonPressMode DefaultButtonPressMode = ButtonPressMode.RandomWithinInterval;
     public const bool DefaultPreloadRoundContent = true;
     public const GameModes DefaultGameMode = GameModes.Tv;
@@ -210,10 +213,87 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     /// </summary>
     [XmlAttribute]
     [DefaultValue(DefaultIgnoreWrong)]
+    [Obsolete("Will be removed")]
     public bool IgnoreWrong
     {
         get => _ignoreWrong;
         set { _ignoreWrong = value; OnPropertyChanged(); }
+    }
+
+    private PenaltyType _questionWithButtonPenalty = DefaultQuestionWithButtonPenalty;
+
+    /// <summary>
+    /// Question with button penalty.
+    /// </summary>
+    [DefaultValue(DefaultQuestionWithButtonPenalty)]
+    public PenaltyType QuestionWithButtonPenalty
+    {
+        get => _questionWithButtonPenalty;
+        set
+        {
+            if (_questionWithButtonPenalty != value)
+            {
+                _questionWithButtonPenalty = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private PenaltyType _questionForYourselfPenalty = DefaultQuestionForYourselfPenalty;
+
+    /// <summary>
+    /// Question for yourself penalty.
+    /// </summary>
+    [DefaultValue(DefaultQuestionForYourselfPenalty)]
+    public PenaltyType QuestionForYourselfPenalty
+    {
+        get => _questionForYourselfPenalty;
+        set
+        {
+            if (_questionForYourselfPenalty != value)
+            {
+                _questionForYourselfPenalty = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private PenaltyType _questionForAllPenalty = DefaultQuestionForAllPenalty;
+
+    /// <summary>
+    /// Question for all penalty.
+    /// </summary>
+    [DefaultValue(DefaultQuestionForAllPenalty)]
+    public PenaltyType QuestionForAllPenalty
+    {
+        get => _questionForAllPenalty;
+        set
+        {
+            if (_questionForAllPenalty != value)
+            {
+                _questionForAllPenalty = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private int _questionForYourselfFactor = DefaultQuestionForYourselfFactor;
+
+    /// <summary>
+    /// Question for yourself factor.
+    /// </summary>
+    [DefaultValue(DefaultQuestionForYourselfFactor)]
+    public int QuestionForYourselfFactor
+    {
+        get => _questionForYourselfFactor;
+        set
+        {
+            if (_questionForYourselfFactor != value)
+            {
+                _questionForYourselfFactor = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -373,34 +453,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
 
     public AppSettingsCore() { } // For serializers
 
-    public AppSettingsCore(AppSettingsCore origin)
-    {
-        TimeSettings = origin.TimeSettings.Clone();
-
-        _readingSpeed = origin._readingSpeed;
-        _multimediaPort = origin._multimediaPort;
-        _falseStart = origin._falseStart;
-        PartialText = origin.PartialText;
-        PartialImages = origin.PartialImages;
-        _hintShowman = origin._hintShowman;
-        PlayAllQuestionsInFinalRound = origin.PlayAllQuestionsInFinalRound;
-        AllowEveryoneToPlayHiddenStakes = origin.AllowEveryoneToPlayHiddenStakes;
-        _oral = origin._oral;
-        _ignoreWrong = origin._ignoreWrong;
-        ButtonPressMode = origin.ButtonPressMode;
-        _preloadRoundContent = origin.PreloadRoundContent;
-        _gameMode = origin._gameMode;
-
-        _randomRoundsCount = origin._randomRoundsCount;
-        _randomThemesCount = origin._randomThemesCount;
-        _randomQuestionsBasePrice = origin._randomQuestionsBasePrice;
-
-        _useApellations = origin.UseApellations;
-        _displayAnswerOptionsOneByOne = origin.DisplayAnswerOptionsOneByOne;
-        _displayAnswerOptionsLabels = origin.DisplayAnswerOptionsLabels;
-
-        Culture = origin.Culture;
-    }
+    public AppSettingsCore(AppSettingsCore origin) => Set(origin);
 
     public void Set(AppSettingsCore settings)
     {
@@ -417,6 +470,10 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         Oral = settings._oral;
         OralPlayersActions = settings.OralPlayersActions;
         _ignoreWrong = settings._ignoreWrong;
+        QuestionWithButtonPenalty = settings.QuestionWithButtonPenalty;
+        QuestionForYourselfPenalty = settings.QuestionForYourselfPenalty;
+        QuestionForAllPenalty = settings.QuestionForAllPenalty;
+        QuestionForYourselfFactor = settings.QuestionForYourselfFactor;
         ButtonPressMode = settings.ButtonPressMode;
         _preloadRoundContent = settings.PreloadRoundContent;
         _gameMode = settings._gameMode;
