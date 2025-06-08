@@ -228,7 +228,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 _data.PersonDataExtensions.StakeInfo,
                 _data.QuestionIndex,
                 _lastStakerIndex,
-                _data.PersonDataExtensions.Var,
+                _data.PersonDataExtensions.StakeInfo.Modes,
                 GetTimePercentage(0));
 
             var msg = new MessageBuilder(Messages.SetStake).Add(stakeDecision);

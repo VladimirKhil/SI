@@ -421,7 +421,7 @@ public sealed class Game : Actor
     {
         var result = new List<ConnectionPersonData>
         {
-            new ConnectionPersonData { Name = ClientData.ShowMan.Name, Role = GameRole.Showman, IsOnline = ClientData.ShowMan.IsConnected }
+            new() { Name = ClientData.ShowMan.Name, Role = GameRole.Showman, IsOnline = ClientData.ShowMan.IsConnected }
         };
 
         for (int i = 0; i < ClientData.Players.Count; i++)
@@ -447,6 +447,124 @@ public sealed class Game : Actor
         return result.ToArray();
     }
 
+    private AuthenticationResult AuthenticateCore(
+        string name,
+        bool isMale,
+        GameRole role,
+        string? password)
+    {
+        if (ClientData.JoinMode == JoinMode.Forbidden)
+        {
+            return AuthenticationResult.Forbidden;
+        }
+
+        if (ClientData.JoinMode == JoinMode.OnlyViewer && role != GameRole.Viewer)
+        {
+            return AuthenticationResult.ForbiddenRole;
+        }
+
+        if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword)
+            && ClientData.Settings.NetworkGamePassword != password)
+        {
+            return AuthenticationResult.WrongPassword;
+        }
+
+        if (ClientData.AllPersons.ContainsKey(name))
+        {
+            return AuthenticationResult.NameIsOccupied;
+        }
+
+        var index = -1;
+        IEnumerable<ViewerAccount>? accountsToSearch;
+
+        switch (role)
+        {
+            case GameRole.Showman:
+                accountsToSearch = new ViewerAccount[1] { ClientData.ShowMan };
+                break;
+
+            case GameRole.Player:
+                accountsToSearch = ClientData.Players;
+
+                if (ClientData.HostName == name) // Host is joining
+                {
+                    var players = ClientData.Players;
+
+                    for (var i = 0; i < players.Count; i++)
+                    {
+                        if (players[i].Name == name)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (index < 0)
+                    {
+                        return AuthenticationResult.PositionNotFound;
+                    }
+                }
+
+                break;
+
+            default: // Viewer
+                accountsToSearch = ClientData.Viewers.Concat(
+                    new ViewerAccount[] { new(Constants.FreePlace, false, false) { IsHuman = true } });
+
+                break;
+        }
+
+        var found = false;
+
+        if (index > -1)
+        {
+            var accounts = accountsToSearch.ToArray();
+
+            var result = TryAuthenticateAccount(role, name, isMale, index, accounts[index]);
+
+            if (result.HasValue)
+            {
+                if (!result.Value)
+                {
+                    return AuthenticationResult.PlaceIsOccupied;
+                }
+                else
+                {
+                    found = true;
+                }
+            }
+        }
+        else
+        {
+            foreach (var account in accountsToSearch)
+            {
+                index++;
+
+                var result = TryAuthenticateAccount(role, name, isMale, index, account);
+
+                if (result.HasValue)
+                {
+                    if (!result.Value)
+                    {
+                        return AuthenticationResult.PlaceIsOccupied;
+                    }
+                    else
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!found)
+        {
+            return AuthenticationResult.FreePlaceNotFound;
+        }
+
+        return AuthenticationResult.Ok;
+    }
+
     /// <summary>
     /// Adds person to the game.
     /// </summary>
@@ -458,139 +576,48 @@ public sealed class Game : Actor
         Action connectionAuthenticator) =>
         ClientData.TaskLock.WithLock(() =>
         {
-            if (ClientData.JoinMode == JoinMode.Forbidden)
+            var result = AuthenticateCore(name, isMale, role, password);
+
+            if (result != AuthenticationResult.Ok)
             {
-                return (false, LO[nameof(R.JoinForbidden)]);
+                return (false, GetAuthenticationErrorMessage(result));
             }
 
-            if (ClientData.JoinMode == JoinMode.OnlyViewer && role != GameRole.Viewer)
-            {
-                return (false, LO[nameof(R.JoinRoleForbidden)]);
-            }
-
-            if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword)
-                && ClientData.Settings.NetworkGamePassword != password)
-            {
-                return (false, LO[nameof(R.WrongPassword)]);
-            }
-
-            if (ClientData.AllPersons.ContainsKey(name))
-            {
-                return (false, string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name));
-            }
-
-            var index = -1;
-            IEnumerable<ViewerAccount>? accountsToSearch = null;
-
-            switch (role)
-            {
-                case GameRole.Showman:
-                    accountsToSearch = new ViewerAccount[1] { ClientData.ShowMan };
-                    break;
-
-                case GameRole.Player:
-                    accountsToSearch = ClientData.Players;
-
-                    if (ClientData.HostName == name) // Host is joining
-                    {
-                        var players = ClientData.Players;
-
-                        for (var i = 0; i < players.Count; i++)
-                        {
-                            if (players[i].Name == name)
-                            {
-                                index = i;
-                                break;
-                            }
-                        }
-
-                        if (index < 0)
-                        {
-                            return (false, LO[nameof(R.PositionNotFoundByIndex)]);
-                        }
-                    }
-
-                    break;
-
-                default: // Viewer
-                    accountsToSearch = ClientData.Viewers.Concat(
-                        new ViewerAccount[] { new ViewerAccount(Constants.FreePlace, false, false) { IsHuman = true } });
-
-                    break;
-            }
-
-            var found = false;
-
-            if (index > -1)
-            {
-                var accounts = accountsToSearch.ToArray();
-
-                var result = CheckAccountNew(
-                    role.ToString().ToLower(),
-                    name,
-                    isMale ? "m" : "f",
-                    ref found,
-                    index,
-                    accounts[index],
-                    connectionAuthenticator);
-
-                if (result.HasValue)
-                {
-                    if (!result.Value)
-                    {
-                        return (false, LO[nameof(R.PlaceIsOccupied)]);
-                    }
-                    else
-                    {
-                        found = true;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var item in accountsToSearch)
-                {
-                    index++;
-
-                    var result = CheckAccountNew(
-                        role.ToString().ToLower(),
-                        name,
-                        isMale ? "m" : "f",
-                        ref found,
-                        index,
-                        item,
-                        connectionAuthenticator);
-
-                    if (result.HasValue)
-                    {
-                        if (!result.Value)
-                        {
-                            return (false, LO[nameof(R.PlaceIsOccupied)]);
-                        }
-                        else
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (!found)
-            {
-                return (false, LO[nameof(R.NoFreePlaceForName)]);
-            }
+            connectionAuthenticator();
 
             return (true, "");
         },
         5000);
 
     /// <summary>
+    /// Authenticates person in the game.
+    /// </summary>
+    public AuthenticationResult Authenticate(
+        string name,
+        bool isMale,
+        GameRole role,
+        string? password) =>
+        ClientData.TaskLock.WithLock(() => AuthenticateCore(name, isMale, role, password), 5000);
+
+    private string GetAuthenticationErrorMessage(AuthenticationResult result) =>
+        result switch
+        {
+            AuthenticationResult.Forbidden => LO[nameof(R.JoinForbidden)],
+            AuthenticationResult.ForbiddenRole => LO[nameof(R.JoinRoleForbidden)],
+            AuthenticationResult.WrongPassword => LO[nameof(R.WrongPassword)],
+            AuthenticationResult.NameIsOccupied => LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)],
+            AuthenticationResult.PositionNotFound => LO[nameof(R.PositionNotFoundByIndex)],
+            AuthenticationResult.PlaceIsOccupied => LO[nameof(R.PlaceIsOccupied)],
+            AuthenticationResult.FreePlaceNotFound => LO[nameof(R.NoFreePlaceForName)],
+            _ => "",
+        };
+
+    /// <summary>
     /// Processed received message.
     /// </summary>
     /// <param name="message">Received message.</param>
     public override ValueTask OnMessageReceivedAsync(Message message) =>
-        ClientData.TaskLock.WithLockAsync(async () =>
+        ClientData.TaskLock.WithLockAsync(() =>
         {
             if (string.IsNullOrEmpty(message.Text))
             {
@@ -641,7 +668,7 @@ public sealed class Game : Actor
                         break;
 
                     case Messages.Connect: // TODO: will be deprecated after switching to SIGame 8
-                        await OnConnectAsync(message, args);
+                        OnConnect(message, args);
                         break;
 
                     case SystemMessages.Disconnect: // TODO: will be deprecated after switching to SIGame 8
@@ -1691,7 +1718,6 @@ public sealed class Game : Actor
             _gameActions.InformTheme(person);
         }
 
-
         if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
         {
             var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - ClientData.TimerStartTime[2]).TotalSeconds * 10;
@@ -1813,7 +1839,7 @@ public sealed class Game : Actor
     }
 
     [Obsolete]
-    private async ValueTask OnConnectAsync(Message message, string[] args)
+    private void OnConnect(Message message, string[] args)
     {
         if (args.Length < 4)
         {
@@ -1821,116 +1847,22 @@ public sealed class Game : Actor
             return;
         }
 
-        var role = args[1];
+        var role = args[1] == Constants.Showman ? GameRole.Showman :
+                   args[1] == Constants.Player ? GameRole.Player : GameRole.Viewer;
+        
         var name = args[2];
-        var sex = args[3];
+        var isMale = args[3] == "m";
 
-        if (ClientData.JoinMode == JoinMode.Forbidden)
+        var result = AuthenticateCore(name, isMale, role, null);
+
+        if (result != AuthenticationResult.Ok)
         {
-            _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.JoinForbidden)], message.Sender);
+            var msg = new MessageBuilder(SystemMessages.Refuse, GetAuthenticationErrorMessage(result)).Build();
+            _gameActions.SendMessage(msg, message.Sender);
             return;
         }
 
-        if (ClientData.JoinMode == JoinMode.OnlyViewer && role != Constants.Viewer)
-        {
-            _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.JoinRoleForbidden)], message.Sender);
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword) && (args.Length < 6 || ClientData.Settings.NetworkGamePassword != args[5]))
-        {
-            _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongPassword)], message.Sender);
-            return;
-        }
-
-        if (ClientData.AllPersons.ContainsKey(name))
-        {
-            _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name), message.Sender);
-            return;
-        }
-
-        var index = -1;
-        IEnumerable<ViewerAccount> accountsToSearch;
-
-        switch (role)
-        {
-            case Constants.Showman:
-                accountsToSearch = new ViewerAccount[1] { ClientData.ShowMan };
-                break;
-
-            case Constants.Player:
-                accountsToSearch = ClientData.Players;
-
-                if (ClientData.HostName == name) // Host is connecting
-                {
-                    var defaultPlayers = ClientData.Settings.Players;
-                    for (var i = 0; i < defaultPlayers.Length; i++)
-                    {
-                        if (defaultPlayers[i].Name == name)
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
-
-                    if (index < 0 || index >= ClientData.Players.Count)
-                    {
-                        _gameActions.SendMessage(string.Join(Message.ArgsSeparator, SystemMessages.Refuse, LO[nameof(R.PositionNotFoundByIndex)]), message.Sender);
-                        return;
-                    }
-                }
-
-                break;
-
-            default:
-                accountsToSearch = ClientData.Viewers.Concat(new ViewerAccount[] { new ViewerAccount(Constants.FreePlace, false, false) { IsHuman = true } });
-                break;
-        }
-
-        var found = false;
-
-        if (index > -1)
-        {
-            var accounts = accountsToSearch.ToArray();
-
-            var (result, foundLocal) = await CheckAccountAsync(message, role, name, sex, index, accounts[index]);
-            if (result.HasValue)
-            {
-                if (!result.Value)
-                {
-                    return;
-                }
-            }
-
-            found |= foundLocal;
-        }
-        else
-        {
-            foreach (var item in accountsToSearch)
-            {
-                index++;
-                var (result, foundLocal) = await CheckAccountAsync(message, role, name, sex, index, item);
-
-                found |= foundLocal;
-
-                if (result.HasValue)
-                {
-                    if (!result.Value)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (!found)
-        {
-            _gameActions.SendMessage($"{SystemMessages.Refuse}{Message.ArgsSeparatorChar}{LO[nameof(R.NoFreePlaceForName)]}", message.Sender);
-        }
+        Master.AuthenticateConnection(message.Sender[1..], name);
     }
 
     private void SelectNewHost()
@@ -3839,107 +3771,26 @@ public sealed class Game : Actor
         _logic.ScheduleExecution(Tasks.StartGame, 1, 1);
     }
 
-    private async Task<(bool? Result, bool Found)> CheckAccountAsync(
-        Message message,
-        string role,
+    private bool? TryAuthenticateAccount(
+        GameRole role,
         string name,
-        string sex,
+        bool isMale,
         int index,
         ViewerAccount account)
     {
         if (account.IsConnected)
         {
-            return (null, false);
+            return account.Name == name ? false : null;
         }
-
-        if (account.Name == name || account.Name == Constants.FreePlace)
-        {
-            var connectionFound = await _client.Node.ConnectionsLock.WithLockAsync(() =>
-            {
-                var connection = Master.Connections.Where(conn => conn.Id == message.Sender[1..]).FirstOrDefault();
-                
-                if (connection == null)
-                {
-                    return false;
-                }
-
-                lock (connection.ClientsSync)
-                {
-                    connection.Clients.Add(name);
-                }
-
-                connection.IsAuthenticated = true;
-                connection.UserName = name;
-
-                return true;
-            });
-
-            if (!connectionFound)
-            {
-                return (false, true);
-            }
-
-            ClientData.BeginUpdatePersons($"Connected {name} as {role} as {index}");
-
-            try
-            {
-                var append = role == "viewer" && account.Name == Constants.FreePlace;
-                account.Name = name;
-                account.IsMale = sex == "m";
-                account.Picture = "";
-                account.IsConnected = true;
-
-                if (append)
-                {
-                    ClientData.Viewers.Add(new ViewerAccount(account) { IsConnected = account.IsConnected });
-                }
-            }
-            finally
-            {
-                ClientData.EndUpdatePersons();
-            }
-
-            var connectedMessage = LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)];
-            _gameActions.SpecialReplic(string.Format(connectedMessage, name));
-
-            _gameActions.SendMessage(Messages.Accepted, name);
-            _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
-
-            if (ClientData.HostName == null && !ClientData.Settings.IsAutomatic)
-            {
-                UpdateHostName(name);
-            }
-
-            OnPersonsChanged();
-        }
-
-        return (true, true);
-    }
-
-    private bool? CheckAccountNew(
-        string role,
-        string name,
-        string sex,
-        ref bool found,
-        int index,
-        ViewerAccount account,
-        Action connectionAuthenticator)
-    {
-        if (account.IsConnected)
-        {
-            return account.Name == name ? false : (bool?)null;
-        }
-
-        found = true;
 
         ClientData.BeginUpdatePersons($"Connected {name} as {role} as {index}");
 
         try
         {
-            var append = role == "viewer" && account.Name == Constants.FreePlace;
+            var append = role == GameRole.Viewer && account.Name == Constants.FreePlace;
 
             account.Name = name;
-            account.IsMale = sex == "m";
+            account.IsMale = isMale;
             account.Picture = "";
             account.IsConnected = true;
 
@@ -3954,15 +3805,13 @@ public sealed class Game : Actor
         }
 
         var connectedMessage = LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)];
-        _gameActions.SpecialReplic(string.Format(connectedMessage, name));
-        _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
+        _gameActions.SpecialReplic(string.Format(connectedMessage, name)); // TODO: REMOVE: replaced by CONNECTED message
+        _gameActions.SendMessageWithArgs(Messages.Connected, role.ToString().ToLowerInvariant(), index, name, isMale ? 'm' : 'f', "");
 
         if (ClientData.HostName == null && !ClientData.Settings.IsAutomatic)
         {
             UpdateHostName(name);
         }
-
-        connectionAuthenticator();
 
         OnPersonsChanged();
 

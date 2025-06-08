@@ -75,7 +75,7 @@ internal sealed class ShowmanComputerController
             return false;
         }
 
-        return _intelligence.ValidateAnswer(answer, _data.PersonDataExtensions.Right, _data.PersonDataExtensions.Wrong);
+        return _intelligence.ValidateAnswer(answer, _data.Right, _data.Wrong);
     }
 
     public void SelectPlayer() => ScheduleExecution(ShowmanTasks.SelectPlayer, 10 + Random.Shared.Next(10));

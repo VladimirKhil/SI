@@ -28,4 +28,11 @@ public interface IPrimaryNode : INode
     /// </summary>
     /// <param name="clientId">Client identifier.</param>
     void Unban(string clientId);
+
+    /// <summary>
+    /// Authenticates a connection with a given identifier and name.
+    /// </summary>
+    /// <param name="connectionId">Connection identifier.</param>
+    /// <param name="name">Client name.</param>
+    void AuthenticateConnection(string connectionId, string name);
 }

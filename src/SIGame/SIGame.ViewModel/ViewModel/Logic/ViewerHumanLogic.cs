@@ -1893,7 +1893,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
         var playerName = _data.Players[playerIndex].Name;
         _gameViewModel.NewValidation = true;
-        _data.PersonDataExtensions.ShowExtraRightButtons = false;
+        _data.ShowExtraRightButtons = false;
         _gameViewModel.Hint = Resources.HintCheckAnswer;
         _gameViewModel.AddValidation(playerName, answer);
         _gameViewModel.DialogMode = DialogModes.AnswerValidation;
@@ -2015,9 +2015,9 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void MakeStake()
     {
-        _gameViewModel.SendStakeNew.CanBeExecuted = _data.PersonDataExtensions.Var[1];
-        _gameViewModel.SendPassNew.CanBeExecuted = _data.PersonDataExtensions.Var[2];
-        _gameViewModel.SendAllInNew.CanBeExecuted = _data.PersonDataExtensions.Var[3];
+        _gameViewModel.SendStakeNew.CanBeExecuted = _data.PersonDataExtensions.StakeInfo.Modes.HasFlag(Models.StakeModes.Stake);
+        _gameViewModel.SendPassNew.CanBeExecuted = _data.PersonDataExtensions.StakeInfo.Modes.HasFlag(Models.StakeModes.Pass);
+        _gameViewModel.SendAllInNew.CanBeExecuted = _data.PersonDataExtensions.StakeInfo.Modes.HasFlag(Models.StakeModes.AllIn);
 
         _gameViewModel.DialogMode = DialogModes.StakeNew;
         _gameViewModel.Hint = Resources.HintMakeAStake;

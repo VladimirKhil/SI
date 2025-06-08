@@ -169,8 +169,6 @@ public abstract class Node : INode
                 m = new Message(messageText, sender, receiver, m.IsSystem, m.IsPrivate);
             }
 
-            Debug.WriteLine($"Incoming message received: {m.IsSystem}|{m.IsPrivate}|{m.Sender}|{m.Receiver}|{m.Text.Replace(Message.ArgsSeparatorChar, ' ')}");
-
             await ProcessIncomingMessageAsync(m);
         }
         catch (Exception exc)
@@ -181,6 +179,9 @@ public abstract class Node : INode
 
     private async ValueTask ProcessIncomingMessageAsync(Message message)
     {
+        // Handle node-level messages
+        // TODO
+
         foreach (var client in _clients.Values)
         {
             if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || string.IsNullOrEmpty(client.Name) || !message.IsSystem && !message.IsPrivate)

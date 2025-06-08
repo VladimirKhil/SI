@@ -1976,7 +1976,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 break;
 
             case StopReason.Appellation:
-                var savedTask = task == Tasks.WaitChoose ? Tasks.AskToChoose : task;
+                var savedTask = task == Tasks.WaitChoose ? Tasks.AskToChoose : (task == Tasks.WaitDelete ? Tasks.AskToDelete : task);
 
                 _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({_taskRunner.PrintOldTasks()})");
 

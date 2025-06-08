@@ -293,7 +293,7 @@ internal class ViewerComputerLogic : IPersonController
 
     public void ValidateAnswer(int playerIndex, string answer)
     {
-        var isRight = AnswerChecker.IsAnswerRight(answer, _data.PersonDataExtensions.Right);
+        var isRight = AnswerChecker.IsAnswerRight(answer, _data.Right);
         _viewerActions.SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
     }
 

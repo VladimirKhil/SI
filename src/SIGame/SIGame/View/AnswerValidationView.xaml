@@ -86,7 +86,7 @@
             
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <ItemsControl
-                    ItemsSource="{Binding Data.PersonDataExtensions.Right}"
+                    ItemsSource="{Binding Data.Right}"
                     VerticalAlignment="Stretch"
                     Height="Auto"
                     Margin="5"
@@ -101,7 +101,7 @@
             
             <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto">
                 <ItemsControl
-                    ItemsSource="{Binding Data.PersonDataExtensions.Wrong}"
+                    ItemsSource="{Binding Data.Wrong}"
                     VerticalAlignment="Stretch"
                     Height="Auto"
                     Margin="5"
@@ -115,7 +115,7 @@
             Grid.ColumnSpan="2"
             Orientation="Horizontal">
             <Button
-                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
                 Command="{Binding IsWrong}" 
                 CommandParameter="0"
@@ -160,7 +160,7 @@
                     <Style TargetType="Button" BasedOn="{StaticResource SIButton}">
                         <Setter Property="BorderThickness" Value="1.5" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Data.PersonDataExtensions.ShowExtraRightButtons}" Value="True">
+                            <DataTrigger Binding="{Binding Data.ShowExtraRightButtons}" Value="True">
                                 <Setter Property="BorderThickness" Value="0,1.5" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -169,7 +169,7 @@
             </Button>
             
             <Button
-                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
                 Command="{Binding IsRight}" 
                 CommandParameter="0.5"
@@ -180,7 +180,7 @@
 
             <Button
                 Grid.Column="2"
-                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
                 Command="{Binding IsRight}" 
                 CommandParameter="2.0"
@@ -209,7 +209,7 @@
                         <Setter Property="BorderThickness" Value="1.5" />
                         
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Data.PersonDataExtensions.ShowExtraRightButtons}" Value="True">
+                            <DataTrigger Binding="{Binding Data.ShowExtraRightButtons}" Value="True">
                                 <Setter Property="BorderThickness" Value="0,1.5" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -218,7 +218,7 @@
             </Button>
 
             <Button
-                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
                 Command="{Binding IsWrong}" 
                 CommandParameter="0.5"
@@ -229,7 +229,7 @@
 
             <Button
                 Grid.Column="2"
-                Visibility="{Binding Data.PersonDataExtensions.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
                 Command="{Binding IsWrong}" 
                 CommandParameter="2.0"

@@ -122,8 +122,8 @@ public sealed class Showman : Viewer
             wrong.Add(mparams[i]);
         }
 
-        ClientData.PersonDataExtensions.Right = right.ToArray();
-        ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
+        ClientData.Right = right.ToArray();
+        ClientData.Wrong = wrong.ToArray();
     }
 
     private void OnValidation2(string[] mparams)
@@ -150,9 +150,9 @@ public sealed class Showman : Viewer
             wrong.Add(mparams[i]);
         }
 
-        ClientData.PersonDataExtensions.Right = right.ToArray();
-        ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
-        ClientData.PersonDataExtensions.ShowExtraRightButtons = mparams[4] == "+";
+        ClientData.Right = right.ToArray();
+        ClientData.Wrong = wrong.ToArray();
+        ClientData.ShowExtraRightButtons = mparams[4] == "+";
 
         var me = (PersonAccount?)ClientData.Me;
 

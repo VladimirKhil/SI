@@ -21,4 +21,9 @@ public sealed class StakeInfo : NumberSet
     /// Stake reason.
     /// </summary>
     public StakeReason Reason { get; internal set; }
+
+    /// <summary>
+    /// Allowed stake modes.
+    /// </summary>
+    public StakeModes Modes { get; internal set; }
 }

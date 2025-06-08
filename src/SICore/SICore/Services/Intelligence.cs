@@ -212,7 +212,7 @@ internal sealed class Intelligence : IIntelligence
         StakeInfo stakeInfo,
         int questionIndex,
         int previousStakerIndex,
-        bool[] vars,
+        StakeModes stakeModes,
         int roundPassedTimePercentage)
     {
         var me = players[myIndex];
@@ -234,7 +234,7 @@ internal sealed class Intelligence : IIntelligence
                         myIndex,
                         previousStakerIndex,
                         _account.Style,
-                        vars,
+                        stakeModes,
                         _account.N1,
                         _account.N5,
                         _account.B1,
@@ -649,7 +649,7 @@ internal sealed class Intelligence : IIntelligence
         int myIndex,
         int lastStakerIndex,
         PlayerStyle style,
-        bool[] vars,
+        StakeModes stakeModes,
         int N1,
         int N5,
         int B1,
@@ -667,11 +667,6 @@ internal sealed class Intelligence : IIntelligence
         if (lastStakerIndex < -1 || lastStakerIndex >= sums.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(lastStakerIndex), lastStakerIndex, "Last staker index is out of range");
-        }
-
-        if (vars.Length < 3)
-        {
-            throw new ArgumentException("Stake variables must have at least 3 elements", nameof(vars));
         }
 
         int i = 0;
@@ -702,19 +697,22 @@ internal sealed class Intelligence : IIntelligence
 
         var stakerScore = lastStakerIndex == -1 ? 0 : sums[lastStakerIndex];
 
+        var canMakeStake = stakeModes.HasFlag(StakeModes.Stake);
+        var canPass = stakeModes.HasFlag(StakeModes.Pass);
+
         // Сначала просчитаем оптимальную реакцию нашего противника на все возможные наши ставки
         StakeDecisions(
             style,
             bestSum,
             mySum,
-            vars[1] ? (minCost - (vars[0] ? stakeStep : 0)) : mySum,
+            canMakeStake ? minCost : mySum,
             mySum,
             p,
             ref pass,
             ref min,
             ref max,
             true /*т.к. он второй, то он всегда может спасовать*/,
-            vars[2] ? stakerScore : 0,
+            canPass ? stakerScore : 0,
             stakeStep,
             ref result);
 
@@ -722,14 +720,14 @@ internal sealed class Intelligence : IIntelligence
             style,
             mySum,
             bestSum,
-            vars[1] ? (minCost - (vars[0] ? stakeStep : 0)) : mySum,
+            canMakeStake ? minCost : mySum,
             mySum,
             p,
             ref pass,
             ref min,
             ref max,
-            vars[2],
-            vars[2] ? stakerScore : 0,
+            canPass,
+            canPass ? stakerScore : 0,
             stakeStep,
             ref result);
 
@@ -951,8 +949,6 @@ internal sealed class Intelligence : IIntelligence
 
         if (stake == 0)
             stakeMode = StakeMode.Pass;
-        else if (stake == minCost - stakeStep && vars[0])
-            stakeMode = StakeMode.Nominal;
         else if (stake == mySum)
             stakeMode = StakeMode.AllIn;
         else

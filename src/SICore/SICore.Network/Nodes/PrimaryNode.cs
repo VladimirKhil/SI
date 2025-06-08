@@ -1,4 +1,5 @@
 ﻿using SICore.Connections;
+using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using SIData;
@@ -106,6 +107,37 @@ public class PrimaryNode : Node, IPrimaryNode
             cancellationToken);
 
         await base.RemoveConnectionAsync(connection, withError, cancellationToken);
+    }
+
+    // TODO: await this method later
+    public async void AuthenticateConnection(string connectionId, string name)
+    {
+        try
+        {
+            await ConnectionsLock.WithLockAsync(() =>
+            {
+                var connection = Connections.Where(conn => conn.Id == connectionId).FirstOrDefault();
+
+                if (connection == null)
+                {
+                    return false;
+                }
+
+                lock (connection.ClientsSync)
+                {
+                    connection.Clients.Add(name);
+                }
+
+                connection.IsAuthenticated = true;
+                connection.UserName = name;
+
+                return true;
+            });
+        }
+        catch (Exception exc)
+        {
+            OnError(exc, true);
+        }
     }
 
     public string Kick(string name, bool ban = false)

@@ -1846,11 +1846,6 @@ public class Viewer : Actor, IViewerClient
 
         var personData = ClientData.PersonDataExtensions;
 
-        personData.Var[0] = false;
-        personData.Var[1] = stakeModes.HasFlag(StakeModes.Stake);
-        personData.Var[2] = stakeModes.HasFlag(StakeModes.Pass);
-        personData.Var[3] = stakeModes.HasFlag(StakeModes.AllIn);
-
         personData.StakeInfo = new StakeInfo
         {
             Minimum = minimumStake,
@@ -1859,6 +1854,7 @@ public class Viewer : Actor, IViewerClient
             Stake = minimumStake,
             PlayerName = playerName,
             Reason = reason,
+            Modes = stakeModes,
         };
 
         _logic.MakeStake();

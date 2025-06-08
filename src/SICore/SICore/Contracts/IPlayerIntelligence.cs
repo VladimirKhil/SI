@@ -42,7 +42,7 @@ internal interface IPlayerIntelligence
         StakeInfo stakeInfo,
         int questionIndex,
         int previousStakerIndex,
-        bool[] vars,
+        StakeModes stakeModes,
         int roundPassedTimePercentage);
 
     /// <summary>

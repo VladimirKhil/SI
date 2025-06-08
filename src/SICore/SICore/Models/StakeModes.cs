@@ -7,6 +7,11 @@
 public enum StakeModes
 {
     /// <summary>
+    /// No stake mode.
+    /// </summary>
+    None = 0,
+    
+    /// <summary>
     /// Fixed stake.
     /// </summary>
     Stake = 1,

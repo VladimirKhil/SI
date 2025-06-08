@@ -352,4 +352,52 @@ public sealed class ViewerData : Data
     }
 
     public bool IsAnswer { get; set; }
+
+    private string[] _right = Array.Empty<string>();
+
+    private string[] _wrong = Array.Empty<string>();
+
+    /// <summary>
+    /// Question right answers.
+    /// </summary>
+    public string[] Right
+    {
+        get => _right;
+        set
+        {
+            _right = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Question wrong answers.
+    /// </summary>
+    public string[] Wrong
+    {
+        get => _wrong;
+        set
+        {
+            _wrong = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool _showExtraRightButtons;
+
+    /// <summary>
+    /// Show additional buttons for accepting right answer with different reward.
+    /// </summary>
+    public bool ShowExtraRightButtons
+    {
+        get => _showExtraRightButtons;
+        set
+        {
+            if (_showExtraRightButtons != value)
+            {
+                _showExtraRightButtons = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 }
