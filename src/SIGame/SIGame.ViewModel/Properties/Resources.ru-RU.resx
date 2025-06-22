@@ -684,4 +684,7 @@
   <data name="ByGame" xml:space="preserve">
     <value>игрой</value>
   </data>
+  <data name="DownloadFileError" xml:space="preserve">
+    <value>Ошибка загрузки файла</value>
+  </data>
 </root>

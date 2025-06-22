@@ -1,11 +1,12 @@
-﻿using System;
+﻿using SIGame.Properties;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
 namespace SIGame.Converters;
 
 /// <summary>
-/// Преобразует числовые коды в ставку на Аукционе
+/// Converts stakes numeric codes to localized strings.
 /// </summary>
 [ValueConversion(typeof(int), typeof(string))]
 public sealed class AuctionStakesConverter : IValueConverter
@@ -14,16 +15,16 @@ public sealed class AuctionStakesConverter : IValueConverter
     {
         if (value == null)
         {
-            return string.Empty;
+            return "";
         }
 
         var stake = System.Convert.ToInt32(value);
 
         return stake switch
         {
-            -1 => SICore.Properties.Resources.Nominal,
-            -2 => string.Empty,// Pass
-            -3 => SICore.Properties.Resources.VaBank,
+            -1 => Resources.Nominal,
+            -2 => "",// Pass
+            -3 => Resources.VaBank,
             -4 => "######",
             _ => Notions.Notion.FormatNumber(stake),
         };

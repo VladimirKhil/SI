@@ -1807,6 +1807,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Nominal.
+        /// </summary>
+        public static string Nominal {
+            get {
+                return ResourceManager.GetString("Nominal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на No penalty for wrong answer.
         /// </summary>
         public static string NoPenaltyForWrongAnswer {
@@ -3270,6 +3279,15 @@ namespace SIGame.Properties {
         public static string UserPackages {
             get {
                 return ResourceManager.GetString("UserPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на ALL-IN!!!.
+        /// </summary>
+        public static string VaBank {
+            get {
+                return ResourceManager.GetString("VaBank", resourceCulture);
             }
         }
         

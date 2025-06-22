@@ -349,15 +349,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Downloading file error.
-        /// </summary>
-        public static string DownloadFileError {
-            get {
-                return ResourceManager.GetString("DownloadFileError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на There&apos;s no question here! The money was just added to your score! Congratulations!.
         /// </summary>
         public static string EasyCat {

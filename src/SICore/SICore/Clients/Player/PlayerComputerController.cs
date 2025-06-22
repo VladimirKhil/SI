@@ -207,7 +207,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     {
         var me = (PlayerAccount?)_data.Me;
 
-        if (me == null)
+        if (me == null || _data.StakeInfo == null)
         {
             return;
         }
@@ -225,10 +225,10 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 _data.Players,
                 myIndex,
                 _data.TInfo.RoundInfo,
-                _data.PersonDataExtensions.StakeInfo,
+                _data.StakeInfo,
                 _data.QuestionIndex,
                 _lastStakerIndex,
-                _data.PersonDataExtensions.StakeInfo.Modes,
+                _data.StakeInfo.Modes,
                 GetTimePercentage(0));
 
             var msg = new MessageBuilder(Messages.SetStake).Add(stakeDecision);

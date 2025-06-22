@@ -295,6 +295,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Downloading file error.
+        /// </summary>
+        public static string DownloadFileError {
+            get {
+                return ResourceManager.GetString("DownloadFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cannot connect to server while uploading game report. The report will be sent later.
         /// </summary>
         public static string Error_SendingReport {

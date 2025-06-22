@@ -1227,4 +1227,10 @@
   <data name="NotReady" xml:space="preserve">
     <value>Not ready</value>
   </data>
+  <data name="Nominal" xml:space="preserve">
+    <value>Nominal</value>
+  </data>
+  <data name="VaBank" xml:space="preserve">
+    <value>ALL-IN!!!</value>
+  </data>
 </root>

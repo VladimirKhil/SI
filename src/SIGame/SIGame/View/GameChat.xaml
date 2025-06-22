@@ -19,7 +19,7 @@
     <UserControl.Resources>
         <SolidColorBrush x:Key="SemiTransparentLightBlueVioletBrushKey">#FFC0CFF4</SolidColorBrush>
         <CollectionViewSource x:Key="Persons" Source="{Binding Data.AllPersons}" />
-        <CollectionViewSource x:Key="Banned" Source="{Binding Data.Banned}" />
+        <CollectionViewSource x:Key="Banned" Source="{Binding Banned}" />
         <lc:HostNameConverter x:Key="HostNameConverter" />
 
         <ObjectDataProvider x:Key="JoinModes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">

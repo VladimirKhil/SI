@@ -246,6 +246,11 @@ public static class Messages
     public const string GameMetadata = "GAMEMETADATA";
 
     /// <summary>
+    /// Game statistics.
+    /// </summary>
+    public const string GameStatistics = "GAME_STATISTICS";
+
+    /// <summary>
     /// Темы всей игры
     /// </summary>
     public const string GameThemes = "GAMETHEMES";
@@ -306,6 +311,11 @@ public static class Messages
     /// Notifies that the client has preloaded the media.
     /// </summary>
     public const string MediaPreloaded = "MEDIA_PRELOADED";
+
+    /// <summary>
+    /// Notifies about media preload progress.
+    /// </summary>
+    public const string MediaPreloadProgress = "MEDIA_PRELOAD_PROGRESS";
 
     /// <summary>
     /// Сменить состояние игры

@@ -618,9 +618,6 @@
   <data name="TypeClassic" xml:space="preserve">
     <value>классическая</value>
   </data>
-  <data name="DownloadFileError" xml:space="preserve">
-    <value>Ошибка загрузки файла</value>
-  </data>
   <data name="File" xml:space="preserve">
     <value>Файл</value>
   </data>

@@ -41,16 +41,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     public const int MaxMediaNotifications = 15;
 
     /// <summary>
-    /// Maximum penalty value for a player.
-    /// </summary>
-    private const int MaxPenalty = 10;
-
-    /// <summary>
-    /// Value of penalty increment for each hit.
-    /// </summary>
-    private const int PenaltyIncrement = 3;
-
-    /// <summary>
     /// Frequency of partial prints per second.
     /// </summary>
     private const double PartialPrintFrequencyPerSecond = 0.5;
@@ -651,7 +641,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         // Notify users that the media file is too large and could be downloaded slowly
         var errorMessage = string.Format(LO[nameof(R.OversizedFile)], R.File, fileLocation, maxRecommendedFileLength);
-        _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage);
+        _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage); // TODO: REMOVE: replaced by USER_ERROR message
         _gameActions.SendMessageWithArgs(Messages.UserError, ErrorCode.OversizedFile, contentType, maxRecommendedFileLength);
 
         if (_data.OversizedMediaNotificationsCount < MaxMediaNotifications)
@@ -2116,11 +2106,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void SendStatistics()
     {
+        var msg = new MessageBuilder(Messages.GameStatistics);
+
         var message = new StringBuilder(LO[nameof(R.GameStatistics)]).Append(':').AppendLine().AppendLine();
 
         foreach (var player in _data.Players)
         {
             var statistic = player.Statistic;
+
+            msg.AddRange(player.Name, statistic.RightAnswerCount, statistic.WrongAnswerCount, statistic.RightTotal, statistic.WrongTotal);
 
             message.Append(player.Name).Append(':').AppendLine();
             message.Append("   ").Append(LO[nameof(R.RightAnswers)]).Append(": ").Append(statistic.RightAnswerCount).AppendLine();
@@ -2131,7 +2125,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             message.AppendLine();
         }
 
-        _gameActions.SpecialReplic(message.ToString());
+        _gameActions.SendMessage(msg.Build());
+        _gameActions.SpecialReplic(message.ToString()); // TODO: REMOVE: replaced by GAME_STATISTICS message
     }
 
     private void AskForPlayerReviews()
@@ -2777,15 +2772,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 case QuestionTypes.Secret:
                 case QuestionTypes.SecretPublicPrice:
                 case QuestionTypes.SecretNoQuestion:
-                    var replic = new StringBuilder(LO[nameof(R.YouReceiveCat)]);
-                    var selectionMode = _data.Question?.Parameters?.FirstOrDefault(p => p.Key == QuestionParameterNames.SelectionMode);
-
-                    if (selectionMode?.Value?.SimpleValue == StepParameterValues.SetAnswererSelect_Any)
-                    {
-                        replic.Append($". {LO[nameof(R.YouCanKeepCat)]}");
-                    }
-
-                    _gameActions.ShowmanReplic(replic.ToString()); // TODO: REMOVE: replaced by QTYPE message
+                    _gameActions.ShowmanReplic(LO[nameof(R.YouReceiveCat)]); // TODO: REMOVE: replaced by QTYPE message
                     break;
 
                 case QuestionTypes.NoRisk:
@@ -3174,6 +3161,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void AskToSelectQuestionAnswerer()
     {
+        if (_data.Chooser == null)
+        {
+            throw new Exception("_data.Chooser == null");
+        }
+
+        var canGiveThemselves = _data.Chooser.Flag;
+        var append = canGiveThemselves ? $" {LO[nameof(R.YouCanKeepCat)]}" : "";
+        _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {LO[nameof(R.GiveCat)]}{append}");
+
         // -- Deprecated
         var msg = new StringBuilder(Messages.Cat);
 
@@ -4587,7 +4583,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {LO[nameof(R.GiveCat)]}");
             ScheduleExecution(Tasks.AskToSelectQuestionAnswerer, 10 + Random.Shared.Next(10), force: true);
         }
     }

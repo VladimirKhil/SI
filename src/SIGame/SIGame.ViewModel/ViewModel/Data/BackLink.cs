@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SICore.Contracts;
 using SICore.Models;
-using SICore.PlatformSpecific;
 using SICore.Results;
 using SIGame.ViewModel.Helpers;
 using SIGame.ViewModel.Properties;
@@ -11,9 +11,9 @@ using SIStatisticsService.Contract.Models;
 
 namespace SIGame.ViewModel;
 
-public sealed class BackLink : GameHostBase
+public sealed class BackLink : IGameHost
 {
-    public override HostOptions Options { get; } = new();
+    public HostOptions Options { get; } = new();
 
     internal static BackLink Default { get; set; }
 
@@ -31,14 +31,14 @@ public sealed class BackLink : GameHostBase
         _logger = serviceProvider.GetRequiredService<ILogger<BackLink>>();
     }
 
-    public override void SendError(Exception exc, bool isWarning = false) => PlatformSpecific.PlatformManager.Instance.SendErrorReport(exc);
+    public void SendError(Exception exc, bool isWarning = false) => PlatformSpecific.PlatformManager.Instance.SendErrorReport(exc);
 
-    public override void LogWarning(string message) => _logger.LogWarning("Game warning: {warning}", message);
+    public void LogWarning(string message) => _logger.LogWarning("Game warning: {warning}", message);
 
     /// <summary>
     /// Sends game results info to server.
     /// </summary>
-    public override async void SaveReport(GameResult gameResult, CancellationToken cancellationToken = default)
+    public async void SaveReport(GameResult gameResult, CancellationToken cancellationToken = default)
     {
         if (gameResult.Reviews.Count == 0)
         {
@@ -64,11 +64,17 @@ public sealed class BackLink : GameHostBase
         }
     }
 
-    public override int MaxImageSizeKb => int.MaxValue;
+    public string? GetAd(string localization, out int adId)
+    {
+        adId = -1;
+        return null;
+    }
 
-    public override int MaxAudioSizeKb => int.MaxValue;
+    public int MaxImageSizeKb => int.MaxValue;
 
-    public override int MaxVideoSizeKb => int.MaxValue;
+    public int MaxAudioSizeKb => int.MaxValue;
 
-    public override bool AreCustomAvatarsSupported => true;
+    public int MaxVideoSizeKb => int.MaxValue;
+
+    public bool AreCustomAvatarsSupported => true;
 }

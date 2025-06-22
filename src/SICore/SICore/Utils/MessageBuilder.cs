@@ -29,6 +29,12 @@ public sealed class MessageBuilder
         return this;
     }
 
+    public MessageBuilder AddRange(params object[] args)
+    {
+        _messageArgs.AddRange(args);
+        return this;
+    }
+
     public string Build() => string.Join(Message.ArgsSeparator, _messageArgs);
 
     public override string ToString() => Build();

@@ -1,5 +1,4 @@
-﻿using SICore.Properties;
-using SIGame.ViewModel.Contracts;
+﻿using SIGame.ViewModel.Contracts;
 using System.Diagnostics;
 using System.Threading.Channels;
 using Utils;
@@ -87,7 +86,7 @@ internal sealed class LocalFileManager : ILocalFileManager
                 {
                     Error?.Invoke(
                         fileTask.Uri,
-                        new Exception($"{Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(cancellationToken)}"));
+                        new Exception($"{SIGame.ViewModel.Properties.Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(cancellationToken)}"));
 
                     return;
                 }

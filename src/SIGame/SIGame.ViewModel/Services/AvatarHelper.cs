@@ -1,4 +1,5 @@
 ﻿using SICore.Contracts;
+using SICore.Models;
 using SIGame.ViewModel.Properties;
 
 namespace SIGame.ViewModel.Services;
@@ -17,7 +18,7 @@ internal sealed class AvatarHelper : IAvatarHelper
 
     public bool FileExists(string fileName) => File.Exists(Path.Combine(_avatarFolder, fileName));
         
-    public string? ExtractAvatarData(string base64data, string fileName)
+    public (ErrorCode, string)? ExtractAvatarData(string base64data, string fileName)
     {
         var imageDataSize = ((base64data.Length * 3) + 3) / 4 -
             (base64data.Length > 0 && base64data[^1] == '=' ?
@@ -26,14 +27,14 @@ internal sealed class AvatarHelper : IAvatarHelper
 
         if (imageDataSize > MaxAvatarSize)
         {
-            return Resources.AvatarTooBig;
+            return (ErrorCode.AvatarTooBig, Resources.AvatarTooBig);
         }
 
         var imageData = new byte[imageDataSize];
 
         if (!Convert.TryFromBase64String(base64data, imageData, out var bytesWritten))
         {
-            return Resources.InvalidAvatarData;
+            return (ErrorCode.InvalidAvatar, Resources.InvalidAvatarData);
         }
 
         Array.Resize(ref imageData, bytesWritten);

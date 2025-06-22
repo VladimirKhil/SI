@@ -29,4 +29,14 @@ public enum ErrorCode
     /// Cannot set host to bots.
     /// </summary>
     CannotSetHostToBots = 5,
+
+    /// <summary>
+    /// Avatar is too big.
+    /// </summary>
+    AvatarTooBig = 6,
+
+    /// <summary>
+    /// Avatar is invalid.
+    /// </summary>
+    InvalidAvatar = 7,
 }

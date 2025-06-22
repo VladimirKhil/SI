@@ -1,7 +1,5 @@
-﻿using SICore.Contracts;
-using SICore.Models;
+﻿using SICore.Models;
 using SIData;
-using System.Collections.ObjectModel;
 using System.Text;
 using Utils;
 
@@ -20,17 +18,6 @@ public sealed class ViewerData : Data
     /// Allows to separate message handling and logic execution.
     /// </summary>
     internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
-
-    private string _stageName = "";
-
-    /// <summary>
-    /// Human-readable game stage name.
-    /// </summary>
-    public string StageName
-    {
-        get => _stageName;
-        set { if (_stageName != value) { _stageName = value; OnPropertyChanged(); } }
-    }
 
     // TODO: maybe client logic should not rely on this property
     /// <summary>
@@ -54,9 +41,7 @@ public sealed class ViewerData : Data
     /// <summary>
     /// Адрес изображения участника
     /// </summary>
-    internal string Picture { get; set; }
-
-    public PersonData PersonDataExtensions { get; private set; } = new();
+    internal string? Picture { get; set; }
 
     /// <summary>
     /// Defines time stamp when game buttons have been activated.
@@ -88,32 +73,6 @@ public sealed class ViewerData : Data
     /// Game showman.
     /// </summary>
     public PersonAccount ShowMan => _showMan;
-
-    private bool _showMainTimer;
-
-    public bool ShowMainTimer
-    {
-        get => _showMainTimer;
-        set
-        {
-            if (_showMainTimer != value)
-            {
-                _showMainTimer = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private bool _enableMediaLoadButton;
-
-    /// <summary>
-    /// Shows button that enables external media load.
-    /// </summary>
-    public bool EnableMediaLoadButton
-    {
-        get => _enableMediaLoadButton;
-        set { if (_enableMediaLoadButton != value) { _enableMediaLoadButton = value; OnPropertyChanged(); } }
-    }
 
     public void OnAllPersonsChanged()
     {
@@ -210,14 +169,9 @@ public sealed class ViewerData : Data
     }
 
     /// <summary>
-    /// Banned persons (keys are persons IPs; values are persons names).
-    /// </summary>
-    public ObservableCollection<BannedInfo> Banned { get; } = new();
-
-    /// <summary>
     /// Default computer players known by server.
     /// </summary>
-    public Account[] DefaultComputerPlayers { get; set; }
+    public Account[] DefaultComputerPlayers { get; set; } = Array.Empty<Account>();
 
     internal void BeginUpdatePersons(string? reason = null)
     {
@@ -241,13 +195,13 @@ public sealed class ViewerData : Data
     /// </summary>
     public StringBuilder SystemLog { get; } = new();
 
-    public string PackageId { get; internal set; }
+    public string? PackageId { get; internal set; }
 
     public int ButtonBlockingTime { get; internal set; } = 3;
 
-    public string ThemeName { get; internal set; }
+    public string? ThemeName { get; internal set; }
 
-    public string ThemeComments { get; internal set; }
+    public string? ThemeComments { get; internal set; }
 
     private bool _apellationEnabled = true;
 
@@ -272,12 +226,12 @@ public sealed class ViewerData : Data
     /// </summary>
     public bool ApellationWrongEnabled => Players.Count > 3;
 
-    private string _hostName;
+    private string? _hostName;
 
     /// <summary>
     /// Game host name.
     /// </summary>
-    public string HostName
+    public string? HostName
     {
         get => _hostName;
         set
@@ -396,6 +350,21 @@ public sealed class ViewerData : Data
             if (_showExtraRightButtons != value)
             {
                 _showExtraRightButtons = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private StakeInfo? _stakeInfo = null;
+
+    public StakeInfo? StakeInfo
+    {
+        get => _stakeInfo;
+        set
+        {
+            if (_stakeInfo != value)
+            {
+                _stakeInfo = value;
                 OnPropertyChanged();
             }
         }

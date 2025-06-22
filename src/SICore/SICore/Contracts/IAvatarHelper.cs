@@ -1,4 +1,6 @@
-﻿namespace SICore.Contracts;
+﻿using SICore.Models;
+
+namespace SICore.Contracts;
 
 /// <summary>
 /// Provides helper methods for working with avatars.
@@ -16,7 +18,7 @@ public interface IAvatarHelper
     /// </summary>
     /// <param name="base64data">Base64-encoded data.</param>
     /// <param name="fileName">Avatar file name.</param>
-    string? ExtractAvatarData(string base64data, string fileName);
+    (ErrorCode, string)? ExtractAvatarData(string base64data, string fileName);
 
     /// <summary>
     /// Adds exising file as the avatar.

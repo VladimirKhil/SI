@@ -26,6 +26,8 @@ public class Viewer : Actor, IViewerClient
 
     protected IPersonController Logic => _logic;
 
+    public IPersonController MyLogic => _logic;
+
     private bool _isHost;
 
     /// <summary>
@@ -44,8 +46,6 @@ public class Viewer : Actor, IViewerClient
             }
         }
     }
-
-    public IPersonController MyLogic => _logic;
 
     public ViewerData ClientData { get; }
 
@@ -296,7 +296,6 @@ public class Viewer : Actor, IViewerClient
                             {
                                 if (roundIndex > -1 && roundIndex < ClientData.RoundNames.Length)
                                 {
-                                    ClientData.StageName = ClientData.RoundNames[roundIndex];
                                     ClientData.RoundIndex = roundIndex;
                                 }
                             }
@@ -321,10 +320,6 @@ public class Viewer : Actor, IViewerClient
                                         ClientData.Players[i].IsChooser = false;
                                     }
 
-                                    break;
-
-                                case GameStage.After:
-                                    ClientData.StageName = "";
                                     break;
                             }
 
@@ -1844,9 +1839,7 @@ public class Viewer : Actor, IViewerClient
 
         var playerName = mparams.Length > 6 ? mparams[6] : null;
 
-        var personData = ClientData.PersonDataExtensions;
-
-        personData.StakeInfo = new StakeInfo
+        ClientData.StakeInfo = new StakeInfo
         {
             Minimum = minimumStake,
             Maximum = maximumStake,

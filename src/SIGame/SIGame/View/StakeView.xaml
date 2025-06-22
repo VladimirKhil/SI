@@ -60,7 +60,7 @@
             Command="{Binding SendStake}" />
         
         <Slider
-            DataContext="{Binding Data.PersonDataExtensions.StakeInfo}"
+            DataContext="{Binding Data.StakeInfo}"
             Name="slider1"
             Margin="5,0"
             Grid.ColumnSpan="2"
@@ -76,7 +76,7 @@
             IsMoveToPointEnabled="True" />
         
         <local:NumericTextBox
-            DataContext="{Binding Data.PersonDataExtensions.StakeInfo}"
+            DataContext="{Binding Data.StakeInfo}"
             Style="{StaticResource {x:Type TextBox}}"
             Grid.Column="2"
             Minimum="{Binding Minimum}"

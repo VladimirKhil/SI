@@ -102,6 +102,7 @@ public sealed class ScenariosTests
         await showmanListener.AssertNextMessageAsync(Messages.Stage);
         await showmanListener.AssertNextMessageAsync(Messages.RoundThemes);
         await showmanListener.AssertNextMessageAsync(Messages.RoundThemes2);
+        await showmanListener.AssertNextMessageAsync(Messages.Theme2);
         await showmanListener.AssertNextMessageAsync(Messages.Table);
         await showmanListener.AssertNextMessageAsync(Messages.First);
         await showmanListener.AssertNextMessageAsync(Messages.AskSelectPlayer);
@@ -128,16 +129,28 @@ public sealed class ScenariosTests
         Assert.That(askValidate[1], Is.EqualTo("0"));
         Assert.That(askValidate[2], Is.EqualTo("myAnswer"));
 
-        var validateMsg = new MessageBuilder(Messages.Validate, 0, "+", 1);
+        var validateMsg = new MessageBuilder(Messages.Validate, "myAnswer", "+", 1);
         showmanClient.SendMessage(validateMsg.ToString(), receiver: NetworkConstants.GameName);
 
-        await showmanListener.AssertNextMessageAsync(Messages.Cancel);
+        await showmanListener.AssertNextMessageAsync(Messages.PlayerAnswer);
+
         var personMsg = await showmanListener.AssertNextMessageAsync(Messages.Person);
         Assert.That(personMsg[1], Is.EqualTo("+"));
         Assert.That(personMsg[2], Is.EqualTo("0"));
         Assert.That(personMsg[3], Is.EqualTo("10"));
 
         await showmanListener.AssertNextMessageAsync(Messages.Sums);
+        await showmanListener.AssertNextMessageAsync(Messages.PlayerAnswer);
+        await showmanListener.AssertNextMessageAsync(Messages.Person);
+        await showmanListener.AssertNextMessageAsync(Messages.Sums);
+        await showmanListener.AssertNextMessageAsync(Messages.RightAnswer);
+        await showmanListener.AssertNextMessageAsync(Messages.QuestionEnd);
+        await showmanListener.AssertNextMessageAsync(Messages.Sums);
+        await showmanListener.AssertNextMessageAsync(Messages.Stop);
+        await showmanListener.AssertNextMessageAsync(Messages.Stop);
+        await showmanListener.AssertNextMessageAsync(Messages.Winner);
+        await showmanListener.AssertNextMessageAsync(Messages.Stage);
+        await showmanListener.AssertNextMessageAsync(Messages.GameStatistics);
     }
 
     private sealed class MessageListener : IDisposable
@@ -150,6 +163,7 @@ public sealed class ScenariosTests
             Messages.Connect,
             Messages.Connected,
             Messages.Replic,
+            Messages.ShowmanReplic,
             Messages.Timer,
             Messages.PlayerState,
         });

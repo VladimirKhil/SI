@@ -459,7 +459,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     internal string? HostKey { get; set; }
 
-    private SICore.Models.JoinMode _joinMode = SICore.Models.JoinMode.AnyRole;
+    private SICore.Models.JoinMode _joinMode = JoinMode.AnyRole;
 
     /// <summary>
     /// Allowed join mode.
@@ -596,6 +596,48 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             }
         }
     }
+
+    private string _stageName = "";
+
+    /// <summary>
+    /// Human-readable game stage name.
+    /// </summary>
+    public string StageName
+    {
+        get => _stageName;
+        set { if (_stageName != value) { _stageName = value; OnPropertyChanged(); } }
+    }
+
+    private bool _showMainTimer;
+
+    public bool ShowMainTimer
+    {
+        get => _showMainTimer;
+        set
+        {
+            if (_showMainTimer != value)
+            {
+                _showMainTimer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _enableMediaLoadButton;
+
+    /// <summary>
+    /// Shows button that enables external media load.
+    /// </summary>
+    public bool EnableMediaLoadButton
+    {
+        get => _enableMediaLoadButton;
+        set { if (_enableMediaLoadButton != value) { _enableMediaLoadButton = value; OnPropertyChanged(); } }
+    }
+
+    /// <summary>
+    /// Banned persons (keys are persons IPs; values are persons names).
+    /// </summary>
+    public ObservableCollection<BannedInfo> Banned { get; } = new();
 
     public GameViewModel(
         ViewerData viewerData,
@@ -843,7 +885,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void SendStake_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.Stake, 1, Host.ClientData.PersonDataExtensions.StakeInfo.Stake);
+        Host?.Actions.SendMessageWithArgs(Messages.Stake, 1, Host.ClientData.StakeInfo.Stake);
         ClearSelections();
     }
 
@@ -861,19 +903,19 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void SendPassNew_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.SetStake, SICore.Models.StakeModes.Pass);
+        Host?.Actions.SendMessageWithArgs(Messages.SetStake, StakeModes.Pass);
         ClearSelections();
     }
 
     private void SendStakeNew_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.SetStake, SICore.Models.StakeModes.Stake, Host.ClientData.PersonDataExtensions.StakeInfo.Stake);
+        Host?.Actions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, Host.ClientData.StakeInfo?.Stake ?? 1);
         ClearSelections();
     }
 
     private void SendAllInNew_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.SetStake, SICore.Models.StakeModes.AllIn);
+        Host?.Actions.SendMessageWithArgs(Messages.SetStake, StakeModes.AllIn);
         ClearSelections();
     }
 

@@ -710,7 +710,7 @@ public sealed class Game : Actor
                                     _ => LO[nameof(R.JoinModeSwitchedToForbidden)]
                                 };
 
-                                _gameActions.SpecialReplic(string.Format(replic, ClientData.HostName));
+                                _gameActions.SpecialReplic(string.Format(replic, ClientData.HostName)); // TODO: REMOVE: replaced by SETJOINMODE message
                             }
                         }
                         break;
@@ -783,6 +783,10 @@ public sealed class Game : Actor
 
                     case Messages.MediaPreloaded:
                         OnMediaPreloaded(message);
+                        break;
+
+                    case Messages.MediaPreloadProgress:
+                        OnMediaPreloadProgress(message, args);
                         break;
 
                     case Messages.Report:
@@ -1136,7 +1140,7 @@ public sealed class Game : Actor
         ClientData.ChooserIndex = playerIndex;
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name));
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name)); // TODO: REMOVE: replaced by SETCHOOSER message
 
         if (isChoosingNow)
         {
@@ -1191,6 +1195,16 @@ public sealed class Game : Actor
 
     private void OnMediaPreloaded(Message message) => _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaPreloaded, message.Sender);
 
+    private void OnMediaPreloadProgress(Message message, string[] args)
+    {
+        if (args.Length < 2 || !int.TryParse(args[1], out var progress) || progress < 0 || progress > 100)
+        {
+            return;
+        }
+        
+        _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaPreloadProgress, message.Sender, progress);
+    }
+
     private void OnToggle(Message message, string[] args)
     {
         if (ClientData.TableController == null)
@@ -1236,7 +1250,7 @@ public sealed class Game : Actor
                     LO[nameof(R.QuestionRemoved)],
                     message.Sender,
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
-                    oldPrice));
+                    oldPrice)); // TODO: REMOVE: replaced by TOGGLE message
         }
         else
         {
@@ -1250,7 +1264,7 @@ public sealed class Game : Actor
                     LO[nameof(R.QuestionRestored)],
                     message.Sender,
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
-                    question.Price));
+                    question.Price)); // TODO: REMOVE: replaced by TOGGLE message
         }
 
         // TODO: remove after all clients upgrade to 7.12.0
@@ -1282,14 +1296,14 @@ public sealed class Game : Actor
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickYouself);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickYouself); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickBots);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickBots); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
@@ -1304,7 +1318,7 @@ public sealed class Game : Actor
             _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
         }
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, clientName));
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, clientName)); // TODO: REMOVE: replaced by BANNED message
     }
 
     private void OnBan(Message message, string[] args)
@@ -1323,14 +1337,14 @@ public sealed class Game : Actor
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanYourself);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanYourself); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanBots);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanBots); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
@@ -1342,10 +1356,10 @@ public sealed class Game : Actor
 
         if (clientId.Length > 0)
         {
-            _gameActions.SendMessageWithArgs(Messages.Banned, clientId, person);
+            _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
         }
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, clientName));
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, clientName)); // TODO: REMOVE: replaced by BANNED message
     }
 
     private void OnSetHost(Message message, string[] args)
@@ -1364,14 +1378,14 @@ public sealed class Game : Actor
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToYourself);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToYourself); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToYourself);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToBots);
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToBots); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToBots);
             return;
         }
@@ -1448,7 +1462,8 @@ public sealed class Game : Actor
 
                 if (error != null)
                 {
-                    _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), error);
+                    _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), error.Value.Item2); // TODO: REMOVE: replaced by USER_ERROR message
+                    _gameActions.SendMessageWithArgs(Messages.UserError, error.Value.Item1);
                     return;
                 }
             }
@@ -1590,6 +1605,7 @@ public sealed class Game : Actor
             _ => StakeMode.Sum
         };
 
+    [Obsolete]
     private void OnStake(Message message, string[] args)
     {
         if (!ClientData.IsWaiting ||

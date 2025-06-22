@@ -499,9 +499,15 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 }
 
                 _gameViewModel.Apellate.CanBeExecuted = false;
+
+                if (_data.RoundIndex > -1 && _data.RoundIndex < _data.RoundNames.Length)
+                {
+                    _gameViewModel.StageName = _data.RoundNames[_data.RoundIndex];
+                }
                 break;
 
             case GameStage.After:
+                _gameViewModel.StageName = "";
                 _gameLogger?.Write("</body></html>");
                 OnGameFinished();
                 break;
@@ -535,7 +541,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     public void GameThemes()
     {
         TInfo.TStage = TableStage.GameThemes;
-        _data.EnableMediaLoadButton = false;
+        _gameViewModel.EnableMediaLoadButton = false;
 
         for (var i = 0; i < _data.TInfo.GameThemes.Count; i++)
         {
@@ -928,7 +934,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                         && !ExternalUrlOk(uri))
                     {
                         currentGroup.Content.Add(new ContentViewModel(ContentType.Text, string.Format(Resources.ExternalLink, uri)));
-                        _data.EnableMediaLoadButton = true;
+                        _gameViewModel.EnableMediaLoadButton = true;
                         _data.ExternalContent.Add((contentType, uri));
                         return;
                     }
@@ -1010,7 +1016,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         {
             TInfo.Text = string.Format(Resources.ExternalLink, uri);
             TInfo.QuestionContentType = QuestionContentType.SpecialText;
-            _data.EnableMediaLoadButton = true;
+            _gameViewModel.EnableMediaLoadButton = true;
             _data.ExternalContent.Add((ContentTypes.Audio, uri));
             return;
         }
@@ -1047,7 +1053,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void ReloadMedia()
     {
-        _data.EnableMediaLoadButton = false;
+        _gameViewModel.EnableMediaLoadButton = false;
 
         var externalContent = _data.ExternalContent.FirstOrDefault();
 
@@ -1109,7 +1115,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             {
                 TInfo.TStage = TableStage.Answer;
                 TInfo.Text = answer;
-                _data.EnableMediaLoadButton = false;
+                _gameViewModel.EnableMediaLoadButton = false;
             }
             catch (NullReferenceException exc)
             {
@@ -1278,7 +1284,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         TInfo.PartialText = false;
         TInfo.PartialImage = false;
         TInfo.IsMediaStopped = false;
-        _data.EnableMediaLoadButton = false;
+        _gameViewModel.EnableMediaLoadButton = false;
         _data.ExternalContent.Clear();
 
         _runTimer = false;
@@ -1547,7 +1553,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     {
         TInfo.Text = text;
         TInfo.TStage = stage == Models.TableStage.Theme ? TableStage.Theme : stage == Models.TableStage.Round ? TableStage.Round : TableStage.QuestionPrice;
-        _data.EnableMediaLoadButton = false;
+        _gameViewModel.EnableMediaLoadButton = false;
 
         if (stage == Models.TableStage.Theme || stage == Models.TableStage.QuestionPrice)
         {
@@ -1651,7 +1657,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                         if (personIndex == -2)
                         {
-                            _data.ShowMainTimer = true;
+                            _gameViewModel.ShowMainTimer = true;
                         }
                     }
 
@@ -1666,7 +1672,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     player.IsDeciding = false;
                 }
 
-                _data.ShowMainTimer = false;
+                _gameViewModel.ShowMainTimer = false;
                 break;
         }
     }
@@ -1733,11 +1739,11 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         UI.Execute(
             () =>
             {
-                var banned = _data.Banned.FirstOrDefault(p => p.Ip == ip);
+                var banned = _gameViewModel.Banned.FirstOrDefault(p => p.Ip == ip);
 
                 if (banned != null)
                 {
-                    _data.Banned.Remove(banned);
+                    _gameViewModel.Banned.Remove(banned);
                     OnSpecialReplic(string.Format(Resources.UserUnbanned, banned.UserName));
                 }
             },
@@ -1747,18 +1753,18 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         UI.Execute(
             () =>
             {
-                _data.Banned.Add(bannedInfo);
+                _gameViewModel.Banned.Add(bannedInfo);
             },
             OnError);
 
     public void OnBannedList(IEnumerable<Models.BannedInfo> banned) =>
         UI.Execute(() =>
         {
-            _data.Banned.Clear();
+            _gameViewModel.Banned.Clear();
 
             foreach (var item in banned)
             {
-                _data.Banned.Add(item);
+                _gameViewModel.Banned.Add(item);
             }
         },
         OnError);
@@ -2015,9 +2021,14 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void MakeStake()
     {
-        _gameViewModel.SendStakeNew.CanBeExecuted = _data.PersonDataExtensions.StakeInfo.Modes.HasFlag(Models.StakeModes.Stake);
-        _gameViewModel.SendPassNew.CanBeExecuted = _data.PersonDataExtensions.StakeInfo.Modes.HasFlag(Models.StakeModes.Pass);
-        _gameViewModel.SendAllInNew.CanBeExecuted = _data.PersonDataExtensions.StakeInfo.Modes.HasFlag(Models.StakeModes.AllIn);
+        if (_data.StakeInfo == null)
+        {
+            return;
+        }
+
+        _gameViewModel.SendStakeNew.CanBeExecuted = _data.StakeInfo.Modes.HasFlag(Models.StakeModes.Stake);
+        _gameViewModel.SendPassNew.CanBeExecuted = _data.StakeInfo.Modes.HasFlag(Models.StakeModes.Pass);
+        _gameViewModel.SendAllInNew.CanBeExecuted = _data.StakeInfo.Modes.HasFlag(Models.StakeModes.AllIn);
 
         _gameViewModel.DialogMode = DialogModes.StakeNew;
         _gameViewModel.Hint = Resources.HintMakeAStake;

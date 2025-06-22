@@ -1227,4 +1227,10 @@
   <data name="NotReady" xml:space="preserve">
     <value>Не готов</value>
   </data>
+  <data name="Nominal" xml:space="preserve">
+    <value>Номинал</value>
+  </data>
+  <data name="VaBank" xml:space="preserve">
+    <value>ВА-БАНК!!!</value>
+  </data>
 </root>

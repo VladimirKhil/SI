@@ -86,7 +86,7 @@
 
             <Grid
                 Grid.Column="2"
-                Visibility="{Binding Data.ShowMainTimer, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                Visibility="{Binding ShowMainTimer, Converter={StaticResource BooleanToVisibilityConverter1}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="15*" />
@@ -118,7 +118,7 @@
                 Style="{StaticResource SIButtonSimple}"
                 Content="{x:Static lp:Resources.EnableMediaLoad}"
                 Command="{Binding EnableExtrenalMediaLoad}"
-                Visibility="{Binding Data.EnableMediaLoadButton, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                Visibility="{Binding EnableMediaLoadButton, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom"
                 Margin="20"
@@ -307,7 +307,7 @@
 
                 <TextBlock
                     Grid.ColumnSpan="3"
-                    Text="{Binding Data.StageName}"
+                    Text="{Binding StageName}"
                     TextAlignment="Center"
                     TextTrimming="CharacterEllipsis"
                     Foreground="Black"

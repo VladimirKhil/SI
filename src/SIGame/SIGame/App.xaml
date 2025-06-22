@@ -1281,14 +1281,14 @@
 
                     <DataTemplate x:Key="{x:Static vmm:DialogModes.CatCost}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.CatCost}">
-                            <l:SimpleStakeView DataContext="{Binding Data.PersonDataExtensions}" />
+                            <l:SimpleStakeView DataContext="{Binding Data}" />
                         </ContentControl>
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static vmm:DialogModes.Stake}">
                         <ContentControl
                             Style="{StaticResource windowStyleWithProgress}"
-                            Tag="{Binding Data.PersonDataExtensions.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
+                            Tag="{Binding Data.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
                             <l:StakeView />
                         </ContentControl>
                     </DataTemplate>
@@ -1296,14 +1296,14 @@
                     <DataTemplate x:Key="{x:Static vmm:DialogModes.StakeNew}">
                         <ContentControl
                             Style="{StaticResource windowStyleWithProgress}"
-                            Tag="{Binding Data.PersonDataExtensions.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
+                            Tag="{Binding Data.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
                             <l:StakeNewView />
                         </ContentControl>
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static vmm:DialogModes.FinalStake}">
                         <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.Stake}">
-                            <l:SimpleStakeView DataContext="{Binding Data.PersonDataExtensions}" />
+                            <l:SimpleStakeView DataContext="{Binding Data}" />
                         </ContentControl>
                     </DataTemplate>
 
