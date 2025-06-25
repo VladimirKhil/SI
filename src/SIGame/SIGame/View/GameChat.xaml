@@ -79,7 +79,7 @@
                     <UniformGrid
                         DockPanel.Dock="Bottom"
                         Columns="2"
-                        Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                        Visibility="{Binding IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
                         <Button
                             Style="{StaticResource SIButtonSimple}"
                             Background="{StaticResource WindowBackground}"
@@ -114,7 +114,7 @@
                         FontSize="18"
                         TextBlock.LineHeight="18"
                         Content="{x:Static lp:Resources.SetHost}"
-                        Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+                        Visibility="{Binding IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}" />
 
                     <DockPanel
                         DockPanel.Dock="Bottom"
@@ -133,7 +133,7 @@
                             SelectedItem="{Binding JoinMode}"
                             VerticalAlignment="Stretch"
                             VerticalContentAlignment="Center"
-                            IsEnabled="{Binding Host.IsHost}">
+                            IsEnabled="{Binding IsHost}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Converter={StaticResource JoinModeConverter}, Mode=OneTime}" />
@@ -178,7 +178,7 @@
                     <UniformGrid
                         DockPanel.Dock="Bottom"
                         Columns="2"
-                        Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                        Visibility="{Binding IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
                         <Button
                             Style="{StaticResource SIButtonSimple}"
                             Background="{StaticResource WindowBackground}"
@@ -207,7 +207,7 @@
                     <UniformGrid
                         DockPanel.Dock="Bottom"
                         Columns="2"
-                        Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                        Visibility="{Binding IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
                         <Button
                             Style="{StaticResource SIButtonSimple}"
                             Background="{StaticResource WindowBackground}"

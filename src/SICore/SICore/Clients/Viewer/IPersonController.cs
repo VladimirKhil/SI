@@ -263,8 +263,6 @@ public interface IPersonController
 
     void OnPersonDisconnected() { }
 
-    void OnHostChanged() { }
-
     void OnPersonStake(int stakerIndex) { }
 
     void OnClientSwitch(IViewerClient viewer) { }
@@ -277,7 +275,7 @@ public interface IPersonController
 
     void OnSelfDisconnected() { }
 
-    void OnHostChanged(string initiator, string newHost) { }
+    void OnHostChanged(string? initiator, string newHost) { }
 
     void OnPersonsUpdated() { }
 }

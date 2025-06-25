@@ -8,11 +8,6 @@ namespace SICore;
 /// </summary>
 public interface IViewerClient : IDisposable
 {
-    /// <summary>
-    /// Host marker.
-    /// </summary>
-    bool IsHost { get; }
-
     GameRole Role { get; }
 
     ViewerData ClientData { get; }

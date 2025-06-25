@@ -2000,8 +2000,6 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnPersonDisconnected() => _gameViewModel.UpdateCommands();
 
-    public void OnHostChanged() => _gameViewModel.UpdateCommands();
-
     public void OnClientSwitch(IViewerClient viewer)
     {
         _gameViewModel.Host = viewer;
@@ -2042,7 +2040,16 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnSelfDisconnected() => OnReplic(ReplicCodes.System.ToString(), Resources.DisconnectMessage);
 
-    public void OnHostChanged(string initiator, string newHost) => OnReplic(
-        ReplicCodes.Special.ToString(),
-        string.Format(Resources.HostChanged, initiator.Length > 0 ? initiator : Resources.ByGame, newHost));
+    public void OnHostChanged(string? initiator, string newHost)
+    {
+        _gameViewModel.IsHost = _viewerActions.Client.Name == newHost;
+        _gameViewModel.UpdateCommands();
+
+        if (!string.IsNullOrEmpty(initiator))
+        {
+            OnReplic(
+                ReplicCodes.Special.ToString(),
+                string.Format(Resources.HostChanged, initiator.Length > 0 ? initiator : Resources.ByGame, newHost));
+        }
+    }
 }

@@ -36,7 +36,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public IViewerClient? Host
     {
         get => _host;
-        set { _host = value; UpdateCommands(); }
+        set
+        {
+            _host = value;
+            UpdateCommands();
+        }
     }
 
     private readonly ViewerData _data;
@@ -639,6 +643,24 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     /// </summary>
     public ObservableCollection<BannedInfo> Banned { get; } = new();
 
+    private bool _isHost;
+
+    /// <summary>
+    /// Is current person a game host (has rights to manage the game process).
+    /// </summary>
+    public bool IsHost
+    {
+        get => _isHost;
+        set
+        {
+            if (_isHost != value)
+            {
+                _isHost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public GameViewModel(
         ViewerData viewerData,
         Node node,
@@ -976,14 +998,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     internal async void ReleaseGameButton()
     {
-        if (Host == null)
-        {
-            return;
-        }
-
         try
         {
-            await Task.Delay(Host.ClientData.ButtonBlockingTime * 1000);
+            await Task.Delay(_data.ButtonBlockingTime * 1000);
             EnableGameButton(false);
         }
         catch (Exception exc)
@@ -995,7 +1012,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     private void AddTable_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
 
     internal void UpdateAddTableCommand() =>
-        AddTable.CanBeExecuted = Host != null && Host.IsHost && Host.ClientData.Players.Count < Constants.MaxPlayers;
+        AddTable.CanBeExecuted = IsHost && _data.Players.Count < Constants.MaxPlayers;
 
     private void ForceStart_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Start);
 
@@ -1151,16 +1168,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void UpdateCurrentPlayerCommands()
     {
-        if (Host == null)
-        {
-            return;
-        }
-
-        FreeTable.CanBeExecuted = Host.IsHost && CurrentPerson != null && CurrentPerson.IsHuman && CurrentPerson.IsConnected;
-        DeleteTable.CanBeExecuted = Host.IsHost && Host.ClientData.Players.Count > 2 && CurrentPerson != null && CurrentPerson.IsPlayer;
-        ChangeType.CanBeExecuted = Host.IsHost;
-        Replace.CanBeExecuted = Host.IsHost && CurrentPerson != null && CurrentPerson.Others != null && CurrentPerson.Others.Any();
-        Kick.CanBeExecuted = Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = Host.IsHost;
+        FreeTable.CanBeExecuted = IsHost && CurrentPerson != null && CurrentPerson.IsHuman && CurrentPerson.IsConnected;
+        DeleteTable.CanBeExecuted = IsHost && _data.Players.Count > 2 && CurrentPerson != null && CurrentPerson.IsPlayer;
+        ChangeType.CanBeExecuted = IsHost;
+        Replace.CanBeExecuted = IsHost && CurrentPerson != null && CurrentPerson.Others != null && CurrentPerson.Others.Any();
+        Kick.CanBeExecuted = Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = IsHost;
     }
 
     private void FreeTable_Executed(object? arg)
@@ -1365,10 +1377,10 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     {
         IsShowman = Host?.Role == GameRole.Showman;
         IsPlayer = Host?.Role == GameRole.Player;
-        Move.CanBeExecuted = Data.Stage != GameStage.Before && (Host != null && Host.IsHost || IsShowman);
+        Move.CanBeExecuted = Data.Stage != GameStage.Before && (IsHost || IsShowman);
         ChangePauseInGame.CanBeExecuted = Move.CanBeExecuted;
         _changeSums.CanBeExecuted = _changeActivePlayer.CanBeExecuted = IsShowman;
-        ForceStart.CanBeExecuted = Host != null && Host.IsHost && Host.ClientData.Stage == GameStage.Before;
+        ForceStart.CanBeExecuted = IsHost && _data.Stage == GameStage.Before;
         PressGameButton.CanBeExecuted = Pass.CanBeExecuted = IsPlayer;
         Ready.CanBeExecuted = UnReady.CanBeExecuted = IsPlayer || IsShowman;
         Apellate.CanBeExecuted &= IsPlayer;
@@ -1393,16 +1405,16 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     internal void UpdatePlayer(PlayerViewModel player) =>
         player.Others = player.IsHuman ?
-            Data.AllPersons.Values.Where(p => p.IsHuman)
+            _data.AllPersons.Values.Where(p => p.IsHuman)
                 .Except(new ViewerAccount[] { player.Model })
                 .ToArray()
             : GetDefaultComputerPlayers()
-                .Where(a => !Data.AllPersons.Values.Any(p => !p.IsHuman && p.Name == a.Name))
+                .Where(a => !_data.AllPersons.Values.Any(p => !p.IsHuman && p.Name == a.Name))
                 .ToArray();
 
     internal void UpdateShowman() =>
         Showman.Others = Showman.IsHuman ?
-            Data.AllPersons.Values.Where(p => p.IsHuman).Except(new ViewerAccount[] { Showman.Model }).ToArray()
+            _data.AllPersons.Values.Where(p => p.IsHuman).Except(new ViewerAccount[] { Showman.Model }).ToArray()
             : Array.Empty<ViewerAccount>();
 
     private void Move_Executed(object? arg)

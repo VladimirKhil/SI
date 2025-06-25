@@ -278,7 +278,8 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         var gameViewModel = new GameViewModel(data, _node, _userSettings, _settingsViewModel, null, loggerFactory.CreateLogger<GameViewModel>())
         {
-            IsOnline = IsOnline
+            IsOnline = IsOnline,
+            IsHost = isHost,
         };
 
         var actions = new ViewerActions(_client);
@@ -297,9 +298,9 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         {
             _host = role switch
             {
-                GameRole.Showman => new Showman(_client, humanPlayer, isHost, logic, actions, data),
-                GameRole.Player => new Player(_client, humanPlayer, isHost, logic, actions, data),
-                _ => new Viewer(_client, humanPlayer, isHost, logic, actions, data),
+                GameRole.Showman => new Showman(_client, humanPlayer, logic, actions, data),
+                GameRole.Player => new Player(_client, humanPlayer, logic, actions, data),
+                _ => new Viewer(_client, humanPlayer, logic, actions, data),
             };
 
             gameViewModel.Host = _host;
@@ -324,7 +325,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
             return gameViewModel;
         }
-        catch (Exception exc)
+        catch
         {
             await logic.DisposeAsync();
             throw;

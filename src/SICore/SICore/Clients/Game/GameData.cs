@@ -592,12 +592,6 @@ public sealed class GameData : Data
     public bool PendingApellation { get; internal set; }
 
     /// <summary>
-    /// Will be removed later.
-    /// </summary>
-    [Obsolete]
-    public GameStages LegacyStage { get; internal set; }
-
-    /// <summary>
     /// Validates players state for current round.
     /// </summary>
     public Func<bool>? PlayersValidator { get; internal set; }
@@ -607,6 +601,11 @@ public sealed class GameData : Data
     /// Question type name.
     /// </summary>
     public string QuestionTypeName { get; internal set; } = QuestionTypes.Default;
+
+    /// <summary>
+    /// Question type settings.
+    /// </summary>
+    public Dictionary<string, QuestionTypeRules> QuestionTypeSettings { get; internal set; } = new();
 
     internal StakesState Stakes { get; }
 
@@ -626,5 +625,37 @@ public sealed class GameData : Data
         _showMan = showman;
         Stakes = new StakesState(Players);
         Settings = settings;
+        InitQuestionTypeSettings();
+    }
+
+    private void InitQuestionTypeSettings()
+    {
+        var appSettings = Settings.AppSettings;
+        var ignoreWrong = appSettings.IgnoreWrong;
+
+        QuestionTypeSettings[QuestionTypes.ForYourself] = QuestionTypeSettings[QuestionTypes.NoRisk] =
+            new QuestionTypeRules((ignoreWrong || appSettings.QuestionForYourselfPenalty == PenaltyType.None)
+                ? PenaltyType.None
+                : PenaltyType.SubtractPoints);
+
+        QuestionTypeSettings[QuestionTypes.ForAll] =
+            new QuestionTypeRules((ignoreWrong || appSettings.QuestionForAllPenalty == PenaltyType.None)
+                ? PenaltyType.None
+                : PenaltyType.SubtractPoints);
+
+        QuestionTypeSettings[QuestionTypes.WithButton] = QuestionTypeSettings[QuestionTypes.Simple] =
+            new QuestionTypeRules((ignoreWrong || appSettings.QuestionWithButtonPenalty == PenaltyType.None)
+                ? PenaltyType.None
+                : PenaltyType.SubtractPoints);
+    }
+
+    public sealed class QuestionTypeRules
+    {
+        public PenaltyType PenaltyType { get; }
+
+        public QuestionTypeRules(PenaltyType penaltyType)
+        {
+             PenaltyType = penaltyType;
+        }
     }
 }

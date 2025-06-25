@@ -764,6 +764,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             NetworkGame = NetworkGame,
             NetworkGamePort = NetworkPort,
             IsOnline = false,
+            IsHost = true,
             TempDocFolder = documentPath
         };
 
@@ -780,7 +781,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         {
             if (_model.HumanPlayerName == _model.Showman.Name)
             {
-                host = new Showman(client, _model.Showman, true, logic, actions, data);
+                host = new Showman(client, _model.Showman, logic, actions, data);
                 game.ClientData.ShowMan.IsConnected = true;
             }
             else
@@ -789,7 +790,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                 {
                     if (_model.Players[i].Name == _model.HumanPlayerName)
                     {
-                        host = new Player(client, _model.Players[i], true, logic, actions, data);
+                        host = new Player(client, _model.Players[i], logic, actions, data);
                         game.ClientData.Players[i].IsConnected = true;
                         break;
                     }
@@ -797,7 +798,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
                 if (host == null)
                 {
-                    host = new Viewer(client, _model.Viewers[0], true, logic, actions, data);
+                    host = new Viewer(client, _model.Viewers[0], logic, actions, data);
                     game.ClientData.Viewers.Add(new ViewerAccount(_model.Viewers[0]) { IsConnected = true });
                 }
             }

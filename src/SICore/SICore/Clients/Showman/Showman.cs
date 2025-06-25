@@ -10,8 +10,8 @@ public sealed class Showman : Viewer
 {
     public override GameRole Role => GameRole.Showman;
 
-    public Showman(Client client, Account personData, bool isHost, IPersonController logic, ViewerActions viewerActions, ViewerData data)
-        : base(client, personData, isHost, logic, viewerActions, data)
+    public Showman(Client client, Account personData, IPersonController logic, ViewerActions viewerActions, ViewerData data)
+        : base(client, personData, logic, viewerActions, data)
     { }
 
     /// <inheritdoc />

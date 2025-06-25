@@ -28,34 +28,9 @@ public class Viewer : Actor, IViewerClient
 
     public IPersonController MyLogic => _logic;
 
-    private bool _isHost;
-
-    /// <summary>
-    /// Is current person a game host (has rights to manage the game process).
-    /// </summary>
-    public bool IsHost
-    {
-        get => _isHost;
-
-        private set
-        {
-            if (_isHost != value)
-            {
-                _isHost = value;
-                _logic.OnHostChanged();
-            }
-        }
-    }
-
     public ViewerData ClientData { get; }
 
     public string? Avatar { get; set; }
-
-    private void Initialize(bool isHost)
-    {
-        IsHost = isHost;
-        ClientData.Name = _client.Name;
-    }
 
     /// <summary>
     /// Initializes a new instance of <see cref="Viewer" /> class.
@@ -63,7 +38,6 @@ public class Viewer : Actor, IViewerClient
     public Viewer(
         Client client,
         Account personData,
-        bool isHost,
         IPersonController logic,
         ViewerActions viewerActions,
         ViewerData data)
@@ -72,9 +46,7 @@ public class Viewer : Actor, IViewerClient
         _viewerActions = viewerActions;
         _logic = logic;
         ClientData = data;
-
-        Initialize(isHost);
-
+        ClientData.Name = client.Name;
         ClientData.Picture = personData.Picture;
     }
 
@@ -674,12 +646,7 @@ public class Viewer : Actor, IViewerClient
         }
 
         ClientData.HostName = mparams[1];
-        IsHost = _client.Name == ClientData.HostName;
-
-        if (mparams.Length > 2) // Host has been changed
-        {
-            _logic.OnHostChanged(mparams[2], mparams[1]);
-        }
+        _logic.OnHostChanged(mparams.Length > 2 ? mparams[2] : null, mparams[1]);
     }
 
     private void OnOut(string[] mparams)
@@ -1624,9 +1591,9 @@ public class Viewer : Actor, IViewerClient
 
         IViewerClient viewer = role switch
         {
-            GameRole.Viewer => new Viewer(_client, newAccount, IsHost, _logic, _viewerActions, ClientData),
-            GameRole.Player => new Player(_client, newAccount, IsHost, _logic, _viewerActions, ClientData),
-            _ => new Showman(_client, newAccount, IsHost, _logic, _viewerActions, ClientData),
+            GameRole.Viewer => new Viewer(_client, newAccount, _logic, _viewerActions, ClientData),
+            GameRole.Player => new Player(_client, newAccount, _logic, _viewerActions, ClientData),
+            _ => new Showman(_client, newAccount, _logic, _viewerActions, ClientData),
         };
 
         viewer.Avatar = Avatar;

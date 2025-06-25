@@ -91,18 +91,6 @@ public static class StepParameterValues
     public const string SetPriceMode_Select = "select";
 
     /// <summary>
-    /// SetPrice mode of question with button (default value).
-    /// </summary>
-
-    public const string SetPriceMode_WithButton = "withButton";
-
-    /// <summary>
-    /// SetPrice mode of question for all players (everybody will play).
-    /// </summary>
-
-    public const string SetPriceMode_ForAll = "forAll";
-
-    /// <summary>
     /// SetAnswerType text type (default value).
     /// </summary>
     public const string SetAnswerTypeType_Text = "text";

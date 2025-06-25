@@ -17,18 +17,16 @@ public sealed class Player : Viewer
     /// </summary>
     /// <param name="client">Player game network client.</param>
     /// <param name="personData">Player account data.</param>
-    /// <param name="isHost">Is the player a game host.</param>
     /// <param name="logic">Player logic.</param>
     /// <param name="viewerActions">Player actions.</param>
     /// <param name="data">Player game data.</param>
     public Player(
         Client client,
         Account personData,
-        bool isHost,
         IPersonController logic,
         ViewerActions viewerActions,
         ViewerData data)
-        : base(client, personData, isHost, logic, viewerActions, data)
+        : base(client, personData, logic, viewerActions, data)
     { }
 
     protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)

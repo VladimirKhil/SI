@@ -176,7 +176,7 @@ public sealed class GameActions
         QuestionSelectionStrategyType roundStrategy,
         string person = NetworkConstants.Everybody)
     {
-        var messageBuilder = new MessageBuilder(Messages.Stage, _gameData.LegacyStage, roundName, roundIndex, roundStrategy);
+        var messageBuilder = new MessageBuilder(Messages.Stage, _gameData.Stage, roundName, roundIndex, roundStrategy);
         SendMessage(messageBuilder.ToString(), person);
     }
 

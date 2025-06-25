@@ -31,7 +31,6 @@ public static class ScriptsLibrary
         var scriptWithButton = new Script();
 
         scriptWithButton.Steps.Add(CreateSetAnswerTypeStep());
-        scriptWithButton.Steps.Add(CreateSetPriceWithButtonStep());
         scriptWithButton.Steps.Add(CreateQuestionStep());
         scriptWithButton.Steps.Add(CreateAskAnswerStep());
         scriptWithButton.Steps.Add(CreateAnswerStep());
@@ -130,7 +129,6 @@ public static class ScriptsLibrary
 
         forAllScript.Steps.Add(CreateSetAnswerTypeStep());
         forAllScript.Steps.Add(CreateSetAnswererAllStep());
-        forAllScript.Steps.Add(CreateSetPriceForAllStep());
         forAllScript.Steps.Add(CreateQuestionStep());
         forAllScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
         forAllScript.Steps.Add(CreateAnswerStep());
@@ -257,22 +255,6 @@ public static class ScriptsLibrary
     {
         var setPriceStep = new Step { Type = StepTypes.SetPrice };
         setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_NoRisk);
-
-        return setPriceStep;
-    }
-
-    private static Step CreateSetPriceWithButtonStep()
-    {
-        var setPriceStep = new Step { Type = StepTypes.SetPrice };
-        setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_WithButton);
-
-        return setPriceStep;
-    }
-
-    private static Step CreateSetPriceForAllStep()
-    {
-        var setPriceStep = new Step { Type = StepTypes.SetPrice };
-        setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_ForAll);
 
         return setPriceStep;
     }

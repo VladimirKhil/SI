@@ -60,7 +60,7 @@ public static class GameRunner
                     new Intelligence((ComputerAccount)settings.Showman),
                     GameRole.Showman);
 
-                var showman = new Showman(showmanClient, settings.Showman, false, logic, actions, data);
+                var showman = new Showman(showmanClient, settings.Showman, logic, actions, data);
                 showmanClient.ConnectTo(node);
 
                 gameData.ShowMan.IsConnected = true;
@@ -84,7 +84,7 @@ public static class GameRunner
                         new Intelligence((ComputerAccount)settings.Players[i]),
                         GameRole.Player);
 
-                    var player = new Player(playerClient, settings.Players[i], false, logic, actions, data);
+                    var player = new Player(playerClient, settings.Players[i], logic, actions, data);
                     playerClient.ConnectTo(node);
 
                     gameData.Players[i].IsConnected = true;

@@ -3732,7 +3732,7 @@ public sealed class Game : Actor
         var data = new ViewerData();
         var actions = new ViewerActions(playerClient);
         var logic = new ViewerComputerLogic(data, actions, new Intelligence(account), GameRole.Player);
-        _ = new Player(playerClient, account, false, logic, actions, data);
+        _ = new Player(playerClient, account, logic, actions, data);
 
         OnInfo(newAccount.Name);
 
@@ -3767,7 +3767,7 @@ public sealed class Game : Actor
             new Intelligence(account),
             GameRole.Showman);
         
-        var showman = new Showman(showmanClient, account, false, logic, actions, data);
+        var showman = new Showman(showmanClient, account, logic, actions, data);
 
         OnInfo(newAccount.Name);
 

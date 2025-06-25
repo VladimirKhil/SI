@@ -251,7 +251,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
     }
 
-    private void OnQuestionPostInfo()
+    private void PostprocessQuestion(int taskTime = 1)
     {
         _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
 
@@ -259,7 +259,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.IsPlayingMedia = false;
         // Temporary moved to QuestSourComm
         // _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
-        ScheduleExecution(Tasks.QuestionPostInfo, 1, 1, force: true);
+        ScheduleExecution(Tasks.QuestionPostInfo, taskTime, 1, force: true);
 
         if (_data.AllowAppellation && _data.PendingApellation)
         {
@@ -1585,6 +1585,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var answererIndicies = _data.QuestionPlayState.AnswererIndicies.OrderBy(index => _data.Players[index].Sum);
         _data.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
+
+        if (_data.QuestionPlayState.AnswerOptions != null)
+        {
+            var m = new MessageBuilder(Messages.Answers).AddRange(_data.Players.Select(p => p.Answer ?? ""));
+            _gameActions.SendMessage(m.ToString());
+            ScheduleExecution(Tasks.MoveNext, 30, 1, true);
+            return true;
+        }
+
         ScheduleExecution(Tasks.Announce, 15);
         return true;
     }
@@ -2491,7 +2500,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         if (_data.AnnouncedAnswerersEnumerator == null || !_data.AnnouncedAnswerersEnumerator.MoveNext())
         {
-            OnQuestionPostInfo();
+            PostprocessQuestion();
             return;
         }
 
@@ -2759,8 +2768,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnQuestionType(bool isDefault)
     {
-        var isNoRisk = false;
-
         if (!isDefault) // TODO: This announcement should be handled by the client in the future
         {
             switch (_data.QuestionTypeName)
@@ -2777,7 +2784,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 case QuestionTypes.NoRisk:
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]); // TODO: REMOVE: replaced by QTYPE message
-                    isNoRisk = true;
                     break;
 
                 case QuestionTypes.Simple:
@@ -2796,6 +2802,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     OnUnsupportedQuestionType(_data.QuestionTypeName); // TODO: emit this by Game Engine
                     return;
             }
+        }
+
+        _data.QuestionTypeSettings.TryGetValue(_data.QuestionTypeName, out var questionTypeRules);
+        
+        var isNoRisk = questionTypeRules?.PenaltyType == PenaltyType.None;
+
+        if (isNoRisk)
+        {
+            _data.CurPriceWrong = 0;
         }
 
         _gameActions.SendMessageWithArgs(Messages.QType, _data.QuestionTypeName, isDefault, isNoRisk);
@@ -2929,13 +2944,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         if (_data.AnnouncedAnswerersEnumerator == null || !_data.AnnouncedAnswerersEnumerator.MoveNext())
         {
-            if (_data.QuestionPlayState.AnswerOptions != null)
-            {
-                var m = new MessageBuilder(Messages.Answers);
-                m.AddRange(_data.Players.Select(p => p.Answer ?? ""));
-                _gameActions.SendMessage(m.ToString());
-            }
-
             ScheduleExecution(Tasks.MoveNext, 15, 1, true);
             return;
         }
@@ -4421,7 +4429,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var roundName = round.Name;
 
             _data.Stage = GameStage.Round;
-            _data.LegacyStage = round.Type == RoundTypes.Final ? GameStages.Final : GameStages.Round;
             OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
 
             _gameActions.InformRound(roundName, roundIndex, _data.RoundStrategy);
@@ -4700,6 +4707,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     internal bool OnQuestionEnd()
     {
         var timeout = DetectRoundTimeout();
+        var nextTaskTime = 1;
 
         if (_data.QuestionPlayState.ValidateAfterRightAnswer)
         {
@@ -4707,9 +4715,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             {
                 return timeout;
             }
+
+            nextTaskTime = 30;
         }
 
-        OnQuestionPostInfo();
+        PostprocessQuestion(nextTaskTime);
         return timeout;
     }
 
@@ -4944,12 +4954,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _data.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
         }
 
-        _data.CurPriceRight *= _data.Settings.AppSettings.QuestionForYourselfFactor;
+        var factor = _data.Settings.AppSettings.QuestionForYourselfFactor;
 
-        if (_data.Settings.AppSettings.IgnoreWrong || _data.Settings.AppSettings.QuestionForYourselfPenalty == PenaltyType.None)
-        {
-            _data.CurPriceWrong = 0;
-        }
+        _data.CurPriceRight *= factor;
+        _data.CurPriceWrong *= factor;
 
         _gameActions.ShowmanReplic(
             $"{_data.Chooser!.Name}, {string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight))}");
@@ -4957,22 +4965,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
 
         ScheduleExecution(Tasks.MoveNext, 20);
-    }
-
-    internal void OnSetPriceWithButton()
-    {
-        if (_data.Settings.AppSettings.IgnoreWrong || _data.Settings.AppSettings.QuestionWithButtonPenalty == PenaltyType.None)
-        {
-            _data.CurPriceWrong = 0;
-        }
-    }
-
-    internal void OnSetPriceForAll()
-    {
-        if (_data.Settings.AppSettings.IgnoreWrong || _data.Settings.AppSettings.QuestionForAllPenalty == PenaltyType.None)
-        {
-            _data.CurPriceWrong = 0;
-        }
     }
 
     internal void AcceptQuestion()
