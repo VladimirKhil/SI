@@ -448,13 +448,23 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             return;
         }
 
-        using var change = ownerDocument.OperationsManager.BeginComplexChange();
-        ownerRound.Themes.Remove(this);
-        change.Commit();
-
-        if (ownerDocument?.ActiveNode == this)
+        try
         {
-            ownerDocument.ActiveNode = ownerRound;
+            var index = ownerRound.Themes.IndexOf(this);
+            var isActive = ownerDocument.ActiveNode == this;
+
+            using var change = ownerDocument.OperationsManager.BeginComplexChange();
+            ownerRound.Themes.Remove(this);
+            change.Commit();
+
+            if (isActive)
+            {
+                ownerDocument.Navigate.Execute(index < ownerRound.Themes.Count ? ownerRound.Themes[index] : ownerRound);
+            }
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
         }
     }
 

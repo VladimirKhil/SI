@@ -575,7 +575,6 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         switch (playMode)
         {
             case Models.ThemesPlayMode.OneByOne:
-                TInfo.TStage = TableStage.RoundThemes;
                 PlatformManager.Instance.PlaySound(Sounds.RoundThemes);
                 break;
             
@@ -1171,6 +1170,9 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
+    public void OnTheme(string themeName, int questionCount, bool animate = false) =>
+        SetText(themeName, animate, Models.TableStage.Theme);
+
     public void OnThemeComments(string comments)
     {
         _prependTableText = comments.UnescapeNewLines().LeaveFirst(MaxAdditionalTableTextLength);
@@ -1549,8 +1551,14 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnTextSpeed(double speed) => TInfo.TextSpeed = speed;
 
-    public void SetText(string text, Models.TableStage stage)
+    public void SetText(string text, bool animate = false, Models.TableStage stage = Models.TableStage.Round)
     {
+        if (animate)
+        {
+            TInfo.TStage = TableStage.Void; // to refresh animation
+        }
+
+        TInfo.AnimateText = animate;
         TInfo.Text = text;
         TInfo.TStage = stage == Models.TableStage.Theme ? TableStage.Theme : stage == Models.TableStage.Round ? TableStage.Round : TableStage.QuestionPrice;
         _gameViewModel.EnableMediaLoadButton = false;

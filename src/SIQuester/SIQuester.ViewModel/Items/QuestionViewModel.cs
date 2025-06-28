@@ -193,13 +193,16 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
         try
         {
+            var index = ownerTheme.Questions.IndexOf(this);
+            var isActive = ownerDocument.ActiveNode == this;
+
             using var change = ownerDocument.OperationsManager.BeginComplexChange();
             ownerTheme.Questions.Remove(this);
             change.Commit();
 
-            if (ownerDocument?.ActiveNode == this)
+            if (isActive)
             {
-                ownerDocument.ActiveNode = ownerTheme;
+                ownerDocument.Navigate.Execute(index < ownerTheme.Questions.Count ? ownerTheme.Questions[index] : ownerTheme);
             }
         }
         catch (Exception exc)

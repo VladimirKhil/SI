@@ -36,11 +36,11 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
         }
     }
 
-    public SimpleCommand AddItem { get; private set; }
+    public SimpleCommand AddItem { get; }
 
-    public SimpleCommand DeleteItem { get; private set; }
+    public SimpleCommand DeleteItem { get; }
 
-    public SimpleCommand MakeRight { get; private set; }
+    public SimpleCommand MakeRight { get; }
 
     public QuestionViewModel Owner => _question;
 
@@ -140,19 +140,31 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
     private void DeleteItem_Executed(object? arg)
     {
         var item = (StepParameterRecord?)arg;
+        var package = _question.OwnerTheme?.OwnerRound?.OwnerPackage;
 
-        if (!item.HasValue || _question.OwnerTheme?.OwnerRound?.OwnerPackage == null)
+        if (!item.HasValue || package == null)
         {
             return;
         }
 
-        using var change = _question.OwnerTheme.OwnerRound.OwnerPackage.Document.OperationsManager.BeginComplexChange();
+        var rightAnswer = _question.Right.Count > 0 ? _question.Right[0] : "";
+
+        using var change = package.Document.OperationsManager.BeginComplexChange();
 
         Remove(item.Value);
 
+        var rightIsValid = false;
+
         for (var i = 0; i < Count; i++)
         {
-            this[i] = new StepParameterRecord(IndexLabelHelper.GetIndexLabel(i), this[i].Value);
+            var key = IndexLabelHelper.GetIndexLabel(i);
+            this[i] = new StepParameterRecord(key, this[i].Value);
+            rightIsValid = key == rightAnswer || rightIsValid;
+        }
+
+        if (!rightIsValid && _question.Right.Count > 0 && Count > 0)
+        {
+            _question.Right[0] = this[^1].Key; // Set the last parameter as right answer if the previous one was removed
         }
 
         UpdateCommands();
@@ -163,7 +175,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
     {
         var item = (StepParameterRecord?)arg;
 
-        if (!item.HasValue || _question.OwnerTheme?.OwnerRound?.OwnerPackage == null)
+        if (!item.HasValue)
         {
             return;
         }

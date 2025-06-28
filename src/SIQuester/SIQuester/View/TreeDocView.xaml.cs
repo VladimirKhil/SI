@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Xml;
 
 namespace SIQuester;
@@ -187,8 +188,18 @@ public partial class TreeDocView : UserControl
 
                 var treeViewItemPosition = treeViewItem.TranslatePoint(new Point(), _grid);
 
+                var additionaHeight = treeViewItem.ActualHeight;
+
+                if (isDroppingToParent)
+                {
+                    if (VisualTreeHelper.GetChild(VisualTreeHelper.GetChild(treeViewItem, 0), 0) is Border header)
+                    {
+                        additionaHeight = header.ActualHeight;
+                    }
+                }
+
                 _insertionMark.Visibility = Visibility.Visible;
-                _insertionMark.Margin = new Thickness(0, treeViewItemPosition.Y + (isDroppingToParent ? treeViewItem.ActualHeight : 0), 0, 0);
+                _insertionMark.Margin = new Thickness(0, treeViewItemPosition.Y + additionaHeight, 0, 0);
             }
             else
             {
@@ -312,6 +323,12 @@ public partial class TreeDocView : UserControl
                 {
                     var value = e.Data.GetData(DataFormats.Serializable).ToString();
 
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        e.Effects = DragDropEffects.None;
+                        return;
+                    }
+
                     using var stringReader = new StringReader(value);
                     using var reader = XmlReader.Create(stringReader);
                     round = new Round();
@@ -323,21 +340,27 @@ public partial class TreeDocView : UserControl
                 if (treeViewItem.DataContext is PackageViewModel package)
                 {
                     roundViewModel = new RoundViewModel(round) { IsSelected = true };
-                    package.Rounds.Add(roundViewModel);
-                    document.ApplyData(dragData);
+                    package.Rounds.Insert(0, roundViewModel);
+
+                    if (dragData != null)
+                    {
+                        document.ApplyData(dragData);
+                    }
 
                     package.IsExpanded = true;
                 }
-                else if (treeViewItem.DataContext is RoundViewModel)
+                else if (treeViewItem.DataContext is RoundViewModel docRound && docRound.OwnerPackage != null)
                 {
                     roundViewModel = new RoundViewModel(round) { IsSelected = true };
-                    var docRound = treeViewItem.DataContext as RoundViewModel;
 
                     docRound.OwnerPackage.Rounds.Insert(
-                        docRound.OwnerPackage.Rounds.IndexOf(docRound),
+                        docRound.OwnerPackage.Rounds.IndexOf(docRound) + 1,
                         roundViewModel);
-
-                    document.ApplyData(dragData);
+                    
+                    if (dragData != null)
+                    {
+                        document.ApplyData(dragData);
+                    }
                 }
 
                 if (roundViewModel != null && AppSettings.Default.ChangePriceOnMove && roundViewModel.OwnerPackage != null)
@@ -367,6 +390,13 @@ public partial class TreeDocView : UserControl
                 else
                 {
                     var value = e.Data.GetData(DataFormats.Serializable).ToString();
+
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        e.Effects = DragDropEffects.None;
+                        return;
+                    }
+
                     using var stringReader = new StringReader(value);
                     using var reader = XmlReader.Create(stringReader);
                     theme = new Theme();
@@ -378,20 +408,27 @@ public partial class TreeDocView : UserControl
                 if (treeViewItem.DataContext is RoundViewModel docRound)
                 {
                     themeViewModel = new ThemeViewModel(theme) { IsSelected = true };
-                    docRound.Themes.Add(themeViewModel);
-                    document.ApplyData(dragData);
+                    docRound.Themes.Insert(0, themeViewModel);
+                    
+                    if (dragData != null)
+                    {
+                        document.ApplyData(dragData);
+                    }
 
                     docRound.IsExpanded = true;
                 }
-                else if (treeViewItem.DataContext is ThemeViewModel docTheme)
+                else if (treeViewItem.DataContext is ThemeViewModel docTheme && docTheme.OwnerRound != null)
                 {
                     themeViewModel = new ThemeViewModel(theme) { IsSelected = true };
                     
                     docTheme.OwnerRound.Themes.Insert(
-                        docTheme.OwnerRound.Themes.IndexOf(docTheme),
+                        docTheme.OwnerRound.Themes.IndexOf(docTheme) + 1,
                         themeViewModel);
-
-                    document.ApplyData(dragData);
+                    
+                    if (dragData != null)
+                    {
+                        document.ApplyData(dragData);
+                    }
                 }
 
                 if (themeViewModel != null && AppSettings.Default.ChangePriceOnMove && themeViewModel.OwnerRound?.OwnerPackage != null)
@@ -417,6 +454,13 @@ public partial class TreeDocView : UserControl
                 else
                 {
                     var value = e.Data.GetData(DataFormats.Serializable).ToString();
+
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        e.Effects = DragDropEffects.None;
+                        return;
+                    }
+
                     using var stringReader = new StringReader(value);
                     using var reader = XmlReader.Create(stringReader);
                     question = new Question();
@@ -432,7 +476,7 @@ public partial class TreeDocView : UserControl
 
                     var currentPrices = targetTheme.CapturePrices();
 
-                    targetTheme.Questions.Add(new QuestionViewModel(question) { IsSelected = true });
+                    targetTheme.Questions.Insert(0, new QuestionViewModel(question) { IsSelected = true });
 
                     if (AppSettings.Default.ChangePriceOnMove)
                     {
@@ -464,7 +508,7 @@ public partial class TreeDocView : UserControl
                     var currentPrices = targetOwnerTheme.CapturePrices();
 
                     var questionIndex = targetOwnerTheme.Questions.IndexOf(targetQuestion);
-                    targetOwnerTheme.Questions.Insert(questionIndex, new QuestionViewModel(question) { IsSelected = true });
+                    targetOwnerTheme.Questions.Insert(questionIndex + 1, new QuestionViewModel(question) { IsSelected = true });
 
                     if (AppSettings.Default.ChangePriceOnMove)
                     {

@@ -348,6 +348,7 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.Theme:
+                case Messages.Theme2:
                     OnTheme(mparams);
                     break;
 
@@ -359,7 +360,7 @@ public class Viewer : Actor, IViewerClient
                     if (mparams.Length > 1)
                     {
                         _logic.ClearQuestionState();
-                        _logic.SetText(mparams[1], TableStage.QuestionPrice);
+                        _logic.SetText(mparams[1], false, TableStage.QuestionPrice);
                         OnThemeOrQuestion();
                         _logic.SetCaption($"{ClientData.ThemeName}, {mparams[1]}");
                     }
@@ -676,10 +677,23 @@ public class Viewer : Actor, IViewerClient
             return;
         }
 
-        _logic.SetText(mparams[1], TableStage.Theme);
-        OnThemeOrQuestion();
-        ClientData.ThemeName = mparams[1];
-        ClientData.ThemeComments = mparams[4];
+        var themeName = mparams[1];
+        
+        if (!int.TryParse(mparams[2], out var questionCount))
+        {
+            questionCount = -1;
+        }
+        
+        var animate = mparams[3] == "+";
+
+        if (!animate)
+        {
+            OnThemeOrQuestion();
+            ClientData.ThemeName = themeName;
+            ClientData.ThemeComments = mparams[4].UnescapeNewLines();
+        }
+
+        _logic.OnTheme(themeName, questionCount, animate);
     }
 
     private void OnThemeInfo(string[] mparams)
@@ -688,9 +702,13 @@ public class Viewer : Actor, IViewerClient
         {
             return;
         }
+        
+        var themeName = mparams[1];
 
-        ClientData.ThemeName = mparams[1];
+        ClientData.ThemeName = themeName;
         ClientData.ThemeComments = mparams[3];
+
+        _logic.OnThemeInfo(themeName);
     }
 
     private void OnSetChooser(string[] mparams)

@@ -78,9 +78,9 @@ public sealed class Player : Viewer
                 break;
 
             case Messages.Theme:
+            case Messages.Theme2:
             case Messages.ThemeInfo:
                 ClientData.QuestionIndex = -1;
-                Logic.OnTheme(mparams);
                 break;
 
             case Messages.Question:

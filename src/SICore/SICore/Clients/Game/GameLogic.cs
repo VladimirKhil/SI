@@ -2028,16 +2028,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                             newTask = Tasks.MoveNext;
                         }
-                        else if (task == Tasks.RoundTheme) // Skip all round themes
-                        {
-                            for (var themeIndex = arg; themeIndex < _data.TInfo.RoundInfo.Count; themeIndex++)
-                            {
-                                _gameActions.SendThemeInfo(themeIndex, true);
-                            }
-
-                            InformTable();
-                            newTask = Tasks.AskFirst;
-                        }
 
                         break;
 

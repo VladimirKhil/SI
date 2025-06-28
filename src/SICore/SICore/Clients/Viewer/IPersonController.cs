@@ -112,7 +112,7 @@ public interface IPersonController
 
     void OnTextSpeed(double speed);
 
-    void SetText(string text, TableStage stage = TableStage.Round);
+    void SetText(string text, bool animate = false, TableStage stage = TableStage.Round) { }
 
     void OnPauseChanged(bool isPaused);
 
@@ -240,7 +240,13 @@ public interface IPersonController
     /// <param name="report">Report text.</param>
     void Report(string report);
 
-    void OnTheme(string[] mparams) { }
+    /// <summary>
+    /// Handles game theme.
+    /// </summary>
+    /// <param name="themeName">Theme name.</param>
+    /// <param name="questionCount">Number of questions in the theme.</param>
+    /// <param name="animate">Should theme be animated.</param>
+    void OnTheme(string themeName, int questionCount, bool animate);
 
     /// <summary>
     /// Handles question selection.
@@ -278,4 +284,6 @@ public interface IPersonController
     void OnHostChanged(string? initiator, string newHost) { }
 
     void OnPersonsUpdated() { }
+
+    void OnThemeInfo(string themeName) { }
 }

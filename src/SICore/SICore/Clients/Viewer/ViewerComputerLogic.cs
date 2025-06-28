@@ -73,7 +73,21 @@ internal class ViewerComputerLogic : IPersonController
         }
     }
 
-    public void OnTheme(string[] mparams) => _player.OnTheme(mparams);
+    public void OnTheme(string themeName, int questionCount, bool animate = false)
+    {
+        if (_role == GameRole.Player)
+        {
+            _player.OnTheme(questionCount);
+        }
+    }
+
+    public void OnThemeInfo(string themeName)
+    {
+        if (_role == GameRole.Player)
+        {
+            _player.OnTheme(-1);
+        }
+    }
 
     public void OnQuestionSelected() => _player.OnQuestionSelected();
 
@@ -148,11 +162,6 @@ internal class ViewerComputerLogic : IPersonController
     }
 
     public void OnTextSpeed(double speed)
-    {
-
-    }
-
-    public void SetText(string text, TableStage tableStage)
     {
 
     }

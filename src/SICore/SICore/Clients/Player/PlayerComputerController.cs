@@ -345,18 +345,15 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     public void OnInitialized() => ScheduleExecution(PlayerTasks.Ready, 10);
 
-    public void OnTheme(string[] mparams)
+    public void OnTheme(int questionCount)
     {
-        if (mparams.Length < 2)
+        if (questionCount == -1)
         {
             _themeQuestionCount = DefaultThemeQuestionCount;
             return;
         }
 
-        if (!int.TryParse(mparams[2], out _themeQuestionCount))
-        {
-            _themeQuestionCount = -1;
-        }
+        _themeQuestionCount = questionCount;
     }
 
     public void OnQuestionSelected() => _themeQuestionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;

@@ -908,15 +908,49 @@
                             
                             <DataTemplate x:Key="{x:Static vm:TableStage.Theme}">
                                 <TextBlock
+                                    Name="themeText"
                                     Text="{Binding Text}"
                                     Tag="{Binding ElementName=root,Path=DataContext.Settings.QuestionLineSpacing}"
                                     Style="{StaticResource QuestionText}" />
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding AnimateText}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                                        Storyboard.TargetName="themeText"
+                                                        Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                        From="0"
+                                                        To="1"
+                                                        Duration="0:0:0.2" />
+                                                    
+                                                    <DoubleAnimation
+                                                        Storyboard.TargetName="themeText"
+                                                        Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                        From="0"
+                                                        To="1"
+                                                        Duration="0:0:0.2" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        
+                                        <Setter TargetName="themeText" Property="RenderTransform">
+                                            <Setter.Value>
+                                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            </Setter.Value>
+                                        </Setter>
+                                        
+                                        <Setter TargetName="themeText" Property="RenderTransformOrigin" Value="0.5,0.5" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:TableStage.QuestionPrice}">
                                 <TextBlock Text="{Binding Text}" Style="{StaticResource RoundText}" />
                             </DataTemplate>
-                            
+
+                            <!-- Deprecated -->
                             <DataTemplate x:Key="{x:Static vm:TableStage.RoundThemes}">
                                 <local:RoundThemesView />
                             </DataTemplate>

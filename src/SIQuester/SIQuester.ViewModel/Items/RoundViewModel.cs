@@ -54,7 +54,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
                 for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                 {
                     if (Themes[i].OwnerRound != null)
-                        throw new Exception("Попытка вставить привязанную тему!");
+                        throw new Exception("An attempt was made to add an already bound theme");
 
                     Themes[i].OwnerRound = this;
                     Model.Themes.Insert(i, Themes[i].Model);
@@ -103,13 +103,16 @@ public sealed class RoundViewModel : ItemViewModel<Round>
 
         try
         {
+            var index = ownerPackage.Rounds.IndexOf(this);
+            var isActive = ownerDocument.ActiveNode == this;
+
             using var change = ownerDocument.OperationsManager.BeginComplexChange();
             ownerPackage.Rounds.Remove(this);
             change.Commit();
 
-            if (ownerDocument?.ActiveNode == this)
+            if (isActive)
             {
-                ownerDocument.ActiveNode = ownerPackage;
+                ownerDocument.Navigate.Execute(index < ownerPackage.Rounds.Count ? ownerPackage.Rounds[index] : ownerPackage);
             }
         }
         catch (Exception ex)

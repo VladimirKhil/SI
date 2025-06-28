@@ -32,6 +32,7 @@ public enum TableStage
     /// Темы раунда
     /// </summary>
     [EnumMember]
+    [Obsolete]
     RoundThemes,
     /// <summary>
     /// Игровое табло раунда
