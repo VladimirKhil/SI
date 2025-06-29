@@ -16,6 +16,8 @@ public sealed class SIHostClient : IGameClient
 
     private JoinGameRequest? _joinGameRequest;
 
+    private bool _reconnect = true;
+
     public event Action<Message>? IncomingMessage;
 
     public event Action<int, ConnectionPersonData[]>? PersonChanged;
@@ -38,6 +40,7 @@ public sealed class SIHostClient : IGameClient
         _connection.On(nameof(ISIHostClient.Disconnect), async () =>
         {
             IncomingMessage?.Invoke(new Message(Resources.YourWereKicked, "@", isSystem: false));
+            _reconnect = false;
             await _connection.StopAsync();
         });
 
@@ -106,7 +109,7 @@ public sealed class SIHostClient : IGameClient
 
     private async Task OnConnectionClosedAsync(Exception? exc)
     {
-        if (await TryReconnectAsync())
+        if (_reconnect && await TryReconnectAsync())
         {
             return;
         }

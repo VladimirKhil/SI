@@ -1691,19 +1691,6 @@ public sealed class Game : Actor
         var roundIndex = _logic.Engine.RoundIndex;
         _gameActions.InformStageInfo(person, roundIndex);
 
-        if (ClientData.Stage == GameStage.Round)
-        {
-            _gameActions.InformRound(
-                ClientData.Round?.Name ?? "",
-                roundIndex,
-                SIEngine.Rules.QuestionSelectionStrategyType.SelectByPlayer /* does not matter */,
-                person); // deprecated
-        }
-        else
-        {
-            _gameActions.InformStage(person); // deprecated
-        }
-
         if ((ClientData.InformStages & InformStages.RoundNames) > 0)
         {
             _gameActions.InformRoundsNames(person);

@@ -247,60 +247,8 @@ public class Viewer : Actor, IViewerClient
 
                 case Messages.Stage:
                 case Messages.StageInfo:
-                    {
-                        #region Stage
-
-                        ClientData.Stage = (GameStage)Enum.Parse(typeof(GameStage), mparams[1]);
-
-                        if (ClientData.Stage != GameStage.Before)
-                        {
-                            for (int i = 0; i < ClientData.Players.Count; i++)
-                            {
-                                ClientData.Players[i].GameStarted = true;
-                            }
-
-                            ClientData.ShowMan.GameStarted = true;
-                        }
-
-                        if (mparams.Length > 3)
-                        {
-                            if (int.TryParse(mparams[3], out var roundIndex))
-                            {
-                                if (roundIndex > -1 && roundIndex < ClientData.RoundNames.Length)
-                                {
-                                    ClientData.RoundIndex = roundIndex;
-                                }
-                            }
-                        }
-
-                        if (mparams[0] == Messages.Stage)
-                        {
-                            _logic.SetCaption("");
-
-                            switch (ClientData.Stage)
-                            {
-                                case GameStage.Round:
-                                case GameStage.Final:
-                                    if (mparams.Length > 2)
-                                    {
-                                        _logic.SetText(mparams[2]);
-                                    }
-
-                                    for (int i = 0; i < ClientData.Players.Count; i++)
-                                    {
-                                        ClientData.Players[i].InGame = true;
-                                        ClientData.Players[i].IsChooser = false;
-                                    }
-
-                                    break;
-                            }
-
-                            _logic.Stage();
-                        }
-
-                        #endregion
-                        break;
-                    }
+                    OnStage(mparams);
+                    break;
 
                 case Messages.Timer:
                     {
@@ -636,6 +584,62 @@ public class Viewer : Actor, IViewerClient
         catch (Exception exc)
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
+        }
+    }
+
+    private void OnStage(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        ClientData.Stage = (GameStage)Enum.Parse(typeof(GameStage), mparams[1]);
+
+        if (ClientData.Stage != GameStage.Before)
+        {
+            for (int i = 0; i < ClientData.Players.Count; i++)
+            {
+                ClientData.Players[i].GameStarted = true;
+            }
+
+            ClientData.ShowMan.GameStarted = true;
+        }
+
+        if (mparams.Length > 3)
+        {
+            if (int.TryParse(mparams[3], out var roundIndex))
+            {
+                if (roundIndex > -1 && roundIndex < ClientData.RoundNames.Length)
+                {
+                    ClientData.RoundIndex = roundIndex;
+                }
+            }
+        }
+
+        if (mparams[0] == Messages.Stage)
+        {
+            _logic.SetCaption("");
+
+            switch (ClientData.Stage)
+            {
+                case GameStage.Round:
+                case GameStage.Final:
+                    if (mparams.Length > 2)
+                    {
+                        _logic.SetText(mparams[2]);
+                    }
+
+                    for (int i = 0; i < ClientData.Players.Count; i++)
+                    {
+                        ClientData.Players[i].InGame = true;
+                        ClientData.Players[i].IsChooser = false;
+                    }
+
+                    break;
+            }
+
+            _logic.Stage();
         }
     }
 

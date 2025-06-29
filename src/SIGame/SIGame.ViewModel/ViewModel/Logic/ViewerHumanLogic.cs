@@ -2046,7 +2046,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
-    public void OnSelfDisconnected() => OnReplic(ReplicCodes.System.ToString(), Resources.DisconnectMessage);
+    public void OnSelfDisconnected() => OnReplic(ReplicCodes.Special.ToString(), Resources.DisconnectMessage);
 
     public void OnHostChanged(string? initiator, string newHost)
     {
