@@ -328,6 +328,11 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
     /// </summary>
     public void MoveBack()
     {
+        if (!CanMoveBack)
+        {
+            return;
+        }
+
         SelectionStrategy.MoveBack();
         Stage = GameStage.SelectingQuestion;
 

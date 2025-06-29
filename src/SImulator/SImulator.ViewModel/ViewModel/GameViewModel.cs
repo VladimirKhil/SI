@@ -1,5 +1,4 @@
-﻿using SIEngine;
-using SIEngine.Rules;
+﻿using SIEngine.Rules;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
@@ -32,8 +31,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     internal event Action? RequestStop;
 
     private readonly Stack<Tuple<PlayerInfo, int, bool>?> _answeringHistory = new();
-
-    private readonly GameEngine _engine; // TODO: remove
     private readonly IGameActions _gameActions;
     private readonly IMediaProvider _mediaProvider;
 
@@ -215,7 +212,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             if (_continuation != value)
             {
                 _continuation = value;
-                UpdateNextCommand();
             }
         }
     }
@@ -624,7 +620,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public GameViewModel(
         AppSettingsViewModel settings,
-        GameEngine engine,
         IGameActions gameActions,
         IMediaProvider mediaProvider,
         IExtendedListener presentationListener,
@@ -632,7 +627,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         IGameLogger gameLogger)
     {
         Settings = settings;
-        _engine = engine;
         _gameActions = gameActions;
         _mediaProvider = mediaProvider;
         _presentationListener = presentationListener;
@@ -654,7 +648,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LocalInfo.AnswerSelected += LocalInfo_AnswerSelected;
 
         _presentationListener.Next = _next = new SimpleUICommand(Next_Executed) { Name = Resources.Next };
-        _presentationListener.Back = _back = new SimpleCommand(Back_Executed) { CanBeExecuted = false };
+        _presentationListener.Back = _back = new SimpleCommand(Back_Executed);
         _presentationListener.Stop = _stop = new SimpleCommand(Stop_Executed);
 
         AddPlayer = new SimpleCommand(AddPlayer_Executed);
@@ -684,8 +678,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _presentationListener.NextRound = _nextRound = new SimpleCommand(NextRound_Executed) { CanBeExecuted = false };
         _presentationListener.PreviousRound = _previousRound = new SimpleCommand(PreviousRound_Executed) { CanBeExecuted = false };
 
-        UpdateNextCommand();
-
         _roundTimer = new Timer(RoundTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
         _questionTimer = new Timer(QuestionTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
         _thinkingTimer = new Timer(ThinkingTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
@@ -693,8 +685,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         settings.Model.SIUISettings.PropertyChanged += Default_PropertyChanged;
         settings.SIUISettings.PropertyChanged += Default_PropertyChanged;
         settings.Model.PropertyChanged += Settings_PropertyChanged;
-
-        _engine.PropertyChanged += Engine_PropertyChanged;
 
         _presentationListener.MediaStart += GameHost_MediaStart;
         _presentationListener.MediaProgress += GameHost_MediaProgress;
@@ -1298,8 +1288,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal async Task StartAsync()
     {
-        UpdateNextCommand();
-
         _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
 
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
@@ -1363,31 +1351,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveTheme = theme;
     }
 
-    internal void OnEndGame() => PresentationController.ClearState();
+    internal void OnEndGame()
+    {
+        PresentationController.ClearState();
+
+        _nextRound.CanBeExecuted = false;
+        _previousRound.CanBeExecuted = true;
+    }
 
     private void Stop_Executed(object? arg = null) => RequestStop?.Invoke();
-
-    private void Engine_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(GameEngine.CanMoveNext):
-                UpdateNextCommand();
-                break;
-
-            case nameof(GameEngine.CanMoveBack):
-                _back.CanBeExecuted = _engine.CanMoveBack;
-                break;
-
-            case nameof(GameEngine.CanMoveNextRound):
-                _nextRound.CanBeExecuted = _engine.CanMoveNextRound;
-                break;
-
-            case nameof(GameEngine.CanMoveBackRound):
-                _previousRound.CanBeExecuted = _engine.CanMoveBackRound;
-                break;
-        }
-    }
 
     /// <summary>
     /// Moves game to next stage.
@@ -1503,6 +1475,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         LocalInfo.TStage = TableStage.Sign;
         _buttonManager?.TryGetCommandExecutor()?.OnStage("Begin");
+
+        _rounds = package.Rounds;
     }
 
     internal void OnGameThemes(IEnumerable<string> themes)
@@ -1513,16 +1487,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal void OnRound(Round round, QuestionSelectionStrategyType selectionStrategyType)
     {
-        _activeRound = round ?? throw new ArgumentNullException(nameof(round));
+        _activeRound = round;
         OnPropertyChanged(nameof(ActiveRound));
-
-        if (PresentationController == null)
-        {
-            return;
-        }
 
         PresentationController.SetRound(round.Name, selectionStrategyType);
         LocalInfo.TStage = TableStage.Round;
+
+        var roundIndex = _rounds.IndexOf(round);
+        _previousRound.CanBeExecuted = roundIndex > 0;
+        _nextRound.CanBeExecuted = roundIndex < _rounds.Count - 1;
 
         _gameLogger.Write("\r\n{0} {1}", Resources.Round, round.Name);
 
@@ -1730,7 +1703,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private void Back_Executed(object? arg = null)
     {
         _gameActions.MoveBack();
-        UpdateNextCommand();
         ClearState();
 
         if (Settings.Model.DropStatsOnBack)
@@ -1766,8 +1738,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LocalInfo.RoundInfo[themeIndex].Name = "";
         _gameActions.MoveNext();
     }
-
-    private void UpdateNextCommand() => _next.CanBeExecuted = _continuation != null || _engine != null && _engine.CanMoveNext;
 
     private void ReturnToQuestion()
     {
@@ -1820,7 +1790,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 _buttonManager = null;
             }
 
-            _engine.PropertyChanged -= Engine_PropertyChanged;
             _gameActions.Dispose();
 
             _gameLogger.Dispose();
@@ -1886,6 +1855,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private string? _currentTheme;
 
+    private List<Round> _rounds = new List<Round>();
+
     public string? CurrentTheme
     {
         get => _currentTheme;
@@ -1935,6 +1906,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             _gameActions.MoveNext(1700);
 
             _gameLogger.Write(ActiveQuestion.GetText());
+
+            _previousRound.CanBeExecuted = true;
 
             if (themeIndex > -1 && themeIndex < LocalInfo.RoundInfo.Count)
             {
@@ -2115,7 +2088,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         _next.CanBeExecuted = false;
         await Task.Delay(500);
-        UpdateNextCommand();
+        _next.CanBeExecuted = true;
     }
 
     private void UnselectPlayer()

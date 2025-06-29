@@ -132,6 +132,11 @@ public abstract class TextsStorageViewModel<T> : TextsStorageViewModelBase
 
     private void Remove_Executed(object? arg)
     {
+        if (arg == null)
+        {
+            return;
+        }
+
         var item = (T)arg;
         item.PropertyChanged -= Item_PropertyChanged;
 

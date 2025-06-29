@@ -535,6 +535,9 @@
   <data name="EmptyLineBeforeThemeName" xml:space="preserve">
     <value>Нужна ли пустая строка после темы</value>
   </data>
+  <data name="EmptyPreviewWarning" xml:space="preserve">
+    <value>У вашего пакета отсутствует превью. Перед загрузкой в Steam рекомендуется задать превью для пакета</value>
+  </data>
   <data name="EmptyQuestion" xml:space="preserve">
     <value>(пустой)</value>
   </data>
@@ -1222,6 +1225,9 @@
   </data>
   <data name="UpdateException" xml:space="preserve">
     <value>При поиске обновления возникла следующая ошибка: {0}</value>
+  </data>
+  <data name="UpdateExistingItem" xml:space="preserve">
+    <value>Обновить существующий пакет</value>
   </data>
   <data name="UpdatePricesOnDragAndDrop" xml:space="preserve">
     <value>Изменять стоимости вопросов при перетаскивании</value>

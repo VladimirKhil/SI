@@ -193,12 +193,12 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
-    private bool _showRight = false;
+    private bool _showRight = true;
 
     /// <summary>
     /// Show right answers on the screen.
     /// </summary>
-    [DefaultValue(false)]
+    [DefaultValue(true)]
     public bool ShowRight
     {
         get => _showRight;

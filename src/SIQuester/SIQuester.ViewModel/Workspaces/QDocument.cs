@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Notions;
-using Polly.Retry;
 using Polly;
+using Polly.Retry;
 using SIPackages;
 using SIPackages.Containers;
 using SIPackages.Core;
+using SIPackages.Models;
 using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
@@ -29,7 +30,6 @@ using System.Xml;
 using System.Xml.Xsl;
 using Utils;
 using Utils.Commands;
-using SIPackages.Models;
 
 namespace SIQuester.ViewModel;
 
@@ -87,7 +87,7 @@ public sealed class QDocument : WorkspaceViewModel
 
     private IItemViewModel? _activeNode = null;
 
-    private IItemViewModel[]? _activeChain = null;
+    private IItemViewModel[] _activeChain = Array.Empty<IItemViewModel>();
 
     public MediaStorageViewModel Images { get; private set; }
 
@@ -160,7 +160,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private CancellationTokenSource _cancellation = null;
+    private CancellationTokenSource? _cancellation = null;
 
     private readonly object _searchSync = new();
 
@@ -426,7 +426,7 @@ public sealed class QDocument : WorkspaceViewModel
 
 
     /// <summary>
-    /// Полный путь к текущему узлу
+    /// Current active node.
     /// </summary>
     public IItemViewModel ActiveNode
     {
@@ -599,9 +599,9 @@ public sealed class QDocument : WorkspaceViewModel
         cancellationToken);
     }
 
-    private string? _filename = null;
+    private string _filename;
 
-    public string? FileName
+    public string FileName
     {
         get => _filename;
         set
@@ -866,7 +866,7 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void Object_PropertyValueChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (OperationsManager.IsMakingUndo || sender == null)
+        if (OperationsManager.IsMakingUndo || sender == null || e.PropertyName == null)
         {
             return;
         }
@@ -977,6 +977,11 @@ public sealed class QDocument : WorkspaceViewModel
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
+                if (e.NewItems == null)
+                {
+                    return;
+                }
+
                 foreach (var item in e.NewItems)
                 {
                     if (item is IItemViewModel itemViewModel)
@@ -1025,6 +1030,11 @@ public sealed class QDocument : WorkspaceViewModel
                 break;
 
             case NotifyCollectionChangedAction.Remove:
+                if (e.OldItems == null)
+                {
+                    return;
+                }
+
                 foreach (var item in e.OldItems)
                 {
                     if (item is IItemViewModel itemViewModel)
@@ -1073,6 +1083,11 @@ public sealed class QDocument : WorkspaceViewModel
                 break;
 
             case NotifyCollectionChangedAction.Replace:
+                if (e.NewItems == null || e.OldItems == null)
+                {
+                    return;
+                }
+
                 if (e.NewItems.Count == e.OldItems.Count)
                 {
                     bool equals = true;
@@ -1201,8 +1216,9 @@ public sealed class QDocument : WorkspaceViewModel
         PreviousSearchResult = new SimpleCommand(PreviousSearchResult_Executed) { CanBeExecuted = false };
         ClearSearchText = new SimpleCommand(ClearSearchText_Executed) { CanBeExecuted = false };
 
-        FileName = "";
-        Path = "";
+        _filename = "";
+        _path = "";
+        _searchText = "";
 
         Document = document;
         Package = new PackageViewModel(Document.Package, this);
@@ -1955,9 +1971,11 @@ public sealed class QDocument : WorkspaceViewModel
     {
         try
         {
-            if (!Package.HasQualityControl)
+            var validationResult = ValidateForSteam();
+
+            if (validationResult != null)
             {
-                PlatformManager.Instance.ShowExclamationMessage(Resources.ExportToSteamWarning);
+                PlatformManager.Instance.ShowExclamationMessage(validationResult);
                 return;
             }
 
@@ -1970,9 +1988,70 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
+    private string? ValidateForSteam()
+    {
+        if (!Package.HasQualityControl)
+        {
+            return Resources.ExportToSteamQualityControlDisabled;
+        }
+
+        var hasQuestions = false;
+
+        foreach (var round in Package.Model.Rounds)
+        {
+            if (round.Name.Length == 0)
+            {
+                return $"{Resources.ExportToSteamEmptyRound}";
+            }
+
+            foreach (var theme in round.Themes)
+            {
+                if (theme.Name.Length == 0)
+                {
+                    return $"{Resources.Round} {round.Name}: {Resources.ExportToSteamEmptyTheme}";
+                }
+
+                foreach (var question in theme.Questions)
+                {
+                    if (question.Price != Question.InvalidPrice)
+                    {
+                        hasQuestions = true;
+                    }
+
+                    var questionText = question.GetText();
+
+                    var emptyNormal = question.Price == Question.InvalidPrice || question.TypeName == QuestionTypes.SecretNoQuestion;
+
+                    var emptyQuestion = !emptyNormal
+                        && (questionText == "" || questionText == Resources.Question)
+                        && !question.HasMediaContent();
+
+                    if (emptyQuestion)
+                    {
+                        return $"{Resources.Round} {round.Name}: {theme.Name}, {question.Price}: {Resources.ExportToSteamEmptyQuestion}";
+                    }
+
+                    var noAnswer = !emptyNormal && (question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]));
+
+                    if (noAnswer)
+                    {
+                        return $"{Resources.Round} {round.Name}: {theme.Name}, {question.Price}: {Resources.ExportToSteamNoAnswer}";
+                    }
+                }
+            }
+        }
+
+        if (!hasQuestions)
+        {
+            return Resources.ExportToSteamNoQuestions;
+        }
+
+        return null;
+    }
+
     private async void ExportTable_Executed(object? arg)
     {
-        string filename = FileName.Replace(".", "-");
+        string? filename = FileName.Replace(".", "-");
 
         var filter = new Dictionary<string, string>
         {
@@ -2324,7 +2403,7 @@ public sealed class QDocument : WorkspaceViewModel
     {
         try
         {
-            string filename = Document.Package.Name;
+            string? filename = Document.Package.Name;
 
             var filter = new Dictionary<string, string>
             {
@@ -2594,7 +2673,7 @@ public sealed class QDocument : WorkspaceViewModel
 
             allthemes.ForEach(theme =>
             {
-                theme.Model.Name = theme.Model.Name?.ToUpper().ClearPoints();
+                theme.Model.Name = theme.Model.Name.ToUpper().ClearPoints();
                 theme.OwnerRound = null;
             });
 
@@ -2920,7 +2999,15 @@ public sealed class QDocument : WorkspaceViewModel
         Dialog = selectThemesViewModel;
     }
 
-    private void PlayQuestion_Executed(object? arg) => Dialog = new QuestionPlayViewModel((QuestionViewModel)arg, this);
+    private void PlayQuestion_Executed(object? arg)
+    {
+        if (arg is not QuestionViewModel questionViewModel)
+        {
+            return;
+        }
+
+        Dialog = new QuestionPlayViewModel(questionViewModel, this);
+    }
 
     internal bool CheckPackageQuality()
     {

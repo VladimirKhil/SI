@@ -3,9 +3,11 @@ using SIQuester.Model;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Properties;
 using Steamworks;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Input;
+using Utils;
 using Utils.Commands;
 
 namespace SIQuester.ViewModel.Workspaces.Dialogs;
@@ -69,11 +71,34 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         }
     }
 
+    /// <summary>
+    /// Workshop items created by the user.
+    /// </summary>
+    public ObservableCollection<WorkshopItemViewModel> UserItems { get; } = new();
+
+    private WorkshopItemViewModel? _selectedItem;
+
+    public WorkshopItemViewModel? SelectedItem
+    {
+        get => _selectedItem;
+        set
+        {
+            if (_selectedItem != value)
+            {
+                _selectedItem = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public ICommand Upload { get; }
     
+    private readonly CallResult<SteamUGCQueryCompleted_t> _getUserItemsCallback;
     private readonly CallResult<CreateItemResult_t> _createItemCallback;
     private readonly CallResult<SubmitItemUpdateResult_t> _submitItemCallback;
     private readonly CallResult<SubmitItemUpdateResult_t> _submitPreviewCallback;
+
+    private UGCQueryHandle_t _userItemsQuery;
 
     private readonly System.Timers.Timer _callbackTimer;
     private System.Timers.Timer? _timer;
@@ -96,6 +121,8 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
     private string? _tempFolder;
 
     private readonly Dictionary<string, object> _metadata = new();
+
+    public bool ShowMissingPreviewWarning => _document.Package.Model.Logo.Length == 0;
 
     public ExportToSteamViewModel(QDocument document)
     {
@@ -147,6 +174,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
         Upload = new SimpleCommand(Upload_Executed);
 
+        _getUserItemsCallback = CallResult<SteamUGCQueryCompleted_t>.Create(OnGetUserItems);
         _createItemCallback = CallResult<CreateItemResult_t>.Create(OnCreateItem);
         _submitItemCallback = CallResult<SubmitItemUpdateResult_t>.Create(OnSubmitItem);
         _submitPreviewCallback = CallResult<SubmitItemUpdateResult_t>.Create(OnSubmitPreview);
@@ -154,6 +182,83 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         _callbackTimer = new System.Timers.Timer(100);
         _callbackTimer.Elapsed += (s, e) => SteamAPI.RunCallbacks();
         _callbackTimer.Start();
+
+        LoadUserItems();
+    }
+
+    private void LoadUserItems()
+    {
+        if (!SteamAPI.IsSteamRunning())
+        {
+            Status = Resources.SteamNotRunning;
+            return;
+        }
+        
+        // Create a query for the current user's published items
+        _userItemsQuery = SteamUGC.CreateQueryUserUGCRequest(
+            SteamUser.GetSteamID().GetAccountID(),
+            EUserUGCList.k_EUserUGCList_Published,
+            EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items_ReadyToUse,
+            EUserUGCListSortOrder.k_EUserUGCListSortOrder_CreationOrderDesc,
+            SteamUtils.GetAppID(),
+            SteamUtils.GetAppID(),
+            1 // page number
+        );
+
+        if (_userItemsQuery == UGCQueryHandle_t.Invalid)
+        {
+            Status = Resources.WorkshopItemsLoadError;
+            return;
+        }
+
+        // Request additional details for each item
+        SteamUGC.SetReturnMetadata(_userItemsQuery, true);
+        SteamUGC.SetReturnLongDescription(_userItemsQuery, true);
+        SteamUGC.SetReturnTotalOnly(_userItemsQuery, false);
+
+        var call = SteamUGC.SendQueryUGCRequest(_userItemsQuery);
+        _getUserItemsCallback.Set(call);
+    }
+
+    private void OnGetUserItems(SteamUGCQueryCompleted_t param, bool bIOFailure)
+    {
+        if (bIOFailure || param.m_eResult != EResult.k_EResultOK)
+        {
+            Status = $"{Resources.WorkshopItemsLoadError}: {param.m_eResult}";
+            return;
+        }
+
+        var userItems = new List<WorkshopItemViewModel>();
+
+        for (uint i = 0; i < param.m_unNumResultsReturned; i++)
+        {
+            if (SteamUGC.GetQueryUGCResult(param.m_handle, i, out SteamUGCDetails_t details))
+            {
+                var item = new WorkshopItemViewModel(details.m_nPublishedFileId)
+                {
+                    Title = details.m_rgchTitle,
+                    Description = details.m_rgchDescription,
+                    Tags = details.m_rgchTags
+                };
+
+                userItems.Add(item);
+            }
+        }
+        
+        // Release the query handle
+        SteamUGC.ReleaseQueryUGCRequest(param.m_handle);
+
+        UI.Execute(
+            () =>
+            {
+                UserItems.Clear();
+            
+                foreach (var item in userItems)
+                {
+                    UserItems.Add(item);
+                }
+            },
+            exc => OnError(exc));
     }
 
     private static string LocalizeContentType(string key) => key switch

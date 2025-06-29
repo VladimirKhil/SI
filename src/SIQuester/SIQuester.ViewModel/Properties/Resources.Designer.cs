@@ -547,11 +547,56 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Enable package quality control for Steam export.
+        ///   Ищет локализованную строку, похожую на Question is empty.
         /// </summary>
-        public static string ExportToSteamWarning {
+        public static string ExportToSteamEmptyQuestion {
             get {
-                return ResourceManager.GetString("ExportToSteamWarning", resourceCulture);
+                return ResourceManager.GetString("ExportToSteamEmptyQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Empty round name.
+        /// </summary>
+        public static string ExportToSteamEmptyRound {
+            get {
+                return ResourceManager.GetString("ExportToSteamEmptyRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Empty theme name.
+        /// </summary>
+        public static string ExportToSteamEmptyTheme {
+            get {
+                return ResourceManager.GetString("ExportToSteamEmptyTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Question answer is empty.
+        /// </summary>
+        public static string ExportToSteamNoAnswer {
+            get {
+                return ResourceManager.GetString("ExportToSteamNoAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Package has no questions.
+        /// </summary>
+        public static string ExportToSteamNoQuestions {
+            get {
+                return ResourceManager.GetString("ExportToSteamNoQuestions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Enable package quality control.
+        /// </summary>
+        public static string ExportToSteamQualityControlDisabled {
+            get {
+                return ResourceManager.GetString("ExportToSteamQualityControlDisabled", resourceCulture);
             }
         }
         
@@ -858,6 +903,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Link {
             get {
                 return ResourceManager.GetString("Link", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Loading Workshop items.
+        /// </summary>
+        public static string LoadingWorkshopItems {
+            get {
+                return ResourceManager.GetString("LoadingWorkshopItems", resourceCulture);
             }
         }
         
@@ -2001,6 +2055,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string WorkshopItemCreationError {
             get {
                 return ResourceManager.GetString("WorkshopItemCreationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Workshop items load error.
+        /// </summary>
+        public static string WorkshopItemsLoadError {
+            get {
+                return ResourceManager.GetString("WorkshopItemsLoadError", resourceCulture);
             }
         }
         

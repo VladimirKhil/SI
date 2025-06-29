@@ -1,5 +1,4 @@
-﻿using SIEngine;
-using SImulator.ViewModel.Contracts;
+﻿using SImulator.ViewModel.Contracts;
 using System.Windows.Input;
 
 namespace SImulator.ViewModel.Listeners;
@@ -7,8 +6,6 @@ namespace SImulator.ViewModel.Listeners;
 /// <inheritdoc cref="IExtendedListener" />
 public sealed class PresentationListener : IExtendedListener
 {
-    private readonly GameEngine _engine;
-
     public bool IsMediaEnded { get; set; }
 
     public ICommand? Next { get; set; }
@@ -31,8 +28,6 @@ public sealed class PresentationListener : IExtendedListener
 
     public event Action<int>? AnswerSelected;
 
-    public PresentationListener(GameEngine engine) => _engine = engine;
-
     public void OnAnswerSelected(int answerIndex) => AnswerSelected?.Invoke(answerIndex);
 
     private readonly object _moveLock = new();
@@ -52,7 +47,7 @@ public sealed class PresentationListener : IExtendedListener
     {
         lock (_moveLock)
         {
-            if (_engine.CanMoveBack)
+            if (Back?.CanExecute(null) == true)
             {
                 Back?.Execute(null);
             }

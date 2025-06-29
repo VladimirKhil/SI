@@ -323,8 +323,23 @@ Humor</value>
   <data name="ExportToSteam" xml:space="preserve">
     <value>Export to Steam</value>
   </data>
-  <data name="ExportToSteamWarning" xml:space="preserve">
-    <value>Enable package quality control for Steam export</value>
+  <data name="ExportToSteamEmptyQuestion" xml:space="preserve">
+    <value>Question is empty</value>
+  </data>
+  <data name="ExportToSteamEmptyRound" xml:space="preserve">
+    <value>Empty round name</value>
+  </data>
+  <data name="ExportToSteamEmptyTheme" xml:space="preserve">
+    <value>Empty theme name</value>
+  </data>
+  <data name="ExportToSteamNoAnswer" xml:space="preserve">
+    <value>Question answer is empty</value>
+  </data>
+  <data name="ExportToSteamNoQuestions" xml:space="preserve">
+    <value>Package has no questions</value>
+  </data>
+  <data name="ExportToSteamQualityControlDisabled" xml:space="preserve">
+    <value>Enable package quality control</value>
   </data>
   <data name="ExternalLinksAreForbidden" xml:space="preserve">
     <value>External links are not allowed</value>
@@ -427,6 +442,9 @@ Humor</value>
   </data>
   <data name="Link" xml:space="preserve">
     <value>(link…)</value>
+  </data>
+  <data name="LoadingWorkshopItems" xml:space="preserve">
+    <value>Loading Workshop items</value>
   </data>
   <data name="LocalProgramName" xml:space="preserve">
     <value>SIQuester</value>
@@ -808,6 +826,9 @@ Humor</value>
   </data>
   <data name="WorkshopItemCreationError" xml:space="preserve">
     <value>Failed to create Workshop item</value>
+  </data>
+  <data name="WorkshopItemsLoadError" xml:space="preserve">
+    <value>Workshop items load error</value>
   </data>
   <data name="WrongBrackets" xml:space="preserve">
     <value>Incorrect bracket placement</value>

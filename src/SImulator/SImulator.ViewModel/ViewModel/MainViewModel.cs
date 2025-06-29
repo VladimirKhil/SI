@@ -161,14 +161,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private ModeTransition _transition = ModeTransition.ModeratorToStart;
-
-    public ModeTransition Transition
-    {
-        get => _transition;
-        set { _transition = value; OnPropertyChanged(); }
-    }
-
     public bool CanSelectScreens => (_mode == GameMode.Start) && Screens.Length > 1;
 
     public IDisplayDescriptor[] Screens { get; private set; }
@@ -459,7 +451,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 throw new Exception(Resources.GamePackageLoadError, exc);
             }
 
-            var presentationListener = new PresentationListener(engine);
+            var presentationListener = new PresentationListener();
 
             IPresentationController presentationController = screen.IsWebView
                 ? new WebPresentationController(screen, presentationListener, Settings.Sounds)
@@ -485,7 +477,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             var game = new GameViewModel(
                 SettingsViewModel,
-                engine,
                 gameActions,
                 mediaProvider,
                 presentationListener,
@@ -576,7 +567,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         Mode = GameMode.Start;
-        Transition = ModeTransition.ModeratorToStart;
     }
 
     private async void SelectPackage_Executed(object? arg)

@@ -313,7 +313,22 @@
   <data name="ExportToSteam" xml:space="preserve">
     <value>Экспорт в Steam</value>
   </data>
-  <data name="ExportToSteamWarning" xml:space="preserve">
+  <data name="ExportToSteamEmptyQuestion" xml:space="preserve">
+    <value>Вопрос без содержимого</value>
+  </data>
+  <data name="ExportToSteamEmptyRound" xml:space="preserve">
+    <value>Пустое имя раунда</value>
+  </data>
+  <data name="ExportToSteamEmptyTheme" xml:space="preserve">
+    <value>Пустое имя темы</value>
+  </data>
+  <data name="ExportToSteamNoAnswer" xml:space="preserve">
+    <value>Вопрос без ответа</value>
+  </data>
+  <data name="ExportToSteamNoQuestions" xml:space="preserve">
+    <value>Пакет не содержит вопросов</value>
+  </data>
+  <data name="ExportToSteamQualityControlDisabled" xml:space="preserve">
     <value>Для экспорта в Steam необходимо включить контроль качества</value>
   </data>
   <data name="ExternalLinksAreForbidden" xml:space="preserve">
@@ -417,6 +432,9 @@
   </data>
   <data name="Link" xml:space="preserve">
     <value>(ссылка…)</value>
+  </data>
+  <data name="LoadingWorkshopItems" xml:space="preserve">
+    <value />
   </data>
   <data name="LocalProgramName" xml:space="preserve">
     <value>SIQuester</value>
@@ -798,6 +816,9 @@
   </data>
   <data name="WorkshopItemCreationError" xml:space="preserve">
     <value>Не удалось создать объект в Мастерской</value>
+  </data>
+  <data name="WorkshopItemsLoadError" xml:space="preserve">
+    <value>Ошибка загрузки объектов Мастерской</value>
   </data>
   <data name="WrongBrackets" xml:space="preserve">
     <value>Некорректная расстановка скобок</value>

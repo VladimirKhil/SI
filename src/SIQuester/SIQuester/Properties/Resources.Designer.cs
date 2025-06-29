@@ -1232,6 +1232,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на You package lacks preview image. It is better to set up preview before uploading to Steam.
+        /// </summary>
+        public static string EmptyPreviewWarning {
+            get {
+                return ResourceManager.GetString("EmptyPreviewWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на (empty).
         /// </summary>
         public static string EmptyQuestion {
@@ -3294,6 +3303,15 @@ namespace SIQuester.Properties {
         public static string UpdateException {
             get {
                 return ResourceManager.GetString("UpdateException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Update existing package.
+        /// </summary>
+        public static string UpdateExistingItem {
+            get {
+                return ResourceManager.GetString("UpdateExistingItem", resourceCulture);
             }
         }
         

@@ -23,19 +23,31 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            
+            <TextBlock Text="{x:Static lp:Resources.UpdateExistingItem}" VerticalAlignment="Center" />
 
-            <TextBlock Grid.Column="0" Text="{x:Static lp:Resources.Name}" VerticalAlignment="Center" />
-            <TextBox Grid.Column="1" Text="{Binding Title, Mode=OneWay}" IsReadOnly="True" Background="LightGray" Margin="10,0,0,0" Padding="2" />
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static lp:Resources.Description}" VerticalAlignment="Top" Margin="0,10,0,0" />
+            <ComboBox Grid.Column="1" ItemsSource="{Binding UserItems}" SelectedItem="{Binding SelectedItem}" IsEnabled="False" Margin="10,10,0,0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Title}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.Name}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Title, Mode=OneWay}" IsReadOnly="True" Background="LightGray" Margin="10,10,0,0" Padding="2" />
+            <TextBlock Grid.Row="2" Text="{x:Static lp:Resources.Description}" VerticalAlignment="Top" Margin="0,10,0,0" />
 
             <TextBox
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="1"
                 Text="{Binding Description}"
                 Height="250"
@@ -47,7 +59,7 @@
                 IsEnabled="{Binding IsUploading, Converter={StaticResource NotConverter}}" />
 
             <Button
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.ColumnSpan="2"
                 Content="{x:Static lp:Resources.UploadToSteamWorkshop}"
                 Command="{Binding Upload}"
@@ -56,10 +68,21 @@
                 Margin="0,20"
                 Padding="15,8" />
 
-            <TextBlock Grid.Row="3" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="{x:Static lp:Resources.SteamWarning}" HorizontalAlignment="Right" Foreground="Red" />
-            <ProgressBar Grid.Row="4" Grid.ColumnSpan="2" x:Name="UploadProgressBar" Height="20" Margin="0,10" Value="{Binding Progress}" Minimum="0" Maximum="100" />
-            <TextBlock Grid.Row="5" Grid.ColumnSpan="2" x:Name="StatusTextBlock" TextWrapping="Wrap" Text="{Binding Status}" />
-            <TextBlock Grid.Row="6" Grid.ColumnSpan="2"><Hyperlink lb:HyperlinkBehavior.IsAttached="True" NavigateUri="{Binding ItemLink}"> <TextBlock Text="{Binding ItemLink}" /></Hyperlink></TextBlock>
+            <TextBlock Grid.Row="4" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="{x:Static lp:Resources.SteamWarning}" HorizontalAlignment="Right" Foreground="Red" />
+            
+            <TextBlock
+                Grid.Row="5"
+                Grid.ColumnSpan="2"
+                TextWrapping="Wrap"
+                Text="{x:Static lp:Resources.EmptyPreviewWarning}"
+                HorizontalAlignment="Right"
+                Foreground="Goldenrod"
+                Margin="0,10,0,5"
+                Visibility="{Binding ShowMissingPreviewWarning, Converter={StaticResource VisibilityConverter}}" />
+            
+            <ProgressBar Grid.Row="6" Grid.ColumnSpan="2" x:Name="UploadProgressBar" Height="20" Margin="0,10" Value="{Binding Progress}" Minimum="0" Maximum="100" />
+            <TextBlock Grid.Row="7" Grid.ColumnSpan="2" x:Name="StatusTextBlock" TextWrapping="Wrap" Text="{Binding Status}" />
+            <TextBlock Grid.Row="8" Grid.ColumnSpan="2"><Hyperlink lb:HyperlinkBehavior.IsAttached="True" NavigateUri="{Binding ItemLink}"> <TextBlock Text="{Binding ItemLink}" /></Hyperlink></TextBlock>
         </Grid>
     </ScrollViewer>
 </UserControl>

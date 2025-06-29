@@ -535,6 +535,9 @@ By following these steps, you help maintain a responsible and collaborative envi
   <data name="EmptyLineBeforeThemeName" xml:space="preserve">
     <value>Is an empty line needed after the theme name</value>
   </data>
+  <data name="EmptyPreviewWarning" xml:space="preserve">
+    <value>You package lacks preview image. It is better to set up preview before uploading to Steam</value>
+  </data>
   <data name="EmptyQuestion" xml:space="preserve">
     <value>(empty)</value>
   </data>
@@ -1226,6 +1229,9 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="UpdateException" xml:space="preserve">
     <value>The following error occurred while searching for an update: {0}</value>
+  </data>
+  <data name="UpdateExistingItem" xml:space="preserve">
+    <value>Update existing package</value>
   </data>
   <data name="UpdatePricesOnDragAndDrop" xml:space="preserve">
     <value>Change question costs when dragging</value>

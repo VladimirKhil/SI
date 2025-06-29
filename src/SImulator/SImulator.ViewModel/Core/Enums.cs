@@ -6,12 +6,6 @@ public enum GameMode
     Moderator,
 }
 
-public enum ModeTransition
-{
-    StartToModerator,
-    ModeratorToStart,
-}
-
 /// <summary>
 /// Defines supported player key managers.
 /// </summary>

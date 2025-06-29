@@ -125,10 +125,10 @@ internal sealed class DesktopManager : PlatformManager
     }
 
     public override IDisplayDescriptor[] GetScreens() =>
-        Screen.AllScreens.Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen))
-            .Concat(Screen.AllScreens.Select(screen => new ScreenDisplayDescriptor(screen)))
-            .Concat(new IDisplayDescriptor[] { WebDisplayDescriptor.Instance, WindowDisplayDescriptor.Instance })
-            .ToArray();
+        [
+            .. Screen.AllScreens.Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen)),
+            WebDisplayDescriptor.Instance,
+        ];
 
     public override string[] GetLocalComputers()
     {
@@ -156,7 +156,7 @@ internal sealed class DesktopManager : PlatformManager
             }
         }
 
-        return list.ToArray();
+        return [.. list];
     }
 
     public override string[] GetComPorts() => SerialPort.GetPortNames();

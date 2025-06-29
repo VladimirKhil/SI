@@ -127,7 +127,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
             stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfQuests, questionCount));
             stats.AppendLine();
 
-            CheckText(stats);
+            CheckText(stats, warnings);
 
             var checkResult = await _document.CheckLinksAsync();
 
@@ -143,7 +143,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         }
     }
 
-    private void CheckText(StringBuilder stats)
+    private void CheckText(StringBuilder stats, List<WarningViewModel> warnings)
     {
         foreach (var round in _document.Document.Package.Rounds)
         {
@@ -158,9 +158,8 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                 var unrecognizedText = theme.Info.Comments.Text.Contains(Resources.Undefined);
                 var noAuthors = theme.Info.Authors.Count == 0 && _checkEmptyAuthors;
                 var invalidBrackets = !Utils.ValidateTextBrackets(theme.Name) || !Utils.ValidateTextBrackets(theme.Info.Comments.Text);
-                var missingQuestions = round.Type == RoundTypes.Standart && theme.Questions.Count < 5;
 
-                if (unrecognizedText || noAuthors || invalidBrackets || missingQuestions)
+                if (unrecognizedText || noAuthors || invalidBrackets)
                 {
                     if (!here)
                     {
@@ -176,11 +175,6 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                     if (noAuthors)
                     {
                         themeData.AppendLine(Resources.NoAuthors);
-                    }
-
-                    if (missingQuestions)
-                    {
-                        themeData.AppendLine(Resources.FewQuestions);
                     }
                 }
 
