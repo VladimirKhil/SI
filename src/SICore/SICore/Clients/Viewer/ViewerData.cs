@@ -19,7 +19,7 @@ public sealed class ViewerData : Data
     /// </summary>
     internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
 
-    // TODO: maybe client logic should not rely on this property
+    // TODO: replace with ButtonsNeeded flag
     /// <summary>
     /// Current question type.
     /// </summary>
@@ -38,6 +38,7 @@ public sealed class ViewerData : Data
 
     public bool IsInfoInitialized { get; set; }
 
+    // TODO: replace with IAvatarService
     /// <summary>
     /// Адрес изображения участника
     /// </summary>
@@ -195,8 +196,10 @@ public sealed class ViewerData : Data
     /// </summary>
     public StringBuilder SystemLog { get; } = new();
 
+    // TODO: move to client
     public string? PackageId { get; internal set; }
 
+    // TODO: move to client
     public int ButtonBlockingTime { get; internal set; } = 3;
 
     public string? ThemeName { get; internal set; }
@@ -205,6 +208,7 @@ public sealed class ViewerData : Data
 
     private bool _apellationEnabled = true;
 
+    // TODO: move to client
     /// <summary>
     /// Enables apellation buttons.
     /// </summary>
@@ -221,6 +225,7 @@ public sealed class ViewerData : Data
         }
     }
 
+    // TODO: move to client
     /// <summary>
     /// Enabled "Wrong" appellation. 4 or more players required to have enough voice for it to work.
     /// </summary>
@@ -228,6 +233,7 @@ public sealed class ViewerData : Data
 
     private string? _hostName;
 
+    // TODO: move to client
     /// <summary>
     /// Game host name.
     /// </summary>
@@ -244,6 +250,7 @@ public sealed class ViewerData : Data
         }
     }
 
+    // TODO: move to client
     /// <summary>
     /// External content that can be loaded only after user approval.
     /// </summary>
@@ -266,6 +273,7 @@ public sealed class ViewerData : Data
 
     private string? _voiceChatUrl = null;
 
+    // TODO: move to client
     /// <summary>
     /// Voice chat url.
     /// </summary>
@@ -282,6 +290,7 @@ public sealed class ViewerData : Data
         }
     }
 
+    // TODO: move to client
     /// <summary>
     /// Network game flag.
     /// </summary>
@@ -289,6 +298,7 @@ public sealed class ViewerData : Data
 
     private int _roundIndex = -1;
 
+    // TODO: move to client
     /// <summary>
     /// Current round index.
     /// </summary>
@@ -305,6 +315,7 @@ public sealed class ViewerData : Data
         }
     }
 
+    // TODO: move to client
     public bool IsAnswer { get; set; }
 
     private string[] _right = Array.Empty<string>();
@@ -339,6 +350,7 @@ public sealed class ViewerData : Data
 
     private bool _showExtraRightButtons;
 
+    // TODO: move to client
     /// <summary>
     /// Show additional buttons for accepting right answer with different reward.
     /// </summary>

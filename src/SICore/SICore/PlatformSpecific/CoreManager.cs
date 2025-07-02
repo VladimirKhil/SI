@@ -15,6 +15,4 @@ public abstract class CoreManager
     public abstract byte[]? GetData(string filename);
 
     public abstract bool FileExists(string filePath);
-
-    public abstract Stream GetFile(string filePath);
 }

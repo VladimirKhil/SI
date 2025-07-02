@@ -1,4 +1,5 @@
-﻿using SIData;
+﻿using SICore.Services;
+using SIData;
 using System.Text.Json;
 
 namespace SICore.Special;
@@ -42,7 +43,7 @@ public static class StoredPersonsRegistry
         StoredPersons.Players.Select(
             player => new ComputerAccount(player)
             {
-                Name = player.GetLocalizedName(cultureCode),
+                Name = player.GetLocalizedName(GetCultureCode(cultureCode)),
                 IsMale = player.IsMale,
                 Picture = Path.Combine(photoPath, player.Picture)
             })
@@ -53,10 +54,17 @@ public static class StoredPersonsRegistry
         StoredPersons.Showmans.Select(
             showman => new ComputerAccount(showman)
             {
-                Name = showman.GetLocalizedName(cultureCode),
+                Name = showman.GetLocalizedName(GetCultureCode(cultureCode)),
                 IsMale = showman.IsMale,
                 Picture = Path.Combine(photoPath, showman.Picture)
             })
             .OrderBy(showman => showman.Name)
             .ToArray();
+
+    private static string GetCultureCode(string culture)
+    {
+        // CultureInfo.TwoLetterISOLanguageName does not work when app is running in Globalization invariant mode
+        var hyphenIndex = culture.IndexOf('-');
+        return hyphenIndex > -1 ? culture[..hyphenIndex] : culture;
+    }
 }

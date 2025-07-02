@@ -31,7 +31,7 @@ public sealed class Game : Actor
     /// <summary>
     /// Informs the hosting environment that a person with provided name should be disconnected.
     /// </summary>
-    public event Action<string>? DisconnectRequested;
+    public event Action<Game, string>? DisconnectRequested;
     private readonly GameActions _gameActions;
 
     private IPrimaryNode Master => (IPrimaryNode)_client.Node;
@@ -1308,7 +1308,7 @@ public sealed class Game : Actor
             return;
         }
 
-        _gameActions.SendMessageToWithArgs(message.Sender, Messages.YouAreKicked);
+        _gameActions.SendMessageToWithArgs(clientName, Messages.YouAreKicked);
         OnDisconnectRequested(clientName);
 
         var clientId = Master.Kick(clientName);
@@ -1349,7 +1349,7 @@ public sealed class Game : Actor
             return;
         }
 
-        _gameActions.SendMessageToWithArgs(message.Sender, Messages.YouAreKicked);
+        _gameActions.SendMessageToWithArgs(clientName, Messages.YouAreKicked);
         OnDisconnectRequested(clientName);
 
         var clientId = Master.Kick(clientName, true);
@@ -2685,7 +2685,7 @@ public sealed class Game : Actor
         }
     }
 
-    private void OnDisconnectRequested(string person) => DisconnectRequested?.Invoke(person);
+    private void OnDisconnectRequested(string person) => DisconnectRequested?.Invoke(this, person);
 
     /// <summary>
     /// Updates game configuration.

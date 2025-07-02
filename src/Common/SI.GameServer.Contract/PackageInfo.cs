@@ -33,6 +33,11 @@ public sealed class PackageInfo
     /// </summary>
     public string? Secret { get; set; }
 
+    /// <summary>
+    /// Optional source uri of the package.
+    /// </summary>
+    public Uri? Source { get; set; }
+
     /// <inheritdoc />
     public override string ToString() => $"{Type}:{Uri}@{ContentServiceUri}:{Secret}";
 }
