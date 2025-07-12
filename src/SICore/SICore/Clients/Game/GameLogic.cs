@@ -2721,7 +2721,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 var res = new StringBuilder();
                 res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfQuestion)], string.Join(", ", authors));
                 _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE: replaced by QUESTION_AUTHORS message
-                _gameActions.SendMessageWithArgs(Messages.QuestionAuthors, authors);
+                var msg = new MessageBuilder(Messages.QuestionAuthors).AddRange(authors);
+                _gameActions.SendMessageWithArgs(msg.ToString());
             }
             else
             {
@@ -2773,7 +2774,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     break;
 
                 case QuestionTypes.NoRisk:
-                    _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]); // TODO: REMOVE: replaced by QTYPE message
+                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionForYourself)]); // TODO: REMOVE: replaced by QTYPE message
                     break;
 
                 case QuestionTypes.Simple:
@@ -2882,7 +2883,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             {
                 var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
                 _gameActions.ShowmanReplic(text); // TODO: REMOVE: replaced by QUESTION_SOURCES message
-                _gameActions.SendMessageWithArgs(Messages.QuestionSources, sources);
+                var msg = new MessageBuilder(Messages.QuestionSources).AddRange(sources);
+                _gameActions.SendMessage(msg.Build());
                 textTime = GetReadingDurationForTextLength(text.Length);
                 informed = true;
             }
@@ -4949,9 +4951,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.CurPriceRight *= factor;
         _data.CurPriceWrong *= factor;
 
-        _gameActions.ShowmanReplic(
-            $"{_data.Chooser!.Name}, {string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight))}");
-        
+        var replic = string.Format(
+            LO[nameof(R.QuestionForYourselfInfo)],
+            Notion.FormatNumber(_data.CurPriceRight),
+            Notion.FormatNumber(_data.CurPriceWrong),
+            factor);
+
+        _gameActions.ShowmanReplic($"{_data.Chooser!.Name}, {replic}");        
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
 
         ScheduleExecution(Tasks.MoveNext, 20);

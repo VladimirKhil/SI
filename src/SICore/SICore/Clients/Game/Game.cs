@@ -1138,7 +1138,7 @@ public sealed class Game : Actor
         }
 
         ClientData.ChooserIndex = playerIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "-", "+");
 
         _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name)); // TODO: REMOVE: replaced by SETCHOOSER message
 

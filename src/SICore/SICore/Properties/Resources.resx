@@ -438,11 +438,11 @@
   <data name="ShowmanWaiting" xml:space="preserve">
     <value>Waiting for the showman's decision...</value>
   </data>
-  <data name="SponsoredQuestion" xml:space="preserve">
+  <data name="QuestionForYourself" xml:space="preserve">
     <value>You got a Question for yourself!</value>
   </data>
-  <data name="SponsoredQuestionInfo" xml:space="preserve">
-    <value>This question is only for you. If you answer correctly, you'll earn {0} points, otherwise you loose nothing!</value>
+  <data name="QuestionForYourselfInfo" xml:space="preserve">
+    <value>This question is only for you. Question price is multiplied by {2}. If you answer correctly, you'll earn {0} points, otherwise you loose {1}</value>
   </data>
   <data name="StageFinished" xml:space="preserve">
     <value>The game is over</value>
@@ -670,7 +670,7 @@
     <value>Join to this game under this role is forbidden</value>
   </data>
   <data name="SetChooser" xml:space="preserve">
-    <value>{0} set {1} as active player</value>
+    <value>{0} made {1} an active player</value>
   </data>
   <data name="SelectAnswerOption" xml:space="preserve">
     <value>Select answer option on table</value>

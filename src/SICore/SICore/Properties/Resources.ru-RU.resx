@@ -438,11 +438,11 @@
   <data name="ShowmanWaiting" xml:space="preserve">
     <value>Ожидаем решение ведущего...</value>
   </data>
-  <data name="SponsoredQuestion" xml:space="preserve">
+  <data name="QuestionForYourself" xml:space="preserve">
     <value>Вам достаётся Вопрос для себя!</value>
   </data>
-  <data name="SponsoredQuestionInfo" xml:space="preserve">
-    <value>вопрос звучит только для вас. В случае верного ответа вы получите {0}, в случае неверного ничего не потеряете</value>
+  <data name="QuestionForYourselfInfo" xml:space="preserve">
+    <value>вопрос звучит только для вас. Стоимость вопроса умножается на {2}. В случае верного ответа вы получите {0}, в случае неверного вы потеряете {1}</value>
   </data>
   <data name="StageFinished" xml:space="preserve">
     <value>Игра окончена</value>

@@ -1105,6 +1105,24 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на You got a Question for yourself!.
+        /// </summary>
+        public static string QuestionForYourself {
+            get {
+                return ResourceManager.GetString("QuestionForYourself", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на This question is only for you. Question price is multiplied by {2}. If you answer correctly, you&apos;ll earn {0} points, otherwise you loose {1}.
+        /// </summary>
+        public static string QuestionForYourselfInfo {
+            get {
+                return ResourceManager.GetString("QuestionForYourselfInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на {0} removes question {1}, {2}.
         /// </summary>
         public static string QuestionRemoved {
@@ -1321,7 +1339,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на {0} set {1} as active player.
+        ///   Ищет локализованную строку, похожую на {0} made {1} an active player.
         /// </summary>
         public static string SetChooser {
             get {
@@ -1425,24 +1443,6 @@ namespace SICore.Properties {
         public static string ShowmanWaiting {
             get {
                 return ResourceManager.GetString("ShowmanWaiting", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на You got a Question for yourself!.
-        /// </summary>
-        public static string SponsoredQuestion {
-            get {
-                return ResourceManager.GetString("SponsoredQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на This question is only for you. If you answer correctly, you&apos;ll earn {0} points, otherwise you loose nothing!.
-        /// </summary>
-        public static string SponsoredQuestionInfo {
-            get {
-                return ResourceManager.GetString("SponsoredQuestionInfo", resourceCulture);
             }
         }
         
