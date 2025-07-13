@@ -619,6 +619,17 @@ public sealed class GameData : Data
     /// </summary>
     public IReadOnlyList<Theme>? Themes { get; internal set; }
 
+    /// <summary>
+    /// Last visual state message sent to players.
+    /// This message will be resent to reconnected players to restore visual state.
+    /// </summary>
+    public string? LastVisualMessage { get; set; }
+
+    /// <summary>
+    /// Defines complex visual state.
+    /// </summary>
+    public IReadOnlyList<string>? ComplexVisualState { get; set; }
+
     public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings)
     {
         Host = gameHost;

@@ -10,6 +10,7 @@ using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SICore;
 
@@ -18,6 +19,11 @@ namespace SICore;
 /// </summary>
 public sealed class GameActions
 {
+    /// <summary>
+    /// Represents character used to form content shape.
+    /// </summary>
+    private const string ContentShapeCharacter = "&";
+
     private readonly GameData _gameData;
 
     public Client Client { get; }
@@ -37,6 +43,38 @@ public sealed class GameActions
 
     public void SendMessageToWithArgs(string receiver, params object[] args) =>
         SendMessage(string.Join(Message.ArgsSeparator, args), receiver);
+
+    /// <summary>
+    /// Sends a visual message that affects game table state and saves it for reconnected players.
+    /// </summary>
+    public void SendVisualMessage(MessageBuilder messageBuilder)
+    {
+        var message = messageBuilder.ToString();
+        _gameData.LastVisualMessage = message;
+        _gameData.ComplexVisualState = null;
+        SendMessage(message);
+    }
+
+    /// <summary>
+    /// Sends a visual message that affects game table state and saves it for reconnected players.
+    /// </summary>
+    public void SendVisualMessage(string message)
+    {
+        _gameData.LastVisualMessage = message;
+        _gameData.ComplexVisualState = null;
+        SendMessage(message);
+    }
+
+    /// <summary>
+    /// Sends a visual message with arguments that affects game table state and saves it for reconnected players.
+    /// </summary>
+    public void SendVisualMessageWithArgs(params object[] args)
+    {
+        var message = string.Join(Message.ArgsSeparator, args);
+        _gameData.LastVisualMessage = message;
+        _gameData.ComplexVisualState = null;
+        SendMessage(message);
+    }
 
     [Obsolete]
     internal void SystemReplic(string text) => UserMessage(MessageTypes.System, text);
@@ -108,10 +146,16 @@ public sealed class GameActions
 
     public void SendThemeInfo(int themeIndex = -1, bool animate = false, int? overridenQuestionCount = null)
     {
-        var theme = themeIndex > -1 ? _gameData.Themes[themeIndex] : _gameData.Theme;
+        var theme = themeIndex > -1 ? _gameData.Themes?[themeIndex] : _gameData.Theme;
+
+        if (theme == null)
+        {
+            return; // No theme available
+        }
+
         var themeInfo = theme.Info;
 
-        var message = new MessageBuilder(
+        var messageBuilder = new MessageBuilder(
             themeIndex > -1 ? Messages.Theme2 : Messages.Theme,
             theme.Name,
             overridenQuestionCount ?? theme.Questions.Count,
@@ -120,15 +164,19 @@ public sealed class GameActions
             themeInfo.Authors.Count)
             .AddRange(themeInfo.Authors)
             .Add(themeInfo.Sources.Count)
-            .AddRange(themeInfo.Sources)
-            .ToString();
+            .AddRange(themeInfo.Sources);
 
-        SendMessage(message);
+        SendVisualMessage(messageBuilder);
     }
 
     internal void InformTheme(string person)
     {
         var theme = _gameData.Theme;
+
+        if (theme == null)
+        {
+            return; // No theme available
+        }
 
         var message = new MessageBuilder(
             Messages.ThemeInfo,
@@ -173,12 +221,8 @@ public sealed class GameActions
     internal void InformRound(
         string roundName,
         int roundIndex,
-        QuestionSelectionStrategyType roundStrategy,
-        string person = NetworkConstants.Everybody)
-    {
-        var messageBuilder = new MessageBuilder(Messages.Stage, _gameData.Stage, roundName, roundIndex, roundStrategy);
-        SendMessage(messageBuilder.ToString(), person);
-    }
+        QuestionSelectionStrategyType roundStrategy) =>
+        SendVisualMessageWithArgs(Messages.Stage, _gameData.Stage, roundName, roundIndex, roundStrategy);
 
     public void InformStageInfo(string person, int stageIndex) =>
         SendMessageToWithArgs(person, Messages.StageInfo, _gameData.Stage.ToString(), _gameData.Round?.Name ?? "", stageIndex);
@@ -323,5 +367,38 @@ public sealed class GameActions
                 SendMessage(msg.ToString(), name);
             }
         }
+    }
+
+    internal void InformLayout(string person = NetworkConstants.Everybody)
+    {
+        var screenContentSequence = _gameData.QuestionPlayState.ScreenContentSequence;
+        var answerOptions = _gameData.QuestionPlayState.AnswerOptions;
+
+        if (answerOptions == null || screenContentSequence == null)
+        {
+            return;
+        }
+
+        var messageBuilder = new MessageBuilder(Messages.Layout)
+            .Add(MessageParams.Layout_AnswerOptions)
+            .Add(string.Join("|", screenContentSequence.Select(group => string.Join("+", group.Select(serializeContentItem)))))
+            .AddRange(answerOptions.Select(o => o.Content.Type));
+
+        var message = messageBuilder.ToString();
+
+        SendMessage(message, person);
+
+        static string serializeContentItem(ContentItem ci) => $"{ci.Type}{(ci.Type == ContentTypes.Text ? "." + ci.Value.Length : "")}";
+    }
+
+    internal void SendContentShape(string person = NetworkConstants.Everybody)
+    {
+        // ContentShapeCharacter symbol is used as an arbitrary symbol with medium width to define the question text shape
+        // Real question text is sent later and it sequentially replaces test shape
+        // Text shape is required to display partial question on the screen correctly
+        // (font size and number of lines must be calculated in the beginning to prevent UI flickers on question text growth)
+        var shape = Regex.Replace(_gameData.Text, "[^\r\n\t\f ]", ContentShapeCharacter);
+        SendMessageToWithArgs(person, Messages.TextShape, shape);
+        SendMessageToWithArgs(person, Messages.ContentShape, ContentPlacements.Screen, 0, ContentTypes.Text, shape.EscapeNewLines());
     }
 }

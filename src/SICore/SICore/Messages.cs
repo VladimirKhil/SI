@@ -310,6 +310,7 @@ public static class Messages
     /// <summary>
     /// Notifies that the client has preloaded the media.
     /// </summary>
+    [Obsolete]
     public const string MediaPreloaded = "MEDIA_PRELOADED";
 
     /// <summary>

@@ -1721,6 +1721,18 @@ public sealed class Game : Actor
             _gameActions.InformTheme(person);
         }
 
+        if ((ClientData.InformStages & InformStages.Layout) > 0)
+        {
+            _gameActions.InformLayout(person);
+            // TODO: send already displayed answer options and their state
+        }
+
+        if ((ClientData.InformStages & InformStages.ContentShape) > 0)
+        {
+            _gameActions.SendContentShape(person);
+            // TODO: send already displayed content part
+        }
+
         if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
         {
             var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - ClientData.TimerStartTime[2]).TotalSeconds * 10;
@@ -1729,6 +1741,29 @@ public sealed class Game : Actor
             {
                 _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, MessageParams.Timer_Go, leftTimeBeforeStart, -2), person);
             }
+        }
+
+        // Send last visual message to restore table state for reconnected player
+        if (!string.IsNullOrEmpty(ClientData.LastVisualMessage))
+        {
+            _gameActions.SendMessage(ClientData.LastVisualMessage, person);
+        }
+        else if (ClientData.ComplexVisualState != null)
+        {
+            foreach (var visualMessage in ClientData.ComplexVisualState)
+            {
+                _gameActions.SendMessage(visualMessage, person);
+            }
+        }
+
+        if (ClientData.TInfo.Pause)
+        {
+            _gameActions.SendMessageWithArgs(Messages.Pause, '+', 0, 0, 0); // TODO: fill time values
+        }
+
+        if (ClientData.Decision == DecisionType.Appellation)
+        {
+            _gameActions.SendMessageWithArgs(Messages.Appellation, '+');
         }
     }
 

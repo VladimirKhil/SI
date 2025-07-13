@@ -14,7 +14,6 @@ using SIPackages.Core;
 using SIPackages.Models;
 using SIUI.Model;
 using System.Text;
-using System.Text.RegularExpressions;
 using Utils.Timers;
 using R = SICore.Properties.Resources;
 
@@ -44,11 +43,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     /// Frequency of partial prints per second.
     /// </summary>
     private const double PartialPrintFrequencyPerSecond = 0.5;
-
-    /// <summary>
-    /// Represents character used to form content shape.
-    /// </summary>
-    private const string ContentShapeCharacter = "&";
 
     /// <summary>
     /// Execution completion;
@@ -257,8 +251,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
         _data.IsPlayingMedia = false;
-        // Temporary moved to QuestSourComm
-        // _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
+
+        _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
+        _data.InformStages &= ~(InformStages.Layout | InformStages.ContentShape);
+
         ScheduleExecution(Tasks.QuestionPostInfo, taskTime, 1, force: true);
 
         if (_data.AllowAppellation && _data.PendingApellation)
@@ -285,9 +281,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnGameThemes(IEnumerable<string> gameThemes)
     {
-        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.GameThemes)]));
+        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.GameThemes)])); // TODO: REMOVE (replaced by GAME_THEMES message)
         var msg = new MessageBuilder(Messages.GameThemes).AddRange(gameThemes);
-        _gameActions.SendMessage(msg.Build());
+        _gameActions.SendVisualMessage(msg);
         _ = gameThemes.TryGetNonEnumeratedCount(out var count);
         ScheduleExecution(Tasks.MoveNext, Math.Max(40, 10 + 10 * count));
     }
@@ -377,8 +373,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         _data.Question = question;
 
-        _gameActions.ShowmanReplic($"{_data.Theme.Name}, {question.Price}");
-        _gameActions.SendMessageWithArgs(Messages.Question, question.Price);
+        _gameActions.ShowmanReplic($"{_data.Theme?.Name}, {question.Price}");
+        _gameActions.SendVisualMessageWithArgs(Messages.Question, question.Price);
 
         InitQuestionState(_data.Question);
         ProceedToThemeAndQuestion();
@@ -460,15 +456,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (_data.IsPartial)
         {
-            // ContentShapeCharacter symbol is used as an arbitrary symbol with medium width to define the question text shape
-            // Real question text is sent later and it sequentially replaces test shape
-            // Text shape is required to display partial question on the screen correctly
-            // (font size and number of lines must be calculated in the beginning to prevent UI flickers on question text growth)
-            var shape = Regex.Replace(text, "[^\r\n\t\f ]", ContentShapeCharacter);
-            _gameActions.SendMessageWithArgs(Messages.TextShape, shape);
-            _gameActions.SendMessageWithArgs(Messages.ContentShape, ContentPlacements.Screen, 0, ContentTypes.Text, shape.EscapeNewLines());
-
             _data.Text = text;
+            _gameActions.SendContentShape();
+            _data.InformStages |= InformStages.ContentShape;
             _data.InitialPartialTextLength = 0;
             _data.PartialIterationCounter = 0;
             _data.TextLength = 0;
@@ -476,7 +466,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
+        _gameActions.SendVisualMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
         _gameActions.SystemReplic(text); // TODO: REMOVE: replaced by CONTENT message
 
         var nextTime = !waitForFinish ? 1 : contentTime;
@@ -599,11 +589,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             if (!success || globalUri == null)
             {
                 var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
-                _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
+                _gameActions.SendVisualMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
                 return null;
             }
 
-            _gameActions.SendMessageWithArgs(
+            _gameActions.SendVisualMessageWithArgs(
                 Messages.Content,
                 contentItem.Placement,
                 0,
@@ -764,7 +754,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.IsWaiting = false;
         _data.Decision = DecisionType.None;
 
-        _data.InformStages &= ~(InformStages.RoundContent | InformStages.RoundThemesNames | InformStages.RoundThemesComments | InformStages.Table | InformStages.Theme);
+        _data.InformStages &= ~(InformStages.RoundContent | 
+            InformStages.RoundThemesNames | 
+            InformStages.RoundThemesComments | 
+            InformStages.Table | 
+            InformStages.Theme | 
+            InformStages.Layout |
+            InformStages.ContentShape);
 
         // This is quite ugly bit here but as we interrupt normal flow we need to cut continuation
         // (or we could replace it with a normal move)
@@ -2124,7 +2120,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             message.AppendLine();
         }
 
-        _gameActions.SendMessage(msg.Build());
+        _gameActions.SendVisualMessage(msg.Build());
         _gameActions.SpecialReplic(message.ToString()); // TODO: REMOVE: replaced by GAME_STATISTICS message
     }
 
@@ -2905,7 +2901,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     _data.Question.Info.Comments.Text);
                 
                 _gameActions.ShowmanReplic(text); // TODO: REMOVE: replaced by QUESTION_COMMENTS message
-                _gameActions.SendMessageWithArgs(Messages.QuestionComments, _data.Question.Info.Comments.Text.EscapeNewLines());
+                _gameActions.SendVisualMessageWithArgs(Messages.QuestionComments, _data.Question.Info.Comments.Text.EscapeNewLines());
                 textTime = GetReadingDurationForTextLength(text.Length);
                 informed = true;
             }
@@ -2921,7 +2917,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            _gameActions.SendMessageWithArgs(Messages.QuestionEnd); // Temporary here
             ScheduleExecution(Tasks.MoveNext, 1, force: !informed);
         }
     }
@@ -3096,7 +3091,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private void AskToChoose()
     {
         _gameActions.InformSums();
-        _gameActions.SendMessage(Messages.ShowTable);
+        _gameActions.SendVisualMessage(Messages.ShowTable);
 
         if (_data.Chooser == null)
         {
@@ -4310,7 +4305,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 }
             }
 
-            _gameActions.SendMessage(messageBuilder.ToString());
+            _gameActions.SendVisualMessage(messageBuilder);
         }
 
         if (stage == 2)
@@ -4647,7 +4642,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     internal void OnSimpleAnswer(string answer)
     {
         var normalizedAnswer = answer.LeaveFirst(MaxAnswerLength);
-        _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
+        _gameActions.SendVisualMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
 
         var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length)
             + _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10;
@@ -4984,22 +4979,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnAnswerOptions()
     {
-        var screenContentSequence = _data.QuestionPlayState.ScreenContentSequence;
-        var answerOptions = _data.QuestionPlayState.AnswerOptions;
-
-        if (answerOptions == null || screenContentSequence == null)
-        {
-            return;
-        }
-
-        var messageBuilder = new MessageBuilder(Messages.Layout)
-            .Add(MessageParams.Layout_AnswerOptions)
-            .Add(string.Join("|", screenContentSequence.Select(group => string.Join("+", group.Select(serializeContentItem)))))
-            .AddRange(answerOptions.Select(o => o.Content.Type));
-
-        _gameActions.SendMessage(messageBuilder.ToString());
-
-        static string serializeContentItem(ContentItem ci) => $"{ci.Type}{(ci.Type == ContentTypes.Text ? "." + ci.Value.Length : "")}";
+        _gameActions.InformLayout();
+        _data.InformStages |= InformStages.Layout;
     }
 
     internal void ShowAnswerOptions(Action? continuation)
@@ -5061,6 +5042,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         var contentTime = -1;
         var registeredMediaPlay = false;
+        var visualState = new List<string>();
 
         foreach (var (placement, contentList) in contentTable)
         {
@@ -5120,11 +5102,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 contentListDuration += duration;
             }
 
-            _gameActions.SendMessage(messageBuilder.ToString());
+            var message = messageBuilder.ToString();
+            _gameActions.SendMessage(message);
+            visualState.Add(message);
 
             contentTime = Math.Max(contentTime, contentListDuration);
         }
 
+        _data.ComplexVisualState = visualState;
         _data.IsPartial = false;
         _data.AtomStart = DateTime.UtcNow;
         _data.AtomTime = contentTime;
