@@ -3527,7 +3527,7 @@ public sealed class QDocument : WorkspaceViewModel
             return;
         }
 
-        if (!PlatformManager.Instance.ConfirmExclWithWindow($"{Resources.ConfirmFilesRemoval}: {string.Join(", ", unusedFiles)}?"))
+        if (!PlatformManager.Instance.ConfirmExclamationWithWindow($"{Resources.ConfirmFilesRemoval}: {string.Join(", ", unusedFiles)}?"))
         {
             return;
         }

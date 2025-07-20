@@ -160,7 +160,10 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         UpdateContentItemCommands();
     }
 
-    protected override bool CanRemove() => Count > 1;
+    protected override bool CanRemove() => Count > 1 || 
+        Count == 1 && (this[0].Model.Type != ContentTypes.Text ||
+            this[0].Model.Placement != ContentPlacements.Screen ||
+            this[0].Model.Value.Length > 0);
 
     private void CurrentAtom_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -210,6 +213,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                         OwnerDocument?.ClearLinks(contentItem.Model);
                     }
                 }
+
                 break;
 
             case NotifyCollectionChangedAction.Reset:
@@ -225,6 +229,24 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         }
 
         UpdateCommands();
+    }
+
+    protected override void OnRemoveAt(int index)
+    {
+        if (Count == 1)
+        {
+            using var change = OwnerDocument?.OperationsManager.BeginComplexChange();
+            
+            this[0].Model.Type = ContentTypes.Text;
+            this[0].Model.IsRef = false;
+            this[0].Model.Value = "";
+            this[0].Model.Placement = ContentPlacements.Screen;
+
+            change?.Commit();
+            return;
+        }
+
+        base.OnRemoveAt(index);
     }
 
     private void UpdateContentItemCommands()

@@ -85,7 +85,7 @@ public abstract class PlatformManager
 
     public abstract bool? ConfirmWithCancel(string message);
 
-    public abstract bool ConfirmExclWithWindow(string message);
+    public abstract bool ConfirmExclamationWithWindow(string message);
 
     public abstract void Exit();
 

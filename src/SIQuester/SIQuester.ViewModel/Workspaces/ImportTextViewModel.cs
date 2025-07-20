@@ -797,7 +797,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                         var themesNum = _existing.Package.Rounds.Sum(r => r.Themes.Count);
                         var message = $"{Resources.TotalImport} {themesNum}. {Resources.LostFile}{filename}_LostPart.txt?";
 
-                        var save = PlatformManager.Instance.ConfirmExclWithWindow(message);
+                        var save = PlatformManager.Instance.ConfirmExclamationWithWindow(message);
 
                         if (save)
                         {

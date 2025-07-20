@@ -3,6 +3,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Notions;
 using SIPackages;
 using SIPackages.Core;
+using SIPackages.Models;
 using SIQuester.Model;
 using SIQuester.Properties;
 using SIQuester.View;
@@ -119,14 +120,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
     public override string[]? ShowMediaOpenUI(string mediaCategory, bool allowAnyFile, bool multiselect = true)
     {
-        var filter = mediaCategory switch
-        {
-            CollectionNames.ImagesStorageName => $"{Resources.Images} (*.jpg, *.jpe, *.jpeg, *.png, *.gif, *.webp)|*.jpg;*.jpe;*.jpeg;*.png;*.gif;*.webp",
-            CollectionNames.AudioStorageName => $"{Resources.Audio} (*.mp3)|*.mp3",
-            CollectionNames.VideoStorageName => $"{Resources.Video} (*.mp4)|*.mp4",
-            CollectionNames.HtmlStorageName => $"{ViewModel.Properties.Resources.HtmlFiles} (*.html)|*.html",
-            _ => throw new ArgumentException($"Invalid category {mediaCategory}", nameof(mediaCategory))
-        };
+        var filter = BuildMediaFilter(mediaCategory);
 
         if (allowAnyFile)
         {
@@ -141,6 +135,28 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
         var result = dialog.ShowDialog();
         return result.HasValue && result.Value ? dialog.FileNames : null;
+    }
+
+    private static string BuildMediaFilter(string mediaCategory)
+    {
+        if (!Quality.FileExtensions.TryGetValue(mediaCategory, out var extensions))
+        {
+            throw new ArgumentException($"Invalid category {mediaCategory}", nameof(mediaCategory));
+        }
+
+        var resourceName = mediaCategory switch
+        {
+            CollectionNames.ImagesStorageName => Resources.Images,
+            CollectionNames.AudioStorageName => Resources.Audio,
+            CollectionNames.VideoStorageName => Resources.Video,
+            CollectionNames.HtmlStorageName => ViewModel.Properties.Resources.HtmlFiles,
+            _ => throw new ArgumentException($"Invalid category {mediaCategory}", nameof(mediaCategory))
+        };
+
+        var extensionsList = string.Join(", ", extensions.Select(ext => $"*{ext}"));
+        var filterPattern = string.Join(";", extensions.Select(ext => $"*{ext}"));
+
+        return $"{resourceName} ({extensionsList})|{filterPattern}";
     }
 
     /// <summary>
@@ -263,6 +279,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                     if (File.Exists(filename))
                     {
                         if (MessageBox.Show(
+                            Application.Current.MainWindow,
                             string.Format(Resources.FileExistReplace, Path.GetFileName(filename)),
                             AppSettings.ProductName,
                             MessageBoxButton.YesNo,
@@ -931,17 +948,17 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         }
         catch (Exception exc)
         {
-            MessageBox.Show(exc.ToString(), App.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Application.Current.MainWindow, exc.ToString(), App.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
     public override void AddToRecentCategory(string fileName) => JumpList.AddToRecentCategory(fileName);
 
     public override void ShowErrorMessage(string message) =>
-        MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBox.Show(Application.Current.MainWindow, message, AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
 
     public override void ShowExclamationMessage(string message) =>
-        MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        MessageBox.Show(Application.Current.MainWindow, message, AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
 
     public override void ShowSelectOptionDialog(string message, params UserOption[] options)
     {
@@ -970,17 +987,18 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
     public override void Inform(string message, bool exclamation = false) =>
         MessageBox.Show(
+            Application.Current.MainWindow,
             message,
             AppSettings.ProductName,
             MessageBoxButton.OK,
             exclamation ? MessageBoxImage.Exclamation : MessageBoxImage.Information);
 
     public override bool Confirm(string message) =>
-        MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+        MessageBox.Show(Application.Current.MainWindow, message, AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
 
     public override bool? ConfirmWithCancel(string message)
     {
-        var result = MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+        var result = MessageBox.Show(Application.Current.MainWindow, message, AppSettings.ProductName, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
         if (result == MessageBoxResult.Cancel)
         {
@@ -990,7 +1008,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         return result == MessageBoxResult.Yes;
     }
 
-    public override bool ConfirmExclWithWindow(string message)
+    public override bool ConfirmExclamationWithWindow(string message)
     {
         var window = Application.Current.MainWindow;
 
@@ -1004,7 +1022,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                 MessageBoxImage.Exclamation) == MessageBoxResult.Yes;
         }
 
-        return MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes;
+        return MessageBox.Show(Application.Current.MainWindow, message, AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes;
     }
 
     public override void Exit() => Application.Current.MainWindow?.Close();

@@ -23,7 +23,7 @@ public partial class MediaStorageView : UserControl
             return;
         }
 
-        e.Accepted = storage.Filter.Length == 0 || item.Model.Name.Contains(storage.Filter);
+        e.Accepted = storage.Filter.Length == 0 || item.Model.Name.Contains(storage.Filter, StringComparison.OrdinalIgnoreCase);
     }
 
     private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

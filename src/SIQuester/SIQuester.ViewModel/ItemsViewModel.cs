@@ -85,7 +85,7 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
     {
         if (e.PropertyName == nameof(Count))
         {
-            CurrentPosition = IndexOf(_currentItem);
+            CurrentPosition = _currentItem != null ? IndexOf(_currentItem) : -1;
             UpdateCommands();
         }
     }
@@ -114,7 +114,7 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
             }
             else if (_currentPosition > -1 && _currentPosition < Count)
             {
-                RemoveAt(_currentPosition);
+                OnRemoveAt(_currentPosition);
             }
 
             UpdateCommands();
@@ -124,6 +124,8 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
             PlatformSpecific.PlatformManager.Instance.ShowErrorMessage(ex.Message);
         }
     }
+
+    protected virtual void OnRemoveAt(int index) => RemoveAt(index);
 
     private void MoveLeft_Executed(object? arg)
     {

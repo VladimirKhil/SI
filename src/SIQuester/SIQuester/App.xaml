@@ -1449,12 +1449,6 @@
                                                         Style="{StaticResource MenuButton}" />
 
                                                     <Button
-                                                        ToolTip="{x:Static lp:Resources.AddText}"
-                                                        Content="{StaticResource AddImage}"
-                                                        Command="{Binding AddText}"
-                                                        Style="{StaticResource MenuButton}" />
-
-                                                    <Button
                                                         ToolTip="{x:Static lp:Resources.AddOral}"
                                                         Content="{StaticResource AddVoiceImage}"
                                                         Command="{Binding AddVoice}"
