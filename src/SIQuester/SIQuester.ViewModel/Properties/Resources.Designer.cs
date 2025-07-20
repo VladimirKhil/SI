@@ -2068,6 +2068,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Item update.
+        /// </summary>
+        public static string WorkshopItemUpdate {
+            get {
+                return ResourceManager.GetString("WorkshopItemUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Incorrect bracket placement.
         /// </summary>
         public static string WrongBrackets {

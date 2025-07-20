@@ -34,7 +34,7 @@
             
             <TextBlock Text="{x:Static lp:Resources.UpdateExistingItem}" VerticalAlignment="Center" />
 
-            <ComboBox Grid.Column="1" ItemsSource="{Binding UserItems}" SelectedItem="{Binding SelectedItem}" IsEnabled="False" Margin="10,10,0,0">
+            <ComboBox Grid.Column="1" ItemsSource="{Binding UserItems}" SelectedItem="{Binding SelectedItem}" Margin="10,10,0,0">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Title}" />

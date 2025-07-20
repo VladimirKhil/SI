@@ -701,7 +701,7 @@ public sealed class Game : Actor
                             if (Enum.TryParse<JoinMode>(args[1], out var joinMode))
                             {
                                 ClientData.JoinMode = joinMode;
-                                _gameActions.SendMessageWithArgs(Messages.SetJoinMode, args[1]);
+                                _gameActions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
 
                                 var replic = joinMode switch
                                 {

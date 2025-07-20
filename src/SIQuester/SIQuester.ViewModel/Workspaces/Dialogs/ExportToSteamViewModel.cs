@@ -1,5 +1,4 @@
 ﻿using SIPackages.Core;
-using SIQuester.Model;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Properties;
 using Steamworks;
@@ -14,6 +13,12 @@ namespace SIQuester.ViewModel.Workspaces.Dialogs;
 
 public sealed class ExportToSteamViewModel : WorkspaceViewModel
 {
+    private static readonly Dictionary<string, string> _languages = new()
+    {
+        { "ru-RU", "Russian" },
+        { "sr-RS", "Serbian" }
+    };
+
     private readonly bool _initialized = false;
 
     private readonly QDocument _document;
@@ -259,6 +264,8 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
                 }
             },
             exc => OnError(exc));
+
+        // TODO: use param.m_unTotalMatchingResults to query next pages if needed
     }
 
     private static string LocalizeContentType(string key) => key switch
@@ -282,8 +289,118 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         Progress = 0;
         IsUploading = true;
 
-        var call = SteamUGC.CreateItem(SteamUtils.GetAppID(), EWorkshopFileType.k_EWorkshopFileTypeCommunity);
-        _createItemCallback.Set(call);
+        if (SelectedItem != null)
+        {
+            // Update existing item
+            UpdateExistingItem(SelectedItem.PublishedFileId, Resources.WorkshopItemUpdate);
+        }
+        else
+        {
+            // Create new item
+            var call = SteamUGC.CreateItem(SteamUtils.GetAppID(), EWorkshopFileType.k_EWorkshopFileTypeCommunity);
+            _createItemCallback.Set(call);
+        }
+    }
+
+    private void UpdateExistingItem(PublishedFileId_t publishedFileId, string message)
+    {
+        try
+        {
+            var updateHandle = SteamUGC.StartItemUpdate(SteamUtils.GetAppID(), publishedFileId);
+
+            if (updateHandle == UGCUpdateHandle_t.Invalid)
+            {
+                Status = Resources.InvalidUpdateHandle;
+                Progress = 0;
+                IsUploading = false;
+                return;
+            }
+
+            PrepareItemUpdate(updateHandle);
+            
+            var call = SteamUGC.SubmitItemUpdate(updateHandle, message);
+            _submitItemCallback.Set(call);
+
+            StartProgressTimer(updateHandle);
+        }
+        catch (Exception ex)
+        {
+            Status = $"{Resources.UploadError}: {ex.Message}";
+            Progress = 0;
+            IsUploading = false;
+        }
+    }
+
+    private void PrepareItemUpdate(UGCUpdateHandle_t updateHandle)
+    {
+        _tempFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(_tempFolder);
+        
+        var contentFolder = Path.Combine(_tempFolder, "content");
+        Directory.CreateDirectory(contentFolder);
+
+        File.Copy(_document.Path, Path.Combine(contentFolder, "package.siq"), true);
+
+        var tags = new List<string>();
+
+        var languageCode = _document.Package.Model.Language;
+        var localizeTags = false;
+
+        if (!_languages.TryGetValue(languageCode, out var languageName))
+        {
+            languageName = "English";
+            localizeTags = true;
+        }
+
+        if (!string.IsNullOrEmpty(languageCode))
+        {
+            tags.Add(languageName);
+        }
+
+        foreach (var tag in _document.Package.Tags)
+        {
+            if (!localizeTags || !TagsRepository.Instance.Translation.TryGetValue(tag, out var englishTag))
+            {
+                tags.Add(tag);
+            }
+            else
+            {
+                tags.Add(englishTag);
+            }
+        }
+
+        SteamUGC.SetItemContent(updateHandle, contentFolder);
+        SteamUGC.SetItemTitle(updateHandle, Title);
+        SteamUGC.SetItemDescription(updateHandle, Description);
+        SteamUGC.SetItemTags(updateHandle, tags);
+        SteamUGC.SetItemMetadata(updateHandle, JsonSerializer.Serialize(_metadata));
+        SteamUGC.SetItemUpdateLanguage(updateHandle, languageName.ToLower());
+        SteamUGC.SetItemVisibility(updateHandle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPublic);
+    }
+
+    private void StartProgressTimer(UGCUpdateHandle_t updateHandle)
+    {
+        _timer = new System.Timers.Timer(100);
+
+        _timer.Elapsed += (s, e) =>
+        {
+            var status = SteamUGC.GetItemUpdateProgress(updateHandle, out ulong bytesProcessed, out ulong bytesTotal);
+
+            if (status == EItemUpdateStatus.k_EItemUpdateStatusInvalid)
+            {
+                _timer.Stop();
+                IsUploading = false;
+                return;
+            }
+
+            if (bytesTotal > 0)
+            {
+                float progress = (float)bytesProcessed / bytesTotal;
+                Progress = (int)(100 * progress);
+            }
+        };
+
+        _timer.Start();
     }
 
     private void OnCreateItem(CreateItemResult_t param, bool bIOFailure)
@@ -299,97 +416,11 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         if (!SteamAPI.IsSteamRunning())
         {
             Status = Resources.SteamNotRunning;
+            IsUploading = false;
             return;
         }
 
-        var publishedFileId = param.m_nPublishedFileId;
-
-        try
-        {
-            var updateHandle = SteamUGC.StartItemUpdate(SteamUtils.GetAppID(), publishedFileId);
-
-            if (updateHandle == UGCUpdateHandle_t.Invalid)
-            {
-                Status = Resources.InvalidUpdateHandle;
-                Progress = 0;
-                IsUploading = false;
-                return;
-            }
-
-            _tempFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(_tempFolder);
-            
-            var contentFolder = Path.Combine(_tempFolder, "content");
-            Directory.CreateDirectory(contentFolder);
-
-            File.Copy(_document.Path, Path.Combine(contentFolder, "package.siq"), true);
-
-            var tags = new List<string>();
-
-            var docLanguage = _document.Package.Model.Language;
-            var language = docLanguage == "ru-RU" ? "Russian" : "English";
-            var localizeTags = language != "English";
-
-            if (!string.IsNullOrEmpty(docLanguage))
-            {
-                tags.Add(language);
-            }
-            else
-            {
-                docLanguage = AppSettings.Default.Language;
-            }
-
-            foreach (var tag in _document.Package.Tags)
-            {
-                if (!localizeTags || !TagsRepository.Instance.Translation.TryGetValue(tag, out var englishTag))
-                {
-                    tags.Add(tag);
-                }
-                else
-                {
-                    tags.Add(englishTag);
-                }
-            }
-
-            SteamUGC.SetItemContent(updateHandle, contentFolder);
-            SteamUGC.SetItemTitle(updateHandle, Title);
-            SteamUGC.SetItemDescription(updateHandle, Description);
-            SteamUGC.SetItemTags(updateHandle, tags);
-            SteamUGC.SetItemMetadata(updateHandle, JsonSerializer.Serialize(_metadata));
-            SteamUGC.SetItemUpdateLanguage(updateHandle, language.ToLower());
-            SteamUGC.SetItemVisibility(updateHandle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPublic);
-            
-            var call = SteamUGC.SubmitItemUpdate(updateHandle, Resources.InitialUpload);
-            _submitItemCallback.Set(call);
-
-            _timer = new System.Timers.Timer(100);
-
-            _timer.Elapsed += (s, e) =>
-            {
-                var status = SteamUGC.GetItemUpdateProgress(updateHandle, out ulong bytesProcessed, out ulong bytesTotal);
-
-                if (status == EItemUpdateStatus.k_EItemUpdateStatusInvalid)
-                {
-                    _timer.Stop();
-                    IsUploading = false;
-                    return;
-                }
-
-                if (bytesTotal > 0)
-                {
-                    float progress = (float)bytesProcessed / bytesTotal;
-                    Progress = (int)(100 * progress);
-                }
-            };
-
-            _timer.Start();
-        }
-        catch (Exception ex)
-        {
-            Status = $"{Resources.UploadError}: {ex.Message}";
-            Progress = 0;
-            IsUploading = false;
-        }
+        UpdateExistingItem(param.m_nPublishedFileId, Resources.InitialUpload);
     }
 
     private void OnSubmitItem(SubmitItemUpdateResult_t param, bool bIOFailure)

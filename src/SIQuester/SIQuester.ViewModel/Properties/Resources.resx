@@ -830,6 +830,9 @@ Humor</value>
   <data name="WorkshopItemsLoadError" xml:space="preserve">
     <value>Workshop items load error</value>
   </data>
+  <data name="WorkshopItemUpdate" xml:space="preserve">
+    <value>Item update</value>
+  </data>
   <data name="WrongBrackets" xml:space="preserve">
     <value>Incorrect bracket placement</value>
   </data>

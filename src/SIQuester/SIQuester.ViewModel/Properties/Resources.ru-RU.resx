@@ -820,6 +820,9 @@
   <data name="WorkshopItemsLoadError" xml:space="preserve">
     <value>Ошибка загрузки объектов Мастерской</value>
   </data>
+  <data name="WorkshopItemUpdate" xml:space="preserve">
+    <value>Обновление объекта</value>
+  </data>
   <data name="WrongBrackets" xml:space="preserve">
     <value>Некорректная расстановка скобок</value>
   </data>
