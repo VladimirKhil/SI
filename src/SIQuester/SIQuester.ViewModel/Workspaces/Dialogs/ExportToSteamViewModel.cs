@@ -344,12 +344,12 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         var tags = new List<string>();
 
         var languageCode = _document.Package.Model.Language;
-        var localizeTags = false;
+        var localizeTags = true;
 
         if (!_languages.TryGetValue(languageCode, out var languageName))
         {
             languageName = "English";
-            localizeTags = true;
+            localizeTags = false;
         }
 
         if (!string.IsNullOrEmpty(languageCode))
