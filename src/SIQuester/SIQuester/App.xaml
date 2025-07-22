@@ -1448,6 +1448,13 @@
                                                         Command="{Binding MoveLeft}"
                                                         Style="{StaticResource MenuButton}" />
 
+                                                    <!-- Required to add text to complex answer part -->
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.AddText}"
+                                                        Content="{StaticResource AddImage}"
+                                                        Command="{Binding AddText}"
+                                                        Style="{StaticResource MenuButton}" />
+
                                                     <Button
                                                         ToolTip="{x:Static lp:Resources.AddOral}"
                                                         Content="{StaticResource AddVoiceImage}"
