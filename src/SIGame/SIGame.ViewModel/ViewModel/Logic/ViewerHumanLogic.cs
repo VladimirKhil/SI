@@ -1894,6 +1894,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         _gameViewModel.Hint = Resources.HintCheckAnswer;
         _gameViewModel.NewValidation = false;
         _gameViewModel.DialogMode = DialogModes.AnswerValidation;
+        _gameViewModel.ClearValidation();
         _gameViewModel.AddValidation(name, answer);
         PlatformManager.Instance.Activate();
     }

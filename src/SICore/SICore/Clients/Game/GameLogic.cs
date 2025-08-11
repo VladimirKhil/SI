@@ -172,16 +172,18 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.TimeThinking = 0.0;
     }
 
-    internal void ProcessApellationRequest()
+    internal void ProcessAppellationRequest()
     {
+        var (appellationSource, isAppellationForRightAnswer) = _data.QuestionPlayState.Appellations.FirstOrDefault();
+
         _data.AppellationCallerIndex = -1;
         _data.AppelaerIndex = -1;
 
-        if (_data.IsAppelationForRightAnswer)
+        if (isAppellationForRightAnswer)
         {
             for (var i = 0; i < _data.Players.Count; i++)
             {
-                if (_data.Players[i].Name == _data.AppellationSource)
+                if (_data.Players[i].Name == appellationSource)
                 {
                     for (var j = 0; j < _data.QuestionHistory.Count; j++)
                     {
@@ -209,13 +211,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 // If there are 2 or 3 players, there are already 2 positive votes for the answer
                 // from answered player and showman. And only 1 or 2 votes left.
                 // So there is no chance to win a vote against the answer
-                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], _data.AppellationSource));
+                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], appellationSource));
                 return;
             }
 
             for (var i = 0; i < _data.Players.Count; i++)
             {
-                if (_data.Players[i].Name == _data.AppellationSource)
+                if (_data.Players[i].Name == appellationSource)
                 {
                     _data.AppellationCallerIndex = i;
                     break;
@@ -240,7 +242,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         if (_data.AppelaerIndex != -1)
         {
             // Appellation started
-            _data.AllowAppellation = false;
+            _data.QuestionPlayState.AppellationState = AppellationState.Collecting;
             Stop(StopReason.Appellation);
         }
     }
@@ -249,7 +251,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
 
-        _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
+        _data.QuestionPlayState.AppellationState = _data.Settings.AppSettings.UseApellations ? AppellationState.Processing : AppellationState.None;
         _data.IsPlayingMedia = false;
 
         _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
@@ -257,9 +259,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         ScheduleExecution(Tasks.QuestionPostInfo, taskTime, 1, force: true);
 
-        if (_data.AllowAppellation && _data.PendingApellation)
+        if (_data.QuestionPlayState.AppellationState != AppellationState.None && _data.QuestionPlayState.Appellations.Any())
         {
-            ProcessApellationRequest();
+            ProcessAppellationRequest();
         }
     }
 
@@ -290,8 +292,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRoundStart(Round round, QuestionSelectionStrategyType strategyType)
     {
-        _data.AppellationOpened = false;
-        _data.AllowAppellation = false;
         _data.Round = round;
         _data.CanMarkQuestion = false;
         _data.AnswererIndex = -1;
@@ -413,8 +413,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private void InitQuestionState(Question question)
     {
         // TODO: move all to question play state
-        _data.AppellationOpened = false;
-        _data.AllowAppellation = false;
         _data.QuestionHistory.Clear();
         _data.PendingAnswererIndex = -1;
         _data.AnswererPressDuration = -1;
@@ -1414,7 +1412,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     /// </summary>
     public void ContinueQuestion()
     {
-        if (IsSpecialQuestion())
+        if (!_data.QuestionPlayState.UseButtons)
         {
             // No need to move to answer as special questions could be different
             // TODO: in the future there could be situations when special questions could be unfinished here
@@ -1447,19 +1445,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.AnswererPressDuration = -1;
         _data.PendingAnswererIndicies.Clear();
 
-        if (!_data.Settings.AppSettings.FalseStart)
-        {
-            _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
-        }
-
         _gameActions.SendMessage(Messages.Resume); // To resume the media
 
         if (_data.Settings.AppSettings.FalseStart || _data.IsQuestionFinished)
         {
-            ScheduleExecution(Tasks.AskToTry, 10, force: true);
+            ScheduleExecution(Tasks.AskToTry, 1, force: true);
             return;
         }
 
+        _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
         _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
 
         // Resume question playing
@@ -1479,7 +1473,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         SendTryToPlayers();
-
         _data.Decision = DecisionType.Pressing;
     }
 
@@ -4011,7 +4004,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             ResumeExecution(40);
             return;
         }
-
+        
+        var (appellationSource, isAppellationForRightAnswer) = _data.QuestionPlayState.Appellations.FirstOrDefault();
         _gameActions.SendMessageWithArgs(Messages.Appellation, '+');
 
         var appelaer = _data.Players[_data.AppelaerIndex];
@@ -4019,14 +4013,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var given = LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
         var apellationReplic = string.Format(LO[nameof(R.PleaseCheckApellation)], given);
 
-        string origin = _data.IsAppelationForRightAnswer
+        string origin = isAppellationForRightAnswer
             ? LO[nameof(R.IsApellating)]
             : string.Format(LO[nameof(R.IsConsideringWrong)], appelaer.Name);
 
-        _gameActions.ShowmanReplic($"{_data.AppellationSource} {origin}. {apellationReplic}");
+        _gameActions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}");
 
-        var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer ?? "", _data.IsAppelationForRightAnswer);
-        var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, _data.IsAppelationForRightAnswer);
+        var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer ?? "", isAppellationForRightAnswer);
+        var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
 
         _data.AppellationAwaitedVoteCount = 0;
         _data.AppellationTotalVoteCount = _data.Players.Count(p => p.IsConnected) + 1; // players and showman
@@ -4034,7 +4028,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.AppellationNegativeVoteCount = 0;
 
         // Showman vote
-        if (_data.IsAppelationForRightAnswer)
+        if (isAppellationForRightAnswer)
         {
             _data.AppellationNegativeVoteCount++;
         }
@@ -4050,7 +4044,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 _data.Players[i].AppellationFlag = false;
                 _data.AppellationPositiveVoteCount++;
             }
-            else if (!_data.IsAppelationForRightAnswer && i == _data.AppellationCallerIndex)
+            else if (!isAppellationForRightAnswer && i == _data.AppellationCallerIndex)
             {
                 _data.Players[i].AppellationFlag = false;
                 _data.AppellationNegativeVoteCount++;
@@ -4083,7 +4077,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 return;
             }
 
-            var votingForRight = _data.IsAppelationForRightAnswer;
+            var votingForRight = _data.QuestionPlayState.Appellations.First().Item2;
             var positiveVoteCount = _data.AppellationPositiveVoteCount;
             var negativeVoteCount = _data.AppellationNegativeVoteCount;
 
@@ -4147,10 +4141,20 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var change = false;
         var singleAnswerer = !HaveMultipleAnswerers();
 
+        var right = new List<object>();
+        var wrong = new List<object>();
+        var passed = new List<object>();
+
         for (var i = 0; i < _data.QuestionHistory.Count; i++)
         {
             var historyItem = _data.QuestionHistory[i];
             var index = historyItem.PlayerIndex;
+
+            if (index < 0 || index >= _data.Players.Count)
+            {
+                continue;
+            }
+
             var player = _data.Players[index];
 
             if (isVotingForRightAnswer && singleAnswerer && index != _data.AppelaerIndex)
@@ -4168,6 +4172,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     player.UndoWrongSum(historyItem.Sum);
                 }
+
+                passed.Add(index);
             }
             else if (index == _data.AppelaerIndex)
             {
@@ -4179,11 +4185,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     {
                         player.UndoRightSum(historyItem.Sum);
                         player.SubtractWrongSum(_data.CurPriceWrong);
+
+                        wrong.Add(index);
                     }
                     else
                     {
                         player.UndoWrongSum(historyItem.Sum);
                         player.AddRightSum(_data.CurPriceRight);
+
+                        right.Add(index);
 
                         // TODO: that should be handled by question selection strategy
                         if (Engine.CanMoveBack) // Not the beginning of a round
@@ -4201,14 +4211,36 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     {
                         player.UndoRightSum(historyItem.Sum);
                         player.SubtractWrongSum(stake);
+
+                        wrong.Add(index);
                     }
                     else
                     {
                         player.UndoWrongSum(historyItem.Sum);
                         player.AddRightSum(stake);
+
+                        right.Add(index);
                     }
                 }
             }
+        }
+
+        if (right.Any())
+        {
+            var rightMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Right).AddRange(right);
+            _gameActions.SendMessage(rightMsg.ToString());
+        }
+
+        if (wrong.Any())
+        {
+            var wrongMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Wrong).AddRange(wrong);
+            _gameActions.SendMessage(wrongMsg.ToString());
+        }
+
+        if (passed.Any())
+        {
+            var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passed);
+            _gameActions.SendMessage(passMsg.ToString());
         }
     }
 

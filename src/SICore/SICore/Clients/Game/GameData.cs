@@ -196,10 +196,6 @@ public sealed class GameData : Data
         }
     }
 
-    public bool IsAppelationForRightAnswer { get; set; }
-
-    public string AppellationSource { get; set; } = "";
-
     /// <summary>
     /// Отвеченные неверные версии
     /// </summary>
@@ -446,16 +442,6 @@ public sealed class GameData : Data
 
     public int ReportsCount { get; set; }
 
-    /// <summary>
-    /// Could appellation messages be collected.
-    /// </summary>
-    public bool AppellationOpened { get; set; }
-
-    /// <summary>
-    /// Could appellation be started now.
-    /// </summary>
-    public bool AllowAppellation { get; set; }
-
     internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
 
     /// <summary>
@@ -588,8 +574,6 @@ public sealed class GameData : Data
     public string? RightOptionLabel { get; internal set; }
 
     public QuestionSelectionStrategyType RoundStrategy { get; internal set; }
-
-    public bool PendingApellation { get; internal set; }
 
     /// <summary>
     /// Validates players state for current round.

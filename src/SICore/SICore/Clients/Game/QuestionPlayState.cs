@@ -89,6 +89,16 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal bool UseButtons { get; set; }
 
+    /// <summary>
+    /// Could appellation messages be collected.
+    /// </summary>
+    public AppellationState AppellationState { get; set; }
+
+    /// <summary>
+    /// Pending appellations.
+    /// </summary>
+    internal List<(string, bool)> Appellations { get; } = new();
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -104,6 +114,8 @@ internal sealed class QuestionPlayState
         IsAnswerAnnounced = false;
         IsAnswerSimple = false;
         UseButtons = false;
+        AppellationState = AppellationState.None;
+        Appellations.Clear();
     }
 
     internal void RemovePlayer(int playerIndex)

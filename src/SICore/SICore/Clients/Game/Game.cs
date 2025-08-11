@@ -1901,6 +1901,7 @@ public sealed class Game : Actor
         }
 
         Master.AuthenticateConnection(message.Sender[1..], name);
+        _gameActions.SendMessage(Messages.Accepted, message.Sender);
     }
 
     private void SelectNewHost()
@@ -1945,23 +1946,75 @@ public sealed class Game : Actor
 
     private void OnAppellation(Message message, string[] args)
     {
-        ClientData.IsAppelationForRightAnswer = args.Length == 1 || args[1] == "+";
-        ClientData.AppellationSource = message.Sender;
-
-        if (!ClientData.AllowAppellation)
+        if (ClientData.QuestionPlayState.AppellationState == AppellationState.None)
         {
-            if (ClientData.AppellationOpened && !ClientData.PendingApellation)
-            {
-                // TODO: save appellation request and return to it after question finish
-                // Merge AppellationOpened and AllowAppellation properties into triple-state property
-                ClientData.PendingApellation = true;
-                _gameActions.SpecialReplic($"{ClientData.AppellationSource} {LO[nameof(R.RequestedApellation)]}");
-            }
-
             return;
         }
 
-        _logic.ProcessApellationRequest();
+        var isAppellationForRightAnswer = args.Length == 1 || args[1] == "+";
+        var appellationSource = message.Sender;
+
+        if (isAppellationForRightAnswer)
+        {
+            var found = false;
+
+            foreach (var answerResult in ClientData.QuestionHistory)
+            {
+                if (answerResult.PlayerIndex < 0 || answerResult.PlayerIndex >= ClientData.Players.Count)
+                {
+                    continue;
+                }
+
+                var player = ClientData.Players[answerResult.PlayerIndex];
+
+                if (player.Name == appellationSource && !answerResult.IsRight)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                // Appellation for right answer, but no wrong answers found
+                return;
+            }
+        }
+        else
+        {
+            var found = false;
+
+            for (var i = 0; i < ClientData.Players.Count; i++)
+            {
+                if (ClientData.Players[i].Name == appellationSource)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                // Appellation for wrong answer, but player not found
+                return;
+            }
+        }
+
+        if (ClientData.QuestionPlayState.Appellations.Any(a => a.Item1 == appellationSource))
+        {
+            // Appellation already exists for this source
+            return;
+        }
+
+        ClientData.QuestionPlayState.Appellations.Add((appellationSource, isAppellationForRightAnswer));
+
+        if (ClientData.QuestionPlayState.AppellationState != AppellationState.Processing)
+        {
+            _gameActions.SpecialReplic($"{message.Sender} {LO[nameof(R.RequestedApellation)]}");
+            return;
+        }
+
+        _logic.ProcessAppellationRequest();
     }
 
     [Obsolete]

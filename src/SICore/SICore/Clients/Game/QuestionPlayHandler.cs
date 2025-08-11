@@ -1,4 +1,5 @@
-﻿using SIEngine.Core;
+﻿using SICore.Models;
+using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
 
@@ -82,8 +83,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         GameLogic.AddHistory("Appellation opened");
 
         _gameData.QuestionPlayState.IsAnswer = true;
-        _gameData.AppellationOpened = _gameData.Settings.AppSettings.UseApellations;
-        _gameData.PendingApellation = false;
+        _gameData.QuestionPlayState.AppellationState = _gameData.Settings.AppSettings.UseApellations ? AppellationState.Collecting : AppellationState.None;
         _gameData.IsPlayingMedia = false;
     }
 
