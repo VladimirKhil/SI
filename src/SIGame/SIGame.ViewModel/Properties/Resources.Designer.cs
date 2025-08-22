@@ -1321,11 +1321,29 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question authors.
+        /// </summary>
+        public static string QuestionAuthors {
+            get {
+                return ResourceManager.GetString("QuestionAuthors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Online question library.
         /// </summary>
         public static string QuestionLibrary {
             get {
                 return ResourceManager.GetString("QuestionLibrary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Question sources.
+        /// </summary>
+        public static string QuestionSources {
+            get {
+                return ResourceManager.GetString("QuestionSources", resourceCulture);
             }
         }
         

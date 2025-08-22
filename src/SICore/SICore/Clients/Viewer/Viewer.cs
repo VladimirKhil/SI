@@ -98,6 +98,10 @@ public class Viewer : Actor, IViewerClient
                     _logic.OnOptions(mparams);
                     break;
 
+                case Messages.Options2:
+                    _logic.OnOptions2(mparams);
+                    break;
+
                 case Messages.ReadingSpeed:
                     {
                         #region ReadingSpeed
@@ -178,6 +182,10 @@ public class Viewer : Actor, IViewerClient
 
                 case Messages.Replic:
                     OnReplic(mparams);
+                    break;
+
+                case Messages.ShowmanReplic:
+                    OnShowmanReplic(mparams);
                     break;
 
                 case Messages.Pause:
@@ -378,6 +386,18 @@ public class Viewer : Actor, IViewerClient
                     }
                     break;
 
+                case Messages.QuestionAuthors:
+                    OnQuestionAuthors(mparams);
+                    break;
+
+                case Messages.QuestionSources:
+                    OnQuestionSources(mparams);
+                    break;
+
+                case Messages.QuestionComments:
+                    OnQuestionComments(mparams);
+                    break;
+
                 case Messages.QType:
                     OnQuestionType(mparams);
                     break;
@@ -421,6 +441,10 @@ public class Viewer : Actor, IViewerClient
 
                 case Messages.MediaLoaded:
                     OnMediaLoaded(mparams);
+                    break;
+
+                case Messages.MediaPreloadProgress:
+                    OnMediaPreloadProgress(mparams);
                     break;
 
                 case Messages.RightAnswer:
@@ -495,6 +519,10 @@ public class Viewer : Actor, IViewerClient
                     _logic.OnPersonPass(int.Parse(mparams[1]));
                     break;
 
+                case Messages.PlayerAnswer:
+                    OnPlayerAnswer(mparams);
+                    break;
+
                 case Messages.PersonFinalAnswer:
                     {
                         if (mparams.Length > 1 && int.TryParse(mparams[1], out int playerIndex))
@@ -551,6 +579,10 @@ public class Viewer : Actor, IViewerClient
                     }
                     break;
 
+                case Messages.GameStatistics:
+                    OnGameStatistics(mparams);
+                    break;
+
                 case Messages.Timeout:
                     {
                         #region Timeout
@@ -585,6 +617,70 @@ public class Viewer : Actor, IViewerClient
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private void OnQuestionComments(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        _logic.OnReplic(ReplicCodes.Showman.ToString(), mparams[1].UnescapeNewLines());
+    }
+
+    private void OnQuestionSources(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        _logic.OnQuestionSources(mparams.Skip(1));
+    }
+
+    private void OnQuestionAuthors(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        _logic.OnQuestionAuthors(mparams.Skip(1));
+    }
+
+    private void OnShowmanReplic(string[] mparams)
+    {
+        if (mparams.Length < 3
+            || !int.TryParse(mparams[1], out var messageIndex)
+            || messageIndex < 0
+            || !Enum.TryParse<MessageCode>(mparams[2], out var messageCode))
+        {
+            return;
+        }
+
+        _logic.OnShowmanReplic(messageIndex, messageCode);
+    }
+
+    private void OnPlayerAnswer(string[] mparams)
+    {
+        if (mparams.Length < 3 || !int.TryParse(mparams[1], out var playerIndex) || playerIndex < 0 || playerIndex >= ClientData.Players.Count)
+        {
+            return;
+        }
+
+        // ClientData.Players[playerIndex].Answer = mparams[2]; // TODO: for the future use
+        _logic.OnReplic(ReplicCodes.Player.ToString() + playerIndex, mparams[2]);
+    }
+
+    private void OnMediaPreloadProgress(string[] mparams)
+    {
+        // TODO: display media preload progress
+    }
+
+    private void OnGameStatistics(string[] mparams)
+    {
+        // TODO: display game statistics
     }
 
     private void OnStage(string[] mparams)

@@ -2447,9 +2447,9 @@ public sealed class Game : Actor
             {
                 if (message.Sender == ClientData.ShowMan.Name)
                 {
-                    if (ClientData.ActivePlayer != null)
+                    if (ClientData.Answerer != null)
                     {
-                        _gameActions.SendMessage(Messages.Cancel, ClientData.ActivePlayer.Name);
+                        _gameActions.SendMessage(Messages.Cancel, ClientData.Answerer.Name);
                     }
                 }
                 else

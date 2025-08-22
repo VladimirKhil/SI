@@ -657,6 +657,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         TInfo.QuestionContentType = QuestionContentType.Text;
     }
 
+    [Obsolete]
     public void OnOptions(string[] mparams)
     {
         for (var i = 1; i + 1 < mparams.Length; i += 2)
@@ -702,6 +703,95 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     if (int.TryParse(optionValue, out var value))
                     {
                         _appSettings.TimeSettings.PartialImageTime = value;
+                    }
+
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void OnOptions2(string[] mparams)
+    {
+        for (var i = 2; i + 1 < mparams.Length; i += 2)
+        {
+            var optionName = mparams[i];
+            var optionValue = mparams[i + 1];
+
+            switch (optionName)
+            {
+                case nameof(AppSettingsCore.DisplayAnswerOptionsLabels):
+                    if (bool.TryParse(optionValue, out var flag))
+                    {
+                        TInfo.Settings.Model.DisplayAnswerOptionsLabels = flag;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.FalseStart):
+                    if (bool.TryParse(optionValue, out var falseStart))
+                    {
+                        _appSettings.FalseStart = falseStart;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.PartialText):
+                    if (bool.TryParse(optionValue, out var partialText))
+                    {
+                        _appSettings.PartialText = partialText;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.PartialImages):
+                    if (bool.TryParse(optionValue, out var partialImages))
+                    {
+                        _appSettings.PartialImages = partialImages;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
+                    if (int.TryParse(optionValue, out var value))
+                    {
+                        _appSettings.TimeSettings.PartialImageTime = value;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.ReadingSpeed):
+                    if (int.TryParse(optionValue, out var readingSpeed))
+                    {
+                        _appSettings.ReadingSpeed = readingSpeed;
+
+                        if (readingSpeed > 0)
+                        {
+                            OnTextSpeed(1.0 / readingSpeed);
+                        }
+                        else
+                        {
+                            OnTextSpeed(0.0);
+                        }
+                    }
+                    break;
+
+                case nameof(AppSettingsCore.TimeSettings.TimeForBlockingButton):
+                    if (int.TryParse(optionValue, out var timeForBlockingButton))
+                    {
+                        // TODO _appSettings.TimeSettings.TimeForBlockingButton = timeForBlockingButton;
+                        _data.ButtonBlockingTime = timeForBlockingButton;
+                    }
+
+                    break;
+
+                case nameof(AppSettingsCore.UseApellations):
+                    if (bool.TryParse(optionValue, out var useApellations))
+                    {
+                        _appSettings.UseApellations = useApellations;
+                        _data.ApellationEnabled = useApellations;
                     }
 
                     break;
@@ -2059,6 +2149,33 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             OnReplic(
                 ReplicCodes.Special.ToString(),
                 string.Format(Resources.HostChanged, initiator.Length > 0 ? initiator : Resources.ByGame, newHost));
+        }
+    }
+
+    public void OnQuestionAuthors(IEnumerable<string> authors)
+    {
+        var authorsText = string.Join(", ", authors);
+        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.QuestionAuthors}: {authorsText}");
+    }
+
+    public void OnQuestionSources(IEnumerable<string> sources)
+    {
+        var sourcesText = string.Join(", ", sources);
+        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.QuestionSources}: {sourcesText}");
+    }
+
+    public void OnShowmanReplic(int messageIndex, Models.MessageCode messageCode)
+    {
+        switch (messageCode)
+        {
+            case Models.MessageCode.ShowmanGreeting:
+                OnReplic(ReplicCodes.Showman.ToString(), Properties.Resources.ShowmanGreeting);
+                break;
+
+            // TODO: localize other messages
+
+            default:
+                break;
         }
     }
 }

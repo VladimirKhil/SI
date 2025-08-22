@@ -421,36 +421,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             _start.CanBeExecuted = false;
             IsStarting = true;
 
-            SIDocument document;
-
-            try
-            {
-                document = await PreparePackageAsync(_cancellationTokenSource.Token);
-            }
-            catch (Exception exc)
-            {
-                throw new Exception(Resources.PackagePreparationError, exc);
-            }
-
-            var mediaProvider = new MediaProvider(document);
-            var gameEngineController = new GameEngineController(mediaProvider);
-
-            GameEngine engine;
-
-            try
-            {
-                engine = EngineFactory.CreateEngine(
-                    SettingsViewModel.Model.GameMode == GameModes.Tv,
-                    document,
-                    GetEngineOptions,
-                    gameEngineController,
-                    gameEngineController);
-            }
-            catch (Exception exc)
-            {
-                throw new Exception(Resources.GamePackageLoadError, exc);
-            }
-
             var presentationListener = new PresentationListener();
 
             IPresentationController presentationController = screen.IsWebView
@@ -462,30 +432,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             presentationController.Error += ShowError;
 
-            IGameLogger gameLogger;
-
-            try
-            {
-                gameLogger = CreateGameLogger();
-            }
-            catch (Exception exc)
-            {
-                throw new Exception(Resources.LoggerInitError, exc);
-            }
-
-            var gameActions = new GameActions(engine);
-
-            var game = new GameViewModel(
-                SettingsViewModel,
-                gameActions,
-                mediaProvider,
-                presentationListener,
-                presentationController,
-                gameLogger);
+            var game = await CreateGameAsync(presentationController, presentationListener);
 
             Game = game;
-
-            gameEngineController.GameViewModel = game;
 
             await game.StartAsync();
 
@@ -523,6 +472,70 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             _start.CanBeExecuted = true;
             IsStarting = false;
         }
+    }
+
+    private async Task<GameViewModel> CreateGameNewAsync(IPresentationController presentationController, IExtendedListener presentationListener)
+    {
+        // TODO: Implement this method using the new game creation logic
+        throw new NotImplementedException("This method is not implemented yet. Use CreateGameAsync instead.");
+    }
+
+    private async Task<GameViewModel> CreateGameAsync(IPresentationController presentationController, IExtendedListener presentationListener)
+    {
+        SIDocument document;
+
+        try
+        {
+            document = await PreparePackageAsync(_cancellationTokenSource.Token);
+        }
+        catch (Exception exc)
+        {
+            throw new Exception(Resources.PackagePreparationError, exc);
+        }
+
+        var mediaProvider = new MediaProvider(document);
+        var gameEngineController = new GameEngineController(mediaProvider);
+
+        GameEngine engine;
+
+        try
+        {
+            engine = EngineFactory.CreateEngine(
+                SettingsViewModel.Model.GameMode == GameModes.Tv,
+                document,
+                GetEngineOptions,
+                gameEngineController,
+                gameEngineController);
+        }
+        catch (Exception exc)
+        {
+            throw new Exception(Resources.GamePackageLoadError, exc);
+        }
+
+        IGameLogger gameLogger;
+
+        try
+        {
+            gameLogger = CreateGameLogger();
+        }
+        catch (Exception exc)
+        {
+            throw new Exception(Resources.LoggerInitError, exc);
+        }
+
+        var gameActions = new GameActions(engine);
+
+        var game = new GameViewModel(
+            SettingsViewModel,
+            gameActions,
+            mediaProvider,
+            presentationListener,
+            presentationController,
+            gameLogger);
+
+        gameEngineController.GameViewModel = game;
+
+        return game;
     }
 
     private async void Game_RequestStop() => await RaiseStop();

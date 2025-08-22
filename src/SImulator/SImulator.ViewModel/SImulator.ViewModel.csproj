@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
+    <ProjectReference Include="..\..\SICore\SICore\SICore.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />

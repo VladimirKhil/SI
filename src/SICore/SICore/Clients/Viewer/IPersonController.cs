@@ -182,6 +182,8 @@ public interface IPersonController
 
     void OnOptions(string[] mparams) { }
 
+    void OnOptions2(string[] mparams) { }
+
     void OnToggle(int themeIndex, int questionIndex, int price) { }
 
     void OnStopPlay() { }
@@ -286,4 +288,10 @@ public interface IPersonController
     void OnPersonsUpdated() { }
 
     void OnThemeInfo(string themeName) { }
+
+    void OnQuestionAuthors(IEnumerable<string> authors) { }
+
+    void OnQuestionSources(IEnumerable<string> sources) { }
+
+    void OnShowmanReplic(int messageIndex, MessageCode messageCode) { }
 }

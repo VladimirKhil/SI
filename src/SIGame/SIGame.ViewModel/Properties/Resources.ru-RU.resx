@@ -687,4 +687,10 @@
   <data name="DownloadFileError" xml:space="preserve">
     <value>Ошибка загрузки файла</value>
   </data>
+  <data name="QuestionAuthors" xml:space="preserve">
+    <value>Авторы вопроса</value>
+  </data>
+  <data name="QuestionSources" xml:space="preserve">
+    <value>Источники вопроса</value>
+  </data>
 </root>

@@ -690,4 +690,10 @@
   <data name="DownloadFileError" xml:space="preserve">
     <value>Downloading file error</value>
   </data>
+  <data name="QuestionAuthors" xml:space="preserve">
+    <value>Question authors</value>
+  </data>
+  <data name="QuestionSources" xml:space="preserve">
+    <value>Question sources</value>
+  </data>
 </root>

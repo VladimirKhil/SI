@@ -200,7 +200,7 @@ public sealed class ViewerData : Data
     public string? PackageId { get; internal set; }
 
     // TODO: move to client
-    public int ButtonBlockingTime { get; internal set; } = 3;
+    public int ButtonBlockingTime { get; set; } = 3;
 
     public string? ThemeName { get; internal set; }
 
