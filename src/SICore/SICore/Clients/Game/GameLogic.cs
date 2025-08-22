@@ -1449,7 +1449,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (_data.Settings.AppSettings.FalseStart || _data.IsQuestionFinished)
         {
-            ScheduleExecution(Tasks.AskToTry, 1, force: true);
+            ScheduleExecution(Tasks.AskToTry, 1, 1, true);
             return;
         }
 
@@ -1763,7 +1763,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         break;
 
                     case Tasks.AskToTry:
-                        AskToTry();
+                        AskToTry(arg);
                         break;
 
                     case Tasks.WaitTry:
@@ -2627,7 +2627,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.GoodLuck, 20 + Random.Shared.Next(10));
     }
 
-    private void AskToTry()
+    private void AskToTry(int arg)
     {
         if (_data.Players.All(p => !p.CanPress))
         {
@@ -2635,7 +2635,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        if (_data.Settings.AppSettings.FalseStart)
+        if (_data.Settings.AppSettings.FalseStart || arg == 1)
         {
             _gameActions.SendMessage(Messages.Try);
         }
