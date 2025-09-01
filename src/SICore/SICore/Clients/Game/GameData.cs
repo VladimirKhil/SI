@@ -1,5 +1,6 @@
 ﻿using SICore.Clients.Game;
 using SICore.Clients.Game.Plugins.Stakes;
+using SICore.Clients.Other;
 using SICore.Contracts;
 using SICore.Models;
 using SICore.Results;
@@ -350,6 +351,11 @@ public sealed class GameData : Data
     /// Game players info.
     /// </summary>
     public List<GamePlayerAccount> Players { get; } = new();
+
+    /// <summary>
+    /// Defines players statistics.
+    /// </summary>
+    internal Dictionary<string, PlayerStatistic> Statistics { get; } = new();
 
     private GamePersonAccount _showMan;
 

@@ -21,11 +21,6 @@ public sealed class GamePlayerAccount : GamePersonAccount
         set { _sum = value; OnPropertyChanged(); }
     }
 
-    /// <summary>
-    /// Player statistic.
-    /// </summary>
-    public PlayerStatistic Statistic { get; } = new();
-
     // TODO: Will be replaced with QuestionPlayState.PossibleAnswerers indicies collection
     /// <summary>
     /// Has the player right to press the button.
@@ -106,33 +101,5 @@ public sealed class GamePlayerAccount : GamePersonAccount
     public GamePlayerAccount()
     {
 
-    }
-
-    internal void AddRightSum(int sum)
-    {
-        Sum += sum;
-        Statistic.RightAnswerCount++;
-        Statistic.RightTotal += sum;
-    }
-
-    internal void SubtractWrongSum(int sum)
-    {
-        Sum -= sum;
-        Statistic.WrongAnswerCount++;
-        Statistic.WrongTotal += sum;
-    }
-
-    internal void UndoRightSum(int sum)
-    {
-        Sum -= sum;
-        Statistic.RightAnswerCount--;
-        Statistic.RightTotal -= sum;
-    }
-
-    internal void UndoWrongSum(int sum)
-    {
-        Sum += sum;
-        Statistic.WrongAnswerCount--;
-        Statistic.WrongTotal -= sum;
     }
 }

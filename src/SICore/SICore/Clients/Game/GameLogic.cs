@@ -2,6 +2,7 @@
 using SICore.Clients;
 using SICore.Clients.Game;
 using SICore.Clients.Game.Plugins.Stakes;
+using SICore.Clients.Other;
 using SICore.Contracts;
 using SICore.Extensions;
 using SICore.Models;
@@ -254,7 +255,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.QuestionPlayState.AppellationState = _data.Settings.AppSettings.UseApellations ? AppellationState.Processing : AppellationState.None;
         _data.IsPlayingMedia = false;
 
-        _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
         _data.InformStages &= ~(InformStages.Layout | InformStages.ContentShape);
 
         ScheduleExecution(Tasks.QuestionPostInfo, taskTime, 1, force: true);
@@ -1274,7 +1274,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 _gameActions.ShowmanReplic(s.ToString());
                 _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, updateSum);
-                _data.Answerer.AddRightSum(updateSum);
+                AddRightSum(_data.Answerer, updateSum);
                 _gameActions.InformSums();
 
                 if (multipleAnswerers)
@@ -1344,7 +1344,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     updateSum = (int)(outcome * _data.Answerer.AnswerValidationFactor);
                     _gameActions.SendMessageWithArgs(Messages.Person, '-', _data.AnswererIndex, updateSum);
-                    _data.Answerer.SubtractWrongSum(updateSum);
+                    SubtractWrongSum(_data.Answerer, updateSum);
                     _gameActions.InformSums();
 
                     if (_data.Answerer.IsHuman)
@@ -2108,13 +2108,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var message = new StringBuilder(LO[nameof(R.GameStatistics)]).Append(':').AppendLine().AppendLine();
 
-        foreach (var player in _data.Players)
+        foreach (var (name, statistic) in _data.Statistics)
         {
-            var statistic = player.Statistic;
+            msg.AddRange(name, statistic.RightAnswerCount, statistic.WrongAnswerCount, statistic.RightTotal, statistic.WrongTotal);
 
-            msg.AddRange(player.Name, statistic.RightAnswerCount, statistic.WrongAnswerCount, statistic.RightTotal, statistic.WrongTotal);
-
-            message.Append(player.Name).Append(':').AppendLine();
+            message.Append(name).Append(':').AppendLine();
             message.Append("   ").Append(LO[nameof(R.RightAnswers)]).Append(": ").Append(statistic.RightAnswerCount).AppendLine();
             message.Append("   ").Append(LO[nameof(R.WrongAnswers)]).Append(": ").Append(statistic.WrongAnswerCount).AppendLine();
             message.Append("   ").Append(LO[nameof(R.ScoreEarned)]).Append(": ").Append(statistic.RightTotal).AppendLine();
@@ -2524,12 +2522,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         if (_data.PlayerIsRight)
         {
             message.Add('+');
-            answerer.AddRightSum(stake);
+            AddRightSum(answerer, stake);
         }
         else
         {
             message.Add('-');
-            answerer.SubtractWrongSum(stake);
+            SubtractWrongSum(answerer, stake);
         }
 
         message.Add(_data.AnswererIndex).Add(stake);
@@ -2876,6 +2874,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (arg == 1)
         {
+            _gameActions.SendMessageWithArgs(Messages.QuestionEnd); // Should be here because only here question is fully processed
+
             var sources = _data.PackageDoc.ResolveSources(_data.Question.Info.Sources);
 
             if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
@@ -3244,6 +3244,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
+            _gameActions.SendVisualMessage(Messages.ShowTable); // Everybody will see the table during showman's decision
+
             _data.ChooserIndex = -1;
 
             // -- Deprecated
@@ -4166,11 +4168,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 if (historyItem.IsRight)
                 {
-                    player.UndoRightSum(historyItem.Sum);
+                    UndoRightSum(player, historyItem.Sum);
                 }
                 else
                 {
-                    player.UndoWrongSum(historyItem.Sum);
+                    UndoWrongSum(player, historyItem.Sum);
                 }
 
                 passed.Add(index);
@@ -4183,15 +4185,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                     if (historyItem.IsRight)
                     {
-                        player.UndoRightSum(historyItem.Sum);
-                        player.SubtractWrongSum(_data.CurPriceWrong);
+                        UndoRightSum(player, historyItem.Sum);
+                        SubtractWrongSum(player, _data.CurPriceWrong);
 
                         wrong.Add(index);
                     }
                     else
                     {
-                        player.UndoWrongSum(historyItem.Sum);
-                        player.AddRightSum(_data.CurPriceRight);
+                        UndoWrongSum(player, historyItem.Sum);
+                        AddRightSum(player, _data.CurPriceRight);
 
                         right.Add(index);
 
@@ -4209,15 +4211,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                     if (historyItem.IsRight)
                     {
-                        player.UndoRightSum(historyItem.Sum);
-                        player.SubtractWrongSum(stake);
+                        UndoRightSum(player, historyItem.Sum);
+                        SubtractWrongSum(player, stake);
 
                         wrong.Add(index);
                     }
                     else
                     {
-                        player.UndoWrongSum(historyItem.Sum);
-                        player.AddRightSum(stake);
+                        UndoWrongSum(player, historyItem.Sum);
+                        AddRightSum(player, stake);
 
                         right.Add(index);
                     }
@@ -4738,23 +4740,28 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var timeout = DetectRoundTimeout();
         var nextTaskTime = 1;
 
-        if (_data.QuestionPlayState.ValidateAfterRightAnswer)
+        if (HaveMultipleAnswerers() && _data.QuestionPlayState.ValidateAfterRightAnswer)
         {
-            if (ValidatePlayersAnswers())
-            {
-                return timeout;
-            }
+            var validationResult = ValidatePlayersAnswers();
 
-            nextTaskTime = 30;
+            if (validationResult.HasValue)
+            {
+                if (validationResult == true)
+                {
+                    return timeout;
+                }
+
+                nextTaskTime = 30;
+            }
         }
 
         PostprocessQuestion(nextTaskTime);
         return timeout;
     }
 
-    private bool ValidatePlayersAnswers()
+    private bool? ValidatePlayersAnswers()
     {
-        if (HaveMultipleAnswerers() && _data.AnnouncedAnswerersEnumerator != null)
+        if (_data.AnnouncedAnswerersEnumerator != null)
         {
             _data.AnnouncedAnswerersEnumerator.Reset();
 
@@ -4766,10 +4773,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             else
             {
                 CalculateOutcomesByRightAnswerOption();
+                return false;
             }
         }
 
-        return false;
+        return null;
     }
 
     private void CalculateOutcomesByRightAnswerOption()
@@ -4797,13 +4805,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             if (isRight)
             {
                 message.Add('+');
-                answerer.AddRightSum(_data.CurPriceRight);
+                AddRightSum(answerer, _data.CurPriceRight);
                 outcome = _data.CurPriceRight;
             }
             else
             {
                 message.Add('-');
-                answerer.SubtractWrongSum(_data.CurPriceWrong);
+                SubtractWrongSum(answerer, _data.CurPriceWrong);
                 outcome = _data.CurPriceWrong;
             }
 
@@ -5010,7 +5018,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.ShowmanReplic(LO[nameof(R.EasyCat)]);
         _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, _data.CurPriceRight);
 
-        _data.Answerer.AddRightSum(_data.CurPriceRight);
+        AddRightSum(_data.Answerer, _data.CurPriceRight);
         _data.ChooserIndex = _data.AnswererIndex;
         _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
         _gameActions.InformSums();
@@ -5168,4 +5176,51 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         ContentTypes.Audio or ContentTypes.Video => DefaultAudioVideoTime,
         _ => 0,
     };
+
+    private void AddRightSum(GamePlayerAccount player, int sum)
+    {
+        player.Sum += sum;
+
+        var statistic = GetStatistic(player.Name);
+
+        statistic.RightAnswerCount++;
+        statistic.RightTotal += sum;
+    }
+
+    private void SubtractWrongSum(GamePlayerAccount player, int sum)
+    {
+        player.Sum -= sum;
+
+        var statistic = GetStatistic(player.Name);
+        statistic.WrongAnswerCount++;
+        statistic.WrongTotal += sum;
+    }
+
+    private void UndoRightSum(GamePlayerAccount player, int sum)
+    {
+        player.Sum -= sum;
+
+        var statistic = GetStatistic(player.Name);
+        statistic.RightAnswerCount--;
+        statistic.RightTotal -= sum;
+    }
+
+    private void UndoWrongSum(GamePlayerAccount player, int sum)
+    {
+        player.Sum += sum;
+
+        var statistic = GetStatistic(player.Name);
+        statistic.WrongAnswerCount--;
+        statistic.WrongTotal -= sum;
+    }
+
+    private PlayerStatistic GetStatistic(string name)
+    {
+        if (!_data.Statistics.TryGetValue(name, out var statistic))
+        {
+            _data.Statistics[name] = statistic = new PlayerStatistic();
+        }
+
+        return statistic;
+    }
 }
