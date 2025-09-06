@@ -331,9 +331,9 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на You need to create questions for quiz topic.
+        ///   Ищет локализованную строку, похожую на You need to create questions for a quiz topic, ensuring they are precise, valid (based on verifiable facts), and preferably target &apos;unknown about known&apos;—obscure or lesser-known details about well-known subjects, people, or concepts (e.g., a rare fact about a famous historical figure)—though this is not mandatory if it doesn&apos;t fit naturally. Questions must have exactly one correct answer, with no ambiguity.
         ///
-        ///1. Pick popular topic (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, gen z fashion, trends, food and drinks, celebrities, fun facts, tv shows, music. Periodically pick less popular ones for diversity. The best way of crafting topics is to use topic names that could be connected to answers in different ways (like &quot;Stones&quot; topic could relate to some info about stones and also about Emma Stone). Topic name could  [остаток строки не уместился]&quot;;.
+        ///1. Pick one of 10 000 top popular topics (if not provided). Examples: games, movies, anime, books,  [остаток строки не уместился]&quot;;.
         /// </summary>
         public static string DefaultGPTPrompt {
             get {

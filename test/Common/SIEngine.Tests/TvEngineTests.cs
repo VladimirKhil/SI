@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
 
@@ -14,7 +15,7 @@ internal sealed class TvEngineTests
         var engineHandler = new SIEnginePlayHandlerMock();
 
         var engine = EngineFactory.CreateEngine(
-            true,
+            WellKnownGameRules.Classic,
             document,
             () => new EngineOptions
             {

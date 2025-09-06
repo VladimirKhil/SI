@@ -234,6 +234,11 @@ public static class Messages
     public const string Game = "GAME";
 
     /// <summary>
+    /// Defines a game-level error.
+    /// </summary>
+    public const string GameError = "GAME_ERROR";
+
+    /// <summary>
     /// Информация об игре для внешнего наблюдателя
     /// </summary>
     [Obsolete("Remove after switching to SIGame 8")]
@@ -373,15 +378,29 @@ public static class Messages
     public const string Package = "PACKAGE";
 
     /// <summary>
+    /// Authors of the package (if any).
+    /// </summary>
+    public const string PackageAuthors = "PACKAGE_AUTHORS";
+
+    /// <summary>
+    /// Comments of the package (if any).
+    /// </summary>
+    public const string PackageComments = "PACKAGE_COMMENTS";
+
+    /// <summary>
+    /// Package creation date.
+    /// </summary>
+    public const string PackageDate = "PACKAGE_DATE";
+
+    /// <summary>
     /// Идентификатор пакета
     /// </summary>
     public const string PackageId = "PACKAGEID";
 
     /// <summary>
-    /// Логотип пакета
+    /// Sources of the package (if any).
     /// </summary>
-    [Obsolete]
-    public const string PackageLogo = "PACKAGELOGO";
+    public const string PackageSources = "PACKAGE_SOURCES";
 
     /// <summary>
     /// Player passed.
@@ -438,41 +457,19 @@ public static class Messages
     public const string PlayerAnswer = "PLAYER_ANSWER";
 
     /// <summary>
+    /// Player started appellating.
+    /// </summary>
+    public const string PlayerAppellating = "PLAYER_APPELLATING";
+
+    /// <summary>
+    /// Notifies about player score change.
+    /// </summary>
+    public const string PlayerScoreChanged = "PLAYER_SCORE_CHANGED";
+
+    /// <summary>
     /// Sets player state.
     /// </summary>
     public const string PlayerState = "PLAYER_STATE";
-
-    /// <summary>
-    /// Скорость чтения вопроса
-    /// </summary>
-    [IdempotencyRequired]
-    [Obsolete("Use Options")]
-    public const string ReadingSpeed = "READINGSPEED";
-
-    /// <summary>
-    /// Готовность к игре
-    /// </summary>
-    public const string Ready = "READY";
-
-    /// <summary>
-    /// Отчёт об игре
-    /// </summary>
-    public const string Report = "REPORT";
-
-    /// <summary>
-    /// Продолжить отыгрыш атома сценария
-    /// </summary>
-    public const string Resume = "RESUME";
-
-    /// <summary>
-    /// Правильный ответ (простой)
-    /// </summary>
-    public const string RightAnswer = "RIGHTANSWER";
-
-    /// <summary>
-    /// Notifies about complex answer start.
-    /// </summary>
-    public const string RightAnswerStart = "RIGHT_ANSWER_START";
 
     /// <summary>
     /// Тип вопроса
@@ -515,9 +512,51 @@ public static class Messages
     public const string QuestionSources = "QUESTION_SOURCES";
 
     /// <summary>
+    /// Скорость чтения вопроса
+    /// </summary>
+    [IdempotencyRequired]
+    [Obsolete("Use Options")]
+    public const string ReadingSpeed = "READINGSPEED";
+
+    /// <summary>
+    /// Готовность к игре
+    /// </summary>
+    public const string Ready = "READY";
+
+    /// <summary>
     /// Реплика игры/участника
     /// </summary>
     public const string Replic = "REPLIC";
+
+    /// <summary>
+    /// Отчёт об игре
+    /// </summary>
+    public const string Report = "REPORT";
+
+    /// <summary>
+    /// Продолжить отыгрыш атома сценария
+    /// </summary>
+    public const string Resume = "RESUME";
+
+    /// <summary>
+    /// Правильный ответ (простой)
+    /// </summary>
+    public const string RightAnswer = "RIGHTANSWER";
+
+    /// <summary>
+    /// Notifies about complex answer start.
+    /// </summary>
+    public const string RightAnswerStart = "RIGHT_ANSWER_START";
+
+    /// <summary>
+    /// Authors of the round (if any).
+    /// </summary>
+    public const string RoundAuthors = "ROUND_AUTHORS";
+
+    /// <summary>
+    /// Comments of the round (if any).
+    /// </summary>
+    public const string RoundComments = "ROUND_COMMENTS";
 
     /// <summary>
     /// Round media content links.
@@ -525,10 +564,20 @@ public static class Messages
     public const string RoundContent = "ROUNDCONTENT";
 
     /// <summary>
+    /// Notifies about round end.
+    /// </summary>
+    public const string RoundEnd = "ROUND_END";
+
+    /// <summary>
     /// Package rounds names. Only rounds with at least one question are taken into account.
     /// </summary>
     [IdempotencyRequired]
     public const string RoundsNames = "ROUNDSNAMES";
+
+    /// <summary>
+    /// Sources of the round (if any).
+    /// </summary>
+    public const string RoundSources = "ROUND_SOURCES";
 
     /// <summary>
     /// Round themes names.

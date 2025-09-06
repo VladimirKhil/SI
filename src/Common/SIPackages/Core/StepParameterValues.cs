@@ -96,6 +96,16 @@ public static class StepParameterValues
     public const string SetAnswerTypeType_Text = "text";
 
     /// <summary>
+    /// SetAnswerType number type.
+    /// </summary>
+    public const string SetAnswerTypeType_Number = "number";
+
+    /// <summary>
+    /// SetAnswerType point type.
+    /// </summary>
+    public const string SetAnswerTypeType_Point = "point";
+
+    /// <summary>
     /// SetAnswerType select type.
     /// </summary>
     public const string SetAnswerTypeType_Select = "select";

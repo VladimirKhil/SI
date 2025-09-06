@@ -1065,6 +1065,12 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="SetAnswererSelect_ExceptCurrent" xml:space="preserve">
     <value>To everyone except oneself</value>
   </data>
+  <data name="SetAnswerTypeType_Number" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="SetAnswerTypeType_Point" xml:space="preserve">
+    <value>Point (on image)</value>
+  </data>
   <data name="SetAnswerTypeType_Select" xml:space="preserve">
     <value>Select from options</value>
   </data>

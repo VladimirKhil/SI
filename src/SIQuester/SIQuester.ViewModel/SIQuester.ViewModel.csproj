@@ -28,7 +28,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="OpenAI" Version="2.1.0" />
+    <PackageReference Include="OpenAI" Version="2.3.0" />
     <PackageReference Include="Steamworks.NET" Version="2024.8.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
 	<PackageReference Include="YamlDotNet" Version="13.1.1" />

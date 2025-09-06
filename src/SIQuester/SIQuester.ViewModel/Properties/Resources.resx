@@ -208,35 +208,22 @@
     <value>The package is stored in the Database {0} under the name {1}</value>
   </data>
   <data name="DefaultGPTPrompt" xml:space="preserve">
-    <value>You need to create questions for quiz topic.
+    <value>You need to create questions for a quiz topic, ensuring they are precise, valid (based on verifiable facts), and preferably target 'unknown about known'—obscure or lesser-known details about well-known subjects, people, or concepts (e.g., a rare fact about a famous historical figure)—though this is not mandatory if it doesn't fit naturally. Questions must have exactly one correct answer, with no ambiguity.
 
-1. Pick popular topic (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, gen z fashion, trends, food and drinks, celebrities, fun facts, tv shows, music. Periodically pick less popular ones for diversity. The best way of crafting topics is to use topic names that could be connected to answers in different ways (like "Stones" topic could relate to some info about stones and also about Emma Stone). Topic name could be a famous quote.
-
-2. Topic could have an optional description explaining it (short, around 5 words) - only when the topic name is not clear enough. Examples: "Guess movie by emojis", For topic "Who is the culptic?" description could be "name the murderer by a novel".
-
-3. Craft topic questions having increasing difficulty. Easy example: "What is the capital of France?" Hard example: "One of his wives was Serbian scientist Mileva Maric". Questions could be based on some interesting facts, or they could be a general (school) knowlege check or a riddle.
-
-Each question should contain several (up to 5) sentences of text (try to keep them very as short as possible). Direct question ("Who is it") is not needed, just mention the fact.
-
-4. Question answer could be a text (up to 5 words) or could contain multiple choice (1 of 4-5 with choice letter as the right answer). For simple text answer, leave answer options empty. For multiple choice, skip letters in answer options and provide a single letter as the answer. Also do not include answer options in question text.
-
-Each question should have exactly one right answer.
-
-5. If answer is unclear, put short explanation in question comment section (around 7-10 words). Leave comment empty if it is not needed, skip well-known facts (mostly for the easiest questions). Avoid repeating the facts from the question itself.
-
-6. For statistics based questions (like "who is the most popular...") and for any time-bound information provide website url as the source. Check that url is valid.
+1. Pick one of 10 000 top popular topics (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, Gen Z fashion, trends, food and drinks, celebrities, fun facts, TV shows, music. Craft topic names that allow creative connections to answers (for example Stones topic could link to geology, Emma Stone, or Rolling Stones). Topic names could be famous quotes for added intrigue.
+2. Topics may include an optional short description (around 5 words) only if the name is ambiguous. Examples: For 'Guess movie by emojis,' no description needed; for 'Who is the culprit?,' use 'Name the murderer from the novel.'
+3. Craft questions with increasing difficulty levels. Prefer 'unknown about known' styles, like easy: 'This city's Eiffel Tower is iconic' (targeting Paris); hard: 'His first wife was Serbian physicist Mileva Marić' Base questions on interesting facts, general knowledge, or riddles. Hard questions should be based on not so popular facts. Present each question as up to 5 very short sentences of descriptive text (no direct interrogatives like 'Who is it?'; just state facts leading to the inference). Use simple language. Do not use too expressive adjectives like "famous", "outstanding", "iconic" etc. It should be clear specify which object/property should be guessed.
+4. Answers must be text (up to 5 words) or multiple choice (4-5 options, with one correct marked by a letter). For text answers, leave options empty. For multiple choice, list options without letters in the options field, and provide only the correct letter as the answer. Exclude options from question text. Hard question answers should not usually have choices. Answer for each question should be unique.
+5. If the answer is unclear and needs to be explained, include a comment. Keep it around 7-10 words, do not repeat question or answer facts or state obvious info in comment.
+6. For all questions involving statistics, time-bound info, or any disputable facts, provide a valid, verifiable source URL (e.g., from reputable sites like Wikipedia, official databases, or academic sources). Always check that the URL is active, current, and directly supports the fact—validate via reliable means before including.
 
 Examples:
 
-- topic "Which language is this", question "Bonjour", answer "French";
-- topic "Book by emoji", question "👴🌊", answer "The Old Man and the Sea";
-- topic "Chemical element by symbol", question "O", answer options "Gold", "Oxygen", "Tin", "Mercury", answer "B";
-- topic "End of story", question: "His last words were Open the second shutter in the living room so that more light comes in", answer "Johann Wolfgang von Goethe";
-- topic "Hasta la vista, baby", question: "Released in November 2006, it became one of the biggest failures for its developers", answer "Windows Vista", comment: "It was not widely used and got a lot of negative reviews", source: "https://en.wikipedia.org/wiki/Windows_Vista"
-
-
-
-</value>
+- Topic 'Which language is this,' question 'Bonjour means hello in this tongue,' answer 'French';
+- Topic 'Book by emoji,' question '👴🌊 tells of a fisherman's epic struggle,' answer 'The Old Man and the Sea';
+- Topic 'Chemical element by symbol,' question 'This element's symbol is O, essential for breathing,' answer options 'Gold', 'Oxygen', 'Tin', 'Mercury', answer 'B';
+- Topic 'End of story,' question 'His final words requested opening the second shutter for more light,' answer 'Johann Wolfgang von Goethe', comment 'Refers to Goethe's deathbed request, per historical accounts', source 'https://en.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe';
+- Topic 'Hasta la vista, baby,' question 'Launched in 2006, this OS flop drew widespread criticism for bugs and incompatibility,' answer 'Windows Vista', comment 'Critics noted its high resource demands and security issues', source 'https://en.wikipedia.org/wiki/Windows_Vista';</value>
   </data>
   <data name="DefaultTags" xml:space="preserve">
     <value>Cars

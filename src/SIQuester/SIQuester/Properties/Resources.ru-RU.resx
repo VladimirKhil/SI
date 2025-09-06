@@ -1061,6 +1061,12 @@
   <data name="SetAnswererSelect_ExceptCurrent" xml:space="preserve">
     <value>Всем кроме себя</value>
   </data>
+  <data name="SetAnswerTypeType_Number" xml:space="preserve">
+    <value>Число</value>
+  </data>
+  <data name="SetAnswerTypeType_Point" xml:space="preserve">
+    <value>Точка (на изображении)</value>
+  </data>
   <data name="SetAnswerTypeType_Select" xml:space="preserve">
     <value>Выбор из вариантов</value>
   </data>

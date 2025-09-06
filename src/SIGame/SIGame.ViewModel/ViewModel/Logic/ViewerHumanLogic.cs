@@ -1406,13 +1406,14 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 }
 
             case QuestionTypes.NoRisk:
+                if (!isDefaultType)
                 {
                     TInfo.Text = Resources.Label_Sponsored;
                     HighlightCurrentTheme();
                     TInfo.TStage = TableStage.Special;
                     PlatformManager.Instance.PlaySound(Sounds.QuestionNoRisk);
-                    break;
                 }
+                break;
 
             case QuestionTypes.Simple:
                 TInfo.TimeLeft = 1.0;

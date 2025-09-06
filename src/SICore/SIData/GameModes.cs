@@ -17,5 +17,15 @@ public enum GameModes
     /// Simplified mode (with question sequential play).
     /// </summary>
     [Display(Description = "GameModes_Sport")]
-    Sport
+    Sport,
+
+    /// <summary>
+    /// Quiz mode.
+    /// </summary>
+    Quiz,
+
+    /// <summary>
+    /// Turn taking mode.
+    /// </summary>
+    TurnTaking,
 }

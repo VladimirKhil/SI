@@ -6,6 +6,7 @@ using SICore.Network.Servers;
 using SICore.Services;
 using SIData;
 using SIEngine;
+using SIEngine.Rules;
 using SIPackages;
 
 namespace SICore;
@@ -98,9 +99,10 @@ public static class GameRunner
 
         var playHandler = new PlayHandler(gameData);
         var questionPlayHandler = new QuestionPlayHandler(gameData);
+        var gameRules = GetGameRules(gameData.Settings.AppSettings.GameMode);
 
         var engine = EngineFactory.CreateEngine(
-            gameData.Settings.AppSettings.GameMode == GameModes.Tv,
+            gameRules,
             document,
             () => CreateEngineOptions(gameData.Settings.AppSettings),
             playHandler,
@@ -133,4 +135,13 @@ public static class GameRunner
             fileShare,
             avatarHelper);
     }
+
+    private static GameRules GetGameRules(GameModes gameMode) => gameMode switch
+    {
+        GameModes.Tv => WellKnownGameRules.Classic,
+        GameModes.Sport => WellKnownGameRules.Simple,
+        GameModes.Quiz => WellKnownGameRules.Quiz,
+        GameModes.TurnTaking => WellKnownGameRules.TurnTaking,
+        _ => throw new NotSupportedException($"Game mode {gameMode} is not supported"),
+    };
 }

@@ -5,12 +5,12 @@ namespace SIEngine.Rules;
 /// <summary>
 /// Defines well-known game rules.
 /// </summary>
-internal static class WellKnownGameRules
+public static class WellKnownGameRules
 {
     /// <summary>
     /// Classic game rules.
     /// </summary>
-    internal static readonly GameRules Classic = new()
+    public static readonly GameRules Classic = new()
     {
         ShowGameThemes = true,
         DefaultRoundRules = new()
@@ -23,13 +23,39 @@ internal static class WellKnownGameRules
     /// <summary>
     /// Simple game rules.
     /// </summary>
-    internal static readonly GameRules Simple = new()
+    public static readonly GameRules Simple = new()
     {
         ShowGameThemes = false,
         DefaultRoundRules = new()
         {
             DefaultQuestionType = QuestionTypes.Simple,
             QuestionSelectionStrategyType = QuestionSelectionStrategyType.Sequential
+        }
+    };
+
+    /// <summary>
+    /// Quiz game rules.
+    /// </summary>
+    public static readonly GameRules Quiz = new()
+    {
+        ShowGameThemes = false,
+        DefaultRoundRules = new()
+        {
+            DefaultQuestionType = QuestionTypes.ForAll,
+            QuestionSelectionStrategyType = QuestionSelectionStrategyType.Sequential
+        }
+    };
+
+    /// <summary>
+    /// Turn-taking game rules.
+    /// </summary>
+    public static readonly GameRules TurnTaking = new()
+    {
+        ShowGameThemes = false,
+        DefaultRoundRules = new()
+        {
+            DefaultQuestionType = QuestionTypes.NoRisk,
+            QuestionSelectionStrategyType = QuestionSelectionStrategyType.SelectByPlayer
         }
     };
 
@@ -42,6 +68,18 @@ internal static class WellKnownGameRules
         };
 
         Simple.RoundRules[RoundTypes.Final] = new()
+        {
+            DefaultQuestionType = QuestionTypes.StakeAll,
+            QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes
+        };
+
+        Quiz.RoundRules[RoundTypes.Final] = new()
+        {
+            DefaultQuestionType = QuestionTypes.StakeAll,
+            QuestionSelectionStrategyType = QuestionSelectionStrategyType.Sequential
+        };
+
+        TurnTaking.RoundRules[RoundTypes.Final] = new()
         {
             DefaultQuestionType = QuestionTypes.StakeAll,
             QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes

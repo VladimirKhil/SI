@@ -39,4 +39,14 @@ public enum ErrorCode
     /// Avatar is invalid.
     /// </summary>
     InvalidAvatar = 7,
+
+    /// <summary>
+    /// Person with the same name already exists.
+    /// </summary>
+    PersonAlreadyExists = 8,
+
+    /// <summary>
+    /// Appellation failed because of too few players.
+    /// </summary>
+    AppellationFailedTooFewPlayers = 9,
 }

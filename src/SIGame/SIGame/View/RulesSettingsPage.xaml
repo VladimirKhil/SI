@@ -18,11 +18,10 @@
     FontFamily="{StaticResource Font}"
     d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Page.Resources>
-        <ObjectDataProvider x:Key="GameModes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="data:GameModes"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        <x:Array x:Key="GameModes" Type="{x:Type data:GameModes}">
+            <data:GameModes>Tv</data:GameModes>
+            <data:GameModes>Sport</data:GameModes>
+        </x:Array>
 
         <ObjectDataProvider x:Key="ButtonPressMode" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>

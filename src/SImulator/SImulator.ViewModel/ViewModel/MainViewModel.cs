@@ -1,4 +1,5 @@
 ﻿using SIEngine;
+using SIEngine.Rules;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Controllers;
@@ -501,7 +502,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         try
         {
             engine = EngineFactory.CreateEngine(
-                SettingsViewModel.Model.GameMode == GameModes.Tv,
+                SettingsViewModel.Model.GameMode == GameModes.Tv ? WellKnownGameRules.Classic : WellKnownGameRules.Simple,
                 document,
                 GetEngineOptions,
                 gameEngineController,

@@ -2812,6 +2812,24 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Number.
+        /// </summary>
+        public static string SetAnswerTypeType_Number {
+            get {
+                return ResourceManager.GetString("SetAnswerTypeType_Number", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Point (on image).
+        /// </summary>
+        public static string SetAnswerTypeType_Point {
+            get {
+                return ResourceManager.GetString("SetAnswerTypeType_Point", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Select from options.
         /// </summary>
         public static string SetAnswerTypeType_Select {
