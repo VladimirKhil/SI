@@ -256,7 +256,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.QuestionPlayState.AppellationState = _data.Settings.AppSettings.UseApellations ? AppellationState.Processing : AppellationState.None;
         _data.IsPlayingMedia = false;
 
-        _data.InformStages &= ~(InformStages.Layout | InformStages.ContentShape);
+        _data.InformStages &= ~(InformStages.Question | InformStages.Layout | InformStages.ContentShape);
 
         ScheduleExecution(Tasks.QuestionPostInfo, taskTime, 1, force: true);
 
@@ -366,6 +366,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.InformRoundThemesNames(playMode: playMode);
             _data.ThemeComments = themes.Select(theme => theme.Info.Comments.Text).ToArray();
             _data.InformStages |= InformStages.RoundThemesNames;
+            _data.ThemesPlayMode = playMode;
         },
         5000);
     }
@@ -394,6 +395,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _gameActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
+        _data.InformStages |= InformStages.Question;
 
         _data.Theme = _data.Round.Themes[themeIndex];
         _data.Question = _data.Theme.Questions[questionIndex];
@@ -470,7 +472,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        _gameActions.SendVisualMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
+        var message = string.Join(Message.ArgsSeparator, Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
+
+        _data.ComplexVisualState ??= new IReadOnlyList<string>[1];
+        _data.ComplexVisualState[0] = new string[] { message };
+
+        _gameActions.SendMessage(message);
         _gameActions.SystemReplic(text); // TODO: REMOVE: replaced by CONTENT message
 
         var nextTime = !waitForFinish ? 1 : contentTime;
@@ -593,7 +600,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             if (!success || globalUri == null)
             {
                 var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
-                _gameActions.SendVisualMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
+                var message = string.Join(Message.ArgsSeparator, Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
+                _gameActions.SendMessage(message);
+
+                _data.ComplexVisualState ??= new IReadOnlyList<string>[1];
+                _data.ComplexVisualState[0] = new string[] { message };
+
                 return null;
             }
 
@@ -1909,6 +1921,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         else
         {
             InformTable();
+            _data.ThemesPlayMode = ThemesPlayMode.None;
             ScheduleExecution(Tasks.AskFirst, 19);
         }
     }
@@ -2056,6 +2069,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                             }
 
                             InformTable();
+                            _data.ThemesPlayMode = ThemesPlayMode.None;
                             newTask = Tasks.AskFirst;
                         }
 
@@ -2832,7 +2846,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _data.CurPriceWrong = 0;
         }
 
-        _gameActions.SendMessageWithArgs(Messages.QType, _data.QuestionTypeName, isDefault, isNoRisk);
+        _gameActions.SendVisualMessageWithArgs(Messages.QType, _data.QuestionTypeName, isDefault, isNoRisk);
         ScheduleExecution(Tasks.MoveNext, isDefault ? 1 : 22, force: true);
     }
 
@@ -2913,7 +2927,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             var sources = _data.PackageDoc.ResolveSources(_data.Question.Info.Sources);
 
-            if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
+            if (sources.Count > 0)
             {
                 var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
                 _gameActions.ShowmanReplic(text); // TODO: REMOVE: replaced by QUESTION_SOURCES message
@@ -4310,7 +4324,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             var sources = _data.PackageDoc.ResolveSources(theme.Info.Sources);
 
-            if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
+            if (sources.Count > 0)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4413,7 +4427,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             var sources = _data.PackageDoc.ResolveSources(package.Info.Sources);
 
-            if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
+            if (sources.Count > 0)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4538,7 +4552,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             var sources = _data.PackageDoc.ResolveSources(round.Info.Sources);
 
-            if (sources.Count > 0 && _data.Settings.AppSettings.DisplaySources)
+            if (sources.Count > 0)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -5086,6 +5100,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         _gameActions.InformLayout();
         _data.InformStages |= InformStages.Layout;
+        _data.LastVisualMessage = null;
+        _data.ComplexVisualState = new IReadOnlyList<string>[1 + (_data.QuestionPlayState.AnswerOptions?.Length ?? 0)];
     }
 
     internal void ShowAnswerOptions(Action? continuation)
@@ -5138,6 +5154,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _gameActions.SendMessage(messageBuilder.ToString());
+
+        if (_data.ComplexVisualState != null && optionIndex + 1 < _data.ComplexVisualState.Length)
+        {
+            _data.ComplexVisualState[optionIndex + 1] = new string[] { messageBuilder.ToString() };
+        }
 
         var nextTask = optionIndex + 1 < _data.QuestionPlayState.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
         ScheduleExecution(nextTask, _data.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? contentDuration : 1, optionIndex + 1);
@@ -5214,7 +5235,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             contentTime = Math.Max(contentTime, contentListDuration);
         }
 
-        _data.ComplexVisualState = visualState;
+        _data.ComplexVisualState ??= new IReadOnlyList<string>[1];
+        _data.ComplexVisualState[0] = visualState;
         _data.IsPartial = false;
         _data.AtomStart = DateTime.UtcNow;
         _data.AtomTime = contentTime;

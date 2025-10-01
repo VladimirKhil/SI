@@ -7,10 +7,11 @@
     <Version>$(SIGameVersion)</Version>
     <PackageProjectUrl>https://github.com/VladimirKhil/SI</PackageProjectUrl>
     <RepositoryUrl>https://github.com/VladimirKhil/SI</RepositoryUrl>
-    <PackageTags>SIGame</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageTags>SIGame</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+	<PackageId>SIPackages</PackageId>
     <Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

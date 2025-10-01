@@ -369,7 +369,7 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.Choice:
-                    OnChoice(mparams);
+                    OnQuestionSelected(mparams);
                     break;
 
                 case Messages.QuestionCaption:
@@ -713,7 +713,7 @@ public class Viewer : Actor, IViewerClient
             }
         }
 
-        if (mparams[0] == Messages.Stage)
+        if (mparams[0] == Messages.Stage || ClientData.Stage == GameStage.Begin || ClientData.Stage == GameStage.After)
         {
             _logic.SetCaption("");
 
@@ -822,7 +822,7 @@ public class Viewer : Actor, IViewerClient
         {
             ClientData.Players[i].IsChooser = i == index;
 
-            if (mparams.Length > 2)
+            if (mparams.Length > 2 && mparams[2] == "+")
             {
                 ClientData.Players[i].State = i == index ? PlayerState.Answering : PlayerState.Pass;
             }
@@ -980,10 +980,15 @@ public class Viewer : Actor, IViewerClient
         _logic.OnQuestionStart(mparams.Length > 2 && bool.TryParse(mparams[2], out var isDefault) && isDefault);
     }
 
-    private void OnChoice(string[] mparams)
+    private void OnQuestionSelected(string[] mparams)
     {
-        ClientData.ThemeIndex = int.Parse(mparams[1]);
-        ClientData.QuestionIndex = int.Parse(mparams[2]);
+        if (mparams.Length < 3 || !int.TryParse(mparams[1], out var themeIndex) || !int.TryParse(mparams[2], out var questionIndex))
+        {
+            return;
+        }
+
+        ClientData.ThemeIndex = themeIndex;
+        ClientData.QuestionIndex = questionIndex;
 
         if (ClientData.ThemeIndex > -1
             && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count
@@ -992,7 +997,10 @@ public class Viewer : Actor, IViewerClient
         {
             var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
             var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
-            _logic.SetCaption($"{selectedTheme.Name}, {selectedQuestion.Price}");
+
+            var questionPrice = mparams.Length > 3 && int.TryParse(mparams[3], out var price) ? price : selectedQuestion.Price;
+
+            _logic.SetCaption($"{selectedTheme.Name}, {questionPrice}");
         }
 
         foreach (var player in ClientData.Players.ToArray())

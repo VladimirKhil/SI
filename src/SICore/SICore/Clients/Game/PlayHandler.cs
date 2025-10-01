@@ -188,11 +188,13 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         GameLogic?.AddHistory("::OnThemeSelected");
         _gameData.ThemeIndex = themeIndex;
         _gameData.Theme = _gameData.Round.Themes[themeIndex];
+        _gameData.ThemesPlayMode = ThemesPlayMode.None;
 
         _gameData.QuestionIndex = questionIndex;
         _gameData.Question = _gameData.Theme.Questions[_gameData.QuestionIndex];
 
         GameLogic?.AnnounceFinalTheme(_gameData.Question);
+        _gameData.InformStages |= InformStages.Theme;
     }
 
     public void OnTheme(Theme theme)

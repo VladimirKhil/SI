@@ -352,7 +352,7 @@
     <value>тип участника</value>
   </data>
   <data name="PersonWithSuchNameIsAlreadyInGame" xml:space="preserve">
-    <value>Человек с именем {0} уже есть в игре!</value>
+    <value>Человек с таким именем уже есть в игре!</value>
   </data>
   <data name="PlaceIsOccupied" xml:space="preserve">
     <value>Место уже занято!</value>

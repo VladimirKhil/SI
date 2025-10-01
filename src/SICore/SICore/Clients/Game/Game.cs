@@ -1703,7 +1703,7 @@ public sealed class Game : Actor
 
         if ((ClientData.InformStages & InformStages.RoundThemesNames) > 0)
         {
-            _gameActions.InformRoundThemesNames(person);
+            _gameActions.InformRoundThemesNames(person, ClientData.ThemesPlayMode);
         }
 
         if ((ClientData.InformStages & InformStages.RoundThemesComments) > 0)
@@ -1719,6 +1719,11 @@ public sealed class Game : Actor
         if ((ClientData.InformStages & InformStages.Theme) > 0)
         {
             _gameActions.InformTheme(person);
+        }
+
+        if ((ClientData.InformStages & InformStages.Question) > 0 && ClientData.Question != null)
+        {
+            _gameActions.SendMessageToWithArgs(person, Messages.Choice, ClientData.ThemeIndex, ClientData.QuestionIndex, ClientData.Question.Price);
         }
 
         if ((ClientData.InformStages & InformStages.Layout) > 0)
@@ -1744,26 +1749,43 @@ public sealed class Game : Actor
         }
 
         // Send last visual message to restore table state for reconnected player
-        if (!string.IsNullOrEmpty(ClientData.LastVisualMessage))
+        if (ClientData.ComplexVisualState != null)
+        {
+            foreach (var visualMessageList in ClientData.ComplexVisualState)
+            {
+                if (visualMessageList == null)
+                {
+                    continue;
+                }
+
+                foreach (var visualMessage in visualMessageList)
+                {
+                    _gameActions.SendMessage(visualMessage, person);
+                }
+            }
+        }
+        else if (!string.IsNullOrEmpty(ClientData.LastVisualMessage))
         {
             _gameActions.SendMessage(ClientData.LastVisualMessage, person);
-        }
-        else if (ClientData.ComplexVisualState != null)
-        {
-            foreach (var visualMessage in ClientData.ComplexVisualState)
-            {
-                _gameActions.SendMessage(visualMessage, person);
-            }
         }
 
         if (ClientData.TInfo.Pause)
         {
-            _gameActions.SendMessageWithArgs(Messages.Pause, '+', 0, 0, 0); // TODO: fill time values
+            _gameActions.SendMessageToWithArgs(person, Messages.Pause, '+', 0, 0, 0); // TODO: fill time values
         }
 
         if (ClientData.Decision == DecisionType.Appellation)
         {
-            _gameActions.SendMessageWithArgs(Messages.Appellation, '+');
+            _gameActions.SendMessageToWithArgs(person, Messages.Appellation, '+');
+        }
+        else if (ClientData.Decision == DecisionType.Pressing)
+        {
+            _gameActions.SendMessageToWithArgs(person, Messages.Try);
+        }
+
+        if (ClientData.ChooserIndex != -1)
+        {
+            _gameActions.SendMessageToWithArgs(person, Messages.SetChooser, ClientData.ChooserIndex, "-", "INITIAL");
         }
     }
 
@@ -3739,7 +3761,9 @@ public sealed class Game : Actor
                 }
 
                 var compPlayer = _defaultPlayers[rand];
-                newAcc = CreateNewComputerPlayer(index, compPlayer);
+                var newPlayerAccount = CreateNewComputerPlayer(index, compPlayer);
+                InheritAccountState(newPlayerAccount, account);
+                newAcc = newPlayerAccount;
                 newName = newAcc.Name;
                 newIsMale = newAcc.IsMale;
             }
@@ -3800,8 +3824,7 @@ public sealed class Game : Actor
             Name = account.Name,
             IsMale = account.IsMale,
             Picture = account.Picture,
-            IsConnected = true,
-            Flag = ClientData.Players[index].Flag
+            IsConnected = true
         };
 
         ClientData.Players[index] = newAccount;

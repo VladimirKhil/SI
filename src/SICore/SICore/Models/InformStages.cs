@@ -10,6 +10,7 @@ internal enum InformStages
     RoundThemesComments = 8,
     Table = 16,
     Theme = 32,
-    Layout = 64,
-    ContentShape = 128,
+    Question = 64,
+    Layout = 128,
+    ContentShape = 256,
 }

@@ -352,7 +352,7 @@
     <value>player's type</value>
   </data>
   <data name="PersonWithSuchNameIsAlreadyInGame" xml:space="preserve">
-    <value>There already is a player with nickname {0} in the game</value>
+    <value>There already is a player with such nickname in the game</value>
   </data>
   <data name="PlaceIsOccupied" xml:space="preserve">
     <value>The place is already occupied!</value>

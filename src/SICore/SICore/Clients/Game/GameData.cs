@@ -618,7 +618,12 @@ public sealed class GameData : Data
     /// <summary>
     /// Defines complex visual state.
     /// </summary>
-    public IReadOnlyList<string>? ComplexVisualState { get; set; }
+    public IReadOnlyList<string>?[]? ComplexVisualState { get; set; }
+
+    /// <summary>
+    /// Themes play mode.
+    /// </summary>
+    public ThemesPlayMode ThemesPlayMode { get; internal set; }
 
     public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings)
     {
@@ -632,20 +637,19 @@ public sealed class GameData : Data
     private void InitQuestionTypeSettings()
     {
         var appSettings = Settings.AppSettings;
-        var ignoreWrong = appSettings.IgnoreWrong;
 
         QuestionTypeSettings[QuestionTypes.ForYourself] = QuestionTypeSettings[QuestionTypes.NoRisk] =
-            new QuestionTypeRules((ignoreWrong || appSettings.QuestionForYourselfPenalty == PenaltyType.None)
+            new QuestionTypeRules(appSettings.QuestionForYourselfPenalty == PenaltyType.None
                 ? PenaltyType.None
                 : PenaltyType.SubtractPoints);
 
         QuestionTypeSettings[QuestionTypes.ForAll] =
-            new QuestionTypeRules((ignoreWrong || appSettings.QuestionForAllPenalty == PenaltyType.None)
+            new QuestionTypeRules(appSettings.QuestionForAllPenalty == PenaltyType.None
                 ? PenaltyType.None
                 : PenaltyType.SubtractPoints);
 
         QuestionTypeSettings[QuestionTypes.WithButton] = QuestionTypeSettings[QuestionTypes.Simple] =
-            new QuestionTypeRules((ignoreWrong || appSettings.QuestionWithButtonPenalty == PenaltyType.None)
+            new QuestionTypeRules(appSettings.QuestionWithButtonPenalty == PenaltyType.None
                 ? PenaltyType.None
                 : PenaltyType.SubtractPoints);
     }

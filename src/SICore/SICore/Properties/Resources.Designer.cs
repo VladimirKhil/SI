@@ -1024,7 +1024,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на There already is a player with nickname {0} in the game.
+        ///   Ищет локализованную строку, похожую на There already is a player with such nickname in the game.
         /// </summary>
         public static string PersonWithSuchNameIsAlreadyInGame {
             get {

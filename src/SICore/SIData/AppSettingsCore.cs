@@ -19,12 +19,10 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultOral = false;
     public const bool DefaultOralPlayersActions = true;
     public const bool DefaultManaged = false;
-    public const bool DefaultIgnoreWrong = false;
     public const PenaltyType DefaultQuestionWithButtonPenalty = PenaltyType.SubtractPoints;
     public const PenaltyType DefaultQuestionForYourselfPenalty = PenaltyType.None;
     public const PenaltyType DefaultQuestionForAllPenalty = PenaltyType.SubtractPoints;
     public const int DefaultQuestionForYourselfFactor = 2;
-    public const bool DefaultDisplaySources = false;
     public const ButtonPressMode DefaultButtonPressMode = ButtonPressMode.RandomWithinInterval;
     public const bool DefaultPreloadRoundContent = true;
     public const GameModes DefaultGameMode = GameModes.Tv;
@@ -205,21 +203,6 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         set { _managed = value; OnPropertyChanged(); }
     }
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private bool _ignoreWrong = DefaultIgnoreWrong;
-
-    /// <summary>
-    /// Wrong answer did not lead to penalty.
-    /// </summary>
-    [XmlAttribute]
-    [DefaultValue(DefaultIgnoreWrong)]
-    [Obsolete("Will be removed")]
-    public bool IgnoreWrong
-    {
-        get => _ignoreWrong;
-        set { _ignoreWrong = value; OnPropertyChanged(); }
-    }
-
     private PenaltyType _questionWithButtonPenalty = DefaultQuestionWithButtonPenalty;
 
     /// <summary>
@@ -294,21 +277,6 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
                 OnPropertyChanged();
             }
         }
-    }
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private bool _displaySources = DefaultDisplaySources;
-
-    /// <summary>
-    /// Display package items sources.
-    /// </summary>
-    [XmlAttribute]
-    [DefaultValue(DefaultDisplaySources)]
-    [Obsolete("Will be removed")]
-    public bool DisplaySources
-    {
-        get => _displaySources;
-        set { _displaySources = value; OnPropertyChanged(); }
     }
 
     private ButtonPressMode _buttonPressMode = DefaultButtonPressMode;
@@ -469,7 +437,6 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         AllowEveryoneToPlayHiddenStakes = settings.AllowEveryoneToPlayHiddenStakes;
         Oral = settings._oral;
         OralPlayersActions = settings.OralPlayersActions;
-        _ignoreWrong = settings._ignoreWrong;
         QuestionWithButtonPenalty = settings.QuestionWithButtonPenalty;
         QuestionForYourselfPenalty = settings.QuestionForYourselfPenalty;
         QuestionForAllPenalty = settings.QuestionForAllPenalty;
