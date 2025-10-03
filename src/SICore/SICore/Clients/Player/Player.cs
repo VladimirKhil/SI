@@ -73,10 +73,6 @@ public sealed class Player : Viewer
                 #endregion
                 break;
 
-            case Messages.Choice:
-                Logic.OnQuestionSelected();
-                break;
-
             case Messages.Theme:
             case Messages.Theme2:
             case Messages.ThemeInfo:

@@ -615,7 +615,7 @@ public class Viewer : Actor, IViewerClient
         }
         catch (Exception exc)
         {
-            throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
+            _client.Node.OnError(exc, true);
         }
     }
 
@@ -987,21 +987,26 @@ public class Viewer : Actor, IViewerClient
             return;
         }
 
+        if (themeIndex < 0 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        {
+            return;
+        }
+
+        var selectedTheme = ClientData.TInfo.RoundInfo[themeIndex];
+
+        if (questionIndex < 0 || questionIndex >= selectedTheme.Questions.Count)
+        {
+            return;
+        }
+
+        var selectedQuestion = selectedTheme.Questions[questionIndex];
+
         ClientData.ThemeIndex = themeIndex;
         ClientData.QuestionIndex = questionIndex;
 
-        if (ClientData.ThemeIndex > -1
-            && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count
-            && ClientData.QuestionIndex > -1
-            && ClientData.QuestionIndex < ClientData.TInfo.RoundInfo[ClientData.ThemeIndex].Questions.Count)
-        {
-            var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
-            var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
+        var questionPrice = mparams.Length > 3 && int.TryParse(mparams[3], out var price) ? price : selectedQuestion.Price;
 
-            var questionPrice = mparams.Length > 3 && int.TryParse(mparams[3], out var price) ? price : selectedQuestion.Price;
-
-            _logic.SetCaption($"{selectedTheme.Name}, {questionPrice}");
-        }
+        _logic.SetCaption($"{selectedTheme.Name}, {questionPrice}");
 
         foreach (var player in ClientData.Players.ToArray())
         {
@@ -1009,7 +1014,7 @@ public class Viewer : Actor, IViewerClient
         }
 
         _logic.ClearQuestionState();
-        _logic.Choice();
+        _logic.OnQuestionSelected(themeIndex, questionIndex);
     }
 
     private void OnMediaLoaded(string[] mparams)

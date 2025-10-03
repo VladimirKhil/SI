@@ -375,8 +375,8 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                 GameLogic?.OnSelectPrice(availableRange);
                 return true;
 
-            case StepParameterValues.SetPriceMode_NoRisk:
-                GameLogic?.OnSetPriceForYourself();
+            case StepParameterValues.SetPriceMode_Multiply:
+                GameLogic?.OnMultiplyPrice();
                 return true;
 
             default:

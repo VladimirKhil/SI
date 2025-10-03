@@ -32,9 +32,9 @@ public interface IPersonController
     void RoundThemes(ThemesPlayMode playMode) { }
 
     /// <summary>
-    /// Игрок выбрал вопрос
+    /// Handles question selection.
     /// </summary>
-    void Choice();
+    void OnQuestionSelected(int themeIndex, int questionIndex);
 
     /// <summary>
     /// Handles right answer or label.
@@ -249,11 +249,6 @@ public interface IPersonController
     /// <param name="questionCount">Number of questions in the theme.</param>
     /// <param name="animate">Should theme be animated.</param>
     void OnTheme(string themeName, int questionCount, bool animate);
-
-    /// <summary>
-    /// Handles question selection.
-    /// </summary>
-    void OnQuestionSelected() { }
     
     /// <summary>
     /// Handles player answering outcome.

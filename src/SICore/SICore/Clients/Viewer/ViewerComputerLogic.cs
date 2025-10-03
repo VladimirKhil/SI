@@ -89,8 +89,6 @@ internal class ViewerComputerLogic : IPersonController
         }
     }
 
-    public void OnQuestionSelected() => _player.OnQuestionSelected();
-
     public void StartThink() => _player.StartThink();
 
     public void EndThink() => _player.EndThink();
@@ -118,7 +116,15 @@ internal class ViewerComputerLogic : IPersonController
         // Do nothing
     }
 
-    public void Choice() => _data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = Question.InvalidPrice;
+    public void OnQuestionSelected(int themeIndex, int questionIndex)
+    {
+        _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
+
+        if (_role == GameRole.Player)
+        {
+            _player.OnQuestionSelected();
+        }
+    }
 
     public void OnRightAnswer(string answer) { }
 

@@ -75,15 +75,9 @@ public static class StepParameterValues
     public const string SetAnswererStakeVisibility_Hidden = "hidden";
 
     /// <summary>
-    /// No risk SetPrice mode.
+    /// Multiply SetPrice mode.
     /// </summary>
-    public const string SetPriceMode_NoRisk = "noRisk";
-
-    /// <summary>
-    /// SetPrice mode of question for yourself.
-    /// </summary>
-    /// <remarks>Reserved for <see cref="SetPriceMode_NoRisk" /> replacement.</remarks>
-    public const string SetPriceMode_ForYourself = "forYourself";
+    public const string SetPriceMode_Multiply = "multiply";
 
     /// <summary>
     /// Select SetPrice mode.

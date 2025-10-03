@@ -592,21 +592,23 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         _appendTableText = null;
     }
 
-    public async void Choice()
+    public async void OnQuestionSelected(int themeIndex, int questionIndex)
     {
         TInfo.Text = "";
         TInfo.MediaSource = null;
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
 
+        _gameViewModel.Apellate.CanBeExecuted = false;
+
         var select = false;
 
         lock (TInfo.RoundInfoLock)
         {
-            if (_data.ThemeIndex > -1 &&
-                _data.ThemeIndex < TInfo.RoundInfo.Count &&
-                _data.QuestionIndex > -1 &&
-                _data.QuestionIndex < TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
+            if (themeIndex > -1 &&
+                themeIndex < TInfo.RoundInfo.Count &&
+                questionIndex > -1 &&
+                questionIndex < TInfo.RoundInfo[themeIndex].Questions.Count)
             {
                 select = true;
             }
@@ -619,7 +621,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
         try
         {
-            await TInfo.PlaySimpleSelectionAsync(_data.ThemeIndex, _data.QuestionIndex);
+            await TInfo.PlaySimpleSelectionAsync(themeIndex, questionIndex);
         }
         catch (Exception exc)
         {
@@ -2093,8 +2095,6 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     }
 
     public void OnCanPressButton() => _gameViewModel.Apellate.CanBeExecuted = false;
-
-    public void OnQuestionSelected() => _gameViewModel.Apellate.CanBeExecuted = false;
 
     public void OnPersonConnected() => _gameViewModel.UpdateCommands();
 

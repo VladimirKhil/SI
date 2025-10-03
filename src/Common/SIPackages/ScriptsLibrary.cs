@@ -115,7 +115,7 @@ public static class ScriptsLibrary
 
         forYourselfScript.Steps.Add(CreateSetAnswerTypeStep());
         forYourselfScript.Steps.Add(CreateSetAnswererForYouselfStep());
-        forYourselfScript.Steps.Add(CreateSetPriceForYorselfStep());
+        forYourselfScript.Steps.Add(CreateSetPriceMultiplyStep());
         forYourselfScript.Steps.Add(CreateQuestionStep());
         forYourselfScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
         forYourselfScript.Steps.Add(CreateAnswerStep());
@@ -251,10 +251,10 @@ public static class ScriptsLibrary
         return setAnswererStep;
     }
 
-    private static Step CreateSetPriceForYorselfStep()
+    private static Step CreateSetPriceMultiplyStep()
     {
         var setPriceStep = new Step { Type = StepTypes.SetPrice };
-        setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_NoRisk);
+        setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_Multiply);
 
         return setPriceStep;
     }

@@ -775,6 +775,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             InformStages.RoundThemesComments | 
             InformStages.Table | 
             InformStages.Theme | 
+            InformStages.Question |
             InformStages.Layout |
             InformStages.ContentShape);
 
@@ -5049,7 +5050,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         AskHiddenStakes();
     }
 
-    internal void OnSetPriceForYourself()
+    internal void OnMultiplyPrice()
     {
         if (_data.ChooserIndex == -1)
         {
