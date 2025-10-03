@@ -257,8 +257,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                 }
                 break;
 
-            case StepParameterValues.SetPriceMode_NoRisk:
-                GameViewModel.OnSetNoRiskPrice();
+            case StepParameterValues.SetPriceMode_Multiply:
+                GameViewModel.OnSetMultiplyPrice();
                 break;
 
             default:

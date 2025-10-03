@@ -2269,7 +2269,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         return true;
     }
 
-    internal void OnSetNoRiskPrice()
+    internal void OnSetMultiplyPrice()
     {
         if (_activeQuestion == null)
         {

@@ -12,7 +12,7 @@ internal sealed class GameController : IPersonController
 
     public bool CanSwitchType => throw new NotImplementedException();
 
-    public void Choice()
+    public void OnQuestionSelected(int themeIndex, int questionIndex)
     {
         throw new NotImplementedException();
     }
