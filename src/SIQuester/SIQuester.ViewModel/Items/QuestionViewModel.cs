@@ -384,4 +384,21 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             }
         }
     }
+
+    public bool TryAddRightAnswerFromFileName(string fileName)
+    {
+        if (Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
+            && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Select)
+        {
+            return false;
+        }
+
+        if (Right.Last().Length == 0)
+        {
+            Right.RemoveAt(Right.Count - 1);
+        }
+
+        Right.Add(Path.GetFileNameWithoutExtension(fileName));
+        return true;
+    }
 }

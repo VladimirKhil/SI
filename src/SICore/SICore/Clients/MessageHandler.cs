@@ -7,7 +7,7 @@ namespace SICore;
 /// <summary>
 /// Defines a message handler.
 /// </summary>
-public abstract class Actor : IDisposable
+public abstract class MessageHandler : IDisposable
 {
     protected readonly Client _client;
 
@@ -15,8 +15,8 @@ public abstract class Actor : IDisposable
 
     public abstract ValueTask OnMessageReceivedAsync(Message message);
 
-    // TODO: Actor should be Client's handler and shouldn't have a link to client
-    protected Actor(Client client)
+    // TODO: it should be Client's handler and shouldn't have a link to client
+    protected MessageHandler(Client client)
     {
         _client = client;
 

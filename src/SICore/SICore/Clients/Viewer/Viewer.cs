@@ -14,21 +14,19 @@ namespace SICore;
 /// <summary>
 /// Implements a game viewer.
 /// </summary>
-public class Viewer : Actor, IViewerClient
+public class Viewer : MessageHandler, IViewerClient
 {
-    protected readonly ViewerActions _viewerActions;
+    protected readonly ViewerActions _actions;
 
-    public ViewerActions Actions => _viewerActions;
+    public ViewerActions Actions => _actions;
 
     public virtual GameRole Role => GameRole.Viewer;
 
-    private readonly IPersonController _logic;
+    private readonly IPersonController _controller;
 
-    protected IPersonController Logic => _logic;
+    protected IPersonController Logic => _controller;
 
-    public IPersonController MyLogic => _logic;
-
-    public ViewerData ClientData { get; }
+    protected ViewerData ClientData { get; }
 
     public string? Avatar { get; set; }
 
@@ -38,19 +36,17 @@ public class Viewer : Actor, IViewerClient
     public Viewer(
         Client client,
         Account personData,
-        IPersonController logic,
-        ViewerActions viewerActions,
-        ViewerData data)
+        IPersonController controller,
+        ViewerActions actions,
+        ViewerData state)
         : base(client)
     {
-        _viewerActions = viewerActions;
-        _logic = logic;
-        ClientData = data;
+        _actions = actions;
+        _controller = controller;
+        ClientData = state;
         ClientData.Name = client.Name;
         ClientData.Picture = personData.Picture;
     }
-
-    public void Move(object arg) => _viewerActions.SendMessageWithArgs(Messages.Move, arg);
 
     // TODO: get rid of async and await here
     /// <summary>
@@ -68,11 +64,11 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case SystemMessages.Disconnect:
-                    _logic.OnSelfDisconnected();
+                    _controller.OnSelfDisconnected();
                     break;
 
                 case SystemMessages.GameClosed:
-                    _logic.OnGameClosed();
+                    _controller.OnGameClosed();
                     break;
 
                 case Messages.Disconnected:
@@ -82,7 +78,7 @@ public class Viewer : Actor, IViewerClient
                 case Messages.GameMetadata:
                     if (mparams.Length > 3)
                     {
-                        _logic.OnGameMetadata(mparams[1], mparams[2], mparams[3], mparams.Length > 4 ? mparams[4] : "");
+                        _controller.OnGameMetadata(mparams[1], mparams[2], mparams[3], mparams.Length > 4 ? mparams[4] : "");
                     }
                     break;
 
@@ -94,50 +90,8 @@ public class Viewer : Actor, IViewerClient
                     OnConfig(mparams);
                     break;
 
-                case Messages.Options:
-                    _logic.OnOptions(mparams);
-                    break;
-
                 case Messages.Options2:
-                    _logic.OnOptions2(mparams);
-                    break;
-
-                case Messages.ReadingSpeed:
-                    {
-                        #region ReadingSpeed
-                        if (mparams.Length > 1)
-                        {
-                            if (int.TryParse(mparams[1], out int readingSpeed))
-                            {
-                                if (readingSpeed > 0)
-                                {
-                                    _logic.OnTextSpeed(1.0 / readingSpeed);
-                                }
-                                else
-                                {
-                                    _logic.OnTextSpeed(0.0);
-                                }
-                            }
-                        }
-                        break;
-                        #endregion
-                    }
-
-                case Messages.ButtonBlockingTime:
-                    if (mparams.Length > 1)
-                    {
-                        if (int.TryParse(mparams[1], out var buttonBlockingTime) && buttonBlockingTime > 0)
-                        {
-                            ClientData.ButtonBlockingTime = buttonBlockingTime;
-                        }
-                    }
-                    break;
-
-                case Messages.ApellationEnabled:
-                    if (mparams.Length > 1)
-                    {
-                        ClientData.ApellationEnabled = mparams[1] == "+";
-                    }
+                    _controller.OnOptions2(mparams);
                     break;
 
                 case Messages.Hostname:
@@ -168,7 +122,7 @@ public class Viewer : Actor, IViewerClient
                         break;
                     }
 
-                    _logic.OnSetJoinMode(joinMode);
+                    _controller.OnSetJoinMode(joinMode);
                     break;
 
                 case Messages.PackageId:
@@ -193,15 +147,15 @@ public class Viewer : Actor, IViewerClient
                         #region Pause
 
                         var isPaused = mparams[1] == "+";
-                        _logic.OnPauseChanged(isPaused);
+                        _controller.OnPauseChanged(isPaused);
 
                         if (mparams.Length > 4)
                         {
                             var message = ClientData.TInfo.Pause ? MessageParams.Timer_UserPause : MessageParams.Timer_UserResume;
 
-                            _logic.OnTimerChanged(0, message, mparams[2]);
-                            _logic.OnTimerChanged(1, message, mparams[3]);
-                            _logic.OnTimerChanged(2, message, mparams[4]);
+                            _controller.OnTimerChanged(0, message, mparams[2]);
+                            _controller.OnTimerChanged(1, message, mparams[3]);
+                            _controller.OnTimerChanged(2, message, mparams[4]);
                         }
 
                         break;
@@ -267,7 +221,7 @@ public class Viewer : Actor, IViewerClient
 
                         var timerCommand = mparams[2];
 
-                        _logic.OnTimerChanged(
+                        _controller.OnTimerChanged(
                             timerIndex,
                             timerCommand,
                             mparams.Length > 3 ? mparams[3] : "",
@@ -285,7 +239,7 @@ public class Viewer : Actor, IViewerClient
                             ClientData.TInfo.GameThemes.Add(mparams[i]);
                         }
 
-                        _logic.GameThemes();
+                        _controller.GameThemes();
 
                         #endregion
                         break;
@@ -300,7 +254,7 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.RoundContent:
-                    _logic.OnRoundContent(mparams);
+                    _controller.OnRoundContent(mparams);
                     break;
 
                 case Messages.Theme:
@@ -315,10 +269,10 @@ public class Viewer : Actor, IViewerClient
                 case Messages.Question:
                     if (mparams.Length > 1)
                     {
-                        _logic.ClearQuestionState();
-                        _logic.SetText(mparams[1], false, TableStage.QuestionPrice);
+                        _controller.ClearQuestionState();
+                        _controller.SetText(mparams[1], false, TableStage.QuestionPrice);
                         OnThemeOrQuestion();
-                        _logic.SetCaption($"{ClientData.ThemeName}, {mparams[1]}");
+                        _controller.SetCaption($"{ClientData.ThemeName}, {mparams[1]}");
                     }
                     break;
 
@@ -354,7 +308,7 @@ public class Viewer : Actor, IViewerClient
                             index++;
                         }
 
-                        _logic.TableLoaded();
+                        _controller.TableLoaded();
 
                         #endregion
                         break;
@@ -365,7 +319,7 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.ShowTable:
-                    _logic.ShowTablo();
+                    _controller.ShowTablo();
                     break;
 
                 case Messages.Choice:
@@ -375,14 +329,14 @@ public class Viewer : Actor, IViewerClient
                 case Messages.QuestionCaption:
                     if (mparams.Length > 1)
                     {
-                        _logic.SetCaption(mparams[1]);
+                        _controller.SetCaption(mparams[1]);
                     }
                     break;
 
                 case Messages.ThemeComments:
                     if (mparams.Length > 1)
                     {
-                        _logic.OnThemeComments(mparams[1]);
+                        _controller.OnThemeComments(mparams[1]);
                     }
                     break;
 
@@ -407,7 +361,7 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.TextShape: // TODO: remove after v7.11.0 deprecation
-                    _logic.OnTextShape(mparams);
+                    _controller.OnTextShape(mparams);
                     break;
 
                 case Messages.ContentShape:
@@ -416,26 +370,26 @@ public class Viewer : Actor, IViewerClient
                         && mparams[2] == "0"
                         && mparams[3] == ContentTypes.Text)
                     {
-                        _logic.OnContentShape(mparams[4].UnescapeNewLines());
+                        _controller.OnContentShape(mparams[4].UnescapeNewLines());
                     }
                     break;
 
                 case Messages.Content:
-                    _logic.OnContent(mparams);
+                    _controller.OnContent(mparams);
                     break;
 
                 case Messages.ContentAppend:
-                    _logic.OnContentAppend(mparams);
+                    _controller.OnContentAppend(mparams);
                     break;
 
                 case Messages.ContentState:
-                    _logic.OnContentState(mparams);
+                    _controller.OnContentState(mparams);
                     break;
 
                 case Messages.Atom_Hint:
                     if (mparams.Length > 1)
                     {
-                        _logic.OnAtomHint(mparams[1]);
+                        _controller.OnAtomHint(mparams[1]);
                     }
                     break;
 
@@ -448,22 +402,22 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.RightAnswer:
-                    _logic.OnRightAnswer(mparams[2]);
+                    _controller.OnRightAnswer(mparams[2]);
                     break;
 
                 case Messages.RightAnswerStart:
                     if (mparams.Length > 2)
                     {
-                        _logic.OnRightAnswerStart(mparams[2]);
+                        _controller.OnRightAnswerStart(mparams[2]);
                     }
                     break;
 
                 case Messages.Resume:
-                    _logic.Resume();
+                    _controller.Resume();
                     break;
 
                 case Messages.Try:
-                    _logic.Try(mparams.Length > 1 && mparams[1] == MessageParams.Try_NotFinished);
+                    _controller.Try(mparams.Length > 1 && mparams[1] == MessageParams.Try_NotFinished);
                     break;
 
                 case Messages.EndTry:
@@ -471,15 +425,15 @@ public class Viewer : Actor, IViewerClient
                     {
                         if (mparams[1] == MessageParams.EndTry_All)
                         {
-                            _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "");
+                            _controller.OnTimerChanged(1, MessageParams.Timer_Stop, "");
                         }
 
-                        _logic.EndTry(mparams[1]);
+                        _controller.EndTry(mparams[1]);
                     }
                     break;
 
                 case Messages.StopPlay:
-                    _logic.OnStopPlay();
+                    _controller.OnStopPlay();
                     break;
 
                 case Messages.WrongTry:
@@ -509,14 +463,14 @@ public class Viewer : Actor, IViewerClient
                             break;
                         }
 
-                        _logic.OnPersonScoreChanged(playerIndex, isRight, price);
+                        _controller.OnPersonScoreChanged(playerIndex, isRight, price);
 
                         #endregion
                         break;
                     }
 
                 case Messages.Pass:
-                    _logic.OnPersonPass(int.Parse(mparams[1]));
+                    _controller.OnPersonPass(int.Parse(mparams[1]));
                     break;
 
                 case Messages.PlayerAnswer:
@@ -527,7 +481,7 @@ public class Viewer : Actor, IViewerClient
                     {
                         if (mparams.Length > 1 && int.TryParse(mparams[1], out int playerIndex))
                         {
-                            _logic.OnPersonFinalAnswer(playerIndex);
+                            _controller.OnPersonFinalAnswer(playerIndex);
                         }
                         break;
                     }
@@ -535,7 +489,7 @@ public class Viewer : Actor, IViewerClient
                     {
                         if (int.TryParse(mparams[1], out int playerIndex))
                         {
-                            _logic.OnPersonApellated(playerIndex);
+                            _controller.OnPersonApellated(playerIndex);
                         }
                         break;
                     }
@@ -543,7 +497,7 @@ public class Viewer : Actor, IViewerClient
                     {
                         if (int.TryParse(mparams[1], out int playerIndex))
                         {
-                            _logic.OnPersonFinalStake(playerIndex);
+                            _controller.OnPersonFinalStake(playerIndex);
                         }
                         break;
                     }
@@ -561,11 +515,11 @@ public class Viewer : Actor, IViewerClient
                     break;
 
                 case Messages.Stop:
-                    _logic.StopRound();
+                    _controller.StopRound();
 
-                    _logic.OnTimerChanged(0, MessageParams.Timer_Stop, "");
-                    _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "");
-                    _logic.OnTimerChanged(2, MessageParams.Timer_Stop, "");
+                    _controller.OnTimerChanged(0, MessageParams.Timer_Stop, "");
+                    _controller.OnTimerChanged(1, MessageParams.Timer_Stop, "");
+                    _controller.OnTimerChanged(2, MessageParams.Timer_Stop, "");
                     break;
 
                 case Messages.Out:
@@ -575,7 +529,7 @@ public class Viewer : Actor, IViewerClient
                 case Messages.Winner:
                     if (mparams.Length > 1 && int.TryParse(mparams[1], out int winnerIndex))
                     {
-                        _logic.OnWinner(winnerIndex);
+                        _controller.OnWinner(winnerIndex);
                     }
                     break;
 
@@ -587,14 +541,14 @@ public class Viewer : Actor, IViewerClient
                     {
                         #region Timeout
 
-                        _logic.TimeOut();
+                        _controller.TimeOut();
 
                         #endregion
                         break;
                     }
 
                 case Messages.FinalThink:
-                    _logic.FinalThink();
+                    _controller.FinalThink();
                     break;
 
                 case Messages.Avatar:
@@ -608,7 +562,7 @@ public class Viewer : Actor, IViewerClient
                 case Messages.Ads:
                     if (mparams.Length > 1)
                     {
-                        _logic.OnAd(mparams[1]);
+                        _controller.OnAd(mparams[1]);
                     }
                     break;
             }
@@ -626,7 +580,7 @@ public class Viewer : Actor, IViewerClient
             return;
         }
 
-        _logic.OnReplic(ReplicCodes.Showman.ToString(), mparams[1].UnescapeNewLines());
+        _controller.OnReplic(ReplicCodes.Showman.ToString(), mparams[1].UnescapeNewLines());
     }
 
     private void OnQuestionSources(string[] mparams)
@@ -636,7 +590,7 @@ public class Viewer : Actor, IViewerClient
             return;
         }
 
-        _logic.OnQuestionSources(mparams.Skip(1));
+        _controller.OnQuestionSources(mparams.Skip(1));
     }
 
     private void OnQuestionAuthors(string[] mparams)
@@ -646,7 +600,7 @@ public class Viewer : Actor, IViewerClient
             return;
         }
 
-        _logic.OnQuestionAuthors(mparams.Skip(1));
+        _controller.OnQuestionAuthors(mparams.Skip(1));
     }
 
     private void OnShowmanReplic(string[] mparams)
@@ -659,7 +613,7 @@ public class Viewer : Actor, IViewerClient
             return;
         }
 
-        _logic.OnShowmanReplic(messageIndex, messageCode);
+        _controller.OnShowmanReplic(messageIndex, messageCode);
     }
 
     private void OnPlayerAnswer(string[] mparams)
@@ -670,7 +624,7 @@ public class Viewer : Actor, IViewerClient
         }
 
         // ClientData.Players[playerIndex].Answer = mparams[2]; // TODO: for the future use
-        _logic.OnReplic(ReplicCodes.Player.ToString() + playerIndex, mparams[2]);
+        _controller.OnReplic(ReplicCodes.Player.ToString() + playerIndex, mparams[2]);
     }
 
     private void OnMediaPreloadProgress(string[] mparams)
@@ -715,15 +669,14 @@ public class Viewer : Actor, IViewerClient
 
         if (mparams[0] == Messages.Stage || ClientData.Stage == GameStage.Begin || ClientData.Stage == GameStage.After)
         {
-            _logic.SetCaption("");
+            _controller.SetCaption("");
 
             switch (ClientData.Stage)
             {
                 case GameStage.Round:
-                case GameStage.Final:
                     if (mparams.Length > 2)
                     {
-                        _logic.SetText(mparams[2]);
+                        _controller.SetText(mparams[2]);
                     }
 
                     for (int i = 0; i < ClientData.Players.Count; i++)
@@ -735,7 +688,7 @@ public class Viewer : Actor, IViewerClient
                     break;
             }
 
-            _logic.Stage();
+            _controller.Stage();
         }
     }
 
@@ -747,7 +700,7 @@ public class Viewer : Actor, IViewerClient
         }
 
         ClientData.HostName = mparams[1];
-        _logic.OnHostChanged(mparams.Length > 2 ? mparams[2] : null, mparams[1]);
+        _controller.OnHostChanged(mparams.Length > 2 ? mparams[2] : null, mparams[1]);
     }
 
     private void OnOut(string[] mparams)
@@ -761,7 +714,7 @@ public class Viewer : Actor, IViewerClient
 
         if (ClientData.ThemeIndex > -1 && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count)
         {
-            _logic.Out(ClientData.ThemeIndex);
+            _controller.Out(ClientData.ThemeIndex);
         }
     }
 
@@ -793,7 +746,7 @@ public class Viewer : Actor, IViewerClient
             ClientData.ThemeComments = mparams[4].UnescapeNewLines();
         }
 
-        _logic.OnTheme(themeName, questionCount, animate);
+        _controller.OnTheme(themeName, questionCount, animate);
     }
 
     private void OnThemeInfo(string[] mparams)
@@ -808,7 +761,7 @@ public class Viewer : Actor, IViewerClient
         ClientData.ThemeName = themeName;
         ClientData.ThemeComments = mparams[3];
 
-        _logic.OnThemeInfo(themeName);
+        _controller.OnThemeInfo(themeName);
     }
 
     private void OnSetChooser(string[] mparams)
@@ -863,7 +816,7 @@ public class Viewer : Actor, IViewerClient
         _ = int.TryParse(mparams[2], out var connectedIndex);
 
         InsertPerson(role, account, connectedIndex);
-        _logic.OnPersonConnected();
+        _controller.OnPersonConnected();
     }
 
     private void OnPlayerState(string[] mparams)
@@ -911,7 +864,7 @@ public class Viewer : Actor, IViewerClient
 
         if (person != null)
         {
-            _logic.UpdateAvatar(person, mparams[2], mparams[3]);
+            _controller.UpdateAvatar(person, mparams[2], mparams[3]);
         }
     }
 
@@ -971,13 +924,13 @@ public class Viewer : Actor, IViewerClient
             optionsTypes.Add(mparams[i]);
         }
 
-        _logic.OnAnswerOptions(questionHasScreenContent, optionsTypes);
+        _controller.OnAnswerOptions(questionHasScreenContent, optionsTypes);
     }
 
     private void OnQuestionType(string[] mparams)
     {
         ClientData.QuestionType = mparams[1];
-        _logic.OnQuestionStart(mparams.Length > 2 && bool.TryParse(mparams[2], out var isDefault) && isDefault);
+        _controller.OnQuestionStart(mparams.Length > 2 && bool.TryParse(mparams[2], out var isDefault) && isDefault);
     }
 
     private void OnQuestionSelected(string[] mparams)
@@ -1006,15 +959,15 @@ public class Viewer : Actor, IViewerClient
 
         var questionPrice = mparams.Length > 3 && int.TryParse(mparams[3], out var price) ? price : selectedQuestion.Price;
 
-        _logic.SetCaption($"{selectedTheme.Name}, {questionPrice}");
+        _controller.SetCaption($"{selectedTheme.Name}, {questionPrice}");
 
         foreach (var player in ClientData.Players.ToArray())
         {
             player.ClearState();
         }
 
-        _logic.ClearQuestionState();
-        _logic.OnQuestionSelected(themeIndex, questionIndex);
+        _controller.ClearQuestionState();
+        _controller.OnQuestionSelected(themeIndex, questionIndex);
     }
 
     private void OnMediaLoaded(string[] mparams)
@@ -1061,7 +1014,7 @@ public class Viewer : Actor, IViewerClient
         }
 
         theme.Questions[questionIndex].Price = price;
-        _logic.OnToggle(themeIndex, questionIndex, price);
+        _controller.OnToggle(themeIndex, questionIndex, price);
     }
 
     private void OnUnbanned(string[] mparams)
@@ -1071,7 +1024,7 @@ public class Viewer : Actor, IViewerClient
             return;
         }
 
-        _logic.OnUnbanned(mparams[1]);
+        _controller.OnUnbanned(mparams[1]);
     }
 
     private void OnBanned(string[] mparams)
@@ -1081,7 +1034,7 @@ public class Viewer : Actor, IViewerClient
             return;
         }
 
-        _logic.OnBanned(new BannedInfo(mparams[1], mparams[2]));
+        _controller.OnBanned(new BannedInfo(mparams[1], mparams[2]));
     }
 
     private void OnBannedList(string[] mparams)
@@ -1093,7 +1046,7 @@ public class Viewer : Actor, IViewerClient
             banned.Add(new BannedInfo(mparams[i], mparams[i + 1]));
         }
 
-        _logic.OnBannedList(banned);
+        _controller.OnBannedList(banned);
     }
 
     private async ValueTask OnDisconnectedAsync(string[] mparams)
@@ -1152,7 +1105,7 @@ public class Viewer : Actor, IViewerClient
             });
         }
 
-        _logic.OnPersonDisconnected();
+        _controller.OnPersonDisconnected();
     }
 
     private void OnRoundThemes(string[] mparams)
@@ -1169,7 +1122,7 @@ public class Viewer : Actor, IViewerClient
             ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
         }
 
-        _logic.RoundThemes(playMode);
+        _controller.RoundThemes(playMode);
     }
 
     private void OnThemeOrQuestion()
@@ -1220,7 +1173,7 @@ public class Viewer : Actor, IViewerClient
         }
 
         ClientData.Players[stakerIndex].Stake = stake;
-        _logic.OnPersonStake(stakerIndex);
+        _controller.OnPersonStake(stakerIndex);
     }
 
     private void OnReplic(string[] mparams)
@@ -1239,7 +1192,7 @@ public class Viewer : Actor, IViewerClient
             text.Append(mparams[i]);
         }
 
-        _logic.OnReplic(personCode, text.ToString().Trim());
+        _controller.OnReplic(personCode, text.ToString().Trim());
     }
 
     private void OnConfig(string[] mparams)
@@ -1267,7 +1220,7 @@ public class Viewer : Actor, IViewerClient
                 break;
         }
 
-        _logic.OnPersonsUpdated();
+        _controller.OnPersonsUpdated();
     }
 
     private void OnConfigAddTable(string[] mparams)
@@ -1283,7 +1236,7 @@ public class Viewer : Actor, IViewerClient
             };
 
             ClientData.Players.Add(account);
-            _logic.AddPlayer(account);
+            _controller.AddPlayer(account);
         }
         finally
         {
@@ -1496,14 +1449,14 @@ public class Viewer : Actor, IViewerClient
                 ClientData.Viewers = cloneV;
             }
 
-            _logic.RemovePlayerAt(index);
+            _controller.RemovePlayerAt(index);
         }
         finally
         {
             ClientData.EndUpdatePersons();
         }
 
-        if (account == me && newAccount != null && _logic.CanSwitchType)
+        if (account == me && newAccount != null && _controller.CanSwitchType)
         {
             // Необходимо самого себя перевести в зрители
             SwitchToNewType(GameRole.Viewer, newAccount);
@@ -1715,23 +1668,23 @@ public class Viewer : Actor, IViewerClient
             throw new ArgumentNullException(nameof(newAccount));
         }
 
-        if (!_logic.CanSwitchType)
+        if (!_controller.CanSwitchType)
         {
             throw new InvalidOperationException($"Trying to switch type of computer account:\n{ClientData.Name}");
         }
 
         IViewerClient viewer = role switch
         {
-            GameRole.Viewer => new Viewer(_client, newAccount, _logic, _viewerActions, ClientData),
-            GameRole.Player => new Player(_client, newAccount, _logic, _viewerActions, ClientData),
-            _ => new Showman(_client, newAccount, _logic, _viewerActions, ClientData),
+            GameRole.Viewer => new Viewer(_client, newAccount, _controller, _actions, ClientData),
+            GameRole.Player => new Player(_client, newAccount, _controller, _actions, ClientData),
+            _ => new Showman(_client, newAccount, _controller, _actions, ClientData),
         };
 
         viewer.Avatar = Avatar;
 
         Dispose(); // TODO: do not dispose anything here
 
-        _logic.OnClientSwitch(viewer);
+        _controller.OnClientSwitch(viewer);
 
         SendAvatar();
     }
@@ -1798,7 +1751,7 @@ public class Viewer : Actor, IViewerClient
             ClientData.Viewers = newViewers;
             ClientData.IsInfoInitialized = true;
 
-            _logic.OnInfo();
+            _controller.OnInfo();
         }
         finally
         {
@@ -1836,7 +1789,7 @@ public class Viewer : Actor, IViewerClient
         }
 
         SendAvatar();
-        _viewerActions.SendMessage(Messages.Moveable);
+        _actions.SendMessage(Messages.Moveable);
     }
 
     private void InsertPerson(string role, Account account, int index)
@@ -1948,7 +1901,7 @@ public class Viewer : Actor, IViewerClient
             Modes = stakeModes,
         };
 
-        _logic.MakeStake();
+        _controller.MakeStake();
     }
 
     /// <summary>
@@ -1958,7 +1911,7 @@ public class Viewer : Actor, IViewerClient
     {
         if (message.IsSystem)
         {
-            _logic.AddLog($"[{message.Text}]");
+            _controller.AddLog($"[{message.Text}]");
 
             await ClientData.TaskLock.WithLockAsync(
                 async () => await OnSystemMessageReceivedAsync(message.Text.Split('\n')),
@@ -1966,7 +1919,7 @@ public class Viewer : Actor, IViewerClient
         }
         else
         {
-            _logic.ReceiveText(message);
+            _controller.ReceiveText(message);
         }
     }
 
@@ -1985,10 +1938,8 @@ public class Viewer : Actor, IViewerClient
         whom = NetworkConstants.Everybody;
 
         _client.SendMessage(text, false, whom);
-        _logic.ReceiveText(new Message(text, _client.Name, whom, false));
+        _controller.ReceiveText(new Message(text, _client.Name, whom, false));
     }
-
-    public void Pause() => _viewerActions.SendMessage(Messages.Pause, ClientData.TInfo.Pause ? "-" : "+");
 
     /// <summary>
     /// Sends user avatar (file or uri) to server.
@@ -1997,7 +1948,7 @@ public class Viewer : Actor, IViewerClient
     {
         if (Avatar != null)
         {
-            _viewerActions.SendMessage(Messages.Picture, Avatar);
+            _actions.SendMessage(Messages.Picture, Avatar);
             return;
         }
 
@@ -2023,7 +1974,7 @@ public class Viewer : Actor, IViewerClient
                 }
                 catch (Exception exc)
                 {
-                    _logic.OnReplic(ReplicCodes.Special.ToString(), exc.Message);
+                    _controller.OnReplic(ReplicCodes.Special.ToString(), exc.Message);
                     return;
                 }
 
@@ -2033,19 +1984,14 @@ public class Viewer : Actor, IViewerClient
                     return;
                 }
 
-                _viewerActions.SendMessage(Messages.Picture, ClientData.Picture, Convert.ToBase64String(data));
+                _actions.SendMessage(Messages.Picture, ClientData.Picture, Convert.ToBase64String(data));
             }
             else
             {
-                _viewerActions.SendMessage(Messages.Picture, ClientData.Picture);
+                _actions.SendMessage(Messages.Picture, ClientData.Picture);
             }
         }
     }
-
-    /// <summary>
-    /// Sends game info request.
-    /// </summary>
-    public void GetInfo() => _viewerActions.SendMessage(Messages.Info);
 
     protected void OnAskSelectPlayer(string[] mparams)
     {
@@ -2060,6 +2006,6 @@ public class Viewer : Actor, IViewerClient
         }
 
         _ = Enum.TryParse<SelectPlayerReason>(mparams[1], out var reason);
-        _logic.OnSelectPlayer(reason);
+        _controller.OnSelectPlayer(reason);
     }
 }

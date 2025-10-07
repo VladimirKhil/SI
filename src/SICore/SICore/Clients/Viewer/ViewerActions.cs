@@ -27,4 +27,13 @@ public sealed class ViewerActions
         var pressDuration = tryStartTime.HasValue ? (int)DateTimeOffset.UtcNow.Subtract(tryStartTime.Value).TotalMilliseconds : -1;
         SendMessageWithArgs(Messages.I, pressDuration);
     }
+
+    /// <summary>
+    /// Sends game info request.
+    /// </summary>
+    public void GetInfo() => SendMessage(Messages.Info);
+
+    public void Pause(bool pause) => SendMessage(Messages.Pause, pause ? "+" : "-");
+
+    public void Move(object arg) => SendMessageWithArgs(Messages.Move, arg);
 }

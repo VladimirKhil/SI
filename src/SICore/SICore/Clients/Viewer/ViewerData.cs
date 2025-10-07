@@ -250,12 +250,6 @@ public sealed class ViewerData : Data
         }
     }
 
-    // TODO: move to client
-    /// <summary>
-    /// External content that can be loaded only after user approval.
-    /// </summary>
-    public List<(string ContentType, string Uri)> ExternalContent { get; } = new();
-
     private string[] _roundNames = Array.Empty<string>();
 
     /// <summary>
@@ -314,9 +308,6 @@ public sealed class ViewerData : Data
             }
         }
     }
-
-    // TODO: move to client
-    public bool IsAnswer { get; set; }
 
     private string[] _right = Array.Empty<string>();
 

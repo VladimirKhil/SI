@@ -22,7 +22,7 @@ namespace SICore;
 /// <summary>
 /// Defines a game actor. Responds to all game-related messages.
 /// </summary>
-public sealed class Game : Actor
+public sealed class Game : MessageHandler
 {
     private const string VideoAvatarUri = "https://vdo.ninja/";
 
@@ -710,7 +710,7 @@ public sealed class Game : Actor
                                     _ => LO[nameof(R.JoinModeSwitchedToForbidden)]
                                 };
 
-                                _gameActions.SpecialReplic(string.Format(replic, ClientData.HostName)); // TODO: REMOVE: replaced by SETJOINMODE message
+                                _gameActions.SpecialReplic(string.Format(replic, ClientData.HostName)); // TODO: REMOVE+
                             }
                         }
                         break;
@@ -1140,7 +1140,7 @@ public sealed class Game : Actor
         ClientData.ChooserIndex = playerIndex;
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "-", "+");
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name)); // TODO: REMOVE: replaced by SETCHOOSER message
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name)); // TODO: REMOVE+
 
         if (isChoosingNow)
         {
@@ -1250,7 +1250,7 @@ public sealed class Game : Actor
                     LO[nameof(R.QuestionRemoved)],
                     message.Sender,
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
-                    oldPrice)); // TODO: REMOVE: replaced by TOGGLE message
+                    oldPrice)); // TODO: REMOVE+
         }
         else
         {
@@ -1264,7 +1264,7 @@ public sealed class Game : Actor
                     LO[nameof(R.QuestionRestored)],
                     message.Sender,
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
-                    question.Price)); // TODO: REMOVE: replaced by TOGGLE message
+                    question.Price)); // TODO: REMOVE+
         }
 
         // TODO: remove after all clients upgrade to 7.12.0
@@ -1318,7 +1318,7 @@ public sealed class Game : Actor
             _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
         }
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, clientName)); // TODO: REMOVE: replaced by BANNED message
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, clientName)); // TODO: REMOVE+
     }
 
     private void OnBan(Message message, string[] args)
@@ -1359,7 +1359,7 @@ public sealed class Game : Actor
             _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
         }
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, clientName)); // TODO: REMOVE: replaced by BANNED message
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, clientName)); // TODO: REMOVE+
     }
 
     private void OnSetHost(Message message, string[] args)

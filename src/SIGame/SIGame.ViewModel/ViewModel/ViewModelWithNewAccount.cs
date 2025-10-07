@@ -1,5 +1,4 @@
-﻿using SICore;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using Utils.Commands;
 
 namespace SIGame.ViewModel;
@@ -46,9 +45,9 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
 
     public ICommand ChangeSettings { get; internal set; }
 
-    public event Action<GameViewModel, ViewerHumanLogic> StartGame;
+    public event Action<GameViewModel> StartGame;
 
-    protected virtual void OnStartGame(GameViewModel gameViewModel, ViewerHumanLogic logic) => StartGame?.Invoke(gameViewModel, logic);
+    protected virtual void OnStartGame(GameViewModel gameViewModel) => StartGame?.Invoke(gameViewModel);
 
     protected ViewModelWithNewAccount()
     {

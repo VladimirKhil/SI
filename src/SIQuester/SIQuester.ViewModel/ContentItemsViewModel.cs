@@ -470,14 +470,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
             if (AppSettings.Default.SetRightAnswerFromFileName)
             {
-                var question = Owner;
-
-                if (question.Right.Last().Length == 0)
-                {
-                    question.Right.RemoveAt(question.Right.Count - 1);
-                }
-
-                question.Right.Add(Path.GetFileNameWithoutExtension(item.Model.Name));
+                Owner.TryAddRightAnswerFromFileName(item.Model.Name);
             }
         }
         catch (Exception exc)
@@ -656,14 +649,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
                 if (AppSettings.Default.SetRightAnswerFromFileName)
                 {
-                    var question = Owner;
-
-                    if (question.Right.Last().Length == 0)
-                    {
-                        question.Right.RemoveAt(question.Right.Count - 1);
-                    }
-
-                    question.Right.Add(Path.GetFileNameWithoutExtension(file.Model.Name));
+                    Owner.TryAddRightAnswerFromFileName(file.Model.Name);
                 }
             }
 

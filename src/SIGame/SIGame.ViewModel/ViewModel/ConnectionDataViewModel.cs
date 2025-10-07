@@ -312,12 +312,12 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
             if (!isHost && Ready != null)
             {
-                Ready(gameViewModel, logic); // Moving to game view is happening here
+                Ready(gameViewModel); // Moving to game view is happening here
             }
 
             await ClearConnectionAsync();
 
-            _host.GetInfo();
+            _host.Actions.GetInfo();
 
             Error = "";
 
@@ -340,7 +340,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     protected virtual Task ClearConnectionAsync() => Task.CompletedTask;
 
-    public event Action<GameViewModel, ViewerHumanLogic> Ready;
+    public event Action<GameViewModel> Ready;
 
     #endregion
 

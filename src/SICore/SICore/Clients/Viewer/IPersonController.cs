@@ -180,8 +180,6 @@ public interface IPersonController
 
     void OnContentShape(string shape) { }
 
-    void OnOptions(string[] mparams) { }
-
     void OnOptions2(string[] mparams) { }
 
     void OnToggle(int themeIndex, int questionIndex, int price) { }

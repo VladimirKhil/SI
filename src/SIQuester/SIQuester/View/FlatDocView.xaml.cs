@@ -643,14 +643,7 @@ public partial class FlatDocView : UserControl
 
         if (AppSettings.Default.SetRightAnswerFromFileName)
         {
-            var question = contentItemsViewModel.Owner;
-
-            if (question.Right.Last().Length == 0)
-            {
-                question.Right.RemoveAt(question.Right.Count - 1);
-            }
-
-            question.Right.Add(Path.GetFileNameWithoutExtension(item.Model.Name));
+            contentItemsViewModel.Owner.TryAddRightAnswerFromFileName(item.Model.Name);
         }
     }
 

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using SI.GameServer.Client;
 using SI.GameServer.Contract;
 using SIContentService.Client;
-using SICore;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Settings;
@@ -208,7 +207,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 })
         };
 
-    private void StartGame(GameViewModel gameViewModel, ViewerHumanLogic logic)
+    private void StartGame(GameViewModel gameViewModel)
     {
         gameViewModel.GameEnded += EndGame_Executed;
 
@@ -218,8 +217,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         PlatformManager.Instance.PlaySound();
 
         gameViewModel.Init();
-
-        logic.PrintGreeting();
     }
 
     private async void EndGame_Executed()

@@ -659,7 +659,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                     return;
                 }
 
-                MoveToGame(info.Value.Item3, (ViewerHumanLogic)info.Value.Item2.MyLogic);
+                MoveToGame(info.Value.Item3);
             }
             else
             {
@@ -811,7 +811,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         client.ConnectTo(node);
 
         gameViewModel.Host = host;
-        host.ClientData.IsNetworkGame = NetworkGame;
+        gameViewModel.Data.IsNetworkGame = NetworkGame;
 
         if (!NetworkGame)
         {
@@ -820,15 +820,15 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         game.Run();
 
-        MoveToGame(gameViewModel, (ViewerHumanLogic)host.MyLogic);
+        MoveToGame(gameViewModel);
     }
 
-    private void MoveToGame(GameViewModel gameViewModel, ViewerHumanLogic logic)
+    private void MoveToGame(GameViewModel gameViewModel)
     {
         _model.ShowmanType = Showman.AccountType;
         _model.PlayersTypes = Players.Select(p => p.AccountType).ToArray();
 
-        OnStartGame(gameViewModel, logic);
+        OnStartGame(gameViewModel);
     }
 
     private void Server_Error(Exception exc, bool isWarning) =>

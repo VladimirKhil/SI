@@ -2855,7 +2855,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         var sp = new StringBuilder(LO[nameof(R.UnknownType)]).Append(' ').Append(typeName);
 
-        // TODO: REMOVE: replaced by SPECIAL_REPLIC message
+        // TODO: REMOVE+
         _gameActions.SpecialReplic(sp.ToString()); 
         _gameActions.SpecialReplic(LO[nameof(R.GameWillResume)]);
         _gameActions.ShowmanReplic(LO[nameof(R.ManuallyPlayedQuestion)]);

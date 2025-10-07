@@ -87,6 +87,13 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     private readonly ViewerData _data;
 
+    private bool _isAnswer;
+
+    /// <summary>
+    /// External content that can be loaded only after user approval.
+    /// </summary>
+    private readonly List<(string ContentType, string Uri)> _externalContent = new();
+
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
         ViewerData data,
@@ -488,7 +495,6 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 break;
 
             case GameStage.Round:
-            case GameStage.Final:
                 TInfo.TStage = TableStage.Round;
                 TInfo.Selectable = false;
                 PlatformManager.Instance.PlaySound(Sounds.RoundBegin);
@@ -659,62 +665,6 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         TInfo.QuestionContentType = QuestionContentType.Text;
     }
 
-    [Obsolete]
-    public void OnOptions(string[] mparams)
-    {
-        for (var i = 1; i + 1 < mparams.Length; i += 2)
-        {
-            var optionName = mparams[i];
-            var optionValue = mparams[i + 1];
-
-            switch (optionName)
-            {
-                case nameof(AppSettingsCore.DisplayAnswerOptionsLabels):
-                    if (bool.TryParse(optionValue, out var flag))
-                    {
-                        TInfo.Settings.Model.DisplayAnswerOptionsLabels = flag;
-                    }
-
-                    break;
-
-                case nameof(AppSettingsCore.FalseStart):
-                    if (bool.TryParse(optionValue, out var falseStart))
-                    {
-                        _appSettings.FalseStart = falseStart;
-                    }
-
-                    break;
-
-                case nameof(AppSettingsCore.PartialText):
-                    if (bool.TryParse(optionValue, out var partialText))
-                    {
-                        _appSettings.PartialText = partialText;
-                    }
-
-                    break;
-
-                case nameof(AppSettingsCore.PartialImages):
-                    if (bool.TryParse(optionValue, out var partialImages))
-                    {
-                        _appSettings.PartialImages = partialImages;
-                    }
-
-                    break;
-
-                case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
-                    if (int.TryParse(optionValue, out var value))
-                    {
-                        _appSettings.TimeSettings.PartialImageTime = value;
-                    }
-
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
-
     public void OnOptions2(string[] mparams)
     {
         for (var i = 2; i + 1 < mparams.Length; i += 2)
@@ -865,7 +815,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             }
         }
 
-        _data.ExternalContent.Clear();
+        _externalContent.Clear();
 
         if (content.Count == 0)
         {
@@ -1026,7 +976,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     {
                         currentGroup.Content.Add(new ContentViewModel(ContentType.Text, string.Format(Resources.ExternalLink, uri)));
                         _gameViewModel.EnableMediaLoadButton = true;
-                        _data.ExternalContent.Add((contentType, uri));
+                        _externalContent.Add((contentType, uri));
                         return;
                     }
 
@@ -1048,7 +998,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     // TODO: this logic should be moved to server; client should receive just boolean flag
                     if (contentType == ContentTypes.Image
                         && _data.QuestionType == QuestionTypes.Simple
-                        && !_data.IsAnswer
+                        && !_isAnswer
                         && !_appSettings.FalseStart
                         && _appSettings.PartialImages
                         && _appSettings.TimeSettings.PartialImageTime > 0)
@@ -1108,7 +1058,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             TInfo.Text = string.Format(Resources.ExternalLink, uri);
             TInfo.QuestionContentType = QuestionContentType.SpecialText;
             _gameViewModel.EnableMediaLoadButton = true;
-            _data.ExternalContent.Add((ContentTypes.Audio, uri));
+            _externalContent.Add((ContentTypes.Audio, uri));
             return;
         }
 
@@ -1146,7 +1096,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     {
         _gameViewModel.EnableMediaLoadButton = false;
 
-        var externalContent = _data.ExternalContent.FirstOrDefault();
+        var externalContent = _externalContent.FirstOrDefault();
 
         if (externalContent == default)
         {
@@ -1198,7 +1148,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnRightAnswer(string answer)
     {
-        _data.IsAnswer = true;
+        _isAnswer = true;
 
         if (TInfo.LayoutMode == LayoutMode.Simple)
         {
@@ -1247,7 +1197,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnRightAnswerStart(string answer)
     {
-        _data.IsAnswer = true;
+        _isAnswer = true;
         TInfo.AnimateText = false;
         TInfo.PartialText = false;
         TInfo.Content = Array.Empty<ContentGroup>();
@@ -1373,13 +1323,13 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
         TInfo.LayoutMode = LayoutMode.Simple;
-        _data.IsAnswer = false;
+        _isAnswer = false;
         TInfo.AnimateText = true;
         TInfo.PartialText = false;
         TInfo.PartialImage = false;
         TInfo.IsMediaStopped = false;
         _gameViewModel.EnableMediaLoadButton = false;
-        _data.ExternalContent.Clear();
+        _externalContent.Clear();
 
         _runTimer = false;
         _initialTime = 0;

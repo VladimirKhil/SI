@@ -118,6 +118,14 @@ internal class ViewerComputerLogic : IPersonController
 
     public void OnQuestionSelected(int themeIndex, int questionIndex)
     {
+        if (themeIndex < 0 ||
+            themeIndex >= _data.TInfo.RoundInfo.Count ||
+            questionIndex < 0 ||
+            questionIndex >= _data.TInfo.RoundInfo[themeIndex].Questions.Count)
+        {
+            return;
+        }
+
         _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
 
         if (_role == GameRole.Player)

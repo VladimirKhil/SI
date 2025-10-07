@@ -907,7 +907,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void SendStake_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.Stake, 1, Host.ClientData.StakeInfo.Stake);
+        Host?.Actions.SendMessageWithArgs(Messages.Stake, 1, _data.StakeInfo.Stake);
         ClearSelections();
     }
 
@@ -931,7 +931,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void SendStakeNew_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, Host.ClientData.StakeInfo?.Stake ?? 1);
+        Host?.Actions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, _data.StakeInfo?.Stake ?? 1);
         ClearSelections();
     }
 
@@ -949,7 +949,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private void OnJoinModeChanged(SICore.Models.JoinMode joinMode) =>
+    private void OnJoinModeChanged(JoinMode joinMode) =>
         Host?.Actions.SendMessage(Messages.SetJoinMode, joinMode.ToString());
 
     private void PressGameButton_Execute(object? arg)
@@ -959,7 +959,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host.Actions.PressButton(Host.ClientData.TryStartTime);
+        Host.Actions.PressButton(_data.TryStartTime);
         GameButtonPressed?.Invoke();
         DisableGameButton(false);
         ReleaseGameButton();
@@ -1316,7 +1316,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     private void EnableExtrenalMediaLoad_Executed(object? arg)
     {
         UserSettings.LoadExternalMedia = true;
-        Host?.MyLogic.ReloadMedia();
+        Logic?.ReloadMedia();
     }
 
     public void OnIsPausedChanged(bool isPaused) => IsPaused = isPaused;
@@ -1324,7 +1324,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     private void Server_Reconnected()
     {
         AddLog(Resources.ReconnectedMessage);
-        Host?.GetInfo(); // Invalidate game state
+        Host?.Actions.GetInfo(); // Invalidate game state
     }
 
     private void Server_Reconnecting() => AddLog(Resources.ReconnectingMessage);
@@ -1424,7 +1424,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host?.Move(arg);
+        Host?.Actions.Move(arg);
         
         if (Equals(arg, 1))
         {
@@ -1439,7 +1439,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         ClearValidation();
     }
 
-    private void ChangePauseInGame_Executed(object? arg) => Host?.Pause();
+    private void ChangePauseInGame_Executed(object? arg) => Host?.Actions.Pause(!Data.TInfo.Pause);
 
     private void EndGame_Executed(object? arg) => GameEnded?.Invoke();
 
@@ -1458,6 +1458,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         {
             PrintOnlineInformation();
         }
+
+        Logic?.PrintGreeting();
     }
 
     private async void PrintOnlineInformation()

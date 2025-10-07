@@ -21,8 +21,8 @@ public static class Quality
     /// </summary>
     public static readonly IReadOnlyDictionary<string, string[]> FileExtensions = new Dictionary<string, string[]>()
     {
-        [CollectionNames.ImagesStorageName] = new[] { ".jpg", ".jpe", ".jpeg", ".png", ".gif", ".webp" },
-        [CollectionNames.AudioStorageName] = new[] { ".mp3" },
+        [CollectionNames.ImagesStorageName] = new[] { ".jpg", ".jpe", ".jpeg", ".png", ".gif", ".webp", ".avif" },
+        [CollectionNames.AudioStorageName] = new[] { ".mp3", ".opus" },
         [CollectionNames.VideoStorageName] = new[] { ".mp4" },
         [CollectionNames.HtmlStorageName] = new[] { ".html" },
     };
