@@ -4450,8 +4450,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 informed = true;
                 var res = new StringBuilder();
                 res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfPackage)], package.Info.Comments.Text);
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by QUESTION_COMMENTS message)
-                _gameActions.SendVisualMessageWithArgs(Messages.QuestionComments, package.Info.Comments.Text.EscapeNewLines());
+                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by PACKAGE_COMMENTS message)
+                _gameActions.SendVisualMessageWithArgs(Messages.PackageComments, package.Info.Comments.Text.EscapeNewLines());
 
                 baseTime = GetReadingDurationForTextLength(package.Info.Comments.Text.Length);
             }
