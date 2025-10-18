@@ -128,10 +128,6 @@ public interface IPersonController
 
     void OnPersonFinalStake(int playerIndex);
 
-    void OnPersonFinalAnswer(int playerIndex);
-
-    void OnPersonApellated(int playerIndex);
-
     void OnPersonPass(int playerIndex);
 
     void OnReplic(string personCode, string text);

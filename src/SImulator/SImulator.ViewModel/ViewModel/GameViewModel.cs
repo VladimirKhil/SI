@@ -260,6 +260,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         set { _rountTime = value; OnPropertyChanged(); }
     }
 
+    private int _roundTimeMax = int.MaxValue;
+
+    public int RoundTimeMax
+    {
+        get => _roundTimeMax;
+        set { _roundTimeMax = value; OnPropertyChanged(); }
+    }
+
     private int _questionTime = 0;
 
     /// <summary>
@@ -616,6 +624,21 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
+    private string _showmanReplic = "";
+
+    public string ShowmanReplic
+    {
+        get => _showmanReplic;
+        set
+        {
+            if (_showmanReplic != value)
+            {
+                _showmanReplic = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     #endregion
 
     public GameViewModel(
@@ -911,7 +934,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ClearState();
         PresentationController.OnQuestionEnd();
         _gameActions.MoveNext();
-        return Settings.Model.RoundTime > 0 && RoundTime >= Settings.Model.RoundTime;
+        return RoundTimeMax > 0 && RoundTime >= RoundTimeMax;
     }
 
     private void GameHost_RoundThemesFinished()
@@ -1007,9 +1030,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             RoundTime++;
 
-            if (RoundTime >= Settings.Model.RoundTime)
+            if (RoundTime >= RoundTimeMax)
             {
-                StopRoundTimer_Executed(null);
+                StopRoundTimer.Execute(null);
             }
         },
         exc => OnError(exc.ToString()));
@@ -1498,14 +1521,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _nextRound.CanBeExecuted = roundIndex < _rounds.Count - 1;
 
         _gameLogger.Write("\r\n{0} {1}", Resources.Round, round.Name);
-
-        if (round.Type == RoundTypes.Standart)
-        {
-            if (Settings.Model.RoundTime > 0)
-            {
-                RunRoundTimer_Executed(0);
-            }
-        }
     }
 
     public void OnRoundThemes(IReadOnlyList<Theme> roundThemes) => UI.Execute(() =>
@@ -1632,7 +1647,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     internal void OnEndRound()
     {
         ClearState();
-        StopRoundTimer_Executed(0);
+        StopRoundTimer.Execute(0);
         ActiveRoundCommand = null;
         PresentationController.ClearState();
         LocalInfo.TStage = TableStage.Sign;
@@ -1771,7 +1786,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             PresentationController.Dispose();
 
-            StopRoundTimer_Executed(null);
+            StopRoundTimer.Execute(null);
             _roundTimer.Dispose();
 
             StopQuestionTimer_Executed(0);

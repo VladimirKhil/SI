@@ -18,7 +18,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     /// </summary>
     private const double MediaContentGroupWeight = 5.0;
 
-    public GameViewModel? GameViewModel { get; set; }
+    public GameViewModel GameViewModel { get; set; } = null!;
 
     public IPresentationController PresentationController => GameViewModel!.PresentationController;
 
@@ -402,7 +402,18 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnQuestion(Question question) => GameViewModel?.OnQuestion(question);
 
-    public void OnRound(Round round, QuestionSelectionStrategyType strategyType) => GameViewModel?.OnRound(round, strategyType);
+    public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
+    {
+        GameViewModel.OnRound(round, strategyType);
+
+        if (round.Type == RoundTypes.Standart)
+        {
+            if (GameViewModel.RoundTimeMax > 0)
+            {
+                GameViewModel.RunRoundTimer.Execute(0);
+            }
+        }
+    }
 
     public void OnRoundEnd(RoundEndReason reason)
     {

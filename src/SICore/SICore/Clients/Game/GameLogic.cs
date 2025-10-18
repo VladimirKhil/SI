@@ -212,7 +212,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 // If there are 2 or 3 players, there are already 2 positive votes for the answer
                 // from answered player and showman. And only 1 or 2 votes left.
                 // So there is no chance to win a vote against the answer
-                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], appellationSource)); // TODO: REMOVE (replicated by USER_ERROR message)
+                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], appellationSource)); // TODO: REMOVE+
                 _gameActions.SendMessageToWithArgs(appellationSource, Messages.UserError, ErrorCode.AppellationFailedTooFewPlayers);
                 return;
             }
@@ -367,6 +367,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _data.ThemeComments = themes.Select(theme => theme.Info.Comments.Text).ToArray();
             _data.InformStages |= InformStages.RoundThemesNames;
             _data.ThemesPlayMode = playMode;
+            _data.LastVisualMessage = null;
         },
         5000);
     }
@@ -874,21 +875,21 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRoundEmpty()
     {
-        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)])); // TODO: REMOVE: replaced by ROUND_END EMPTY message
+        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)])); // TODO: REMOVE+
         _gameActions.SendMessage(Messages.RoundEnd, "empty");
     }
 
     internal void OnRoundTimeout()
     {
         _gameActions.SendMessage(Messages.Timeout); // TODO: REMOVE: replaced by ROUND_END TIMEOUT message
-        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllTime)])); // TODO: REMOVE: replaced by ROUND_END TIMEOUT message
+        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllTime)])); // TODO: REMOVE+
 
         _gameActions.SendMessage(Messages.RoundEnd, "timeout");
     }
 
     internal void OnRoundEndedManually()
     {
-        _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToOtherRound)]); // TODO: REMOVE: replaced by ROUND_END MANUAL message
+        _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToOtherRound)]); // TODO: REMOVE+
         _gameActions.SendMessage(Messages.RoundEnd, "manual");
     }
 
@@ -1901,7 +1902,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _data.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
             ScheduleExecution(Tasks.NoTask, 10);
             _data.MoveNextBlocked = true;
-            _gameActions.SpecialReplic("Game ERROR"); // TODO: REMOVE: replaced by GAME_ERROR message
+            _gameActions.SpecialReplic("Game ERROR"); // TODO: REMOVE+
             _gameActions.SendMessageWithArgs(Messages.GameError);
         }
     }
@@ -2168,7 +2169,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _gameActions.SendVisualMessage(msg.Build());
-        _gameActions.SpecialReplic(message.ToString()); // TODO: REMOVE: replaced by GAME_STATISTICS message
+        _gameActions.SpecialReplic(message.ToString()); // TODO: REMOVE+
     }
 
     private void AskForPlayerReviews()
@@ -3095,7 +3096,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 break;
 
             default:
-                _gameActions.SpecialReplic(LO[nameof(R.WrongGameState)] + " - " + Tasks.StartGame); // TODO: REMOVE
+                _gameActions.SpecialReplic(LO[nameof(R.WrongGameState)] + " - " + Tasks.StartGame); // TODO: REMOVE+
                 break;
         }
 

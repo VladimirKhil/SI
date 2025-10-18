@@ -1,4 +1,5 @@
-﻿using SImulator.ViewModel.Contracts;
+﻿using SICore;
+using SImulator.ViewModel.Contracts;
 
 namespace SImulator.ViewModel.Services;
 
@@ -7,9 +8,13 @@ namespace SImulator.ViewModel.Services;
 /// </summary>
 internal sealed class NewGameActions : IGameActions
 {
-    public void Dispose()
+    private readonly ViewerActions _viewerActions;
+    private readonly ViewerData _state;
+
+    public NewGameActions(ViewerActions viewerActions, ViewerData state)
     {
-        throw new NotImplementedException();
+        _viewerActions = viewerActions;
+        _state = state;
     }
 
     public void IsRightAnswer()
@@ -29,11 +34,22 @@ internal sealed class NewGameActions : IGameActions
 
     public void MoveNext(int delayMs = 100)
     {
-        throw new NotImplementedException();
+        if (_state.Stage == SIData.GameStage.Before)
+        {
+            _viewerActions.Start();
+            return;
+        }
+
+        _viewerActions.Move();
     }
 
     public void MoveNextRound()
     {
         throw new NotImplementedException();
+    }
+
+    public void Dispose()
+    {
+        
     }
 }

@@ -276,16 +276,6 @@ internal class ViewerComputerLogic : IPersonController
 
     }
 
-    public void OnPersonFinalAnswer(int playerIndex)
-    {
-
-    }
-
-    public void OnPersonApellated(int playerIndex)
-    {
-
-    }
-
     public void OnPersonPass(int playerIndex)
     {
 

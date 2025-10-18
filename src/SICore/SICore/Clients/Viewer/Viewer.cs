@@ -277,42 +277,8 @@ public class Viewer : MessageHandler, IViewerClient
                     break;
 
                 case Messages.Table:
-                    {
-                        #region Table
-
-                        // TODO: clear existing table and renew it
-                        if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
-                        {
-                            break;
-                        }
-
-                        var index = 1;
-
-                        for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
-                        {
-                            if (index == mparams.Length)
-                            {
-                                break;
-                            }
-
-                            while (index < mparams.Length && mparams[index].Length > 0) // empty value separates the themes content
-                            {
-                                if (!int.TryParse(mparams[index++], out int price))
-                                {
-                                    price = -1;
-                                }
-
-                                ClientData.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
-                            }
-
-                            index++;
-                        }
-
-                        _controller.TableLoaded();
-
-                        #endregion
-                        break;
-                    }
+                    OnTable(mparams);
+                    break;
 
                 case Messages.Toggle:
                     OnToggle(mparams);
@@ -436,10 +402,6 @@ public class Viewer : MessageHandler, IViewerClient
                     _controller.OnStopPlay();
                     break;
 
-                case Messages.WrongTry:
-                    OnWrongTry(mparams);
-                    break;
-
                 case Messages.Person:
                     {
                         #region Person
@@ -477,30 +439,9 @@ public class Viewer : MessageHandler, IViewerClient
                     OnPlayerAnswer(mparams);
                     break;
 
-                case Messages.PersonFinalAnswer:
-                    {
-                        if (mparams.Length > 1 && int.TryParse(mparams[1], out int playerIndex))
-                        {
-                            _controller.OnPersonFinalAnswer(playerIndex);
-                        }
-                        break;
-                    }
-                case Messages.PersonApellated:
-                    {
-                        if (int.TryParse(mparams[1], out int playerIndex))
-                        {
-                            _controller.OnPersonApellated(playerIndex);
-                        }
-                        break;
-                    }
                 case Messages.PersonFinalStake:
-                    {
-                        if (int.TryParse(mparams[1], out int playerIndex))
-                        {
-                            _controller.OnPersonFinalStake(playerIndex);
-                        }
-                        break;
-                    }
+                    OnPersonFinalStake(mparams);
+                    break;
 
                 case Messages.PlayerState:
                     OnPlayerState(mparams);
@@ -538,14 +479,8 @@ public class Viewer : MessageHandler, IViewerClient
                     break;
 
                 case Messages.Timeout:
-                    {
-                        #region Timeout
-
-                        _controller.TimeOut();
-
-                        #endregion
-                        break;
-                    }
+                    _controller.TimeOut();
+                    break;
 
                 case Messages.FinalThink:
                     _controller.FinalThink();
@@ -571,6 +506,49 @@ public class Viewer : MessageHandler, IViewerClient
         {
             _client.Node.OnError(exc, true);
         }
+    }
+
+    private void OnTable(string[] mparams)
+    {
+        // TODO: clear existing table and renew it
+        if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
+        {
+            return;
+        }
+
+        var index = 1;
+
+        for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
+        {
+            if (index == mparams.Length)
+            {
+                break;
+            }
+
+            while (index < mparams.Length && mparams[index].Length > 0) // empty value separates the themes content
+            {
+                if (!int.TryParse(mparams[index++], out int price))
+                {
+                    price = -1;
+                }
+
+                ClientData.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
+            }
+
+            index++;
+        }
+
+        _controller.TableLoaded();
+    }
+
+    private void OnPersonFinalStake(string[] mparams)
+    {
+        if (mparams.Length < 2 || !int.TryParse(mparams[1], out int playerIndex))
+        {
+            return;
+        }
+
+        _controller.OnPersonFinalStake(playerIndex);
     }
 
     private void OnQuestionComments(string[] mparams)
@@ -874,33 +852,6 @@ public class Viewer : MessageHandler, IViewerClient
         {
             ClientData.Players[i - 1].Answer = mparams[i];
         }
-    }
-
-    private void OnWrongTry(string[] mparams)
-    {
-        if (!int.TryParse(mparams[1], out var playerIndex) || playerIndex <= 0 || playerIndex >= ClientData.Players.Count)
-        {
-            return;
-        }
-
-        var player = ClientData.Players[playerIndex];
-
-        if (player.State != PlayerState.None)
-        {
-            return;
-        }
-
-        player.State = PlayerState.Lost;
-        
-        Task.Run(async () =>
-        {
-            await Task.Delay(200);
-
-            if (player.State == PlayerState.Lost)
-            {
-                player.State = PlayerState.None;
-            }
-        });
     }
 
     private void OnLayout(string[] mparams)

@@ -1,4 +1,10 @@
-﻿using SIEngine;
+﻿using SICore;
+using SICore.Contracts;
+using SICore.Network.Clients;
+using SICore.Network.Configuration;
+using SICore.Network.Servers;
+using SIData;
+using SIEngine;
 using SIEngine.Rules;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
@@ -12,6 +18,7 @@ using SImulator.ViewModel.Services;
 using SIPackages;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
@@ -321,7 +328,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async Task<SIDocument> PreparePackageAsync(CancellationToken cancellationToken = default)
+    private async Task<(SIDocument, string)> PreparePackageAsync(CancellationToken cancellationToken = default)
     {
         if (_packageSource == null)
         {
@@ -352,7 +359,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             }
         }
 
-        return document;
+        return (document, tempDir);
     }
 
     private EngineOptions GetEngineOptions()
@@ -477,8 +484,116 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async Task<GameViewModel> CreateGameNewAsync(IPresentationController presentationController, IExtendedListener presentationListener)
     {
-        // TODO: Implement this method using the new game creation logic
-        throw new NotImplementedException("This method is not implemented yet. Use CreateGameAsync instead.");
+        SIDocument document;
+        string tempDir;
+
+        try
+        {
+            (document, tempDir) = await PreparePackageAsync(_cancellationTokenSource.Token);
+        }
+        catch (Exception exc)
+        {
+            throw new Exception(Resources.PackagePreparationError, exc);
+        }
+
+        var node = new PrimaryNode(NodeConfiguration.Default);
+
+        node.Error += (error, _) => ShowError(error);
+
+        var gameSettings = new GameSettingsCore<AppSettingsCore>
+        {
+            HumanPlayerName = "HOST",
+            AppSettings = new AppSettingsCore
+            {
+                Managed = true,
+                Culture = "ru-RU"
+            },
+            Showman = new Account
+            {
+                IsHuman = true,
+                Name = "HOST"
+            },
+            Players = new[]
+            {
+                new Account
+                {
+                    IsHuman = true,
+                    Name = ""
+                },
+                new Account
+                {
+                    IsHuman = true,
+                    Name = ""
+                }
+            }
+        };
+
+        var gameHost = new GameHost();
+        var fileShare = new Services.FileShare(tempDir);
+
+        var computerPlayers = Array.Empty<ComputerAccount>();
+        var computerShowmans = Array.Empty<ComputerAccount>();
+
+        var avatarHelper = new AvatarHelper();
+
+        var game = GameRunner.CreateGame(
+           node,
+           gameSettings,
+           document,
+           gameHost,
+           fileShare,
+           computerPlayers,
+           computerShowmans,
+           avatarHelper,
+           null);
+
+        var client = new Client("HOST");
+        var actions = new ViewerActions(client);
+        var state = new ViewerData();
+
+        var gameController = new GameController(actions);
+
+        var host = new Showman(client, new Account(), gameController, actions, state);
+
+        client.ConnectTo(node);
+
+        // TODO: consider using Join() method
+        game.ClientData.BeginUpdatePersons("Add human host");
+
+        game.ClientData.ShowMan.IsConnected = true;
+
+        game.ClientData.EndUpdatePersons();
+
+        actions.GetInfo();
+
+        game.Run();
+
+        var gameActions = new NewGameActions(actions, state);
+
+        IGameLogger gameLogger;
+
+        try
+        {
+            gameLogger = CreateGameLogger();
+        }
+        catch (Exception exc)
+        {
+            throw new Exception(Resources.LoggerInitError, exc);
+        }
+
+        var mediaProvider = new MediaProvider(document);
+
+        var gameViewModel = new GameViewModel(
+            SettingsViewModel,
+            gameActions,
+            mediaProvider,
+            presentationListener,
+            presentationController,
+            gameLogger);
+
+        gameController.GameViewModel = gameViewModel;
+
+        return gameViewModel;
     }
 
     private async Task<GameViewModel> CreateGameAsync(IPresentationController presentationController, IExtendedListener presentationListener)
@@ -487,7 +602,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         try
         {
-            document = await PreparePackageAsync(_cancellationTokenSource.Token);
+            (document, _) = await PreparePackageAsync(_cancellationTokenSource.Token);
         }
         catch (Exception exc)
         {
@@ -502,7 +617,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         try
         {
             engine = EngineFactory.CreateEngine(
-                SettingsViewModel.Model.GameMode == GameModes.Tv ? WellKnownGameRules.Classic : WellKnownGameRules.Simple,
+                SettingsViewModel.Model.GameMode == Model.GameModes.Tv ? WellKnownGameRules.Classic : WellKnownGameRules.Simple,
                 document,
                 GetEngineOptions,
                 gameEngineController,
@@ -524,7 +639,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             throw new Exception(Resources.LoggerInitError, exc);
         }
 
-        var gameActions = new GameActions(engine);
+        var gameActions = new Services.GameActions(engine);
 
         var game = new GameViewModel(
             SettingsViewModel,
@@ -533,6 +648,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             presentationListener,
             presentationController,
             gameLogger);
+
+        game.RoundTimeMax = Settings.RoundTime;
 
         gameEngineController.GameViewModel = game;
 

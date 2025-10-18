@@ -1298,26 +1298,6 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         _data.Players[playerIndex].Stake = -4;
     }
 
-    public void OnPersonFinalAnswer(int playerIndex)
-    {
-        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
-        {
-            return;
-        }
-
-        _data.Players[playerIndex].State = PlayerState.HasAnswered;
-    }
-
-    public void OnPersonApellated(int playerIndex)
-    {
-        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
-        {
-            return;
-        }
-
-        _data.Players[playerIndex].State = PlayerState.HasAnswered;
-    }
-
     public void OnQuestionStart(bool isDefaultType)
     {
         TInfo.QuestionContentType = QuestionContentType.Text;

@@ -8,9 +8,13 @@ namespace SImulator.ViewModel.Controllers;
 /// </summary>
 internal sealed class GameController : IPersonController
 {
-    public GameViewModel? GameViewModel { get; set; }
+    public GameViewModel GameViewModel { get; set; } = null!;
 
-    public bool CanSwitchType => throw new NotImplementedException();
+    private readonly ViewerActions _viewerActions;
+
+    public GameController(ViewerActions actions) => _viewerActions = actions;
+
+    public bool CanSwitchType => false;
 
     public void OnQuestionSelected(int themeIndex, int questionIndex)
     {
@@ -19,7 +23,7 @@ internal sealed class GameController : IPersonController
 
     public void ClearSelections(bool full = false)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void DeleteTheme()
@@ -84,7 +88,10 @@ internal sealed class GameController : IPersonController
 
     public void OnReplic(string personCode, string text)
     {
-        throw new NotImplementedException();
+        if (personCode == "s")
+        {
+            GameViewModel.ShowmanReplic = text;
+        }
     }
 
     public void OnRightAnswer(string answer)
@@ -99,7 +106,7 @@ internal sealed class GameController : IPersonController
 
     public void OnTheme(string themeName, int questionCount, bool animate)
     {
-        throw new NotImplementedException();
+        GameViewModel.ShowmanReplic = themeName;
     }
 
     public void OnTimeChanged()
@@ -109,7 +116,7 @@ internal sealed class GameController : IPersonController
 
     public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string? person = null)
     {
-        throw new NotImplementedException();
+        GameViewModel.RoundTimeMax = int.Parse(arg);
     }
 
     public void Out(int themeIndex)
@@ -144,13 +151,10 @@ internal sealed class GameController : IPersonController
 
     public void ShowTablo()
     {
-        throw new NotImplementedException();
+
     }
 
-    public void Stage()
-    {
-        throw new NotImplementedException();
-    }
+    public void Stage() => _viewerActions.Move();
 
     public void StopRound()
     {
@@ -159,7 +163,7 @@ internal sealed class GameController : IPersonController
 
     public void TableLoaded()
     {
-        throw new NotImplementedException();
+
     }
 
     public void TimeOut()

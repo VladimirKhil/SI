@@ -1419,14 +1419,16 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void Move_Executed(object? arg)
     {
-        if (arg == null)
+        if (arg is not string s ||
+            int.TryParse(s, out var intArg) == false ||
+            Enum.IsDefined(typeof(MoveDirections), intArg) == false)
         {
             return;
         }
 
-        Host?.Actions.Move(arg);
+        Host?.Actions.Move((MoveDirections)intArg);
         
-        if (Equals(arg, 1))
+        if (intArg == 1)
         {
             NextButtonPressed?.Invoke();
         }

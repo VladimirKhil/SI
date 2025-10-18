@@ -354,6 +354,7 @@ public static class Messages
     /// Game options.
     /// </summary>
     [IdempotencyRequired]
+    [Obsolete("Use Options2")]
     public const string Options = "OPTIONS";
 
     /// <summary>

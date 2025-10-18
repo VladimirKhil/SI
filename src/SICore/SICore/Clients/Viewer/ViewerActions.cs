@@ -33,7 +33,9 @@ public sealed class ViewerActions
     /// </summary>
     public void GetInfo() => SendMessage(Messages.Info);
 
+    public void Start() => SendMessage(Messages.Start);
+
     public void Pause(bool pause) => SendMessage(Messages.Pause, pause ? "+" : "-");
 
-    public void Move(object arg) => SendMessageWithArgs(Messages.Move, arg);
+    public void Move(MoveDirections direction = MoveDirections.Next) => SendMessageWithArgs(Messages.Move, (int)direction);
 }

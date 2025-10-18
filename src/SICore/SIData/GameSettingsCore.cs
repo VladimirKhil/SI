@@ -13,7 +13,7 @@ public class GameSettingsCore<T> : IGameSettingsCore<T>
     /// Game host name.
     /// </summary>
     [DataMember]
-    public string HumanPlayerName { get; set; }
+    public string HumanPlayerName { get; set; } = "";
 
     /// <summary>
     /// Имя сетевой игры
@@ -54,7 +54,7 @@ public class GameSettingsCore<T> : IGameSettingsCore<T>
     /// </summary>
     [XmlIgnore]
     [DataMember]
-    public Account[] Players { get; set; }
+    public Account[] Players { get; set; } = Array.Empty<Account>();
 
     /// <summary>
     /// Зрители

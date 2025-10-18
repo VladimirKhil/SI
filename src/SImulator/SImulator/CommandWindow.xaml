@@ -631,6 +631,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" MaxHeight="100" />
                         <RowDefinition Height="3*" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -688,7 +689,19 @@
 
                     <Separator Grid.Row="1" Width="250" />
 
-                    <DockPanel Grid.Row="2">
+                    <TextBlock Text="{Binding ShowmanReplic}" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,5">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShowmanReplic}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <DockPanel Grid.Row="3">
                         <Button
                             DockPanel.Dock="Left"
                             Style="{StaticResource CommandButton}"
@@ -715,9 +728,9 @@
                             FontSize="14" />
                     </DockPanel>
 
-                    <Separator Grid.Row="3" Width="250" />
+                    <Separator Grid.Row="4" Width="250" />
 
-                    <StackPanel Grid.Row="4" Margin="1,4,5,1" Orientation="Horizontal">
+                    <StackPanel Grid.Row="5" Margin="1,4,5,1" Orientation="Horizontal">
                         <StackPanel.Resources>
                             <Style TargetType="RadioButton">
                                 <Setter Property="Height" Value="25" />
@@ -845,7 +858,7 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <Border Margin="0,5,0,0" Grid.Row="5">
+                    <Border Margin="0,5,0,0" Grid.Row="6">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Style.Triggers>
@@ -875,7 +888,7 @@
                         Margin="0,5,4,5"
                         HorizontalAlignment="Center"
                         Background="{StaticResource AreaBrush}"
-                        Grid.Row="6">
+                        Grid.Row="7">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />

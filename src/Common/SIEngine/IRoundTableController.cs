@@ -10,7 +10,7 @@ public interface IRoundTableController
     /// </summary>
     /// <param name="themeIndex">Question theme index.</param>
     /// <param name="questionIndex">Question index.</param>
-    /// <returns>Remove succccess status.</returns>
+    /// <returns>Remove success status.</returns>
     bool RemoveQuestion(int themeIndex, int questionIndex);
 
     /// <summary>
