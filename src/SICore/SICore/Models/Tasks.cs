@@ -186,9 +186,9 @@ public enum Tasks
     /// </summary>
     GoodLuck,
     /// <summary>
-    /// Сообщить об апелляции
+    /// Start appellation process.
     /// </summary>
-    PrintAppellation,
+    StartAppellation,
     /// <summary>
     /// Ожидание решения игроков об апелляции
     /// </summary>

@@ -2012,6 +2012,11 @@ public sealed class Game : MessageHandler
         }
         else
         {
+            if (_logic.HaveMultipleAnswerers())
+            {
+                return; // Appellation for wrong answer not allowed when multiple answerers
+            }
+
             var found = false;
 
             for (var i = 0; i < ClientData.Players.Count; i++)
@@ -2030,22 +2035,23 @@ public sealed class Game : MessageHandler
             }
         }
 
-        if (ClientData.QuestionPlayState.Appellations.Any(a => a.Item1 == appellationSource))
+        if (ClientData.QuestionPlayState.Appellations.Any(a => a.Item1 == appellationSource || !a.Item2))
         {
-            // Appellation already exists for this source
+            // Appellation already exists for this source or appellation for wrong answer already given
             return;
         }
 
         ClientData.QuestionPlayState.Appellations.Add((appellationSource, isAppellationForRightAnswer));
 
-        if (ClientData.QuestionPlayState.AppellationState != AppellationState.Processing)
+        _gameActions.SpecialReplic($"{appellationSource} {LO[nameof(R.RequestedApellation)]}"); // TODO: REMOVE+
+        _gameActions.SendMessageWithArgs(Messages.PlayerAppellating, appellationSource);
+
+        if (ClientData.QuestionPlayState.AppellationState == AppellationState.Collecting)
         {
-            _gameActions.SpecialReplic($"{appellationSource} {LO[nameof(R.RequestedApellation)]}"); // TODO: REMOVE+
-            _gameActions.SendMessageWithArgs(Messages.PlayerAppellating, appellationSource);
             return;
         }
 
-        _logic.ProcessAppellationRequest();
+        _logic.ProcessNextAppellationRequest(true);
     }
 
     [Obsolete]

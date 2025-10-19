@@ -173,9 +173,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.TimeThinking = 0.0;
     }
 
-    internal void ProcessAppellationRequest()
+    internal bool ProcessNextAppellationRequest(bool stop)
     {
         var (appellationSource, isAppellationForRightAnswer) = _data.QuestionPlayState.Appellations.FirstOrDefault();
+        _data.QuestionPlayState.Appellations.RemoveAt(0);
 
         _data.AppellationCallerIndex = -1;
         _data.AppelaerIndex = -1;
@@ -214,7 +215,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 // So there is no chance to win a vote against the answer
                 _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], appellationSource)); // TODO: REMOVE+
                 _gameActions.SendMessageToWithArgs(appellationSource, Messages.UserError, ErrorCode.AppellationFailedTooFewPlayers);
-                return;
+                return false;
             }
 
             for (var i = 0; i < _data.Players.Count; i++)
@@ -229,7 +230,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             if (_data.AppellationCallerIndex == -1)
             {
                 // Only players can appellate
-                return;
+                return false;
             }
 
             // Last person has right answer and is responsible for appellation
@@ -244,9 +245,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         if (_data.AppelaerIndex != -1)
         {
             // Appellation started
-            _data.QuestionPlayState.AppellationState = AppellationState.Collecting;
-            Stop(StopReason.Appellation);
+            if (stop)
+            {
+                _data.QuestionPlayState.AppellationState = AppellationState.Collecting; // To query other appellations
+                Stop(StopReason.Appellation);
+            }
+            
+            return true;
         }
+
+        return false;
     }
 
     private void PostprocessQuestion(int taskTime = 1)
@@ -268,7 +276,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (_data.QuestionPlayState.AppellationState != AppellationState.None && _data.QuestionPlayState.Appellations.Any())
         {
-            ProcessAppellationRequest();
+            ProcessNextAppellationRequest(true);
         }
     }
 
@@ -1844,8 +1852,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         QuestionSourcesAndComments(arg);
                         break;
 
-                    case Tasks.PrintAppellation:
-                        PrintAppellation();
+                    case Tasks.StartAppellation:
+                        OnStartAppellation();
                         break;
 
                     case Tasks.WaitAppellationDecision:
@@ -1853,7 +1861,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         break;
 
                     case Tasks.CheckAppellation:
-                        CheckAppellation();
+                        OnCheckAppellation();
                         break;
 
                     case Tasks.AskToDelete:
@@ -2017,7 +2025,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({_taskRunner.PrintOldTasks()})");
 
                 _taskRunner.PauseExecution(savedTask, arg, _leftTime);
-                ScheduleExecution(Tasks.PrintAppellation, 10);
+                ScheduleExecution(Tasks.StartAppellation, 10);
                 break;
 
             case StopReason.Move:
@@ -4066,19 +4074,19 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.OrderHistory.AppendFormat("New order index: {0}", _data.OrderIndex).AppendLine();
     }
 
-    private void PrintAppellation()
+    private void OnStartAppellation()
     {
         if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
         {
-            _tasksHistory.AddLogEntry($"PrintAppellation resumed ({_taskRunner.PrintOldTasks()})");
+            _tasksHistory.AddLogEntry($"OnStartAppellation resumed ({_taskRunner.PrintOldTasks()})");
             ResumeExecution(40);
             return;
         }
         
-        var (appellationSource, isAppellationForRightAnswer) = _data.QuestionPlayState.Appellations.FirstOrDefault();
         _gameActions.SendMessageWithArgs(Messages.Appellation, '+');
 
         var appelaer = _data.Players[_data.AppelaerIndex];
+        var isAppellationForRightAnswer = _data.AppellationCallerIndex == -1;
 
         var given = LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
         var apellationReplic = string.Format(LO[nameof(R.PleaseCheckApellation)], given);
@@ -4087,7 +4095,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             ? LO[nameof(R.IsApellating)]
             : string.Format(LO[nameof(R.IsConsideringWrong)], appelaer.Name);
 
-        _gameActions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}");
+        _gameActions.ShowmanReplic($"{appelaer.Name} {origin}. {apellationReplic}");
 
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
 
@@ -4135,7 +4143,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal int ResumeExecution(int resumeTime = 0) => _taskRunner.ResumeExecution(resumeTime, ShouldRunTimer());
 
-    private void CheckAppellation()
+    private void OnCheckAppellation()
     {
         try
         {
@@ -4145,7 +4153,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 return;
             }
 
-            var votingForRight = _data.QuestionPlayState.Appellations.First().Item2;
+            var votingForRight = _data.AppellationCallerIndex == -1;
             var positiveVoteCount = _data.AppellationPositiveVoteCount;
             var negativeVoteCount = _data.AppellationNegativeVoteCount;
 
@@ -4172,8 +4180,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         finally
         {
-            _gameActions.SendMessageWithArgs(Messages.Appellation, '-');
-            ResumeExecution(40);
+            if (_data.QuestionPlayState.Appellations.Count == 0 || !ProcessNextAppellationRequest(false))
+            {
+                _gameActions.SendMessageWithArgs(Messages.Appellation, '-');
+                ResumeExecution(40);
+            }
+            else
+            {
+                ScheduleExecution(Tasks.StartAppellation, 10);
+            }
         }
     }
 
@@ -4393,11 +4408,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             if (package.Name != Constants.RandomIndicator && authors.Length > 0)
             {
                 informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfPackage)], string.Join(", ", authors));
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by PACKAGE_AUTHORS message)
                 var msg = new MessageBuilder(Messages.PackageAuthors).AddRange(authors);
-                _gameActions.SendMessageWithArgs(msg.ToString());
+                _gameActions.SendVisualMessage(msg);
+                baseTime = 20;
             }
             else
             {
@@ -4417,10 +4430,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             if (logoItem != null)
             {
-                // Old
-                ShareMedia(logoItem);
-
-                // New
                 var (success, globalUri, _, error) = TryShareContent(logoItem);
 
                 if (success && globalUri != null)
@@ -4434,35 +4443,26 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
 
             _gameActions.SendVisualMessage(messageBuilder);
-        }
 
-        if (stage == 3)
-        {
             var sources = _data.PackageDoc.ResolveSources(package.Info.Sources);
 
             if (sources.Count > 0)
             {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfPackage)], string.Join(", ", sources));
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by PACKAGE_SOURCES message)
                 var msg = new MessageBuilder(Messages.PackageSources).AddRange(sources);
-                _gameActions.SendMessageWithArgs(msg.ToString());
+                _gameActions.SendMessage(msg.ToString());
             }
-            else
+
+            if (!string.IsNullOrWhiteSpace(package.Date))
             {
-                stage++;
+                _gameActions.SendMessageWithArgs(Messages.PackageDate, package.Date);
             }
         }
 
-        if (stage == 4)
+        if (stage == 3)
         {
             if (package.Info.Comments.Text.Length > 0 && package.Name != Constants.RandomIndicator)
             {
                 informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfPackage)], package.Info.Comments.Text);
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by PACKAGE_COMMENTS message)
                 _gameActions.SendVisualMessageWithArgs(Messages.PackageComments, package.Info.Comments.Text.EscapeNewLines());
 
                 baseTime = GetReadingDurationForTextLength(package.Info.Comments.Text.Length);
@@ -4473,7 +4473,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        if (stage == 5)
+        if (stage == 4)
         {
             if (!string.IsNullOrWhiteSpace(package.Restriction))
             {
@@ -4488,23 +4488,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        if (stage == 6)
-        {
-            if (!string.IsNullOrWhiteSpace(package.Date))
-            {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.CreationDate)], LO[nameof(R.OfPackage)], package.Date); // TODO: REMOVE (replaced by PACKAGE_DATE message)
-                _gameActions.ShowmanReplic(res.ToString());
-                _gameActions.SendMessageWithArgs(Messages.PackageDate, package.Date);
-            }
-            else
-            {
-                stage++;
-            }
-        }
-
-        if (stage < 6)
+        if (stage < 4)
         {
             ScheduleExecution(Tasks.Package, baseTime + 15, stage + 1, force: !informed);
         }
