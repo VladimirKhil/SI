@@ -61,6 +61,18 @@ internal class ViewerComputerLogic : IPersonController
         }
     }
 
+    public void ValidateAnswer(int playerIndex, string answer)
+    {
+        if (_role == GameRole.Showman)
+        {
+            _showman.OnAskValidateAnswer(answer, true);
+        }
+        else
+        {
+            _player.OnAskValidateAnswer(answer, true);
+        }
+    }
+
     public void OnSelectPlayer(SelectPlayerReason reason)
     {
         if (_role == GameRole.Showman)
@@ -302,12 +314,6 @@ internal class ViewerComputerLogic : IPersonController
         {
             _player.OnInitialized();
         }
-    }
-
-    public void ValidateAnswer(int playerIndex, string answer)
-    {
-        var isRight = AnswerChecker.IsAnswerRight(answer, _data.Right);
-        _viewerActions.SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
     }
 
     public void MakeStake() => _player.MakeStake();

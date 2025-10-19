@@ -625,12 +625,15 @@ public sealed class GameData : Data
     /// </summary>
     public ThemesPlayMode ThemesPlayMode { get; internal set; }
 
-    public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings)
+    public IPackageStatisticsProvider? PackageStatistisProvider { get; }
+
+    public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings, IPackageStatisticsProvider? packageStatisticsProvider)
     {
         Host = gameHost;
         _showMan = showman;
         Stakes = new StakesState(Players);
         Settings = settings;
+        PackageStatistisProvider = packageStatisticsProvider;
         InitQuestionTypeSettings();
     }
 

@@ -49,6 +49,11 @@ internal sealed class ShowmanComputerController
                 OnValidateAnswer((string?)arg);
                 break;
 
+            case ShowmanTasks.ValidateAnswerNew:
+                var (answer, voteForRight) = ((string, bool))arg!;
+                OnValidateAnswerNew(answer, voteForRight);
+                break;
+
             default:
                 break;
         }
@@ -68,6 +73,12 @@ internal sealed class ShowmanComputerController
         _viewerActions.SendMessage(Messages.IsRight, isRight ? "+" : "-");
     }
 
+    private void OnValidateAnswerNew(string answer, bool voteForRight)
+    {
+        var isRight = ValidateAnswerCore(answer);
+        _viewerActions.ValidateAnswer(answer, isRight);
+    }
+
     private bool ValidateAnswerCore(string? answer)
     {
         if (string.IsNullOrEmpty(answer))
@@ -82,12 +93,15 @@ internal sealed class ShowmanComputerController
 
     public void IsRight(string answer) => ScheduleExecution(ShowmanTasks.ValidateAnswer, 10 + Random.Shared.Next(10), answer);
 
+    public void OnAskValidateAnswer(string answer, bool voteForRight) => ScheduleExecution(ShowmanTasks.ValidateAnswerNew, 10 + Random.Shared.Next(10), (answer, voteForRight));
+
     public void OnInitialized() => ScheduleExecution(ShowmanTasks.Ready, 10);
 
     private enum ShowmanTasks
     {
         Ready, // Internal action
         ValidateAnswer,
+        ValidateAnswerNew,
         SelectPlayer,
     }
 }

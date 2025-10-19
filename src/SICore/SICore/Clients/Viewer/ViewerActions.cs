@@ -38,4 +38,6 @@ public sealed class ViewerActions
     public void Pause(bool pause) => SendMessage(Messages.Pause, pause ? "+" : "-");
 
     public void Move(MoveDirections direction = MoveDirections.Next) => SendMessageWithArgs(Messages.Move, (int)direction);
+
+    public void ValidateAnswer(string answer, bool isRight) => SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
 }

@@ -444,6 +444,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
         }
+
+        SendQuestionAnswersToShowman();
     }
 
     internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration)
@@ -3398,25 +3400,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void SendAnswersInfoToShowman(string answer)
     {
-        _gameActions.SendMessage(BuildValidationMessage(_data.Answerer.Name, answer), _data.ShowMan.Name);
-
         _gameActions.SendMessage(
             BuildValidation2Message(_data.Answerer.Name, answer, _data.AnswerMode == StepParameterValues.AskAnswerMode_Button),
             _data.ShowMan.Name);
-    }
-
-    [Obsolete]
-    private string BuildValidationMessage(string name, string answer, bool isCheckingForTheRight = true)
-    {
-        var question = _data.Question ?? throw new InvalidOperationException("Question is null");
-
-        var rightAnswers = question.Right;
-        var wrongAnswers = question.Wrong;
-
-        return new MessageBuilder(Messages.Validation, name, answer, isCheckingForTheRight ? '+' : '-', rightAnswers.Count)
-            .AddRange(rightAnswers)
-            .AddRange(wrongAnswers)
-            .Build();
     }
 
     private string BuildValidation2Message(string name, string answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
@@ -3426,14 +3412,30 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var rightAnswers = question.Right;
         var wrongAnswers = question.Wrong;
 
+        ICollection<string> appellatedAnswers = Array.Empty<string>();
+
+        if (_data.PackageStatistisProvider != null)
+        {
+            appellatedAnswers = _data.PackageStatistisProvider.GetAppellatedAnswers(
+                Engine.RoundIndex,
+                _data.ThemeIndex,
+                _data.QuestionIndex);
+
+            if (appellatedAnswers.Count > 0)
+            {
+                _data.Host.LogWarning($"Appellated answers count: {appellatedAnswers.Count}");
+            }
+        }
+
         return new MessageBuilder(
             Messages.Validation2,
             name,
             answer,
             isCheckingForTheRight ? '+' : '-',
             allowPriceModifications ? '+' : '-',
-            rightAnswers.Count)
+            rightAnswers.Count + appellatedAnswers.Count)
             .AddRange(rightAnswers)
+            .AddRange(appellatedAnswers)
             .AddRange(wrongAnswers)
             .Build();
     }
@@ -3454,11 +3456,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     _data.Players[i].Flag = true;
                     _gameActions.SendMessage(Messages.Answer, _data.Players[i].Name);
                 }
-            }
-
-            if (_data.QuestionPlayState.AnswerOptions == null)
-            {
-                SendQuestionAnswersToShowman();
             }
 
             _data.AnswerCount = _data.QuestionPlayState.AnswererIndicies.Count;
@@ -3528,15 +3525,31 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         WaitFor(DecisionType.Answering, waitAnswerTime, _data.AnswererIndex);
     }
 
-    private void SendQuestionAnswersToShowman()
+    internal void SendQuestionAnswersToShowman()
     {
-        var question = _data.Question ?? throw new InvalidOperationException("Question is null");
+        var question = _data.Question;
+
+        if (question == null || _data.QuestionPlayState.AnswerOptions != null)
+        {
+            return;
+        }
 
         var rightAnswers = question.Right;
         var wrongAnswers = question.Wrong;
 
-        var message = new MessageBuilder(Messages.QuestionAnswers, rightAnswers.Count)
+        ICollection<string> appellatedAnswers = Array.Empty<string>();
+
+        if (_data.PackageStatistisProvider != null)
+        {
+            appellatedAnswers = _data.PackageStatistisProvider.GetAppellatedAnswers(
+                Engine.RoundIndex,
+                _data.ThemeIndex,
+                _data.QuestionIndex);
+        }
+
+        var message = new MessageBuilder(Messages.QuestionAnswers, rightAnswers.Count + appellatedAnswers.Count)
             .AddRange(rightAnswers)
+            .AddRange(appellatedAnswers)
             .AddRange(wrongAnswers)
             .Build();
 
@@ -4076,7 +4089,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         _gameActions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}");
 
-        var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer ?? "", isAppellationForRightAnswer);
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
 
         _data.AppellationAwaitedVoteCount = 0;
@@ -4112,7 +4124,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             {
                 _data.AppellationAwaitedVoteCount++;
                 _data.Players[i].AppellationFlag = true;
-                _gameActions.SendMessage(validationMessage, _data.Players[i].Name);
                 _gameActions.SendMessage(validation2Message, _data.Players[i].Name);
             }
         }

@@ -3558,6 +3558,8 @@ public sealed class Game : MessageHandler
                     IsConnected = account.IsConnected,
                     IsMoveable = account.IsMoveable
                 };
+
+                Logic.SendQuestionAnswersToShowman();
             }
             else
             {
@@ -3655,6 +3657,8 @@ public sealed class Game : MessageHandler
                 {
                     ClientData.ShowMan.Ready = otherPerson.Ready;
                 }
+
+                Logic.SendQuestionAnswersToShowman();
             }
 
             InformAvatar(otherAccount);
@@ -3879,6 +3883,7 @@ public sealed class Game : MessageHandler
         var showman = new Showman(showmanClient, account, logic, actions, data);
 
         OnInfo(newAccount.Name);
+        Logic.SendQuestionAnswersToShowman();
 
         return newAccount;
     }
@@ -3908,7 +3913,7 @@ public sealed class Game : MessageHandler
             return account.Name == name ? false : null;
         }
 
-        ClientData.BeginUpdatePersons($"Connected {name} as {role} as {index}");
+        ClientData.BeginUpdatePersons($"Connected {name} as {role} at {index}");
 
         try
         {
@@ -3936,6 +3941,11 @@ public sealed class Game : MessageHandler
         if (ClientData.HostName == null && !ClientData.Settings.IsAutomatic)
         {
             UpdateHostName(name);
+        }
+
+        if (role == GameRole.Showman)
+        {
+            Logic.SendQuestionAnswersToShowman();
         }
 
         OnPersonsChanged();

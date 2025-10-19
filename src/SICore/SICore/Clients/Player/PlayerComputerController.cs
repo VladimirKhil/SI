@@ -87,6 +87,11 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 OnValidateAnswer((bool?)arg);
                 break;
 
+            case PlayerTasks.ValidateAnswerNew:
+                var (answer, voteForRight) = (ValueTuple<string, bool>)arg!;
+                OnValidateAnswerNew(answer, voteForRight);
+                break;
+
             case PlayerTasks.SelectPlayer:
                 OnSelectPlayer();
                 break;
@@ -156,7 +161,11 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
     }
 
+    // As player is validating only during appellations, computer player always agrees with appellation
     private void OnValidateAnswer(bool? voteForRight) => _viewerActions.SendMessage(Messages.IsRight, voteForRight == true ? "+" : "-");
+
+    // As player is validating only during appellations, computer player always agrees with appellation
+    private void OnValidateAnswerNew(string answer, bool voteForRight) => _viewerActions.ValidateAnswer(answer, voteForRight);
 
     private void OnSelectPlayer()
     {
@@ -331,6 +340,8 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     public void ValidateAnswer(bool voteForRight) => ScheduleExecution(PlayerTasks.ValidateAnswer, 10 + Random.Shared.Next(10), voteForRight);
 
+    public void OnAskValidateAnswer(string answer, bool voteForRight) => ScheduleExecution(PlayerTasks.ValidateAnswerNew, 10 + Random.Shared.Next(10), (answer, voteForRight));
+
     public void SendReport()
     {
         if (_data.SystemLog.Length > 0)
@@ -382,6 +393,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         MakeStake,
         DeleteTheme,
         ValidateAnswer,
+        ValidateAnswerNew,
         PressButton, // Internal action
         SelectPlayer,
     }
