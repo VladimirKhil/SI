@@ -24,9 +24,6 @@
     <EmbeddedResource Include="persons.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.Model\SIUI.Model.csproj" />
     <ProjectReference Include="..\SICore.Network\SICore.Network.csproj" />

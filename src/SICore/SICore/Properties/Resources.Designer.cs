@@ -1699,6 +1699,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на to.
+        /// </summary>
+        public static string UpTo {
+            get {
+                return ResourceManager.GetString("UpTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на ALL-IN!!!.
         /// </summary>
         public static string VaBank {

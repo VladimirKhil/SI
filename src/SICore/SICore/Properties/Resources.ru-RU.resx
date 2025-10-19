@@ -726,4 +726,7 @@
   <data name="RandomPackageName" xml:space="preserve">
     <value>Случайный набор тем</value>
   </data>
+  <data name="UpTo" xml:space="preserve">
+    <value>до</value>
+  </data>
 </root>

@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AllQuestions" xml:space="preserve">
+    <value>Sva pitanja su odigrana; Dakle, odigrali smo sva pitanja</value>
+  </data>
+  <data name="AllTime" xml:space="preserve">
+    <value>Vreme runde je isteklo; Vreme je isteklo</value>
+  </data>
+  <data name="Bravo" xml:space="preserve">
+    <value>Bravo!!!;Odlično!!!;Apsolutno tačno!!!;Upravo tako, čestitam!!!;Dali ste apsolutno tačan odgovor!!!;Apsolutno ste u pravu!!!</value>
+  </data>
+  <data name="DeleteTheme" xml:space="preserve">
+    <value>Molim vas, uklonite temu koja vam se ne sviđa; molim vas, uklonite jednu od tema</value>
+  </data>
+  <data name="EasyCat" xml:space="preserve">
+    <value>Nema nikakog pitanja! Novac se jednostavno prebacuje na vaš račun. Čestitamo!</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>od</value>
+  </data>
+  <data name="GameRules" xml:space="preserve">
+    <value>Pravila igre</value>
+  </data>
+  <data name="IDontKnow" xml:space="preserve">
+    <value>Ne znam</value>
+  </data>
+  <data name="InformChooser" xml:space="preserve">
+    <value>{0} će započeti igru; {0} započinje igru</value>
+  </data>
+  <data name="LetsSee" xml:space="preserve">
+    <value>Dakle, pogledajmo odgovore igrača; Vreme je da pogledamo odgovore naših igrača</value>
+  </data>
+  <data name="MakeStake" xml:space="preserve">
+    <value>Dragi igrači, molimo vas da postavite svoje opklade; Gospodo, molimo vas da postavite svoje opklade</value>
+  </data>
+  <data name="MinMaxChoice" xml:space="preserve">
+    <value>Minimum ili maksimum po rundi (opciono)</value>
+  </data>
+  <data name="Nominal" xml:space="preserve">
+    <value>Nominal</value>
+  </data>
+  <data name="NowPlays" xml:space="preserve">
+    <value>Dakle, igra</value>
+  </data>
+  <data name="OfPackage" xml:space="preserve">
+    <value>paketa</value>
+  </data>
+  <data name="OfTheme" xml:space="preserve">
+    <value>teme</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>ili</value>
+  </data>
+  <data name="PAuthors" xml:space="preserve">
+    <value>Autori</value>
+  </data>
+  <data name="Restrictions" xml:space="preserve">
+    <value>Ograničenja</value>
+  </data>
+  <data name="Right" xml:space="preserve">
+    <value>Tačno!;U pravu ste!;Da, tako je!;Da!;Apsolutno tačno!;Upravo tako!;Naravno!;Naravno!;Pa, u osnovi, da!;Da, tako je;Dali ste tačan odgovor!;Apsolutno tačno!;U principu, u pravu ste</value>
+  </data>
+  <data name="QuestionForYourselfInfo" xml:space="preserve">
+    <value>Pitanje je samo za vas. Vrednost pitanja se množi sa {2}. Ako je odgovor tačan, dobićete {0}; ako je netačan, izgubićete {1}</value>
+  </data>
+  <data name="Stake" xml:space="preserve">
+    <value>Ulog od</value>
+  </data>
+  <data name="StartThink" xml:space="preserve">
+    <value>Razmisli!</value>
+  </data>
+  <data name="ThankYou" xml:space="preserve">
+    <value>Hvala! Pažnja, pitanje!</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="TypeManaged" xml:space="preserve">
+    <value>kontrolisana</value>
+  </data>
+  <data name="TypeNoFalseStart" xml:space="preserve">
+    <value>bez falstarta</value>
+  </data>
+  <data name="TypeOral" xml:space="preserve">
+    <value>oralna</value>
+  </data>
+  <data name="TypeSport" xml:space="preserve">
+    <value>pojednostavljena</value>
+  </data>
+  <data name="With" xml:space="preserve">
+    <value>za</value>
+  </data>
+  <data name="WithStepOf" xml:space="preserve">
+    <value>u koracima od</value>
+  </data>
+  <data name="Wrong" xml:space="preserve">
+    <value>Oh, šta to govoriš!;Pogrešno!;Avaj, to nije istina!;Ne, grešiš;Nažalost, grešiš;Dao si pogrešan odgovor!;Pogrešno;Ne;Ne, grešiš;Ne, grešiš;Ne, ne!;Tvoj odgovor je netačan</value>
+  </data>
+  <data name="YouCanSayOnly" xml:space="preserve">
+    <value>možeš samo reći</value>
+  </data>
+  <data name="YourChoice" xml:space="preserve">
+    <value>na izboru</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="YourStake" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="YouWin" xml:space="preserve">
+    <value>Čestitam, pobedili ste!;Primite moje čestitke!;Čestitam vam na pobedi!</value>
+  </data>
+  <data name="TypeClassic" xml:space="preserve">
+    <value>klasična</value>
+  </data>
+  <data name="Cost2" xml:space="preserve">
+    <value>Cena</value>
+  </data>
+  <data name="UpTo" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+</root>

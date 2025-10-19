@@ -354,20 +354,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _data.TInfo.RoundInfo.Add(new ThemeInfo { Name = theme.Name });
         }
 
-        string themesReplic;
-
         if (willPlayAllThemes)
         {
-            themesReplic = isFirstPlay
+            var themesReplic = isFirstPlay
                 ? $"{GetRandomString(LO[nameof(R.RoundThemes)])}. {LO[nameof(R.WeWillPlayAllOfThem)]}"
                 : LO[nameof(R.LetsPlayNextTheme)];
-        }
-        else
-        {
-            themesReplic = GetRandomString(LO[nameof(R.RoundThemes)]);
-        }
 
-        _gameActions.ShowmanReplic(themesReplic);
+            _gameActions.ShowmanReplic(themesReplic);
+        }
 
         _data.TableInformStageLock.WithLock(() =>
         {
@@ -2758,57 +2752,23 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void OnQuestionStartInfo(int arg)
     {
-        var informed = false;
+        var authors = _data.PackageDoc.ResolveAuthors(_data.Question.Info.Authors);
 
-        if (_data.Question == null)
+        if (authors.Length > 0)
         {
-            throw new Exception($"_data.Question == null: {_data.Round?.Type} {_data.Settings.AppSettings.GameMode}");
+            var msg = new MessageBuilder(Messages.QuestionAuthors).AddRange(authors);
+            _gameActions.SendMessage(msg.ToString());
         }
 
-        if (arg == 1)
-        {
-            var authors = _data.PackageDoc.ResolveAuthors(_data.Question.Info.Authors);
+        var themeComments = _data.Theme.Info.Comments.Text;
 
-            if (authors.Length > 0)
-            {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfQuestion)], string.Join(", ", authors));
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE: replaced by QUESTION_AUTHORS message
-                var msg = new MessageBuilder(Messages.QuestionAuthors).AddRange(authors);
-                _gameActions.SendMessageWithArgs(msg.ToString());
-            }
-            else
-            {
-                arg++;
-            }
+        if (themeComments.Length > 0)
+        {
+            _gameActions.ShowmanReplic(themeComments); // TODO: REMOVE: replaced by THEME message
+            _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines()); // TODO: REMOVE: replaced by THEME message
         }
 
-        if (arg == 2)
-        {
-            var themeComments = _data.Theme.Info.Comments.Text;
-
-            if (themeComments.Length > 0)
-            {
-                informed = true;
-                _gameActions.ShowmanReplic(themeComments); // TODO: REMOVE: replaced by THEME message
-                _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines()); // TODO: REMOVE: replaced by THEME message
-            }
-            else
-            {
-                arg++;
-            }
-        }
-
-        var delay = informed ? 20 : 1;
-
-        if (arg >= 2)
-        {
-            ScheduleExecution(Tasks.MoveNext, delay, arg + 1, force: !informed);
-            return;
-        }
-
-        ScheduleExecution(Tasks.QuestionStartInfo, delay, arg + 1);
+        ScheduleExecution(Tasks.MoveNext, 1, arg + 1, force: true);
     }
 
     internal void OnQuestionType(bool isDefault)
@@ -2818,29 +2778,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             switch (_data.QuestionTypeName)
             {
                 case QuestionTypes.Stake:
-                    _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)])); // TODO: REMOVE: replaced by QTYPE message
-                    break;
-
                 case QuestionTypes.Secret:
                 case QuestionTypes.SecretPublicPrice:
                 case QuestionTypes.SecretNoQuestion:
-                    _gameActions.ShowmanReplic(LO[nameof(R.YouReceiveCat)]); // TODO: REMOVE: replaced by QTYPE message
-                    break;
-
                 case QuestionTypes.NoRisk:
-                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionForYourself)]); // TODO: REMOVE: replaced by QTYPE message
-                    break;
-
                 case QuestionTypes.Simple:
-                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeSimple)]); // TODO: REMOVE: replaced by QTYPE message
-                    break;
-
                 case QuestionTypes.StakeAll:
-                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeStakeAll)]); // TODO: REMOVE: replaced by QTYPE message
-                    break;
-
                 case QuestionTypes.ForAll:
-                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionTypeForAll)]); // TODO: REMOVE: replaced by QTYPE message
                     break;
 
                 default:
@@ -4505,10 +4449,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private void OnRound(Round round, int stage)
     {
         var informed = false;
-        var baseTime = stage == 1 ? 30 : 20;
+        var baseTime = 20;
 
         if (stage == 1)
         {
+            informed = true;
             _gameActions.InformSums();
 
             var roundIndex = Engine.RoundIndex;
@@ -4521,58 +4466,31 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.InformRoundContent();
             _data.InformStages |= InformStages.RoundContent;
 
-            _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {roundName}!"); // TODO: REMOVE: replaced by STAGE message
             _gameActions.SystemReplic(" "); // new line // TODO: REMOVE: replaced by STAGE message
             _gameActions.SystemReplic(roundName); // TODO: REMOVE: replaced by STAGE message
-        }
-        else if (stage == 2)
-        {
+
             var authors = _data.PackageDoc.ResolveAuthors(round.Info.Authors);
 
             if (authors.Length > 0)
             {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfRound)], string.Join(", ", authors));
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by ROUND_AUTHORS message)
-
                 var msg = new MessageBuilder(Messages.RoundAuthors).AddRange(authors);
-                _gameActions.SendMessageWithArgs(msg.ToString());
+                _gameActions.SendMessage(msg.ToString());
             }
-            else
-            {
-                stage++;
-            }
-        }
 
-        if (stage == 3)
-        {
             var sources = _data.PackageDoc.ResolveSources(round.Info.Sources);
 
             if (sources.Count > 0)
             {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfRound)], string.Join(", ", sources));
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by ROUND_SOURCES message)
-
                 var msg = new MessageBuilder(Messages.RoundSources).AddRange(sources);
-                _gameActions.SendMessageWithArgs(msg.ToString());
-            }
-            else
-            {
-                stage++;
+                _gameActions.SendMessage(msg.ToString());
             }
         }
 
-        if (stage == 4)
+        if (stage == 2)
         {
             if (round.Info.Comments.Text.Length > 0)
             {
                 informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfRound)], round.Info.Comments.Text);
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by ROUND_COMMENTS message)
                 _gameActions.SendVisualMessageWithArgs(Messages.RoundComments, round.Info.Comments.Text.EscapeNewLines());
 
                 baseTime = GetReadingDurationForTextLength(round.Info.Comments.Text.Length);
@@ -4585,7 +4503,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var adShown = false;
 
-        if (stage == 5)
+        if (stage == 3)
         {
             // Showing advertisement
             try
@@ -4618,7 +4536,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        if (stage < 5)
+        if (stage < 3)
         {
             ScheduleExecution(Tasks.Round, baseTime + Random.Shared.Next(10), stage + 1);
         }
@@ -4903,7 +4821,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             if (availableRange.Step > 0)
             {
                 s.Append(
-                    $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Maximum)} " +
+                    $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.UpTo)]} {Notion.FormatNumber(availableRange.Maximum)} " +
                     $"{LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(availableRange.Step)} ({LO[nameof(R.YourChoice)]})");
             }
             else
