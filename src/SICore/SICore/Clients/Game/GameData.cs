@@ -30,6 +30,11 @@ public sealed class GameData : Data
     public IGameSettingsCore<AppSettingsCore> Settings { get; }
 
     /// <summary>
+    /// Gets game time settings.
+    /// </summary>
+    public SI.Contracts.TimeSettings TimeSettings { get; }
+
+    /// <summary>
     /// Game package document.
     /// </summary>
     internal SIDocument? PackageDoc { get; set; }
@@ -633,6 +638,25 @@ public sealed class GameData : Data
         _showMan = showman;
         Stakes = new StakesState(Players);
         Settings = settings;
+
+        TimeSettings = new SI.Contracts.TimeSettings
+        {
+            QuestionSelection = settings.AppSettings.TimeSettings.TimeForChoosingQuestion,
+            ThemeSelection = settings.AppSettings.TimeSettings.TimeForChoosingFinalTheme,
+            PlayerSelection = settings.AppSettings.TimeSettings.TimeForGivingACat,
+            ButtonPressing = settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion,
+            AnswerGiving = settings.AppSettings.TimeSettings.TimeForPrintingAnswer,
+            SoloAnswerGiving = settings.AppSettings.TimeSettings.TimeForThinkingOnSpecial,
+            HiddenAnswerPrinting = settings.AppSettings.TimeSettings.TimeForFinalThinking,
+            StakeMaking = settings.AppSettings.TimeSettings.TimeForMakingStake,
+            ShowmanDecision = settings.AppSettings.TimeSettings.TimeForShowmanDecisions,
+            Round = settings.AppSettings.TimeSettings.TimeOfRound,
+            ButtonBlocking = settings.AppSettings.TimeSettings.TimeForBlockingButton,
+            RightAnswer = settings.AppSettings.TimeSettings.TimeForRightAnswer,
+            Image = settings.AppSettings.TimeSettings.ImageTime,
+            PartialImage = settings.AppSettings.TimeSettings.PartialImageTime,
+        };
+
         PackageStatistisProvider = packageStatisticsProvider;
         InitQuestionTypeSettings();
     }

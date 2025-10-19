@@ -1710,7 +1710,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 _tasksHistory.AddLogEntry($"{task}:{arg}");
 
                 // Special catch for hanging old tasks
-                if (task == Tasks.AskToChoose && _taskRunner.OldTasks.Any())
+                if (task == Tasks.AskToSelectQuestion && _taskRunner.OldTasks.Any())
                 {
                     static string oldTaskPrinter(Tuple<Tasks, int, int> t) => $"{t.Item1}:{t.Item2}";
 
@@ -1753,8 +1753,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         WaitFirst();
                         break;
 
-                    case Tasks.AskToChoose:
-                        AskToChoose();
+                    case Tasks.AskToSelectQuestion:
+                        OnAskToSelectQuestion();
                         break;
 
                     case Tasks.WaitChoose:
@@ -2014,7 +2014,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 break;
 
             case StopReason.Appellation:
-                var savedTask = task == Tasks.WaitChoose ? Tasks.AskToChoose : (task == Tasks.WaitDelete ? Tasks.AskToDelete : task);
+                var savedTask = task == Tasks.WaitChoose ? Tasks.AskToSelectQuestion : (task == Tasks.WaitDelete ? Tasks.AskToDelete : task);
 
                 _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({_taskRunner.PrintOldTasks()})");
 
@@ -3096,7 +3096,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         return string.Join(", ", rules);
     }
 
-    private void AskToChoose()
+    private void OnAskToSelectQuestion()
     {
         _gameActions.InformSums();
         _gameActions.SendVisualMessage(Messages.ShowTable);
@@ -3133,7 +3133,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (activeQuestionsCount > 1)
         {
-            time = _data.Settings.AppSettings.TimeSettings.TimeForChoosingQuestion * 10;
+            time = _data.TimeSettings.QuestionSelection * 10;
 
             var message = $"{Messages.Choose}{Message.ArgsSeparatorChar}1";
             _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;

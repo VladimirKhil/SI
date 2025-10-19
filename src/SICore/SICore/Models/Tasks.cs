@@ -39,10 +39,12 @@ public enum Tasks
     /// Ожидание выяснения того, кто начнёт раунд
     /// </summary>
     WaitFirst,
+
     /// <summary>
-    /// Просьба выбрать вопрос
+    /// Ask to select question on game table.
     /// </summary>
-    AskToChoose,
+    AskToSelectQuestion,
+    
     /// <summary>
     /// Ожидание выбора вопроса
     /// </summary>

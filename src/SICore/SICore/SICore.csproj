@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.Model\SIUI.Model.csproj" />
+    <ProjectReference Include="..\SI.Contracts\SI.Contracts.csproj" />
     <ProjectReference Include="..\SICore.Network\SICore.Network.csproj" />
   </ItemGroup>
   <ItemGroup>

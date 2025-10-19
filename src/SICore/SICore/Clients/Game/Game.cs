@@ -1152,7 +1152,7 @@ public sealed class Game : MessageHandler
 
         if (isChoosingNow)
         {
-            _logic.PlanExecution(Tasks.AskToChoose, 10);
+            _logic.PlanExecution(Tasks.AskToSelectQuestion, 10);
         }
     }
 
