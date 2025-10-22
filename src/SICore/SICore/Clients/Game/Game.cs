@@ -3209,8 +3209,6 @@ public sealed class Game : MessageHandler
             if (ClientData.Decision == DecisionType.StakeMaking || ClientData.Decision == DecisionType.NextPersonStakeMaking)
             {
                 // Staker has been deleted. We need to move game further
-                Logic.StopWaiting();
-
                 if (ClientData.IsOralNow || ClientData.Decision == DecisionType.NextPersonStakeMaking)
                 {
                     _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
@@ -3221,9 +3219,7 @@ public sealed class Game : MessageHandler
         }
         else if (ClientData.Decision == DecisionType.NextPersonStakeMaking)
         {
-            Logic.StopWaiting();
             _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
-
             ContinueMakingStakes();
         }
     }
@@ -3311,6 +3307,11 @@ public sealed class Game : MessageHandler
 
     private void ContinueMakingStakes()
     {
+        Logic.AddHistory("ContinueMakingStakes");
+
+        var previousDecision = ClientData.Decision;
+        Logic.StopWaiting(); // Drops ClientData.Decision
+
         if (Logic.TryDetectStakesWinner())
         {
             if (ClientData.Stake == -1)
@@ -3321,7 +3322,7 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        if (ClientData.OrderIndex > -1 && ClientData.Decision == DecisionType.NextPersonStakeMaking)
+        if (ClientData.OrderIndex > -1 && previousDecision == DecisionType.NextPersonStakeMaking)
         {
             Logic.AddHistory("Rolling order index back");
             ClientData.OrderIndex--;

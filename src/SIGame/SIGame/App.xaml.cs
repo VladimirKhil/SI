@@ -125,16 +125,15 @@ public partial class App : Application
             UserSettings.Default = SettingsManager.LoadUserSettings() ?? new UserSettings();
             _appState = SettingsManager.LoadAppState();
 
-            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("sr-RS");
-            //if (UserSettings.Default.Language != null)
-            //{
-            //    Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(UserSettings.Default.Language);
-            //}
-            //else
-            //{
-            //    var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
-            //    UserSettings.Default.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
-            //}
+            if (UserSettings.Default.Language != null)
+            {
+                Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(UserSettings.Default.Language);
+            }
+            else
+            {
+                var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+                UserSettings.Default.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
+            }
 
             if (e.Args.Length > 0)
             {

@@ -520,6 +520,7 @@ public sealed class QuestionEngine : IQuestionEngine
         var nextStepIndex = _script.Steps.Count - 1;
         var askAnswerFound = false;
 
+        // Rewind to the last AskAnswer step and move one step forward
         while (nextStepIndex >= _stepIndex)
         {
             var nextStep = _script.Steps[nextStepIndex];
@@ -533,17 +534,23 @@ public sealed class QuestionEngine : IQuestionEngine
             nextStepIndex--;
         }
 
-        if (askAnswerFound && nextStepIndex + 1 > _stepIndex)
-        {
-            _stepIndex = nextStepIndex + 1;
-            _contentIndex = 0;
+        _contentIndex = 0;
+        _areButtonsEnabled = false;
+        _isAskingAnswer = false;
 
-            if (_areButtonsEnabled || _isAskingAnswer)
+        if (askAnswerFound)
+        {
+            if (nextStepIndex + 1 > _stepIndex)
             {
-                _playHandler.OnAnswerStart();
-                _areButtonsEnabled = false;
-                _isAskingAnswer = false;
+                _stepIndex = nextStepIndex + 1;
             }
+
+            _playHandler.OnAnswerStart();
+        }
+        else
+        {
+            // No AskAnswer step found, move to the end
+            _stepIndex = _script.Steps.Count;
         }
     }
 }

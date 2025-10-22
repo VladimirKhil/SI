@@ -4909,12 +4909,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.OrderHistory.Clear();
 
         _data.OrderHistory.Append("Stake making. Initial state. ")
+            .AppendLine()
             .Append("Sums: ")
             .Append(string.Join(",", _data.Players.Select(p => p.Sum)))
+            .AppendLine()
             .Append("StakeMaking: ")
             .Append(string.Join(",", _data.Players.Select(p => p.StakeMaking)))
+            .AppendLine()
             .Append(" Order: ")
             .Append(string.Join(",", _data.Order))
+            .AppendLine()
             .Append(" Nominal: ")
             .Append(_data.CurPriceRight)
             .AppendLine();
