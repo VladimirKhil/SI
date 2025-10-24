@@ -517,40 +517,44 @@ public sealed class QuestionEngine : IQuestionEngine
             return;
         }
 
-        var nextStepIndex = _script.Steps.Count - 1;
-        var askAnswerFound = false;
-
         // Rewind to the last AskAnswer step and move one step forward
-        while (nextStepIndex >= _stepIndex)
+        var askAnswerStepIndex = LastIndexOfAskAnswerStep(_script, _stepIndex, _script.Steps.Count - 2); // -2 because we want to have one step after AskAnswer
+        var askAnswerFound = askAnswerStepIndex != -1;
+
+        var nextStepIndex = askAnswerFound ? askAnswerStepIndex + 1 : _script.Steps.Count;
+
+        if (nextStepIndex <= _stepIndex)
         {
-            var nextStep = _script.Steps[nextStepIndex];
-
-            if (nextStep.Type == StepTypes.AskAnswer)
-            {
-                askAnswerFound = true;
-                break;
-            }
-
-            nextStepIndex--;
+            return;
         }
 
+        _stepIndex = nextStepIndex;
         _contentIndex = 0;
         _areButtonsEnabled = false;
         _isAskingAnswer = false;
 
         if (askAnswerFound)
         {
-            if (nextStepIndex + 1 > _stepIndex)
-            {
-                _stepIndex = nextStepIndex + 1;
-            }
-
             _playHandler.OnAnswerStart();
         }
-        else
+    }
+
+    private static int LastIndexOfAskAnswerStep(Script script, int fromIndex, int toIndex)
+    {
+        var index = toIndex;
+        
+        while (index >= fromIndex)
         {
-            // No AskAnswer step found, move to the end
-            _stepIndex = _script.Steps.Count;
+            var step = script.Steps[index];
+
+            if (step.Type == StepTypes.AskAnswer)
+            {
+                return index;
+            }
+
+            index--;
         }
+
+        return -1;
     }
 }

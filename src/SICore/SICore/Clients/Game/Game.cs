@@ -1704,10 +1704,11 @@ public sealed class Game : MessageHandler
             _gameActions.InformRoundsNames(person);
         }
 
-        if ((ClientData.InformStages & InformStages.RoundContent) > 0)
-        {
-            _gameActions.InformRoundContent(person);
-        }
+        // To save traffic, do not send round content info on reconnection
+        //if ((ClientData.InformStages & InformStages.RoundContent) > 0)
+        //{
+        //    _gameActions.InformRoundContent(person);
+        //}
 
         if ((ClientData.InformStages & InformStages.RoundThemesNames) > 0)
         {
@@ -1777,10 +1778,7 @@ public sealed class Game : MessageHandler
             _gameActions.SendMessage(ClientData.LastVisualMessage, person);
         }
 
-        if (ClientData.TInfo.Pause)
-        {
-            _gameActions.SendMessageToWithArgs(person, Messages.Pause, '+', 0, 0, 0); // TODO: fill time values
-        }
+        _gameActions.SendMessageToWithArgs(person, Messages.Pause, ClientData.TInfo.Pause ? '+' : '-', 0, 0, 0); // TODO: fill time values
 
         if (ClientData.Decision == DecisionType.Appellation)
         {
