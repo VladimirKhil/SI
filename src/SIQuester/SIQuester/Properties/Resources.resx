@@ -1072,7 +1072,7 @@ When there are some questions in theme, they will be used as examples</value>
     <value>Point (on image)</value>
   </data>
   <data name="SetAnswerTypeType_Select" xml:space="preserve">
-    <value>Select from options</value>
+    <value>Selection</value>
   </data>
   <data name="SetAnswerTypeType_Text" xml:space="preserve">
     <value>Text</value>
@@ -1295,5 +1295,11 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="YourThemes" xml:space="preserve">
     <value>Your topics:</value>
+  </data>
+  <data name="AnswerDeviation" xml:space="preserve">
+    <value>Allowed deviation</value>
+  </data>
+  <data name="Deviation" xml:space="preserve">
+    <value>±</value>
   </data>
 </root>

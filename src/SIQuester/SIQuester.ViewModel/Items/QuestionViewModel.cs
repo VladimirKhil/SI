@@ -79,6 +79,35 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         }
     }
 
+    /// <summary>
+    /// Gets the numeric answer view model if the question uses numeric answers.
+    /// </summary>
+    public NumericAnswerViewModel? NumericAnswer
+    {
+        get
+        {
+            if (Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
+                && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Number)
+            {
+                return new NumericAnswerViewModel(this);
+            }
+
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Gets whether this question uses numeric answers.
+    /// </summary>
+    public bool IsNumericAnswer
+    {
+        get
+        {
+            return Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
+                && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Number;
+        }
+    }
+
     public QuestionViewModel(Question question)
         : base(question)
     {
@@ -249,8 +278,11 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerType);
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerDeviation);
 
                 innerChange.Commit();
+                OnPropertyChanged(nameof(IsNumericAnswer));
+                OnPropertyChanged(nameof(NumericAnswer));
                 return;
             }
 
@@ -271,7 +303,24 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                 answerTypeParameter.Model.SimpleValue = answerType;
             }
 
-            if (answerType == StepParameterValues.SetAnswerTypeType_Select)
+            if (answerType == StepParameterValues.SetAnswerTypeType_Number)
+            {
+                // Add numeric deviation parameter with default value 0
+                if (!Parameters.TryGetValue(QuestionParameterNames.AnswerDeviation, out var deviationParameter))
+                {
+                    deviationParameter = new StepParameterViewModel(this, new StepParameter
+                    {
+                        Type = StepParameterTypes.Simple,
+                        SimpleValue = "0"
+                    });
+
+                    Parameters.AddParameter(QuestionParameterNames.AnswerDeviation, deviationParameter);
+                }
+
+                // Remove answer options if they exist
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
+            }
+            else if (answerType == StepParameterValues.SetAnswerTypeType_Select)
             {
                 var options = new StepParameter
                 {
@@ -302,9 +351,20 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                 Right.ClearOneByOne();
                 Right.Add(IndexLabelHelper.GetIndexLabel(0));
                 Wrong.ClearOneByOne();
+
+                // Remove deviation parameter for select type
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerDeviation);
+            }
+            else
+            {
+                // For other answer types, remove both options and deviation
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerDeviation);
             }
 
             change.Commit();
+            OnPropertyChanged(nameof(IsNumericAnswer));
+            OnPropertyChanged(nameof(NumericAnswer));
         }
         catch (Exception exc)
         {

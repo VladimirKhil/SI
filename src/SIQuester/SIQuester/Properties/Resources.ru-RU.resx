@@ -1292,4 +1292,10 @@
   <data name="YourThemes" xml:space="preserve">
     <value>Ваши темы:</value>
   </data>
+  <data name="AnswerDeviation" xml:space="preserve">
+    <value>Допустимое отклонение</value>
+  </data>
+  <data name="Deviation" xml:space="preserve">
+    <value>±</value>
+  </data>
 </root>

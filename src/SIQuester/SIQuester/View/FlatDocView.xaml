@@ -7,6 +7,7 @@
     xmlns:l="clr-namespace:SIQuester"
     xmlns:lc="clr-namespace:SIQuester.Converters"
     xmlns:ls="clr-namespace:SIQuester.Selectors"
+    xmlns:lv="clr-namespace:SIQuester.View"
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:util="clr-namespace:SIQuester.Utilities"
@@ -988,38 +989,57 @@
                                                 <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
                                                 <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
+                                            
+                                            <!-- Hide deviation parameter when showing numeric template -->
+                                            <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerDeviation}">
+                                                <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                                <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
                                         </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <TextBlock
-                                Text="{x:Static lp:Resources.Answer}"
-                                Margin="0,5,0,0"
-                                Padding="0,1" />
+                            <!-- Show numeric answer template for numeric questions -->
+                            <StackPanel x:Name="numericAnswerSection" Visibility="Collapsed">
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.Answer}"
+                                    Margin="0,5,0,0"
+                                    Padding="0,1" />
+                                    
+                                <lv:NumericAnswerTemplate DataContext="{Binding NumericAnswer}" />
+                            </StackPanel>
 
-                            <TextBox
-                                Text="{Binding Right, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
-                                Margin="0,1,0,0"
-                                Padding="0,1"
-                                IsReadOnly="True"
-                                BorderThickness="0"
-                                TextWrapping="Wrap"
-                                VerticalAlignment="Center" />
+                            <!-- Show regular answer fields for non-numeric questions -->
+                            <StackPanel x:Name="regularAnswerSection">
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.Answer}"
+                                    Margin="0,5,0,0"
+                                    Padding="0,1" />
 
-                            <TextBlock
-                                Text="{x:Static lp:Resources.WrongAnswers}"
-                                Margin="0,5,0,0"
-                                Padding="0,1" />
+                                <TextBox
+                                    Text="{Binding Right, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                                    Margin="0,1,0,0"
+                                    Padding="0,1"
+                                    IsReadOnly="True"
+                                    BorderThickness="0"
+                                    TextWrapping="Wrap"
+                                    VerticalAlignment="Center" />
 
-                            <TextBox
-                                Text="{Binding Wrong, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
-                                Margin="0,1,0,0"
-                                Padding="0,1"
-                                IsReadOnly="True"
-                                BorderThickness="0"
-                                TextWrapping="Wrap"
-                                VerticalAlignment="Center" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.WrongAnswers}"
+                                    Margin="0,5,0,0"
+                                    Padding="0,1" />
+
+                                <TextBox
+                                    Text="{Binding Wrong, Converter={StaticResource CollectionConverter}, Mode=OneWay}"
+                                    Margin="0,1,0,0"
+                                    Padding="0,1"
+                                    IsReadOnly="True"
+                                    BorderThickness="0"
+                                    TextWrapping="Wrap"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
 
                             <ContentControl Content="{Binding Info}" ContentTemplate="{StaticResource InfoTemplate}" />
                         </StackPanel>
@@ -1036,6 +1056,12 @@
                         <DataTrigger Binding="{Binding TypeName}" Value="">
                             <Setter TargetName="typeHeader" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        
+                        <!-- Show numeric answer template when IsNumericAnswer is true -->
+                        <DataTrigger Binding="{Binding IsNumericAnswer}" Value="True">
+                            <Setter TargetName="numericAnswerSection" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="regularAnswerSection" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>

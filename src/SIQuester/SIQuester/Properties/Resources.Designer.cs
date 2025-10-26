@@ -268,6 +268,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Allowed deviation.
+        /// </summary>
+        public static string AnswerDeviation {
+            get {
+                return ResourceManager.GetString("AnswerDeviation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Answer:.
         /// </summary>
         public static string AnswerHeader {
@@ -1066,6 +1075,15 @@ namespace SIQuester.Properties {
         public static string Description {
             get {
                 return ResourceManager.GetString("Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на ±.
+        /// </summary>
+        public static string Deviation {
+            get {
+                return ResourceManager.GetString("Deviation", resourceCulture);
             }
         }
         
@@ -2515,6 +2533,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Right answer.
+        /// </summary>
+        public static string RightAnswer {
+            get {
+                return ResourceManager.GetString("RightAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         public static string Round {
@@ -2830,7 +2857,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Select from options.
+        ///   Ищет локализованную строку, похожую на Select.
         /// </summary>
         public static string SetAnswerTypeType_Select {
             get {

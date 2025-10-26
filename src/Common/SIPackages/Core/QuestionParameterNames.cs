@@ -26,6 +26,11 @@ public static class QuestionParameterNames
     public const string Answer = "answer";
 
     /// <summary>
+    /// Represents the possible deviation for numerical answers.
+    /// </summary>
+    public const string AnswerDeviation = "answerDeviation";
+
+    /// <summary>
     /// Question theme.
     /// </summary>
     public const string Theme = "theme";
