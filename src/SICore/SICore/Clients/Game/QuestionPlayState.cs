@@ -99,6 +99,16 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal List<(string, bool)> Appellations { get; } = new();
 
+    /// <summary>
+    /// Gets a value indicating whether the answer is a numeric value.
+    /// </summary>
+    public bool IsNumericAnswer { get; internal set; }
+
+    /// <summary>
+    /// Defines acceptable deviation for numeric answers.
+    /// </summary>
+    public int NumericAnswerDeviation { get; internal set; }
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -116,6 +126,8 @@ internal sealed class QuestionPlayState
         UseButtons = false;
         AppellationState = AppellationState.None;
         Appellations.Clear();
+        IsNumericAnswer = false;
+        NumericAnswerDeviation = 0;
     }
 
     internal void RemovePlayer(int playerIndex)

@@ -23,6 +23,11 @@ public static class Messages
     public const string Answer = "ANSWER";
 
     /// <summary>
+    /// Defines acceptable deviation for number answers.
+    /// </summary>
+    public const string AnswerDeviation = "ANSWER_DEVIATION";
+
+    /// <summary>
     /// Contains all players answers.
     /// </summary>
     public const string Answers = "ANSWERS";
@@ -501,6 +506,11 @@ public static class Messages
     /// Comments for the question (if any).
     /// </summary>
     public const string QuestionComments = "QUESTION_COMMENTS";
+
+    /// <summary>
+    /// Represents a question sequential index in round.
+    /// </summary>
+    public const string QuestionCounter = "QUESTION_COUNTER";
 
     /// <summary>
     /// Question has ended.

@@ -286,4 +286,6 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     }
 
     private void OnMessage(object message) => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions));
+
+    public bool OnNumericAnswerType(int deviation) => false;
 }

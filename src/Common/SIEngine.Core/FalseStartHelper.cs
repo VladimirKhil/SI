@@ -17,7 +17,7 @@ public static class FalseStartHelper
     /// <returns>Index of first step that should allow button press.</returns>
     public static int? GetAskAnswerStartIndex(
         Script script,
-        StepParameters? parameters,
+        StepParameters parameters,
         FalseStartMode falseStartMode)
     {
         if (falseStartMode == FalseStartMode.Enabled)
@@ -48,7 +48,7 @@ public static class FalseStartHelper
     private static int? MoveAskAnswerStepUpper(
         int askAnswerStepIndex,
         Script script,
-        StepParameters? parameters,
+        StepParameters parameters,
         FalseStartMode falseStartMode)
     {
         var j = askAnswerStepIndex - 1;
@@ -73,7 +73,7 @@ public static class FalseStartHelper
 
     private static bool ValidateThatStepIsFalseStartable(
         Step step,
-        StepParameters? parameters,
+        StepParameters parameters,
         FalseStartMode falseStartMode)
     {
         if (step.Type != StepTypes.ShowContent)
@@ -93,7 +93,7 @@ public static class FalseStartHelper
 
             if (refId != null)
             {
-                _ = parameters?.TryGetValue(refId, out content);
+                _ = parameters.TryGetValue(refId, out content);
             }
 
             if (content == null)

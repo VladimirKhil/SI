@@ -23,6 +23,12 @@ public interface IQuestionEnginePlayHandler
     bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence);
 
     /// <summary>
+    /// Notifies about numeric answer type.
+    /// </summary>
+    /// <param name="deviation">Acceptable numeric answer deviation.</param>
+    bool OnNumericAnswerType(int deviation);
+
+    /// <summary>
     /// Shows question content.
     /// </summary>
     /// <param name="content">Question content to display.</param>

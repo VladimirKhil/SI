@@ -3335,6 +3335,21 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             OnDecision();
         }
+        else if (_data.QuestionPlayState.IsNumericAnswer &&
+            int.TryParse(_data.Question?.Right.FirstOrDefault() ?? "", out var rightNumber))
+        {
+            _data.IsWaiting = true;
+            _data.Decision = DecisionType.AnswerValidating;
+
+            var deviation = _data.QuestionPlayState.NumericAnswerDeviation;
+
+            _data.Answerer.AnswerIsRight = int.TryParse(_data.Answerer.Answer, out var playerNumber) && 
+                Math.Abs(playerNumber - rightNumber) <= deviation;
+            
+            _data.Answerer.AnswerValidationFactor = 1.0;
+            _data.ShowmanDecision = true;
+            OnDecision();
+        }
         else
         {
             _data.ShowmanDecision = false;
@@ -3406,7 +3421,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     _data.Players[i].Answer = "";
                     _data.Players[i].Flag = true;
-                    _gameActions.SendMessage(Messages.Answer, _data.Players[i].Name);
+
+                    _gameActions.SendMessageToWithArgs(
+                        _data.Players[i].Name,
+                        Messages.Answer,
+                        _data.QuestionPlayState.IsNumericAnswer ? "number" : "");
                 }
             }
 
@@ -3455,7 +3474,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
             else // The only place where we do not check CanPlayerAct()
             {
-                _gameActions.SendMessage(Messages.Answer, _data.Answerer.Name);
+                _gameActions.SendMessageToWithArgs(
+                    _data.Answerer.Name,
+                    Messages.Answer,
+                    _data.QuestionPlayState.IsNumericAnswer ? "number" : "");
             }
         }
 
@@ -5219,4 +5241,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         return statistic;
     }
+
+    internal void OnNumericAnswer() => _gameActions.InformAnswerDeviation(_data.QuestionPlayState.NumericAnswerDeviation);
 }

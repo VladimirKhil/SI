@@ -184,6 +184,29 @@ public sealed class QuestionEngine : IQuestionEngine
                 case StepTypes.SetAnswerType:
                     var answerType = TryGetParameter(step, StepParameterNames.Type)?.SimpleValue;
 
+                    if (answerType == StepParameterValues.SetAnswerTypeType_Number)
+                    {
+                        var deviation = 0;
+                        
+                        if (_question.Parameters.TryGetValue(
+                            QuestionParameterNames.AnswerDeviation,
+                            out var answerDeviation) &&
+                            answerDeviation.SimpleValue != null)
+                        {
+                            _ = int.TryParse(answerDeviation.SimpleValue, out deviation);
+                        }
+                        
+                        var setNumericAnswerResult = _playHandler.OnNumericAnswerType(deviation);
+                        _stepIndex++;
+                        
+                        if (setNumericAnswerResult)
+                        {
+                            return true;
+                        }
+                        
+                        break;
+                    }
+
                     if (answerType != StepParameterValues.SetAnswerTypeType_Select) // Only "select" type is currently supported
                     {
                         _stepIndex++;
@@ -219,34 +242,31 @@ public sealed class QuestionEngine : IQuestionEngine
 
                     var allTypes = new List<ContentItem[]>();
 
-                    if (_question.Parameters != null)
+                    foreach (var param in _question.Parameters)
                     {
-                        foreach (var param in _question.Parameters)
+                        if (param.Value.ContentValue != null)
                         {
-                            if (param.Value.ContentValue != null)
+                            var types = new List<ContentItem>();
+
+                            foreach (var contentItem in param.Value.ContentValue)
                             {
-                                var types = new List<ContentItem>();
-
-                                foreach (var contentItem in param.Value.ContentValue)
+                                if (contentItem.Placement != ContentPlacements.Screen)
                                 {
-                                    if (contentItem.Placement != ContentPlacements.Screen)
-                                    {
-                                        continue;
-                                    }
-
-                                    types.Add(contentItem);
-
-                                    if (contentItem.WaitForFinish)
-                                    {
-                                        allTypes.Add(types.ToArray());
-                                        types.Clear();
-                                    }
+                                    continue;
                                 }
 
-                                if (types.Count > 0)
+                                types.Add(contentItem);
+
+                                if (contentItem.WaitForFinish)
                                 {
                                     allTypes.Add(types.ToArray());
+                                    types.Clear();
                                 }
+                            }
+
+                            if (types.Count > 0)
+                            {
+                                allTypes.Add(types.ToArray());
                             }
                         }
                     }
@@ -289,7 +309,7 @@ public sealed class QuestionEngine : IQuestionEngine
 
                         if (refId != null)
                         {
-                            _ = _question.Parameters?.TryGetValue(refId, out content);
+                            _ = _question.Parameters.TryGetValue(refId, out content);
                         }
 
                         if (content == null)
@@ -481,7 +501,7 @@ public sealed class QuestionEngine : IQuestionEngine
 
         if (refId != null)
         {
-            _ = _question.Parameters?.TryGetValue(refId, out value);
+            _ = _question.Parameters.TryGetValue(refId, out value);
         }
 
         return value;

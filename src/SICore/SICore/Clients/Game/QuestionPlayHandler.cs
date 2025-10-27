@@ -8,141 +8,124 @@ namespace SICore.Clients.Game;
 /// <inheritdoc cref="IQuestionEnginePlayHandler" />
 internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 {
-    private readonly GameData _gameData;
+    private readonly GameData _state;
+    private GameLogic _controller = null!;
 
-    public GameLogic? GameLogic { get; set; }
+    public GameLogic GameLogic
+    {
+        get => _controller;
+        set => _controller = value;
+    }
 
-    public QuestionPlayHandler(GameData gameData) => _gameData = gameData;
+    public QuestionPlayHandler(GameData state) => _state = state;
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {
-        if (GameLogic == null)
-        {
-            return false;
-        }
+        _state.QuestionPlayState.AnswerOptions = answerOptions;
+        _state.QuestionPlayState.ScreenContentSequence = screenContentSequence;
+        return false;
+    }
 
-        _gameData.QuestionPlayState.AnswerOptions = answerOptions;
-        _gameData.QuestionPlayState.ScreenContentSequence = screenContentSequence;
+    public bool OnNumericAnswerType(int deviation)
+    {
+        _state.QuestionPlayState.IsNumericAnswer = true;
+        _state.QuestionPlayState.NumericAnswerDeviation = deviation;
+        _controller.OnNumericAnswer();
         return false;
     }
 
     public bool OnAccept()
     {
-        GameLogic?.AcceptQuestion();
+        _controller.AcceptQuestion();
         return true;
     }
 
     public void OnAskAnswer(string mode)
     {
-        if (GameLogic == null)
+        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.LayoutShown)
         {
+            _controller.OnAnswerOptions();
+            _state.QuestionPlayState.LayoutShown = true;
+        }
+
+        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.AnswerOptionsShown)
+        {
+            _controller.ShowAnswerOptions(() => OnAskAnswer(mode));
+            _state.QuestionPlayState.AnswerOptionsShown = true;
             return;
         }
 
-        if (_gameData.QuestionPlayState.AnswerOptions != null && !_gameData.QuestionPlayState.LayoutShown)
-        {
-            GameLogic.OnAnswerOptions();
-            _gameData.QuestionPlayState.LayoutShown = true;
-        }
-
-        if (_gameData.QuestionPlayState.AnswerOptions != null && !_gameData.QuestionPlayState.AnswerOptionsShown)
-        {
-            GameLogic.ShowAnswerOptions(() => OnAskAnswer(mode));
-            _gameData.QuestionPlayState.AnswerOptionsShown = true;
-            return;
-        }
-
-        _gameData.IsQuestionFinished = true;
-        _gameData.IsPlayingMedia = false;
-        _gameData.IsPlayingMediaPaused = false;
-        _gameData.AnswerMode = mode;
+        _state.IsQuestionFinished = true;
+        _state.IsPlayingMedia = false;
+        _state.IsPlayingMediaPaused = false;
+        _state.AnswerMode = mode;
 
         switch (mode)
         {
             case StepParameterValues.AskAnswerMode_Button:
-                GameLogic.AskToPress();
+                _controller.AskToPress();
                 break;
 
             case StepParameterValues.AskAnswerMode_Direct:
-                GameLogic.AskDirectAnswer();
+                _controller.AskDirectAnswer();
                 break;
 
             default:
-                GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
+                _controller.ScheduleExecution(Tasks.MoveNext, 1);
                 break;
         }
     }
 
     public void OnAnswerStart()
     {
-        if (GameLogic == null)
-        {
-            return;
-        }
+        _controller.AddHistory("Appellation opened");
 
-        GameLogic.AddHistory("Appellation opened");
-
-        _gameData.QuestionPlayState.IsAnswer = true;
-        _gameData.QuestionPlayState.AppellationState = _gameData.Settings.AppSettings.UseApellations ? AppellationState.Collecting : AppellationState.None;
-        _gameData.IsPlayingMedia = false;
+        _state.QuestionPlayState.IsAnswer = true;
+        _state.QuestionPlayState.AppellationState = _state.Settings.AppSettings.UseApellations ? AppellationState.Collecting : AppellationState.None;
+        _state.IsPlayingMedia = false;
     }
 
     public bool OnButtonPressStart()
     {
-        if (GameLogic == null)
-        {
-            return false;
-        }
-
         // TODO: merge somehow with GameLogic.AskToPress() and OnAskAnswer() for buttons
-        if (_gameData.QuestionPlayState.AnswerOptions != null && !_gameData.QuestionPlayState.LayoutShown)
+        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.LayoutShown)
         {
-            GameLogic.OnAnswerOptions();
-            _gameData.QuestionPlayState.LayoutShown = true;
+            _controller.OnAnswerOptions();
+            _state.QuestionPlayState.LayoutShown = true;
         }
 
-        if (_gameData.QuestionPlayState.AnswerOptions != null && !_gameData.QuestionPlayState.AnswerOptionsShown)
+        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.AnswerOptionsShown)
         {
-            GameLogic.ShowAnswerOptions(null);
-            _gameData.QuestionPlayState.AnswerOptionsShown = true;
+            _controller.ShowAnswerOptions(null);
+            _state.QuestionPlayState.AnswerOptionsShown = true;
             return true;
         }
 
-        _gameData.AnswerMode = StepParameterValues.AskAnswerMode_Button;
-        GameLogic.OnButtonPressStart();
+        _state.AnswerMode = StepParameterValues.AskAnswerMode_Button;
+        _controller.OnButtonPressStart();
         return false;
     }
 
     public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
-        if (GameLogic == null)
+        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.LayoutShown)
         {
-            return;
+            _controller.OnAnswerOptions();
+            _state.QuestionPlayState.LayoutShown = true;
         }
 
-        if (_gameData.QuestionPlayState.AnswerOptions != null && !_gameData.QuestionPlayState.LayoutShown)
+        if (_state.QuestionPlayState.IsAnswer && !_state.QuestionPlayState.IsAnswerSimple && !_state.QuestionPlayState.IsAnswerAnnounced)
         {
-            GameLogic.OnAnswerOptions();
-            _gameData.QuestionPlayState.LayoutShown = true;
-        }
-
-        if (_gameData.QuestionPlayState.IsAnswer && !_gameData.QuestionPlayState.IsAnswerSimple && !_gameData.QuestionPlayState.IsAnswerAnnounced)
-        {
-            GameLogic?.OnComplexAnswer();
-            _gameData.QuestionPlayState.IsAnswerAnnounced = true;
+            _controller.OnComplexAnswer();
+            _state.QuestionPlayState.IsAnswerAnnounced = true;
         }
     }
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
     {
-        if (GameLogic == null)
-        {
-            return;
-        }
-
         if (content.Count == 0)
         {
-            GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
+            _controller.ScheduleExecution(Tasks.MoveNext, 1);
             return;
         }
 
@@ -157,11 +140,6 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     private void OnQuestionComplexContent(IReadOnlyCollection<ContentItem> content)
     {
-        if (GameLogic == null)
-        {
-            return;
-        }
-
         var contentTable = new Dictionary<string, List<ContentItem>>();
 
         foreach (var contentItem in content)
@@ -208,45 +186,40 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
             contentList.Add(contentItem);
         }
 
-        GameLogic.OnComplexContent(contentTable);
+        _controller.OnComplexContent(contentTable);
     }
 
     public void OnQuestionContentItem(ContentItem contentItem)
     {
-        if (GameLogic == null)
-        {
-            return;
-        }
-
         switch (contentItem.Placement)
         {
             case ContentPlacements.Screen:
                 switch (contentItem.Type)
                 {
                     case ContentTypes.Text:
-                        if (_gameData.QuestionPlayState.IsAnswerSimple)
+                        if (_state.QuestionPlayState.IsAnswerSimple)
                         {
-                            GameLogic.OnSimpleAnswer(contentItem.Value);
+                            _controller.OnSimpleAnswer(contentItem.Value);
                             break;
                         }
 
-                        GameLogic.OnContentScreenText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
+                        _controller.OnContentScreenText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
                         break;
 
                     case ContentTypes.Image:
-                        GameLogic.OnContentScreenImage(contentItem);
+                        _controller.OnContentScreenImage(contentItem);
                         break;
 
                     case ContentTypes.Video:
-                        GameLogic.OnContentScreenVideo(contentItem);
+                        _controller.OnContentScreenVideo(contentItem);
                         break;
 
                     case ContentTypes.Html:
-                        GameLogic.OnContentScreenHtml(contentItem);
+                        _controller.OnContentScreenHtml(contentItem);
                         break;
 
                     default:
-                        GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
+                        _controller.ScheduleExecution(Tasks.MoveNext, 1);
                         break;
                 }
                 break;
@@ -254,27 +227,27 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
             case ContentPlacements.Replic:
                 if (contentItem.Type == ContentTypes.Text)
                 {
-                    GameLogic.OnContentReplicText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
+                    _controller.OnContentReplicText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
                 }
                 else
                 {
-                    GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
+                    _controller.ScheduleExecution(Tasks.MoveNext, 1);
                 }
                 break;
 
             case ContentPlacements.Background:
                 if (contentItem.Type == ContentTypes.Audio)
                 {
-                    GameLogic.OnContentBackgroundAudio(contentItem);
+                    _controller.OnContentBackgroundAudio(contentItem);
                 }
                 else
                 {
-                    GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
+                    _controller.ScheduleExecution(Tasks.MoveNext, 1);
                 }
                 break;
 
             default:
-                GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
+                _controller.ScheduleExecution(Tasks.MoveNext, 1);
                 break;
         }
     }
@@ -282,19 +255,14 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
     // TODO: think about merging with GameLogic.InitQuestionState() and QuestionPlayState.Clear()
     public void OnQuestionStart(bool questionRequiresButtons, Action skipQuestionCallback)
     {
-        if (GameLogic == null)
-        {
-            return;
-        }
+        _state.SkipQuestion = skipQuestionCallback;
+        _state.CanMarkQuestion = true;
+        _state.IsDeferringAnswer = false;
+        _state.IsQuestionFinished = false;
+        _state.UseBackgroundAudio = false;
+        _state.QuestionPlayState.UseButtons = questionRequiresButtons;
 
-        _gameData.SkipQuestion = skipQuestionCallback;
-        _gameData.CanMarkQuestion = true;
-        _gameData.IsDeferringAnswer = false;
-        _gameData.IsQuestionFinished = false;
-        _gameData.UseBackgroundAudio = false;
-        _gameData.QuestionPlayState.UseButtons = questionRequiresButtons;
-
-        foreach (var player in _gameData.Players)
+        foreach (var player in _state.Players)
         {
             player.CanPress = questionRequiresButtons; // Always set true if there will be more complex question types
         }
@@ -311,15 +279,15 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         switch (mode)
         {
             case StepParameterValues.SetAnswererMode_ByCurrent:
-                GameLogic?.SetAnswererByActive(select == StepParameterValues.SetAnswererSelect_Any);
+                _controller.SetAnswererByActive(select == StepParameterValues.SetAnswererSelect_Any);
                 return true;
 
             case StepParameterValues.SetAnswererMode_Current:
-                GameLogic?.SetAnswererAsActive();
+                _controller.SetAnswererAsActive();
                 return true;
 
             case StepParameterValues.SetAnswererMode_All:
-                GameLogic?.SetAnswerersAll();
+                _controller.SetAnswerersAll();
                 return true;
 
             case StepParameterValues.SetAnswererMode_Stake:
@@ -329,7 +297,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                         switch (stakeVisibility)
                         {
                             case StepParameterValues.SetAnswererStakeVisibility_Visible:
-                                GameLogic?.SetAnswererByHighestVisibleStake();
+                                _controller.SetAnswererByHighestVisibleStake();
                                 return true;
 
                             default:
@@ -340,7 +308,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                         switch (stakeVisibility)
                         {
                             case StepParameterValues.SetAnswererStakeVisibility_Hidden:
-                                GameLogic?.SetAnswerersByAllHiddenStakes();
+                                _controller.SetAnswerersByAllHiddenStakes();
                                 return true;
 
                             default:
@@ -358,7 +326,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public bool OnAnnouncePrice(NumberSet availableRange)
     {
-        GameLogic?.OnAnnouncePrice(availableRange);
+        _controller.OnAnnouncePrice(availableRange);
         return true;
     }
 
@@ -372,11 +340,11 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                     return false;
                 }
 
-                GameLogic?.OnSelectPrice(availableRange);
+                _controller.OnSelectPrice(availableRange);
                 return true;
 
             case StepParameterValues.SetPriceMode_Multiply:
-                GameLogic?.OnMultiplyPrice();
+                _controller.OnMultiplyPrice();
                 return true;
 
             default:
@@ -386,20 +354,15 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public bool OnSetTheme(string themeName)
     {
-        GameLogic?.OnSetTheme(themeName);
+        _controller.OnSetTheme(themeName);
         return true;
     }
 
-    public void OnSimpleRightAnswerStart() => _gameData.QuestionPlayState.IsAnswerSimple = true;
+    public void OnSimpleRightAnswerStart() => _state.QuestionPlayState.IsAnswerSimple = true;
 
     public bool OnRightAnswerOption(string rightOptionLabel)
     {
-        if (GameLogic == null)
-        {
-            return false;
-        }
-
-        GameLogic.OnRightAnswerOption(rightOptionLabel);
+        _controller.OnRightAnswerOption(rightOptionLabel);
         return true;
     }
 }

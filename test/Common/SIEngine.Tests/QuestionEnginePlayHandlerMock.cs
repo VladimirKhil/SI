@@ -66,4 +66,9 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
     }
 
     public bool OnRightAnswerOption(string rightOptionLabel) => false;
+
+    public bool OnNumericAnswerType(int deviation)
+    {
+        throw new NotImplementedException();
+    }
 }

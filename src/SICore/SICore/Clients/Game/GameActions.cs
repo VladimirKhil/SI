@@ -408,4 +408,10 @@ public sealed class GameActions
         SendMessageToWithArgs(person, Messages.TextShape, shape);
         SendMessageToWithArgs(person, Messages.ContentShape, ContentPlacements.Screen, 0, ContentTypes.Text, shape.EscapeNewLines());
     }
+
+    internal void InformQuestionCounter(int questionIndex, string person = NetworkConstants.Everybody) =>
+        SendMessageToWithArgs(person, Messages.QuestionCounter, questionIndex);
+
+    internal void InformAnswerDeviation(int deviation, string person = NetworkConstants.Everybody) =>
+        SendMessageToWithArgs(person, Messages.AnswerDeviation, deviation);
 }

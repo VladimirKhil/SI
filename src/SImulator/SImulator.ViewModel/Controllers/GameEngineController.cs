@@ -463,4 +463,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     public void OnPackageEnd() => GameViewModel?.OnEndGame();
 
     public void OnGameThemes(IEnumerable<string> themes) => GameViewModel?.OnGameThemes(themes);
+
+    public bool OnNumericAnswerType(int deviation) => false;
 }
