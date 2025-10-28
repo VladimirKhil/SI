@@ -118,6 +118,8 @@ public partial class App : Application
                 Name = SImulator.Properties.Resources.TestPackage,
                 ContentUri = new Uri("https://vladimirkhil.com/sistorage/packages/d8faa1a4-2a6f-4103-b298-fd15c6ee3ea6.siq")
             });
+
+        Settings.ScreenNumber = 1;
 #else
         ProcessAsync();
 #endif

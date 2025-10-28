@@ -1,5 +1,6 @@
 ﻿using SICore.Models;
 using SIData;
+using SIEngine.Rules;
 
 namespace SICore;
 
@@ -16,14 +17,15 @@ public interface IPersonController
     void ReceiveText(Message m);
 
     /// <summary>
-    /// Новое состояние игры
+    /// Handles game stage change.
     /// </summary>
-    void Stage();
+    void OnStage(GameStage stage, string stageName, QuestionSelectionStrategyType? questionSelectionStrategyType) { }
 
     /// <summary>
     /// Game themes received.
     /// </summary>
-    void GameThemes() { }
+    /// <param name="themes">Game themes.</param>
+    void OnGameThemes(IEnumerable<string> themes) { }
 
     /// <summary>
     /// Handles round themes.
@@ -278,9 +280,17 @@ public interface IPersonController
 
     void OnThemeInfo(string themeName) { }
 
+    void OnPackageAuthors(IEnumerable<string> authors) { }
+
+    void OnPackageSources(IEnumerable<string> sources) { }
+
+    void OnPackageComments(string comments) { }
+
     void OnQuestionAuthors(IEnumerable<string> authors) { }
 
     void OnQuestionSources(IEnumerable<string> sources) { }
 
     void OnShowmanReplic(int messageIndex, MessageCode messageCode) { }
+
+    void OnPackage(string packageName, string? logiUri) { }
 }

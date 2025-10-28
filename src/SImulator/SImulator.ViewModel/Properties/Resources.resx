@@ -180,6 +180,12 @@
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Error opening license folder: {0}</value>
   </data>
+  <data name="PackageAuthors" xml:space="preserve">
+    <value>Package authors</value>
+  </data>
+  <data name="PackageComments" xml:space="preserve">
+    <value>Package comments</value>
+  </data>
   <data name="PackagePreparationError" xml:space="preserve">
     <value>Package preparation error</value>
   </data>

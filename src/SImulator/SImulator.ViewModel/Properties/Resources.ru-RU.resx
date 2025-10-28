@@ -180,6 +180,12 @@
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Ошибка при открытии папки лицензий: {0}</value>
   </data>
+  <data name="PackageAuthors" xml:space="preserve">
+    <value>Авторы пакета</value>
+  </data>
+  <data name="PackageComments" xml:space="preserve">
+    <value>Комментарии пакета</value>
+  </data>
   <data name="PackagePreparationError" xml:space="preserve">
     <value>Ошибка подготовки пакета</value>
   </data>

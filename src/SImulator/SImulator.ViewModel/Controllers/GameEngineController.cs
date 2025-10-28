@@ -404,7 +404,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
     {
-        GameViewModel.OnRound(round, strategyType);
+        GameViewModel.OnRound(round.Name, strategyType);
 
         if (round.Type == RoundTypes.Standart)
         {
@@ -458,7 +458,14 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool OnQuestionEnd() => GameViewModel == null || GameViewModel.OnQuestionEnd();
 
-    public void OnPackage(Package package) => GameViewModel?.OnPackage(package);
+    public void OnPackage(Package package)
+    {
+        var logo = package.LogoItem;
+        var media = logo != null ? _mediaProvider.TryGetMedia(logo) : null;
+
+        GameViewModel?.OnPackage(package.Name, media);
+        GameViewModel?.OnRoundNames(package.Rounds.Select(r => r.Name).ToArray());
+    }
 
     public void OnPackageEnd() => GameViewModel?.OnEndGame();
 

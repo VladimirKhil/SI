@@ -1,5 +1,8 @@
 ﻿using SICore;
 using SIData;
+using SIEngine.Rules;
+using SImulator.ViewModel.Properties;
+using SIPackages.Core;
 
 namespace SImulator.ViewModel.Controllers;
 
@@ -46,6 +49,8 @@ internal sealed class GameController : IPersonController
         throw new NotImplementedException();
     }
 
+    public void OnGameThemes(IEnumerable<string> themes) => GameViewModel.OnGameThemes(themes);
+
     public void IsRight(string name, bool voteForRight, string answer)
     {
         throw new NotImplementedException();
@@ -58,7 +63,7 @@ internal sealed class GameController : IPersonController
 
     public void OnPauseChanged(bool isPaused)
     {
-        throw new NotImplementedException();
+
     }
 
     public void OnPersonApellated(int playerIndex)
@@ -94,6 +99,17 @@ internal sealed class GameController : IPersonController
         }
     }
 
+    public void OnPackageAuthors(IEnumerable<string> authors) =>
+        GameViewModel.ShowmanReplic = $"{Resources.PackageAuthors}: {string.Join(", ", authors)}";
+
+    public void OnPackage(string packageName, string? logoUri)
+    {
+        MediaInfo? packageLogo = logoUri != null ? new MediaInfo(logoUri) : null;
+        GameViewModel.OnPackage(packageName, packageLogo);
+    }
+
+    public void OnPackageComments(string comments) => GameViewModel.ShowmanReplic = $"{Resources.PackageComments}: {comments}";
+    
     public void OnRightAnswer(string answer)
     {
         throw new NotImplementedException();
@@ -116,7 +132,10 @@ internal sealed class GameController : IPersonController
 
     public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string? person = null)
     {
-        GameViewModel.RoundTimeMax = int.Parse(arg);
+        if (timerIndex == 1 && timerCommand == "MAXTIME" && int.TryParse(arg, out var maxTime))
+        {
+            GameViewModel.RoundTimeMax = maxTime;
+        }
     }
 
     public void Out(int themeIndex)
@@ -154,7 +173,15 @@ internal sealed class GameController : IPersonController
 
     }
 
-    public void Stage() => _viewerActions.Move();
+    public void OnStage(GameStage stage, string roundName, QuestionSelectionStrategyType? questionSelectionStrategyType)
+    {
+        if (stage != GameStage.Round || questionSelectionStrategyType == null)
+        {
+            return;
+        }
+
+        GameViewModel.OnRound(roundName, questionSelectionStrategyType.Value);
+    }
 
     public void StopRound()
     {

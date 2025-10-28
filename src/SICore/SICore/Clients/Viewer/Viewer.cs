@@ -5,6 +5,7 @@ using SICore.Network.Clients;
 using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
 using SIData;
+using SIEngine.Rules;
 using SIPackages.Core;
 using SIUI.Model;
 using System.Text;
@@ -134,6 +135,22 @@ public class Viewer : MessageHandler, IViewerClient
                         break;
                     }
 
+                case Messages.PackageAuthors:
+                    _controller.OnPackageAuthors(mparams.Skip(1));
+                    break;
+
+                case Messages.Package:
+                    OnPackage(mparams);
+                    break;
+
+                case Messages.PackageSources:
+                    _controller.OnPackageSources(mparams.Skip(1));
+                    break;
+
+                case Messages.PackageComments:
+                    OnPackageComments(mparams);
+                    break;
+
                 case Messages.Replic:
                     OnReplic(mparams);
                     break;
@@ -231,19 +248,8 @@ public class Viewer : MessageHandler, IViewerClient
                     }
 
                 case Messages.GameThemes:
-                    {
-                        #region GameThemes
-
-                        for (var i = 1; i < mparams.Length; i++)
-                        {
-                            ClientData.TInfo.GameThemes.Add(mparams[i]);
-                        }
-
-                        _controller.GameThemes();
-
-                        #endregion
-                        break;
-                    }
+                    OnGameThemes(mparams);
+                    break;
 
                 case Messages.RoundThemes2:
                     OnRoundThemes(mparams);
@@ -508,6 +514,38 @@ public class Viewer : MessageHandler, IViewerClient
         }
     }
 
+    private void OnGameThemes(string[] mparams)
+    {
+        for (var i = 1; i < mparams.Length; i++)
+        {
+            ClientData.TInfo.GameThemes.Add(mparams[i]);
+        }
+
+        _controller.OnGameThemes(ClientData.TInfo.GameThemes);
+    }
+
+    private void OnPackageComments(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        _controller.OnPackageComments(mparams[1].UnescapeNewLines());
+    }
+
+    private void OnPackage(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        var logoUri = mparams.Length > 3 ? mparams[3] : null;
+
+        _controller.OnPackage(mparams[1], logoUri);
+    }
+
     private void OnTable(string[] mparams)
     {
         // TODO: clear existing table and renew it
@@ -666,7 +704,10 @@ public class Viewer : MessageHandler, IViewerClient
                     break;
             }
 
-            _controller.Stage();
+            _controller.OnStage(
+                ClientData.Stage,
+                mparams.Length > 2 ? mparams[2] : "",
+                mparams.Length > 4 ? Enum.Parse<QuestionSelectionStrategyType>(mparams[4]) : null);
         }
     }
 

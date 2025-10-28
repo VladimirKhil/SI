@@ -118,11 +118,6 @@ internal class ViewerComputerLogic : IPersonController
         // Do nothing
     }
 
-    public void Stage()
-    {
-        // Do nothing
-    }
-
     public void RoundThemes(bool print)
     {
         // Do nothing

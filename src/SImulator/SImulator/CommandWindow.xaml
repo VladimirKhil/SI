@@ -454,7 +454,7 @@
 
                     <DataTemplate x:Key="{x:Static uim:TableStage.Round}">
                         <TextBlock
-                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1}, Path=DataContext.Game.ActiveRound.Name}"
+                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1}, Path=DataContext.Game.ActiveRoundName}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center" />
                     </DataTemplate>
@@ -1046,10 +1046,15 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <TabControl TabStripPlacement="Left" Background="White" BorderThickness="1,0,0,0" Padding="6,4,4,4" Margin="-2,0,0,0">
+    <TabControl
+        SelectedIndex="{Binding SelectedIndex}"
+        TabStripPlacement="Left"
+        Background="White"
+        BorderThickness="1,0,0,0"
+        Padding="6,4,4,4"
+        Margin="-2,0,0,0">
         <TabItem
             Header="{x:Static lp:Resources.Start}"
-            IsSelected="True"
             Visibility="{Binding Mode, Converter={StaticResource StartView}}">
             <Grid Margin="2,2,0,0">
                 <Grid.RowDefinitions>
@@ -1216,7 +1221,6 @@
 
         <TabItem
             Header="{x:Static lp:Resources.Game}"
-            IsSelected="{Binding Mode, Converter={StaticResource IsModerator}, Mode=OneWay}"
             Visibility="{Binding Mode, Converter={StaticResource ModeratorView}}"
             Content="{Binding}"
             ContentTemplate="{StaticResource Game}" />
@@ -1598,6 +1602,7 @@
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
                     <CheckBox Margin="5,5,0,0" IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
+                    <CheckBox Margin="5,5,0,0" IsChecked="{Binding UseSIGameEngine}" Content="{x:Static lp:Resources.UseSIGameEngine}" />
                 </UniformGrid>
                 
                 <Expander

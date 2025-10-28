@@ -314,9 +314,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         set { _thinkingTimeMax = value; OnPropertyChanged(); }
     }
 
-    private Round? _activeRound;
+    private string _activeRoundName = "";
 
-    public Round ActiveRound => _activeRound ?? throw new InvalidOperationException("Active round is undefined");
+    public string ActiveRoundName
+    {
+        get => _activeRoundName;
+        set { _activeRoundName = value; OnPropertyChanged(); }
+    }
 
     private Question? _activeQuestion;
 
@@ -500,7 +504,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private bool _isAllIn = false;
 
-    private IReadOnlyList<Theme>? _roundThemes;
+    private IReadOnlyList<Theme> _roundThemes = Array.Empty<Theme>();
 
     private bool _managedMode;
 
@@ -1437,7 +1441,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                     typeName,
                     Resources.StakeQuestion.ToUpper(),
                     Settings.Model.SpecialsAliases.StakeQuestionAlias,
-                    ActiveTheme != null ? ActiveRound.Themes.IndexOf(ActiveTheme) : -1);
+                    -1);
                 
                 break;
 
@@ -1471,9 +1475,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LocalInfo.TStage = TableStage.Special;
     }
 
-    internal void OnPackage(Package package)
+    internal void OnPackage(string packageName, MediaInfo? packageLogo)
     {
-        _gameLogger.Write("Package: {0}", package.Name);
+        _gameLogger.Write("Package: {0}", packageName);
         
         var videoUrl = Settings.Model.VideoUrl;
         var imageUrl = Settings.SIUISettings.Model.LogoUri;
@@ -1490,17 +1494,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         else
         {
-            var logo = package.LogoItem;
-            var media = logo != null ? _mediaProvider.TryGetMedia(logo) : null;
-
-            PresentationController.OnPackage(package.Name, media);
+            PresentationController.OnPackage(packageName, packageLogo);
         }
 
         LocalInfo.TStage = TableStage.Sign;
         _buttonManager?.TryGetCommandExecutor()?.OnStage("Begin");
-
-        _rounds = package.Rounds;
     }
+
+    internal void OnRoundNames(string[] roundNames) => _roundNames = roundNames;
 
     internal void OnGameThemes(IEnumerable<string> themes)
     {
@@ -1508,19 +1509,18 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LocalInfo.TStage = TableStage.GameThemes;
     }
 
-    internal void OnRound(Round round, QuestionSelectionStrategyType selectionStrategyType)
+    internal void OnRound(string roundName, QuestionSelectionStrategyType selectionStrategyType)
     {
-        _activeRound = round;
-        OnPropertyChanged(nameof(ActiveRound));
+        ActiveRoundName = roundName;
 
-        PresentationController.SetRound(round.Name, selectionStrategyType);
+        PresentationController.SetRound(roundName, selectionStrategyType);
         LocalInfo.TStage = TableStage.Round;
 
-        var roundIndex = _rounds.IndexOf(round);
+        var roundIndex = Array.IndexOf(_roundNames, roundName);
         _previousRound.CanBeExecuted = roundIndex > 0;
-        _nextRound.CanBeExecuted = roundIndex < _rounds.Count - 1;
+        _nextRound.CanBeExecuted = roundIndex < _roundNames.Length - 1;
 
-        _gameLogger.Write("\r\n{0} {1}", Resources.Round, round.Name);
+        _gameLogger.Write("\r\n{0} {1}", Resources.Round, roundName);
     }
 
     public void OnRoundThemes(IReadOnlyList<Theme> roundThemes) => UI.Execute(() =>
@@ -1692,6 +1692,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal void OnFinalThemes(IReadOnlyList<Theme> finalThemes) => UI.Execute(() =>
     {
+        _roundThemes = finalThemes.ToArray(); // Make a copy to avoid issues later
         LocalInfo.RoundInfo.Clear();
 
         foreach (var theme in finalThemes)
@@ -1823,7 +1824,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal void OnThemeSelected(int themeIndex, int questionIndex)
     {
-        var theme = ActiveRound.Themes[themeIndex];
+        var theme = _roundThemes[themeIndex];
 
         ActiveTheme = theme;
         ActiveQuestion = theme.Questions[questionIndex];
@@ -1870,7 +1871,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private string? _currentTheme;
 
-    private List<Round> _rounds = new List<Round>();
+    private string[] _roundNames = Array.Empty<string>();
 
     public string? CurrentTheme
     {
@@ -1899,11 +1900,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         try
         {
-            if (_roundThemes == null)
-            {
-                throw new InvalidOperationException("_roundThemes == null");
-            }
-
             _answeringHistory.Push(null);
 
             ActiveTheme = _roundThemes[themeIndex];
@@ -2253,15 +2249,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (availableRange.Maximum == availableRange.Minimum && availableRange.Minimum == 0)
         {
             // Minimum or maximum in round
-            if (_activeRound == null || _activeRound.Themes.Max(t => t.Questions.Count) == 0)
+            if (LocalInfo.RoundInfo.Max(t => t.Questions.Count) == 0)
             {
                 return false;
             }
 
-            var minimum = _activeRound.Themes[0].Questions[0].Price;
+            var minimum = LocalInfo.RoundInfo[0].Questions[0].Price;
             var maximum = 0;
 
-            foreach (var theme in _activeRound.Themes)
+            foreach (var theme in LocalInfo.RoundInfo)
             {
                 foreach (var question in theme.Questions)
                 {

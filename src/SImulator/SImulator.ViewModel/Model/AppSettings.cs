@@ -755,6 +755,25 @@ public sealed class AppSettings : INotifyPropertyChanged
 
     public SpecialsAliases SpecialsAliases { get; set; } = new SpecialsAliases();
 
+    private bool _useSIGameEngine = true;
+
+    /// <summary>
+    /// Use SIGame engine for game creation.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool UseSIGameEngine
+    {
+        get => _useSIGameEngine;
+        set
+        {
+            if (_useSIGameEngine != value)
+            {
+                _useSIGameEngine = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     #endregion
 
     public void Save(Stream stream, XmlSerializer? serializer = null)

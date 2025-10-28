@@ -709,4 +709,7 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="QuestionPrice" xml:space="preserve">
     <value>Цена вопроса</value>
   </data>
+  <data name="UseSIGameEngine" xml:space="preserve">
+    <value>Использовать движок SIGame</value>
+  </data>
 </root>

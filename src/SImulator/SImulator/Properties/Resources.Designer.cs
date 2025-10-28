@@ -1720,6 +1720,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Use SIGame engine.
+        /// </summary>
+        public static string UseSIGameEngine {
+            get {
+                return ResourceManager.GetString("UseSIGameEngine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Version.
         /// </summary>
         public static string Version {

@@ -708,4 +708,7 @@ To play, you need to organize a local network.</value>
   <data name="QuestionPrice" xml:space="preserve">
     <value>Question price</value>
   </data>
+  <data name="UseSIGameEngine" xml:space="preserve">
+    <value>Use SIGame engine</value>
+  </data>
 </root>

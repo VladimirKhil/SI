@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Notions;
 using SICore.Clients.Viewer;
 using SIData;
+using SIEngine.Rules;
 using SIGame;
 using SIGame.ViewModel;
 using SIGame.ViewModel.Contracts;
@@ -447,9 +448,9 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     private void OnError(Exception exc) => PlatformManager.Instance.ShowMessage(exc.ToString(), MessageType.Error, true);
 
-    public void Stage()
+    public void OnStage(GameStage stage, string stageName, QuestionSelectionStrategyType? questionSelectionStrategyType)
     {
-        switch (_data.Stage)
+        switch (stage)
         {
             case GameStage.Before:
                 break;
@@ -544,14 +545,14 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             OnError);
     }
 
-    public void GameThemes()
+    public void OnGameThemes(IEnumerable<string> themes)
     {
         TInfo.TStage = TableStage.GameThemes;
         _gameViewModel.EnableMediaLoadButton = false;
 
-        for (var i = 0; i < _data.TInfo.GameThemes.Count; i++)
+        foreach (var theme in themes)
         {
-            OnReplic(ReplicCodes.System.ToString(), _data.TInfo.GameThemes[i]);
+            OnReplic(ReplicCodes.System.ToString(), theme);
         }
     }
 

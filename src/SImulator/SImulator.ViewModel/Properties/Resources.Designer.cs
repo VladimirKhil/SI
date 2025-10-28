@@ -250,6 +250,33 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Question package.
+        /// </summary>
+        public static string Package {
+            get {
+                return ResourceManager.GetString("Package", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Package authors.
+        /// </summary>
+        public static string PackageAuthors {
+            get {
+                return ResourceManager.GetString("PackageAuthors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Package comments.
+        /// </summary>
+        public static string PackageComments {
+            get {
+                return ResourceManager.GetString("PackageComments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Package preparation error.
         /// </summary>
         public static string PackagePreparationError {

@@ -1,5 +1,4 @@
 ﻿using SICore;
-using SICore.Contracts;
 using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
@@ -18,7 +17,6 @@ using SImulator.ViewModel.Services;
 using SIPackages;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
@@ -163,6 +161,22 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             if (_mode != value)
             {
                 _mode = value;
+                OnPropertyChanged();
+                OnModeChanged();
+            }
+        }
+    }
+
+    private int _selectedIndex;
+
+    public int SelectedIndex
+    {
+        get => _selectedIndex;
+        set
+        {
+            if (_selectedIndex != value)
+            {
+                _selectedIndex = value;
                 OnPropertyChanged();
                 OnModeChanged();
             }
@@ -440,7 +454,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             presentationController.Error += ShowError;
 
-            var game = await CreateGameAsync(presentationController, presentationListener);
+            var game = Settings.UseSIGameEngine 
+                ? await CreateGameNewAsync(presentationController, presentationListener)
+                : await CreateGameAsync(presentationController, presentationListener);
 
             Game = game;
 
@@ -462,6 +478,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             }
 
             Mode = GameMode.Moderator;
+            SelectedIndex = 1;
         }
         catch (Exception exc)
         {
@@ -647,9 +664,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             mediaProvider,
             presentationListener,
             presentationController,
-            gameLogger);
-
-        game.RoundTimeMax = Settings.RoundTime;
+            gameLogger)
+        {
+            RoundTimeMax = Settings.RoundTime
+        };
 
         gameEngineController.GameViewModel = game;
 
@@ -698,6 +716,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         Mode = GameMode.Start;
+        SelectedIndex = 0;
     }
 
     private async void SelectPackage_Executed(object? arg)
