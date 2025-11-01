@@ -26,6 +26,9 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     private bool? _optionsShown = null;
 
+    private bool _isAnswer = false;
+    private bool _isAnswerSimple = false;
+
     public GameEngineController(IMediaProvider mediaProvider) => _mediaProvider = mediaProvider;
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
@@ -167,6 +170,11 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             }).ToList();
         }
 
+        if (_isAnswerSimple)
+        {
+            PresentationController.OnSimpleRightAnswer(content.First().Value);
+        }
+
         var hasMedia = PresentationController.OnQuestionContent(content, TryGetMediaUri, textToShow);
 
         if (hasMedia)
@@ -236,11 +244,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool OnSetPrice(string mode, NumberSet? availableRange)
     {
-        if (GameViewModel == null)
-        {
-            return false;
-        }
-
         switch (mode)
         {
             case StepParameterValues.SetPriceMode_Select:
@@ -271,11 +274,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool OnSetTheme(string themeName)
     {
-        if (GameViewModel != null)
-        {
-            GameViewModel.CurrentTheme = themeName;
-        }
-        
+        GameViewModel.CurrentTheme = themeName;
         return false;
     }
 
@@ -287,11 +286,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnQuestionStart(bool buttonsRequired, Action skipQuestionCallback)
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
-
         GameViewModel.OnQuestionStart();
 
         if (buttonsRequired)
@@ -300,15 +294,14 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
 
         _optionsShown = null;
+        _isAnswerSimple = false;
+        _isAnswer = false;
         PresentationController.OnQuestionStart();
     }
 
     public void OnAnswerStart()
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
+        _isAnswer = true;
 
         GameViewModel.State = QuestionState.Normal;
         GameViewModel.OnRightAnswer();
@@ -317,13 +310,14 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
-
         GameViewModel.OnContentStart();
         PresentationController.OnContentStart();
+
+        if (_isAnswer && !_isAnswerSimple)
+        {
+            PresentationController.OnComplexRightAnswer(GameViewModel.ActiveQuestion?.Right.FirstOrDefault() ?? "");
+            _isAnswer = false;
+        }
 
         GameViewModel.ContentItems = contentItems;
         GameViewModel.ActiveMediaCommand = null;
@@ -333,22 +327,13 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnSimpleRightAnswerStart()
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
-
+        _isAnswerSimple = true;
         PresentationController.SetSimpleAnswer();
         GameViewModel.OnRightAnswer();
     }
 
     public bool OnRightAnswerOption(string rightOptionLabel)
     {
-        if (GameViewModel == null)
-        {
-            return false;
-        }
-
         PresentationController.SetQuestionSound(false);
         PresentationController.SetSound();
         GameViewModel.OnRightAnswer();

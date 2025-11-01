@@ -106,13 +106,11 @@ public interface IPersonController
     void OnAd(string? text = null) { }
 
     /// <summary>
-    /// Обновление изображения
+    /// Updates account avatar.
     /// </summary>
-    /// <param name="i"></param>
-    /// <param name="path"></param>
+    /// <param name="account">Account to update.</param>
+    /// <param name="path">Avatar path.</param>
     void UpdatePicture(Account account, string path);
-
-    void OnTextSpeed(double speed);
 
     void SetText(string text, bool animate = false, TableStage stage = TableStage.Round) { }
 

@@ -1355,8 +1355,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     internal void OnQuestion(Question question)
     {
         ActiveQuestion = question;
-
-        PresentationController.SetCurrentThemeAndQuestion(ActiveTheme, ActiveQuestion);
         PresentationController.SetQuestionPrice(question.Price);
 
         CurrentTheme = ActiveTheme?.Name;
@@ -1828,7 +1826,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         ActiveTheme = theme;
         ActiveQuestion = theme.Questions[questionIndex];
-        PresentationController.SetCurrentThemeAndQuestion(ActiveTheme, ActiveQuestion);
 
         PresentationController.SetTheme(theme.Name);
         PresentationController.SetSound();
@@ -1912,7 +1909,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             _gameLogger.Write("\r\n{0}, {1}", CurrentTheme, Price);
 
             SetSound(Settings.Model.Sounds.QuestionSelected);
-            PresentationController.SetCurrentThemeAndQuestion(ActiveTheme, ActiveQuestion);
             PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
             _gameActions.MoveNext(1700);
 
@@ -2280,14 +2276,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         return true;
     }
 
-    internal void OnSetMultiplyPrice()
+    internal void OnSetMultiplyPrice(int factor = 2)
     {
         if (_activeQuestion == null)
         {
             return;
         }
 
-        Price = _activeQuestion.Price * 2;
+        Price = _activeQuestion.Price * factor;
         NegativePrice = 0;
     }
 

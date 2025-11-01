@@ -19,6 +19,8 @@ internal sealed class GameController : IPersonController
 
     public bool CanSwitchType => false;
 
+    public void OnThemeComments(string comments) => GameViewModel.PresentationController.OnThemeComments(comments);
+
     public void OnQuestionSelected(int themeIndex, int questionIndex)
     {
         throw new NotImplementedException();
@@ -110,15 +112,9 @@ internal sealed class GameController : IPersonController
 
     public void OnPackageComments(string comments) => GameViewModel.ShowmanReplic = $"{Resources.PackageComments}: {comments}";
     
-    public void OnRightAnswer(string answer)
-    {
-        throw new NotImplementedException();
-    }
+    public void OnRightAnswer(string answer) => GameViewModel.PresentationController.OnSimpleRightAnswer(answer);
 
-    public void OnTextSpeed(double speed)
-    {
-        throw new NotImplementedException();
-    }
+    public void OnRightAnswerStart(string answer) => GameViewModel.PresentationController.OnComplexRightAnswer(answer);
 
     public void OnTheme(string themeName, int questionCount, bool animate)
     {

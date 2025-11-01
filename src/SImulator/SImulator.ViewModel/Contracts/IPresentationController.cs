@@ -47,15 +47,17 @@ public interface IPresentationController : IDisposable
 
     void SetQuestionPrice(int questionPrice);
 
-    void SetCurrentThemeAndQuestion(Theme? activeTheme, Question activeQuestion) { }
-
     void SetText(string text = "");
 
     void SetQuestionContentType(QuestionContentType questionContentType);
 
     void SetQuestionStyle(QuestionStyle questionStyle) { }
 
-    void OnContentStart();
+    void OnContentStart() { }
+
+    void OnSimpleRightAnswer(string answer) { }
+
+    void OnComplexRightAnswer(string answer) { }
 
     void SetQuestionSound(bool sound);
 
@@ -123,7 +125,9 @@ public interface IPresentationController : IDisposable
     /// <param name="state">Answer state.</param>
     void SetAnswerState(int answerIndex, ItemState state);
 
-    void OnQuestionStart();
+    void OnThemeComments(string comments) { }
+
+    void OnQuestionStart() { }
 
     void BeginPressButton();
 
@@ -146,7 +150,7 @@ public interface IPresentationController : IDisposable
 
     void SetSimpleAnswer() { }
 
-    void OnAnswerStart();
+    void OnAnswerStart() { }
 
     void ClearState();
 

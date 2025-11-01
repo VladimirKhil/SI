@@ -28,9 +28,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     private Action? _onLoad;
 
-    private bool _isAnswer = false;
-    private bool _isAnswerSimple = false;
-
     public Uri Source { get; } = new($"file:///{AppDomain.CurrentDomain.BaseDirectory}webtable/index.html");
 
     public Action<int, int>? SelectionCallback { get; set; }
@@ -44,8 +41,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private ItemViewModel[]? _answerOptions;
 
     private int _playerCount;
-    private Theme? _theme;
-    private Question? _question;
     private readonly SoundsSettings _soundsSettings;
 
     public bool CanControlMedia => false;
@@ -97,20 +92,11 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void ClearPlayersState() { }
 
-    public void OnQuestionStart()
+    public void OnThemeComments(string comments) => SendMessage(new
     {
-        _isAnswerSimple = false;
-        _isAnswer = false;
-
-        if (_theme != null && _theme.Info.Comments.Text.Length > 0)
-        {
-            SendMessage(new
-            {
-                Type = "themeComments",
-                ThemeComments = _theme.Info.Comments.Text
-            });
-        }
-    }
+        Type = "themeComments",
+        ThemeComments = comments
+    });
 
     public void RunPlayerTimer(int playerIndex, int maxTime) => SendMessage(new
     {
@@ -465,31 +451,17 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         ThemeName = themeName
     });
 
-    public void SetCurrentThemeAndQuestion(Theme? activeTheme, Question activeQuestion) 
-    {
-        _theme = activeTheme;
-        _question = activeQuestion;
-    }
-
     public void SetQuestionPrice(int questionPrice) => SendMessage(new
     {
         Type = "question",
         QuestionPrice = questionPrice
     });
 
-    public void OnContentStart()
+    public void OnComplexRightAnswer(string answer) => SendMessage(new
     {
-        if (_isAnswer && !_isAnswerSimple)
-        {
-            SendMessage(new
-            {
-                Type = "rightAnswerStart",
-                Answer = _question?.Right.FirstOrDefault()
-            });
-
-            _isAnswer = false;
-        }
-    }
+        Type = "rightAnswerStart",
+        Answer = answer
+    });
 
     public bool OnQuestionContent(IReadOnlyCollection<ContentItem> content, Func<ContentItem, string?> tryGetMediaUri, string? textToShow)
     {
@@ -513,18 +485,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                     switch (contentItem.Type)
                     {
                         case ContentTypes.Text:
-                            if (_isAnswerSimple)
-                            {
-                                SendMessage(new
-                                {
-                                    Type = "rightAnswer",
-                                    Answer = contentItem.Value
-                                });
-
-                                break;
-                            }
-
-
                             screenContent.Add(new ContentInfo(ContentType.Text, contentItem.Value));
                             break;
 
@@ -577,6 +537,12 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         return hasMedia;
     }
 
+    public void OnSimpleRightAnswer(string answer) => SendMessage(new
+    {
+        Type = "rightAnswer",
+        Answer = answer
+    });
+
     public void SetQuestionType(string typeName, string aliasName, int activeThemeIndex) => SendMessage(new
     {
         Type = "questionType",
@@ -607,10 +573,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         IsPaused = pause,
         CurrentTime = new int[] { 0, passedTime, 0 }
     });
-
-    public void SetSimpleAnswer() => _isAnswerSimple = true;
-
-    public void OnAnswerStart() => _isAnswer = true;
 
     public void ClearState()
     {
