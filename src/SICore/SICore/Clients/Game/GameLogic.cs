@@ -266,7 +266,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         _data.InformStages &= ~(InformStages.Question | InformStages.Layout | InformStages.ContentShape);
 
-        ScheduleExecution(Tasks.QuestionPostInfo, taskTime, 1, force: true);
+        ScheduleExecution(Tasks.QuestionPostInfo, taskTime, force: true);
 
         if (GetTurnSwitchingStrategy() == TurnSwitchingStrategy.Sequentially)
         {
@@ -1843,7 +1843,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         break;
 
                     case Tasks.QuestionPostInfo:
-                        QuestionSourcesAndComments(arg);
+                        QuestionSourcesAndComments();
                         break;
 
                     case Tasks.StartAppellation:
@@ -2871,62 +2871,32 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
     }
 
-    private void QuestionSourcesAndComments(int arg)
+    private void QuestionSourcesAndComments()
     {
         var informed = false;
 
-        var textTime = 20;
+        var textTime = 1;
 
-        if (arg == 1)
+        _gameActions.SendMessageWithArgs(Messages.QuestionEnd); // Should be here because only here question is fully processed
+
+        var sources = _data.PackageDoc.ResolveSources(_data.Question.Info.Sources);
+
+        if (sources.Count > 0)
         {
-            _gameActions.SendMessageWithArgs(Messages.QuestionEnd); // Should be here because only here question is fully processed
-
-            var sources = _data.PackageDoc.ResolveSources(_data.Question.Info.Sources);
-
-            if (sources.Count > 0)
-            {
-                var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
-                _gameActions.ShowmanReplic(text); // TODO: REMOVE: replaced by QUESTION_SOURCES message
-                var msg = new MessageBuilder(Messages.QuestionSources).AddRange(sources);
-                _gameActions.SendMessage(msg.Build());
-                textTime = GetReadingDurationForTextLength(text.Length);
-                informed = true;
-            }
-            else
-            {
-                arg++;
-            }
+            var msg = new MessageBuilder(Messages.QuestionSources).AddRange(sources);
+            _gameActions.SendMessage(msg.Build());
         }
 
-        if (arg == 2)
+        var comments = _data.Question.Info.Comments.Text;
+
+        if (comments.Length > 0)
         {
-            if (_data.Question.Info.Comments.Text.Length > 0)
-            {
-                var text = string.Format(
-                    OfObjectPropertyFormat,
-                    LO[nameof(R.PComments)],
-                    LO[nameof(R.OfQuestion)],
-                    _data.Question.Info.Comments.Text);
-                
-                _gameActions.ShowmanReplic(text); // TODO: REMOVE: replaced by QUESTION_COMMENTS message
-                _gameActions.SendVisualMessageWithArgs(Messages.QuestionComments, _data.Question.Info.Comments.Text.EscapeNewLines());
-                textTime = GetReadingDurationForTextLength(text.Length);
-                informed = true;
-            }
-            else
-            {
-                arg++;
-            }
+            _gameActions.SendVisualMessageWithArgs(Messages.QuestionComments, comments.EscapeNewLines());
+            textTime = GetReadingDurationForTextLength(comments.Length);
+            informed = true;
         }
 
-        if (arg < 3)
-        {
-            ScheduleExecution(Tasks.QuestionPostInfo, textTime, arg + 1);
-        }
-        else
-        {
-            ScheduleExecution(Tasks.MoveNext, 1, force: !informed);
-        }
+        ScheduleExecution(Tasks.MoveNext, textTime, force: !informed);
     }
 
     private int GetReadingDurationForTextLength(int textLength)

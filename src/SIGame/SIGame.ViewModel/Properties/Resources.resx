@@ -696,4 +696,13 @@
   <data name="QuestionSources" xml:space="preserve">
     <value>Question sources</value>
   </data>
+  <data name="PackageAuthors" xml:space="preserve">
+    <value>Package authors</value>
+  </data>
+  <data name="PackageSources" xml:space="preserve">
+    <value>Package sources</value>
+  </data>
+  <data name="PackageComments" xml:space="preserve">
+    <value>Package comments</value>
+  </data>
 </root>

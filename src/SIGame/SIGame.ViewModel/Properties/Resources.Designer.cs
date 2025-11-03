@@ -1231,11 +1231,29 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Package authors.
+        /// </summary>
+        public static string PackageAuthors {
+            get {
+                return ResourceManager.GetString("PackageAuthors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Checking the pack....
         /// </summary>
         public static string PackageCheck {
             get {
                 return ResourceManager.GetString("PackageCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Package comments.
+        /// </summary>
+        public static string PackageComments {
+            get {
+                return ResourceManager.GetString("PackageComments", resourceCulture);
             }
         }
         
@@ -1254,6 +1272,15 @@ namespace SIGame.ViewModel.Properties {
         public static string PackageNotSelected {
             get {
                 return ResourceManager.GetString("PackageNotSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Package sources.
+        /// </summary>
+        public static string PackageSources {
+            get {
+                return ResourceManager.GetString("PackageSources", resourceCulture);
             }
         }
         

@@ -290,5 +290,5 @@ public interface IPersonController
 
     void OnShowmanReplic(int messageIndex, MessageCode messageCode) { }
 
-    void OnPackage(string packageName, string? logiUri) { }
+    void OnPackage(string packageName, string? packageLogoUri) { }
 }

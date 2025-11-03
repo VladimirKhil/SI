@@ -123,6 +123,9 @@
   <data name="AllTime" xml:space="preserve">
     <value>Vreme runde je isteklo; Vreme je isteklo</value>
   </data>
+  <data name="AnswerIsOral" xml:space="preserve">
+    <value>Odgovor treba dati usmeno</value>
+  </data>
   <data name="Bravo" xml:space="preserve">
     <value>Bravo!!!;Odlično!!!;Apsolutno tačno!!!;Upravo tako, čestitam!!!;Dali ste apsolutno tačan odgovor!!!;Apsolutno ste u pravu!!!</value>
   </data>
@@ -170,6 +173,9 @@
   </data>
   <data name="PAuthors" xml:space="preserve">
     <value>Autori</value>
+  </data>
+  <data name="RandomPackageName" xml:space="preserve">
+    <value>Slučajne teme</value>
   </data>
   <data name="Restrictions" xml:space="preserve">
     <value>Ograničenja</value>

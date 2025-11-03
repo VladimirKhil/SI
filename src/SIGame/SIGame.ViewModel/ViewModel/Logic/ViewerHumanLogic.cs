@@ -2084,6 +2084,43 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
+    public void OnPackage(string packageName, string? packageLogoUri)
+    {
+        var screenContent = new List<ContentInfo>();
+
+        if (!string.IsNullOrEmpty(packageLogoUri))
+        {
+            var preprocessedUri = PreprocessUri(packageLogoUri);
+            
+            if (preprocessedUri != null)
+            {
+                screenContent.Add(new ContentInfo(ContentTypes.Image, preprocessedUri, ""));
+            }
+        }
+
+        screenContent.Add(new ContentInfo(ContentTypes.Text, packageName, ""));
+
+        OnScreenContent(screenContent);
+    }
+
+    public void OnPackageAuthors(IEnumerable<string> authors)
+    {
+        var authorsText = string.Join(", ", authors);
+        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.PackageAuthors}: {authorsText}");
+    }
+
+    public void OnPackageSources(IEnumerable<string> sources)
+    {
+        var sourcesText = string.Join(", ", sources);
+        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.PackageSources}: {sourcesText}");
+    }
+
+    public void OnPackageComments(string comments)
+    {
+        var commentsText = comments.UnescapeNewLines();
+        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.PackageComments}: {commentsText}");
+    }
+
     public void OnQuestionAuthors(IEnumerable<string> authors)
     {
         var authorsText = string.Join(", ", authors);

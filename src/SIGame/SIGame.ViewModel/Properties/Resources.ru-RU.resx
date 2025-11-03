@@ -693,4 +693,13 @@
   <data name="QuestionSources" xml:space="preserve">
     <value>Источники вопроса</value>
   </data>
+  <data name="PackageAuthors" xml:space="preserve">
+    <value>Авторы пакета</value>
+  </data>
+  <data name="PackageSources" xml:space="preserve">
+    <value>Источники пакета</value>
+  </data>
+  <data name="PackageComments" xml:space="preserve">
+    <value>Комментарии пакета</value>
+  </data>
 </root>
