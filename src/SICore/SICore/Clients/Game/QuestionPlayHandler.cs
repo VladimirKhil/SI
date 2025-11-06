@@ -261,6 +261,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         _state.IsQuestionFinished = false;
         _state.UseBackgroundAudio = false;
         _state.QuestionPlayState.UseButtons = questionRequiresButtons;
+        _state.QuestionPlayState.FlexiblePrice = false;
 
         foreach (var player in _state.Players)
         {
@@ -291,6 +292,8 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                 return true;
 
             case StepParameterValues.SetAnswererMode_Stake:
+                _state.QuestionPlayState.FlexiblePrice = true;
+
                 switch (select)
                 {
                     case StepParameterValues.SetAnswererSelect_Highest:

@@ -109,6 +109,11 @@ internal sealed class QuestionPlayState
     /// </summary>
     public int NumericAnswerDeviation { get; internal set; }
 
+    /// <summary>
+    /// Marks whether the question has flexible pricing.
+    /// </summary>
+    public bool FlexiblePrice { get; internal set; }
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -128,6 +133,7 @@ internal sealed class QuestionPlayState
         Appellations.Clear();
         IsNumericAnswer = false;
         NumericAnswerDeviation = 0;
+        FlexiblePrice = false;
     }
 
     internal void RemovePlayer(int playerIndex)

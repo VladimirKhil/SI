@@ -3338,7 +3338,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private void SendAnswersInfoToShowman(string answer)
     {
         _gameActions.SendMessage(
-            BuildValidation2Message(_data.Answerer.Name, answer, _data.AnswerMode == StepParameterValues.AskAnswerMode_Button),
+            BuildValidation2Message(_data.Answerer.Name, answer, !_data.QuestionPlayState.FlexiblePrice),
             _data.ShowMan.Name);
     }
 
