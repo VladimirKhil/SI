@@ -437,17 +437,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.AnswererIndex = -1;
         _data.CanMarkQuestion = false;
         _data.QuestionPlayState.Clear();
-
-        if (_data.Settings.AppSettings.HintShowman)
-        {
-            // TODO: use SendAnswerInfoToShowman()
-            var rightAnswers = question.Right;
-            var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
-
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
-        }
-
-        SendQuestionAnswersToShowman();
     }
 
     internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration)
@@ -3357,11 +3346,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 Engine.RoundIndex,
                 _data.ThemeIndex,
                 _data.QuestionIndex);
-
-            if (appellatedAnswers.Count > 0)
-            {
-                _data.Host.LogWarning($"Appellated answers count: {appellatedAnswers.Count}");
-            }
         }
 
         return new MessageBuilder(
@@ -5213,4 +5197,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     }
 
     internal void OnNumericAnswer() => _gameActions.InformAnswerDeviation(_data.QuestionPlayState.NumericAnswerDeviation);
+
+    internal void OnQuestionStart()
+    {
+        if (_data.Settings.AppSettings.HintShowman)
+        {
+            // TODO: use SendAnswerInfoToShowman()
+            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, _data.QuestionPlayState.RightAnswers.FirstOrDefault() ?? ""), _data.ShowMan.Name);
+        }
+
+        SendQuestionAnswersToShowman();
+    }
 }

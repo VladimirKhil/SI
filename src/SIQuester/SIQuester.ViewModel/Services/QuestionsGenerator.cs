@@ -135,7 +135,7 @@ internal static class QuestionsGenerator
 
         if (!string.IsNullOrEmpty(themeInfo.Description))
         {
-            theme.Info.Comments.Text = themeInfo.Description.ClearPoints();
+            themeViewModel.Info.Comments.Text = themeInfo.Description.ClearPoints();
         }
 
         foreach (var questionInfo in themeInfo.Questions)

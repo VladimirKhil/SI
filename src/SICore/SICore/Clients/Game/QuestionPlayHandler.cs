@@ -253,7 +253,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
     }
 
     // TODO: think about merging with GameLogic.InitQuestionState() and QuestionPlayState.Clear()
-    public void OnQuestionStart(bool questionRequiresButtons, Action skipQuestionCallback)
+    public void OnQuestionStart(bool questionRequiresButtons, ICollection<string> rightAnswers, Action skipQuestionCallback)
     {
         _state.SkipQuestion = skipQuestionCallback;
         _state.CanMarkQuestion = true;
@@ -262,11 +262,14 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         _state.UseBackgroundAudio = false;
         _state.QuestionPlayState.UseButtons = questionRequiresButtons;
         _state.QuestionPlayState.FlexiblePrice = false;
+        _state.QuestionPlayState.RightAnswers = rightAnswers;
 
         foreach (var player in _state.Players)
         {
             player.CanPress = questionRequiresButtons; // Always set true if there will be more complex question types
         }
+
+        _controller.OnQuestionStart();
     }
 
     public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility)

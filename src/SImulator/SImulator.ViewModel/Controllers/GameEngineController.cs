@@ -170,6 +170,14 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             }).ToList();
         }
 
+        foreach (var item in content)
+        {
+            if (item.Type == ContentTypes.Text)
+            {
+                GameViewModel.OnQuestionText(item.Value);
+            }
+        }
+
         if (_isAnswerSimple)
         {
             PresentationController.OnSimpleRightAnswer(content.First().Value);
@@ -284,7 +292,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return media?.Uri?.OriginalString;
     }
 
-    public void OnQuestionStart(bool buttonsRequired, Action skipQuestionCallback)
+    public void OnQuestionStart(bool buttonsRequired, ICollection<string> rightAnswers, Action skipQuestionCallback)
     {
         GameViewModel.OnQuestionStart();
 
@@ -296,8 +304,12 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         _optionsShown = null;
         _isAnswerSimple = false;
         _isAnswer = false;
+        _rightAnswer = rightAnswers.FirstOrDefault() ?? "";
+        GameViewModel.QuestionAnswers = rightAnswers.ToArray();
         PresentationController.OnQuestionStart();
     }
+
+    private string _rightAnswer = "";
 
     public void OnAnswerStart()
     {
@@ -315,7 +327,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
         if (_isAnswer && !_isAnswerSimple)
         {
-            PresentationController.OnComplexRightAnswer(GameViewModel.ActiveQuestion?.Right.FirstOrDefault() ?? "");
+            PresentationController.OnComplexRightAnswer(_rightAnswer);
             _isAnswer = false;
         }
 
@@ -359,33 +371,28 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool ShouldPlayRoundWithRemovableThemes() => true;
 
-    public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController) => GameViewModel?.OnRoundThemes(themes);
+    public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController) => GameViewModel.OnRoundThemes(themes);
 
     public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback)
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
-
         PresentationController.SelectionCallback = selectCallback;
         PresentationController.SetRoundTable();
         GameViewModel.LocalInfo.TStage = TableStage.RoundTable;
     }
 
-    public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel?.OnQuestionSelected(themeIndex, questionIndex);
+    public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel.OnQuestionSelected(themeIndex, questionIndex);
 
-    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay) => GameViewModel?.OnFinalThemes(themes);
+    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay) => GameViewModel.OnFinalThemes(themes);
 
     public void AskForThemeDelete(Action<int> deleteCallback) => PresentationController.DeletionCallback = deleteCallback;
 
-    public void OnThemeDeleted(int themeIndex) => GameViewModel?.OnThemeDeleted(themeIndex);
+    public void OnThemeDeleted(int themeIndex) => GameViewModel.OnThemeDeleted(themeIndex);
 
-    public void OnThemeSelected(int themeIndex, int questionIndex) => GameViewModel?.OnThemeSelected(themeIndex, questionIndex);
+    public void OnThemeSelected(int themeIndex, int questionIndex) => GameViewModel.OnThemeSelected(themeIndex, questionIndex);
 
-    public void OnTheme(Theme theme) => GameViewModel?.OnTheme(theme);
+    public void OnTheme(Theme theme) => GameViewModel.OnTheme(theme);
 
-    public void OnQuestion(Question question) => GameViewModel?.OnQuestion(question);
+    public void OnQuestion(Question question) => GameViewModel.OnQuestion(question);
 
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
     {

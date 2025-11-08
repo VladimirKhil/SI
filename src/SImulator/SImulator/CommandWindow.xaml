@@ -259,8 +259,6 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="20" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <Grid.ColumnDefinitions>
@@ -270,14 +268,14 @@
 
                         <TextBlock
                             Text="{x:Static lp:Resources.ThemeComments}"
-                            Visibility="{Binding ActiveTheme.Info.Comments.Text, Converter={StaticResource NotNullOrEmpty}}"
+                            Visibility="{Binding ThemeComments, Converter={StaticResource NotNullOrEmpty}}"
                             Foreground="DarkGray"
                             TextWrapping="Wrap" />
 
                         <TextBlock
                             Grid.Column="1"
-                            Text="{Binding ActiveTheme.Info.Comments.Text}"
-                            Visibility="{Binding ActiveTheme.Info.Comments.Text, Converter={StaticResource NotNullOrEmpty}}"
+                            Text="{Binding ThemeComments}"
+                            Visibility="{Binding ThemeComments, Converter={StaticResource NotNullOrEmpty}}"
                             TextWrapping="Wrap" />
 
                         <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.Question}" Foreground="DarkGray" />
@@ -404,22 +402,12 @@
                         </ItemsControl>
 
                         <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.Answer}" Foreground="DarkGray" />
-                        <TextBlock Grid.Row="6" Text="{x:Static lp:Resources.Source}" Foreground="DarkGray" />
-                        <TextBlock Grid.Row="7" Text="{x:Static lp:Resources.Comment}" Foreground="DarkGray" />
 
                         <TextBlock
                             Grid.Row="5"
                             Grid.Column="1"
-                            Text="{Binding ActiveQuestion.Right, Converter={StaticResource CollectionsConverter}}"
+                            Text="{Binding QuestionAnswers, Converter={StaticResource CollectionsConverter}}"
                             TextWrapping="Wrap" />
-
-                        <TextBlock
-                            Grid.Row="6"
-                            Grid.Column="1"
-                            Text="{Binding ActiveQuestion.Info.Sources, Converter={StaticResource CollectionsConverter}}"
-                            TextWrapping="Wrap" />
-
-                        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding ActiveQuestion.Info.Comments.Text}" TextWrapping="Wrap" />
                     </Grid>
                 </ScrollViewer>
 
@@ -569,14 +557,14 @@
                             Orientation="Vertical"
                             DataContext="{Binding
                                 RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1},
-                                Path=DataContext.Game.ActiveQuestion}"
-                                d:DataContext="{d:DesignInstance p:Question}">
+                                Path=DataContext.Game}"
+                                d:DataContext="{d:DesignInstance vm:GameViewModel}">
                             <StackPanel.Resources>
-                                <CollectionViewSource x:Key="Parameters" Source="{Binding Parameters}" Filter="Parameters_Filter" />
+                                <CollectionViewSource x:Key="Parameters" Source="{Binding ActiveQuestion.Parameters}" Filter="Parameters_Filter" />
                             </StackPanel.Resources>
 
                             <TextBlock
-                                Text="{Binding TypeName, Converter={StaticResource QuestionTypeConverter}}"
+                                Text="{Binding ActiveQuestion.TypeName, Converter={StaticResource QuestionTypeConverter}}"
                                 TextWrapping="Wrap"
                                 FontSize="16"
                                 FontWeight="Bold" />

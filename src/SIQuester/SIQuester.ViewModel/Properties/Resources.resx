@@ -208,22 +208,196 @@
     <value>The package is stored in the Database {0} under the name {1}</value>
   </data>
   <data name="DefaultGPTPrompt" xml:space="preserve">
-    <value>You need to create questions for a quiz topic, ensuring they are precise, valid (based on verifiable facts), and preferably target 'unknown about known'—obscure or lesser-known details about well-known subjects, people, or concepts (e.g., a rare fact about a famous historical figure)—though this is not mandatory if it doesn't fit naturally. Questions must have exactly one correct answer, with no ambiguity.
+    <value>Create quiz questions that are precise, factually valid, with exactly one unambiguous answer. Prefer "unknown about known" style—obscure facts about familiar subjects—when naturally appropriate.
 
-1. Pick one of 10 000 top popular topics (if not provided). Examples: games, movies, anime, books, pop culture, social media, tech, memes, Gen Z fashion, trends, food and drinks, celebrities, fun facts, TV shows, music. Craft topic names that allow creative connections to answers (for example Stones topic could link to geology, Emma Stone, or Rolling Stones). Topic names could be famous quotes for added intrigue.
-2. Topics may include an optional short description (around 5 words) only if the name is ambiguous. Examples: For 'Guess movie by emojis,' no description needed; for 'Who is the culprit?,' use 'Name the murderer from the novel.'
-3. Craft questions with increasing difficulty levels. Prefer 'unknown about known' styles, like easy: 'This city's Eiffel Tower is iconic' (targeting Paris); hard: 'His first wife was Serbian physicist Mileva Marić' Base questions on interesting facts, general knowledge, or riddles. Hard questions should be based on not so popular facts. Present each question as up to 5 very short sentences of descriptive text (no direct interrogatives like 'Who is it?'; just state facts leading to the inference). Use simple language. Do not use too expressive adjectives like "famous", "outstanding", "iconic" etc. It should be clear specify which object/property should be guessed.
-4. Answers must be text (up to 5 words) or multiple choice (4-5 options, with one correct marked by a letter). For text answers, leave options empty. For multiple choice, list options without letters in the options field, and provide only the correct letter as the answer. Exclude options from question text. Hard question answers should not usually have choices. Answer for each question should be unique.
-5. If the answer is unclear and needs to be explained, include a comment. Keep it around 7-10 words, do not repeat question or answer facts or state obvious info in comment.
-6. For all questions involving statistics, time-bound info, or any disputable facts, provide a valid, verifiable source URL (e.g., from reputable sites like Wikipedia, official databases, or academic sources). Always check that the URL is active, current, and directly supports the fact—validate via reliable means before including.
+## Topic Selection
+Every single time you generate a topic, follow this exact 2-step ritual.  
+Do not skip anything. Do not default to video games.
 
-Examples:
+Step 1 – Category Roulette (roll ONCE right now)
+Imagine you just rolled a fair 12-sided die (d12).  
+Use the number you rolled to pick ONE category family from this exact table:
 
-- Topic 'Which language is this,' question 'Bonjour means hello in this tongue,' answer 'French';
-- Topic 'Book by emoji,' question '👴🌊 tells of a fisherman's epic struggle,' answer 'The Old Man and the Sea';
-- Topic 'Chemical element by symbol,' question 'This element's symbol is O, essential for breathing,' answer options 'Gold', 'Oxygen', 'Tin', 'Mercury', answer 'B';
-- Topic 'End of story,' question 'His final words requested opening the second shutter for more light,' answer 'Johann Wolfgang von Goethe', comment 'Refers to Goethe's deathbed request, per historical accounts', source 'https://en.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe';
-- Topic 'Hasta la vista, baby,' question 'Launched in 2006, this OS flop drew widespread criticism for bugs and incompatibility,' answer 'Windows Vista', comment 'Critics noted its high resource demands and security issues', source 'https://en.wikipedia.org/wiki/Windows_Vista';</value>
+1. Food, drinks, regional recipes  
+2. Movies &amp; cinema (any country, any era, any genre)  
+3. Music (any language, any decade, any style)  
+4. History &amp; historical figures  
+5. Science, space, animals, plants  
+6. Sports, athletes, weird records  
+7. TV shows, reality TV, web series  
+8. Fashion, beauty, design, architecture  
+9. Tech, gadgets, apps, internet history  
+10. Books, comics, manga, mythology  
+11. Memes, viral moments, TikTok, YouTube  
+12. Art, photography, sculpture, street art  
+
+→ Your roll today: whatever number you just imagined (1–12)  
+→ You MUST use the exact category that matches your roll.
+
+Step 2 – Fresh Angle (inside the chosen category)
+Now, inside that category, invent ONE topic that:
+- you personally find surprising or funny
+- feels “clickbait-y” in a good way
+- has never appeared in any example anywhere
+- is 4–12 words long
+- gets a 3–6 word clarification in parentheses ONLY if truly ambiguous
+
+Examples of perfect outputs (just vibe, never reuse):
+• Topic: The only country that sells canned whale sushi in vending machines  
+• Topic: 1970s disco song that accidentally predicted Bitcoin  
+• Topic: Olympic sport removed because too many horses got drunk  
+• Topic: TikTok filter that revealed real ghosts in 2024
+
+Add a ~5-word description ONLY if the topic name is ambiguous (e.g., "Who is the culprit?" needs "Name the murderer from the novel").
+
+## Question Format
+- **Structure**: Up to 5 very short sentences stating ONLY facts as descriptive clues. **NEVER end with "Name the X," "Who is it?," "What is it?," "Identify the X," or any similar direct question.** These imperatives are FORBIDDEN. The target must be clear from context alone.
+- **Language**: Simple, clear. NO expressive adjectives ("famous," "iconic," "outstanding," "thrilling," "remarkable," "untold").
+- **Difficulty Scaling**:
+  - **200-400**: Well-known, easily recognizable facts
+  - **600**: Moderately obscure details
+  - **800-1000**: Genuinely obscure, lesser-known facts that require deeper knowledge
+- **Clarity**: From context alone, it must be obvious what object/property/person to guess WITHOUT any closing question.
+- **Focus**: Each question must identify a DIFFERENT answer within the topic.
+
+## Answers
+- **Text answers**: Up to 5 words. Leave options field empty.
+- **Multiple choice**: List 4-5 options in the options field (without letter prefixes). Provide only the correct letter (A, B, C, D, or E) as the answer.
+- **CRITICAL**: Every question must have a UNIQUE answer. Never repeat the same answer across multiple questions in a topic.
+- **Hard questions (800+)**: Prefer text answers over multiple choice.
+
+## Comments
+Include ONLY when the answer genuinely needs clarification that isn't obvious from the question.
+
+**NEVER include comments that:**
+- Repeat facts from the question or answer
+- State well-known or obvious information
+- Add promotional/expressive language
+- Simply restate what was already said differently
+
+**DO include comments when:**
+- The connection between clues and answer requires non-obvious context
+- Technical terminology needs brief explanation
+- Historical nuance genuinely affects understanding
+
+Keep to 7-10 words maximum. Most questions should have NO comment.
+
+## Sources
+
+**YOU MUST INCLUDE A SOURCE FOR EVERY QUESTION.** No exceptions.
+
+### Why Sources Are Required:
+Every question contains specific, verifiable claims that must be validated. Even seemingly obvious facts need citation to ensure accuracy.
+
+### Source Requirements:
+1. **Acceptable sources**: Wikipedia, Fandom wikis (for games/media), official websites, .gov, .edu, IGN/GameFAQs (for games), IMDb (for movies/TV), reputable databases
+2. **MANDATORY VALIDATION PROCESS** - Before including ANY source:
+   - Open the URL in your browser
+   - Verify the page loads successfully (no 404, no errors)
+   - Confirm the SPECIFIC fact from your question appears on that page
+   - Ensure the source directly supports your claim
+3. **If validation fails**: Reformulate the question using information you CAN verify, or choose a different fact
+4. **Use specific section links** when possible (e.g., https://example.com/page#Section_Name)
+5. **Fan sites**: Only use if they're well-established (e.g., Zelda Wiki, Bulbapedia, Wookieepedia) and you've verified the link works
+
+### What Needs Sources:
+- Game-specific facts (item locations, character names, boss strategies)
+- Movie/TV details (release dates, character names, plot points)
+- Book information (publication dates, character details)
+- Historical facts (dates, events, quotes)
+- Statistics and numbers
+- ANY specific factual claim
+
+**If you cannot find a valid, working source for a fact, DO NOT use that fact in a question.**
+
+## Format Requirements
+Every question must include:
+- Question text (descriptive clues only, no direct questions at the end)
+- Options field (only for multiple choice - list options without letters, empty for text answers)
+- Answer (letter for multiple choice, text for open-ended)
+- **Source (MANDATORY for every question - must be validated)**
+- Comment (only when genuinely needed - most questions should omit this)
+
+## Examples
+
+**Good Example - Video Game:**
+Question: Plays several melodies on a blue wind instrument. Used to travel and shift time. Given by the princess in the castle.
+Answer: Ocarina of Time
+Source: https://zelda.fandom.com/wiki/Ocarina_of_Time_(Item)
+
+**Good Example - Movie:**
+Question: This 1999 film features a red pill and a blue pill choice. Neo discovers reality is a computer simulation. Directed by the Wachowskis.
+Answer: The Matrix
+Source: https://en.wikipedia.org/wiki/The_Matrix
+
+**Good Example - Music:**
+Question: Released in 1991, this grunge anthem begins with a distinctive guitar riff. Kurt Cobain wrote it about teenage rebellion. Became Nirvana's signature song.
+Answer: Smells Like Teen Spirit
+Source: https://en.wikipedia.org/wiki/Smells_Like_Teen_Spirit
+
+**Good Example - Science (Multiple Choice):**
+Question: This element's symbol is O. Essential for breathing. Makes up about 21% of Earth's atmosphere.
+Options: Gold, Oxygen, Tin, Mercury
+Answer: B
+Source: https://en.wikipedia.org/wiki/Oxygen
+
+**Good Example - History (With Comment):**
+Question: His final words requested opening the second shutter for more light.
+Answer: Johann Wolfgang von Goethe
+Comment: Deathbed request documented by witnesses present
+Source: https://en.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe#Death
+
+**Good Example - Food &amp; Drink:**
+Question: Italian coffee drink made by adding hot water to espresso. Name means "American" in Italian. Created as a way to dilute espresso for American soldiers.
+Answer: Americano
+Source: https://en.wikipedia.org/wiki/Caff%C3%A8_Americano
+
+**Bad Example - No Source:**
+Question: First dungeon boss inside the Great Deku Tree. Large arachnid with a single glaring eye.
+Answer: Queen Gohma
+❌ WRONG - Missing required source
+
+**Bad Example - Unvalidated Source:**
+Question: This 2010 sci-fi film explores dreams within dreams.
+Answer: Inception
+Source: https://www.broken-movie-site.com/inception-facts
+❌ WRONG - This URL doesn't exist (not validated)
+
+**Bad Example - All Same Answer:**
+Question 1: This composer wrote The Magic Flute. Answer: Mozart
+Question 2: This composer died at age 35. Answer: Mozart
+Question 3: This composer was born in Salzburg. Answer: Mozart
+❌ WRONG - All answers identical; each must be unique
+
+**Bad Example - Trivial Comment:**
+Question: Bonjour means hello in this tongue.
+Answer: French
+Comment: French is spoken in France
+❌ WRONG - Comment states obvious information
+
+**Bad Example - Direct Question at End:**
+Question: Italian coffee drink made by adding hot water to espresso. **What is this drink called?**
+❌ FORBIDDEN - Never use "Name the X," "Who is it?," "What is it?," "Identify X," or any imperative/question at the end
+
+**Bad Example - Another Direct Question:**
+Question: Released in 1991, this grunge anthem became Nirvana's signature song. **Name the song.**
+❌ FORBIDDEN - End with facts only: "Released in 1991, this grunge anthem begins with a distinctive guitar riff. Kurt Cobain wrote it about teenage rebellion."
+
+---
+
+## CRITICAL CHECKLIST (Review Before Submitting):
+
+1. ✓ **Every question has a validated source URL?**
+2. ✓ **Opened each URL to verify it works and contains the fact?**
+3. ✓ **Each question has a different answer?**
+4. ✓ **Comments omitted unless genuinely clarifying?**
+5. ✓ **NO "Name the X," "Who is it?," "What is it?," or ANY question/imperative at end of clues?**
+6. ✓ **Questions end with factual statements ONLY?**
+7. ✓ **Hard questions (800-1000) use genuinely obscure facts?**
+8. ✓ **Simple language without promotional adjectives?**
+9. ✓ **Multiple choice questions include the options list?**
+
+**If any checklist item fails, revise before submitting.**</value>
   </data>
   <data name="DefaultTags" xml:space="preserve">
     <value>Cars

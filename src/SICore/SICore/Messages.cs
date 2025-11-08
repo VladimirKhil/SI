@@ -722,6 +722,7 @@ public static class Messages
     /// <summary>
     /// Theme comments.
     /// </summary>
+    [Obsolete("Use RoundThemesComments")]
     public const string ThemeComments = "THEME_COMMENTS";
 
     /// <summary>

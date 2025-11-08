@@ -331,9 +331,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на You need to create questions for a quiz topic, ensuring they are precise, valid (based on verifiable facts), and preferably target &apos;unknown about known&apos;—obscure or lesser-known details about well-known subjects, people, or concepts (e.g., a rare fact about a famous historical figure)—though this is not mandatory if it doesn&apos;t fit naturally. Questions must have exactly one correct answer, with no ambiguity.
+        ///   Ищет локализованную строку, похожую на Create quiz questions that are precise, factually valid, with exactly one unambiguous answer. Prefer &quot;unknown about known&quot; style—obscure facts about familiar subjects—when naturally appropriate.
         ///
-        ///1. Pick one of 10 000 top popular topics (if not provided). Examples: games, movies, anime, books,  [остаток строки не уместился]&quot;;.
+        ///## Topic Selection
+        ///Every single time you generate a topic, follow this exact 2-step ritual.  
+        ///Do not skip anything. Do not default to video games.
+        ///
+        ///Step 1 – Category Roulette (roll ONCE right now)
+        ///Imagine you just rolled a fair 12-sided die (d12).  
+        ///Use the number you rolled to pick ONE category family from this [остаток строки не уместился]&quot;;.
         /// </summary>
         public static string DefaultGPTPrompt {
             get {
@@ -1528,7 +1534,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Correct answer.
+        ///   Ищет локализованную строку, похожую на Right answer.
         /// </summary>
         public static string RightAnswer {
             get {

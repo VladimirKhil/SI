@@ -58,7 +58,7 @@ public sealed class QuestionEngine : IQuestionEngine
         if (!_started)
         {
             _enableButtonsStepIndex = FalseStartHelper.GetAskAnswerStartIndex(_script, _question.Parameters, _options.FalseStarts);
-            _playHandler.OnQuestionStart(ScriptHasAskAnswerButtonsStep(_script), SkipQuestion);
+            _playHandler.OnQuestionStart(ScriptHasAskAnswerButtonsStep(_script), _question.Right, SkipQuestion);
             _started = true;
         }
 

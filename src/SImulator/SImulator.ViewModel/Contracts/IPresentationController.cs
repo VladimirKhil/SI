@@ -43,7 +43,7 @@ public interface IPresentationController : IDisposable
 
     void SetRound(string roundName, QuestionSelectionStrategyType selectionStrategyType);
 
-    void SetTheme(string themeName);
+    void SetTheme(string themeName, bool animate);
 
     void SetQuestionPrice(int questionPrice);
 

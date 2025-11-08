@@ -12,8 +12,9 @@ public interface IQuestionEnginePlayHandler
     /// Handles question start.
     /// </summary>
     /// <param name="buttonsRequired">Whether the question requires buttons to play.</param>
+    /// <param name="rightAnswers">Question right answers.</param>
     /// <param name="skipQuestionCallback">Callback that allows to skip the question.</param>
-    void OnQuestionStart(bool buttonsRequired, Action skipQuestionCallback);
+    void OnQuestionStart(bool buttonsRequired, ICollection<string> rightAnswers, Action skipQuestionCallback);
 
     /// <summary>
     /// Sets answer options.

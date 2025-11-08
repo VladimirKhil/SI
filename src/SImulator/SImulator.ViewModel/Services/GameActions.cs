@@ -8,11 +8,15 @@ namespace SImulator.ViewModel.Services;
 internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
 {
     private readonly GameEngine _engine;
+    private readonly IPresentationController _presentationController;
     private readonly TaskRunner<Tasks> _taskRunner;
 
-    public GameActions(GameEngine engine)
+    private string[] _themeNames = Array.Empty<string>();
+
+    public GameActions(GameEngine engine, IPresentationController presentationController)
     {
         _engine = engine;
+        _presentationController = presentationController;
         _taskRunner = new TaskRunner<Tasks>(this);
     }
 
@@ -25,10 +29,26 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
             case Tasks.MoveNext:
                 _engine.MoveNext();
                 break;
+
+            case Tasks.ShowTheme:
+                if (arg < 0 || arg >= _themeNames.Length)
+                {
+                    break;
+                }
+
+                _presentationController.SetTheme(_themeNames[arg], true);
+                _taskRunner.ScheduleExecution(Tasks.ShowTheme, 20, arg + 1);
+                break;
         }
     }
 
     public void MoveNext(int delayMs = 100) => _taskRunner.ScheduleExecution(Tasks.MoveNext, delayMs / 100);
+
+    public void ShowThemes(string[] themeNames)
+    {
+        _themeNames = themeNames;
+        _taskRunner.ScheduleExecution(Tasks.ShowTheme, 1, 0);
+    }
 
     public void MoveBack()
     {

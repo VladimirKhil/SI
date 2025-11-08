@@ -608,7 +608,11 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void OnQuestionStart() => TInfo.LayoutMode = LayoutMode.Simple;
 
-    public void Dispose() => _animatableTimer.Dispose();
+    public void Dispose()
+    {
+        SetSound();
+        _animatableTimer.Dispose();
+    }
 
     public void SetRound(string roundName, QuestionSelectionStrategyType selectionStrategyType)
     {
@@ -617,8 +621,9 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         SetSound(_soundsSettings.RoundBegin);
     }
 
-    public void SetTheme(string themeName)
+    public void SetTheme(string themeName, bool animate)
     {
+        SetSound();
         SetText($"{Resources.Theme}: {themeName}");
         SetStage(TableStage.Theme);
     }

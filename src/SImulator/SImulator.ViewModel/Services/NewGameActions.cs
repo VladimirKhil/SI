@@ -24,7 +24,7 @@ internal sealed class NewGameActions : IGameActions
 
     public void MoveBack()
     {
-        throw new NotImplementedException();
+
     }
 
     public void MoveBackRound()
@@ -37,10 +37,14 @@ internal sealed class NewGameActions : IGameActions
         if (_state.Stage == SIData.GameStage.Before)
         {
             _viewerActions.Start();
-            return;
         }
 
         _viewerActions.Move();
+    }
+
+    public void ShowThemes(string[] themeNames)
+    {
+
     }
 
     public void MoveNextRound()

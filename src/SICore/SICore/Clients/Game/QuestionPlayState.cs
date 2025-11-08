@@ -75,6 +75,11 @@ internal sealed class QuestionPlayState
     internal bool IsAnswer { get; set; }
 
     /// <summary>
+    /// Question right answer.
+    /// </summary>
+    public ICollection<string> RightAnswers { get; internal set; } = Array.Empty<string>();
+
+    /// <summary>
     /// Has the answer stage been announced.
     /// </summary>
     internal bool IsAnswerAnnounced { get; set; }
@@ -126,6 +131,7 @@ internal sealed class QuestionPlayState
         MediaContentCompletions.Clear();
         Validations.Clear();
         IsAnswer = false;
+        RightAnswers = Array.Empty<string>();
         IsAnswerAnnounced = false;
         IsAnswerSimple = false;
         UseButtons = false;

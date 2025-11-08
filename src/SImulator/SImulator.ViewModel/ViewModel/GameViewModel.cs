@@ -32,7 +32,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private readonly Stack<Tuple<PlayerInfo, int, bool>?> _answeringHistory = new();
     private readonly IGameActions _gameActions;
-    private readonly IMediaProvider _mediaProvider;
 
     /// <summary>
     /// Game buttons manager.
@@ -330,12 +329,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         set { _activeQuestion = value; OnPropertyChanged(); }
     }
 
-    private Theme? _activeTheme;
+    private string[] _questionAnswers = Array.Empty<string>();
 
-    public Theme? ActiveTheme
+    public string[] QuestionAnswers
     {
-        get => _activeTheme;
-        set { _activeTheme = value; OnPropertyChanged(); }
+        get => _questionAnswers;
+        set { _questionAnswers = value; OnPropertyChanged(); }
     }
 
     private IReadOnlyList<ContentItem>? _contentItems = null;
@@ -648,14 +647,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     public GameViewModel(
         AppSettingsViewModel settings,
         IGameActions gameActions,
-        IMediaProvider mediaProvider,
         IExtendedListener presentationListener,
         IPresentationController presentationController,
         IGameLogger gameLogger)
     {
         Settings = settings;
         _gameActions = gameActions;
-        _mediaProvider = mediaProvider;
         _presentationListener = presentationListener;
         _gameLogger = gameLogger;
         PresentationController = presentationController;
@@ -1357,7 +1354,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveQuestion = question;
         PresentationController.SetQuestionPrice(question.Price);
 
-        CurrentTheme = ActiveTheme?.Name;
         Price = question.Price;
 
         LocalInfo.Text = question.Price.ToString();
@@ -1368,12 +1364,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal void OnTheme(Theme theme)
     {
-        PresentationController.SetTheme(theme.Name);
+        PresentationController.SetTheme(theme.Name, false);
 
         LocalInfo.Text = $"{Resources.Theme}: {theme.Name}";
         LocalInfo.TStage = TableStage.Theme;
 
-        ActiveTheme = theme;
+        CurrentTheme = theme.Name;
+        ThemeComments = theme.Info.Comments.Text;
     }
 
     internal void OnEndGame()
@@ -1547,6 +1544,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
         LocalInfo.TStage = TableStage.RoundTable;
         Continuation = AfterRoundThemes;
+
+        _gameActions.ShowThemes(LocalInfo.RoundInfo.Select(t => t.Name).ToArray());
     },
     exc => OnError(exc.Message));
 
@@ -1805,10 +1804,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             }
 
             _gameActions.Dispose();
-
             _gameLogger.Dispose();
-
-            PresentationController.SetSound();
 
             PlatformManager.Instance.ClearMedia();
         }
@@ -1824,12 +1820,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         var theme = _roundThemes[themeIndex];
 
-        ActiveTheme = theme;
+        CurrentTheme = theme.Name;
+        ThemeComments = theme.Info.Comments.Text;
         ActiveQuestion = theme.Questions[questionIndex];
 
-        PresentationController.SetTheme(theme.Name);
-        PresentationController.SetSound();
-        SetCaption(theme.Name);
+        PresentationController.SetTheme(CurrentTheme, false);
+        SetCaption(CurrentTheme);
     }
 
     /// <summary>
@@ -1866,9 +1862,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         MediaProgress = 0;
     }
 
-    private string? _currentTheme;
-
     private string[] _roundNames = Array.Empty<string>();
+
+    private string? _currentTheme;
 
     public string? CurrentTheme
     {
@@ -1877,6 +1873,18 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             _currentTheme = value;
             UpdateCaption();
+        }
+    }
+
+    private string _themeComments = "";
+
+    public string ThemeComments
+    {
+        get => _themeComments;
+        set
+        {
+            _themeComments = value;
+            OnPropertyChanged();
         }
     }
 
@@ -1893,17 +1901,21 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         SetCaption(caption);
     }
 
+    private readonly string[] _themesComments = Array.Empty<string>();
+
+    internal void OnQuestionText(string text) => _gameLogger.Write(text);
+
     internal void OnQuestionSelected(int themeIndex, int questionIndex)
     {
         try
         {
             _answeringHistory.Push(null);
 
-            ActiveTheme = _roundThemes[themeIndex];
-            ActiveQuestion = ActiveTheme.Questions[questionIndex];
+            ActiveQuestion = _roundThemes[themeIndex].Questions[questionIndex];
 
-            CurrentTheme = ActiveTheme.Name;
-            Price = ActiveQuestion.Price;
+            CurrentTheme = LocalInfo.RoundInfo[themeIndex].Name;
+            ThemeComments = _themesComments.Length > themeIndex ? _themesComments[themeIndex] : "";
+            Price = LocalInfo.RoundInfo[themeIndex].Questions[questionIndex].Price;
 
             LogScore();
             _gameLogger.Write("\r\n{0}, {1}", CurrentTheme, Price);
@@ -1911,8 +1923,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             SetSound(Settings.Model.Sounds.QuestionSelected);
             PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
             _gameActions.MoveNext(1700);
-
-            _gameLogger.Write(ActiveQuestion.GetText());
 
             _previousRound.CanBeExecuted = true;
 

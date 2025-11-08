@@ -200,7 +200,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public bool OnAccept() => false;
 
-    public void OnQuestionStart(bool buttonsRequired, Action skipQuestionCallback) { }
+    public void OnQuestionStart(bool buttonsRequired, ICollection<string> rightAnswers, Action skipQuestionCallback) { }
 
     public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback) { }
 

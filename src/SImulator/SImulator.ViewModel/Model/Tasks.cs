@@ -4,4 +4,5 @@ public enum Tasks
 {
     NoTask,
     MoveNext,
+    ShowTheme,
 }

@@ -598,12 +598,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             throw new Exception(Resources.LoggerInitError, exc);
         }
 
-        var mediaProvider = new MediaProvider(document);
-
         var gameViewModel = new GameViewModel(
             SettingsViewModel,
             gameActions,
-            mediaProvider,
             presentationListener,
             presentationController,
             gameLogger);
@@ -656,12 +653,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             throw new Exception(Resources.LoggerInitError, exc);
         }
 
-        var gameActions = new Services.GameActions(engine);
+        var gameActions = new Services.GameActions(engine, presentationController);
 
         var game = new GameViewModel(
             SettingsViewModel,
             gameActions,
-            mediaProvider,
             presentationListener,
             presentationController,
             gameLogger)

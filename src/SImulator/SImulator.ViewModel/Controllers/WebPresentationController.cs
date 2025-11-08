@@ -347,11 +347,11 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             ["round_timeout"] = GetSoundUri(_soundsSettings.RoundTimeout),
             ["applause_small"] = GetSoundUri(_soundsSettings.AnswerRight),
             ["applause_big"] = GetSoundUri(_soundsSettings.AnswerRight),
-            ["question_norisk"] = GetSoundUri(_soundsSettings.NoRiskQuestion),
+            ["question_for_yourself"] = GetSoundUri(_soundsSettings.NoRiskQuestion),
             ["question_secret"] = GetSoundUri(_soundsSettings.SecretQuestion),
             ["question_stake"] = GetSoundUri(_soundsSettings.StakeQuestion),
-            ["question_stake_all"] = GetSoundUri(_soundsSettings.StakeForAllQuestion),
-            ["question_all"] = GetSoundUri(_soundsSettings.ForAllQuestion),
+            ["question_for_all_with_stake"] = GetSoundUri(_soundsSettings.StakeForAllQuestion),
+            ["question_for_all"] = GetSoundUri(_soundsSettings.ForAllQuestion),
             ["answer_wrong"] = GetSoundUri(_soundsSettings.AnswerWrong),
             ["question_noanswers"] = GetSoundUri(_soundsSettings.NoAnswer),
             ["question_selected"] = GetSoundUri(_soundsSettings.QuestionSelected),
@@ -445,10 +445,11 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         IsVisible = showPlayers
     });
 
-    public void SetTheme(string themeName) => SendMessage(new
+    public void SetTheme(string themeName, bool animate) => SendMessage(new
     {
         Type = "theme",
-        ThemeName = themeName
+        ThemeName = themeName,
+        Animate = animate
     });
 
     public void SetQuestionPrice(int questionPrice) => SendMessage(new
