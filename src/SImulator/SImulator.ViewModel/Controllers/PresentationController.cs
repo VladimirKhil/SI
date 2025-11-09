@@ -333,13 +333,13 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         p.State = player.State;
     }
 
-    public void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal)
+    public void SetRoundThemes(string[] themes, bool isFinal)
     {
         TInfo.RoundInfo.Clear();
 
         foreach (var theme in themes)
         {
-            TInfo.RoundInfo.Add(theme);
+            TInfo.RoundInfo.Add(new ThemeInfoViewModel { Name = theme });
         }
 
         lock (TInfo.TStageLock)
@@ -350,6 +350,16 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         if (!isFinal)
         {
             SetSound(_soundsSettings.RoundThemes);
+        }
+    }
+
+    public void SetTable(ThemeInfoViewModel[] table)
+    {
+        TInfo.RoundInfo.Clear();
+
+        foreach (var theme in table)
+        {
+            TInfo.RoundInfo.Add(theme);
         }
     }
 

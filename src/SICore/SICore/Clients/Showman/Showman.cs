@@ -35,7 +35,7 @@ public sealed class Showman : Viewer
                     if (mparams.Length < 3
                         || !int.TryParse(mparams[1], out var playerIndex)
                         || playerIndex < 0
-                        || playerIndex >= ClientData.Players.Count)
+                        || playerIndex >= State.Players.Count)
                     {
                         break;
                     }
@@ -61,9 +61,9 @@ public sealed class Showman : Viewer
                     break;
 
                 case Messages.Stage:
-                    for (var i = 0; i < ClientData.Players.Count; i++)
+                    for (var i = 0; i < State.Players.Count; i++)
                     {
-                        ClientData.Players[i].CanBeSelected = false;
+                        State.Players[i].CanBeSelected = false;
                     }
                     break;
 
@@ -122,8 +122,8 @@ public sealed class Showman : Viewer
             wrong.Add(mparams[i]);
         }
 
-        ClientData.Right = right.ToArray();
-        ClientData.Wrong = wrong.ToArray();
+        State.Right = right.ToArray();
+        State.Wrong = wrong.ToArray();
     }
 
     private void OnValidation2(string[] mparams)
@@ -150,11 +150,11 @@ public sealed class Showman : Viewer
             wrong.Add(mparams[i]);
         }
 
-        ClientData.Right = right.ToArray();
-        ClientData.Wrong = wrong.ToArray();
-        ClientData.ShowExtraRightButtons = mparams[4] == "+";
+        State.Right = right.ToArray();
+        State.Wrong = wrong.ToArray();
+        State.ShowExtraRightButtons = mparams[4] == "+";
 
-        var me = (PersonAccount?)ClientData.Me;
+        var me = (PersonAccount?)State.Me;
 
         if (me != null)
         {

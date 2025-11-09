@@ -11,6 +11,7 @@ using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIPackages.Core;
+using SIUI.Model;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Diagnostics;
@@ -89,6 +90,8 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     private readonly ViewerData _data;
 
     private bool _isAnswer;
+
+    private int _themeCounter;
 
     /// <summary>
     /// External content that can be loaded only after user approval.
@@ -448,16 +451,17 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     private void OnError(Exception exc) => PlatformManager.Instance.ShowMessage(exc.ToString(), MessageType.Error, true);
 
-    public void OnStage(GameStage stage, string stageName, QuestionSelectionStrategyType? questionSelectionStrategyType)
+    public void OnStage(bool informOnly, GameStage stage, string stageName, int stageIndex, QuestionSelectionStrategyType? questionSelectionStrategyType)
     {
         switch (stage)
         {
             case GameStage.Before:
+                TInfo.Caption = "";
                 break;
 
             case GameStage.Begin:
-                TInfo.TStage = TableStage.Sign;
-
+                TInfo.Caption = "";
+                
                 if (_userSettings.GameSettings.AppSettings.MakeLogs && _gameLogger == null)
                 {
                     try
@@ -483,40 +487,60 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     }
                 }
 
-                OnReplic(ReplicCodes.Special.ToString(), $"{Resources.GameStarted} {DateTime.Now}");
-
-                var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{_data.ShowMan?.Name}\"");
-
-                for (var i = 0; i < _data.Players.Count; i++)
+                if (!informOnly)
                 {
-                    gameMeta.Append($" data-player-{i}=\"{_data.Players[i].Name}\"");
-                }
+                    TInfo.TStage = TableStage.Sign;
+                    OnReplic(ReplicCodes.Special.ToString(), $"{Resources.GameStarted} {DateTime.Now}");
 
-                AddToFileLog(gameMeta + "></span>");
+                    var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{_data.ShowMan?.Name}\"");
+
+                    for (var i = 0; i < _data.Players.Count; i++)
+                    {
+                        gameMeta.Append($" data-player-{i}=\"{_data.Players[i].Name}\"");
+                    }
+
+                    AddToFileLog(gameMeta + "></span>");
+                }
+                
                 break;
 
             case GameStage.Round:
-                TInfo.TStage = TableStage.Round;
-                TInfo.Selectable = false;
-                PlatformManager.Instance.PlaySound(Sounds.RoundBegin);
-
-                foreach (var player in _data.Players)
+                if (stageIndex > -1 && stageIndex < _data.RoundNames.Length)
                 {
-                    player.ClearState();
+                    _gameViewModel.RoundIndex = stageIndex;
+                    _gameViewModel.StageName = _data.RoundNames[_gameViewModel.RoundIndex];
                 }
 
-                _gameViewModel.Apellate.CanBeExecuted = false;
+                _themeCounter = 0;
 
-                if (_data.RoundIndex > -1 && _data.RoundIndex < _data.RoundNames.Length)
+                if (!informOnly)
                 {
-                    _gameViewModel.StageName = _data.RoundNames[_data.RoundIndex];
+                    TInfo.Caption = "";
+                    SetText(_gameViewModel.StageName);
+                    TInfo.TStage = TableStage.Round;
+                    TInfo.Selectable = false;
+                    PlatformManager.Instance.PlaySound(Sounds.RoundBegin);
+
+                    foreach (var player in _data.Players)
+                    {
+                        player.ClearState();
+                    }
+
+                    _gameViewModel.Apellate.CanBeExecuted = false;
                 }
+
                 break;
 
             case GameStage.After:
+                TInfo.Caption = "";
                 _gameViewModel.StageName = "";
-                _gameLogger?.Write("</body></html>");
-                OnGameFinished();
+
+                if (!informOnly)
+                {
+                    _gameLogger?.Write("</body></html>");
+                    OnGameFinished();
+                }
+
                 break;
 
             default:
@@ -556,25 +580,25 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
-    public void RoundThemes(Models.ThemesPlayMode playMode)
+    public void RoundThemes(List<string> themes, Models.ThemesPlayMode playMode)
     {
-        UI.Execute(() => RoundThemesUI(playMode), OnError);
+        UI.Execute(() => RoundThemesUI(themes, playMode), OnError);
         OnAd();
     }
 
-    private void RoundThemesUI(Models.ThemesPlayMode playMode)
+    private void RoundThemesUI(List<string> themes, Models.ThemesPlayMode playMode)
     {
         lock (TInfo.RoundInfoLock)
         {
             TInfo.RoundInfo.Clear();
 
-            foreach (var theme in _data.TInfo.RoundInfo.Select(themeInfo => new ThemeInfoViewModel(themeInfo)))
+            foreach (var theme in themes)
             {
-                TInfo.RoundInfo.Add(theme);
+                TInfo.RoundInfo.Add(new ThemeInfoViewModel(new ThemeInfo { Name = theme }));
 
                 if (playMode != Models.ThemesPlayMode.None)
                 {
-                    OnReplic(ReplicCodes.System.ToString(), theme.Name);
+                    OnReplic(ReplicCodes.System.ToString(), theme);
                 }
             }
         }
@@ -1213,8 +1237,17 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
-    public void OnTheme(string themeName, int questionCount, bool animate = false) =>
+    public void OnTheme(string themeName, string themeComments, int questionCount, bool animate = false)
+    {
         SetText(themeName, animate, Models.TableStage.Theme);
+
+        if (_themeCounter >= TInfo.RoundInfo.Count)
+        {
+            return;
+        }
+
+        TInfo.RoundInfo[_themeCounter++].Comments = themeComments;
+    }
 
     public void OnThemeComments(string comments)
     {
@@ -1536,7 +1569,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
-    private void OnPictureError(string remoteUri) =>
+    private static void OnPictureError(string remoteUri) =>
         PlatformManager.Instance.ShowMessage(
             string.Format(Resources.Error_UploadingAvatar + ": {0}", remoteUri),
             MessageType.Warning,
@@ -1614,20 +1647,20 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         _gameViewModel.OnIsPausedChanged(isPaused);
     }
 
-    public void TableLoaded() => UI.Execute(TableLoadedUI, OnError);
+    public void TableLoaded(List<ThemeInfo> table) => UI.Execute(() => TableLoadedUI(table), OnError);
 
-    private void TableLoadedUI()
+    private void TableLoadedUI(List<ThemeInfo> table)
     {
         lock (TInfo.RoundInfoLock)
         {
-            for (int i = 0; i < _data.TInfo.RoundInfo.Count; i++)
+            for (int i = 0; i < table.Count; i++)
             {
                 if (TInfo.RoundInfo.Count <= i)
                     break;
 
                 TInfo.RoundInfo[i].Questions.Clear();
 
-                foreach (var item in _data.TInfo.RoundInfo[i].Questions.Select(questionInfo => new QuestionInfoViewModel(questionInfo)).ToArray())
+                foreach (var item in table[i].Questions.Select(questionInfo => new QuestionInfoViewModel(questionInfo)).ToArray())
                 {
                     TInfo.RoundInfo[i].Questions.Add(item);
                 }

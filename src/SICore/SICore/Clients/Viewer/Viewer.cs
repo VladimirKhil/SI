@@ -27,7 +27,7 @@ public class Viewer : MessageHandler, IViewerClient
 
     protected IPersonController Logic => _controller;
 
-    protected ViewerData ClientData { get; }
+    protected ViewerData State { get; }
 
     public string? Avatar { get; set; }
 
@@ -44,9 +44,9 @@ public class Viewer : MessageHandler, IViewerClient
     {
         _actions = actions;
         _controller = controller;
-        ClientData = state;
-        ClientData.Name = client.Name;
-        ClientData.Picture = personData.Picture;
+        State = state;
+        State.Name = client.Name;
+        State.Picture = personData.Picture;
     }
 
     // TODO: get rid of async and await here
@@ -113,7 +113,7 @@ public class Viewer : MessageHandler, IViewerClient
 
                 case Messages.ComputerAccounts:
                     {
-                        ClientData.DefaultComputerPlayers = mparams.Skip(1).Select(name => new Account { Name = name }).ToArray();
+                        State.DefaultComputerPlayers = mparams.Skip(1).Select(name => new Account { Name = name }).ToArray();
                         break;
                     }
 
@@ -130,7 +130,7 @@ public class Viewer : MessageHandler, IViewerClient
                     {
                         if (mparams.Length > 1)
                         {
-                            ClientData.PackageId = mparams[1];
+                            State.PackageId = mparams[1];
                         }
                         break;
                     }
@@ -168,7 +168,7 @@ public class Viewer : MessageHandler, IViewerClient
 
                         if (mparams.Length > 4)
                         {
-                            var message = ClientData.TInfo.Pause ? MessageParams.Timer_UserPause : MessageParams.Timer_UserResume;
+                            var message = State.TInfo.Pause ? MessageParams.Timer_UserPause : MessageParams.Timer_UserResume;
 
                             _controller.OnTimerChanged(0, message, mparams[2]);
                             _controller.OnTimerChanged(1, message, mparams[3]);
@@ -184,7 +184,7 @@ public class Viewer : MessageHandler, IViewerClient
                     {
                         #region Sums
 
-                        var players = ClientData.Players;
+                        var players = State.Players;
                         var max = Math.Min(players.Count, mparams.Length - 1);
 
                         for (int i = 0; i < max; i++)
@@ -202,14 +202,14 @@ public class Viewer : MessageHandler, IViewerClient
                     {
                         #region Ready
 
-                        if (ClientData.Players.Count == 0)
+                        if (State.Players.Count == 0)
                         {
                             return;
                         }
 
                         var ready = mparams.Length == 2 || mparams[2] == "+";
 
-                        var person = ClientData.MainPersons.FirstOrDefault(item => item.Name == mparams[1]);
+                        var person = State.MainPersons.FirstOrDefault(item => item.Name == mparams[1]);
                         
                         if (person != null)
                         {
@@ -221,7 +221,7 @@ public class Viewer : MessageHandler, IViewerClient
                     }
 
                 case Messages.RoundsNames:
-                    ClientData.RoundNames = mparams.Skip(1).ToArray();
+                    State.RoundNames = mparams.Skip(1).ToArray();
                     break;
 
                 case Messages.Stage:
@@ -278,7 +278,7 @@ public class Viewer : MessageHandler, IViewerClient
                         _controller.ClearQuestionState();
                         _controller.SetText(mparams[1], false, TableStage.QuestionPrice);
                         OnThemeOrQuestion();
-                        _controller.SetCaption($"{ClientData.ThemeName}, {mparams[1]}");
+                        _controller.SetCaption($"{State.ThemeName}, {mparams[1]}");
                     }
                     break;
 
@@ -421,7 +421,7 @@ public class Viewer : MessageHandler, IViewerClient
                         
                         if (!int.TryParse(mparams[2], out var playerIndex)
                             || playerIndex < 0
-                            || playerIndex >= ClientData.Players.Count)
+                            || playerIndex >= State.Players.Count)
                         {
                             break;
                         }
@@ -518,10 +518,10 @@ public class Viewer : MessageHandler, IViewerClient
     {
         for (var i = 1; i < mparams.Length; i++)
         {
-            ClientData.TInfo.GameThemes.Add(mparams[i]);
+            State.TInfo.GameThemes.Add(mparams[i]);
         }
 
-        _controller.OnGameThemes(ClientData.TInfo.GameThemes);
+        _controller.OnGameThemes(State.TInfo.GameThemes);
     }
 
     private void OnPackageComments(string[] mparams)
@@ -549,14 +549,14 @@ public class Viewer : MessageHandler, IViewerClient
     private void OnTable(string[] mparams)
     {
         // TODO: clear existing table and renew it
-        if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
+        if (State.TInfo.RoundInfo.Any(t => t.Questions.Any()))
         {
             return;
         }
 
         var index = 1;
 
-        for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
+        for (int i = 0; i < State.TInfo.RoundInfo.Count; i++)
         {
             if (index == mparams.Length)
             {
@@ -570,13 +570,13 @@ public class Viewer : MessageHandler, IViewerClient
                     price = -1;
                 }
 
-                ClientData.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
+                State.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
             }
 
             index++;
         }
 
-        _controller.TableLoaded();
+        _controller.TableLoaded(State.TInfo.RoundInfo);
     }
 
     private void OnPersonFinalStake(string[] mparams)
@@ -634,7 +634,7 @@ public class Viewer : MessageHandler, IViewerClient
 
     private void OnPlayerAnswer(string[] mparams)
     {
-        if (mparams.Length < 3 || !int.TryParse(mparams[1], out var playerIndex) || playerIndex < 0 || playerIndex >= ClientData.Players.Count)
+        if (mparams.Length < 3 || !int.TryParse(mparams[1], out var playerIndex) || playerIndex < 0 || playerIndex >= State.Players.Count)
         {
             return;
         }
@@ -660,55 +660,40 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        ClientData.Stage = (GameStage)Enum.Parse(typeof(GameStage), mparams[1]);
+        State.Stage = (GameStage)Enum.Parse(typeof(GameStage), mparams[1]);
 
-        if (ClientData.Stage != GameStage.Before)
+        if (State.Stage != GameStage.Before)
         {
-            for (int i = 0; i < ClientData.Players.Count; i++)
+            for (int i = 0; i < State.Players.Count; i++)
             {
-                ClientData.Players[i].GameStarted = true;
+                State.Players[i].GameStarted = true;
             }
 
-            ClientData.ShowMan.GameStarted = true;
+            State.ShowMan.GameStarted = true;
         }
+
+        var roundIndex = -1;
 
         if (mparams.Length > 3)
         {
-            if (int.TryParse(mparams[3], out var roundIndex))
-            {
-                if (roundIndex > -1 && roundIndex < ClientData.RoundNames.Length)
-                {
-                    ClientData.RoundIndex = roundIndex;
-                }
-            }
+            _ = int.TryParse(mparams[3], out roundIndex);
         }
 
-        if (mparams[0] == Messages.Stage || ClientData.Stage == GameStage.Begin || ClientData.Stage == GameStage.After)
+        if (mparams[0] == Messages.Stage && State.Stage == GameStage.Round)
         {
-            _controller.SetCaption("");
-
-            switch (ClientData.Stage)
+            for (int i = 0; i < State.Players.Count; i++)
             {
-                case GameStage.Round:
-                    if (mparams.Length > 2)
-                    {
-                        _controller.SetText(mparams[2]);
-                    }
-
-                    for (int i = 0; i < ClientData.Players.Count; i++)
-                    {
-                        ClientData.Players[i].InGame = true;
-                        ClientData.Players[i].IsChooser = false;
-                    }
-
-                    break;
+                State.Players[i].InGame = true;
+                State.Players[i].IsChooser = false;
             }
-
-            _controller.OnStage(
-                ClientData.Stage,
-                mparams.Length > 2 ? mparams[2] : "",
-                mparams.Length > 4 ? Enum.Parse<QuestionSelectionStrategyType>(mparams[4]) : null);
         }
+
+        _controller.OnStage(
+            mparams[0] == Messages.Stage,
+            State.Stage,
+            mparams.Length > 2 ? mparams[2] : "",
+            roundIndex,
+            mparams.Length > 4 ? Enum.Parse<QuestionSelectionStrategyType>(mparams[4]) : null);
     }
 
     private void OnHostName(string[] mparams)
@@ -718,7 +703,7 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        ClientData.HostName = mparams[1];
+        State.HostName = mparams[1];
         _controller.OnHostChanged(mparams.Length > 2 ? mparams[2] : null, mparams[1]);
     }
 
@@ -729,11 +714,11 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        ClientData.ThemeIndex = themeIndex;
+        State.ThemeIndex = themeIndex;
 
-        if (ClientData.ThemeIndex > -1 && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count)
+        if (State.ThemeIndex > -1 && State.ThemeIndex < State.TInfo.RoundInfo.Count)
         {
-            _controller.Out(ClientData.ThemeIndex);
+            _controller.Out(State.ThemeIndex);
         }
     }
 
@@ -744,7 +729,7 @@ public class Viewer : MessageHandler, IViewerClient
 
     private void OnTheme(string[] mparams)
     {
-        if (mparams.Length <= 4)
+        if (mparams.Length <= 5)
         {
             return;
         }
@@ -761,11 +746,13 @@ public class Viewer : MessageHandler, IViewerClient
         if (!animate)
         {
             OnThemeOrQuestion();
-            ClientData.ThemeName = themeName;
-            ClientData.ThemeComments = mparams[4].UnescapeNewLines();
+            State.ThemeName = themeName;
+            State.ThemeComments = mparams[4].UnescapeNewLines();
         }
 
-        _controller.OnTheme(themeName, questionCount, animate);
+        var themeComments = mparams[4].UnescapeNewLines();
+
+        _controller.OnTheme(themeName, themeComments, questionCount, animate);
     }
 
     private void OnThemeInfo(string[] mparams)
@@ -777,8 +764,8 @@ public class Viewer : MessageHandler, IViewerClient
         
         var themeName = mparams[1];
 
-        ClientData.ThemeName = themeName;
-        ClientData.ThemeComments = mparams[3];
+        State.ThemeName = themeName;
+        State.ThemeComments = mparams[3];
 
         _controller.OnThemeInfo(themeName);
     }
@@ -790,13 +777,13 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        for (int i = 0; i < ClientData.Players.Count; i++)
+        for (int i = 0; i < State.Players.Count; i++)
         {
-            ClientData.Players[i].IsChooser = i == index;
+            State.Players[i].IsChooser = i == index;
 
             if (mparams.Length > 2 && mparams[2] == "+")
             {
-                ClientData.Players[i].State = i == index ? PlayerState.Answering : PlayerState.Pass;
+                State.Players[i].State = i == index ? PlayerState.Answering : PlayerState.Pass;
             }
         }
     }
@@ -849,9 +836,9 @@ public class Viewer : MessageHandler, IViewerClient
         {
             if (int.TryParse(mparams[i], out int playerIndex)
                 && playerIndex >= 0
-                && playerIndex < ClientData.Players.Count)
+                && playerIndex < State.Players.Count)
             {
-                ClientData.Players[playerIndex].State = state;
+                State.Players[playerIndex].State = state;
             }
         }
 
@@ -861,7 +848,7 @@ public class Viewer : MessageHandler, IViewerClient
             {
                 await Task.Delay(200);
 
-                foreach (var player in ClientData.Players)
+                foreach (var player in State.Players)
                 {
                     if (player.State == PlayerState.Lost)
                     {
@@ -879,7 +866,7 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        var person = ClientData.MainPersons.FirstOrDefault(person => person.Name == mparams[1]);
+        var person = State.MainPersons.FirstOrDefault(person => person.Name == mparams[1]);
 
         if (person != null)
         {
@@ -889,9 +876,9 @@ public class Viewer : MessageHandler, IViewerClient
 
     private void OnAnswers(string[] mparams)
     {
-        for (var i = 1; i < mparams.Length && i - 1 < ClientData.Players.Count; i++)
+        for (var i = 1; i < mparams.Length && i - 1 < State.Players.Count; i++)
         {
-            ClientData.Players[i - 1].Answer = mparams[i];
+            State.Players[i - 1].Answer = mparams[i];
         }
     }
 
@@ -921,7 +908,7 @@ public class Viewer : MessageHandler, IViewerClient
 
     private void OnQuestionType(string[] mparams)
     {
-        ClientData.QuestionType = mparams[1];
+        State.QuestionType = mparams[1];
         _controller.OnQuestionStart(mparams.Length > 2 && bool.TryParse(mparams[2], out var isDefault) && isDefault);
     }
 
@@ -932,12 +919,12 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        if (themeIndex < 0 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        if (themeIndex < 0 || themeIndex >= State.TInfo.RoundInfo.Count)
         {
             return;
         }
 
-        var selectedTheme = ClientData.TInfo.RoundInfo[themeIndex];
+        var selectedTheme = State.TInfo.RoundInfo[themeIndex];
 
         if (questionIndex < 0 || questionIndex >= selectedTheme.Questions.Count)
         {
@@ -946,14 +933,14 @@ public class Viewer : MessageHandler, IViewerClient
 
         var selectedQuestion = selectedTheme.Questions[questionIndex];
 
-        ClientData.ThemeIndex = themeIndex;
-        ClientData.QuestionIndex = questionIndex;
+        State.ThemeIndex = themeIndex;
+        State.QuestionIndex = questionIndex;
 
         var questionPrice = mparams.Length > 3 && int.TryParse(mparams[3], out var price) ? price : selectedQuestion.Price;
 
         _controller.SetCaption($"{selectedTheme.Name}, {questionPrice}");
 
-        foreach (var player in ClientData.Players.ToArray())
+        foreach (var player in State.Players.ToArray())
         {
             player.ClearState();
         }
@@ -969,7 +956,7 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        var player = ClientData.Players.FirstOrDefault(p => p.Name == mparams[1]);
+        var player = State.Players.FirstOrDefault(p => p.Name == mparams[1]);
 
         if (player == null)
         {
@@ -993,12 +980,12 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        if (themeIndex < 0 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        if (themeIndex < 0 || themeIndex >= State.TInfo.RoundInfo.Count)
         {
             return;
         }
 
-        var theme = ClientData.TInfo.RoundInfo[themeIndex];
+        var theme = State.TInfo.RoundInfo[themeIndex];
 
         if (questionIndex < 0 || questionIndex >= theme.Questions.Count)
         {
@@ -1050,9 +1037,9 @@ public class Viewer : MessageHandler, IViewerClient
 
         var name = mparams[1];
 
-        if (ClientData.AllPersons.TryGetValue(name, out var person))
+        if (State.AllPersons.TryGetValue(name, out var person))
         {
-            ClientData.BeginUpdatePersons($"Disconnected {name}");
+            State.BeginUpdatePersons($"Disconnected {name}");
 
             try
             {
@@ -1062,19 +1049,19 @@ public class Viewer : MessageHandler, IViewerClient
 
                 var personAccount = person as PersonAccount;
 
-                if (ClientData.Stage == GameStage.Before && personAccount != null)
+                if (State.Stage == GameStage.Before && personAccount != null)
                 {
                     personAccount.Ready = false;
                 }
 
                 if (personAccount == null)
                 {
-                    ClientData.Viewers.Remove(person);
+                    State.Viewers.Remove(person);
                 }
             }
             finally
             {
-                ClientData.EndUpdatePersons();
+                State.EndUpdatePersons();
             }
         }
 
@@ -1107,19 +1094,19 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        ClientData.TInfo.RoundInfo.Clear();
+        State.TInfo.RoundInfo.Clear();
 
         for (var i = 2; i < mparams.Length; i++)
         {
-            ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
+            State.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
         }
 
-        _controller.RoundThemes(playMode);
+        _controller.RoundThemes(State.TInfo.RoundInfo.Select(t => t.Name).ToList(), playMode);
     }
 
     private void OnThemeOrQuestion()
     {
-        foreach (var player in ClientData.Players)
+        foreach (var player in State.Players)
         {
             player.ClearState();
         }
@@ -1130,7 +1117,7 @@ public class Viewer : MessageHandler, IViewerClient
         if (mparams.Length < 3 ||
             !int.TryParse(mparams[1], out var stakerIndex) ||
             stakerIndex < 0 ||
-            stakerIndex >= ClientData.Players.Count ||
+            stakerIndex >= State.Players.Count ||
             !int.TryParse(mparams[2], out var stakeType))
         {
             return;
@@ -1145,7 +1132,7 @@ public class Viewer : MessageHandler, IViewerClient
         else if (stakeType == 2)
         {
             stake = -2;
-            ClientData.Players[stakerIndex].State = PlayerState.Pass;
+            State.Players[stakerIndex].State = PlayerState.Pass;
         }
         else if (stakeType == 3)
         {
@@ -1160,11 +1147,11 @@ public class Viewer : MessageHandler, IViewerClient
 
             if (mparams.Length > 4)
             {
-                ClientData.Players[stakerIndex].SafeStake = true;
+                State.Players[stakerIndex].SafeStake = true;
             }
         }
 
-        ClientData.Players[stakerIndex].Stake = stake;
+        State.Players[stakerIndex].Stake = stake;
         _controller.OnPersonStake(stakerIndex);
     }
 
@@ -1217,22 +1204,22 @@ public class Viewer : MessageHandler, IViewerClient
 
     private void OnConfigAddTable(string[] mparams)
     {
-        ClientData.BeginUpdatePersons($"Config_AddTable {string.Join(" ", mparams)}");
+        State.BeginUpdatePersons($"Config_AddTable {string.Join(" ", mparams)}");
 
         try
         {
-            var account = new PlayerAccount(mparams[2], mparams[3] == "+", mparams[4] == "+", ClientData.Stage != GameStage.Before)
+            var account = new PlayerAccount(mparams[2], mparams[3] == "+", mparams[4] == "+", State.Stage != GameStage.Before)
             {
                 IsHuman = mparams[5] == "+",
                 Ready = mparams[6] == "+"
             };
 
-            ClientData.Players.Add(account);
+            State.Players.Add(account);
             _controller.AddPlayer(account);
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            State.EndUpdatePersons();
         }
     }
 
@@ -1246,7 +1233,7 @@ public class Viewer : MessageHandler, IViewerClient
         var personType = mparams[2];
         var indexString = mparams[3];
 
-        var me = ClientData.Me;
+        var me = State.Me;
 
         PersonAccount account;
 
@@ -1254,28 +1241,28 @@ public class Viewer : MessageHandler, IViewerClient
         
         if (isPlayer)
         {
-            if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
+            if (!int.TryParse(indexString, out int index) || index < 0 || index >= State.Players.Count)
             {
                 return;
             }
 
-            account = ClientData.Players[index];
+            account = State.Players[index];
         }
         else
         {
-            account = ClientData.ShowMan;
+            account = State.ShowMan;
         }
 
-        var clone = new List<ViewerAccount>(ClientData.Viewers);
+        var clone = new List<ViewerAccount>(State.Viewers);
         var newAccount = new ViewerAccount(account) { IsConnected = true };
 
         clone.Add(newAccount);
 
-        ClientData.BeginUpdatePersons($"Config_Free {string.Join(" ", mparams)}");
+        State.BeginUpdatePersons($"Config_Free {string.Join(" ", mparams)}");
         
         try
         {
-            ClientData.Viewers = clone;
+            State.Viewers = clone;
 
             account.Name = Constants.FreePlace;
             account.IsConnected = false;
@@ -1284,7 +1271,7 @@ public class Viewer : MessageHandler, IViewerClient
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            State.EndUpdatePersons();
         }
 
         if (account == me)
@@ -1307,23 +1294,23 @@ public class Viewer : MessageHandler, IViewerClient
         var newName = mparams[5];
         var newSex = mparams[6] == "+";
 
-        var me = ClientData.Me;
+        var me = State.Me;
 
         PersonAccount account;
         var isPlayer = personType == Constants.Player;
 
         if (isPlayer)
         {
-            if (!int.TryParse(indexString, out var index) || index < 0 || index >= ClientData.Players.Count)
+            if (!int.TryParse(indexString, out var index) || index < 0 || index >= State.Players.Count)
             {
                 return;
             }
 
-            account = ClientData.Players[index];
+            account = State.Players[index];
         }
         else
         {
-            account = ClientData.ShowMan;
+            account = State.ShowMan;
         }
 
         if (account.IsHuman == newTypeHuman)
@@ -1333,11 +1320,11 @@ public class Viewer : MessageHandler, IViewerClient
 
         if (newTypeHuman)
         {
-            ClientData.BeginUpdatePersons($"Config_ChangeType {string.Join(" ", mparams)}");
+            State.BeginUpdatePersons($"Config_ChangeType {string.Join(" ", mparams)}");
 
             try
             {
-                if (account.Name == ClientData.Name /* for computer accounts being deleted */)
+                if (account.Name == State.Name /* for computer accounts being deleted */)
                 {
                     ThrowComputerAccountError();
                 }
@@ -1350,26 +1337,26 @@ public class Viewer : MessageHandler, IViewerClient
             }
             finally
             {
-                ClientData.EndUpdatePersons();
+                State.EndUpdatePersons();
             }
         }
         else
         {
-            ClientData.BeginUpdatePersons($"Config_ChangeType {string.Join(" ", mparams)}");
+            State.BeginUpdatePersons($"Config_ChangeType {string.Join(" ", mparams)}");
             ViewerAccount? newAccount = null;
 
             try
             {
                 if (account.IsConnected)
                 {
-                    var clone = new List<ViewerAccount>(ClientData.Viewers);
+                    var clone = new List<ViewerAccount>(State.Viewers);
                     newAccount = new ViewerAccount(account) { IsConnected = true };
 
                     clone.Add(newAccount);
 
-                    ClientData.Viewers = clone;
+                    State.Viewers = clone;
                 }
-                else if (account == ClientData.Me)
+                else if (account == State.Me)
                 {
                     throw new InvalidOperationException("I am not connected!");
                 }
@@ -1383,7 +1370,7 @@ public class Viewer : MessageHandler, IViewerClient
             }
             finally
             {
-                ClientData.EndUpdatePersons();
+                State.EndUpdatePersons();
             }
 
             if (account == me && newAccount != null)
@@ -1406,9 +1393,9 @@ public class Viewer : MessageHandler, IViewerClient
 
         var indexString = mparams[2];
 
-        var me = ClientData.Me;
+        var me = State.Me;
 
-        if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
+        if (!int.TryParse(indexString, out int index) || index < 0 || index >= State.Players.Count)
         {
             return;
         }
@@ -1416,15 +1403,15 @@ public class Viewer : MessageHandler, IViewerClient
         PlayerAccount account;
         ViewerAccount? newAccount = null;
 
-        ClientData.BeginUpdatePersons($"Config_DeleteTable {string.Join(" ", mparams)}");
+        State.BeginUpdatePersons($"Config_DeleteTable {string.Join(" ", mparams)}");
 
         try
         {
-            account = ClientData.Players[index];
+            account = State.Players[index];
 
-            ClientData.Players.RemoveAt(index);
+            State.Players.RemoveAt(index);
 
-            if (!account.IsHuman && account.Name == ClientData.Name /* for computer accounts being deleted */)
+            if (!account.IsHuman && account.Name == State.Name /* for computer accounts being deleted */)
             {
                 ThrowComputerAccountError();
             }
@@ -1433,19 +1420,19 @@ public class Viewer : MessageHandler, IViewerClient
             {
                 newAccount = new ViewerAccount(account) { IsConnected = true };
 
-                var cloneV = new List<ViewerAccount>(ClientData.Viewers)
+                var cloneV = new List<ViewerAccount>(State.Viewers)
                 {
                     newAccount
                 };
 
-                ClientData.Viewers = cloneV;
+                State.Viewers = cloneV;
             }
 
             _controller.RemovePlayerAt(index);
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            State.EndUpdatePersons();
         }
 
         if (account == me && newAccount != null && _controller.CanSwitchType)
@@ -1459,15 +1446,15 @@ public class Viewer : MessageHandler, IViewerClient
     {
         if (isPlayer)
         {
-            if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
+            if (!int.TryParse(indexString, out int index) || index < 0 || index >= State.Players.Count)
             {
                 return null;
             }
 
-            return ClientData.Players[index];
+            return State.Players[index];
         }
         
-        return ClientData.ShowMan;
+        return State.ShowMan;
     }
 
     private void OnConfigSet(string[] mparams)
@@ -1484,7 +1471,7 @@ public class Viewer : MessageHandler, IViewerClient
 
         var isPlayer = personType == Constants.Player;
 
-        var me = ClientData.Me;
+        var me = State.Me;
 
         // Кого заменяем
         var account = GetAccountByType(isPlayer, indexString);
@@ -1496,11 +1483,11 @@ public class Viewer : MessageHandler, IViewerClient
 
         if (!account.IsHuman)
         {
-            ClientData.BeginUpdatePersons($"Config_Set {string.Join(" ", mparams)}");
+            State.BeginUpdatePersons($"Config_Set {string.Join(" ", mparams)}");
 
             try
             {
-                if (account.Name == ClientData.Name /* for computer accounts being deleted */)
+                if (account.Name == State.Name /* for computer accounts being deleted */)
                 {
                     ThrowComputerAccountError();
                 }
@@ -1511,7 +1498,7 @@ public class Viewer : MessageHandler, IViewerClient
             }
             finally
             {
-                ClientData.EndUpdatePersons();
+                State.EndUpdatePersons();
             }
         }
         else
@@ -1527,14 +1514,14 @@ public class Viewer : MessageHandler, IViewerClient
             ViewerAccount? other = null;
             GameRole role = GameRole.Viewer;
 
-            ClientData.BeginUpdatePersons($"Config_Set {string.Join(" ", mparams)}");
+            State.BeginUpdatePersons($"Config_Set {string.Join(" ", mparams)}");
 
             try
             {
-                if (isPlayer && ClientData.ShowMan.Name == replacer)
+                if (isPlayer && State.ShowMan.Name == replacer)
                 {
                     // Put the showman in the place of the player
-                    var showman = ClientData.ShowMan;
+                    var showman = State.ShowMan;
                     other = showman;
                     role = GameRole.Showman;
 
@@ -1556,7 +1543,7 @@ public class Viewer : MessageHandler, IViewerClient
                 {
                     var found = false;
 
-                    foreach (var item in ClientData.Players)
+                    foreach (var item in State.Players)
                     {
                         if (item.Name == replacer)
                         {
@@ -1584,7 +1571,7 @@ public class Viewer : MessageHandler, IViewerClient
 
                     if (!found)
                     {
-                        foreach (var item in ClientData.Viewers)
+                        foreach (var item in State.Viewers)
                         {
                             if (item.Name == replacer)
                             {
@@ -1607,7 +1594,7 @@ public class Viewer : MessageHandler, IViewerClient
                                 else
                                 {
                                     // the place was empty, the viewer needs to be deleted
-                                    ClientData.Viewers.Remove(item);
+                                    State.Viewers.Remove(item);
                                     account.IsConnected = true;
                                 }
 
@@ -1620,7 +1607,7 @@ public class Viewer : MessageHandler, IViewerClient
             }
             finally
             {
-                ClientData.EndUpdatePersons();
+                State.EndUpdatePersons();
             }
 
             if (other == null)
@@ -1662,14 +1649,14 @@ public class Viewer : MessageHandler, IViewerClient
 
         if (!_controller.CanSwitchType)
         {
-            throw new InvalidOperationException($"Trying to switch type of computer account:\n{ClientData.Name}");
+            throw new InvalidOperationException($"Trying to switch type of computer account:\n{State.Name}");
         }
 
         IViewerClient viewer = role switch
         {
-            GameRole.Viewer => new Viewer(_client, newAccount, _controller, _actions, ClientData),
-            GameRole.Player => new Player(_client, newAccount, _controller, _actions, ClientData),
-            _ => new Showman(_client, newAccount, _controller, _actions, ClientData),
+            GameRole.Viewer => new Viewer(_client, newAccount, _controller, _actions, State),
+            GameRole.Player => new Player(_client, newAccount, _controller, _actions, State),
+            _ => new Showman(_client, newAccount, _controller, _actions, State),
         };
 
         viewer.Avatar = Avatar;
@@ -1686,14 +1673,14 @@ public class Viewer : MessageHandler, IViewerClient
         _ = int.TryParse(mparams[1], out var playerCount);
         var viewerCount = (mparams.Length - 2) / 5 - 1 - playerCount;
 
-        var gameStarted = ClientData.Stage != GameStage.Before;
+        var gameStarted = State.Stage != GameStage.Before;
 
         var mIndex = 2;
-        ClientData.BeginUpdatePersons($"ProcessInfo {string.Join(" ", mparams)}");
+        State.BeginUpdatePersons($"ProcessInfo {string.Join(" ", mparams)}");
 
         try
         {
-            var showman = ClientData.ShowMan;
+            var showman = State.ShowMan;
 
             showman.Name = mparams[mIndex++];
             showman.IsMale = mparams[mIndex++] == "+";
@@ -1715,8 +1702,8 @@ public class Viewer : MessageHandler, IViewerClient
                 newPlayers.Add(account);
             }
 
-            ClientData.Players.Clear();
-            ClientData.Players.AddRange(newPlayers);
+            State.Players.Clear();
+            State.Players.AddRange(newPlayers);
 
             var newViewers = new List<ViewerAccount>();
 
@@ -1740,26 +1727,26 @@ public class Viewer : MessageHandler, IViewerClient
                 mIndex++; // skipping "Ready" status
             }
 
-            ClientData.Viewers = newViewers;
-            ClientData.IsInfoInitialized = true;
+            State.Viewers = newViewers;
+            State.IsInfoInitialized = true;
 
             _controller.OnInfo();
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            State.EndUpdatePersons();
         }
 
-        if (ClientData.Me != null)
+        if (State.Me != null)
         {
-            ClientData.Me.Picture = ClientData.Picture;
+            State.Me.Picture = State.Picture;
         }
 
         if (!_client.Node.IsMain) // TODO: this should be handled on node level
         {
-            foreach (var item in ClientData.AllPersons.Values)
+            foreach (var item in State.AllPersons.Values)
             {
-                if (item != ClientData.Me && item.Name != NetworkConstants.GameName)
+                if (item != State.Me && item.Name != NetworkConstants.GameName)
                 {
                     await _client.Node.ConnectionsLock.WithLockAsync(() =>
                     {
@@ -1786,14 +1773,14 @@ public class Viewer : MessageHandler, IViewerClient
 
     private void InsertPerson(string role, Account account, int index)
     {
-        ClientData.BeginUpdatePersons($"InsertPerson {role} {account.Name} {index}");
+        State.BeginUpdatePersons($"InsertPerson {role} {account.Name} {index}");
 
         try
         {
             switch (role)
             {
                 case Constants.Showman:
-                    var showman = ClientData.ShowMan;
+                    var showman = State.ShowMan;
 
                     showman.Name = account.Name;
                     showman.IsMale = account.IsMale;
@@ -1801,36 +1788,36 @@ public class Viewer : MessageHandler, IViewerClient
                     showman.IsHuman = true;
                     showman.IsConnected = true;
                     showman.Ready = false;
-                    showman.GameStarted = ClientData.Stage != GameStage.Before;
+                    showman.GameStarted = State.Stage != GameStage.Before;
                     break;
 
                 case Constants.Player:
                     var playersWereUpdated = false;
 
-                    while (index >= ClientData.Players.Count)
+                    while (index >= State.Players.Count)
                     {
                         var p = new PlayerAccount(
                             Constants.FreePlace,
                             true,
                             false,
-                            ClientData.Stage != GameStage.Before)
+                            State.Stage != GameStage.Before)
                         {
                             IsHuman = true,
                             Ready = false
                         };
 
-                        ClientData.Players.Add(p);
+                        State.Players.Add(p);
                         playersWereUpdated = true;
                     }
 
                     if (playersWereUpdated)
                     {
-                        ClientData.UpdatePlayers();
+                        State.UpdatePlayers();
                     }
 
-                    var player = ClientData.Players[index];
+                    var player = State.Players[index];
 
-                    if (player.Name == ClientData.Name)
+                    if (player.Name == State.Name)
                     {
                         break;
                     }
@@ -1841,21 +1828,21 @@ public class Viewer : MessageHandler, IViewerClient
                     player.IsHuman = true;
                     player.IsConnected = true;
                     player.Ready = false;
-                    player.GameStarted = ClientData.Stage != GameStage.Before;
+                    player.GameStarted = State.Stage != GameStage.Before;
                     break;
 
                 case Constants.Viewer:
                     var viewer = new ViewerAccount(account) { IsHuman = true, IsConnected = true };
 
-                    var existingViewer = ClientData.Viewers.FirstOrDefault(v => v.Name == viewer.Name);
+                    var existingViewer = State.Viewers.FirstOrDefault(v => v.Name == viewer.Name);
 
                     if (existingViewer != null)
                     {
-                        throw new Exception($"Duplicate viewer name: \"{viewer.Name}\" ({existingViewer.IsConnected})!\n" + ClientData.PersonsUpdateHistory);
+                        throw new Exception($"Duplicate viewer name: \"{viewer.Name}\" ({existingViewer.IsConnected})!\n" + State.PersonsUpdateHistory);
                     }
 
-                    ClientData.Viewers.Add(viewer);
-                    ClientData.UpdateViewers();
+                    State.Viewers.Add(viewer);
+                    State.UpdateViewers();
                     break;
 
                 default:
@@ -1864,7 +1851,7 @@ public class Viewer : MessageHandler, IViewerClient
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            State.EndUpdatePersons();
         }
     }
 
@@ -1882,7 +1869,7 @@ public class Viewer : MessageHandler, IViewerClient
 
         var playerName = mparams.Length > 6 ? mparams[6] : null;
 
-        ClientData.StakeInfo = new StakeInfo
+        State.StakeInfo = new StakeInfo
         {
             Minimum = minimumStake,
             Maximum = maximumStake,
@@ -1905,7 +1892,7 @@ public class Viewer : MessageHandler, IViewerClient
         {
             _controller.AddLog($"[{message.Text}]");
 
-            await ClientData.TaskLock.WithLockAsync(
+            await State.TaskLock.WithLockAsync(
                 async () => await OnSystemMessageReceivedAsync(message.Text.Split('\n')),
                 ViewerData.LockTimeoutMs);
         }
@@ -1944,9 +1931,9 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(ClientData.Picture))
+        if (!string.IsNullOrWhiteSpace(State.Picture))
         {
-            if (!Uri.TryCreate(ClientData.Picture, UriKind.RelativeOrAbsolute, out var uri))
+            if (!Uri.TryCreate(State.Picture, UriKind.RelativeOrAbsolute, out var uri))
             {
                 return;
             }
@@ -1962,7 +1949,7 @@ public class Viewer : MessageHandler, IViewerClient
 
                 try
                 {
-                    data = CoreManager.Instance.GetData(ClientData.Picture);
+                    data = CoreManager.Instance.GetData(State.Picture);
                 }
                 catch (Exception exc)
                 {
@@ -1972,15 +1959,15 @@ public class Viewer : MessageHandler, IViewerClient
 
                 if (data == null)
                 {
-                    _client.Node.OnError(new Exception($"Avatar file not found: {ClientData.Picture}"), true);
+                    _client.Node.OnError(new Exception($"Avatar file not found: {State.Picture}"), true);
                     return;
                 }
 
-                _actions.SendMessage(Messages.Picture, ClientData.Picture, Convert.ToBase64String(data));
+                _actions.SendMessage(Messages.Picture, State.Picture, Convert.ToBase64String(data));
             }
             else
             {
-                _actions.SendMessage(Messages.Picture, ClientData.Picture);
+                _actions.SendMessage(Messages.Picture, State.Picture);
             }
         }
     }
@@ -1992,9 +1979,9 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        for (var i = 0; i < ClientData.Players.Count; i++)
+        for (var i = 0; i < State.Players.Count; i++)
         {
-            ClientData.Players[i].CanBeSelected = i + 2 < mparams.Length && mparams[i + 2] == "+";
+            State.Players[i].CanBeSelected = i + 2 < mparams.Length && mparams[i + 2] == "+";
         }
 
         _ = Enum.TryParse<SelectPlayerReason>(mparams[1], out var reason);

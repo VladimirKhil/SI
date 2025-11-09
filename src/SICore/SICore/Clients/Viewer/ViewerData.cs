@@ -1,5 +1,7 @@
 ﻿using SICore.Models;
 using SIData;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Utils;
 
@@ -10,7 +12,7 @@ namespace SICore;
 /// <summary>
 /// Defines viewer data.
 /// </summary>
-public sealed class ViewerData : Data
+public sealed class ViewerData : Data, INotifyPropertyChanged
 {
     internal const int LockTimeoutMs = 5000;
 
@@ -290,25 +292,6 @@ public sealed class ViewerData : Data
     /// </summary>
     public bool IsNetworkGame { get; set; }
 
-    private int _roundIndex = -1;
-
-    // TODO: move to client
-    /// <summary>
-    /// Current round index.
-    /// </summary>
-    public int RoundIndex 
-    {
-        get => _roundIndex;
-        set
-        {
-            if (_roundIndex != value)
-            {
-                _roundIndex = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     private string[] _right = Array.Empty<string>();
 
     private string[] _wrong = Array.Empty<string>();
@@ -372,4 +355,20 @@ public sealed class ViewerData : Data
             }
         }
     }
+
+    private GameStage _stage = GameStage.Before;
+
+    /// <summary>
+    /// Current game stage.
+    /// </summary>
+    public GameStage Stage
+    {
+        get => _stage;
+        set { _stage = value; OnPropertyChanged(); }
+    }
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

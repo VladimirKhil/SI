@@ -1,6 +1,7 @@
 ﻿using SIEngine.Rules;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Helpers;
 using SImulator.ViewModel.Model;
@@ -8,6 +9,7 @@ using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
 using SIPackages;
 using SIPackages.Core;
+using SIUI.Model;
 using SIUI.ViewModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -1518,21 +1520,37 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _gameLogger.Write("\r\n{0} {1}", Resources.Round, roundName);
     }
 
-    public void OnRoundThemes(IReadOnlyList<Theme> roundThemes) => UI.Execute(() =>
+    public void SetThemes(IReadOnlyList<Theme> roundThemes) => _roundThemes = roundThemes.ToArray();
+
+    public void OnRoundThemes(List<string> roundThemes) => UI.Execute(() =>
     {
-        _roundThemes = roundThemes;
-        LocalInfo.RoundInfo.Clear();
-
         _gameLogger.Write($"{Resources.RoundThemes}:");
-
-        var maxQuestionCount = roundThemes.Max(theme => theme.Questions.Count);
 
         foreach (var theme in roundThemes)
         {
+            _gameLogger.Write(theme);
+        }
+
+        PresentationController.SetRoundThemes(roundThemes.ToArray(), false);
+    },
+    exc => OnError(exc.Message));
+
+    public void PlayThemes(List<string> roundThemes)
+    {
+        _gameActions.ShowThemes(roundThemes.ToArray());
+        Continuation = AfterRoundThemes;
+    }
+
+    public void LoadTable(List<ThemeInfo> table) => UI.Execute(() =>
+    {
+        LocalInfo.RoundInfo.Clear();
+
+        var maxQuestionCount = table.Max(theme => theme.Questions.Count);
+
+        foreach (var theme in table)
+        {
             var themeInfo = new ThemeInfoViewModel { Name = theme.Name };
             LocalInfo.RoundInfo.Add(themeInfo);
-
-            _gameLogger.Write(theme.Name);
 
             for (var i = 0; i < maxQuestionCount; i++)
             {
@@ -1541,11 +1559,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             }
         }
 
-        PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
+        PresentationController.SetTable(LocalInfo.RoundInfo.ToArray());
         LocalInfo.TStage = TableStage.RoundTable;
-        Continuation = AfterRoundThemes;
-
-        _gameActions.ShowThemes(LocalInfo.RoundInfo.Select(t => t.Name).ToArray());
     },
     exc => OnError(exc.Message));
 
@@ -1687,23 +1702,17 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _previousState = QuestionState.Normal;
     }
 
-    internal void OnFinalThemes(IReadOnlyList<Theme> finalThemes) => UI.Execute(() =>
+    internal void OnFinalThemes(IReadOnlyList<string> finalThemes) => UI.Execute(() =>
     {
-        _roundThemes = finalThemes.ToArray(); // Make a copy to avoid issues later
         LocalInfo.RoundInfo.Clear();
 
         foreach (var theme in finalThemes)
         {
-            if (theme.Questions.Count == 0)
-            {
-                continue;
-            }
-
-            var themeInfo = new ThemeInfoViewModel { Name = theme.Name };
+            var themeInfo = new ThemeInfoViewModel { Name = theme };
             LocalInfo.RoundInfo.Add(themeInfo);
         }
 
-        PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), true);
+        PresentationController.SetRoundThemes(finalThemes.ToArray(), true);
         PresentationController.SetSound();
         LocalInfo.TStage = TableStage.Final;
         _gameActions.MoveNext();

@@ -362,20 +362,10 @@ public sealed class GameData : Data
     /// </summary>
     internal Dictionary<string, PlayerStatistic> Statistics { get; } = new();
 
-    private GamePersonAccount _showMan;
-
     /// <summary>
     /// Game showman.
     /// </summary>
-    public GamePersonAccount ShowMan
-    {
-        get => _showMan;
-        set
-        {
-            _showMan = value;
-            OnPropertyChanged();
-        }
-    }
+    public GamePersonAccount ShowMan { get; set; }
 
     private string PrintPersons() => new StringBuilder()
         .Append("Showman: ").Append(PrintAccount(ShowMan)).AppendLine()
@@ -387,7 +377,7 @@ public sealed class GameData : Data
     {
         try
         {
-            AllPersons = new ViewerAccount[] { _showMan }
+            AllPersons = new ViewerAccount[] { ShowMan }
                 .Concat(Players)
                 .Concat(Viewers)
                 .Where(a => a.IsConnected)
@@ -401,7 +391,7 @@ public sealed class GameData : Data
         PersonsUpdateHistory.Append($"Update: ").Append(PrintPersons());
     }
 
-    public void OnMainPersonsChanged() => MainPersons = new GamePersonAccount[] { _showMan }.Concat(Players).ToArray();
+    public void OnMainPersonsChanged() => MainPersons = new GamePersonAccount[] { ShowMan }.Concat(Players).ToArray();
 
     /// <summary>
     /// Зрители
@@ -415,12 +405,7 @@ public sealed class GameData : Data
     /// </summary>
     internal GamePersonAccount[] MainPersons
     {
-        get => _mainPersons;
-        private set
-        {
-            _mainPersons = value;
-            OnPropertyChanged();
-        }
+        get => _mainPersons; private set => _mainPersons = value;
     }
 
     private Dictionary<string, ViewerAccount> _allPersons = new();
@@ -430,12 +415,7 @@ public sealed class GameData : Data
     /// </summary>
     internal Dictionary<string, ViewerAccount> AllPersons
     {
-        get => _allPersons;
-        private set
-        {
-            _allPersons = value;
-            OnPropertyChanged();
-        }
+        get => _allPersons; private set => _allPersons = value;
     }
 
     internal int ActiveHumanCount => Viewers.Count
@@ -631,30 +611,37 @@ public sealed class GameData : Data
     public ThemesPlayMode ThemesPlayMode { get; internal set; }
 
     public IPackageStatisticsProvider? PackageStatistisProvider { get; }
+    
+    /// <summary>
+    /// Current game stage.
+    /// </summary>
+    public SIData.GameStage Stage { get; internal set; }
 
     public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings, IPackageStatisticsProvider? packageStatisticsProvider)
     {
         Host = gameHost;
-        _showMan = showman;
+        ShowMan = showman;
         Stakes = new StakesState(Players);
         Settings = settings;
 
+        var timeSettings = settings.AppSettings.TimeSettings;
+
         TimeSettings = new SI.Contracts.TimeSettings
         {
-            QuestionSelection = settings.AppSettings.TimeSettings.TimeForChoosingQuestion,
-            ThemeSelection = settings.AppSettings.TimeSettings.TimeForChoosingFinalTheme,
-            PlayerSelection = settings.AppSettings.TimeSettings.TimeForGivingACat,
-            ButtonPressing = settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion,
-            AnswerGiving = settings.AppSettings.TimeSettings.TimeForPrintingAnswer,
-            SoloAnswerGiving = settings.AppSettings.TimeSettings.TimeForThinkingOnSpecial,
-            HiddenAnswerPrinting = settings.AppSettings.TimeSettings.TimeForFinalThinking,
-            StakeMaking = settings.AppSettings.TimeSettings.TimeForMakingStake,
-            ShowmanDecision = settings.AppSettings.TimeSettings.TimeForShowmanDecisions,
-            Round = settings.AppSettings.TimeSettings.TimeOfRound,
-            ButtonBlocking = settings.AppSettings.TimeSettings.TimeForBlockingButton,
-            RightAnswer = settings.AppSettings.TimeSettings.TimeForRightAnswer,
-            Image = settings.AppSettings.TimeSettings.ImageTime,
-            PartialImage = settings.AppSettings.TimeSettings.PartialImageTime,
+            QuestionSelection = timeSettings.TimeForChoosingQuestion,
+            ThemeSelection = timeSettings.TimeForChoosingFinalTheme,
+            PlayerSelection = timeSettings.TimeForGivingACat,
+            ButtonPressing = timeSettings.TimeForThinkingOnQuestion,
+            Answering = timeSettings.TimeForPrintingAnswer,
+            SoloAnswering = timeSettings.TimeForThinkingOnSpecial,
+            HiddenAnswering = timeSettings.TimeForFinalThinking,
+            StakeMaking = timeSettings.TimeForMakingStake,
+            ShowmanDecision = timeSettings.TimeForShowmanDecisions,
+            Round = timeSettings.TimeOfRound,
+            ButtonBlocking = timeSettings.TimeForBlockingButton,
+            RightAnswer = timeSettings.TimeForRightAnswer,
+            Image = timeSettings.ImageTime,
+            PartialImage = timeSettings.PartialImageTime,
         };
 
         PackageStatistisProvider = packageStatisticsProvider;

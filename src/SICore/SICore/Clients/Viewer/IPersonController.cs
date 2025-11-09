@@ -1,6 +1,7 @@
 ﻿using SICore.Models;
 using SIData;
 using SIEngine.Rules;
+using SIUI.Model;
 
 namespace SICore;
 
@@ -19,7 +20,7 @@ public interface IPersonController
     /// <summary>
     /// Handles game stage change.
     /// </summary>
-    void OnStage(GameStage stage, string stageName, QuestionSelectionStrategyType? questionSelectionStrategyType) { }
+    void OnStage(bool informOnly, GameStage stage, string stageName, int stageIndex, QuestionSelectionStrategyType? questionSelectionStrategyType) { }
 
     /// <summary>
     /// Game themes received.
@@ -30,8 +31,9 @@ public interface IPersonController
     /// <summary>
     /// Handles round themes.
     /// </summary>
+    /// <param name="themes">Round themes names.</param>
     /// <param name="playMode">Themes play mode.</param>
-    void RoundThemes(ThemesPlayMode playMode) { }
+    void RoundThemes(List<string> themes, ThemesPlayMode playMode) { }
 
     /// <summary>
     /// Handles question selection.
@@ -116,7 +118,7 @@ public interface IPersonController
 
     void OnPauseChanged(bool isPaused);
 
-    void TableLoaded();
+    void TableLoaded(List<ThemeInfo> table) { }
 
     void PrintGreeting();
 
@@ -240,9 +242,10 @@ public interface IPersonController
     /// Handles game theme.
     /// </summary>
     /// <param name="themeName">Theme name.</param>
+    /// <param name="themeComments">Theme comments.</param>
     /// <param name="questionCount">Number of questions in the theme.</param>
     /// <param name="animate">Should theme be animated.</param>
-    void OnTheme(string themeName, int questionCount, bool animate);
+    void OnTheme(string themeName, string themeComments, int questionCount, bool animate);
     
     /// <summary>
     /// Handles player answering outcome.

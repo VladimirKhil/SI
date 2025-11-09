@@ -20,6 +20,11 @@ public sealed class ThemeInfoViewModel : ViewModelBase<ThemeInfo>
         set { _model.Name = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// Theme comments.
+    /// </summary>
+    public string Comments { get; set; } = "";
+
     private QuestionInfoStages _state = QuestionInfoStages.None;
 
     /// <summary>

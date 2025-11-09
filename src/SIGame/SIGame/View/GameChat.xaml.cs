@@ -1,5 +1,6 @@
 ﻿using SICore;
 using SIGame.ViewModel;
+using SIGame.ViewModel.Models;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;

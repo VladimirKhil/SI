@@ -463,12 +463,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     internal string? HostKey { get; set; }
 
-    private SICore.Models.JoinMode _joinMode = JoinMode.AnyRole;
+    private JoinMode _joinMode = JoinMode.AnyRole;
 
     /// <summary>
     /// Allowed join mode.
     /// </summary>
-    public SICore.Models.JoinMode JoinMode
+    public JoinMode JoinMode
     {
         get => _joinMode;
         set
@@ -656,6 +656,24 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             if (_isHost != value)
             {
                 _isHost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private int _roundIndex = -1;
+
+    /// <summary>
+    /// Current round index.
+    /// </summary>
+    public int RoundIndex
+    {
+        get => _roundIndex;
+        set
+        {
+            if (_roundIndex != value)
+            {
+                _roundIndex = value;
                 OnPropertyChanged();
             }
         }
@@ -1014,7 +1032,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     internal void UpdateAddTableCommand() =>
         AddTable.CanBeExecuted = IsHost && _data.Players.Count < Constants.MaxPlayers;
 
-    private void ForceStart_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Start);
+    private void ForceStart_Executed(object? arg) => Host?.Actions.Start();
 
     private void Unban_Executed(object? arg)
     {

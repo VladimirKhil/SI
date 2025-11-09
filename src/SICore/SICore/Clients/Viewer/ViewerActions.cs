@@ -40,4 +40,6 @@ public sealed class ViewerActions
     public void Move(MoveDirections direction = MoveDirections.Next) => SendMessageWithArgs(Messages.Move, (int)direction);
 
     public void ValidateAnswer(string answer, bool isRight) => SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
+
+    public void SelectQuestion(int themeIndex, int questionIndex) => SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
 }

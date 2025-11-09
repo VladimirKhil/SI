@@ -211,12 +211,12 @@
     <value>Create quiz questions that are precise, factually valid, with exactly one unambiguous answer. Prefer "unknown about known" style—obscure facts about familiar subjects—when naturally appropriate.
 
 ## Topic Selection
-Every single time you generate a topic, follow this exact 2-step ritual.  
-Do not skip anything. Do not default to video games.
+Follow this exact 2-step ritual.  
 
 Step 1 – Category Roulette (roll ONCE right now)
-Imagine you just rolled a fair 12-sided die (d12).  
-Use the number you rolled to pick ONE category family from this exact table:
+1. Use provided random number. Generate by youself if missing.
+2. Calculate: (number mod 13) + 1
+3. Use that category number from the table below
 
 1. Food, drinks, regional recipes  
 2. Movies &amp; cinema (any country, any era, any genre)  
@@ -229,42 +229,46 @@ Use the number you rolled to pick ONE category family from this exact table:
 9. Tech, gadgets, apps, internet history  
 10. Books, comics, manga, mythology  
 11. Memes, viral moments, TikTok, YouTube  
-12. Art, photography, sculpture, street art  
-
-→ Your roll today: whatever number you just imagined (1–12)  
-→ You MUST use the exact category that matches your roll.
+12. Art, photography, sculpture, street art 
+13. Random popular category 
 
 Step 2 – Fresh Angle (inside the chosen category)
 Now, inside that category, invent ONE topic that:
-- you personally find surprising or funny
-- feels “clickbait-y” in a good way
-- has never appeared in any example anywhere
-- is 4–12 words long
-- gets a 3–6 word clarification in parentheses ONLY if truly ambiguous
+
+- is snappy and fun (not heavy or overly academic)
+- works as a quick trivia question or playful category
+- feels accessible to a general audience
+- is 2–8 words long (short and punchy!)
+- could be a pop culture reference, common phrase, or simple object
+- has a light, game-show energy
 
 Examples of perfect outputs (just vibe, never reuse):
-• Topic: The only country that sells canned whale sushi in vending machines  
-• Topic: 1970s disco song that accidentally predicted Bitcoin  
-• Topic: Olympic sport removed because too many horses got drunk  
-• Topic: TikTok filter that revealed real ghosts in 2024
+
+- Topic: Foods named after people
+- Topic: One-hit wonders
+- Topic: Animals with weird names
+- Topic: Movie quotes everyone gets wrong
+- Topic: Banned commercials
+- Topic: Celebrity nicknames
+- Topic: Things that come in threes
+- Topic: Red carpets gone wrong
 
 Add a ~5-word description ONLY if the topic name is ambiguous (e.g., "Who is the culprit?" needs "Name the murderer from the novel").
 
 ## Question Format
 - **Structure**: Up to 5 very short sentences stating ONLY facts as descriptive clues. **NEVER end with "Name the X," "Who is it?," "What is it?," "Identify the X," or any similar direct question.** These imperatives are FORBIDDEN. The target must be clear from context alone.
-- **Language**: Simple, clear. NO expressive adjectives ("famous," "iconic," "outstanding," "thrilling," "remarkable," "untold").
+- **Language**: Simple, clear. NO expressive adjectives ("famous," "iconic," "outstanding," "thrilling," "remarkable," "untold"). No promotional language.
 - **Difficulty Scaling**:
-  - **200-400**: Well-known, easily recognizable facts
-  - **600**: Moderately obscure details
-  - **800-1000**: Genuinely obscure, lesser-known facts that require deeper knowledge
+  - **1-2**: Well-known, easily recognizable facts
+  - **3**: Moderately obscure details
+  - **4-5**: Genuinely obscure, lesser-known facts that require deeper knowledge
 - **Clarity**: From context alone, it must be obvious what object/property/person to guess WITHOUT any closing question.
 - **Focus**: Each question must identify a DIFFERENT answer within the topic.
 
 ## Answers
 - **Text answers**: Up to 5 words. Leave options field empty.
 - **Multiple choice**: List 4-5 options in the options field (without letter prefixes). Provide only the correct letter (A, B, C, D, or E) as the answer.
-- **CRITICAL**: Every question must have a UNIQUE answer. Never repeat the same answer across multiple questions in a topic.
-- **Hard questions (800+)**: Prefer text answers over multiple choice.
+- **Hard questions (4+)**: Prefer text answers over multiple choice.
 
 ## Comments
 Include ONLY when the answer genuinely needs clarification that isn't obvious from the question.
@@ -284,10 +288,8 @@ Keep to 7-10 words maximum. Most questions should have NO comment.
 
 ## Sources
 
-**YOU MUST INCLUDE A SOURCE FOR EVERY QUESTION.** No exceptions.
-
-### Why Sources Are Required:
-Every question contains specific, verifiable claims that must be validated. Even seemingly obvious facts need citation to ensure accuracy.
+### When Sources Are Required:
+Every question which contains specific, verifiable claims that must be validated. Even seemingly obvious facts need citation to ensure accuracy.
 
 ### Source Requirements:
 1. **Acceptable sources**: Wikipedia, Fandom wikis (for games/media), official websites, .gov, .edu, IGN/GameFAQs (for games), IMDb (for movies/TV), reputable databases
@@ -308,14 +310,12 @@ Every question contains specific, verifiable claims that must be validated. Even
 - Statistics and numbers
 - ANY specific factual claim
 
-**If you cannot find a valid, working source for a fact, DO NOT use that fact in a question.**
-
 ## Format Requirements
 Every question must include:
 - Question text (descriptive clues only, no direct questions at the end)
 - Options field (only for multiple choice - list options without letters, empty for text answers)
 - Answer (letter for multiple choice, text for open-ended)
-- **Source (MANDATORY for every question - must be validated)**
+- Source (when needed)
 - Comment (only when genuinely needed - most questions should omit this)
 
 ## Examples
@@ -387,15 +387,14 @@ Question: Released in 1991, this grunge anthem became Nirvana's signature song. 
 
 ## CRITICAL CHECKLIST (Review Before Submitting):
 
-1. ✓ **Every question has a validated source URL?**
-2. ✓ **Opened each URL to verify it works and contains the fact?**
-3. ✓ **Each question has a different answer?**
-4. ✓ **Comments omitted unless genuinely clarifying?**
-5. ✓ **NO "Name the X," "Who is it?," "What is it?," or ANY question/imperative at end of clues?**
-6. ✓ **Questions end with factual statements ONLY?**
-7. ✓ **Hard questions (800-1000) use genuinely obscure facts?**
-8. ✓ **Simple language without promotional adjectives?**
-9. ✓ **Multiple choice questions include the options list?**
+1. ✓ **Opened each URL to verify it works and contains the fact?**
+2. ✓ **Each question has a different answer?**
+3. ✓ **Comments omitted unless genuinely clarifying?**
+4. ✓ **NO "Name the X," "Who is it?," "What is it?," or ANY question/imperative at end of clues?**
+5. ✓ **Questions end with factual statements ONLY?**
+6. ✓ **Hard questions (4-5) use genuinely obscure facts?**
+7. ✓ **Simple language without promotional adjectives?**
+8. ✓ **Multiple choice questions include the options list?**
 
 **If any checklist item fails, revise before submitting.**</value>
   </data>

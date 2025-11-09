@@ -33,7 +33,9 @@ public interface IPresentationController : IDisposable
 
     void SetGameThemes(IEnumerable<string> themes);
 
-    void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal);
+    void SetRoundThemes(string[] themes, bool isFinal);
+
+    void SetTable(ThemeInfoViewModel[] table);
 
     void SetStage(TableStage stage);
 

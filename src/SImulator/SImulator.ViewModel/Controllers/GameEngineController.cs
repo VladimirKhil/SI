@@ -371,7 +371,34 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool ShouldPlayRoundWithRemovableThemes() => true;
 
-    public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController) => GameViewModel.OnRoundThemes(themes);
+    public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController)
+    {
+        GameViewModel.SetThemes(themes);
+
+        var roundThemes = new List<SIUI.Model.ThemeInfo>();
+
+        foreach (var theme in themes) {
+            var themeInfo = new SIUI.Model.ThemeInfo
+            {
+                Name = theme.Name
+            };
+           
+            foreach (var question in theme.Questions)
+            {
+                themeInfo.Questions.Add(new SIUI.Model.QuestionInfo
+                {
+                    Price = question.Price
+                });
+            }
+            
+            roundThemes.Add(themeInfo);
+        }
+
+        GameViewModel.SetThemes(themes);
+        GameViewModel.OnRoundThemes(roundThemes.Select(t => t.Name).ToList());
+        GameViewModel.LoadTable(roundThemes);
+        GameViewModel.PlayThemes(roundThemes.Select(t => t.Name).ToList());
+    }
 
     public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback)
     {
@@ -382,7 +409,11 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel.OnQuestionSelected(themeIndex, questionIndex);
 
-    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay) => GameViewModel.OnFinalThemes(themes);
+    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
+    {
+        GameViewModel.SetThemes(themes);
+        GameViewModel.OnFinalThemes(themes.Select(t => t.Name).ToList());
+    }
 
     public void AskForThemeDelete(Action<int> deleteCallback) => PresentationController.DeletionCallback = deleteCallback;
 

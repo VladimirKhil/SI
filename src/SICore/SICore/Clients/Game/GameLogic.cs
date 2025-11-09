@@ -163,7 +163,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.IsPartial = false;
         ShareMedia(contentItem);
 
-        var contentTime = GetContentItemDuration(contentItem, TimeSettings.ImageTime * 10);
+        var contentTime = GetContentItemDuration(contentItem, _data.TimeSettings.Image * 10);
 
         _data.AtomTime = contentTime;
         _data.AtomStart = DateTime.UtcNow;
@@ -445,7 +445,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (_data.QuestionPlayState.IsAnswer)
         {
-            contentTime += _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10;
+            contentTime += _data.TimeSettings.RightAnswer * 10;
         }
 
         _data.AtomTime = contentTime;
@@ -666,7 +666,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
         
-        var waitTime = GetContentItemDuration(contentItem, TimeSettings.ImageTime * 10);
+        var waitTime = GetContentItemDuration(contentItem, _data.TimeSettings.Image * 10);
 
         var contentTime = renderTime + waitTime;
 
@@ -745,7 +745,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         if (_data.QuestionTypeName == QuestionTypes.StakeAll)
         {
-            _gameActions.SendMessageWithArgs(Messages.FinalThink, _data.Settings.AppSettings.TimeSettings.TimeForFinalThinking);
+            _gameActions.SendMessageWithArgs(Messages.FinalThink, _data.TimeSettings.HiddenAnswering);
         }
 
         ScheduleExecution(Tasks.AskAnswer, 1, force: true);
@@ -849,7 +849,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         try
         {
-            var maxPressingTime = _data.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
+            var maxPressingTime = _data.TimeSettings.ButtonPressing * 10;
             times[1] = maxPressingTime - ResumeExecution();
         }
         catch (Exception exc)
@@ -911,7 +911,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var playerIndex = _data.ThemeDeleters.Current.PlayerIndex;
         var themeName = _data.TInfo.RoundInfo[themeIndex].Name;
 
-        _gameActions.PlayerReplic(playerIndex, themeName); // TODO: REMOVE: replaced by OUT message
         ScheduleExecution(Tasks.MoveNext, 10);
     }
 
@@ -1076,7 +1075,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         StopWaiting();
 
         var s = _data.ChooserIndex == _data.AnswererIndex ? LO[nameof(R.ToMyself)] : _data.Answerer.Name;
-        _gameActions.PlayerReplic(_data.ChooserIndex, s); // TODO: REMOVE: replaced by SETCHOOSER message
 
         _data.ChooserIndex = _data.AnswererIndex;
         _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, "+");
@@ -1192,14 +1190,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         else if (_data.StakeType == StakeMode.Pass)
         {
-            _gameActions.PlayerReplic(playerIndex, LO[nameof(R.Pass)]); // TODO: REMOVE: replaced by PERSONSTAKE message
             _data.Players[playerIndex].StakeMaking = false;
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass, playerIndex);
             _gameActions.SendMessage(passMsg.ToString());
         }
         else
         {
-            _gameActions.PlayerReplic(playerIndex, LO[nameof(R.VaBank)]); // TODO: REMOVE: replaced by PERSONSTAKE message
             _data.Stake = _data.Players[playerIndex].Sum;
             _data.Stakes.StakerIndex = playerIndex;
             _data.AllIn = true;
@@ -1560,7 +1556,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private void RunRoundTimer()
     {
         _data.TimerStartTime[0] = DateTime.UtcNow;
-        _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10);
+        _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _data.TimeSettings.Round * 10);
     }
 
     private bool OnDecisionAnswering()
@@ -2369,7 +2365,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.StakeRange.Minimum, _data.StakeRange.Maximum, _data.StakeRange.Step);
 
-        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
+        var waitTime = _data.TimeSettings.StakeMaking * 10;
 
         _data.IsOralNow = _data.IsOral && answerer.IsHuman;
 
@@ -2615,7 +2611,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.StakeModes = StakeModes.Stake;
         AskToMakeStake(StakeReason.Hidden, stakers);
 
-        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
+        var waitTime = _data.TimeSettings.StakeMaking * 10;
         ScheduleExecution(Tasks.WaitHiddenStake, waitTime);
         WaitFor(DecisionType.HiddenStakeMaking, waitTime, -2);
     }
@@ -2680,7 +2676,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         SendTryToPlayers();
 
-        var maxTime = _data.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
+        var maxTime = _data.TimeSettings.ButtonPressing * 10;
 
         _data.TimerStartTime[1] = DateTime.UtcNow;
         _data.IsThinking = true;
@@ -3144,7 +3140,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         _data.AnswererIndex = -1;
 
-        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForGivingACat * 10;
+        var waitTime = _data.TimeSettings.PlayerSelection * 10;
 
         _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;
         var playerSelectors = new List<string>();
@@ -3226,7 +3222,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             // -- end
             AskToSelectPlayer(SelectPlayerReason.Chooser, _data.ShowMan.Name);
 
-            var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+            var waitTime = _data.TimeSettings.ShowmanDecision * 10;
             ScheduleExecution(Tasks.WaitFirst, waitTime);
             WaitFor(DecisionType.StarterChoosing, waitTime, -1);
         }
@@ -3318,7 +3314,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 SendAnswersInfoToShowman(_data.Answerer.Answer ?? "");
             }
 
-            var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+            var waitTime = _data.TimeSettings.ShowmanDecision * 10;
             ScheduleExecution(Tasks.WaitRight, waitTime);
             WaitFor(DecisionType.AnswerValidating, waitTime, -1);
         }
@@ -3363,8 +3359,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void AskAnswer()
     {
-        var timeSettings = _data.Settings.AppSettings.TimeSettings;
-
         if (HaveMultipleAnswerers())
         {
             _gameActions.ShowmanReplic(LO[nameof(R.StartThink)]);
@@ -3383,9 +3377,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 }
             }
 
+            var waitTime = _data.TimeSettings.HiddenAnswering * 10;
+
             _data.AnswerCount = _data.QuestionPlayState.AnswererIndicies.Count;
-            ScheduleExecution(Tasks.WaitAnswer, timeSettings.TimeForFinalThinking * 10, force: true);
-            WaitFor(DecisionType.Answering, timeSettings.TimeForFinalThinking * 10, -2, false);
+            ScheduleExecution(Tasks.WaitAnswer, waitTime, force: true);
+            WaitFor(DecisionType.Answering, waitTime, -2, false);
             return;
         }
 
@@ -3395,7 +3391,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        if (!IsSpecialQuestion())
+        var useButtons = _data.QuestionPlayState.UseButtons;
+
+        if (useButtons)
         {
             _gameActions.SendMessageWithArgs(Messages.EndTry, _data.AnswererIndex);
         }
@@ -3404,7 +3402,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.SendMessageWithArgs(Messages.StopPlay);
         }
 
-        var waitAnswerTime = IsSpecialQuestion() ? timeSettings.TimeForThinkingOnSpecial * 10 : timeSettings.TimeForPrintingAnswer * 10;
+        var waitAnswerTime = useButtons ? _data.TimeSettings.SoloAnswering * 10 : _data.TimeSettings.Answering * 10;
 
         var useAnswerOptions = _data.QuestionPlayState.AnswerOptions != null;
         _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
@@ -3554,7 +3552,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var message = string.Join(Message.ArgsSeparator, Messages.Choose, 2);
         _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
 
-        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForChoosingFinalTheme * 10;
+        var waitTime = _data.TimeSettings.ThemeSelection * 10;
 
         if (_data.IsOralNow)
         {
@@ -3594,7 +3592,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         // -- end
         AskToSelectPlayer(SelectPlayerReason.Deleter, _data.ShowMan.Name);
 
-        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+        var waitTime = _data.TimeSettings.ShowmanDecision * 10;
         ScheduleExecution(Tasks.WaitNext, waitTime, 1);
         WaitFor(DecisionType.NextPersonFinalThemeDeleting, waitTime, -1);
     }
@@ -3680,7 +3678,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 AskToSelectPlayer(SelectPlayerReason.Staker, _data.ShowMan.Name);
                 _data.OrderHistory.AppendLine("Asking showman for the next staker");
 
-                var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+                var time = _data.TimeSettings.ShowmanDecision * 10;
                 ScheduleExecution(Tasks.WaitNext, time);
                 WaitFor(DecisionType.NextPersonStakeMaking, time, -1);
                 return false;
@@ -3843,7 +3841,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             stakeMsg2.Add(minimumStakeAligned);
             stakeMsg2.Add(_data.StakeStep);
 
-            var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
+            var waitTime = _data.TimeSettings.StakeMaking * 10;
 
             if (CanPlayerAct())
             {
@@ -4056,7 +4054,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        var waitTime = _data.AppellationAwaitedVoteCount > 0 ? _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10 : 1;
+        var waitTime = _data.AppellationAwaitedVoteCount > 0 ? _data.TimeSettings.ShowmanDecision * 10 : 1;
         ScheduleExecution(Tasks.WaitAppellationDecision, waitTime);
         WaitFor(DecisionType.Appellation, waitTime, -2);
     }
@@ -4645,7 +4643,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.SendVisualMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
 
         var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length)
-            + _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10;
+            + _data.TimeSettings.RightAnswer * 10;
         
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
@@ -4672,7 +4670,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         _data.RightOptionLabel = rightOptionLabel;
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
-        var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
+        var answerTime = _data.TimeSettings.RightAnswer;
         answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
@@ -4681,7 +4679,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         var roundDuration = DateTime.UtcNow.Subtract(_data.TimerStartTime[0]).TotalMilliseconds / 100;
 
-        if (_data.Stage == GameStage.Round && roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
+        if (_data.Stage == GameStage.Round && roundDuration >= _data.TimeSettings.Round * 10)
         {
             // Round timeout
             _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
@@ -5087,7 +5085,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                     if (_data.QuestionPlayState.IsAnswer)
                     {
-                        duration += _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10;
+                        duration += _data.TimeSettings.RightAnswer * 10;
                     }
                 }
                 else
@@ -5144,7 +5142,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private int GetContentItemDefaultDuration(ContentItem contentItem) => contentItem.Type switch
     {
         ContentTypes.Text => GetReadingDurationForTextLength(contentItem.Value.Length),
-        ContentTypes.Image or ContentTypes.Html => TimeSettings.ImageTime * 10,
+        ContentTypes.Image or ContentTypes.Html => _data.TimeSettings.Image * 10,
         ContentTypes.Audio or ContentTypes.Video => DefaultAudioVideoTime,
         _ => 0,
     };

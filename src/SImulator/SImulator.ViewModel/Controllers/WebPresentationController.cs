@@ -231,20 +231,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Type = "endPressButtonByTimeout"
     });
 
-    public void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal)
+    public void SetRoundThemes(string[] themes, bool isFinal)
     {
         SendMessage(new
         {
             Type = "roundThemes",
-            Themes = themes.Select(t => t.Name).ToArray(),
+            Themes = themes,
             PlayMode = isFinal ? "AllTogether" : "OneByOne"
-        });
-
-        SendMessage(new
-        {
-            Type = "table",
-            Table = themes.Select(t => new { t.Name, Questions = t.Questions.Select(q => q.Price).ToArray() }).ToArray(),
-            IsFinal = isFinal
         });
 
         if (isFinal)
@@ -255,6 +248,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             });
         }
     }
+
+    public void SetTable(ThemeInfoViewModel[] table) => SendMessage(new
+    {
+        Type = "table",
+        Table = table.Select(t => new { t.Name, Questions = t.Questions.Select(q => q.Price).ToArray() }).ToArray(),
+        IsFinal = false
+    });
 
     public void SetStage(TableStage stage) { }
 

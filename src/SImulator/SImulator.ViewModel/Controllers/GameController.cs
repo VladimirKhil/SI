@@ -1,8 +1,11 @@
 ﻿using SICore;
+using SICore.Models;
 using SIData;
 using SIEngine.Rules;
 using SImulator.ViewModel.Properties;
 using SIPackages.Core;
+using SIUI.Model;
+using System.Diagnostics;
 
 namespace SImulator.ViewModel.Controllers;
 
@@ -19,12 +22,14 @@ internal sealed class GameController : IPersonController
 
     public bool CanSwitchType => false;
 
+    public void AddLog(string message)
+    {
+        Trace.TraceInformation(message);
+    }
+
     public void OnThemeComments(string comments) => GameViewModel.PresentationController.OnThemeComments(comments);
 
-    public void OnQuestionSelected(int themeIndex, int questionIndex)
-    {
-        throw new NotImplementedException();
-    }
+    public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel.OnQuestionSelected(themeIndex, questionIndex);
 
     public void ClearSelections(bool full = false)
     {
@@ -116,9 +121,20 @@ internal sealed class GameController : IPersonController
 
     public void OnRightAnswerStart(string answer) => GameViewModel.PresentationController.OnComplexRightAnswer(answer);
 
-    public void OnTheme(string themeName, int questionCount, bool animate)
+    public void RoundThemes(List<string> themes, ThemesPlayMode playMode) 
     {
-        GameViewModel.ShowmanReplic = themeName;
+        if (playMode == ThemesPlayMode.OneByOne)
+        {
+            GameViewModel.OnRoundThemes(themes);
+        }
+    }
+
+    public void OnTheme(string themeName, string themeComments, int questionCount, bool animate)
+    {
+        GameViewModel.ShowmanReplic = "";
+        GameViewModel.LocalInfo.Text = themeName;
+        GameViewModel.LocalInfo.TStage = SIUI.ViewModel.TableStage.Theme;
+        GameViewModel.PresentationController.SetTheme(themeName, animate);
     }
 
     public void OnTimeChanged()
@@ -166,17 +182,22 @@ internal sealed class GameController : IPersonController
 
     public void ShowTablo()
     {
+        GameViewModel.PresentationController.SelectionCallback = (themeIndex, questionIndex) =>
+        {
+            _viewerActions.SelectQuestion(themeIndex, questionIndex);
+        };
 
+        GameViewModel.PresentationController.SetRoundTable();
     }
 
-    public void OnStage(GameStage stage, string roundName, QuestionSelectionStrategyType? questionSelectionStrategyType)
+    public void OnStage(bool informOnly, GameStage stage, string stageName, int stageIndex, QuestionSelectionStrategyType? questionSelectionStrategyType)
     {
         if (stage != GameStage.Round || questionSelectionStrategyType == null)
         {
             return;
         }
 
-        GameViewModel.OnRound(roundName, questionSelectionStrategyType.Value);
+        GameViewModel.OnRound(stageName, questionSelectionStrategyType.Value);
     }
 
     public void StopRound()
@@ -184,10 +205,7 @@ internal sealed class GameController : IPersonController
         throw new NotImplementedException();
     }
 
-    public void TableLoaded()
-    {
-
-    }
+    public void TableLoaded(List<ThemeInfo> table) => GameViewModel.LoadTable(table);
 
     public void TimeOut()
     {

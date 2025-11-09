@@ -275,7 +275,7 @@ public sealed class Game : MessageHandler
         _gameActions.SendMessageToWithArgs(person, Messages.ButtonBlockingTime, appSettings.TimeSettings.TimeForBlockingButton);
         _gameActions.SendMessageToWithArgs(person, Messages.ApellationEnabled, appSettings.UseApellations ? '+' : '-');
 
-        var maxPressingTime = appSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
+        var maxPressingTime = ClientData.TimeSettings.ButtonPressing * 10;
         _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
 
         _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, ClientData.JoinMode);
@@ -307,7 +307,9 @@ public sealed class Game : MessageHandler
             nameof(appSettings.PartialImages), appSettings.PartialImages,
             nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime,
             nameof(appSettings.UseApellations), appSettings.UseApellations,
-            nameof(appSettings.TimeSettings.TimeForBlockingButton), appSettings.TimeSettings.TimeForBlockingButton);
+            nameof(appSettings.TimeSettings.TimeForBlockingButton), appSettings.TimeSettings.TimeForBlockingButton,
+            nameof(ClientData.TimeSettings.ButtonBlocking), ClientData.TimeSettings.ButtonBlocking,
+            nameof(ClientData.TimeSettings.PartialImage), ClientData.TimeSettings.PartialImage);
     }
 
     private void InformBanned(string person)
@@ -2764,7 +2766,7 @@ public sealed class Game : MessageHandler
     private int DetectAnswererIndex(string playerName)
     {
         var answererIndex = -1;
-        var blockingButtonTime = ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton;
+        var blockingButtonTime = ClientData.TimeSettings.ButtonBlocking;
 
         for (var i = 0; i < ClientData.Players.Count; i++)
         {

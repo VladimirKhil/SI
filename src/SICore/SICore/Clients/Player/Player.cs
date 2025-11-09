@@ -45,8 +45,8 @@ public sealed class Player : Viewer
 
                 if (mparams[1] == nameof(GameStage.Round))
                 {
-                    ClientData.QuestionIndex = -1;
-                    ClientData.ThemeIndex = -1;
+                    State.QuestionIndex = -1;
+                    State.ThemeIndex = -1;
 
                     Logic.ClearSelections(true);
                 }
@@ -76,22 +76,22 @@ public sealed class Player : Viewer
             case Messages.Theme:
             case Messages.Theme2:
             case Messages.ThemeInfo:
-                ClientData.QuestionIndex = -1;
+                State.QuestionIndex = -1;
                 break;
 
             case Messages.Question:
-                ClientData.QuestionIndex++;
+                State.QuestionIndex++;
                 break;
 
             case Messages.Content:
-                if (ClientData.QuestionType == QuestionTypes.Simple)
+                if (State.QuestionType == QuestionTypes.Simple)
                 {
                     Logic.OnEnableButton();
                 }
                 break;
 
             case Messages.Try:
-                ClientData.TryStartTime = DateTimeOffset.UtcNow;
+                State.TryStartTime = DateTimeOffset.UtcNow;
                 Logic.OnCanPressButton();
                 break;
 
@@ -135,7 +135,7 @@ public sealed class Player : Viewer
 
                 if (!int.TryParse(mparams[2], out var playerIndex) ||
                     playerIndex < 0 ||
-                    playerIndex >= ClientData.Players.Count)
+                    playerIndex >= State.Players.Count)
                 {
                     break;
                 }
@@ -151,7 +151,7 @@ public sealed class Player : Viewer
                     report.AppendLine(mparams[r]);
                 }
 
-                var me = (PersonAccount?)ClientData.Me;
+                var me = (PersonAccount?)State.Me;
 
                 if (me != null)
                 {
@@ -187,11 +187,11 @@ public sealed class Player : Viewer
             wrong.Add(mparams[i]);
         }
 
-        ClientData.Right = right.ToArray();
-        ClientData.Wrong = wrong.ToArray();
-        ClientData.ShowExtraRightButtons = mparams[4] == "+";
+        State.Right = right.ToArray();
+        State.Wrong = wrong.ToArray();
+        State.ShowExtraRightButtons = mparams[4] == "+";
 
-        var me = (PersonAccount?)ClientData.Me;
+        var me = (PersonAccount?)State.Me;
 
         if (me != null)
         {

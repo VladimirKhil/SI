@@ -1,4 +1,5 @@
 ﻿using Notions;
+using OpenAI;
 using OpenAI.Chat;
 using SIPackages;
 using SIPackages.Core;
@@ -7,6 +8,7 @@ using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System.ClientModel;
+using System.ClientModel.Primitives;
 using System.Text;
 using System.Text.Json;
 
@@ -102,7 +104,11 @@ internal static class QuestionsGenerator
                 jsonSchemaIsStrict: true)
         };
 
-        var client = new ChatClient(AppSettings.Default.GPTModel, AppSettings.Default.GPTApiKey);
+        var client = new ChatClient(AppSettings.Default.GPTModel, new ApiKeyCredential(AppSettings.Default.GPTApiKey), new OpenAIClientOptions
+        {
+            NetworkTimeout = TimeSpan.FromMinutes(4),
+            RetryPolicy = new ClientRetryPolicy(0)
+        });
 
         ClientResult<ChatCompletion> completion;
 

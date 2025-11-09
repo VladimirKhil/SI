@@ -85,7 +85,7 @@ internal class ViewerComputerLogic : IPersonController
         }
     }
 
-    public void OnTheme(string themeName, int questionCount, bool animate = false)
+    public void OnTheme(string themeName, string themeComments, int questionCount, bool animate = false)
     {
         if (_role == GameRole.Player)
         {
@@ -190,11 +190,6 @@ internal class ViewerComputerLogic : IPersonController
     public void OnPauseChanged(bool isPaused)
     {
         _data.TInfo.Pause = isPaused;
-    }
-
-    public void TableLoaded()
-    {
-
     }
 
     public void PrintGreeting()

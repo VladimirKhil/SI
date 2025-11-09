@@ -9,9 +9,9 @@ public sealed class TimeSettings
     public const int DefaultThemeSelection = 30;
     public const int DefaultPlayerSelection = 30;
     public const int DefaultButtonPressing = 5;
-    public const int DefaultAnswerGiving = 25;
-    public const int DefaultSoloAnswerGiving = 25;
-    public const int DefaultHiddenAnswerPrinting = 45;
+    public const int DefaultAnswering = 25;
+    public const int DefaultSoloAnswering = 25;
+    public const int DefaultHiddenAnswering = 45;
     public const int DefaultStakeMaking = 30;
     public const int DefaultShowmanDecision = 30;
     public const int DefaultRound = 3600;
@@ -26,9 +26,9 @@ public sealed class TimeSettings
         ThemeSelection = DefaultThemeSelection,
         PlayerSelection = DefaultPlayerSelection,
         ButtonPressing = DefaultButtonPressing,
-        AnswerGiving = DefaultAnswerGiving,
-        SoloAnswerGiving = DefaultSoloAnswerGiving,
-        HiddenAnswerPrinting = DefaultHiddenAnswerPrinting,
+        Answering = DefaultAnswering,
+        SoloAnswering = DefaultSoloAnswering,
+        HiddenAnswering = DefaultHiddenAnswering,
         StakeMaking = DefaultStakeMaking,
         ShowmanDecision = DefaultShowmanDecision,
         Round = DefaultRound,
@@ -44,12 +44,12 @@ public sealed class TimeSettings
     public int QuestionSelection { get; set; } = DefaultQuestionSelection;
 
     /// <summary>
-    /// Gets or sets the time interval allowed for seleting a theme.
+    /// Gets or sets the time interval allowed for selecting a theme.
     /// </summary>
     public int ThemeSelection { get; set; } = DefaultThemeSelection;
 
     /// <summary>
-    /// Gets or sets the time interval allowed for seleting a player.
+    /// Gets or sets the time interval allowed for selecting a player.
     /// </summary>
     public int PlayerSelection { get; set; } = DefaultPlayerSelection;
 
@@ -61,17 +61,17 @@ public sealed class TimeSettings
     /// <summary>
     /// Gets or sets the time interval allowed for giving an answer.
     /// </summary>
-    public int AnswerGiving { get; set; } = DefaultAnswerGiving;
+    public int Answering { get; set; } = DefaultAnswering;
 
     /// <summary>
     /// Gets or sets the time interval allowed for giving a solo answer.
     /// </summary>
-    public int SoloAnswerGiving { get; set; } = DefaultSoloAnswerGiving;
+    public int SoloAnswering { get; set; } = DefaultSoloAnswering;
 
     /// <summary>
     /// Gets or sets the time interval allowed for printing an answer.
     /// </summary>
-    public int HiddenAnswerPrinting { get; set; } = DefaultHiddenAnswerPrinting;
+    public int HiddenAnswering { get; set; } = DefaultHiddenAnswering;
 
     /// <summary>
     /// Gets or sets the time interval for making a stake.

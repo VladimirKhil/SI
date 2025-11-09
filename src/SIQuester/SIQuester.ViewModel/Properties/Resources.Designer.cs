@@ -334,12 +334,15 @@ namespace SIQuester.ViewModel.Properties {
         ///   Ищет локализованную строку, похожую на Create quiz questions that are precise, factually valid, with exactly one unambiguous answer. Prefer &quot;unknown about known&quot; style—obscure facts about familiar subjects—when naturally appropriate.
         ///
         ///## Topic Selection
-        ///Every single time you generate a topic, follow this exact 2-step ritual.  
-        ///Do not skip anything. Do not default to video games.
+        ///Follow this exact 2-step ritual.  
         ///
         ///Step 1 – Category Roulette (roll ONCE right now)
-        ///Imagine you just rolled a fair 12-sided die (d12).  
-        ///Use the number you rolled to pick ONE category family from this [остаток строки не уместился]&quot;;.
+        ///1. Get the current Unix timestamp in seconds
+        ///2. Calculate: (timestamp mod 13) + 1
+        ///3. Use that category number from the table below
+        ///
+        ///1. Food, drinks, regional recipes  
+        ///2. Movies &amp; cinema (any country,  [остаток строки не уместился]&quot;;.
         /// </summary>
         public static string DefaultGPTPrompt {
             get {
