@@ -175,8 +175,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal bool ProcessNextAppellationRequest(bool stop)
     {
-        var (appellationSource, isAppellationForRightAnswer) = _data.QuestionPlayState.Appellations.FirstOrDefault();
-        _data.QuestionPlayState.Appellations.RemoveAt(0);
+        var (appellationSource, isAppellationForRightAnswer) =
+            _data.QuestionPlayState.Appellations[_data.QuestionPlayState.AppellationIndex++];
 
         _data.AppellationCallerIndex = -1;
         _data.AppelaerIndex = -1;
@@ -4005,6 +4005,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var appelaer = _data.Players[_data.AppelaerIndex];
         var isAppellationForRightAnswer = _data.AppellationCallerIndex == -1;
+        var appellationSource = isAppellationForRightAnswer ? appelaer : _data.Players[_data.AppellationCallerIndex];
 
         var given = LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
         var apellationReplic = string.Format(LO[nameof(R.PleaseCheckApellation)], given);
@@ -4013,7 +4014,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             ? LO[nameof(R.IsApellating)]
             : string.Format(LO[nameof(R.IsConsideringWrong)], appelaer.Name);
 
-        _gameActions.ShowmanReplic($"{appelaer.Name} {origin}. {apellationReplic}");
+        _gameActions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}");
 
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
 
@@ -4098,7 +4099,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         finally
         {
-            if (_data.QuestionPlayState.Appellations.Count == 0 || !ProcessNextAppellationRequest(false))
+            if (_data.QuestionPlayState.AppellationIndex >= _data.QuestionPlayState.Appellations.Count || !ProcessNextAppellationRequest(false))
             {
                 _gameActions.SendMessageWithArgs(Messages.Appellation, '-');
                 ResumeExecution(40);

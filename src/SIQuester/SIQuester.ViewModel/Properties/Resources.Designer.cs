@@ -333,20 +333,42 @@ namespace SIQuester.ViewModel.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Create quiz questions that are precise, factually valid, with exactly one unambiguous answer. Prefer &quot;unknown about known&quot; style—obscure facts about familiar subjects—when naturally appropriate.
         ///
-        ///## Topic Selection
-        ///Follow this exact 2-step ritual.  
-        ///
-        ///Step 1 – Category Roulette (roll ONCE right now)
-        ///1. Get the current Unix timestamp in seconds
-        ///2. Calculate: (timestamp mod 13) + 1
-        ///3. Use that category number from the table below
-        ///
-        ///1. Food, drinks, regional recipes  
-        ///2. Movies &amp; cinema (any country,  [остаток строки не уместился]&quot;;.
+        ///## Question Format
+        ///- **Structure**: Up to 5 very short sentences stating ONLY facts as descriptive clues. **NEVER end with &quot;Name the X,&quot; &quot;Who is it?,&quot; &quot;What is it?,&quot; &quot;Identify the X,&quot; or any similar direct question.** These imperatives are FORBIDDEN. The target must be clear from context alone.
+        ///- **Language**:  [остаток строки не уместился]&quot;;.
         /// </summary>
         public static string DefaultGPTPrompt {
             get {
                 return ResourceManager.GetString("DefaultGPTPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на ## Topic Selection Protocol
+        ///
+        ///Follow this exact 2-step ritual for EACH generation.
+        ///
+        ///---
+        ///
+        ///### STEP 1 – Category Roulette
+        ///
+        ///1. Take the random number provided by the user (REQUIRED - do not proceed without it)
+        ///2. Calculate: (random_number mod 16) + 1
+        ///3. Use that category number from the table below
+        ///
+        ///---
+        ///
+        ///### CATEGORY TABLE
+        ///
+        ///1. Food, drinks, regional recipes, cooking
+        ///2. Movies &amp; cinema (any country, era, genre)
+        ///3. Music (any language, decade, style)
+        ///4. History &amp; historical figures
+        ///5. Science, [остаток строки не уместился]&quot;;.
+        /// </summary>
+        public static string DefaultGTPTopicGeneration {
+            get {
+                return ResourceManager.GetString("DefaultGTPTopicGeneration", resourceCulture);
             }
         }
         

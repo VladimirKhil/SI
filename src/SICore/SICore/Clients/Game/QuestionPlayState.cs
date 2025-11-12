@@ -105,6 +105,11 @@ internal sealed class QuestionPlayState
     internal List<(string, bool)> Appellations { get; } = new();
 
     /// <summary>
+    /// Pending appellations index.
+    /// </summary>
+    internal int AppellationIndex { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether the answer is a numeric value.
     /// </summary>
     public bool IsNumericAnswer { get; internal set; }
@@ -137,6 +142,7 @@ internal sealed class QuestionPlayState
         UseButtons = false;
         AppellationState = AppellationState.None;
         Appellations.Clear();
+        AppellationIndex = 0;
         IsNumericAnswer = false;
         NumericAnswerDeviation = 0;
         FlexiblePrice = false;

@@ -30,15 +30,10 @@ internal static class QuestionsGenerator
             throw new Exception(Resources.ApiKeyNotSet);
         }
 
-        var prompt = AppSettings.Default.GPTPrompt;
-
-        if (string.IsNullOrEmpty(prompt))
-        {
-            prompt = Resources.DefaultGPTPrompt;
-        }
-
         var themeNameSet = !string.IsNullOrEmpty(theme.Name);
-        var topicName = themeNameSet ? $"\"{theme.Name}\"" : "";
+        var topicName = themeNameSet ? $"\"{theme.Name}\"" : "<generate topic>";
+
+        var prompt = Resources.DefaultGPTPrompt + (!themeNameSet ? " " + Resources.DefaultGTPTopicGeneration + " Use random number: " + new Random().Next(1, 1000) : "");
 
         var questionToGenerateCount = themeViewModel.OwnerRound.Model.Type == RoundTypes.Final ? 1 : 5;
         var promptExamples = new StringBuilder();

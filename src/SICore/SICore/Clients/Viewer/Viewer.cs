@@ -689,7 +689,7 @@ public class Viewer : MessageHandler, IViewerClient
         }
 
         _controller.OnStage(
-            mparams[0] == Messages.Stage,
+            mparams[0] == Messages.StageInfo,
             State.Stage,
             mparams.Length > 2 ? mparams[2] : "",
             roundIndex,

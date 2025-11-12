@@ -210,51 +210,6 @@
   <data name="DefaultGPTPrompt" xml:space="preserve">
     <value>Create quiz questions that are precise, factually valid, with exactly one unambiguous answer. Prefer "unknown about known" style—obscure facts about familiar subjects—when naturally appropriate.
 
-## Topic Selection
-Follow this exact 2-step ritual.  
-
-Step 1 – Category Roulette (roll ONCE right now)
-1. Use provided random number. Generate by youself if missing.
-2. Calculate: (number mod 13) + 1
-3. Use that category number from the table below
-
-1. Food, drinks, regional recipes  
-2. Movies &amp; cinema (any country, any era, any genre)  
-3. Music (any language, any decade, any style)  
-4. History &amp; historical figures  
-5. Science, space, animals, plants  
-6. Sports, athletes, weird records  
-7. TV shows, reality TV, web series  
-8. Fashion, beauty, design, architecture  
-9. Tech, gadgets, apps, internet history  
-10. Books, comics, manga, mythology  
-11. Memes, viral moments, TikTok, YouTube  
-12. Art, photography, sculpture, street art 
-13. Random popular category 
-
-Step 2 – Fresh Angle (inside the chosen category)
-Now, inside that category, invent ONE topic that:
-
-- is snappy and fun (not heavy or overly academic)
-- works as a quick trivia question or playful category
-- feels accessible to a general audience
-- is 2–8 words long (short and punchy!)
-- could be a pop culture reference, common phrase, or simple object
-- has a light, game-show energy
-
-Examples of perfect outputs (just vibe, never reuse):
-
-- Topic: Foods named after people
-- Topic: One-hit wonders
-- Topic: Animals with weird names
-- Topic: Movie quotes everyone gets wrong
-- Topic: Banned commercials
-- Topic: Celebrity nicknames
-- Topic: Things that come in threes
-- Topic: Red carpets gone wrong
-
-Add a ~5-word description ONLY if the topic name is ambiguous (e.g., "Who is the culprit?" needs "Name the murderer from the novel").
-
 ## Question Format
 - **Structure**: Up to 5 very short sentences stating ONLY facts as descriptive clues. **NEVER end with "Name the X," "Who is it?," "What is it?," "Identify the X," or any similar direct question.** These imperatives are FORBIDDEN. The target must be clear from context alone.
 - **Language**: Simple, clear. NO expressive adjectives ("famous," "iconic," "outstanding," "thrilling," "remarkable," "untold"). No promotional language.
@@ -268,7 +223,8 @@ Add a ~5-word description ONLY if the topic name is ambiguous (e.g., "Who is the
 ## Answers
 - **Text answers**: Up to 5 words. Leave options field empty.
 - **Multiple choice**: List 4-5 options in the options field (without letter prefixes). Provide only the correct letter (A, B, C, D, or E) as the answer.
-- **Hard questions (4+)**: Prefer text answers over multiple choice.
+- **Hard questions (4+)**: Prefer text answers over multiple choice. Still prefer unknown facts and well-known answers.
+- Question text should not include the answer or its parts
 
 ## Comments
 Include ONLY when the answer genuinely needs clarification that isn't obvious from the question.
@@ -397,6 +353,110 @@ Question: Released in 1991, this grunge anthem became Nirvana's signature song. 
 8. ✓ **Multiple choice questions include the options list?**
 
 **If any checklist item fails, revise before submitting.**</value>
+  </data>
+  <data name="DefaultGTPTopicGeneration" xml:space="preserve">
+    <value>## Topic Selection Protocol
+
+Follow this exact 2-step ritual for EACH generation.
+
+---
+
+### STEP 1 – Category Roulette
+
+1. Take the random number provided by the user (REQUIRED - do not proceed without it)
+2. Calculate: (random_number mod 16) + 1
+3. Use that category number from the table below
+
+---
+
+### CATEGORY TABLE
+
+1. Food, drinks, regional recipes, cooking
+2. Movies &amp; cinema (any country, era, genre)
+3. Music (any language, decade, style)
+4. History &amp; historical figures
+5. Science, space, animals, plants, nature
+6. Sports, athletes, competitions, records
+7. TV shows, reality TV, web series, streaming
+8. Fashion, beauty, design, architecture
+9. Tech, gadgets, apps, internet history
+10. Books, comics, manga, mythology, literature
+11. Memes, viral moments, TikTok, YouTube, internet culture
+12. Art, photography, sculpture, street art
+13. Gaming (video games, board games, esports, gaming culture)
+14. Geography, travel, landmarks, world cultures
+15. Language, words, slang, phrases, translations
+16. Celebrities, pop culture, gossip, fame
+
+---
+
+### STEP 2 – Fresh Angle
+
+Inside the chosen category, invent ONE topic that:
+
+- Is snappy and fun (2–8 words long)
+- Works as a quick trivia question or playful category
+- Feels accessible to a general audience
+- Has a light, game-show energy
+
+**IMPORTANT: Mix both styles randomly**
+
+**Style A - Straightforward Quiz Formats (50% of the time):**
+- Direct knowledge tests
+- "Guess X by Y" formats
+- Classic trivia categories
+- Identification challenges
+
+**Style B - Creative Angles (50% of the time):**
+- Pop culture references
+- Quirky subcategories
+- Playful twists on familiar topics
+- Unexpected connections
+
+---
+
+### AVOID THESE PATTERNS
+
+- Don't default to "famous X" or "best X" 
+- Vary between objects, events, people, phrases, and concepts
+- Mix serious and silly tones
+- Never repeat exact topics from previous generations
+
+---
+
+### EXAMPLES
+
+**Style A - Straightforward:**
+- Topic: Guess movie by emojis
+- Topic: Books by author
+- Topic: Chemical elements
+- Topic: Capital cities
+- Topic: Flags of the world
+- Topic: Paintings by artist
+- Topic: Sports by equipment
+- Topic: Identify the logo
+- Topic: Song by opening line
+- Topic: Historical dates
+- Topic: Animal species
+- Topic: Programming languages
+
+**Style B - Creative:**
+- Topic: Secret levels
+- Topic: Apps that became verbs
+- Topic: Words that mean both
+- Topic: Buildings that look like things
+- Topic: Hidden symbols in paintings
+- Topic: TikTok sounds you know
+- Topic: Misheard lyrics
+- Topic: Red carpet oops
+- Topic: Video game urban legends
+- Topic: Countries inside countries
+- Topic: Post-credits surprises
+- Topic: Animals that broke the internet
+
+---
+
+Add a ~5-word comment ONLY if the topic name is ambiguous (e.g., "Who is the culprit?" needs "Name the murderer from the novel").</value>
   </data>
   <data name="DefaultTags" xml:space="preserve">
     <value>Cars
