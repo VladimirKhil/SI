@@ -1268,7 +1268,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (_data.Answerer.AnswerIsRight)
         {
-            var showmanReplic = IsSpecialQuestion() ? nameof(R.Bravo) : nameof(R.Right);            
+            var showmanReplic = _data.QuestionPlayState.UseButtons ? nameof(R.Right) : nameof(R.Bravo);
             var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
             var canonicalAnswer = _data.Question?.Right.FirstOrDefault();
@@ -1508,9 +1508,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         SendTryToPlayers();
         _data.Decision = DecisionType.Pressing;
     }
-
-    // TODO: this should be removed
-    internal bool IsSpecialQuestion() => _data.QuestionTypeName != QuestionTypes.Simple;
 
     private bool OnDecisionNextPersonStakeMaking()
     {
@@ -2472,7 +2469,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.IsThinking = false;
         _data.Decision = DecisionType.None;
 
-        if (!IsSpecialQuestion())
+        if (_data.QuestionPlayState.UseButtons)
         {
             _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All); // Timer 1 STOP
         }
@@ -3402,7 +3399,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.SendMessageWithArgs(Messages.StopPlay);
         }
 
-        var waitAnswerTime = useButtons ? _data.TimeSettings.SoloAnswering * 10 : _data.TimeSettings.Answering * 10;
+        var waitAnswerTime = useButtons ? _data.TimeSettings.Answering * 10 : _data.TimeSettings.SoloAnswering * 10;
 
         var useAnswerOptions = _data.QuestionPlayState.AnswerOptions != null;
         _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;

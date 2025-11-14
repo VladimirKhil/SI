@@ -3287,8 +3287,8 @@ public sealed class Game : MessageHandler
                 Logic.PlanExecution(Tasks.Announce, 15);
             }
         }
-        else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0 && Logic.IsSpecialQuestion())
-        {            
+        else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0 && !ClientData.QuestionPlayState.UseButtons)
+        {
             ClientData.SkipQuestion?.Invoke();
             Logic.PlanExecution(Tasks.MoveNext, 20, 1);
         }

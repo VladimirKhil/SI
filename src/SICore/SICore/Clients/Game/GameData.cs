@@ -575,6 +575,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Question type name.
     /// </summary>
+    [Obsolete]
     public string QuestionTypeName { get; internal set; } = QuestionTypes.Default;
 
     /// <summary>
