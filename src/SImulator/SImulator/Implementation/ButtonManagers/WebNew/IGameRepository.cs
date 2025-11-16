@@ -9,6 +9,8 @@ public interface IGameRepository
 
     ConnectionPersonData[] Players { get; }
 
+    string StageName { get; set; }
+
     Task<bool> TryAddPlayerAsync(string id, string userName);
 
     Task<bool> TryRemovePlayerAsync(string playerName);
@@ -16,8 +18,6 @@ public interface IGameRepository
     GameInfo? TryGetGameById(int gameId);
 
     void OnPlayerPress(string playerName);
-
-    void InformPlayer(string playerName, string connectionId);
 
     void OnPlayerAnswer(string playerName, string answer, bool isPreliminary);
 

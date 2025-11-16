@@ -6,6 +6,7 @@ using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
 using SIData;
+using SIGame.ViewModel.Contracts;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
@@ -121,21 +122,32 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     private readonly CommonSettings _commonSettings;
     protected readonly UserSettings _userSettings;
     private readonly SettingsViewModel _settingsViewModel;
+    private IGameSettingsViewModelFactory _gameSettingsViewModelFactory;
 
     protected GameSettingsViewModel GameSettings { get; private set; }
 
-    protected ConnectionDataViewModel(CommonSettings commonSettings, UserSettings userSettings)
+    protected ConnectionDataViewModel(
+        CommonSettings commonSettings,
+        UserSettings userSettings,
+        IGameSettingsViewModelFactory gameSettingsViewModelFactory)
     {
         _commonSettings = commonSettings;
         _userSettings = userSettings;
+        _gameSettingsViewModelFactory = gameSettingsViewModelFactory;
     }
 
-    protected ConnectionDataViewModel(ConnectionData connectionData, CommonSettings commonSettings, UserSettings userSettings, SettingsViewModel settingsViewModel)
+    protected ConnectionDataViewModel(
+        ConnectionData connectionData,
+        CommonSettings commonSettings,
+        UserSettings userSettings,
+        SettingsViewModel settingsViewModel,
+        IGameSettingsViewModelFactory gameSettingsViewModelFactory)
         : base(connectionData)
     {
         _commonSettings = commonSettings;
         _userSettings = userSettings;
         _settingsViewModel = settingsViewModel;
+        _gameSettingsViewModelFactory = gameSettingsViewModelFactory;
     }
 
     protected override void Initialize()
@@ -165,20 +177,14 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             }
         };
 
-        GameSettings = new GameSettingsViewModel(
-            _userSettings.GameSettings,
-            _commonSettings,
-            _userSettings,
+        GameSettings = _gameSettingsViewModelFactory.Create(
             _settingsViewModel,
-            siStorageClientFactory,
             libraries,
-            loggerFactory,
             true,
-            MaxPackageSize)
-        {
-            Human = Human,
-            ChangeSettings = ChangeSettings
-        };
+            MaxPackageSize);
+
+        GameSettings.Human = Human;
+        GameSettings.ChangeSettings = ChangeSettings;
 
         GameSettings.StartGame += OnStartGame;
         GameSettings.PrepareForGame();

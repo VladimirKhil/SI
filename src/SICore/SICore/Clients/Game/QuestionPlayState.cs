@@ -124,6 +124,11 @@ internal sealed class QuestionPlayState
     /// </summary>
     public bool FlexiblePrice { get; internal set; }
 
+    /// <summary>
+    /// Gets the unique identifier for the question.
+    /// </summary>
+    public string QuestionKey { get; internal set; } = "";
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -146,6 +151,7 @@ internal sealed class QuestionPlayState
         IsNumericAnswer = false;
         NumericAnswerDeviation = 0;
         FlexiblePrice = false;
+        QuestionKey = "";
     }
 
     internal void RemovePlayer(int playerIndex)

@@ -82,8 +82,6 @@
                 </my:MappedConverter.Map>
             </my:MappedConverter>
 
-            <my:QuestionParameterValueConverter x:Key="QuestionParameterValueConverter" />
-
             <my:MappedConverter x:Key="PlayerButtonTypesConverter">
                 <my:MappedConverter.Map>
                     <my:StringDictionary>
@@ -559,24 +557,20 @@
                                 RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1},
                                 Path=DataContext.Game}"
                                 d:DataContext="{d:DesignInstance vm:GameViewModel}">
-                            <StackPanel.Resources>
-                                <CollectionViewSource x:Key="Parameters" Source="{Binding ActiveQuestion.Parameters}" Filter="Parameters_Filter" />
-                            </StackPanel.Resources>
-
                             <TextBlock
-                                Text="{Binding ActiveQuestion.TypeName, Converter={StaticResource QuestionTypeConverter}}"
+                                Text="{Binding ActiveQuestionTypeName, Converter={StaticResource QuestionTypeConverter}}"
                                 TextWrapping="Wrap"
                                 FontSize="16"
                                 FontWeight="Bold" />
 
-                            <ItemsControl ItemsSource="{Binding Source={StaticResource Parameters}}">
+                            <ItemsControl ItemsSource="{Binding ActiveQuestionParameters}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Key, Converter={StaticResource QuestionTypeParamNameConverter}}" Width="250" />
 
                                             <TextBlock
-                                                Text="{Binding Converter={StaticResource QuestionParameterValueConverter}}"
+                                                Text="{Binding Value}"
                                                 Margin="5,0,0,0"
                                                 Width="250" />
                                         </StackPanel>

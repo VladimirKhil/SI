@@ -794,6 +794,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Generate {0} unique topics. Use random numbers.
+        /// </summary>
+        public static string GPTTopisHint {
+            get {
+                return ResourceManager.GetString("GPTTopisHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Updates were found for the program from {0}. Download them now?.
         /// </summary>
         public static string HasUpdates {

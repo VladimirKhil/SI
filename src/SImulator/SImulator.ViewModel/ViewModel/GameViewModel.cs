@@ -1,7 +1,6 @@
 ﻿using SIEngine.Rules;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
-using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Helpers;
 using SImulator.ViewModel.Model;
@@ -323,13 +322,17 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         set { _activeRoundName = value; OnPropertyChanged(); }
     }
 
-    private Question? _activeQuestion;
+    private string _activeQuestionTypeName = "";
 
-    public Question? ActiveQuestion
+    public string ActiveQuestionTypeName
     {
-        get => _activeQuestion;
-        set { _activeQuestion = value; OnPropertyChanged(); }
+        get => _activeQuestionTypeName;
+        set { _activeQuestionTypeName = value; OnPropertyChanged(); }
     }
+
+    public ObservableCollection<KeyValuePair<string, string>> ActiveQuestionParameters { get; } = new();
+
+    private bool _isQuestion = false;
 
     private string[] _questionAnswers = Array.Empty<string>();
 
@@ -504,8 +507,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     }
 
     private bool _isAllIn = false;
-
-    private IReadOnlyList<Theme> _roundThemes = Array.Empty<Theme>();
 
     private bool _managedMode;
 
@@ -735,7 +736,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             _gameLogger.Write("{0} +{1}", player.Name, increment);
 
-            if (_activeQuestion == null)
+            if (!_isQuestion)
             {
                 return;
             }
@@ -779,7 +780,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             player.Sum -= substract;
             player.Wrong++;
 
-            if (_activeQuestion == null)
+            if (!_isQuestion)
             {
                 return;
             }
@@ -932,12 +933,27 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    internal bool OnQuestionEnd()
+    internal bool OnQuestionEnd(string comments)
+    {
+        if (comments.Length > 0)
+        {
+            PresentationController.SetQuestionComments(comments);
+            Continuation = EndQuestion;
+        }
+        else
+        {
+            EndQuestion();
+        }
+
+        return RoundTimeMax > 0 && RoundTime >= RoundTimeMax;
+    }
+
+    private bool EndQuestion()
     {
         ClearState();
         PresentationController.OnQuestionEnd();
         _gameActions.MoveNext();
-        return RoundTimeMax > 0 && RoundTime >= RoundTimeMax;
+        return true;
     }
 
     private void GameHost_RoundThemesFinished()
@@ -1314,7 +1330,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal async Task StartAsync()
     {
-        _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
+        _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings.Model, this);
 
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
         {
@@ -1351,28 +1367,27 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.ClearPlayersState();
     }
 
-    internal void OnQuestion(Question question)
+    internal void OnQuestion(int price)
     {
-        ActiveQuestion = question;
-        PresentationController.SetQuestionPrice(question.Price);
+        PresentationController.SetQuestionPrice(price);
 
-        Price = question.Price;
+        Price = price;
 
-        LocalInfo.Text = question.Price.ToString();
+        LocalInfo.Text = price.ToString();
         LocalInfo.TStage = TableStage.QuestionPrice;
     }
 
     private void SetCaption(string caption) => PresentationController.SetCaption(Settings.Model.ShowTableCaption ? caption : "");
 
-    internal void OnTheme(Theme theme)
+    internal void OnTheme(string themeName, string themeComments)
     {
-        PresentationController.SetTheme(theme.Name, false);
+        PresentationController.SetTheme(themeName, false);
 
-        LocalInfo.Text = $"{Resources.Theme}: {theme.Name}";
+        LocalInfo.Text = $"{Resources.Theme}: {themeName}";
         LocalInfo.TStage = TableStage.Theme;
 
-        CurrentTheme = theme.Name;
-        ThemeComments = theme.Info.Comments.Text;
+        CurrentTheme = themeName;
+        ThemeComments = themeComments;
     }
 
     internal void OnEndGame()
@@ -1412,18 +1427,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    internal void PlayQuestionType(string typeName, bool isDefault)
+    internal void OnQuestionType(string typeName, bool isDefault)
     {
-        if (_activeQuestion == null)
-        {
-            return;
-        }
-
         if (isDefault)
         {
             _gameActions.MoveNext();
             return;
         }
+
+        ActiveQuestionTypeName = typeName;
 
         switch (typeName)
         {
@@ -1519,8 +1531,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         _gameLogger.Write("\r\n{0} {1}", Resources.Round, roundName);
     }
-
-    public void SetThemes(IReadOnlyList<Theme> roundThemes) => _roundThemes = roundThemes.ToArray();
 
     public void OnRoundThemes(List<string> roundThemes) => UI.Execute(() =>
     {
@@ -1700,7 +1710,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         State = QuestionState.Normal;
         _previousState = QuestionState.Normal;
+
+        _isQuestion = false;
+        UI.Execute(ActiveQuestionParameters.Clear, exc => OnError(exc.Message));
     }
+
+    internal void AddQuestionParameter(string key, string value) => UI.Execute(() =>
+    {
+        ActiveQuestionParameters.Add(new KeyValuePair<string, string>(key, value));
+    }, exc => OnError(exc.Message));
 
     internal void OnFinalThemes(IReadOnlyList<string> finalThemes) => UI.Execute(() =>
     {
@@ -1713,7 +1731,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         PresentationController.SetRoundThemes(finalThemes.ToArray(), true);
-        PresentationController.SetSound();
         LocalInfo.TStage = TableStage.Final;
         _gameActions.MoveNext();
     },
@@ -1825,16 +1842,16 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _isDisposed = true;
     }
 
-    internal void OnThemeSelected(int themeIndex, int questionIndex)
+    internal void OnThemeSelected(int themeIndex)
     {
-        var theme = _roundThemes[themeIndex];
+        CurrentTheme = LocalInfo.RoundInfo[themeIndex].Name;
+        ThemeComments = LocalInfo.RoundInfo[themeIndex].Comments;
 
-        CurrentTheme = theme.Name;
-        ThemeComments = theme.Info.Comments.Text;
-        ActiveQuestion = theme.Questions[questionIndex];
+        Price = 0;
 
         PresentationController.SetTheme(CurrentTheme, false);
         SetCaption(CurrentTheme);
+        _gameActions.MoveNext(500);
     }
 
     /// <summary>
@@ -1910,7 +1927,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         SetCaption(caption);
     }
 
-    private readonly string[] _themesComments = Array.Empty<string>();
+    private readonly List<string> _themesComments = new();
+
+    internal void AddThemeComments(string themeComments) => _themesComments.Add(themeComments);
+
+    internal void ClearThemesComments() => _themesComments.Clear();
 
     internal void OnQuestionText(string text) => _gameLogger.Write(text);
 
@@ -1920,10 +1941,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             _answeringHistory.Push(null);
 
-            ActiveQuestion = _roundThemes[themeIndex].Questions[questionIndex];
-
             CurrentTheme = LocalInfo.RoundInfo[themeIndex].Name;
-            ThemeComments = _themesComments.Length > themeIndex ? _themesComments[themeIndex] : "";
+            ThemeComments = _themesComments.Count > themeIndex ? _themesComments[themeIndex] : "";
             Price = LocalInfo.RoundInfo[themeIndex].Questions[questionIndex].Price;
 
             LogScore();
@@ -2248,6 +2267,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         State = QuestionState.Normal;
         _previousState = QuestionState.Normal;
 
+        _isQuestion = true;
+
         foreach (var player in Players)
         {
             player.Answer = "";
@@ -2259,14 +2280,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LocalInfo.TStage = TableStage.Question;
     }
 
-    internal bool SelectStake(NumberSet availableRange)
+    internal void SelectStake(NumberSet availableRange)
     {
         if (availableRange.Maximum == availableRange.Minimum && availableRange.Minimum == 0)
         {
             // Minimum or maximum in round
             if (LocalInfo.RoundInfo.Max(t => t.Questions.Count) == 0)
             {
-                return false;
+                return;
             }
 
             var minimum = LocalInfo.RoundInfo[0].Questions[0].Price;
@@ -2292,17 +2313,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         DecisionMode = DecisionMode.SimpleStake;
         StakeInfo = availableRange;
         Price = availableRange.Minimum;
-        return true;
     }
 
     internal void OnSetMultiplyPrice(int factor = 2)
     {
-        if (_activeQuestion == null)
-        {
-            return;
-        }
-
-        Price = _activeQuestion.Price * factor;
+        Price *= factor;
         NegativePrice = 0;
     }
 

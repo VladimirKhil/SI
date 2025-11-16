@@ -482,7 +482,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, exc), false);
+            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, exc.Message), false);
 
             if (_game != null)
             {
@@ -803,7 +803,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com)
             {
-                _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings, this);
+                _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings, this);
 
                 if (_buttonManager == null)
                 {

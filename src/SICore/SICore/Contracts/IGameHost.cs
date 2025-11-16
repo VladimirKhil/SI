@@ -33,7 +33,7 @@ public interface IGameHost
 
     bool AreCustomAvatarsSupported { get; }
 
-    void SaveReport(Results.GameResult result, CancellationToken cancellationToken = default);
+    void SaveReport(Results.GameResult result);
 
     /// <summary>
     /// Process advertisement request.

@@ -61,25 +61,25 @@ public static class WellKnownGameRules
 
     static WellKnownGameRules()
     {
-        Classic.RoundRules[RoundTypes.Final] = new()
+        Classic.RoundRules[RoundTypes.Final] = Classic.RoundRules[RoundTypes.ThemeList] = new()
         {
             DefaultQuestionType = QuestionTypes.StakeAll,
             QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes
         };
 
-        Simple.RoundRules[RoundTypes.Final] = new()
+        Simple.RoundRules[RoundTypes.Final] = Simple.RoundRules[RoundTypes.ThemeList] = new()
         {
             DefaultQuestionType = QuestionTypes.StakeAll,
             QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes
         };
 
-        Quiz.RoundRules[RoundTypes.Final] = new()
+        Quiz.RoundRules[RoundTypes.Final] = Quiz.RoundRules[RoundTypes.ThemeList] = new()
         {
             DefaultQuestionType = QuestionTypes.StakeAll,
             QuestionSelectionStrategyType = QuestionSelectionStrategyType.Sequential
         };
 
-        TurnTaking.RoundRules[RoundTypes.Final] = new()
+        TurnTaking.RoundRules[RoundTypes.Final] = TurnTaking.RoundRules[RoundTypes.ThemeList] = new()
         {
             DefaultQuestionType = QuestionTypes.StakeAll,
             QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes

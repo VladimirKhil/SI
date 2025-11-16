@@ -175,7 +175,7 @@
     <value>License folder not found</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Question for yourself without risk</value>
+    <value>Question for yourself</value>
   </data>
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Error opening license folder: {0}</value>
@@ -194,6 +194,18 @@
   </data>
   <data name="PressTheButton" xml:space="preserve">
     <value>Press the button</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="PriceFromToStep" xml:space="preserve">
+    <value>From {0} to {1} with step {2}</value>
+  </data>
+  <data name="PriceMinMaxRound" xml:space="preserve">
+    <value>Minimum or maximum in the round</value>
+  </data>
+  <data name="PriceOr" xml:space="preserve">
+    <value>{0} or {1}</value>
   </data>
   <data name="QuestionSelection" xml:space="preserve">
     <value>Question selection</value>
@@ -237,6 +249,12 @@
   <data name="SecretQuestion" xml:space="preserve">
     <value>Secret question</value>
   </data>
+  <data name="SelectAny" xml:space="preserve">
+    <value>Anyone</value>
+  </data>
+  <data name="SelectAnyExceptCurrent" xml:space="preserve">
+    <value>Anyone except yourself</value>
+  </data>
   <data name="SelectAudioFile" xml:space="preserve">
     <value>Select audio file</value>
   </data>
@@ -248,6 +266,9 @@
   </data>
   <data name="SelectIntroVideo" xml:space="preserve">
     <value>Select splash video file</value>
+  </data>
+  <data name="SelectionMode" xml:space="preserve">
+    <value>Can be given to</value>
   </data>
   <data name="SelectLogoImage" xml:space="preserve">
     <value>Select splash image</value>

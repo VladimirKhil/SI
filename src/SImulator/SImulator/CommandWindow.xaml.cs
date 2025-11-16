@@ -1,7 +1,4 @@
 ﻿using SImulator.ViewModel;
-using SIPackages;
-using SIPackages.Core;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
@@ -41,11 +38,5 @@ public partial class CommandWindow : Window
     private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
     {
         e.Accepted = (ViewModel.Core.PlayerKeysModes)e.Item != ViewModel.Core.PlayerKeysModes.Com;
-    }
-
-    private void Parameters_Filter(object sender, FilterEventArgs e)
-    {
-        var parameterName = ((KeyValuePair<string, StepParameter>)e.Item).Key;
-        e.Accepted = parameterName != QuestionParameterNames.Question && parameterName != QuestionParameterNames.Answer;
     }
 }

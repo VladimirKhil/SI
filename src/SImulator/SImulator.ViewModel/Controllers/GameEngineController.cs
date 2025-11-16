@@ -4,6 +4,7 @@ using SIEngine.Models;
 using SIEngine.Rules;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
+using SImulator.ViewModel.Properties;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
@@ -81,17 +82,12 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool OnAccept()
     {
-        GameViewModel?.Accept();
+        GameViewModel.Accept();
         return false;
     }
 
     public void OnAskAnswer(string mode)
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
-
         if (_optionsShown.HasValue && !_optionsShown.Value)
         {
             GameViewModel.Continuation = () =>
@@ -138,11 +134,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
-
         var textToShow =
             GameViewModel.Settings.Model.FalseStart || GameViewModel.Settings.Model.ShowTextNoFalstart
             ? null
@@ -212,11 +203,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility)
     {
-        if (GameViewModel == null)
-        {
-            return false;
-        }
-
         GameViewModel.IsCommonPrice = true;
         GameViewModel.QuestionForAll = false;
 
@@ -235,6 +221,12 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                 return GameViewModel.OnAskHiddenStakes();
             
             case StepParameterValues.SetAnswererMode_ByCurrent:
+                GameViewModel.AddQuestionParameter(
+                    Resources.SelectionMode,
+                    select == StepParameterValues.SetAnswererSelect_Any
+                        ? Resources.SelectAny
+                        : Resources.SelectAnyExceptCurrent);
+                
                 return GameViewModel.OnSetAnswererDirectly(select == StepParameterValues.SetAnswererSelect_Any);
             
             case StepParameterValues.SetAnswererMode_Current:
@@ -257,14 +249,18 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             case StepParameterValues.SetPriceMode_Select:
                 if (availableRange != null)
                 {
+                    GameViewModel.AddQuestionParameter(Resources.Price, PrintNumberSet(availableRange));
+
                     if (availableRange.Maximum == availableRange.Minimum && availableRange.Minimum > 0)
                     {
                         GameViewModel.Price = availableRange.Maximum;
                     }
                     else
                     {
-                        return GameViewModel.SelectStake(availableRange);
+                        GameViewModel.SelectStake(availableRange);
                     }
+                    
+                    return true;
                 }
                 break;
 
@@ -280,10 +276,31 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return false;
     }
 
+    private static string PrintNumberSet(NumberSet numberSet)
+    {
+        if (numberSet.Maximum == 0)
+        {
+            return Resources.PriceMinMaxRound;
+        }
+
+        if (numberSet.Maximum == numberSet.Minimum)
+        {
+            return numberSet.Maximum.ToString();
+        }
+
+        if (numberSet.Maximum - numberSet.Minimum == numberSet.Step)
+        {
+            return string.Format(Resources.PriceOr, numberSet.Minimum, numberSet.Maximum);
+        }
+
+        return string.Format(Resources.PriceFromToStep, numberSet.Minimum, numberSet.Maximum, numberSet.Step);
+    }
+
     public bool OnSetTheme(string themeName)
     {
+        GameViewModel.AddQuestionParameter(Resources.Theme, themeName);
         GameViewModel.CurrentTheme = themeName;
-        return false;
+        return true;
     }
 
     private string? TryGetMediaUri(ContentItem contentItem)
@@ -373,11 +390,11 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController)
     {
-        GameViewModel.SetThemes(themes);
-
         var roundThemes = new List<SIUI.Model.ThemeInfo>();
+        GameViewModel.ClearThemesComments();
 
-        foreach (var theme in themes) {
+        foreach (var theme in themes) 
+        {
             var themeInfo = new SIUI.Model.ThemeInfo
             {
                 Name = theme.Name
@@ -392,9 +409,9 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             }
             
             roundThemes.Add(themeInfo);
+            GameViewModel.AddThemeComments(theme.Info.Comments.Text);
         }
 
-        GameViewModel.SetThemes(themes);
         GameViewModel.OnRoundThemes(roundThemes.Select(t => t.Name).ToList());
         GameViewModel.LoadTable(roundThemes);
         GameViewModel.PlayThemes(roundThemes.Select(t => t.Name).ToList());
@@ -411,19 +428,24 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
-        GameViewModel.SetThemes(themes);
         GameViewModel.OnFinalThemes(themes.Select(t => t.Name).ToList());
+        GameViewModel.ClearThemesComments();
+
+        foreach (var theme in themes)
+        {
+            GameViewModel.AddThemeComments(theme.Info.Comments.Text);
+        }
     }
 
     public void AskForThemeDelete(Action<int> deleteCallback) => PresentationController.DeletionCallback = deleteCallback;
 
     public void OnThemeDeleted(int themeIndex) => GameViewModel.OnThemeDeleted(themeIndex);
 
-    public void OnThemeSelected(int themeIndex, int questionIndex) => GameViewModel.OnThemeSelected(themeIndex, questionIndex);
+    public void OnThemeSelected(int themeIndex, int questionIndex) => GameViewModel.OnThemeSelected(themeIndex);
 
-    public void OnTheme(Theme theme) => GameViewModel.OnTheme(theme);
+    public void OnTheme(Theme theme) => GameViewModel.OnTheme(theme.Name, theme.Info.Comments.Text);
 
-    public void OnQuestion(Question question) => GameViewModel.OnQuestion(question);
+    public void OnQuestion(Question question) => GameViewModel.OnQuestion(question.Price);
 
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
     {
@@ -440,11 +462,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnRoundEnd(RoundEndReason reason)
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
-
         GameViewModel.LogScore();
 
         switch (reason)
@@ -468,31 +485,26 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
     {
-        if (GameViewModel == null)
-        {
-            return;
-        }
-
         GameViewModel.LocalInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
         PresentationController.RestoreQuestion(themeIndex, questionIndex, price);
     }
 
-    public void OnQuestionType(string typeName, bool isDefault) => GameViewModel?.PlayQuestionType(typeName, isDefault);
+    public void OnQuestionType(string typeName, bool isDefault) => GameViewModel.OnQuestionType(typeName, isDefault);
 
-    public bool OnQuestionEnd() => GameViewModel == null || GameViewModel.OnQuestionEnd();
+    public bool OnQuestionEnd(string comments) => GameViewModel.OnQuestionEnd(comments);
 
     public void OnPackage(Package package)
     {
         var logo = package.LogoItem;
         var media = logo != null ? _mediaProvider.TryGetMedia(logo) : null;
 
-        GameViewModel?.OnPackage(package.Name, media);
-        GameViewModel?.OnRoundNames(package.Rounds.Select(r => r.Name).ToArray());
+        GameViewModel.OnPackage(package.Name, media);
+        GameViewModel.OnRoundNames(package.Rounds.Select(r => r.Name).ToArray());
     }
 
-    public void OnPackageEnd() => GameViewModel?.OnEndGame();
+    public void OnPackageEnd() => GameViewModel.OnEndGame();
 
-    public void OnGameThemes(IEnumerable<string> themes) => GameViewModel?.OnGameThemes(themes);
+    public void OnGameThemes(IEnumerable<string> themes) => GameViewModel.OnGameThemes(themes);
 
     public bool OnNumericAnswerType(int deviation) => false;
 }

@@ -1302,4 +1302,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="Deviation" xml:space="preserve">
     <value>±</value>
   </data>
+  <data name="GenerateThemes" xml:space="preserve">
+    <value>Generate themes with GPT</value>
+  </data>
 </root>

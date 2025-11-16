@@ -399,15 +399,15 @@ Inside the chosen category, invent ONE topic that:
 - Feels accessible to a general audience
 - Has a light, game-show energy
 
-**IMPORTANT: Mix both styles randomly**
+**IMPORTANT: Calculate style as (random_number mod 2) + 1**
 
-**Style A - Straightforward Quiz Formats (50% of the time):**
+**Style 1 - Straightforward Quiz Formats:**
 - Direct knowledge tests
 - "Guess X by Y" formats
 - Classic trivia categories
 - Identification challenges
 
-**Style B - Creative Angles (50% of the time):**
+**Style 2 - Creative Angles:**
 - Pop culture references
 - Quirky subcategories
 - Playful twists on familiar topics
@@ -426,21 +426,19 @@ Inside the chosen category, invent ONE topic that:
 
 ### EXAMPLES
 
-**Style A - Straightforward:**
-- Topic: Guess movie by emojis
-- Topic: Books by author
-- Topic: Chemical elements
+**Style 1 - Straightforward:**
 - Topic: Capital cities
-- Topic: Flags of the world
-- Topic: Paintings by artist
-- Topic: Sports by equipment
-- Topic: Identify the logo
-- Topic: Song by opening line
+- Topic: Chemical elements
 - Topic: Historical dates
 - Topic: Animal species
 - Topic: Programming languages
+- Topic: Identify the logo
+- Topic: Flags of the world
+- Topic: Guess movie by emojis
+- Topic: Books by author
+- Topic: Sports by equipment
 
-**Style B - Creative:**
+**Style 2 - Creative:**
 - Topic: Secret levels
 - Topic: Apps that became verbs
 - Topic: Words that mean both
@@ -614,6 +612,9 @@ Humor</value>
   </data>
   <data name="GPTCreateTopicFinalRoundPrompt" xml:space="preserve">
     <value>Generate topic {0} with {1} hard quiz question that requires some time to think, some knowledge and maybe guessing. Each question has 3-4 sentences</value>
+  </data>
+  <data name="GPTTopisHint" xml:space="preserve">
+    <value>Generate {0} unique topics. Use random numbers</value>
   </data>
   <data name="HasUpdates" xml:space="preserve">
     <value>Updates were found for the program from {0}. Download them now?</value>

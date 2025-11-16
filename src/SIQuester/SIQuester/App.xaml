@@ -1069,6 +1069,13 @@
                                                         Content="{StaticResource AddImage}"
                                                         Command="{Binding AddRound}"
                                                         Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.GenerateThemes}"
+                                                        Content="{StaticResource GenerateQuestionsImage}"
+                                                        Command="{Binding GenerateThemes}"
+                                                        Style="{StaticResource MenuButton}"
+                                                        IsEnabled="{Binding DataContext.Settings.UseGPT, RelativeSource={RelativeSource AncestorType=TreeView}}" />
                                                     
                                                     <Separator Style="{StaticResource MenuSeparator}" />
 

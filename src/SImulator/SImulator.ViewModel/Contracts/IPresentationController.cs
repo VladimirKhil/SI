@@ -49,6 +49,8 @@ public interface IPresentationController : IDisposable
 
     void SetQuestionPrice(int questionPrice);
 
+    void SetQuestionComments(string comments) { }
+
     void SetText(string text = "");
 
     void SetQuestionContentType(QuestionContentType questionContentType);
@@ -61,7 +63,7 @@ public interface IPresentationController : IDisposable
 
     void OnComplexRightAnswer(string answer) { }
 
-    void SetQuestionSound(bool sound);
+    void SetQuestionSound(bool sound) { }
 
     void AddPlayer(string playerName);
 

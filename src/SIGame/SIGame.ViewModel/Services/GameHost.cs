@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SICore.Contracts;
 using SICore.Models;
 using SICore.Results;
@@ -11,24 +10,23 @@ using SIStatisticsService.Contract.Models;
 
 namespace SIGame.ViewModel;
 
-public sealed class BackLink : IGameHost
+internal sealed class GameHost : IGameHost
 {
     public HostOptions Options { get; } = new();
 
-    internal static BackLink Default { get; set; }
-
     private readonly AppState _appState;
 
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<BackLink> _logger;
+    private readonly ISIStatisticsServiceClient _siStatisticsServiceClient;
+    private readonly ILogger<GameHost> _logger;
 
-    internal BackLink(
+    public GameHost(
         AppState appState,
-        IServiceProvider serviceProvider)
+        ISIStatisticsServiceClient siStatisticsServiceClient,
+        ILogger<GameHost> logger)
     {
         _appState = appState;
-        _serviceProvider = serviceProvider;
-        _logger = serviceProvider.GetRequiredService<ILogger<BackLink>>();
+        _siStatisticsServiceClient = siStatisticsServiceClient;
+        _logger = logger;
     }
 
     public void SendError(Exception exc, bool isWarning = false) => PlatformSpecific.PlatformManager.Instance.SendErrorReport(exc);
@@ -38,20 +36,14 @@ public sealed class BackLink : IGameHost
     /// <summary>
     /// Sends game results info to server.
     /// </summary>
-    public async void SaveReport(GameResult gameResult, CancellationToken cancellationToken = default)
+    public async void SaveReport(GameResult gameResult)
     {
-        if (gameResult.Reviews.Count == 0)
-        {
-            return;
-        }
-
         GameReport? gameReport = null;
 
         try
         {
             gameReport = gameResult.ToGameReport();
-            var statisticsService = _serviceProvider.GetRequiredService<ISIStatisticsServiceClient>();
-            await statisticsService.SendGameReportAsync(gameReport, cancellationToken);
+            await _siStatisticsServiceClient.SendGameReportAsync(gameReport);
         }
         catch (Exception)
         {

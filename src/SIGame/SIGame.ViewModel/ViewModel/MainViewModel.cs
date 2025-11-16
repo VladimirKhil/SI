@@ -4,9 +4,9 @@ using Microsoft.Extensions.Options;
 using SI.GameServer.Client;
 using SI.GameServer.Contract;
 using SIContentService.Client;
+using SIGame.ViewModel.Contracts;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
-using SIGame.ViewModel.Settings;
 using SIStatisticsService.Contract;
 using SIStorage.Service.Client;
 using System.ComponentModel;
@@ -115,20 +115,24 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     private readonly CommonSettings _commonSettings;
     private readonly UserSettings _userSettings;
+    private readonly IGameSettingsViewModelFactory _gameSettingsViewModelFactory;
     private readonly IServiceProvider _serviceProvider;
 
-    public MainViewModel(CommonSettings commonSettings, UserSettings userSettings, AppState appState, IServiceProvider serviceProvider)
+    public MainViewModel(
+        CommonSettings commonSettings,
+        UserSettings userSettings,
+        IGameSettingsViewModelFactory gameSettingsViewModelFactory,
+        IServiceProvider serviceProvider)
     {
         _commonSettings = commonSettings;
         _userSettings = userSettings;
+        _gameSettingsViewModelFactory = gameSettingsViewModelFactory;
         _serviceProvider = serviceProvider;
 
         Human = new HumanPlayerViewModel(userSettings.GameSettings, commonSettings);
         Settings = new AppSettingsViewModel(userSettings.GameSettings.AppSettings);
 
         MainMenu = new MainMenuViewModel(userSettings) { IsVisible = false };
-
-        BackLink.Default = new BackLink(appState, serviceProvider);
 
         Cancel = new SimpleCommand(Cancel_Executed);
 
@@ -253,18 +257,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             }
         };
 
-        var gameSettings = new GameSettingsViewModel(
-            _userSettings.GameSettings,
-            _commonSettings,
-            _userSettings,
-            Settings.ThemeSettings.SIUISettings,
-            siStorageClientFactory,
-            libraries,
-            loggerFactory)
-        {
-            Human = Human.HumanPlayer,
-            ChangeSettings = ShowSlideMenu
-        };
+        var gameSettings = _gameSettingsViewModelFactory.Create(Settings.ThemeSettings.SIUISettings, libraries);
+
+        gameSettings.Human = Human.HumanPlayer;
+        gameSettings.ChangeSettings = ShowSlideMenu;
 
         gameSettings.StartGame += StartGame;
 
@@ -309,7 +305,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 _serviceProvider.GetRequiredService<ISIStatisticsServiceClient>(),
                 _serviceProvider.GetRequiredService<IOptions<SIContentClientOptions>>().Value,
                 _serviceProvider.GetRequiredService<ILogger<SIOnlineViewModel>>(),
-                Cancel)
+                Cancel,
+                _serviceProvider.GetRequiredService<IGameSettingsViewModelFactory>())
             {
                 Human = humanAccount,
                 ChangeSettings = ShowSlideMenu
@@ -333,7 +330,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             _userSettings.ConnectionData,
             _commonSettings,
             _userSettings,
-            Settings.ThemeSettings.SIUISettings)
+            Settings.ThemeSettings.SIUISettings,
+            _serviceProvider.GetRequiredService<IGameSettingsViewModelFactory>())
         {
             Human = Human.HumanPlayer, 
             ChangeSettings = ShowSlideMenu,

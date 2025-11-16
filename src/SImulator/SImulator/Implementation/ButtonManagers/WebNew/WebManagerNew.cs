@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -18,39 +19,32 @@ namespace SImulator.Implementation.ButtonManagers.WebNew;
 /// <summary>
 /// Provides web-based buttons.
 /// </summary>
-public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommandExecutor
+public sealed class WebManagerNew(WebApplication webApplication, IGameRepository gameRepository, IButtonManagerListener buttonManagerListener)
+    : ButtonManagerBase(buttonManagerListener), ICommandExecutor
 {
-    private readonly WebApplication _webApplication;
-
-    private string _stageName = "Before";
-
-    public ICollection<string> BannedNames { get; } = new HashSet<string>();
-
-    public ConnectionPersonData[] Players => Listener.GamePlayers.Select(p => new ConnectionPersonData
-    {
-        Role = GameRole.Player,
-        IsOnline = p.IsConnected,
-        Name = p.Name
-    }).ToArray();
-
-    public WebManagerNew(int port, IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
+    internal static async Task<WebManagerNew> CreateAsync(int port, IButtonManagerListener buttonManagerListener)
     {
         var builder = WebApplication.CreateBuilder();
+
+        // Configure the URL for the web application
+        builder.WebHost.UseUrls($"http://+:{port}/");
 
         builder.Services
             .AddSignalR(options => options.HandshakeTimeout = TimeSpan.FromMinutes(1))
             .AddMessagePackProtocol();
-        
-        builder.Services.AddSingleton<IGameRepository>(this);
 
-        _webApplication = builder.Build();
+        var gameRepository = new GameRepository(buttonManagerListener);
+
+        builder.Services.AddSingleton<IGameRepository>(gameRepository);
+
+        var webApplication = builder.Build();
 
         var fileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "wwwroot2"));
 
-        _webApplication.UseDefaultFiles(new DefaultFilesOptions
-            {
-                FileProvider = fileProvider,
-            })
+        webApplication.UseDefaultFiles(new DefaultFilesOptions
+        {
+            FileProvider = fileProvider,
+        })
             .UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = fileProvider,
@@ -58,15 +52,17 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
             .UseRouting()
             .UseEndpoints(endpoints => endpoints.MapHub<ButtonHubNew>("/sihost"));
 
-        _webApplication.MapGet("/api/v1/info/bots", () => Array.Empty<string>());
-        
-        _webApplication.MapGet("/api/v1/info/host", () => new 
+        webApplication.MapGet("/api/v1/info/bots", () => Array.Empty<string>());
+
+        webApplication.MapGet("/api/v1/info/host", () => new
         {
             ContentInfos = new[] { new { } },
             StorageInfos = Array.Empty<object>(),
         });
 
-        _webApplication.RunAsync($"http://+:{port}");
+        await webApplication.StartAsync();
+
+        return new WebManagerNew(webApplication, gameRepository, buttonManagerListener);
     }
 
     public override bool ArePlayersManaged() => true;
@@ -78,33 +74,16 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
 
     public override void Stop()
     {
-
+        
     }
 
-    public override ValueTask DisposeAsync() => _webApplication.DisposeAsync();
-
-    public GameInfo? TryGetGameById(int gameId) => new()
-    {
-        GameID = 1,
-        GameName = "SIGame",
-        StartTime = DateTime.Now,
-        Persons = Players,
-        Rules = GameRules.FalseStart
-    };
-
-    public Task<bool> TryAddPlayerAsync(string id, string playerName) => UI.ExecuteAsync(
-        () => Listener.TryConnectPlayer(playerName, id),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
-
-    public Task<bool> TryRemovePlayerAsync(string playerName) => UI.ExecuteAsync(
-        () => Listener.TryDisconnectPlayer(playerName),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+    public override ValueTask DisposeAsync() => webApplication.DisposeAsync();
 
     public override ICommandExecutor? TryGetCommandExecutor() => this;
 
     public void OnStage(string stageName)
     {
-        _stageName = stageName;
+        gameRepository.StageName = stageName;
         SendMessage("STAGE", stageName);
     }
 
@@ -112,7 +91,7 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
     {
         var messageText = string.Join("\n", args);
         var message = new Message { IsSystem = true, Sender = "@", Receiver = "*", Text = messageText };
-        var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
+        var context = webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
         context.Clients.Client(connectionId).Receive(message);
     }
 
@@ -120,30 +99,8 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
     {
         var messageText = string.Join("\n", args);
         var message = new Message { IsSystem = true, Sender = "@", Receiver = "*", Text = messageText };
-        var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
+        var context = webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
         context.Clients.Group("1").Receive(message);
-    }
-
-    public void OnPlayerPress(string playerName) => UI.Execute(
-        () => Listener.OnPlayerPressed(playerName),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
-
-    public void OnPlayerAnswer(string playerName, string answer, bool isPreliminary) => UI.Execute(
-        () => Listener.OnPlayerAnswered(playerName, answer, isPreliminary),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
-
-    public void OnPlayerPass(string playerName) => UI.Execute(
-        () => Listener.OnPlayerPassed(playerName),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
-
-    public void OnPlayerStake(string playerName, int stake) => UI.Execute(
-        () => Listener.OnPlayerStake(playerName, stake),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
-
-    public void InformPlayer(string playerName, string connectionId)
-    {
-        SendMessageTo(connectionId, "INFO2", "1", "", "+", "+", "+", "+", playerName, "+", "+", "+", "+");
-        SendMessageTo(connectionId, "STAGE_INFO", _stageName, "", "-1");
     }
 
     public void AskStake(string connectionId, int maximum) => SendMessageTo(connectionId, "ASK_STAKE", "Stake", "1", maximum.ToString(), "1", "", "");
@@ -158,8 +115,8 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
     {
         try
         {
-            var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
-            context.Clients.Group(ButtonHubNew.SubscribersGroup).GamePersonsChanged(1, Players);
+            var context = webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
+            context.Clients.Group(ButtonHubNew.SubscribersGroup).GamePersonsChanged(1, gameRepository.Players);
         }
         catch (ObjectDisposedException)
         {
@@ -169,8 +126,55 @@ public sealed class WebManagerNew : ButtonManagerBase, IGameRepository, ICommand
 
     public override void DisconnectPlayerById(string id, string name)
     {
-        var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
+        var context = webApplication.Services.GetRequiredService<IHubContext<ButtonHubNew, IButtonClient>>();
         context.Clients.Client(id).Disconnect();
-        BannedNames.Add(name);
+        gameRepository.BannedNames.Add(name);
     }
+}
+
+internal sealed class GameRepository(IButtonManagerListener listener) : IGameRepository
+{
+    public ConnectionPersonData[] Players => [.. listener.GamePlayers.Select(p => new ConnectionPersonData
+        {
+            Role = GameRole.Player,
+            IsOnline = p.IsConnected,
+            Name = p.Name
+        })];
+
+    public ICollection<string> BannedNames { get; } = new HashSet<string>();
+
+    public string StageName { get; set; } = "Before";
+
+    public GameInfo? TryGetGameById(int gameId) => new()
+    {
+        GameID = 1,
+        GameName = "SIGame",
+        StartTime = DateTime.Now,
+        Persons = Players,
+        Rules = GameRules.FalseStart
+    };
+
+    public Task<bool> TryAddPlayerAsync(string id, string playerName) => UI.ExecuteAsync(
+        () => listener.TryConnectPlayer(playerName, id),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
+    public Task<bool> TryRemovePlayerAsync(string playerName) => UI.ExecuteAsync(
+        () => listener.TryDisconnectPlayer(playerName),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
+    public void OnPlayerPress(string playerName) => UI.Execute(
+        () => listener.OnPlayerPressed(playerName),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
+    public void OnPlayerAnswer(string playerName, string answer, bool isPreliminary) => UI.Execute(
+        () => listener.OnPlayerAnswered(playerName, answer, isPreliminary),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
+    public void OnPlayerPass(string playerName) => UI.Execute(
+        () => listener.OnPlayerPassed(playerName),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+
+    public void OnPlayerStake(string playerName, int stake) => UI.Execute(
+        () => listener.OnPlayerStake(playerName, stake),
+        exc => PlatformManager.Instance.ShowMessage(exc.Message));
 }

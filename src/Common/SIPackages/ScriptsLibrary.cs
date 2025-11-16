@@ -14,17 +14,25 @@ public static class ScriptsLibrary
     /// </summary>
     public static IReadOnlyDictionary<string, Script> Scripts => _scripts;
 
-    static ScriptsLibrary() => _scripts = new Dictionary<string, Script>
+    static ScriptsLibrary()
     {
-        [QuestionTypes.Simple] = CreateScriptWithButton(),
-        [QuestionTypes.Stake] = CreateStakeScript(),
-        [QuestionTypes.StakeAll] = CreateStakeAllScript(),
-        [QuestionTypes.Secret] = CreateSecretScript(),
-        [QuestionTypes.SecretPublicPrice] = CreateSecretPublicPriceScript(),
-        [QuestionTypes.SecretNoQuestion] = CreateSecretNoQuestionScript(),
-        [QuestionTypes.NoRisk] = CreateForYourselfScript(),
-        [QuestionTypes.ForAll] = CreateForAllScript()
-    };
+        var withButtonScript = CreateScriptWithButton();
+        var forYourselfScript = CreateForYourselfScript();
+
+        _scripts = new Dictionary<string, Script>
+        {
+            [QuestionTypes.Simple] = withButtonScript, // Simple is alias for WithButton
+            [QuestionTypes.WithButton] = withButtonScript,
+            [QuestionTypes.Stake] = CreateStakeScript(),
+            [QuestionTypes.StakeAll] = CreateStakeAllScript(),
+            [QuestionTypes.Secret] = CreateSecretScript(),
+            [QuestionTypes.SecretPublicPrice] = CreateSecretPublicPriceScript(),
+            [QuestionTypes.SecretNoQuestion] = CreateSecretNoQuestionScript(),
+            [QuestionTypes.NoRisk] = forYourselfScript, // NoRisk is alias for ForYourself
+            [QuestionTypes.ForYourself] = forYourselfScript,
+            [QuestionTypes.ForAll] = CreateForAllScript()
+        };
+    }
 
     private static Script CreateScriptWithButton()
     {

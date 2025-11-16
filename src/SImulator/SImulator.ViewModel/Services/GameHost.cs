@@ -27,7 +27,7 @@ internal sealed class GameHost : IGameHost
         throw new NotImplementedException();
     }
 
-    public void SaveReport(GameResult result, CancellationToken cancellationToken = default)
+    public void SaveReport(GameResult result)
     {
         throw new NotImplementedException();
     }

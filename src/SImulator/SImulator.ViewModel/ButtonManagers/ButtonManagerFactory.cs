@@ -13,10 +13,10 @@ public class ButtonManagerFactory
     /// </summary>
     /// <param name="settings">Button manager settings.</param>
     /// <returns>Created button manager.</returns>
-    public virtual IButtonManager? Create(AppSettings settings, IButtonManagerListener buttonManagerListener) =>
-        settings.UsePlayersKeys switch
+    public virtual Task<IButtonManager?> CreateAsync(AppSettings settings, IButtonManagerListener buttonManagerListener) =>
+        Task.FromResult<IButtonManager?>(settings.UsePlayersKeys switch
         {
             PlayerKeysModes.External => new EmptyButtonManager(buttonManagerListener),
             _ => null,
-        };
+        });
 }

@@ -437,6 +437,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _data.AnswererIndex = -1;
         _data.CanMarkQuestion = false;
         _data.QuestionPlayState.Clear();
+
+        var key = _data.QuestionPlayState.QuestionKey = $"{Engine.RoundIndex}:{_data.ThemeIndex}:{_data.QuestionIndex}";
+        var humanPlayerCount = _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count();
+        _data.GameResultInfo.IncrementQuestionSeenCount(key, humanPlayerCount);
     }
 
     internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration)
@@ -1284,6 +1288,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 });
             }
 
+            if (_data.Answerer.IsHuman)
+            {
+                _data.GameResultInfo.IncrementQuestionCorrectCount(_data.QuestionPlayState.QuestionKey);
+            }
+
             if (!_data.QuestionPlayState.HiddenStakes)
             {
                 var outcome = _data.CurPriceRight;
@@ -1352,6 +1361,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     _data.QuestionPlayState.UsedAnswerOptions.Add(_data.Answerer.Answer);
                 }
+            }
+
+            if (_data.Answerer.IsHuman)
+            {
+                _data.GameResultInfo.IncrementQuestionWrongCount(_data.QuestionPlayState.QuestionKey);
             }
 
             if (!_data.QuestionPlayState.HiddenStakes)
@@ -3333,7 +3347,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         ICollection<string> appellatedAnswers = Array.Empty<string>();
 
-        if (_data.PackageStatistisProvider != null)
+        if (_data.PackageStatistisProvider != null && !_data.ShowMan.IsHuman)
         {
             appellatedAnswers = _data.PackageStatistisProvider.GetAppellatedAnswers(
                 Engine.RoundIndex,
@@ -3462,7 +3476,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         ICollection<string> appellatedAnswers = Array.Empty<string>();
 
-        if (_data.PackageStatistisProvider != null)
+        if (_data.PackageStatistisProvider != null && !_data.ShowMan.IsHuman)
         {
             appellatedAnswers = _data.PackageStatistisProvider.GetAppellatedAnswers(
                 Engine.RoundIndex,
@@ -3991,7 +4005,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void OnStartAppellation()
     {
-        if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
+        if (_data.AppelaerIndex < 0 ||
+            _data.AppelaerIndex >= _data.Players.Count ||
+            _data.AppellationCallerIndex != -1 && (_data.AppellationCallerIndex < 0 || _data.AppellationCallerIndex >= _data.Players.Count))
         {
             _tasksHistory.AddLogEntry($"OnStartAppellation resumed ({_taskRunner.PrintOldTasks()})");
             ResumeExecution(40);

@@ -7,6 +7,7 @@ using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
 using SIData;
+using SIGame.ViewModel.Contracts;
 using SIGame.ViewModel.Implementation;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PackageSources;
@@ -344,8 +345,9 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         ISIStatisticsServiceClient siStatisticsServiceClient,
         SIContentClientOptions siContentClientOptions,
         ILogger<SIOnlineViewModel> logger,
-        ICommand cancel)
-        : base(connectionData, commonSettings, userSettings, settingsViewModel)
+        ICommand cancel,
+        IGameSettingsViewModelFactory gameSettingsViewModelFactory)
+        : base(connectionData, commonSettings, userSettings, settingsViewModel, gameSettingsViewModelFactory)
     {
         _gameServerClient = gameServerClient;
 

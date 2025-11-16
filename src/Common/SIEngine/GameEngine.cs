@@ -292,7 +292,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
             return;
         }
 
-        var roundTimeout = _playHandler.OnQuestionEnd();
+        var roundTimeout = _playHandler.OnQuestionEnd(ActiveQuestion.Info.Comments.Text);
 
         if (roundTimeout)
         {

@@ -220,8 +220,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetQuestionContentType(QuestionContentType questionContentType) { }
 
-    public void SetQuestionSound(bool sound) { }
-
     public void BeginPressButton() => SendMessage(new { Type = "beginPressButton" });
 
     public void FinishQuestion() { }
@@ -252,8 +250,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     public void SetTable(ThemeInfoViewModel[] table) => SendMessage(new
     {
         Type = "table",
-        Table = table.Select(t => new { t.Name, Questions = t.Questions.Select(q => q.Price).ToArray() }).ToArray(),
-        IsFinal = false
+        Table = table.Select(t => new { t.Name, Questions = t.Questions.Select(q => q.Price).ToArray() }).ToArray()
     });
 
     public void SetStage(TableStage stage) { }
@@ -456,6 +453,12 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     {
         Type = "question",
         QuestionPrice = questionPrice
+    });
+
+    public void SetQuestionComments(string comments) => SendMessage(new
+    {
+        Type = "questionComments",
+        QuestionComments = comments
     });
 
     public void OnComplexRightAnswer(string answer) => SendMessage(new

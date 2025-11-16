@@ -232,7 +232,7 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Question for yourself without risk.
+        ///   Ищет локализованную строку, похожую на Question for yourself.
         /// </summary>
         public static string NoRiskQuestion {
             get {
@@ -246,15 +246,6 @@ namespace SImulator.ViewModel.Properties {
         public static string OpenLicensesError {
             get {
                 return ResourceManager.GetString("OpenLicensesError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Question package.
-        /// </summary>
-        public static string Package {
-            get {
-                return ResourceManager.GetString("Package", resourceCulture);
             }
         }
         
@@ -300,6 +291,42 @@ namespace SImulator.ViewModel.Properties {
         public static string PressTheButton {
             get {
                 return ResourceManager.GetString("PressTheButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Price.
+        /// </summary>
+        public static string Price {
+            get {
+                return ResourceManager.GetString("Price", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на From {0} to {1} with step {2}.
+        /// </summary>
+        public static string PriceFromToStep {
+            get {
+                return ResourceManager.GetString("PriceFromToStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Minimum or maximum in the round.
+        /// </summary>
+        public static string PriceMinMaxRound {
+            get {
+                return ResourceManager.GetString("PriceMinMaxRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} or {1}.
+        /// </summary>
+        public static string PriceOr {
+            get {
+                return ResourceManager.GetString("PriceOr", resourceCulture);
             }
         }
         
@@ -430,6 +457,24 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Anyone.
+        /// </summary>
+        public static string SelectAny {
+            get {
+                return ResourceManager.GetString("SelectAny", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Anyone except yourself.
+        /// </summary>
+        public static string SelectAnyExceptCurrent {
+            get {
+                return ResourceManager.GetString("SelectAnyExceptCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Select audio file.
         /// </summary>
         public static string SelectAudioFile {
@@ -462,6 +507,15 @@ namespace SImulator.ViewModel.Properties {
         public static string SelectIntroVideo {
             get {
                 return ResourceManager.GetString("SelectIntroVideo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Can be given to.
+        /// </summary>
+        public static string SelectionMode {
+            get {
+                return ResourceManager.GetString("SelectionMode", resourceCulture);
             }
         }
         

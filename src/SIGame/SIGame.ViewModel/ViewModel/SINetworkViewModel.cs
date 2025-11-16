@@ -3,6 +3,7 @@ using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
 using SIData;
+using SIGame.ViewModel.Contracts;
 using SIGame.ViewModel.Models;
 using SIGame.ViewModel.Properties;
 using SIUI.ViewModel;
@@ -89,8 +90,13 @@ public sealed class SINetworkViewModel : ConnectionDataViewModel
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    public SINetworkViewModel(ConnectionData connectionData, CommonSettings commonSettings, UserSettings userSettings, SettingsViewModel settingsViewModel)
-        : base(connectionData, commonSettings, userSettings, settingsViewModel)
+    public SINetworkViewModel(
+        ConnectionData connectionData,
+        CommonSettings commonSettings,
+        UserSettings userSettings,
+        SettingsViewModel settingsViewModel,
+        IGameSettingsViewModelFactory gameSettingsViewModelFactory)
+        : base(connectionData, commonSettings, userSettings, settingsViewModel, gameSettingsViewModelFactory)
     {
 
     }

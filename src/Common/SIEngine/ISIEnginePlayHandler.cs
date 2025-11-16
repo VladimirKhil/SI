@@ -132,6 +132,7 @@ public interface ISIEnginePlayHandler
     /// <summary>
     /// Handles question end.
     /// </summary>
+    /// <param name="comments">Question comments.</param>
     /// <returns>Has the current round timed out.</returns>
-    bool OnQuestionEnd();
+    bool OnQuestionEnd(string comments);
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
+using SICore.Contracts;
 using SIGame.ViewModel.Contracts;
 using SIGame.ViewModel.Services;
 using System.Net;
@@ -23,7 +24,11 @@ public static class ServiceCollectionExtensions
                 .WaitAndRetryAsync(
                     RetryCount,
                     retryAttempt => TimeSpan.FromSeconds(Math.Pow(1.5, retryAttempt))));
-        
+
+        services.AddSingleton<IGameHost, GameHost>();
+        services.AddSingleton<IGameSettingsViewModelFactory, GameSettingsViewModelFactory>();
+        services.AddSingleton<MainViewModel>();
+
         return services;
     }
 }

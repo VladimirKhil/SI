@@ -11,6 +11,7 @@ using System.ClientModel;
 using System.ClientModel.Primitives;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SIQuester.ViewModel.Services;
 
@@ -33,7 +34,7 @@ internal static class QuestionsGenerator
         var themeNameSet = !string.IsNullOrEmpty(theme.Name);
         var topicName = themeNameSet ? $"\"{theme.Name}\"" : "<generate topic>";
 
-        var prompt = Resources.DefaultGPTPrompt + (!themeNameSet ? " " + Resources.DefaultGTPTopicGeneration + " Use random number: " + new Random().Next(1, 1000) : "");
+        var prompt = Resources.DefaultGPTPrompt + (!themeNameSet ? " " + Resources.DefaultGTPTopicGeneration + " Use random number: " + new Random().Next(1, 1_000_000) : "");
 
         var questionToGenerateCount = themeViewModel.OwnerRound.Model.Type == RoundTypes.Final ? 1 : 5;
         var promptExamples = new StringBuilder();
@@ -129,14 +130,17 @@ internal static class QuestionsGenerator
             }
         }
 
-        if (!themeNameSet && !string.IsNullOrEmpty(themeInfo.Name))
+        if (!themeNameSet)
         {
-            theme.Name = themeInfo.Name;
-        }
+            if (!string.IsNullOrEmpty(themeInfo.Name))
+            {
+                theme.Name = themeInfo.Name;
+            }
 
-        if (!string.IsNullOrEmpty(themeInfo.Description))
-        {
-            themeViewModel.Info.Comments.Text = themeInfo.Description.ClearPoints();
+            if (!string.IsNullOrEmpty(themeInfo.Description))
+            {
+                themeViewModel.Info.Comments.Text = themeInfo.Description.ClearPoints();
+            }
         }
 
         foreach (var questionInfo in themeInfo.Questions)
@@ -163,7 +167,7 @@ internal static class QuestionsGenerator
                             Type = StepParameterTypes.Content,
                             ContentValue = new()
                             {
-                                    new() { Type = ContentTypes.Text, Value = questionInfo.AnswerOptions[i].ClearPoints() }
+                                new() { Type = ContentTypes.Text, Value = questionInfo.AnswerOptions[i].ClearPoints() }
                             }
                         });
                 }
@@ -193,6 +197,82 @@ internal static class QuestionsGenerator
         themeViewModel.IsExpanded = true;
     }
 
+    internal static async Task GenerateThemesAsync(PackageViewModel packageViewModel)
+    {
+        if (string.IsNullOrEmpty(AppSettings.Default.GPTApiKey))
+        {
+            throw new Exception(Resources.ApiKeyNotSet);
+        }
+
+        var topicCount = packageViewModel.Rounds.SelectMany(r => r.Themes).Count(t => t.Model.Name.Length == 0);
+        var prompt = Resources.DefaultGTPTopicGeneration;
+        var userPrompt = $"{string.Format(Resources.GPTTopisHint, topicCount)}: {string.Join(", ", Enumerable.Range(0, topicCount).Select(_ => new Random().Next(1, 1_000_000)))}";
+
+        List<ChatMessage> messages = new()
+        {
+            new SystemChatMessage(prompt),
+            new UserChatMessage(userPrompt)
+        };
+
+        ChatCompletionOptions options = new()
+        {
+            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                jsonSchemaFormatName: "themes",
+                jsonSchema: ThemesJsonSchema,
+                jsonSchemaIsStrict: true)
+        };
+
+        var client = new ChatClient(AppSettings.Default.GPTModel, new ApiKeyCredential(AppSettings.Default.GPTApiKey), new OpenAIClientOptions
+        {
+            NetworkTimeout = TimeSpan.FromMinutes(4),
+            RetryPolicy = new ClientRetryPolicy(0)
+        });
+
+        ClientResult<ChatCompletion> completion;
+
+        using (var dialog = PlatformManager.Instance.ShowProgressDialog())
+        {
+            completion = await client.CompleteChatAsync(messages, options);
+        }
+
+        var data = completion.Value.Content[0].Text;
+        var themesResponse = JsonSerializer.Deserialize<ThemesResponse>(data) ?? throw new Exception(Resources.FailedToParseGPTResponse);
+        var themes = themesResponse.Themes;
+        var themeIndex = 0;
+
+        if (themes.Count == 0)
+        {
+            return;
+        }
+
+        var document = packageViewModel.Document ?? throw new InvalidOperationException("Document not found");
+        using var change = document.OperationsManager.BeginComplexChange();
+
+        foreach (var round in packageViewModel.Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                if (theme.Model.Name.Length == 0)
+                {
+                    theme.Model.Name = themes[themeIndex++];
+
+                    if (themeIndex >= themes.Count)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (themeIndex >= themes.Count)
+            {
+                break;
+            }
+        }
+
+        change.Commit();
+        packageViewModel.IsExpanded = true;
+    }
+
     public sealed class QuestionInfo
     {
         public string Text { get; set; } = string.Empty;
@@ -214,6 +294,28 @@ internal static class QuestionsGenerator
 
         public List<QuestionInfo> Questions { get; set; } = new List<QuestionInfo>();
     }
+
+    public sealed class ThemesResponse
+    {
+        [JsonPropertyName("themes")]
+        public List<string> Themes { get; set; } = new List<string>();
+    }
+
+    private static readonly BinaryData ThemesJsonSchema = BinaryData.FromBytes(
+        Encoding.UTF8.GetBytes(
+        @"{
+            ""type"": ""object"",
+            ""properties"": {
+                ""themes"": {
+                    ""type"": ""array"",
+                    ""items"": {
+                        ""type"": ""string""
+                    }
+                }
+            },
+            ""required"": [""themes""],
+            ""additionalProperties"": false
+        }"));
 
     private static readonly BinaryData JsonSchema = BinaryData.FromBytes(
         Encoding.UTF8.GetBytes(

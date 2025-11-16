@@ -1520,6 +1520,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Generate themes with GPT.
+        /// </summary>
+        public static string GenerateThemes {
+            get {
+                return ResourceManager.GetString("GenerateThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Go to.
         /// </summary>
         public static string Goto {
@@ -2533,15 +2542,6 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Right answer.
-        /// </summary>
-        public static string RightAnswer {
-            get {
-                return ResourceManager.GetString("RightAnswer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         public static string Round {
@@ -2857,7 +2857,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Select.
+        ///   Ищет локализованную строку, похожую на Selection.
         /// </summary>
         public static string SetAnswerTypeType_Select {
             get {

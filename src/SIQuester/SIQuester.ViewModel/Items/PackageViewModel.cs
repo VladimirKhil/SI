@@ -5,6 +5,7 @@ using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
+using SIQuester.ViewModel.Services;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -105,6 +106,11 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         }
     }
 
+    /// <summary>
+    /// Generates themes with the help of GPT.
+    /// </summary>
+    public ICommand GenerateThemes { get; private set; }
+
     public PackageViewModel(Package package, QDocument document)
         : base(package)
     {
@@ -133,6 +139,20 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         
         CopyInfo = new SimpleCommand(CopyInfo_Executed);
         PasteInfo = new SimpleCommand(PasteInfo_Executed);
+        
+        GenerateThemes = new SimpleCommand(GenerateThemes_Executed);
+    }
+
+    private async void GenerateThemes_Executed(object? arg)
+    {
+        try
+        {
+            await QuestionsGenerator.GenerateThemesAsync(this);
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowErrorMessage(exc.Message);
+        }
     }
 
     private void CopyInfo_Executed(object? arg)

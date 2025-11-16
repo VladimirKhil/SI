@@ -1,4 +1,6 @@
-﻿namespace SICore.Results;
+﻿using SICore.Models;
+
+namespace SICore.Results;
 
 /// <summary>
 /// Defines a game result report.
@@ -69,4 +71,40 @@ public sealed class GameResult
     /// Complained by users questions.
     /// </summary>
     public List<QuestionReport> ComplainedQuestions { get; } = new();
+
+    /// <summary>
+    /// Defines statistics for questions.
+    /// </summary>
+    public Dictionary<string, QuestionStats> QuestionsStats { get; } = new();
+
+    internal void IncrementQuestionSeenCount(string questionKey, int humanPlayerCount)
+    {
+        if (!QuestionsStats.TryGetValue(questionKey, out var questionStats))
+        {
+            QuestionsStats[questionKey] = questionStats = new QuestionStats();
+        }
+
+        questionStats.ShownCount++;
+        questionStats.PlayerSeenCount += humanPlayerCount;
+    }
+
+    internal void IncrementQuestionCorrectCount(string questionKey)
+    {
+        if (!QuestionsStats.TryGetValue(questionKey, out var questionStats))
+        {
+            QuestionsStats[questionKey] = questionStats = new QuestionStats();
+        }
+
+        questionStats.CorrectCount++;
+    }
+
+    internal void IncrementQuestionWrongCount(string questionKey)
+    {
+        if (!QuestionsStats.TryGetValue(questionKey, out var questionStats))
+        {
+            QuestionsStats[questionKey] = questionStats = new QuestionStats();
+        }
+
+        questionStats.WrongCount++;
+    }
 }

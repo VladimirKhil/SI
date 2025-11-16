@@ -1,6 +1,4 @@
 ﻿using SIPackages.Core;
-using SIPackages.TypeConverters;
-using System.ComponentModel;
 using System.Diagnostics;
 
 namespace SIPackages;
@@ -8,7 +6,6 @@ namespace SIPackages;
 /// <summary>
 /// Defines a question type.
 /// </summary>
-[TypeConverter(typeof(QuestionTypeTypeConverter))]
 [Obsolete]
 internal sealed class QuestionType : Named
 {

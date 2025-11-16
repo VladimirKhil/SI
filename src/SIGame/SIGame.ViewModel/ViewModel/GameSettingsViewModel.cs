@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SI.GameServer.Contract;
 using SICore;
 using SICore.Clients;
+using SICore.Contracts;
 using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
@@ -386,6 +387,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
     private readonly UserSettings _userSettings;
     private readonly ISIStorageClientFactory _siStorageClientFactory;
+    private readonly IGameHost _gameHost;
     private readonly ILoggerFactory _loggerFactory;
 
     public GameSettingsViewModel(
@@ -395,6 +397,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         SettingsViewModel settingsViewModel,
         ISIStorageClientFactory siStorageClientFactory,
         SIStorageInfo[] libraries,
+        IGameHost gameHost,
         ILoggerFactory loggerFactory,
         bool isNetworkGame = false,
         long? maxPackageSize = null)
@@ -406,6 +409,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _settingsViewModel = settingsViewModel;
         _siStorageClientFactory = siStorageClientFactory;
         _libraries = libraries;
+        _gameHost = gameHost;
         _loggerFactory = loggerFactory;
 
         UpdateComputerPlayers();
@@ -750,7 +754,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             node,
             _model,
             document,
-            BackLink.Default,
+            _gameHost,
             fileShare,
             _computerPlayers.ToArray(),
             _computerShowmans.ToArray(),

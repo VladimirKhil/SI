@@ -347,10 +347,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
             TInfo.TStage = isFinal ? TableStage.Final : TableStage.RoundThemes;
         }
 
-        if (!isFinal)
-        {
-            SetSound(_soundsSettings.RoundThemes);
-        }
+        SetSound(isFinal ? "" : _soundsSettings.RoundThemes);
     }
 
     public void SetTable(ThemeInfoViewModel[] table)

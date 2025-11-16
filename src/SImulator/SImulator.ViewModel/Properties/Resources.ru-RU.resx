@@ -175,7 +175,7 @@
     <value>Папка лицензий не найдена!</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Вопрос для себя без риска</value>
+    <value>Вопрос для себя</value>
   </data>
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Ошибка при открытии папки лицензий: {0}</value>
@@ -194,6 +194,18 @@
   </data>
   <data name="PressTheButton" xml:space="preserve">
     <value>Нажмите на кнопку</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Стоимость</value>
+  </data>
+  <data name="PriceFromToStep" xml:space="preserve">
+    <value>От {0} до {1} с шагом {2}</value>
+  </data>
+  <data name="PriceMinMaxRound" xml:space="preserve">
+    <value>Минимум или максимум в раунде</value>
+  </data>
+  <data name="PriceOr" xml:space="preserve">
+    <value>{0} или {1}</value>
   </data>
   <data name="QuestionSelection" xml:space="preserve">
     <value>Выбор вопроса</value>
@@ -237,6 +249,12 @@
   <data name="SecretQuestion" xml:space="preserve">
     <value>Вопрос с секретом</value>
   </data>
+  <data name="SelectAny" xml:space="preserve">
+    <value>Кому угодно</value>
+  </data>
+  <data name="SelectAnyExceptCurrent" xml:space="preserve">
+    <value>Кому угодно, кроме себя</value>
+  </data>
   <data name="SelectAudioFile" xml:space="preserve">
     <value>Выберите аудиофайл</value>
   </data>
@@ -248,6 +266,9 @@
   </data>
   <data name="SelectIntroVideo" xml:space="preserve">
     <value>Выберите заставочный видеофайл</value>
+  </data>
+  <data name="SelectionMode" xml:space="preserve">
+    <value>Можно отдать</value>
   </data>
   <data name="SelectLogoImage" xml:space="preserve">
     <value>Выберите изображение-заставку</value>

@@ -57,6 +57,8 @@ public partial class App : Application
 
     private readonly DesktopManager _manager = new();
 
+    private CommonSettings _commonSettings = new();
+    private UserSettings _userSettings = new();
     private AppState _appState = new();
 
     /// <summary>
@@ -66,6 +68,10 @@ public partial class App : Application
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
+        _commonSettings = CommonSettings.Default = SettingsManager.LoadCommonSettings();
+        _userSettings = UserSettings.Default = SettingsManager.LoadUserSettings() ?? new UserSettings();
+        _appState = SettingsManager.LoadAppState();
+
         _host = new HostBuilder()
 #if DEBUG
             .UseEnvironment("Development")
@@ -103,6 +109,8 @@ public partial class App : Application
         services.AddSIStorageServiceClient(configuration);
         services.AddSIContentServiceClient(configuration);
 
+        services.AddSingleton(_commonSettings);
+        services.AddSingleton(_userSettings);
         services.AddSingleton(_appState);
 
         services.AddSingleton<IUIThreadExecutor>(_manager);
@@ -120,10 +128,6 @@ public partial class App : Application
         try
         {
             UI.Initialize();
-
-            CommonSettings.Default = SettingsManager.LoadCommonSettings();
-            UserSettings.Default = SettingsManager.LoadUserSettings() ?? new UserSettings();
-            _appState = SettingsManager.LoadAppState();
 
             if (UserSettings.Default.Language != null)
             {
@@ -172,9 +176,11 @@ public partial class App : Application
 
             UserSettings.Default.PropertyChanged += Default_PropertyChanged;
 
+            var mainViewModel = _host!.Services.GetRequiredService<MainViewModel>();
+
             MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel(CommonSettings.Default, UserSettings.Default, _appState, _host.Services)
+                DataContext = mainViewModel
             };
 
 #if UPDATE
@@ -344,21 +350,13 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        if (CommonSettings.Default != null)
-        {
-            SettingsManager.SaveCommonSettings(CommonSettings.Default);
-        }
-
-        if (UserSettings.Default != null)
-        {
-            SettingsManager.SaveUserSettings(UserSettings.Default);
-        }
-
+        SettingsManager.SaveCommonSettings(_commonSettings);
+        SettingsManager.SaveUserSettings(_userSettings);
         SettingsManager.SaveAppState(_appState);
 
         base.OnExit(e);
     }
 
     private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) =>
-        e.Handled = new ExceptionHandler(_host.Services.GetRequiredService<IErrorManager>()).Handle(e.Exception);
+        e.Handled = new ExceptionHandler(_host!.Services.GetRequiredService<IErrorManager>()).Handle(e.Exception);
 }

@@ -1298,4 +1298,7 @@
   <data name="Deviation" xml:space="preserve">
     <value>±</value>
   </data>
+  <data name="GenerateThemes" xml:space="preserve">
+    <value>Сгенерировать темы при помощи GPT</value>
+  </data>
 </root>
