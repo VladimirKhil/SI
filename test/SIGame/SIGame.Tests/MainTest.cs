@@ -59,7 +59,7 @@ public class MainTest
         var serviceProvider = services.BuildServiceProvider();
         manager.ServiceProvider = serviceProvider;
 
-        var mainViewModel = new MainViewModel(commonSettings, userSettings, appState, serviceProvider);
+        var mainViewModel = serviceProvider.GetRequiredService<MainViewModel>();
 
         await mainViewModel.Open.ExecuteAsync(null);
 
