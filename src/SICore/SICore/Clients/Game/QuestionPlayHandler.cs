@@ -1,4 +1,5 @@
 ﻿using SICore.Models;
+using SICore.Network.Servers;
 using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
@@ -21,15 +22,15 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {
-        _state.QuestionPlayState.AnswerOptions = answerOptions;
-        _state.QuestionPlayState.ScreenContentSequence = screenContentSequence;
+        _state.QuestionPlay.AnswerOptions = answerOptions;
+        _state.QuestionPlay.ScreenContentSequence = screenContentSequence;
         return false;
     }
 
     public bool OnNumericAnswerType(int deviation)
     {
-        _state.QuestionPlayState.IsNumericAnswer = true;
-        _state.QuestionPlayState.NumericAnswerDeviation = deviation;
+        _state.QuestionPlay.IsNumericAnswer = true;
+        _state.QuestionPlay.NumericAnswerDeviation = deviation;
         _controller.OnNumericAnswer();
         return false;
     }
@@ -42,16 +43,16 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnAskAnswer(string mode)
     {
-        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.LayoutShown)
+        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
         {
             _controller.OnAnswerOptions();
-            _state.QuestionPlayState.LayoutShown = true;
+            _state.QuestionPlay.LayoutShown = true;
         }
 
-        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.AnswerOptionsShown)
+        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
         {
             _controller.ShowAnswerOptions(() => OnAskAnswer(mode));
-            _state.QuestionPlayState.AnswerOptionsShown = true;
+            _state.QuestionPlay.AnswerOptionsShown = true;
             return;
         }
 
@@ -80,24 +81,24 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
     {
         _controller.AddHistory("Appellation opened");
 
-        _state.QuestionPlayState.IsAnswer = true;
-        _state.QuestionPlayState.AppellationState = _state.Settings.AppSettings.UseApellations ? AppellationState.Collecting : AppellationState.None;
+        _state.QuestionPlay.IsAnswer = true;
+        _state.QuestionPlay.AppellationState = _state.Settings.AppSettings.UseApellations ? AppellationState.Collecting : AppellationState.None;
         _state.IsPlayingMedia = false;
     }
 
     public bool OnButtonPressStart()
     {
         // TODO: merge somehow with GameLogic.AskToPress() and OnAskAnswer() for buttons
-        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.LayoutShown)
+        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
         {
             _controller.OnAnswerOptions();
-            _state.QuestionPlayState.LayoutShown = true;
+            _state.QuestionPlay.LayoutShown = true;
         }
 
-        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.AnswerOptionsShown)
+        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
         {
             _controller.ShowAnswerOptions(null);
-            _state.QuestionPlayState.AnswerOptionsShown = true;
+            _state.QuestionPlay.AnswerOptionsShown = true;
             return true;
         }
 
@@ -108,16 +109,16 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
-        if (_state.QuestionPlayState.AnswerOptions != null && !_state.QuestionPlayState.LayoutShown)
+        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
         {
             _controller.OnAnswerOptions();
-            _state.QuestionPlayState.LayoutShown = true;
+            _state.QuestionPlay.LayoutShown = true;
         }
 
-        if (_state.QuestionPlayState.IsAnswer && !_state.QuestionPlayState.IsAnswerSimple && !_state.QuestionPlayState.IsAnswerAnnounced)
+        if (_state.QuestionPlay.IsAnswer && !_state.QuestionPlay.IsAnswerSimple && !_state.QuestionPlay.IsAnswerAnnounced)
         {
             _controller.OnComplexAnswer();
-            _state.QuestionPlayState.IsAnswerAnnounced = true;
+            _state.QuestionPlay.IsAnswerAnnounced = true;
         }
     }
 
@@ -197,7 +198,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                 switch (contentItem.Type)
                 {
                     case ContentTypes.Text:
-                        if (_state.QuestionPlayState.IsAnswerSimple)
+                        if (_state.QuestionPlay.IsAnswerSimple)
                         {
                             _controller.OnSimpleAnswer(contentItem.Value);
                             break;
@@ -260,9 +261,9 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         _state.IsDeferringAnswer = false;
         _state.IsQuestionFinished = false;
         _state.UseBackgroundAudio = false;
-        _state.QuestionPlayState.UseButtons = questionRequiresButtons;
-        _state.QuestionPlayState.FlexiblePrice = false;
-        _state.QuestionPlayState.RightAnswers = rightAnswers;
+        _state.QuestionPlay.UseButtons = questionRequiresButtons;
+        _state.QuestionPlay.FlexiblePrice = false;
+        _state.QuestionPlay.RightAnswers = rightAnswers;
 
         foreach (var player in _state.Players)
         {
@@ -295,7 +296,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                 return true;
 
             case StepParameterValues.SetAnswererMode_Stake:
-                _state.QuestionPlayState.FlexiblePrice = true;
+                _state.QuestionPlay.FlexiblePrice = true;
 
                 switch (select)
                 {
@@ -364,7 +365,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         return true;
     }
 
-    public void OnSimpleRightAnswerStart() => _state.QuestionPlayState.IsAnswerSimple = true;
+    public void OnSimpleRightAnswerStart() => _state.QuestionPlay.IsAnswerSimple = true;
 
     public bool OnRightAnswerOption(string rightOptionLabel)
     {

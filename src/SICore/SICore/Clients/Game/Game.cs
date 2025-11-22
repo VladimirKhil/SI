@@ -42,32 +42,34 @@ public sealed class Game : MessageHandler
     private readonly IFileShare _fileShare;
     private readonly IAvatarHelper _avatarHelper;
 
-    private readonly GameLogic _logic;
+    private readonly GameLogic _controller;
 
-    public GameLogic Logic => _logic;
+    public GameLogic Logic => _controller;
 
     private ILocalizer LO { get; }
 
-    public GameData ClientData { get; }
+    private readonly GameData _state;
+
+    public GameData ClientData => _state;
 
     public Game(
         Client client,
         ILocalizer localizer,
-        GameData gameData,
-        GameActions gameActions,
-        GameLogic gameLogic,
+        GameData state,
+        GameActions actions,
+        GameLogic controller,
         ComputerAccount[] defaultPlayers,
         ComputerAccount[] defaultShowmans,
         IFileShare fileShare,
         IAvatarHelper avatarHelper)
         : base(client)
     {
-        _gameActions = gameActions;
-        _logic = gameLogic;
+        _gameActions = actions;
+        _controller = controller;
         LO = localizer;
-        ClientData = gameData;
+        _state = state;
 
-        _logic.AutoGame += AutoGame;
+        _controller.AutoGame += AutoGame;
 
         _defaultPlayers = defaultPlayers;
         _defaultShowmans = defaultShowmans;
@@ -84,8 +86,8 @@ public sealed class Game : MessageHandler
     {
         // Logic must be disposed before TaskLock
         Logic.Dispose();
-        ClientData.TaskLock.Dispose();
-        ClientData.TableInformStageLock.Dispose();
+        _state.TaskLock.Dispose();
+        _state.TableInformStageLock.Dispose();
 
         base.Dispose(disposing);
     }
@@ -97,9 +99,9 @@ public sealed class Game : MessageHandler
     {
         Client.CurrentNode.SerializationError += CurrentServer_SerializationError;
 
-        _logic.Run();
+        _controller.Run();
 
-        foreach (var personName in ClientData.AllPersons.Keys)
+        foreach (var personName in _state.AllPersons.Keys)
         {
             if (personName == NetworkConstants.GameName)
             {
@@ -130,23 +132,23 @@ public sealed class Game : MessageHandler
         _gameActions.SendMessageToWithArgs(
             person,
             Messages.GameMetadata,
-            ClientData.GameName,
-            _logic.Engine.PackageName,
-            _logic.Engine.ContactUri,
-            ClientData.Settings.NetworkVoiceChat);
+            _state.GameName,
+            _controller.Engine.PackageName,
+            _controller.Engine.ContactUri,
+            _state.Settings.NetworkVoiceChat);
 
-        _gameActions.SendMessageToWithArgs(person, Messages.Hostname, ClientData.HostName ?? "");
+        _gameActions.SendMessageToWithArgs(person, Messages.Hostname, _state.HostName ?? "");
     }
 
     private void OnSetOptions(Message message, string[] mparams)
     {
-        if (message.Sender != ClientData.HostName)
+        if (message.Sender != _state.HostName)
         {
             return;
         }
 
-        var appSettings = ClientData.Settings.AppSettings;
-        var msg = new MessageBuilder(Messages.Options2, ClientData.HostName);
+        var appSettings = _state.Settings.AppSettings;
+        var msg = new MessageBuilder(Messages.Options2, _state.HostName);
         var changed = false;
 
         for (var i = 1; i + 1 < mparams.Length; i += 2)
@@ -264,7 +266,7 @@ public sealed class Game : MessageHandler
             Messages.ComputerAccounts,
             string.Join(Message.ArgsSeparator, _defaultPlayers.Select(p => p.Name)));
 
-        var appSettings = ClientData.Settings.AppSettings;
+        var appSettings = _state.Settings.AppSettings;
 
         _gameActions.SendMessageToWithArgs(
             person,
@@ -275,10 +277,10 @@ public sealed class Game : MessageHandler
         _gameActions.SendMessageToWithArgs(person, Messages.ButtonBlockingTime, appSettings.TimeSettings.TimeForBlockingButton);
         _gameActions.SendMessageToWithArgs(person, Messages.ApellationEnabled, appSettings.UseApellations ? '+' : '-');
 
-        var maxPressingTime = ClientData.TimeSettings.ButtonPressing * 10;
+        var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
         _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
 
-        _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, ClientData.JoinMode);
+        _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, _state.JoinMode);
 
         _gameActions.SendMessageToWithArgs(
             person,
@@ -308,8 +310,8 @@ public sealed class Game : MessageHandler
             nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime,
             nameof(appSettings.UseApellations), appSettings.UseApellations,
             nameof(appSettings.TimeSettings.TimeForBlockingButton), appSettings.TimeSettings.TimeForBlockingButton,
-            nameof(ClientData.TimeSettings.ButtonBlocking), ClientData.TimeSettings.ButtonBlocking,
-            nameof(ClientData.TimeSettings.PartialImage), ClientData.TimeSettings.PartialImage);
+            nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
+            nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
     }
 
     private void InformBanned(string person)
@@ -334,18 +336,18 @@ public sealed class Game : MessageHandler
         // Send persons avatars info
         if (person != NetworkConstants.Everybody)
         {
-            InformAvatar(ClientData.ShowMan, person);
+            InformAvatar(_state.ShowMan, person);
 
-            foreach (var item in ClientData.Players)
+            foreach (var item in _state.Players)
             {
                 InformAvatar(item, person);
             }
         }
         else
         {
-            InformAvatar(ClientData.ShowMan);
+            InformAvatar(_state.ShowMan);
 
-            foreach (var item in ClientData.Players)
+            foreach (var item in _state.Players)
             {
                 InformAvatar(item);
             }
@@ -356,33 +358,33 @@ public sealed class Game : MessageHandler
     {
         var info = new StringBuilder(Messages.Info2)
             .Append(Message.ArgsSeparatorChar)
-            .Append(ClientData.Players.Count)
+            .Append(_state.Players.Count)
             .Append(Message.ArgsSeparatorChar);
 
-        AppendAccountExt(ClientData.ShowMan, info);
+        AppendAccountExt(_state.ShowMan, info);
 
         info.Append(Message.ArgsSeparatorChar);
 
-        foreach (var player in ClientData.Players)
+        foreach (var player in _state.Players)
         {
             AppendAccountExt(player, info);
 
             info.Append(Message.ArgsSeparatorChar);
         }
 
-        foreach (var viewer in ClientData.Viewers)
+        foreach (var viewer in _state.Viewers)
         {
             if (!viewer.IsConnected)
             {
-                ClientData.Host.LogWarning($"Viewer {viewer.Name} not connected\n" + ClientData.PersonsUpdateHistory);
+                _state.Host.LogWarning($"Viewer {viewer.Name} not connected\n" + _state.PersonsUpdateHistory);
                 continue;
             }
 
-            if (ClientData.Players.Any(p => p.Name == viewer.Name)
-                || ClientData.ShowMan.Name == viewer.Name)
+            if (_state.Players.Any(p => p.Name == viewer.Name)
+                || _state.ShowMan.Name == viewer.Name)
             {
                 // Need to catch that state
-                ClientData.Host.LogWarning($"Viewer {viewer.Name} is already in players or showman\n" + ClientData.PersonsUpdateHistory);
+                _state.Host.LogWarning($"Viewer {viewer.Name} is already in players or showman\n" + _state.PersonsUpdateHistory);
                 continue;
             }
 
@@ -412,7 +414,7 @@ public sealed class Game : MessageHandler
     public string GetSums()
     {
         var s = new StringBuilder();
-        var total = ClientData.Players.Count;
+        var total = _state.Players.Count;
 
         for (int i = 0; i < total; i++)
         {
@@ -421,7 +423,7 @@ public sealed class Game : MessageHandler
                 s.Append(", ");
             }
 
-            s.AppendFormat("{0}: {1}", ClientData.Players[i].Name, ClientData.Players[i].Sum);
+            s.AppendFormat("{0}: {1}", _state.Players[i].Name, _state.Players[i].Sum);
         }
 
         return s.ToString();
@@ -431,26 +433,26 @@ public sealed class Game : MessageHandler
     {
         var result = new List<ConnectionPersonData>
         {
-            new() { Name = ClientData.ShowMan.Name, Role = GameRole.Showman, IsOnline = ClientData.ShowMan.IsConnected }
+            new() { Name = _state.ShowMan.Name, Role = GameRole.Showman, IsOnline = _state.ShowMan.IsConnected }
         };
 
-        for (int i = 0; i < ClientData.Players.Count; i++)
+        for (int i = 0; i < _state.Players.Count; i++)
         {
             result.Add(new ConnectionPersonData
             {
-                Name = ClientData.Players[i].Name,
+                Name = _state.Players[i].Name,
                 Role = GameRole.Player,
-                IsOnline = ClientData.Players[i].IsConnected
+                IsOnline = _state.Players[i].IsConnected
             });
         }
 
-        for (int i = 0; i < ClientData.Viewers.Count; i++)
+        for (int i = 0; i < _state.Viewers.Count; i++)
         {
             result.Add(new ConnectionPersonData
             {
-                Name = ClientData.Viewers[i].Name,
+                Name = _state.Viewers[i].Name,
                 Role = GameRole.Viewer,
-                IsOnline = ClientData.Viewers[i].IsConnected
+                IsOnline = _state.Viewers[i].IsConnected
             });
         }
 
@@ -463,23 +465,23 @@ public sealed class Game : MessageHandler
         GameRole role,
         string? password)
     {
-        if (ClientData.JoinMode == JoinMode.Forbidden)
+        if (_state.JoinMode == JoinMode.Forbidden)
         {
             return AuthenticationResult.Forbidden;
         }
 
-        if (ClientData.JoinMode == JoinMode.OnlyViewer && role != GameRole.Viewer)
+        if (_state.JoinMode == JoinMode.OnlyViewer && role != GameRole.Viewer)
         {
             return AuthenticationResult.ForbiddenRole;
         }
 
-        if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword)
-            && ClientData.Settings.NetworkGamePassword != password)
+        if (!string.IsNullOrEmpty(_state.Settings.NetworkGamePassword)
+            && _state.Settings.NetworkGamePassword != password)
         {
             return AuthenticationResult.WrongPassword;
         }
 
-        if (ClientData.AllPersons.ContainsKey(name))
+        if (_state.AllPersons.ContainsKey(name))
         {
             return AuthenticationResult.NameIsOccupied;
         }
@@ -490,15 +492,15 @@ public sealed class Game : MessageHandler
         switch (role)
         {
             case GameRole.Showman:
-                accountsToSearch = new ViewerAccount[1] { ClientData.ShowMan };
+                accountsToSearch = new ViewerAccount[1] { _state.ShowMan };
                 break;
 
             case GameRole.Player:
-                accountsToSearch = ClientData.Players;
+                accountsToSearch = _state.Players;
 
-                if (ClientData.HostName == name) // Host is joining
+                if (_state.HostName == name) // Host is joining
                 {
-                    var players = ClientData.Players;
+                    var players = _state.Players;
 
                     for (var i = 0; i < players.Count; i++)
                     {
@@ -518,7 +520,7 @@ public sealed class Game : MessageHandler
                 break;
 
             default: // Viewer
-                accountsToSearch = ClientData.Viewers.Concat(
+                accountsToSearch = _state.Viewers.Concat(
                     new ViewerAccount[] { new(Constants.FreePlace, false, false) { IsHuman = true } });
 
                 break;
@@ -584,7 +586,7 @@ public sealed class Game : MessageHandler
         GameRole role,
         string? password,
         Action connectionAuthenticator) =>
-        ClientData.TaskLock.WithLock(() =>
+        _state.TaskLock.WithLock(() =>
         {
             var result = AuthenticateCore(name, isMale, role, password);
 
@@ -607,7 +609,7 @@ public sealed class Game : MessageHandler
         bool isMale,
         GameRole role,
         string? password) =>
-        ClientData.TaskLock.WithLock(() => AuthenticateCore(name, isMale, role, password), 5000);
+        _state.TaskLock.WithLock(() => AuthenticateCore(name, isMale, role, password), 5000);
 
     private string GetAuthenticationErrorMessage(AuthenticationResult result) =>
         result switch
@@ -627,7 +629,7 @@ public sealed class Game : MessageHandler
     /// </summary>
     /// <param name="message">Received message.</param>
     public override ValueTask OnMessageReceivedAsync(Message message) =>
-        ClientData.TaskLock.WithLockAsync(() =>
+        _state.TaskLock.WithLockAsync(() =>
         {
             if (string.IsNullOrEmpty(message.Text))
             {
@@ -650,25 +652,25 @@ public sealed class Game : MessageHandler
                         var res = new StringBuilder();
                         
                         res.Append(Messages.GameInfo);
-                        res.Append(Message.ArgsSeparatorChar).Append(ClientData.Settings.NetworkGameName);
-                        res.Append(Message.ArgsSeparatorChar).Append(ClientData.HostName);
-                        res.Append(Message.ArgsSeparatorChar).Append(ClientData.Players.Count);
+                        res.Append(Message.ArgsSeparatorChar).Append(_state.Settings.NetworkGameName);
+                        res.Append(Message.ArgsSeparatorChar).Append(_state.HostName);
+                        res.Append(Message.ArgsSeparatorChar).Append(_state.Players.Count);
 
-                        res.Append(Message.ArgsSeparatorChar).Append(ClientData.ShowMan.Name);
-                        res.Append(Message.ArgsSeparatorChar).Append(ClientData.ShowMan.IsConnected ? '+' : '-');
+                        res.Append(Message.ArgsSeparatorChar).Append(_state.ShowMan.Name);
+                        res.Append(Message.ArgsSeparatorChar).Append(_state.ShowMan.IsConnected ? '+' : '-');
                         res.Append(Message.ArgsSeparatorChar).Append('-');
 
-                        for (int i = 0; i < ClientData.Players.Count; i++)
+                        for (int i = 0; i < _state.Players.Count; i++)
                         {
-                            res.Append(Message.ArgsSeparatorChar).Append(ClientData.Players[i].Name);
-                            res.Append(Message.ArgsSeparatorChar).Append(ClientData.Players[i].IsConnected ? '+' : '-');
+                            res.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Name);
+                            res.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].IsConnected ? '+' : '-');
                             res.Append(Message.ArgsSeparatorChar).Append('-');
                         }
 
-                        for (int i = 0; i < ClientData.Viewers.Count; i++)
+                        for (int i = 0; i < _state.Viewers.Count; i++)
                         {
-                            res.Append(Message.ArgsSeparatorChar).Append(ClientData.Viewers[i].Name);
-                            res.Append(Message.ArgsSeparatorChar).Append(ClientData.Viewers[i].IsConnected ? '+' : '-');
+                            res.Append(Message.ArgsSeparatorChar).Append(_state.Viewers[i].Name);
+                            res.Append(Message.ArgsSeparatorChar).Append(_state.Viewers[i].IsConnected ? '+' : '-');
                             res.Append(Message.ArgsSeparatorChar).Append('-');
                         }
 
@@ -706,11 +708,11 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.SetJoinMode:
-                        if (message.Sender == ClientData.HostName && args.Length > 1)
+                        if (message.Sender == _state.HostName && args.Length > 1)
                         {
                             if (Enum.TryParse<JoinMode>(args[1], out var joinMode))
                             {
-                                ClientData.JoinMode = joinMode;
+                                _state.JoinMode = joinMode;
                                 _gameActions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
 
                                 var replic = joinMode switch
@@ -720,7 +722,7 @@ public sealed class Game : MessageHandler
                                     _ => LO[nameof(R.JoinModeSwitchedToForbidden)]
                                 };
 
-                                _gameActions.SpecialReplic(string.Format(replic, ClientData.HostName)); // TODO: REMOVE+
+                                _gameActions.SpecialReplic(string.Format(replic, _state.HostName)); // TODO: REMOVE+
                             }
                         }
                         break;
@@ -730,7 +732,7 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.Start:
-                        if (message.Sender == ClientData.HostName && ClientData.Stage == GameStage.Before)
+                        if (message.Sender == _state.HostName && _state.Stage == GameStage.Before)
                         {
                             StartGame();
                         }
@@ -745,7 +747,7 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.Pin:
-                        if (message.Sender == ClientData.HostName)
+                        if (message.Sender == _state.HostName)
                         {
                             OnPin(message.Sender);
                         }
@@ -808,19 +810,19 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.Next:
-                        if (ClientData.IsWaiting &&
-                            ClientData.Decision == DecisionType.NextPersonStakeMaking &&
-                            message.Sender == ClientData.ShowMan.Name)
+                        if (_state.IsWaiting &&
+                            _state.Decision == DecisionType.NextPersonStakeMaking &&
+                            message.Sender == _state.ShowMan.Name)
                         {
                             #region Next
 
-                            if (args.Length > 1 && int.TryParse(args[1], out int n) && n > -1 && n < ClientData.Players.Count)
+                            if (args.Length > 1 && int.TryParse(args[1], out int n) && n > -1 && n < _state.Players.Count)
                             {
-                                if (ClientData.Players[n].Flag)
+                                if (_state.Players[n].Flag)
                                 {
-                                    ClientData.Order[ClientData.OrderIndex] = n;
-                                    Logic.CheckOrder(ClientData.OrderIndex);
-                                    _logic.Stop(StopReason.Decision);
+                                    _state.Order[_state.OrderIndex] = n;
+                                    Logic.CheckOrder(_state.OrderIndex);
+                                    _controller.Stop(StopReason.Decision);
                                 }
                             }
 
@@ -829,33 +831,33 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.Cat:
-                        if (ClientData.IsWaiting
-                            && ClientData.Decision == DecisionType.QuestionAnswererSelection
-                            && (ClientData.Chooser != null && message.Sender == ClientData.Chooser.Name
-                                || ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
+                        if (_state.IsWaiting
+                            && _state.Decision == DecisionType.QuestionAnswererSelection
+                            && (_state.Chooser != null && message.Sender == _state.Chooser.Name
+                                || _state.IsOralNow && message.Sender == _state.ShowMan.Name))
                         {
                             #region Cat
 
                             try
                             {
-                                if (int.TryParse(args[1], out int index) && index > -1 && index < ClientData.Players.Count && ClientData.Players[index].Flag)
+                                if (int.TryParse(args[1], out int index) && index > -1 && index < _state.Players.Count && _state.Players[index].Flag)
                                 {
-                                    ClientData.AnswererIndex = index;
-                                    ClientData.QuestionPlayState.SetSingleAnswerer(index);
+                                    _state.AnswererIndex = index;
+                                    _state.QuestionPlay.SetSingleAnswerer(index);
 
-                                    if (ClientData.IsOralNow)
+                                    if (_state.IsOralNow)
                                     {
                                         _gameActions.SendMessage(
                                             Messages.Cancel,
-                                            message.Sender == ClientData.ShowMan.Name ? ClientData.Chooser.Name : ClientData.ShowMan.Name);
+                                            message.Sender == _state.ShowMan.Name ? _state.Chooser.Name : _state.ShowMan.Name);
                                     }
 
-                                    _logic.Stop(StopReason.Decision);
+                                    _controller.Stop(StopReason.Decision);
                                 }
                             }
                             catch (Exception ex)
                             {
-                                ClientData.Host.SendError(ex, true);
+                                _state.Host.SendError(ex, true);
                             }
 
                             #endregion
@@ -864,13 +866,13 @@ public sealed class Game : MessageHandler
 
                     case Messages.SelectPlayer:
                         {
-                            if (ClientData.IsWaiting
-                                && ClientData.DecisionMakers.Contains(message.Sender)
+                            if (_state.IsWaiting
+                                && _state.DecisionMakers.Contains(message.Sender)
                                 && args.Length > 1
                                 && int.TryParse(args[1], out var playerIndex)
                                 && playerIndex > -1
-                                && playerIndex < ClientData.Players.Count
-                                && ClientData.Players[playerIndex].Flag)
+                                && playerIndex < _state.Players.Count
+                                && _state.Players[playerIndex].Flag)
                             {
                                 OnSelectedPlayer(playerIndex, message.Sender);
                             }
@@ -898,20 +900,20 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.FinalStake:
-                        if (ClientData.IsWaiting && ClientData.Decision == DecisionType.HiddenStakeMaking)
+                        if (_state.IsWaiting && _state.Decision == DecisionType.HiddenStakeMaking)
                         {
                             #region FinalStake
 
-                            for (var i = 0; i < ClientData.Players.Count; i++)
+                            for (var i = 0; i < _state.Players.Count; i++)
                             {
-                                var player = ClientData.Players[i];
+                                var player = _state.Players[i];
 
-                                if (ClientData.QuestionPlayState.AnswererIndicies.Contains(i) && player.PersonalStake == -1 && message.Sender == player.Name)
+                                if (_state.QuestionPlay.AnswererIndicies.Contains(i) && player.PersonalStake == -1 && message.Sender == player.Name)
                                 {
                                     if (int.TryParse(args[1], out int finalStake) && finalStake >= 1 && finalStake <= player.Sum)
                                     {
                                         player.PersonalStake = finalStake;
-                                        ClientData.HiddenStakerCount--;
+                                        _state.HiddenStakerCount--;
 
                                         _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                                     }
@@ -920,9 +922,9 @@ public sealed class Game : MessageHandler
                                 }
                             }
 
-                            if (ClientData.HiddenStakerCount == 0)
+                            if (_state.HiddenStakerCount == 0)
                             {
-                                _logic.Stop(StopReason.Decision);
+                                _controller.Stop(StopReason.Decision);
                             }
 
                             #endregion
@@ -958,15 +960,15 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.Mark:
-                        if (!ClientData.CanMarkQuestion || args.Length < 3)
+                        if (!_state.CanMarkQuestion || args.Length < 3)
                         {
                             break;
                         }
 
-                        ClientData.GameResultInfo.ComplainedQuestions.Add(new QuestionReport
+                        _state.GameResultInfo.ComplainedQuestions.Add(new QuestionReport
                         {
-                            ThemeName = ClientData.Theme.Name,
-                            QuestionText = ClientData.Question?.GetText(),
+                            ThemeName = _state.Theme.Name,
+                            QuestionText = _state.Question?.GetText(),
                             ReportText = args[2]
                         });
                         break;
@@ -984,7 +986,7 @@ public sealed class Game : MessageHandler
 
     private void OnValidate(Message message, string[] args)
     {
-        if (message.Sender != ClientData.ShowMan.Name || args.Length <= 2)
+        if (message.Sender != _state.ShowMan.Name || args.Length <= 2)
         {
             return;
         }
@@ -993,12 +995,12 @@ public sealed class Game : MessageHandler
         var validationStatus = args[2] == "+";
         var validationFactor = args.Length > 3 && double.TryParse(args[3], out var factor) && factor >= 0.0 ? factor : 1.0;
 
-        if (!ClientData.QuestionPlayState.Validations.TryGetValue(answer, out var validation) || validation.HasValue)
+        if (!_state.QuestionPlay.Validations.TryGetValue(answer, out var validation) || validation.HasValue)
         {
             return;
         }
 
-        ClientData.QuestionPlayState.Validations[answer] = (validationStatus, validationFactor);
+        _state.QuestionPlay.Validations[answer] = (validationStatus, validationFactor);
     }
 
     private void OnPin(string hostName)
@@ -1009,36 +1011,36 @@ public sealed class Game : MessageHandler
 
     private void OnSelectedPlayer(int playerIndex, string messageSender)
     {
-        switch (ClientData.Decision)
+        switch (_state.Decision)
         {
             case DecisionType.StarterChoosing:
-                ClientData.ChooserIndex = playerIndex;
-                _logic.Stop(StopReason.Decision);
+                _state.ChooserIndex = playerIndex;
+                _controller.Stop(StopReason.Decision);
                 break;
 
             case DecisionType.NextPersonStakeMaking:
-                ClientData.Order[ClientData.OrderIndex] = playerIndex;
-                Logic.CheckOrder(ClientData.OrderIndex);
-                _logic.Stop(StopReason.Decision);
+                _state.Order[_state.OrderIndex] = playerIndex;
+                Logic.CheckOrder(_state.OrderIndex);
+                _controller.Stop(StopReason.Decision);
                 break;
 
             case DecisionType.NextPersonFinalThemeDeleting:
-                ClientData.ThemeDeleters?.Current.SetIndex(playerIndex);
-                _logic.Stop(StopReason.Decision);
+                _state.ThemeDeleters?.Current.SetIndex(playerIndex);
+                _controller.Stop(StopReason.Decision);
                 break;
 
             case DecisionType.QuestionAnswererSelection:
-                ClientData.AnswererIndex = playerIndex;
-                ClientData.QuestionPlayState.SetSingleAnswerer(playerIndex);
+                _state.AnswererIndex = playerIndex;
+                _state.QuestionPlay.SetSingleAnswerer(playerIndex);
 
-                if (ClientData.IsOralNow)
+                if (_state.IsOralNow)
                 {
                     _gameActions.SendMessage(
                         Messages.Cancel,
-                        messageSender == ClientData.ShowMan.Name ? ClientData.Chooser.Name : ClientData.ShowMan.Name);
+                        messageSender == _state.ShowMan.Name ? _state.Chooser.Name : _state.ShowMan.Name);
                 }
 
-                _logic.Stop(StopReason.Decision);
+                _controller.Stop(StopReason.Decision);
                 break;
 
             default:
@@ -1048,12 +1050,12 @@ public sealed class Game : MessageHandler
 
     private void OnChoice(Message message, string[] args)
     {
-        if (!ClientData.IsWaiting
-            || ClientData.Decision != DecisionType.QuestionSelection
+        if (!_state.IsWaiting
+            || _state.Decision != DecisionType.QuestionSelection
             || args.Length != 3
-            || ClientData.Chooser == null
-            || message.Sender != ClientData.Chooser.Name
-                && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
+            || _state.Chooser == null
+            || message.Sender != _state.Chooser.Name
+                && (!_state.IsOralNow || message.Sender != _state.ShowMan.Name))
         {
             return;
         }
@@ -1063,104 +1065,104 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        if (themeIndex < 0 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        if (themeIndex < 0 || themeIndex >= _state.TInfo.RoundInfo.Count)
         {
             return;
         }
 
-        if (questionIndex < 0 || questionIndex >= ClientData.TInfo.RoundInfo[themeIndex].Questions.Count)
+        if (questionIndex < 0 || questionIndex >= _state.TInfo.RoundInfo[themeIndex].Questions.Count)
         {
             return;
         }
 
-        if (!ClientData.TInfo.RoundInfo[themeIndex].Questions[questionIndex].IsActive())
+        if (!_state.TInfo.RoundInfo[themeIndex].Questions[questionIndex].IsActive())
         {
             return;
         }
 
-        ClientData.ThemeIndex = themeIndex;
-        ClientData.QuestionIndex = questionIndex;
+        _state.ThemeIndex = themeIndex;
+        _state.QuestionIndex = questionIndex;
 
-        if (ClientData.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         if (Logic.CanPlayerAct())
         {
-            _gameActions.SendMessage(Messages.Cancel, ClientData.Chooser.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
         }
 
-        _logic.Stop(StopReason.Decision);
+        _controller.Stop(StopReason.Decision);
     }
 
     private void OnFirst(Message message, string[] args)
     {
-        if (!ClientData.IsWaiting
-            || ClientData.Decision != DecisionType.StarterChoosing
-            || message.Sender != ClientData.ShowMan.Name
+        if (!_state.IsWaiting
+            || _state.Decision != DecisionType.StarterChoosing
+            || message.Sender != _state.ShowMan.Name
             || args.Length <= 1)
         {
             return;
         }
 
-        if (!int.TryParse(args[1], out int playerIndex) || playerIndex <= -1 || playerIndex >= ClientData.Players.Count || !ClientData.Players[playerIndex].Flag)
+        if (!int.TryParse(args[1], out int playerIndex) || playerIndex <= -1 || playerIndex >= _state.Players.Count || !_state.Players[playerIndex].Flag)
         {
             return;
         }
 
-        ClientData.ChooserIndex = playerIndex;
-        _logic.Stop(StopReason.Decision);
+        _state.ChooserIndex = playerIndex;
+        _controller.Stop(StopReason.Decision);
     }
 
     private void OnSetChooser(Message message, string[] args)
     {
-        if (message.Sender != ClientData.ShowMan.Name || args.Length <= 1)
+        if (message.Sender != _state.ShowMan.Name || args.Length <= 1)
         {
             return;
         }
 
-        if (!int.TryParse(args[1], out int playerIndex) || playerIndex <= -1 || playerIndex >= ClientData.Players.Count)
+        if (!int.TryParse(args[1], out int playerIndex) || playerIndex <= -1 || playerIndex >= _state.Players.Count)
         {
             return;
         }
 
-        if (ClientData.ChooserIndex == playerIndex)
+        if (_state.ChooserIndex == playerIndex)
         {
             return;
         }
 
-        var isChoosingNow = _logic.Runner.PendingTask == Tasks.WaitChoose;
+        var isChoosingNow = _controller.Runner.PendingTask == Tasks.WaitChoose;
 
         if (isChoosingNow)
         {
-            _logic.StopWaiting();
+            _controller.StopWaiting();
 
-            if (ClientData.IsOralNow)
+            if (_state.IsOralNow)
             {
-                _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
 
-            if (ClientData.Chooser != null && Logic.CanPlayerAct())
+            if (_state.Chooser != null && Logic.CanPlayerAct())
             {
-                _gameActions.SendMessage(Messages.Cancel, ClientData.Chooser.Name);
+                _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
             }
         }
 
-        ClientData.ChooserIndex = playerIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "-", "+");
+        _state.ChooserIndex = playerIndex;
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "+");
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name)); // TODO: REMOVE+
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], _state.ShowMan.Name, _state.Chooser?.Name)); // TODO: REMOVE+
 
         if (isChoosingNow)
         {
-            _logic.PlanExecution(Tasks.AskToSelectQuestion, 10);
+            _controller.PlanExecution(Tasks.AskToSelectQuestion, 10);
         }
     }
 
     private void OnMoveable(Message message)
     {
-        if (ClientData.AllPersons.TryGetValue(message.Sender, out var person))
+        if (_state.AllPersons.TryGetValue(message.Sender, out var person))
         {
             person.IsMoveable = true;
         }
@@ -1168,9 +1170,9 @@ public sealed class Game : MessageHandler
 
     private void OnReport(Message message, string[] args)
     {
-        if (ClientData.Decision != DecisionType.Reporting
-            || !ClientData.Players.Any(player => player.Name == message.Sender)
-            || ClientData.GameResultInfo.Reviews.ContainsKey(message.Sender))
+        if (_state.Decision != DecisionType.Reporting
+            || !_state.Players.Any(player => player.Name == message.Sender)
+            || _state.GameResultInfo.Reviews.ContainsKey(message.Sender))
         {
             return;
         }
@@ -1184,26 +1186,26 @@ public sealed class Game : MessageHandler
 
         if (args[1] == MessageParams.Report_Log)
         {
-            ClientData.Host.LogWarning("Player error: " + review);
+            _state.Host.LogWarning("Player error: " + review);
             return;
         }
 
-        ClientData.ReportsCount--;
+        _state.ReportsCount--;
 
         if (review.Length > 0)
         {
-            ClientData.GameResultInfo.Reviews[message.Sender] = review.ToString();
+            _state.GameResultInfo.Reviews[message.Sender] = review.ToString();
         }
 
-        if (ClientData.ReportsCount == 0)
+        if (_state.ReportsCount == 0)
         {
-            _logic.RescheduleTask();
+            _controller.RescheduleTask();
         }
     }
 
-    private void OnMediaLoaded(Message message) => _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaLoaded, message.Sender);
+    private void OnMediaLoaded(Message message) => _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.MediaLoaded, message.Sender);
 
-    private void OnMediaPreloaded(Message message) => _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaPreloaded, message.Sender);
+    private void OnMediaPreloaded(Message message) => _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.MediaPreloaded, message.Sender);
 
     private void OnMediaPreloadProgress(Message message, string[] args)
     {
@@ -1212,17 +1214,17 @@ public sealed class Game : MessageHandler
             return;
         }
         
-        _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaPreloadProgress, message.Sender, progress);
+        _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.MediaPreloadProgress, message.Sender, progress);
     }
 
     private void OnToggle(Message message, string[] args)
     {
-        if (ClientData.TableController == null)
+        if (_state.TableController == null)
         {
             return;
         }
 
-        if (message.Sender != ClientData.ShowMan.Name || args.Length < 3)
+        if (message.Sender != _state.ShowMan.Name || args.Length < 3)
         {
             return;
         }
@@ -1232,21 +1234,21 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        if (themeIndex < 0 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        if (themeIndex < 0 || themeIndex >= _state.TInfo.RoundInfo.Count)
         {
             return;
         }
 
-        if (questionIndex < 0 || questionIndex >= ClientData.TInfo.RoundInfo[themeIndex].Questions.Count)
+        if (questionIndex < 0 || questionIndex >= _state.TInfo.RoundInfo[themeIndex].Questions.Count)
         {
             return;
         }
 
-        var question = ClientData.TInfo.RoundInfo[themeIndex].Questions[questionIndex];
+        var question = _state.TInfo.RoundInfo[themeIndex].Questions[questionIndex];
 
         if (question.IsActive())
         {
-            if (!ClientData.TableController.RemoveQuestion(themeIndex, questionIndex))
+            if (!_state.TableController.RemoveQuestion(themeIndex, questionIndex))
             {
                 return;
             }
@@ -1259,12 +1261,12 @@ public sealed class Game : MessageHandler
                 string.Format(
                     LO[nameof(R.QuestionRemoved)],
                     message.Sender,
-                    ClientData.TInfo.RoundInfo[themeIndex].Name,
+                    _state.TInfo.RoundInfo[themeIndex].Name,
                     oldPrice)); // TODO: REMOVE+
         }
         else
         {
-            if (!ClientData.TableController.RestoreQuestion(themeIndex, questionIndex))
+            if (!_state.TableController.RestoreQuestion(themeIndex, questionIndex))
             {
                 return;
             }
@@ -1273,15 +1275,15 @@ public sealed class Game : MessageHandler
                 string.Format(
                     LO[nameof(R.QuestionRestored)],
                     message.Sender,
-                    ClientData.TInfo.RoundInfo[themeIndex].Name,
+                    _state.TInfo.RoundInfo[themeIndex].Name,
                     question.Price)); // TODO: REMOVE+
         }
 
         // TODO: remove after all clients upgrade to 7.12.0
-        ClientData.TableInformStageLock.WithLock(
+        _state.TableInformStageLock.WithLock(
             () =>
             {
-                if ((ClientData.InformStages & InformStages.Table) > 0)
+                if ((_state.InformStages & InformStages.Table) > 0)
                 {
                     _gameActions.InformRoundThemesNames(playMode: ThemesPlayMode.None);
                     _gameActions.InformTable();
@@ -1292,14 +1294,14 @@ public sealed class Game : MessageHandler
 
     private void OnKick(Message message, string[] args)
     {
-        if (message.Sender != ClientData.HostName || args.Length <= 1)
+        if (message.Sender != _state.HostName || args.Length <= 1)
         {
             return;
         }
 
         var clientName = args[1];
 
-        if (!ClientData.AllPersons.TryGetValue(clientName, out var person))
+        if (!_state.AllPersons.TryGetValue(clientName, out var person))
         {
             return;
         }
@@ -1333,14 +1335,14 @@ public sealed class Game : MessageHandler
 
     private void OnBan(Message message, string[] args)
     {
-        if (message.Sender != ClientData.HostName || args.Length <= 1)
+        if (message.Sender != _state.HostName || args.Length <= 1)
         {
             return;
         }
 
         var clientName = args[1];
 
-        if (!ClientData.AllPersons.TryGetValue(clientName, out var person))
+        if (!_state.AllPersons.TryGetValue(clientName, out var person))
         {
             return;
         }
@@ -1374,14 +1376,14 @@ public sealed class Game : MessageHandler
 
     private void OnSetHost(Message message, string[] args)
     {
-        if (message.Sender != ClientData.HostName || args.Length <= 1)
+        if (message.Sender != _state.HostName || args.Length <= 1)
         {
             return;
         }
 
         var clientName = args[1];
 
-        if (!ClientData.AllPersons.TryGetValue(clientName, out var person))
+        if (!_state.AllPersons.TryGetValue(clientName, out var person))
         {
             return;
         }
@@ -1405,7 +1407,7 @@ public sealed class Game : MessageHandler
 
     private void OnUnban(Message message, string[] args)
     {
-        if (message.Sender != ClientData.HostName || args.Length <= 1)
+        if (message.Sender != _state.HostName || args.Length <= 1)
         {
             return;
         }
@@ -1416,30 +1418,30 @@ public sealed class Game : MessageHandler
 
     private void OnNextDelete(Message message, string[] args)
     {
-        if (!ClientData.IsWaiting ||
-            ClientData.Decision != DecisionType.NextPersonFinalThemeDeleting ||
-            message.Sender != ClientData.ShowMan.Name ||
+        if (!_state.IsWaiting ||
+            _state.Decision != DecisionType.NextPersonFinalThemeDeleting ||
+            message.Sender != _state.ShowMan.Name ||
             args.Length <= 1 ||
             !int.TryParse(args[1], out int playerIndex) ||
             playerIndex <= -1 ||
-            playerIndex >= ClientData.Players.Count ||
-            !ClientData.Players[playerIndex].Flag)
+            playerIndex >= _state.Players.Count ||
+            !_state.Players[playerIndex].Flag)
         {
             return;
         }
 
         try
         {
-            ClientData.ThemeDeleters?.Current.SetIndex(playerIndex);
+            _state.ThemeDeleters?.Current.SetIndex(playerIndex);
         }
         catch (Exception exc)
         {
             throw new InvalidOperationException(
-                $"SetIndex error. Person history: {ClientData.PersonsUpdateHistory}; Logic history: {Logic.PrintHistory()}",
+                $"SetIndex error. Person history: {_state.PersonsUpdateHistory}; Logic history: {Logic.PrintHistory()}",
                 exc);
         }
 
-        _logic.Stop(StopReason.Decision);
+        _controller.Stop(StopReason.Decision);
     }
 
     private void OnPicture(Message message, string[] args)
@@ -1450,7 +1452,7 @@ public sealed class Game : MessageHandler
         }
 
         var path = args[1];
-        var person = ClientData.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
+        var person = _state.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
 
         if (person == null)
         {
@@ -1459,7 +1461,7 @@ public sealed class Game : MessageHandler
 
         if (args.Length > 2)
         {
-            if (!ClientData.Host.AreCustomAvatarsSupported)
+            if (!_state.Host.AreCustomAvatarsSupported)
             {
                 return;
             }
@@ -1499,7 +1501,7 @@ public sealed class Game : MessageHandler
 
         var contentType = args[1];
         var avatarUri = args[2];
-        var person = ClientData.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
+        var person = _state.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
 
         if (person == null)
         {
@@ -1521,18 +1523,18 @@ public sealed class Game : MessageHandler
 
     private void OnSetStake(Message message, string[] args)
     {
-        if (!ClientData.IsWaiting
-            || !ClientData.DecisionMakers.Contains(message.Sender)
+        if (!_state.IsWaiting
+            || !_state.DecisionMakers.Contains(message.Sender)
             || args.Length <= 1
             || !Enum.TryParse<StakeModes>(args[1], out var stakeMode)
-            || (ClientData.StakeModes & stakeMode) <= 0)
+            || (_state.StakeModes & stakeMode) <= 0)
         {
             return;
         }
 
-        var stakerName = message.Sender == ClientData.ShowMan.Name ? ClientData.DecisionMakers.First() : message.Sender;
+        var stakerName = message.Sender == _state.ShowMan.Name ? _state.DecisionMakers.First() : message.Sender;
 
-        if (!ClientData.StakeLimits.TryGetValue(stakerName, out var stakeLimit))
+        if (!_state.StakeLimits.TryGetValue(stakerName, out var stakeLimit))
         {
             return;
         }
@@ -1554,46 +1556,46 @@ public sealed class Game : MessageHandler
             }
         }
 
-        switch (ClientData.Decision)
+        switch (_state.Decision)
         {
             case DecisionType.StakeMaking:
-                ClientData.StakeType = FromStakeMode(stakeMode);
-                ClientData.StakeSum = stakeSum;
-                _logic.Stop(StopReason.Decision);
+                _state.StakeType = FromStakeMode(stakeMode);
+                _state.StakeSum = stakeSum;
+                _controller.Stop(StopReason.Decision);
                 break;
 
             case DecisionType.QuestionPriceSelection:
-                ClientData.CurPriceRight = stakeSum;
-                _logic.Stop(StopReason.Decision);
+                _state.CurPriceRight = stakeSum;
+                _controller.Stop(StopReason.Decision);
                 break;
 
             case DecisionType.HiddenStakeMaking:
-                for (var i = 0; i < ClientData.Players.Count; i++)
+                for (var i = 0; i < _state.Players.Count; i++)
                 {
-                    var player = ClientData.Players[i];
+                    var player = _state.Players[i];
 
                     if (stakerName == player.Name)
                     {
                         player.PersonalStake = stakeSum;
-                        ClientData.HiddenStakerCount--;
-                        ClientData.StakeLimits.Remove(stakerName);
+                        _state.HiddenStakerCount--;
+                        _state.StakeLimits.Remove(stakerName);
 
                         _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                         break;
                     }
                 }
 
-                if (ClientData.HiddenStakerCount == 0)
+                if (_state.HiddenStakerCount == 0)
                 {
-                    _logic.Stop(StopReason.Decision);
+                    _controller.Stop(StopReason.Decision);
                 }
 
                 break;
         }
 
-        if (ClientData.IsOralNow)
+        if (_state.IsOralNow)
         {
-            if (message.Sender == ClientData.ShowMan.Name)
+            if (message.Sender == _state.ShowMan.Name)
             {
                 if (Logic.CanPlayerAct())
                 {
@@ -1602,7 +1604,7 @@ public sealed class Game : MessageHandler
             }
             else
             {
-                _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
         }
     }
@@ -1618,10 +1620,10 @@ public sealed class Game : MessageHandler
     [Obsolete]
     private void OnStake(Message message, string[] args)
     {
-        if (!ClientData.IsWaiting ||
-            ClientData.Decision != DecisionType.StakeMaking ||
-            (ClientData.ActivePlayer == null || message.Sender != ClientData.ActivePlayer.Name)
-            && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
+        if (!_state.IsWaiting ||
+            _state.Decision != DecisionType.StakeMaking ||
+            (_state.ActivePlayer == null || message.Sender != _state.ActivePlayer.Name)
+            && (!_state.IsOralNow || message.Sender != _state.ShowMan.Name))
         {
             return;
         }
@@ -1631,60 +1633,60 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        ClientData.StakeType = (StakeMode)stakeType;
+        _state.StakeType = (StakeMode)stakeType;
 
-        if (!ClientData.StakeVariants[(int)ClientData.StakeType])
+        if (!_state.StakeVariants[(int)_state.StakeType])
         {
-            ClientData.StakeType = null;
+            _state.StakeType = null;
         }
-        else if (ClientData.StakeType == StakeMode.Sum)
+        else if (_state.StakeType == StakeMode.Sum)
         {
-            var minimum = ClientData.Stake != -1 ? ClientData.Stake + ClientData.StakeStep : ClientData.CurPriceRight + ClientData.StakeStep;
+            var minimum = _state.Stake != -1 ? _state.Stake + _state.StakeStep : _state.CurPriceRight + _state.StakeStep;
             
             // TODO: optimize
-            while (minimum % ClientData.StakeStep != 0)
+            while (minimum % _state.StakeStep != 0)
             {
                 minimum++;
             }
 
             if (!int.TryParse(args[2], out var stakeSum))
             {
-                ClientData.StakeType = null;
+                _state.StakeType = null;
                 return;
             }
 
-            if (stakeSum < minimum || stakeSum > ClientData.ActivePlayer.Sum || stakeSum % ClientData.StakeStep != 0)
+            if (stakeSum < minimum || stakeSum > _state.ActivePlayer.Sum || stakeSum % _state.StakeStep != 0)
             {
-                ClientData.StakeType = null;
+                _state.StakeType = null;
                 return;
             }
 
-            ClientData.StakeSum = stakeSum;
+            _state.StakeSum = stakeSum;
         }
 
-        if (ClientData.IsOralNow)
+        if (_state.IsOralNow)
         {
-            if (message.Sender == ClientData.ShowMan.Name)
+            if (message.Sender == _state.ShowMan.Name)
             {
-                if (ClientData.ActivePlayer != null)
+                if (_state.ActivePlayer != null)
                 {
-                    _gameActions.SendMessage(Messages.Cancel, ClientData.ActivePlayer.Name);
+                    _gameActions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
                 }
             }
             else
             {
-                _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
         }
 
-        _logic.Stop(StopReason.Decision);
+        _controller.Stop(StopReason.Decision);
     }
 
     private void OnInfo(string person)
     {
         Inform(person);
 
-        foreach (var item in ClientData.MainPersons)
+        foreach (var item in _state.MainPersons)
         {
             if (item.Ready)
             {
@@ -1698,10 +1700,10 @@ public sealed class Game : MessageHandler
 
     private void InformGameStage(string person)
     {
-        var roundIndex = _logic.Engine.RoundIndex;
+        var roundIndex = _controller.Engine.RoundIndex;
         _gameActions.InformStageInfo(person, roundIndex);
 
-        if ((ClientData.InformStages & InformStages.RoundNames) > 0)
+        if ((_state.InformStages & InformStages.RoundNames) > 0)
         {
             _gameActions.InformRoundsNames(person);
         }
@@ -1712,46 +1714,46 @@ public sealed class Game : MessageHandler
         //    _gameActions.InformRoundContent(person);
         //}
 
-        if ((ClientData.InformStages & InformStages.RoundThemesNames) > 0)
+        if ((_state.InformStages & InformStages.RoundThemesNames) > 0)
         {
-            _gameActions.InformRoundThemesNames(person, ClientData.ThemesPlayMode);
+            _gameActions.InformRoundThemesNames(person, _state.ThemesPlayMode);
         }
 
-        if ((ClientData.InformStages & InformStages.RoundThemesComments) > 0)
+        if ((_state.InformStages & InformStages.RoundThemesComments) > 0)
         {
             _gameActions.InformRoundThemesComments(person);
         }
 
-        if ((ClientData.InformStages & InformStages.Table) > 0)
+        if ((_state.InformStages & InformStages.Table) > 0)
         {
             _gameActions.InformTable(person);
         }
 
-        if ((ClientData.InformStages & InformStages.Theme) > 0)
+        if ((_state.InformStages & InformStages.Theme) > 0)
         {
             _gameActions.InformTheme(person);
         }
 
-        if ((ClientData.InformStages & InformStages.Question) > 0 && ClientData.Question != null)
+        if ((_state.InformStages & InformStages.Question) > 0 && _state.Question != null)
         {
-            _gameActions.SendMessageToWithArgs(person, Messages.Choice, ClientData.ThemeIndex, ClientData.QuestionIndex, ClientData.Question.Price);
+            _gameActions.SendMessageToWithArgs(person, Messages.Choice, _state.ThemeIndex, _state.QuestionIndex, _state.Question.Price);
         }
 
-        if ((ClientData.InformStages & InformStages.Layout) > 0)
+        if ((_state.InformStages & InformStages.Layout) > 0)
         {
             _gameActions.InformLayout(person);
             // TODO: send already displayed answer options and their state
         }
 
-        if ((ClientData.InformStages & InformStages.ContentShape) > 0)
+        if ((_state.InformStages & InformStages.ContentShape) > 0)
         {
             _gameActions.SendContentShape(person);
             // TODO: send already displayed content part
         }
 
-        if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
+        if (_state.Stage == GameStage.Before && _state.Settings.IsAutomatic)
         {
-            var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - ClientData.TimerStartTime[2]).TotalSeconds * 10;
+            var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - _state.TimerStartTime[2]).TotalSeconds * 10;
 
             if (leftTimeBeforeStart > 0)
             {
@@ -1760,9 +1762,9 @@ public sealed class Game : MessageHandler
         }
 
         // Send last visual message to restore table state for reconnected player
-        if (ClientData.ComplexVisualState != null)
+        if (_state.ComplexVisualState != null)
         {
-            foreach (var visualMessageList in ClientData.ComplexVisualState)
+            foreach (var visualMessageList in _state.ComplexVisualState)
             {
                 if (visualMessageList == null)
                 {
@@ -1775,66 +1777,71 @@ public sealed class Game : MessageHandler
                 }
             }
         }
-        else if (!string.IsNullOrEmpty(ClientData.LastVisualMessage))
+        else if (!string.IsNullOrEmpty(_state.LastVisualMessage))
         {
-            _gameActions.SendMessage(ClientData.LastVisualMessage, person);
+            _gameActions.SendMessage(_state.LastVisualMessage, person);
         }
 
-        _gameActions.SendMessageToWithArgs(person, Messages.Pause, ClientData.TInfo.Pause ? '+' : '-', 0, 0, 0); // TODO: fill time values
+        if (_state.Stage == GameStage.Round) // TODO: keep all timers state on server and send it to client on reconnection
+        {
+            _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _state.TimeSettings.Round * 10);
+        }
 
-        if (ClientData.Decision == DecisionType.Appellation)
+        _gameActions.SendMessageToWithArgs(person, Messages.Pause, _state.TInfo.Pause ? '+' : '-', 0, 0, 0); // TODO: fill time values
+
+        if (_state.Decision == DecisionType.Appellation)
         {
             _gameActions.SendMessageToWithArgs(person, Messages.Appellation, '+');
         }
-        else if (ClientData.Decision == DecisionType.Pressing)
+        else if (_state.Decision == DecisionType.Pressing)
         {
             _gameActions.SendMessageToWithArgs(person, Messages.Try);
         }
 
-        if (ClientData.ChooserIndex != -1)
+        if (_state.ChooserIndex != -1)
         {
-            _gameActions.SendMessageToWithArgs(person, Messages.SetChooser, ClientData.ChooserIndex, "-", "INITIAL");
+            _gameActions.SendMessageToWithArgs(person, Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");
         }
     }
 
     private void OnDelete(Message message, string[] args)
     {
-        if (!ClientData.IsWaiting ||
-            ClientData.Decision != DecisionType.ThemeDeleting ||
-            ClientData.ActivePlayer == null ||
-            message.Sender != ClientData.ActivePlayer.Name && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
+        if (!_state.IsWaiting ||
+            _state.Decision != DecisionType.ThemeDeleting ||
+            _state.ActivePlayer == null ||
+            message.Sender != _state.ActivePlayer.Name && (!_state.IsOralNow || message.Sender != _state.ShowMan.Name))
         {
             return;
         }
 
-        if (!int.TryParse(args[1], out int themeIndex) || themeIndex <= -1 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        if (!int.TryParse(args[1], out int themeIndex) || themeIndex <= -1 || themeIndex >= _state.TInfo.RoundInfo.Count)
         {
             return;
         }
 
-        if (ClientData.TInfo.RoundInfo[themeIndex].Name == QuestionHelper.InvalidThemeName)
+        if (_state.TInfo.RoundInfo[themeIndex].Name == QuestionHelper.InvalidThemeName)
         {
             return;
         }
 
-        ClientData.ThemeIndexToDelete = themeIndex;
+        _state.ThemeIndexToDelete = themeIndex;
 
-        if (ClientData.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         if (Logic.CanPlayerAct())
         {
-            _gameActions.SendMessage(Messages.Cancel, ClientData.ActivePlayer.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
         }
 
-        _logic.Stop(StopReason.Decision);
+        _controller.Stop(StopReason.Decision);
     }
 
     private void OnDisconnect(string[] args)
     {
-        if (args.Length < 3 || !ClientData.AllPersons.TryGetValue(args[1], out var account))
+        if (args.Length < 3 || !_state.AllPersons.TryGetValue(args[1], out var account))
         {
             return;
         }
@@ -1849,19 +1856,19 @@ public sealed class Game : MessageHandler
         _gameActions.SpecialReplic(res.ToString()); // TODO: REMOVE+
         _gameActions.SendMessageWithArgs(Messages.Disconnected, account.Name);
 
-        ClientData.BeginUpdatePersons($"Disconnected {account.Name}");
+        _state.BeginUpdatePersons($"Disconnected {account.Name}");
 
         try
         {
             account.IsConnected = false;
 
-            if (ClientData.Viewers.Contains(account))
+            if (_state.Viewers.Contains(account))
             {
-                ClientData.Viewers.Remove(account);
+                _state.Viewers.Remove(account);
             }
             else
             {
-                var isBefore = ClientData.Stage == GameStage.Before;
+                var isBefore = _state.Stage == GameStage.Before;
 
                 if (account is GamePersonAccount person)
                 {
@@ -1877,29 +1884,29 @@ public sealed class Game : MessageHandler
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            _state.EndUpdatePersons();
         }
 
-        if (args[1] == ClientData.HostName)
+        if (args[1] == _state.HostName)
         {
             // A new host must be assigned if possible.
             // The host is assigned randomly
 
             SelectNewHost();
 
-            if (ClientData.Settings.AppSettings.Managed && !_logic.Runner.IsRunning)
+            if (_state.Settings.AppSettings.Managed && !_controller.Runner.IsRunning)
             {
-                if (_logic.StopReason == StopReason.Pause || ClientData.TInfo.Pause)
+                if (_controller.StopReason == StopReason.Pause || _state.TInfo.Pause)
                 {
-                    _logic.AddHistory("Managed game pause autoremoved");
-                    _logic.OnPauseCore(false);
+                    _controller.AddHistory("Managed game pause autoremoved");
+                    _controller.OnPauseCore(false);
                     return;
                 }
 
-                _logic.AddHistory("Managed game move autostarted");
+                _controller.AddHistory("Managed game move autostarted");
 
-                ClientData.MoveDirection = MoveDirections.Next;
-                _logic.Stop(StopReason.Move);
+                _state.MoveDirection = MoveDirections.Next;
+                _controller.Stop(StopReason.Move);
             }
         }
 
@@ -1940,13 +1947,13 @@ public sealed class Game : MessageHandler
 
         string? newHostName = null;
 
-        if (canBeHost(ClientData.ShowMan))
+        if (canBeHost(_state.ShowMan))
         {
-            newHostName = ClientData.ShowMan.Name;
+            newHostName = _state.ShowMan.Name;
         }
         else
         {
-            var availablePlayers = ClientData.Players.Where(canBeHost).ToArray();
+            var availablePlayers = _state.Players.Where(canBeHost).ToArray();
 
             if (availablePlayers.Length > 0)
             {
@@ -1955,7 +1962,7 @@ public sealed class Game : MessageHandler
             }
             else
             {
-                var availableViewers = ClientData.Viewers.Where(canBeHost).ToArray();
+                var availableViewers = _state.Viewers.Where(canBeHost).ToArray();
 
                 if (availableViewers.Length > 0)
                 {
@@ -1970,13 +1977,13 @@ public sealed class Game : MessageHandler
 
     private void UpdateHostName(string? newHostName, string source = "")
     {
-        ClientData.HostName = newHostName;
+        _state.HostName = newHostName;
         _gameActions.SendMessageWithArgs(Messages.Hostname, newHostName ?? "", source);
     }
 
     private void OnAppellation(Message message, string[] args)
     {
-        if (ClientData.QuestionPlayState.AppellationState == AppellationState.None)
+        if (_state.QuestionPlay.AppellationState == AppellationState.None)
         {
             return;
         }
@@ -1988,14 +1995,14 @@ public sealed class Game : MessageHandler
         {
             var found = false;
 
-            foreach (var answerResult in ClientData.QuestionHistory)
+            foreach (var answerResult in _state.QuestionHistory)
             {
-                if (answerResult.PlayerIndex < 0 || answerResult.PlayerIndex >= ClientData.Players.Count)
+                if (answerResult.PlayerIndex < 0 || answerResult.PlayerIndex >= _state.Players.Count)
                 {
                     continue;
                 }
 
-                var player = ClientData.Players[answerResult.PlayerIndex];
+                var player = _state.Players[answerResult.PlayerIndex];
 
                 if (player.Name == appellationSource && !answerResult.IsRight)
                 {
@@ -2012,16 +2019,16 @@ public sealed class Game : MessageHandler
         }
         else
         {
-            if (_logic.HaveMultipleAnswerers())
+            if (_controller.HaveMultipleAnswerers())
             {
                 return; // Appellation for wrong answer not allowed when multiple answerers
             }
 
             var found = false;
 
-            for (var i = 0; i < ClientData.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == appellationSource)
+                if (_state.Players[i].Name == appellationSource)
                 {
                     found = true;
                     break;
@@ -2035,60 +2042,60 @@ public sealed class Game : MessageHandler
             }
         }
 
-        if (ClientData.QuestionPlayState.Appellations.Any(a => a.Item1 == appellationSource || !a.Item2))
+        if (_state.QuestionPlay.Appellations.Any(a => a.Item1 == appellationSource || !a.Item2))
         {
             // Appellation already exists for this source or appellation for wrong answer already given
             return;
         }
 
-        ClientData.QuestionPlayState.Appellations.Add((appellationSource, isAppellationForRightAnswer));
+        _state.QuestionPlay.Appellations.Add((appellationSource, isAppellationForRightAnswer));
 
         _gameActions.SpecialReplic($"{appellationSource} {LO[nameof(R.RequestedApellation)]}"); // TODO: REMOVE+
         _gameActions.SendMessageWithArgs(Messages.PlayerAppellating, appellationSource);
 
-        if (ClientData.QuestionPlayState.AppellationState == AppellationState.Collecting)
+        if (_state.QuestionPlay.AppellationState == AppellationState.Collecting)
         {
             return;
         }
 
-        _logic.ProcessNextAppellationRequest(true);
+        _controller.ProcessNextAppellationRequest(true);
     }
 
     [Obsolete]
     private void OnCatCost(Message message, string[] args)
     {
-        if (!ClientData.IsWaiting ||
-            ClientData.Decision != DecisionType.QuestionPriceSelection ||
-            (ClientData.Answerer == null || message.Sender != ClientData.Answerer.Name) &&
-            (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
+        if (!_state.IsWaiting ||
+            _state.Decision != DecisionType.QuestionPriceSelection ||
+            (_state.Answerer == null || message.Sender != _state.Answerer.Name) &&
+            (!_state.IsOralNow || message.Sender != _state.ShowMan.Name))
         {
             return;
         }
 
         if (int.TryParse(args[1], out var sum)
-            && sum >= ClientData.StakeRange.Minimum
-            && sum <= ClientData.StakeRange.Maximum
-            && (ClientData.StakeRange.Step == 0 || (sum - ClientData.StakeRange.Minimum) % ClientData.StakeRange.Step == 0))
+            && sum >= _state.StakeRange.Minimum
+            && sum <= _state.StakeRange.Maximum
+            && (_state.StakeRange.Step == 0 || (sum - _state.StakeRange.Minimum) % _state.StakeRange.Step == 0))
         {
-            ClientData.CurPriceRight = sum;
+            _state.CurPriceRight = sum;
         }
 
-        if (ClientData.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
-        if (Logic.CanPlayerAct() && ClientData.Answerer != null)
+        if (Logic.CanPlayerAct() && _state.Answerer != null)
         {
-            _gameActions.SendMessage(Messages.Cancel, ClientData.Answerer.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
         }
 
-        _logic.Stop(StopReason.Decision);
+        _controller.Stop(StopReason.Decision);
     }
 
     private void OnChanged(Message message, string[] args)
     {
-        if (message.Sender != ClientData.ShowMan.Name || args.Length != 3)
+        if (message.Sender != _state.ShowMan.Name || args.Length != 3)
         {
             return;
         }
@@ -2096,27 +2103,27 @@ public sealed class Game : MessageHandler
         if (!int.TryParse(args[1], out var playerIndex) ||
             !int.TryParse(args[2], out var sum) ||
             playerIndex < 1 ||
-            playerIndex > ClientData.Players.Count)
+            playerIndex > _state.Players.Count)
         {
             return;
         }
 
-        var player = ClientData.Players[playerIndex - 1];
+        var player = _state.Players[playerIndex - 1];
         var oldSum = player.Sum;
         player.Sum = sum;
 
-        var verbEnding = ClientData.ShowMan.IsMale ? "" : LO[nameof(R.FemaleEnding)];
+        var verbEnding = _state.ShowMan.IsMale ? "" : LO[nameof(R.FemaleEnding)];
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.ScoreChanged)], ClientData.ShowMan.Name, player.Name, oldSum, sum, verbEnding)); // TODO: REMOVE+
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.ScoreChanged)], _state.ShowMan.Name, player.Name, oldSum, sum, verbEnding)); // TODO: REMOVE+
         _gameActions.SendMessageWithArgs(Messages.PlayerScoreChanged, playerIndex - 1, sum);
         _gameActions.InformSums();
 
-        _logic.AddHistory($"Sum change: {playerIndex - 1} = {sum}");
+        _controller.AddHistory($"Sum change: {playerIndex - 1} = {sum}");
     }
 
     private void OnMove(Message message, string[] args)
     {
-        if (message.Sender != ClientData.HostName && message.Sender != ClientData.ShowMan.Name || args.Length <= 1)
+        if (message.Sender != _state.HostName && message.Sender != _state.ShowMan.Name || args.Length <= 1)
         {
             return;
         }
@@ -2136,7 +2143,7 @@ public sealed class Game : MessageHandler
         switch (moveDirection)
         {
             case MoveDirections.RoundBack:
-                if (!_logic.Engine.CanMoveBackRound)
+                if (!_controller.Engine.CanMoveBackRound)
                 {
                     return;
                 }
@@ -2144,7 +2151,7 @@ public sealed class Game : MessageHandler
                 break;
 
             case MoveDirections.Back:
-                if (!_logic.Engine.CanMoveBack)
+                if (!_controller.Engine.CanMoveBack)
                 {
                     return;
                 }
@@ -2152,7 +2159,7 @@ public sealed class Game : MessageHandler
                 break;
 
             case MoveDirections.Next:
-                if (ClientData.MoveNextBlocked)
+                if (_state.MoveNextBlocked)
                 {
                     return;
                 }
@@ -2160,7 +2167,7 @@ public sealed class Game : MessageHandler
                 break;
 
             case MoveDirections.RoundNext:
-                if (!_logic.Engine.CanMoveNextRound)
+                if (!_controller.Engine.CanMoveNextRound)
                 {
                     return;
                 }
@@ -2168,25 +2175,25 @@ public sealed class Game : MessageHandler
                 break;
 
             case MoveDirections.Round:
-                if (!_logic.Engine.CanMoveNextRound && !_logic.Engine.CanMoveBackRound ||
-                    ClientData.Package == null ||
+                if (!_controller.Engine.CanMoveNextRound && !_controller.Engine.CanMoveBackRound ||
+                    _state.Package == null ||
                     args.Length <= 2 ||
                     !int.TryParse(args[2], out int roundIndex) ||
                     roundIndex < 0 ||
-                    roundIndex >= ClientData.Rounds.Length ||
-                    ClientData.Rounds[roundIndex].Index == _logic.Engine.RoundIndex)
+                    roundIndex >= _state.Rounds.Length ||
+                    _state.Rounds[roundIndex].Index == _controller.Engine.RoundIndex)
                 {
                     return;
                 }
 
-                ClientData.TargetRoundIndex = ClientData.Rounds[roundIndex].Index;
+                _state.TargetRoundIndex = _state.Rounds[roundIndex].Index;
                 break;
         }
 
         // Resume paused game
-        if (ClientData.TInfo.Pause)
+        if (_state.TInfo.Pause)
         {
-            _logic.OnPauseCore(false);
+            _controller.OnPauseCore(false);
 
             if (moveDirection == MoveDirections.Next)
             {
@@ -2194,15 +2201,15 @@ public sealed class Game : MessageHandler
             }
         }
 
-        _logic.AddHistory($"Move started: {moveDirection}");
+        _controller.AddHistory($"Move started: {moveDirection}");
 
-        ClientData.MoveDirection = moveDirection;
-        _logic.Stop(StopReason.Move);
+        _state.MoveDirection = moveDirection;
+        _controller.Stop(StopReason.Move);
     }
 
     private void OnReady(Message message, string[] args)
     {
-        if (ClientData.Stage != GameStage.Before)
+        if (_state.Stage != GameStage.Before)
         {
             return;
         }
@@ -2216,7 +2223,7 @@ public sealed class Game : MessageHandler
         var found = false;
         var toReady = args.Length == 1 || args[1] == "+";
 
-        foreach (var item in ClientData.MainPersons)
+        foreach (var item in _state.MainPersons)
         {
             if (message.Sender == item.Name && (toReady && !item.Ready || !toReady && item.Ready))
             {
@@ -2237,9 +2244,9 @@ public sealed class Game : MessageHandler
         {
             StartGame();
         }
-        else if (ClientData.Settings.IsAutomatic)
+        else if (_state.Settings.IsAutomatic)
         {
-            if (ClientData.Players.All(player => player.IsConnected))
+            if (_state.Players.All(player => player.IsConnected))
             {
                 StartGame();
             }
@@ -2248,18 +2255,18 @@ public sealed class Game : MessageHandler
 
     private void OnPause(Message message, string[] args)
     {
-        if (message.Sender != ClientData.HostName && message.Sender != ClientData.ShowMan.Name || args.Length <= 1)
+        if (message.Sender != _state.HostName && message.Sender != _state.ShowMan.Name || args.Length <= 1)
         {
             return;
         }
 
-        _logic.OnPauseCore(args[1] == "+");
+        _controller.OnPauseCore(args[1] == "+");
     }
 
     private void OnAtom(string[] args)
     {
         Completion? completion;
-        var completions = ClientData.QuestionPlayState.MediaContentCompletions;
+        var completions = _state.QuestionPlay.MediaContentCompletions;
 
         if (args.Length > 2)
         {
@@ -2270,7 +2277,7 @@ public sealed class Game : MessageHandler
             {
                 if (completions.Count > 0)
                 {
-                    ClientData.Host.LogWarning($"Completion for content ({contentType}, {contentValue}) not found among completions: {string.Join("|", completions.Keys)}");
+                    _state.Host.LogWarning($"Completion for content ({contentType}, {contentValue}) not found among completions: {string.Join("|", completions.Keys)}");
                 }
 
                 return;
@@ -2287,37 +2294,37 @@ public sealed class Game : MessageHandler
 
         completion.Current++;
 
-        if (!ClientData.IsPlayingMedia || ClientData.TInfo.Pause)
+        if (!_state.IsPlayingMedia || _state.TInfo.Pause)
         {
             return;
         }
 
         if (completion.Current == completion.Total)
         {
-            ClientData.IsPlayingMedia = false;
-            _logic.RescheduleTask();
+            _state.IsPlayingMedia = false;
+            _controller.RescheduleTask();
         }
         else
         {
             // Sometimes someone drops out, and the process gets delayed by 120 seconds. This is unacceptable. We'll give 3 seconds
-            _logic.RescheduleTask(30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
+            _controller.RescheduleTask(30 + _state.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
         }
     }
 
     private void OnAnswerVersion(Message message, string[] args)
     {
-        if (ClientData.Decision != DecisionType.Answering || args[1].Length == 0)
+        if (_state.Decision != DecisionType.Answering || args[1].Length == 0)
         {
             return;
         }
 
         if (Logic.HaveMultipleAnswerers())
         {
-            for (var i = 0; i < ClientData.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == message.Sender && ClientData.QuestionPlayState.AnswererIndicies.Contains(i))
+                if (_state.Players[i].Name == message.Sender && _state.QuestionPlay.AnswererIndicies.Contains(i))
                 {
-                    ClientData.Players[i].Answer = args[1];
+                    _state.Players[i].Answer = args[1];
                     return;
                 }
             }
@@ -2325,9 +2332,9 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        var answerer = ClientData.Answerer;
+        var answerer = _state.Answerer;
         
-        if (!ClientData.IsWaiting || answerer == null || !answerer.IsHuman || answerer.Name != message.Sender)
+        if (!_state.IsWaiting || answerer == null || !answerer.IsHuman || answerer.Name != message.Sender)
         {
             return;
         }
@@ -2337,39 +2344,39 @@ public sealed class Game : MessageHandler
 
     private void OnAnswer(Message message, string[] args)
     {
-        if (ClientData.Decision != DecisionType.Answering)
+        if (_state.Decision != DecisionType.Answering)
         {
             return;
         }
 
         if (Logic.HaveMultipleAnswerers())
         {
-            ClientData.AnswererIndex = -1; // TODO: do not use AnswererIndex here - update player answer directly
+            _state.AnswererIndex = -1; // TODO: do not use AnswererIndex here - update player answer directly
 
-            for (var i = 0; i < ClientData.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == message.Sender
-                    && ClientData.QuestionPlayState.AnswererIndicies.Contains(i)
-                    && ClientData.Players[i].Flag)
+                if (_state.Players[i].Name == message.Sender
+                    && _state.QuestionPlay.AnswererIndicies.Contains(i)
+                    && _state.Players[i].Flag)
                 {
-                    ClientData.AnswererIndex = i;
-                    ClientData.Players[i].Flag = false;
+                    _state.AnswererIndex = i;
+                    _state.Players[i].Flag = false;
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
                     _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
 
-                    if (ClientData.QuestionPlayState.AnswerOptions == null && ClientData.Players[i].IsHuman && args[1].Length > 0)
+                    if (_state.QuestionPlay.AnswerOptions == null && _state.Players[i].IsHuman && args[1].Length > 0)
                     {
                         var answer = args[1];
 
-                        if (ClientData.QuestionPlayState.Validations.ContainsKey(answer))
+                        if (_state.QuestionPlay.Validations.ContainsKey(answer))
                         {
                             break;
                         }
 
-                        ClientData.QuestionPlayState.Validations[answer] = null;
+                        _state.QuestionPlay.Validations[answer] = null;
 
                         _gameActions.SendMessageToWithArgs(
-                            ClientData.ShowMan.Name,
+                            _state.ShowMan.Name,
                             Messages.AskValidate,
                             i,
                             answer);
@@ -2379,58 +2386,58 @@ public sealed class Game : MessageHandler
                 }
             }
 
-            if (ClientData.AnswererIndex == -1)
+            if (_state.AnswererIndex == -1)
             {
                 return;
             }
         }
-        else if (!ClientData.IsWaiting
-            || ClientData.Answerer != null
-                && ClientData.Answerer.Name != message.Sender
-                && !(ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
+        else if (!_state.IsWaiting
+            || _state.Answerer != null
+                && _state.Answerer.Name != message.Sender
+                && !(_state.IsOralNow && message.Sender == _state.ShowMan.Name))
         {
             return;
         }
 
-        if (ClientData.Answerer == null)
+        if (_state.Answerer == null)
         {
             return;
         }
 
-        if (!ClientData.Answerer.IsHuman)
+        if (!_state.Answerer.IsHuman)
         {
             var isSure = args.Length > 2 && args[2] == "+";
 
             if (args[1] == MessageParams.Answer_Right)
             {
-                if (ClientData.QuestionPlayState.AnswerOptions != null)
+                if (_state.QuestionPlay.AnswerOptions != null)
                 {
-                    var rightLabel = ClientData.Question.Right.FirstOrDefault();
-                    ClientData.Answerer.Answer = rightLabel;
+                    var rightLabel = _state.Question.Right.FirstOrDefault();
+                    _state.Answerer.Answer = rightLabel;
                 }
                 else
                 {
-                    ClientData.Answerer.Answer = (ClientData.Question.Right.FirstOrDefault() ?? "(...)").GrowFirstLetter();
-                    ClientData.Answerer.AnswerIsWrong = false;
+                    _state.Answerer.Answer = (_state.Question.Right.FirstOrDefault() ?? "(...)").GrowFirstLetter();
+                    _state.Answerer.AnswerIsWrong = false;
                 }
             }
-            else if (ClientData.QuestionPlayState.AnswerOptions != null)
+            else if (_state.QuestionPlay.AnswerOptions != null)
             {
-                var rightLabel = ClientData.Question.Right.FirstOrDefault();
-                var wrongOptions = ClientData.QuestionPlayState.AnswerOptions.Where(o => o.Label != rightLabel && !ClientData.QuestionPlayState.UsedAnswerOptions.Contains(o.Label)).ToArray();
+                var rightLabel = _state.Question.Right.FirstOrDefault();
+                var wrongOptions = _state.QuestionPlay.AnswerOptions.Where(o => o.Label != rightLabel && !_state.QuestionPlay.UsedAnswerOptions.Contains(o.Label)).ToArray();
                 var wrong = wrongOptions[Random.Shared.Next(wrongOptions.Length)];
 
-                ClientData.Answerer.Answer = wrong.Label;
+                _state.Answerer.Answer = wrong.Label;
             }
             else
             {
-                ClientData.Answerer.AnswerIsWrong = true;
+                _state.Answerer.AnswerIsWrong = true;
 
                 var restwrong = new List<string>();
 
-                foreach (var wrong in ClientData.Question.Wrong)
+                foreach (var wrong in _state.Question.Wrong)
                 {
-                    if (!ClientData.UsedWrongVersions.Contains(wrong))
+                    if (!_state.UsedWrongVersions.Contains(wrong))
                     {
                         restwrong.Add(wrong);
                     }
@@ -2443,13 +2450,13 @@ public sealed class Game : MessageHandler
                 {
                     for (int i = 0; i < wrongAnswers.Length; i++)
                     {
-                        if (!ClientData.UsedWrongVersions.Contains(wrongAnswers[i]))
+                        if (!_state.UsedWrongVersions.Contains(wrongAnswers[i]))
                         {
                             restwrong.Add(wrongAnswers[i]);
                         }
                     }
 
-                    if (!ClientData.UsedWrongVersions.Contains(LO[nameof(R.NoAnswer)]))
+                    if (!_state.UsedWrongVersions.Contains(LO[nameof(R.NoAnswer)]))
                     {
                         restwrong.Add(LO[nameof(R.NoAnswer)]);
                     }
@@ -2467,119 +2474,119 @@ public sealed class Game : MessageHandler
 
                 if (!Logic.HaveMultipleAnswerers())
                 {
-                    ClientData.UsedWrongVersions.Add(restwrong[wrongIndex]);
+                    _state.UsedWrongVersions.Add(restwrong[wrongIndex]);
                 }
 
-                ClientData.Answerer.Answer = restwrong[wrongIndex].GrowFirstLetter();
+                _state.Answerer.Answer = restwrong[wrongIndex].GrowFirstLetter();
             }
         }
         else
         {
             if (args[1].Length > 0)
             {
-                ClientData.Answerer.Answer = args[1];
-                ClientData.Answerer.AnswerIsWrong = false;
+                _state.Answerer.Answer = args[1];
+                _state.Answerer.AnswerIsWrong = false;
             }
             else
             {
-                ClientData.Answerer.Answer = LO[nameof(R.IDontKnow)];
-                ClientData.Answerer.AnswerIsWrong = true;
+                _state.Answerer.Answer = LO[nameof(R.IDontKnow)];
+                _state.Answerer.AnswerIsWrong = true;
             }
 
-            if (ClientData.IsOralNow)
+            if (_state.IsOralNow)
             {
-                if (message.Sender == ClientData.ShowMan.Name)
+                if (message.Sender == _state.ShowMan.Name)
                 {
-                    if (ClientData.Answerer != null)
+                    if (_state.Answerer != null)
                     {
-                        _gameActions.SendMessage(Messages.Cancel, ClientData.Answerer.Name);
+                        _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
                     }
                 }
                 else
                 {
-                    _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                    _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
                 }
             }
         }
 
-        ClientData.AnswerCount--;
+        _state.AnswerCount--;
 
-        if (ClientData.AnswerCount == 0)
+        if (_state.AnswerCount == 0)
         {
-            _logic.Stop(StopReason.Decision);
+            _controller.Stop(StopReason.Decision);
         }
     }
 
     private void OnIsRight(Message message, string[] args)
     {
-        if (!ClientData.IsWaiting || args.Length <= 1)
+        if (!_state.IsWaiting || args.Length <= 1)
         {
             return;
         }
 
-        if ((ClientData.Decision == DecisionType.AnswerValidating || ClientData.IsOralNow && ClientData.Decision == DecisionType.Answering) &&
-            ClientData.ShowMan != null &&
-            message.Sender == ClientData.ShowMan.Name &&
-            ClientData.Answerer != null)
+        if ((_state.Decision == DecisionType.AnswerValidating || _state.IsOralNow && _state.Decision == DecisionType.Answering) &&
+            _state.ShowMan != null &&
+            message.Sender == _state.ShowMan.Name &&
+            _state.Answerer != null)
         {
-            ClientData.Decision = DecisionType.AnswerValidating;
-            ClientData.Answerer.AnswerIsRight = args[1] == "+";
-            ClientData.Answerer.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor >= 0.0 ? factor : 1.0;
-            ClientData.ShowmanDecision = true;
+            _state.Decision = DecisionType.AnswerValidating;
+            _state.Answerer.AnswerIsRight = args[1] == "+";
+            _state.Answerer.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor >= 0.0 ? factor : 1.0;
+            _state.ShowmanDecision = true;
 
-            if (ClientData.Answerer != null
-                && ClientData.IsOralNow
-                && (ClientData.QuestionPlayState.AnswerOptions == null || !ClientData.Settings.AppSettings.OralPlayersActions))
+            if (_state.Answerer != null
+                && _state.IsOralNow
+                && (_state.QuestionPlay.AnswerOptions == null || !_state.Settings.AppSettings.OralPlayersActions))
             {
                 // Cancelling Oral Answer player mode
-                _gameActions.SendMessage(Messages.Cancel, ClientData.Answerer.Name);
+                _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
             }
 
-            _logic.Stop(StopReason.Decision);
+            _controller.Stop(StopReason.Decision);
             return;
         }
 
-        if (ClientData.Decision == DecisionType.Appellation)
+        if (_state.Decision == DecisionType.Appellation)
         {
-            for (var i = 0; i < ClientData.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (ClientData.Players[i].AppellationFlag && ClientData.Players[i].Name == message.Sender)
+                if (_state.Players[i].AppellationFlag && _state.Players[i].Name == message.Sender)
                 {
                     if (args[1] == "+")
                     {
-                        ClientData.AppellationPositiveVoteCount++;
+                        _state.AppellationPositiveVoteCount++;
                     }
                     else
                     {
-                        ClientData.AppellationNegativeVoteCount++;
+                        _state.AppellationNegativeVoteCount++;
                     }
 
-                    ClientData.Players[i].AppellationFlag = false;
-                    ClientData.AppellationAwaitedVoteCount--;
+                    _state.Players[i].AppellationFlag = false;
+                    _state.AppellationAwaitedVoteCount--;
                     _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
                     _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
                     break;
                 }
             }
 
-            if (ClientData.AppellationAwaitedVoteCount == 0)
+            if (_state.AppellationAwaitedVoteCount == 0)
             {
-                _logic.Stop(StopReason.Decision);
+                _controller.Stop(StopReason.Decision);
             }
 
-            var halfVoteCount = ClientData.AppellationTotalVoteCount / 2;
+            var halfVoteCount = _state.AppellationTotalVoteCount / 2;
 
-            if (ClientData.AppellationPositiveVoteCount > halfVoteCount || ClientData.AppellationNegativeVoteCount > halfVoteCount)
+            if (_state.AppellationPositiveVoteCount > halfVoteCount || _state.AppellationNegativeVoteCount > halfVoteCount)
             {
                 SendAppellationCancellationsToActivePlayers();
-                _logic.Stop(StopReason.Decision);
+                _controller.Stop(StopReason.Decision);
             }
         }
     }
 
     private void SendAppellationCancellationsToActivePlayers()
     {
-        foreach (var player in ClientData.Players)
+        foreach (var player in _state.Players)
         {
             if (player.AppellationFlag)
             {
@@ -2590,7 +2597,7 @@ public sealed class Game : MessageHandler
 
     private void OnPass(Message message)
     {
-        if (!ClientData.IsQuestionAskPlaying) // TODO: this condition looks ugly and unnecessary
+        if (!_state.IsQuestionAskPlaying) // TODO: this condition looks ugly and unnecessary
         {
             return;
         }
@@ -2598,39 +2605,39 @@ public sealed class Game : MessageHandler
         var nextTask = Logic.Runner.PendingTask;
 
         if (nextTask == Tasks.AskStake
-            || ClientData.Decision == DecisionType.StakeMaking
-            || ClientData.Decision == DecisionType.NextPersonStakeMaking)
+            || _state.Decision == DecisionType.StakeMaking
+            || _state.Decision == DecisionType.NextPersonStakeMaking)
         {
             // Sending pass in stakes in advance
-            if (ClientData.Decision == DecisionType.StakeMaking && ClientData.ActivePlayer?.Name == message.Sender)
+            if (_state.Decision == DecisionType.StakeMaking && _state.ActivePlayer?.Name == message.Sender)
             {
                 return; // Currently making stake player can pass with the standard button
             }
 
             // Stake making pass
-            for (var i = 0; i < ClientData.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                var player = ClientData.Players[i];
+                var player = _state.Players[i];
 
                 if (player.Name == message.Sender)
                 {
-                    if (player.StakeMaking && i != ClientData.Stakes.StakerIndex) // Current stakes winner cannot pass
+                    if (player.StakeMaking && i != _state.Stakes.StakerIndex) // Current stakes winner cannot pass
                     {
                         player.StakeMaking = false;
                         
-                        ClientData.OrderHistory.Append("Player passed on stakes making: ")
+                        _state.OrderHistory.Append("Player passed on stakes making: ")
                             .Append(i)
                             .Append(' ')
-                            .Append(ClientData.ActivePlayer?.StakeMaking)
+                            .Append(_state.ActivePlayer?.StakeMaking)
                             .AppendLine();
                         
                         // TODO: leave only one pass message
                         _gameActions.SendMessageWithArgs(Messages.Pass, i);
                         _gameActions.SendMessageWithArgs(Messages.PersonStake, i, 2);
 
-                        if (ClientData.ActivePlayer != null
-                            && ClientData.ActivePlayer.StakeMaking
-                            && (nextTask == Tasks.AskStake || ClientData.Decision == DecisionType.NextPersonStakeMaking))
+                        if (_state.ActivePlayer != null
+                            && _state.ActivePlayer.StakeMaking
+                            && (nextTask == Tasks.AskStake || _state.Decision == DecisionType.NextPersonStakeMaking))
                         {
                             // We do not interrupt DecisionType.StakeMaking of the current player
                             Logic.TryDetectStakesWinner(); // returning despite of the call result
@@ -2648,9 +2655,9 @@ public sealed class Game : MessageHandler
 
         // Player can pass while somebody is answering
         // so accepting pass and moving to answer are separate actions
-        for (var i = 0; i < ClientData.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            var player = ClientData.Players[i];
+            var player = _state.Players[i];
 
             if (player.Name == message.Sender && player.CanPress)
             {
@@ -2662,13 +2669,13 @@ public sealed class Game : MessageHandler
         }
 
         if (canPressChanged
-            && ClientData.Players.All(p => !p.CanPress || !p.IsConnected)
-            && (ClientData.Decision == DecisionType.None || ClientData.Decision == DecisionType.Pressing) // TODO: Can this state be described in a more clear way?
-            && !ClientData.TInfo.Pause
-            && !ClientData.QuestionPlayState.IsAnswer)
+            && _state.Players.All(p => !p.CanPress || !p.IsConnected)
+            && (_state.Decision == DecisionType.None || _state.Decision == DecisionType.Pressing) // TODO: Can this state be described in a more clear way?
+            && !_state.TInfo.Pause
+            && !_state.QuestionPlay.IsAnswer)
         {
-            _logic.MoveToAnswer();
-            _logic.ScheduleExecution(Tasks.WaitTry, 1, force: true);
+            _controller.MoveToAnswer();
+            _controller.ScheduleExecution(Tasks.WaitTry, 1, force: true);
         }
     }
 
@@ -2679,12 +2686,12 @@ public sealed class Game : MessageHandler
     /// <param name="pressDurationMs">Player reaction time.</param>
     private void OnI(string playerName, int pressDurationMs)
     {
-        if (ClientData.TInfo.Pause)
+        if (_state.TInfo.Pause)
         {
             return;
         }
 
-        if (ClientData.Decision != DecisionType.Pressing)
+        if (_state.Decision != DecisionType.Pressing)
         {
             // Just show that the player has misfired the button
             HandlePlayerMisfire(playerName);
@@ -2699,7 +2706,7 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        var buttonPressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = _state.Settings.AppSettings.ButtonPressMode;
 
         switch (buttonPressMode)
         {
@@ -2722,55 +2729,55 @@ public sealed class Game : MessageHandler
 
     private void ProcessAnswerer_FirstWinsServer(int answererIndex)
     {
-        ClientData.PendingAnswererIndex = answererIndex;
+        _state.PendingAnswererIndex = answererIndex;
 
-        if (_logic.Stop(StopReason.Answer))
+        if (_controller.Stop(StopReason.Answer))
         {
-            ClientData.Decision = DecisionType.None;
+            _state.Decision = DecisionType.None;
         }
     }
 
     private void ProcessAnswerer_RandomWithinInterval(int answererIndex)
     {
-        if (!ClientData.PendingAnswererIndicies.Contains(answererIndex))
+        if (!_state.PendingAnswererIndicies.Contains(answererIndex))
         {
-            ClientData.PendingAnswererIndicies.Add(answererIndex);
+            _state.PendingAnswererIndicies.Add(answererIndex);
         }
 
-        if (!ClientData.IsDeferringAnswer)
+        if (!_state.IsDeferringAnswer)
         {            
-            ClientData.WaitInterval = (int)(ClientData.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
-            _logic.Stop(StopReason.Wait);
+            _state.WaitInterval = (int)(_state.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
+            _controller.Stop(StopReason.Wait);
         }
     }
 
     private void ProcessAnswerer_FirstWinsClient(int answererIndex, int pressDurationMs)
     {
-        if (ClientData.PendingAnswererIndex == -1 || pressDurationMs > 0 && pressDurationMs < ClientData.AnswererPressDuration)
+        if (_state.PendingAnswererIndex == -1 || pressDurationMs > 0 && pressDurationMs < _state.AnswererPressDuration)
         {
-            ClientData.PendingAnswererIndex = answererIndex;
-            ClientData.AnswererPressDuration = pressDurationMs > 0 ? pressDurationMs : (int)ClientData.Host.Options.ButtonsAcceptInterval.TotalMilliseconds;
+            _state.PendingAnswererIndex = answererIndex;
+            _state.AnswererPressDuration = pressDurationMs > 0 ? pressDurationMs : (int)_state.Host.Options.ButtonsAcceptInterval.TotalMilliseconds;
         }
         else
         {
-            ClientData.PendingAnswererIndicies.Add(answererIndex);
+            _state.PendingAnswererIndicies.Add(answererIndex);
         }
 
-        if (!ClientData.IsDeferringAnswer)
+        if (!_state.IsDeferringAnswer)
         {
-            ClientData.WaitInterval = (int)(ClientData.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
-            _logic.Stop(StopReason.Wait);
+            _state.WaitInterval = (int)(_state.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
+            _controller.Stop(StopReason.Wait);
         }
     }
 
     private int DetectAnswererIndex(string playerName)
     {
         var answererIndex = -1;
-        var blockingButtonTime = ClientData.TimeSettings.ButtonBlocking;
+        var blockingButtonTime = _state.TimeSettings.ButtonBlocking;
 
-        for (var i = 0; i < ClientData.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            var player = ClientData.Players[i];
+            var player = _state.Players[i];
 
             if (player.Name == playerName)
             {
@@ -2794,13 +2801,13 @@ public sealed class Game : MessageHandler
 
     private void HandlePlayerMisfire(string playerName)
     {
-        for (var i = 0; i < ClientData.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            var player = ClientData.Players[i];
+            var player = _state.Players[i];
 
             if (player.Name == playerName)
             {
-                if (ClientData.Answerer != player)
+                if (_state.Answerer != player)
                 {
                     _gameActions.SendMessageWithArgs(Messages.WrongTry, i);
                     
@@ -2823,12 +2830,12 @@ public sealed class Game : MessageHandler
     /// </summary>
     private void OnConfig(Message message, string[] args)
     {
-        if (message.Sender != ClientData.HostName || args.Length <= 1)
+        if (message.Sender != _state.HostName || args.Length <= 1)
         {
             return;
         }
 
-        if (ClientData.HostName == null || !ClientData.AllPersons.TryGetValue(ClientData.HostName, out var host))
+        if (_state.HostName == null || !_state.AllPersons.TryGetValue(_state.HostName, out var host))
         {
             return;
         }
@@ -2862,23 +2869,23 @@ public sealed class Game : MessageHandler
 
     private void AddTable(Message message, Account host)
     {
-        if (ClientData.Players.Count >= Constants.MaxPlayers)
+        if (_state.Players.Count >= Constants.MaxPlayers)
         {
             return;
         }
 
         var newAccount = new ViewerAccount(Constants.FreePlace, false, false) { IsHuman = true };
 
-        ClientData.BeginUpdatePersons("AddTable " + message.Text);
+        _state.BeginUpdatePersons("AddTable " + message.Text);
 
         try
         {
-            ClientData.Players.Add(new GamePlayerAccount(newAccount));
-            Logic.AddHistory($"Player added (total: {ClientData.Players.Count})");
+            _state.Players.Add(new GamePlayerAccount(newAccount));
+            Logic.AddHistory($"Player added (total: {_state.Players.Count})");
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            _state.EndUpdatePersons();
         }
 
         var info = new StringBuilder(Messages.Config).Append(Message.ArgsSeparatorChar)
@@ -2887,7 +2894,7 @@ public sealed class Game : MessageHandler
         AppendAccountExt(newAccount, info);
 
         _gameActions.SendMessage(info.ToString());
-        _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Added)], host.IsMale)} {LO[nameof(R.NewGameTable)]}"); // TODO: REMOVE+
+        _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Added)], host.IsMale)} {LO[nameof(R.NewGameTable)]}"); // TODO: REMOVE+
         OnPersonsChanged();
     }
 
@@ -2900,28 +2907,28 @@ public sealed class Game : MessageHandler
 
         var indexStr = args[2];
 
-        if (ClientData.Players.Count <= 2
+        if (_state.Players.Count <= 2
             || !int.TryParse(indexStr, out int index)
             || index <= -1
-            || index >= ClientData.Players.Count)
+            || index >= _state.Players.Count)
         {
             return;
         }
 
-        var account = ClientData.Players[index];
+        var account = _state.Players[index];
         var isOnline = account.IsConnected;
 
-        if (ClientData.Stage != GameStage.Before && account.IsHuman && isOnline && !account.IsMoveable)
+        if (_state.Stage != GameStage.Before && account.IsHuman && isOnline && !account.IsMoveable)
         {
             return;
         }
 
-        ClientData.BeginUpdatePersons("DeleteTable " + message.Text);
+        _state.BeginUpdatePersons("DeleteTable " + message.Text);
 
         try
         {
-            ClientData.Players.RemoveAt(index);
-            Logic.AddHistory($"Player removed at {index}; AnswererIndex: {ClientData.AnswererIndex}");
+            _state.Players.RemoveAt(index);
+            Logic.AddHistory($"Player removed at {index}; AnswererIndex: {_state.AnswererIndex}");
 
             try
             {
@@ -2930,18 +2937,18 @@ public sealed class Game : MessageHandler
             catch (Exception exc)
             {
                 throw new InvalidOperationException(
-                    $"DropPlayerIndex error. Persons history: {ClientData.PersonsUpdateHistory}; logic history: {Logic.PrintHistory()}; stake history: {ClientData.OrderHistory}",
+                    $"DropPlayerIndex error. Persons history: {_state.PersonsUpdateHistory}; logic history: {Logic.PrintHistory()}; stake history: {_state.OrderHistory}",
                     exc);
             }
 
             if (isOnline && account.IsHuman)
             {
-                ClientData.Viewers.Add(account);
+                _state.Viewers.Add(account);
             }
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            _state.EndUpdatePersons();
         }
 
         if (!account.IsHuman)
@@ -2958,11 +2965,11 @@ public sealed class Game : MessageHandler
         }
 
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
-        _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Deleted)], host.IsMale)} {LO[nameof(R.GameTableNumber)]} {index + 1}"); // TODO: REMOVE+
+        _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Deleted)], host.IsMale)} {LO[nameof(R.GameTableNumber)]} {index + 1}"); // TODO: REMOVE+
 
-        if (ClientData.Stage == GameStage.Before)
+        if (_state.Stage == GameStage.Before)
         {
-            var readyAll = ClientData.MainPersons.All(p => p.Ready);
+            var readyAll = _state.MainPersons.All(p => p.Ready);
 
             if (readyAll)
             {
@@ -2976,7 +2983,7 @@ public sealed class Game : MessageHandler
     [Obsolete("Use Logic.PlanExecution()")]
     private void PlanExecution(Tasks task, double taskTime, int arg = 0)
     {
-        Logic.AddHistory($"PlanExecution old {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
+        Logic.AddHistory($"PlanExecution old {task} {taskTime} {arg} ({_state.TInfo.Pause})");
 
         if (Logic.Runner.IsExecutionPaused)
         {
@@ -2994,45 +3001,45 @@ public sealed class Game : MessageHandler
     /// <param name="playerIndex">Index of the player to remove.</param>
     private void DropPlayerIndex(int playerIndex)
     {
-        if (ClientData.ChooserIndex > playerIndex)
+        if (_state.ChooserIndex > playerIndex)
         {
-            ClientData.ChooserIndex--;
+            _state.ChooserIndex--;
         }
-        else if (ClientData.ChooserIndex == playerIndex)
+        else if (_state.ChooserIndex == playerIndex)
         {
             DropCurrentChooser();
         }
 
-        ClientData.QuestionPlayState.RemovePlayer(playerIndex);
+        _state.QuestionPlay.RemovePlayer(playerIndex);
 
-        if (ClientData.AnswererIndex > playerIndex)
+        if (_state.AnswererIndex > playerIndex)
         {
-            ClientData.AnswererIndex--;
-            Logic.AddHistory($"AnswererIndex reduced to {ClientData.AnswererIndex}");
+            _state.AnswererIndex--;
+            Logic.AddHistory($"AnswererIndex reduced to {_state.AnswererIndex}");
         }
-        else if (ClientData.AnswererIndex == playerIndex)
+        else if (_state.AnswererIndex == playerIndex)
         {
             DropCurrentAnswerer();
         }
 
-        if (ClientData.AppelaerIndex > playerIndex)
+        if (_state.AppelaerIndex > playerIndex)
         {
-            ClientData.AppelaerIndex--;
+            _state.AppelaerIndex--;
         }
-        else if (ClientData.AppelaerIndex == playerIndex)
+        else if (_state.AppelaerIndex == playerIndex)
         {
             DropCurrentAppelaer();
         }
 
         if (Logic.Stakes.HandlePlayerDrop(playerIndex))
         {
-            Logic.AddHistory($"StakerIndex set to {ClientData.Stakes.StakerIndex}");
+            Logic.AddHistory($"StakerIndex set to {_state.Stakes.StakerIndex}");
         }
 
         // TODO: move to stakes.HandlePlayerDrop()
-        if (ClientData.Question != null
-            && ClientData.QuestionTypeName == QuestionTypes.Stake
-            && ClientData.Order.Length > 0)
+        if (_state.Question != null
+            && _state.QuestionTypeName == QuestionTypes.Stake
+            && _state.Order.Length > 0)
         {
             DropPlayerFromStakes(playerIndex);
         }
@@ -3046,25 +3053,25 @@ public sealed class Game : MessageHandler
         DropPlayerFromQuestionHistory(playerIndex);
         ValidatePlayers();
 
-        if (!ClientData.IsWaiting)
+        if (!_state.IsWaiting)
         {
             return;
         }
 
-        switch (ClientData.Decision)
+        switch (_state.Decision)
         {
             case DecisionType.StarterChoosing:
                 // Asking again
-                _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
-                _logic.StopWaiting();
-                _logic.PlanExecution(Tasks.AskFirst, 20);
+                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _controller.StopWaiting();
+                _controller.PlanExecution(Tasks.AskFirst, 20);
                 break;
         }
     }
 
     private void DropPlayerFromThemeDeleters(int playerIndex)
     {
-        var themeDeleters = ClientData.ThemeDeleters;
+        var themeDeleters = _state.ThemeDeleters;
 
         if (themeDeleters == null)
         {
@@ -3075,43 +3082,43 @@ public sealed class Game : MessageHandler
         themeDeleters.RemoveAt(playerIndex);
         Logic.AddHistory($"ThemeDeleters removed: {playerIndex}; result: {themeDeleters}");
 
-        if (!ClientData.IsWaiting)
+        if (!_state.IsWaiting)
         {
             return;
         }
 
-        if (ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting)
+        if (_state.Decision == DecisionType.NextPersonFinalThemeDeleting)
         {
             if (themeDeleters.IsEmpty())
             {
-                _logic.StopWaiting();
-                ClientData.MoveDirection = MoveDirections.RoundNext;
-                _logic.Stop(StopReason.Move);
+                _controller.StopWaiting();
+                _state.MoveDirection = MoveDirections.RoundNext;
+                _controller.Stop(StopReason.Move);
             }
             else
             {
                 var indicies = themeDeleters.Current.PossibleIndicies;
                 var hasAnyFlag = false;
 
-                for (var i = 0; i < ClientData.Players.Count; i++)
+                for (var i = 0; i < _state.Players.Count; i++)
                 {
-                    ClientData.Players[i].Flag = indicies.Contains(i);
+                    _state.Players[i].Flag = indicies.Contains(i);
                     hasAnyFlag = true;
                 }
 
                 if (!hasAnyFlag)
                 {
-                    _logic.PlanExecution(Tasks.AskToDelete, 10);
+                    _controller.PlanExecution(Tasks.AskToDelete, 10);
                 }
             }
         }
-        else if (ClientData.Decision == DecisionType.ThemeDeleting)
+        else if (_state.Decision == DecisionType.ThemeDeleting)
         {
             if (themeDeleters.IsEmpty())
             {
-                _logic.StopWaiting();
-                ClientData.MoveDirection = MoveDirections.RoundNext;
-                _logic.Stop(StopReason.Move);
+                _controller.StopWaiting();
+                _state.MoveDirection = MoveDirections.RoundNext;
+                _controller.Stop(StopReason.Move);
             }
         }
     }
@@ -3120,9 +3127,9 @@ public sealed class Game : MessageHandler
     {
         var newHistory = new List<AnswerResult>();
 
-        for (var i = 0; i < ClientData.QuestionHistory.Count; i++)
+        for (var i = 0; i < _state.QuestionHistory.Count; i++)
         {
-            var answerResult = ClientData.QuestionHistory[i];
+            var answerResult = _state.QuestionHistory[i];
 
             if (answerResult.PlayerIndex == playerIndex)
             {
@@ -3133,47 +3140,47 @@ public sealed class Game : MessageHandler
             newHistory.Add(new AnswerResult(newPlayerIndex, answerResult.IsRight, answerResult.Sum));
         }
 
-        ClientData.QuestionHistory.Clear();
-        ClientData.QuestionHistory.AddRange(newHistory);
+        _state.QuestionHistory.Clear();
+        _state.QuestionHistory.AddRange(newHistory);
     }
 
     private void ValidatePlayers()
     {
-        var playersAreValid = ClientData.PlayersValidator == null || ClientData.PlayersValidator();
+        var playersAreValid = _state.PlayersValidator == null || _state.PlayersValidator();
 
         if (playersAreValid)
         {
             return;
         }
 
-        _logic.StopWaiting();
-        ClientData.MoveDirection = MoveDirections.RoundNext;
-        _logic.Stop(StopReason.Move);
+        _controller.StopWaiting();
+        _state.MoveDirection = MoveDirections.RoundNext;
+        _controller.Stop(StopReason.Move);
     }
 
     private void DropPlayerFromStakes(int playerIndex)
     {
-        var currentOrder = ClientData.Order;
-        var currentOrderIndex = ClientData.OrderIndex;
+        var currentOrder = _state.Order;
+        var currentOrderIndex = _state.OrderIndex;
         var currentStaker = currentOrderIndex == -1 ? -1 : currentOrder[currentOrderIndex];
 
-        ClientData.OrderHistory
+        _state.OrderHistory
             .Append("DropPlayerFromStakes. Before ")
             .Append(playerIndex)
             .Append(' ')
             .Append(string.Join(",", currentOrder))
-            .AppendFormat(" {0}", ClientData.OrderIndex)
+            .AppendFormat(" {0}", _state.OrderIndex)
             .AppendLine();
 
-        var newOrder = new int[ClientData.Players.Count];
+        var newOrder = new int[_state.Players.Count];
 
         for (int i = 0, j = 0; i < currentOrder.Length; i++)
         {
             if (currentOrder[i] == playerIndex)
             {
-                if (ClientData.OrderIndex >= i)
+                if (_state.OrderIndex >= i)
                 {
-                    ClientData.OrderIndex--; // -1 - OK
+                    _state.OrderIndex--; // -1 - OK
                 }
             }
             else
@@ -3187,44 +3194,44 @@ public sealed class Game : MessageHandler
             }
         }
 
-        if (ClientData.OrderIndex == currentOrder.Length - 1)
+        if (_state.OrderIndex == currentOrder.Length - 1)
         {
-            ClientData.OrderIndex = newOrder.Length - 1;
+            _state.OrderIndex = newOrder.Length - 1;
         }
 
-        ClientData.Order = newOrder;
+        _state.Order = newOrder;
 
-        ClientData.OrderHistory
+        _state.OrderHistory
             .Append("DropPlayerFromStakes. After ")
             .Append(string.Join(",", newOrder))
-            .AppendFormat(" {0}", ClientData.OrderIndex)
+            .AppendFormat(" {0}", _state.OrderIndex)
             .AppendLine();
 
-        if (!ClientData.Players.Any(p => p.StakeMaking))
+        if (!_state.Players.Any(p => p.StakeMaking))
         {
             Logic.AddHistory("Last staker dropped");
-            ClientData.SkipQuestion?.Invoke();
+            _state.SkipQuestion?.Invoke();
             Logic.PlanExecution(Tasks.MoveNext, 20, 1);
         }
-        else if (currentOrderIndex != -1 && ClientData.OrderIndex == -1
-            || currentStaker != -1 && ClientData.Order[ClientData.OrderIndex] == -1)
+        else if (currentOrderIndex != -1 && _state.OrderIndex == -1
+            || currentStaker != -1 && _state.Order[_state.OrderIndex] == -1)
         {
             Logic.AddHistory("Current staker dropped");
 
-            if (ClientData.Decision == DecisionType.StakeMaking || ClientData.Decision == DecisionType.NextPersonStakeMaking)
+            if (_state.Decision == DecisionType.StakeMaking || _state.Decision == DecisionType.NextPersonStakeMaking)
             {
                 // Staker has been deleted. We need to move game further
-                if (ClientData.IsOralNow || ClientData.Decision == DecisionType.NextPersonStakeMaking)
+                if (_state.IsOralNow || _state.Decision == DecisionType.NextPersonStakeMaking)
                 {
-                    _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                    _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
                 }
 
                 ContinueMakingStakes();
             }
         }
-        else if (ClientData.Decision == DecisionType.NextPersonStakeMaking)
+        else if (_state.Decision == DecisionType.NextPersonStakeMaking)
         {
-            _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             ContinueMakingStakes();
         }
     }
@@ -3233,13 +3240,13 @@ public sealed class Game : MessageHandler
     {
         // Give turn to player with least score
         // TODO: MinBy in .NET 7
-        var minSum = ClientData.Players.Min(p => p.Sum);
-        ClientData.ChooserIndex = ClientData.Players.TakeWhile(p => p.Sum != minSum).Count();
+        var minSum = _state.Players.Min(p => p.Sum);
+        _state.ChooserIndex = _state.Players.TakeWhile(p => p.Sum != minSum).Count();
     }
 
     private void DropCurrentAppelaer()
     {
-        ClientData.AppelaerIndex = -1;
+        _state.AppelaerIndex = -1;
         Logic.AddHistory($"AppelaerIndex dropped");
     }
 
@@ -3249,9 +3256,9 @@ public sealed class Game : MessageHandler
     private void DropCurrentAnswerer()
     {
         // Drop answerer index
-        ClientData.AnswererIndex = -1;
+        _state.AnswererIndex = -1;
 
-        if (!ClientData.IsQuestionAskPlaying)
+        if (!_state.IsQuestionAskPlaying)
         {
             return;
         }
@@ -3260,17 +3267,17 @@ public sealed class Game : MessageHandler
 
         Logic.AddHistory(
             $"AnswererIndex dropped; nextTask = {nextTask};" +
-            $" ClientData.Decision = {ClientData.Decision}");
+            $" ClientData.Decision = {_state.Decision}");
 
-        if ((ClientData.Decision == DecisionType.Answering ||
-            ClientData.Decision == DecisionType.AnswerValidating) && !Logic.HaveMultipleAnswerers())
+        if ((_state.Decision == DecisionType.Answering ||
+            _state.Decision == DecisionType.AnswerValidating) && !Logic.HaveMultipleAnswerers())
         {
             // Answerer has been dropped. The game should be moved forward
             Logic.StopWaiting();
 
-            if (ClientData.IsOralNow)
+            if (_state.IsOralNow)
             {
-                _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
 
             Logic.PlanExecution(Tasks.ContinueQuestion, 1);
@@ -3278,7 +3285,7 @@ public sealed class Game : MessageHandler
         else if (nextTask == Tasks.AskRight || nextTask == Tasks.WaitRight)
         {
             // Player has been removed after giving answer. But the answer has not been validated by showman yet
-            if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0)
+            if (_state.QuestionPlay.AnswererIndicies.Count == 0)
             {
                 Logic.PlanExecution(Tasks.ContinueQuestion, 1);
             }
@@ -3287,9 +3294,9 @@ public sealed class Game : MessageHandler
                 Logic.PlanExecution(Tasks.Announce, 15);
             }
         }
-        else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0 && !ClientData.QuestionPlayState.UseButtons)
+        else if (_state.QuestionPlay.AnswererIndicies.Count == 0 && !_state.QuestionPlay.UseButtons)
         {
-            ClientData.SkipQuestion?.Invoke();
+            _state.SkipQuestion?.Invoke();
             Logic.PlanExecution(Tasks.MoveNext, 20, 1);
         }
         else if (nextTask == Tasks.AnnounceStake)
@@ -3300,37 +3307,37 @@ public sealed class Game : MessageHandler
 
     private void DropPlayerFromAnnouncing(int index)
     {
-        if (ClientData.AnnouncedAnswerersEnumerator == null)
+        if (_state.AnnouncedAnswerersEnumerator == null)
         {
             return;
         }
 
-        Logic.AddHistory($"AnnouncedAnswerersEnumerator before update: {ClientData.AnnouncedAnswerersEnumerator}");
-        ClientData.AnnouncedAnswerersEnumerator.Update(CustomEnumeratorUpdaters.RemoveByIndex(index));
-        Logic.AddHistory($"AnnouncedAnswerersEnumerator after update: {ClientData.AnnouncedAnswerersEnumerator}");
+        Logic.AddHistory($"AnnouncedAnswerersEnumerator before update: {_state.AnnouncedAnswerersEnumerator}");
+        _state.AnnouncedAnswerersEnumerator.Update(CustomEnumeratorUpdaters.RemoveByIndex(index));
+        Logic.AddHistory($"AnnouncedAnswerersEnumerator after update: {_state.AnnouncedAnswerersEnumerator}");
     }
 
     private void ContinueMakingStakes()
     {
         Logic.AddHistory("ContinueMakingStakes");
 
-        var previousDecision = ClientData.Decision;
+        var previousDecision = _state.Decision;
         Logic.StopWaiting(); // Drops ClientData.Decision
 
         if (Logic.TryDetectStakesWinner())
         {
-            if (ClientData.Stake == -1)
+            if (_state.Stake == -1)
             {
-                ClientData.Stake = ClientData.CurPriceRight;
+                _state.Stake = _state.CurPriceRight;
             }
 
             return;
         }
 
-        if (ClientData.OrderIndex > -1 && previousDecision == DecisionType.NextPersonStakeMaking)
+        if (_state.OrderIndex > -1 && previousDecision == DecisionType.NextPersonStakeMaking)
         {
             Logic.AddHistory("Rolling order index back");
-            ClientData.OrderIndex--;
+            _state.OrderIndex--;
         }
 
         Logic.PlanExecution(Tasks.AskStake, 20);
@@ -3358,49 +3365,49 @@ public sealed class Game : MessageHandler
 
             var indexStr = args[3];
 
-            if (!int.TryParse(indexStr, out index) || index < 0 || index >= ClientData.Players.Count)
+            if (!int.TryParse(indexStr, out index) || index < 0 || index >= _state.Players.Count)
             {
                 return;
             }
 
-            account = ClientData.Players[index];
+            account = _state.Players[index];
         }
         else
         {
-            account = ClientData.ShowMan;
+            account = _state.ShowMan;
         }
 
-        if (!account.IsConnected || !account.IsHuman || ClientData.Stage != GameStage.Before && !account.IsMoveable)
+        if (!account.IsConnected || !account.IsHuman || _state.Stage != GameStage.Before && !account.IsMoveable)
         {
             return;
         }
 
         var newAccount = new Account { IsHuman = true, Name = Constants.FreePlace };
 
-        ClientData.BeginUpdatePersons("FreeTable " + message.Text);
+        _state.BeginUpdatePersons("FreeTable " + message.Text);
 
         try
         {
             if (isPlayer)
             {
-                ClientData.Players[index] = new GamePlayerAccount(newAccount);
-                InheritAccountState(ClientData.Players[index], account);
+                _state.Players[index] = new GamePlayerAccount(newAccount);
+                InheritAccountState(_state.Players[index], account);
             }
             else
             {
-                ClientData.ShowMan = new GamePersonAccount(newAccount);
+                _state.ShowMan = new GamePersonAccount(newAccount);
             }
 
             account.Ready = false;
 
-            ClientData.Viewers.Add(account);
+            _state.Viewers.Add(account);
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            _state.EndUpdatePersons();
         }
 
-        foreach (var item in ClientData.MainPersons)
+        foreach (var item in _state.MainPersons)
         {
             if (item.Ready)
             {
@@ -3409,7 +3416,7 @@ public sealed class Game : MessageHandler
         }
 
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
-        _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Free)], host.IsMale)} {account.Name} {LO[nameof(R.FromTable)]}"); // TODO: REMOVE+
+        _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Free)], host.IsMale)} {account.Name} {LO[nameof(R.FromTable)]}"); // TODO: REMOVE+
 
         OnPersonsChanged();
     }
@@ -3449,19 +3456,19 @@ public sealed class Game : MessageHandler
         {
             var indexStr = args[3];
 
-            if (!int.TryParse(indexStr, out index) || index < 0 || index >= ClientData.Players.Count)
+            if (!int.TryParse(indexStr, out index) || index < 0 || index >= _state.Players.Count)
             {
                 return;
             }
 
-            account = ClientData.Players[index];
+            account = _state.Players[index];
         }
         else
         {
-            account = ClientData.ShowMan;
+            account = _state.ShowMan;
         }
 
-        if (ClientData.Stage != GameStage.Before && account.IsConnected && !account.IsMoveable)
+        if (_state.Stage != GameStage.Before && account.IsConnected && !account.IsMoveable)
         {
             return;
         }
@@ -3471,14 +3478,14 @@ public sealed class Game : MessageHandler
 
         if (!account.IsHuman)
         {
-            if (ClientData.AllPersons.ContainsKey(replacer))
+            if (_state.AllPersons.ContainsKey(replacer))
             {
                 _gameActions.SpecialReplic(string.Format(LO[nameof(R.PersonAlreadyExists)], replacer)); // TODO: REMOVE+
                 _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.PersonAlreadyExists);
                 return;
             }
 
-            ClientData.BeginUpdatePersons($"SetComputerPerson {account.Name} {account.IsConnected} {replacer} {index}");
+            _state.BeginUpdatePersons($"SetComputerPerson {account.Name} {account.IsConnected} {replacer} {index}");
 
             try
             {
@@ -3488,7 +3495,7 @@ public sealed class Game : MessageHandler
             }
             finally
             {
-                ClientData.EndUpdatePersons();
+                _state.EndUpdatePersons();
             }
 
             if (newAccount == null)
@@ -3507,7 +3514,7 @@ public sealed class Game : MessageHandler
         }
 
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
-        _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Replaced)], host.IsMale)} {oldName} {LO[nameof(R.To)]} {replacer}"); // TODO: REMOVE+
+        _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Replaced)], host.IsMale)} {oldName} {LO[nameof(R.To)]} {replacer}"); // TODO: REMOVE+
 
         InformAvatar(newAccount);
         OnPersonsChanged();
@@ -3551,20 +3558,20 @@ public sealed class Game : MessageHandler
         // Who replaces
         ViewerAccount? otherAccount = null;
 
-        ClientData.BeginUpdatePersons($"SetHumanPerson {account.Name} {account.IsConnected} {replacer} {index}");
+        _state.BeginUpdatePersons($"SetHumanPerson {account.Name} {account.IsConnected} {replacer} {index}");
 
         try
         {
-            if (ClientData.ShowMan.Name == replacer && ClientData.ShowMan.IsHuman)
+            if (_state.ShowMan.Name == replacer && _state.ShowMan.IsHuman)
             {
-                otherAccount = ClientData.ShowMan;
+                otherAccount = _state.ShowMan;
 
-                if (ClientData.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
+                if (_state.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
                 {
                     return false;
                 }
 
-                ClientData.ShowMan = new GamePersonAccount(account)
+                _state.ShowMan = new GamePersonAccount(account)
                 {
                     Ready = account.Ready,
                     IsConnected = account.IsConnected,
@@ -3575,27 +3582,27 @@ public sealed class Game : MessageHandler
             }
             else
             {
-                for (var i = 0; i < ClientData.Players.Count; i++)
+                for (var i = 0; i < _state.Players.Count; i++)
                 {
-                    if (ClientData.Players[i].Name == replacer && ClientData.Players[i].IsHuman)
+                    if (_state.Players[i].Name == replacer && _state.Players[i].IsHuman)
                     {
-                        otherAccount = ClientData.Players[i];
+                        otherAccount = _state.Players[i];
 
-                        if (ClientData.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
+                        if (_state.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
                         {
                             return false;
                         }
 
-                        ClientData.Players[i] = new GamePlayerAccount(account)
+                        _state.Players[i] = new GamePlayerAccount(account)
                         {
                             Ready = account.Ready,
                             IsConnected = account.IsConnected,
                             IsMoveable = account.IsMoveable,
-                            Flag = ClientData.Players[i].Flag,
-                            Sum = ClientData.Players[i].Sum
+                            Flag = _state.Players[i].Flag,
+                            Sum = _state.Players[i].Sum
                         };
 
-                        InheritAccountState(ClientData.Players[i], otherAccount);
+                        InheritAccountState(_state.Players[i], otherAccount);
 
                         otherIndex = i;
                         break;
@@ -3604,25 +3611,25 @@ public sealed class Game : MessageHandler
 
                 if (otherIndex == -1)
                 {
-                    for (var i = 0; i < ClientData.Viewers.Count; i++)
+                    for (var i = 0; i < _state.Viewers.Count; i++)
                     {
-                        if (ClientData.Viewers[i].Name == replacer) // always IsHuman
+                        if (_state.Viewers[i].Name == replacer) // always IsHuman
                         {
-                            otherAccount = ClientData.Viewers[i];
+                            otherAccount = _state.Viewers[i];
                             otherIndex = i;
 
-                            if (ClientData.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
+                            if (_state.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
                             {
                                 return false;
                             }
 
                             if (account.IsConnected)
                             {
-                                ClientData.Viewers[i] = new ViewerAccount(account) { IsConnected = true };
+                                _state.Viewers[i] = new ViewerAccount(account) { IsConnected = true };
                             }
                             else
                             {
-                                ClientData.Viewers.RemoveAt(i);
+                                _state.Viewers.RemoveAt(i);
                             }
 
                             break;
@@ -3641,25 +3648,25 @@ public sealed class Game : MessageHandler
 
             if (isPlayer)
             {
-                var previousPlayer = ClientData.Players[index];
+                var previousPlayer = _state.Players[index];
 
-                ClientData.Players[index] = new GamePlayerAccount(otherAccount)
+                _state.Players[index] = new GamePlayerAccount(otherAccount)
                 {
                     IsConnected = otherAccount.IsConnected,
                     IsMoveable = otherAccount.IsMoveable,
                     Sum = previousPlayer.Sum
                 };
 
-                InheritAccountState(ClientData.Players[index], previousPlayer);
+                InheritAccountState(_state.Players[index], previousPlayer);
 
                 if (otherPerson != null)
                 {
-                    ClientData.Players[index].Ready = otherPerson.Ready;
+                    _state.Players[index].Ready = otherPerson.Ready;
                 }
             }
             else
             {
-                ClientData.ShowMan = new GamePersonAccount(otherAccount)
+                _state.ShowMan = new GamePersonAccount(otherAccount)
                 {
                     IsConnected = otherAccount.IsConnected,
                     IsMoveable = otherAccount.IsMoveable
@@ -3667,7 +3674,7 @@ public sealed class Game : MessageHandler
 
                 if (otherPerson != null)
                 {
-                    ClientData.ShowMan.Ready = otherPerson.Ready;
+                    _state.ShowMan.Ready = otherPerson.Ready;
                 }
 
                 Logic.SendQuestionAnswersToShowman();
@@ -3678,7 +3685,7 @@ public sealed class Game : MessageHandler
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            _state.EndUpdatePersons();
         }
     }
 
@@ -3691,25 +3698,25 @@ public sealed class Game : MessageHandler
 
         if (isPlayer)
         {
-            if (!int.TryParse(indexStr, out index) || index < 0 || index >= ClientData.Players.Count)
+            if (!int.TryParse(indexStr, out index) || index < 0 || index >= _state.Players.Count)
             {
                 return;
             }
 
-            account = ClientData.Players[index];
+            account = _state.Players[index];
         }
         else
         {
-            account = ClientData.ShowMan;
+            account = _state.ShowMan;
         }
 
         if (account == null)
         {
-            ClientData.Host.LogWarning("ChangePersonType: account == null");
+            _state.Host.LogWarning("ChangePersonType: account == null");
             return;
         }
 
-        if (ClientData.Stage != GameStage.Before && account.IsConnected && !account.IsMoveable)
+        if (_state.Stage != GameStage.Before && account.IsConnected && !account.IsMoveable)
         {
             return;
         }
@@ -3722,13 +3729,13 @@ public sealed class Game : MessageHandler
 
         ViewerAccount? newAcc = null;
 
-        ClientData.BeginUpdatePersons($"ChangePersonType {personType} {indexStr}");
+        _state.BeginUpdatePersons($"ChangePersonType {personType} {indexStr}");
 
         try
         {
             if (account.IsConnected && account.IsHuman)
             {
-                ClientData.Viewers.Add(account);
+                _state.Viewers.Add(account);
             }
 
             if (!account.IsHuman)
@@ -3750,7 +3757,7 @@ public sealed class Game : MessageHandler
 
                 if (!isPlayer)
                 {
-                    ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
+                    _state.IsOral = _state.Settings.AppSettings.Oral && _state.ShowMan.IsHuman;
                 }
             }
             else if (isPlayer)
@@ -3762,13 +3769,13 @@ public sealed class Game : MessageHandler
 
                 var visited = new List<int>();
 
-                for (var i = 0; i < ClientData.Players.Count; i++)
+                for (var i = 0; i < _state.Players.Count; i++)
                 {
-                    if (i != index && ClientData.Players[i].IsConnected)
+                    if (i != index && _state.Players[i].IsConnected)
                     {
                         for (var j = 0; j < _defaultPlayers.Length; j++)
                         {
-                            if (_defaultPlayers[j].Name == ClientData.Players[i].Name)
+                            if (_defaultPlayers[j].Name == _state.Players[i].Name)
                             {
                                 visited.Add(j);
                                 break;
@@ -3797,7 +3804,7 @@ public sealed class Game : MessageHandler
                 var name = showman.Name;
                 var nameIndex = 0;
 
-                while (nameIndex < Constants.MaxPlayers && ClientData.AllPersons.ContainsKey(name))
+                while (nameIndex < Constants.MaxPlayers && _state.AllPersons.ContainsKey(name))
                 {
                     name = $"{showman.Name} {nameIndex++}";
                 }
@@ -3808,15 +3815,15 @@ public sealed class Game : MessageHandler
                 newName = newAcc.Name;
                 newIsMale = newAcc.IsMale;
 
-                ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
+                _state.IsOral = _state.Settings.AppSettings.Oral && _state.ShowMan.IsHuman;
             }
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            _state.EndUpdatePersons();
         }
 
-        foreach (var item in ClientData.MainPersons)
+        foreach (var item in _state.MainPersons)
         {
             if (item.Ready)
             {
@@ -3829,7 +3836,7 @@ public sealed class Game : MessageHandler
         if (responsePerson != null)
         {
             var newTypeString = newType ? LO[nameof(R.Human)] : LO[nameof(R.Computer)];
-            _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Changed)], responsePerson.IsMale)} {LO[nameof(R.PersonType)]} {oldName} {LO[nameof(R.To)]} \"{newTypeString}\""); // TODO: REMOVE+
+            _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Changed)], responsePerson.IsMale)} {LO[nameof(R.PersonType)]} {oldName} {LO[nameof(R.To)]} \"{newTypeString}\""); // TODO: REMOVE+
         }
 
         if (newAcc != null)
@@ -3851,7 +3858,7 @@ public sealed class Game : MessageHandler
             IsConnected = true
         };
 
-        ClientData.Players[index] = newAccount;
+        _state.Players[index] = newAccount;
 
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData();
@@ -3866,7 +3873,7 @@ public sealed class Game : MessageHandler
 
     private GamePersonAccount CreateNewComputerShowman(ComputerAccount account)
     {
-        if (ClientData.Host == null)
+        if (_state.Host == null)
         {
             throw new InvalidOperationException($"{nameof(CreateNewComputerShowman)}: this.ClientData.BackLink == null");
         }
@@ -3880,7 +3887,7 @@ public sealed class Game : MessageHandler
             IsConnected = true
         };
 
-        ClientData.ShowMan = newAccount;
+        _state.ShowMan = newAccount;
 
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData();
@@ -3902,15 +3909,15 @@ public sealed class Game : MessageHandler
 
     internal void StartGame()
     {
-        ClientData.Stage = GameStage.Begin;
-        ClientData.GameResultInfo.StartTime = DateTimeOffset.UtcNow;
+        _state.Stage = GameStage.Begin;
+        _state.GameResultInfo.StartTime = DateTimeOffset.UtcNow;
 
-        _logic.OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
+        _controller.OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
         _gameActions.InformStage();
 
-        ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
+        _state.IsOral = _state.Settings.AppSettings.Oral && _state.ShowMan.IsHuman;
 
-        _logic.ScheduleExecution(Tasks.StartGame, 1, 1);
+        _controller.ScheduleExecution(Tasks.StartGame, 1, 1);
     }
 
     private bool? TryAuthenticateAccount(
@@ -3925,7 +3932,7 @@ public sealed class Game : MessageHandler
             return account.Name == name ? false : null;
         }
 
-        ClientData.BeginUpdatePersons($"Connected {name} as {role} at {index}");
+        _state.BeginUpdatePersons($"Connected {name} as {role} at {index}");
 
         try
         {
@@ -3938,19 +3945,19 @@ public sealed class Game : MessageHandler
 
             if (append)
             {
-                ClientData.Viewers.Add(new ViewerAccount(account) { IsConnected = account.IsConnected });
+                _state.Viewers.Add(new ViewerAccount(account) { IsConnected = account.IsConnected });
             }
         }
         finally
         {
-            ClientData.EndUpdatePersons();
+            _state.EndUpdatePersons();
         }
 
         var connectedMessage = LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)];
         _gameActions.SpecialReplic(string.Format(connectedMessage, name)); // TODO: REMOVE+
         _gameActions.SendMessageWithArgs(Messages.Connected, role.ToString().ToLowerInvariant(), index, name, isMale ? 'm' : 'f', "");
 
-        if (ClientData.HostName == null && !ClientData.Settings.IsAutomatic)
+        if (_state.HostName == null && !_state.Settings.IsAutomatic)
         {
             UpdateHostName(name);
         }
@@ -3969,7 +3976,7 @@ public sealed class Game : MessageHandler
 
     private void InformAvatar(ViewerAccount account)
     {
-        foreach (var personName in ClientData.AllPersons.Keys)
+        foreach (var personName in _state.AllPersons.Keys)
         {
             if (account.Name != personName && personName != NetworkConstants.GameName)
             {
@@ -4026,7 +4033,7 @@ public sealed class Game : MessageHandler
             }
             else
             {
-                if (!ClientData.Host.AreCustomAvatarsSupported)
+                if (!_state.Host.AreCustomAvatarsSupported)
                 {
                     return null;
                 }
@@ -4055,9 +4062,9 @@ public sealed class Game : MessageHandler
     internal void AutoGame()
     {
         // Заполняем пустые слоты ботами
-        for (var i = 0; i < ClientData.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            if (!ClientData.Players[i].IsConnected)
+            if (!_state.Players[i].IsConnected)
             {
                 ChangePersonType(Constants.Player, i.ToString(), null);
             }

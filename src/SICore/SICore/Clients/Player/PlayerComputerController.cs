@@ -17,7 +17,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private readonly IPlayerIntelligence _intelligence;
     private readonly ViewerActions _viewerActions;
-    private readonly ViewerData _data;
+    private readonly ViewerData _state;
 
     private readonly TimerInfo[] _timersInfo;
 
@@ -34,11 +34,11 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     /// <summary>
     /// Initializes a new instance of the <see cref="PlayerComputerController"/> class.
     /// </summary>
-    public PlayerComputerController(ViewerData data, IPlayerIntelligence intelligence, ViewerActions viewerActions, TimerInfo[] timerInfos)
+    public PlayerComputerController(ViewerData state, IPlayerIntelligence intelligence, ViewerActions viewerActions, TimerInfo[] timerInfos)
     {
         _intelligence = intelligence;
         _viewerActions = viewerActions;
-        _data = data;
+        _state = state;
         _timersInfo = timerInfos;
         _taskRunner = new TaskRunner<PlayerTasks>(this);
     }
@@ -56,11 +56,11 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     {
         try
         {
-            _data.TaskLock.WithLock(() => ExecuteTaskCore(taskId, _taskArg), ViewerData.LockTimeoutMs);
+            _state.TaskLock.WithLock(() => ExecuteTaskCore(taskId, _taskArg), ViewerData.LockTimeoutMs);
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Execution error: {0}", exc.ToString()).AppendLine();
+            _state.SystemLog.AppendFormat("Execution error: {0}", exc.ToString()).AppendLine();
         }
     }
 
@@ -117,7 +117,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void OnAnswer(bool knows, bool isSure)
     {
-        var me = (PlayerAccount?)_data.Me;
+        var me = (PlayerAccount?)_state.Me;
 
         if (me == null)
         {
@@ -131,13 +131,13 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Answering error: {0} {1}", exc, _historyLog).AppendLine();
+            _state.SystemLog.AppendFormat("Answering error: {0} {1}", exc, _historyLog).AppendLine();
         }
     }
 
     private void OnSelectQuestion()
     {
-        var me = (PlayerAccount?)_data.Me;
+        var me = (PlayerAccount?)_state.Me;
 
         if (me == null)
         {
@@ -147,8 +147,8 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         try
         {
             var (themeIndex, questionIndex) = _intelligence.SelectQuestion(
-                _data.TInfo.RoundInfo,
-                (_data.ThemeIndex, _data.QuestionIndex),
+                _state.TInfo.RoundInfo,
+                (_state.ThemeIndex, _state.QuestionIndex),
                 me.Sum,
                 BestOpponentScore(),
                 GetTimePercentage(0));
@@ -157,7 +157,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Question selection error: {0} {1}", exc.ToString(), _historyLog).AppendLine();
+            _state.SystemLog.AppendFormat("Question selection error: {0} {1}", exc.ToString(), _historyLog).AppendLine();
         }
     }
 
@@ -169,14 +169,14 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     private void OnSelectPlayer()
     {
-        var me = (PlayerAccount?)_data.Me;
+        var me = (PlayerAccount?)_state.Me;
 
         if (me == null)
         {
             return;
         }
 
-        var myIndex = _data.Players.IndexOf(me);
+        var myIndex = _state.Players.IndexOf(me);
 
         if (myIndex == -1)
         {
@@ -186,16 +186,16 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         try
         {
             var playerIndex = _intelligence.SelectPlayer(
-                _data.Players,
+                _state.Players,
                 myIndex,
-                _data.TInfo.RoundInfo,
+                _state.TInfo.RoundInfo,
                 GetTimePercentage(0));
 
             _viewerActions.SendMessageWithArgs(Messages.SelectPlayer, playerIndex);
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Select player error: {0} {1}", exc, _historyLog).AppendLine();
+            _state.SystemLog.AppendFormat("Select player error: {0} {1}", exc, _historyLog).AppendLine();
         }
     }
 
@@ -203,25 +203,25 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     {
         try
         {
-            var themeIndex = _intelligence.DeleteTheme(_data.TInfo.RoundInfo);
+            var themeIndex = _intelligence.DeleteTheme(_state.TInfo.RoundInfo);
             _viewerActions.SendMessageWithArgs(Messages.Delete, themeIndex);
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Theme delete error: {0} {1}", exc, _historyLog).AppendLine();
+            _state.SystemLog.AppendFormat("Theme delete error: {0} {1}", exc, _historyLog).AppendLine();
         }
     }
 
     private void OnMakeStake()
     {
-        var me = (PlayerAccount?)_data.Me;
+        var me = (PlayerAccount?)_state.Me;
 
-        if (me == null || _data.StakeInfo == null)
+        if (me == null || _state.StakeInfo == null)
         {
             return;
         }
 
-        var myIndex = _data.Players.IndexOf(me);
+        var myIndex = _state.Players.IndexOf(me);
 
         if (myIndex == -1)
         {
@@ -231,13 +231,13 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         try
         {
             var (stakeDecision, stakeSum) = _intelligence.MakeStake(
-                _data.Players,
+                _state.Players,
                 myIndex,
-                _data.TInfo.RoundInfo,
-                _data.StakeInfo,
-                _data.QuestionIndex,
+                _state.TInfo.RoundInfo,
+                _state.StakeInfo,
+                _state.QuestionIndex,
                 _lastStakerIndex,
-                _data.StakeInfo.Modes,
+                _state.StakeInfo.Modes,
                 GetTimePercentage(0));
 
             var msg = new MessageBuilder(Messages.SetStake).Add(stakeDecision);
@@ -251,11 +251,11 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Stake task error: {0} {1}", exc, _historyLog).AppendLine();
+            _state.SystemLog.AppendFormat("Stake task error: {0} {1}", exc, _historyLog).AppendLine();
         }
     }
 
-    private void OnPressButton() => _viewerActions.PressButton(_data.TryStartTime);
+    private void OnPressButton() => _viewerActions.PressButton(_state.TryStartTime);
 
     public void CancelTask() => _taskRunner.ScheduleExecution(PlayerTasks.None, 0, runTimer: false);
 
@@ -277,7 +277,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     /// </summary>
     public void PersonAnswered(int playerIndex, bool isRight)
     {
-        if (_data.Me == null)
+        if (_state.Me == null)
         {
             return;
         }
@@ -288,10 +288,10 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
 
         _intelligence.OnPlayerOutcome(
-            _data.Players,
-            _data.Players.IndexOf((PlayerAccount)_data.Me),
+            _state.Players,
+            _state.Players.IndexOf((PlayerAccount)_state.Me),
             playerIndex,
-            _data.TInfo.RoundInfo,
+            _state.TInfo.RoundInfo,
             isRight,
             GetTimePercentage(0));
     }
@@ -299,8 +299,8 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     public void SelectQuestion() => ScheduleExecution(PlayerTasks.SelectQuestion, 20 + Random.Shared.Next(10));
 
     internal void OnQuestionStart() => _intelligence.OnQuestionStart(
-        _data.QuestionType == QuestionTypes.Simple,
-        1.0 + 4.0 * DifficultyHelper.GetDifficulty(_data.QuestionIndex, _themeQuestionCount));
+        _state.QuestionType == QuestionTypes.Simple,
+        1.0 + 4.0 * DifficultyHelper.GetDifficulty(_state.QuestionIndex, _themeQuestionCount));
 
     public void StartThink()
     {
@@ -325,7 +325,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
         ScheduleExecution(
             PlayerTasks.Answer,
-            _data.QuestionType == QuestionTypes.Simple ? 10 + Random.Shared.Next(10) : answerTime,
+            _state.QuestionType == QuestionTypes.Simple ? 10 + Random.Shared.Next(10) : answerTime,
             (knows, isSure));
     }
 
@@ -344,9 +344,9 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     public void SendReport()
     {
-        if (_data.SystemLog.Length > 0)
+        if (_state.SystemLog.Length > 0)
         {
-            _viewerActions.SendMessage(Messages.Report, MessageParams.Report_Log, _data.SystemLog.ToString());
+            _viewerActions.SendMessage(Messages.Report, MessageParams.Report_Log, _state.SystemLog.ToString());
         }
         else
         {
@@ -367,18 +367,18 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         _themeQuestionCount = questionCount;
     }
 
-    public void OnQuestionSelected() => _themeQuestionCount = _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count;
+    public void OnQuestionSelected() => _themeQuestionCount = _state.TInfo.RoundInfo[_state.ThemeIndex].Questions.Count;
 
     /// <summary>
     /// Returns the maximum opponent score.
     /// </summary>
-    private int BestOpponentScore() => _data.Players.Where(player => player.Name != _viewerActions.Client.Name).Max(player => player.Sum);
+    private int BestOpponentScore() => _state.Players.Where(player => player.Name != _viewerActions.Client.Name).Max(player => player.Sum);
 
     internal void OnPersonStake(int stakerIndex) => _lastStakerIndex = stakerIndex;
 
     internal void OnPersonsUpdated()
     {
-        if (_lastStakerIndex >= _data.Players.Count)
+        if (_lastStakerIndex >= _state.Players.Count)
         {
             _lastStakerIndex = -1; // Reset if index is out of bounds
         }

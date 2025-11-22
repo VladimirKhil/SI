@@ -1002,6 +1002,9 @@ Question: Released in 1991, this grunge anthem became Nirvana's signature song. 
   <data name="SteamNotRunning" xml:space="preserve">
     <value>Steam не запущен. Экспорт невозможен</value>
   </data>
+  <data name="SteamResultFail" xml:space="preserve">
+    <value>Неизвестная ошибка</value>
+  </data>
   <data name="Success" xml:space="preserve">
     <value>Входной файл считан полностью! Весь заголовок файла помещён в комментарии к пакету. Просьба самостоятельно рассортировать его содержимое. Всего импортировано тем:</value>
   </data>

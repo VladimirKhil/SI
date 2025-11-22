@@ -407,7 +407,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
     {
         if (bIOFailure || param.m_eResult != EResult.k_EResultOK)
         {
-            Status = $"{Resources.WorkshopItemCreationError}: {param.m_eResult}";
+            Status = $"{Resources.WorkshopItemCreationError}: {GetUserMessage(param.m_eResult)}";
             Progress = 0;
             IsUploading = false;
             return;
@@ -430,7 +430,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
         if (bIOFailure || param.m_eResult != EResult.k_EResultOK)
         {
-            Status = $"{Resources.UploadError}: {param.m_eResult}";
+            Status = $"{Resources.UploadError}: {GetUserMessage(param.m_eResult)}";
             Progress = 0;
             return;
         }
@@ -456,13 +456,19 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         }
     }
 
+    private static string GetUserMessage(EResult m_eResult) => m_eResult switch
+    {
+        EResult.k_EResultFail => Resources.SteamResultFail,
+        _ => m_eResult.ToString()
+    };
+
     private void OnSubmitPreview(SubmitItemUpdateResult_t param, bool bIOFailure)
     {
         Status = Resources.UploadSuccess;
         
         if (bIOFailure || param.m_eResult != EResult.k_EResultOK)
         {
-            PlatformSpecific.PlatformManager.Instance.ShowExclamationMessage($"{Resources.PreviewUploadError}: {param.m_eResult}");
+            PlatformSpecific.PlatformManager.Instance.ShowExclamationMessage($"{Resources.PreviewUploadError}: {GetUserMessage(param.m_eResult)}");
             return;
         }
 

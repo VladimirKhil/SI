@@ -21,20 +21,20 @@ internal class ViewerComputerLogic : IPersonController
 
     private readonly GameRole _role;
 
-    private readonly ViewerData _data;
+    private readonly ViewerData _state;
 
     internal ViewerComputerLogic(
-        ViewerData data,
+        ViewerData state,
         ViewerActions viewerActions,
         IIntelligence intelligence,
         GameRole role)
     {
-        _data = data;
+        _state = state;
         _viewerActions = viewerActions;
         _role = role;
 
-        _player = new PlayerComputerController(data,  intelligence, viewerActions, _timersInfo);
-        _showman = new ShowmanComputerController(data, viewerActions, intelligence);
+        _player = new PlayerComputerController(state,  intelligence, viewerActions, _timersInfo);
+        _showman = new ShowmanComputerController(state, viewerActions, intelligence);
     }
 
     public void ClearSelections(bool full = false)
@@ -126,14 +126,14 @@ internal class ViewerComputerLogic : IPersonController
     public void OnQuestionSelected(int themeIndex, int questionIndex)
     {
         if (themeIndex < 0 ||
-            themeIndex >= _data.TInfo.RoundInfo.Count ||
+            themeIndex >= _state.TInfo.RoundInfo.Count ||
             questionIndex < 0 ||
-            questionIndex >= _data.TInfo.RoundInfo[themeIndex].Questions.Count)
+            questionIndex >= _state.TInfo.RoundInfo[themeIndex].Questions.Count)
         {
             return;
         }
 
-        _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
+        _state.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
 
         if (_role == GameRole.Player)
         {
@@ -160,7 +160,7 @@ internal class ViewerComputerLogic : IPersonController
 
     }
 
-    public void Out(int themeIndex) => _data.TInfo.RoundInfo[themeIndex].Name = "";
+    public void Out(int themeIndex) => _state.TInfo.RoundInfo[themeIndex].Name = "";
 
     public void TimeOut()
     {
@@ -189,7 +189,7 @@ internal class ViewerComputerLogic : IPersonController
 
     public void OnPauseChanged(bool isPaused)
     {
-        _data.TInfo.Pause = isPaused;
+        _state.TInfo.Pause = isPaused;
     }
 
     public void PrintGreeting()

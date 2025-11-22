@@ -1838,6 +1838,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Unknown error.
+        /// </summary>
+        public static string SteamResultFail {
+            get {
+                return ResourceManager.GetString("SteamResultFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The input file has been completely read! The entire file header is placed in the package comments. Please sort its content yourself. Total imported themes:.
         /// </summary>
         public static string Success {

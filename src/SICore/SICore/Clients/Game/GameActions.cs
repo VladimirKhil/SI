@@ -378,8 +378,8 @@ public sealed class GameActions
 
     internal void InformLayout(string person = NetworkConstants.Everybody)
     {
-        var screenContentSequence = _gameData.QuestionPlayState.ScreenContentSequence;
-        var answerOptions = _gameData.QuestionPlayState.AnswerOptions;
+        var screenContentSequence = _gameData.QuestionPlay.ScreenContentSequence;
+        var answerOptions = _gameData.QuestionPlay.AnswerOptions;
 
         if (answerOptions == null || screenContentSequence == null)
         {

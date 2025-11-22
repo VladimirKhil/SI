@@ -9,13 +9,13 @@ namespace SICore;
 internal sealed class ShowmanComputerController
 {
     private readonly ViewerActions _viewerActions;
-    private readonly ViewerData _data;
+    private readonly ViewerData _state;
     private readonly IShowmanIntelligence _intelligence;
 
-    public ShowmanComputerController(ViewerData data, ViewerActions viewerActions, IShowmanIntelligence intelligence)
+    public ShowmanComputerController(ViewerData state, ViewerActions viewerActions, IShowmanIntelligence intelligence)
     {
         _viewerActions = viewerActions;
-        _data = data;
+        _state = state;
         _intelligence = intelligence;
     }
 
@@ -25,11 +25,11 @@ internal sealed class ShowmanComputerController
 
         try
         {
-            await _data.TaskLock.WithLockAsync(() => ExecuteTask(task, arg), ViewerData.LockTimeoutMs);
+            await _state.TaskLock.WithLockAsync(() => ExecuteTask(task, arg), ViewerData.LockTimeoutMs);
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Execution error: {0}", exc.ToString()).AppendLine();
+            _state.SystemLog.AppendFormat("Execution error: {0}", exc.ToString()).AppendLine();
         }
     }
 
@@ -63,7 +63,7 @@ internal sealed class ShowmanComputerController
 
     private void OnSelectPlayer()
     {
-        var playerIndex = _data.Players.SelectRandomIndex();
+        var playerIndex = _state.Players.SelectRandomIndex();
         _viewerActions.SendMessage(Messages.SelectPlayer, playerIndex.ToString());
     }
 
@@ -86,7 +86,7 @@ internal sealed class ShowmanComputerController
             return false;
         }
 
-        return _intelligence.ValidateAnswer(answer, _data.Right, _data.Wrong);
+        return _intelligence.ValidateAnswer(answer, _state.Right, _state.Wrong);
     }
 
     public void SelectPlayer() => ScheduleExecution(ShowmanTasks.SelectPlayer, 10 + Random.Shared.Next(10));

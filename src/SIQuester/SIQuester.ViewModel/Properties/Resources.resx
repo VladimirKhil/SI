@@ -961,6 +961,9 @@ Humor</value>
   <data name="SteamNotRunning" xml:space="preserve">
     <value>Steam is not running. Export is not possible</value>
   </data>
+  <data name="SteamResultFail" xml:space="preserve">
+    <value>Unknown error</value>
+  </data>
   <data name="Success" xml:space="preserve">
     <value>The input file has been completely read! The entire file header is placed in the package comments. Please sort its content yourself. Total imported themes:</value>
   </data>

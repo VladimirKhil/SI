@@ -105,7 +105,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Question play state. This state is reset before each question.
     /// </summary>
-    internal QuestionPlayState QuestionPlayState { get; } = new();
+    internal QuestionPlayState QuestionPlay { get; } = new();
 
     /// <summary>
     /// Index of possible answerer.

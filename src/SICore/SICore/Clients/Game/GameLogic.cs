@@ -79,7 +79,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private readonly HistoryLog _tasksHistory = new();
 
-    private TimeSettings TimeSettings => _data.Settings.AppSettings.TimeSettings;
+    private TimeSettings TimeSettings => _state.Settings.AppSettings.TimeSettings;
 
     public SIEngine.GameEngine Engine { get; } // TODO: remove dependency on GameEngine
 
@@ -94,7 +94,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         int progressTotal = 0) => StageChanged?.Invoke(this, stage, stageName, progressCurrent, progressTotal);
 
     internal void OnAdShown(int adId) =>
-        AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, _data.AllPersons.Values.Count(p => p.IsHuman));
+        AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, _state.AllPersons.Values.Count(p => p.IsHuman));
 
     private readonly IFileShare _fileShare;
     private readonly TaskRunner<Tasks> _taskRunner;
@@ -111,41 +111,41 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal StakesPlugin Stakes { get; }
 
-    private readonly GameData _data;
+    private readonly GameData _state;
 
     public GameLogic(
-        GameData data,
-        GameActions gameActions,
+        GameData state,
+        GameActions actions,
         SIEngine.GameEngine engine,
         ILocalizer localizer,
         IFileShare fileShare,
         IPinHelper? pinHelper)
     {
-        _data = data;
-        _gameActions = gameActions;
+        _state = state;
+        _gameActions = actions;
         Engine = engine;
         LO = localizer;
         _fileShare = fileShare;
         _taskRunner = new(this);
         PinHelper = pinHelper;
-        Stakes = new StakesPlugin(data);
+        Stakes = new StakesPlugin(state);
     }
 
     internal void Run()
     {
-        _data.PackageDoc = Engine.Document;
+        _state.PackageDoc = Engine.Document;
 
-        _data.GameResultInfo.Name = _data.GameName;
-        _data.GameResultInfo.Language = _data.Settings.AppSettings.Culture;
-        _data.GameResultInfo.PackageName = Engine.PackageName;
-        _data.GameResultInfo.PackageAuthors = Engine.Document.Package.Info.Authors.ToArray();
-        _data.GameResultInfo.PackageAuthorsContacts = Engine.Document.Package.ContactUri;
+        _state.GameResultInfo.Name = _state.GameName;
+        _state.GameResultInfo.Language = _state.Settings.AppSettings.Culture;
+        _state.GameResultInfo.PackageName = Engine.PackageName;
+        _state.GameResultInfo.PackageAuthors = Engine.Document.Package.Info.Authors.ToArray();
+        _state.GameResultInfo.PackageAuthorsContacts = Engine.Document.Package.ContactUri;
 
-        if (_data.Settings.IsAutomatic)
+        if (_state.Settings.IsAutomatic)
         {
             // The game should be started automatically
             ScheduleExecution(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
-            _data.TimerStartTime[2] = DateTime.UtcNow;
+            _state.TimerStartTime[2] = DateTime.UtcNow;
 
             _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
         }
@@ -160,42 +160,42 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnContentScreenHtml(ContentItem contentItem)
     {
-        _data.IsPartial = false;
+        _state.IsPartial = false;
         ShareMedia(contentItem);
 
-        var contentTime = GetContentItemDuration(contentItem, _data.TimeSettings.Image * 10);
+        var contentTime = GetContentItemDuration(contentItem, _state.TimeSettings.Image * 10);
 
-        _data.AtomTime = contentTime;
-        _data.AtomStart = DateTime.UtcNow;
+        _state.AtomTime = contentTime;
+        _state.AtomStart = DateTime.UtcNow;
 
         ScheduleExecution(Tasks.MoveNext, contentTime);
 
-        _data.TimeThinking = 0.0;
+        _state.TimeThinking = 0.0;
     }
 
     internal bool ProcessNextAppellationRequest(bool stop)
     {
         var (appellationSource, isAppellationForRightAnswer) =
-            _data.QuestionPlayState.Appellations[_data.QuestionPlayState.AppellationIndex++];
+            _state.QuestionPlay.Appellations[_state.QuestionPlay.AppellationIndex++];
 
-        _data.AppellationCallerIndex = -1;
-        _data.AppelaerIndex = -1;
+        _state.AppellationCallerIndex = -1;
+        _state.AppelaerIndex = -1;
 
         if (isAppellationForRightAnswer)
         {
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (_data.Players[i].Name == appellationSource)
+                if (_state.Players[i].Name == appellationSource)
                 {
-                    for (var j = 0; j < _data.QuestionHistory.Count; j++)
+                    for (var j = 0; j < _state.QuestionHistory.Count; j++)
                     {
-                        var index = _data.QuestionHistory[j].PlayerIndex;
+                        var index = _state.QuestionHistory[j].PlayerIndex;
 
                         if (index == i)
                         {
-                            if (!_data.QuestionHistory[j].IsRight)
+                            if (!_state.QuestionHistory[j].IsRight)
                             {
-                                _data.AppelaerIndex = index;
+                                _state.AppelaerIndex = index;
                             }
 
                             break;
@@ -208,7 +208,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            if (_data.Players.Count(p => p.IsConnected) <= 3)
+            if (_state.Players.Count(p => p.IsConnected) <= 3)
             {
                 // If there are 2 or 3 players, there are already 2 positive votes for the answer
                 // from answered player and showman. And only 1 or 2 votes left.
@@ -218,36 +218,36 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 return false;
             }
 
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (_data.Players[i].Name == appellationSource)
+                if (_state.Players[i].Name == appellationSource)
                 {
-                    _data.AppellationCallerIndex = i;
+                    _state.AppellationCallerIndex = i;
                     break;
                 }
             }
 
-            if (_data.AppellationCallerIndex == -1)
+            if (_state.AppellationCallerIndex == -1)
             {
                 // Only players can appellate
                 return false;
             }
 
             // Last person has right answer and is responsible for appellation
-            var count = _data.QuestionHistory.Count;
+            var count = _state.QuestionHistory.Count;
 
-            if (count > 0 && _data.QuestionHistory[count - 1].IsRight)
+            if (count > 0 && _state.QuestionHistory[count - 1].IsRight)
             {
-                _data.AppelaerIndex = _data.QuestionHistory[count - 1].PlayerIndex;
+                _state.AppelaerIndex = _state.QuestionHistory[count - 1].PlayerIndex;
             }
         }
 
-        if (_data.AppelaerIndex != -1)
+        if (_state.AppelaerIndex != -1)
         {
             // Appellation started
             if (stop)
             {
-                _data.QuestionPlayState.AppellationState = AppellationState.Collecting; // To query other appellations
+                _state.QuestionPlay.AppellationState = AppellationState.Collecting; // To query other appellations
                 Stop(StopReason.Appellation);
             }
             
@@ -261,20 +261,20 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
 
-        _data.QuestionPlayState.AppellationState = _data.Settings.AppSettings.UseApellations ? AppellationState.Processing : AppellationState.None;
-        _data.IsPlayingMedia = false;
+        _state.QuestionPlay.AppellationState = _state.Settings.AppSettings.UseApellations ? AppellationState.Processing : AppellationState.None;
+        _state.IsPlayingMedia = false;
 
-        _data.InformStages &= ~(InformStages.Question | InformStages.Layout | InformStages.ContentShape);
+        _state.InformStages &= ~(InformStages.Question | InformStages.Layout | InformStages.ContentShape);
 
         ScheduleExecution(Tasks.QuestionPostInfo, taskTime, force: true);
 
         if (GetTurnSwitchingStrategy() == TurnSwitchingStrategy.Sequentially)
         {
-            _data.ChooserIndex = (_data.ChooserIndex + 1) % _data.Players.Count;
-            _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
+            _state.ChooserIndex = (_state.ChooserIndex + 1) % _state.Players.Count;
+            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
         }
 
-        if (_data.QuestionPlayState.AppellationState != AppellationState.None && _data.QuestionPlayState.Appellations.Any())
+        if (_state.QuestionPlay.AppellationState != AppellationState.None && _state.QuestionPlay.Appellations.Any())
         {
             ProcessNextAppellationRequest(true);
         }
@@ -282,16 +282,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnPackage(Package package)
     {
-        _data.Package = package;
+        _state.Package = package;
 
-        _data.Rounds = _data.Package.Rounds
+        _state.Rounds = _state.Package.Rounds
             .Select((round, index) => new RoundInfo { Index = index, Name = round.Name })
             .ToArray();
 
         _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID)); // TODO: REMOVE (replaced by PACKAGE_INFO message)
         _gameActions.InformRoundsNames();
 
-        _data.InformStages |= InformStages.RoundNames;
+        _state.InformStages |= InformStages.RoundNames;
 
         OnPackage(package, 1);
     }
@@ -306,12 +306,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRoundStart(Round round, QuestionSelectionStrategyType strategyType)
     {
-        _data.Round = round;
-        _data.CanMarkQuestion = false;
-        _data.AnswererIndex = -1;
-        _data.QuestionPlayState.Clear();
-        _data.ThemeDeleters = null;
-        _data.RoundStrategy = strategyType;
+        _state.Round = round;
+        _state.CanMarkQuestion = false;
+        _state.AnswererIndex = -1;
+        _state.QuestionPlay.Clear();
+        _state.ThemeDeleters = null;
+        _state.RoundStrategy = strategyType;
 
         OnRound(round, 1);
         SetRoundPrices(round);
@@ -342,16 +342,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _minRoundPrice = Math.Max(1, _minRoundPrice);
-        _data.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
+        _state.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
     }
 
     internal void InitThemes(IEnumerable<Theme> themes, bool willPlayAllThemes, bool isFirstPlay, ThemesPlayMode playMode)
     {
-        _data.TInfo.RoundInfo.Clear();
+        _state.TInfo.RoundInfo.Clear();
 
         foreach (var theme in themes)
         {
-            _data.TInfo.RoundInfo.Add(new ThemeInfo { Name = theme.Name });
+            _state.TInfo.RoundInfo.Add(new ThemeInfo { Name = theme.Name });
         }
 
         if (willPlayAllThemes)
@@ -363,13 +363,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.ShowmanReplic(themesReplic);
         }
 
-        _data.TableInformStageLock.WithLock(() =>
+        _state.TableInformStageLock.WithLock(() =>
         {
             _gameActions.InformRoundThemesNames(playMode: playMode);
-            _data.ThemeComments = themes.Select(theme => theme.Info.Comments.Text).ToArray();
-            _data.InformStages |= InformStages.RoundThemesNames;
-            _data.ThemesPlayMode = playMode;
-            _data.LastVisualMessage = null;
+            _state.ThemeComments = themes.Select(theme => theme.Info.Comments.Text).ToArray();
+            _state.InformStages |= InformStages.RoundThemesNames;
+            _state.ThemesPlayMode = playMode;
+            _state.LastVisualMessage = null;
         },
         5000);
     }
@@ -377,41 +377,41 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     /// <summary>
     /// Gets count of questions left to play in current round.
     /// </summary>
-    internal int GetRoundActiveQuestionsCount() => _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
+    internal int GetRoundActiveQuestionsCount() => _state.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
 
     internal void OnQuestion(Question question)
     {
-        _data.Question = question;
+        _state.Question = question;
 
-        _gameActions.ShowmanReplic($"{_data.Theme?.Name}, {question.Price}");
+        _gameActions.ShowmanReplic($"{_state.Theme?.Name}, {question.Price}");
         _gameActions.SendVisualMessageWithArgs(Messages.Question, question.Price);
 
-        InitQuestionState(_data.Question);
+        InitQuestionState(_state.Question);
         ProceedToThemeAndQuestion();
     }
 
     internal void OnQuestionSelected(int themeIndex, int questionIndex)
     {
-        if (_data.Round == null)
+        if (_state.Round == null)
         {
             throw new InvalidOperationException("_data.Round == null");
         }
 
         _gameActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
-        _data.InformStages |= InformStages.Question;
+        _state.InformStages |= InformStages.Question;
 
-        _data.Theme = _data.Round.Themes[themeIndex];
-        _data.Question = _data.Theme.Questions[questionIndex];
+        _state.Theme = _state.Round.Themes[themeIndex];
+        _state.Question = _state.Theme.Questions[questionIndex];
 
-        _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
+        _state.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
 
-        InitQuestionState(_data.Question);
+        InitQuestionState(_state.Question);
         ProceedToThemeAndQuestion(20);
     }
 
     private void ProceedToThemeAndQuestion(int delay = 10, bool force = true)
     {
-        if (!_data.ThemeInfoShown.Contains(_data.Theme))
+        if (!_state.ThemeInfoShown.Contains(_state.Theme))
         {
             ScheduleExecution(Tasks.Theme, delay, 1, force);
         }
@@ -424,56 +424,56 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private void InitQuestionState(Question question)
     {
         // TODO: move all to question play state
-        _data.QuestionHistory.Clear();
-        _data.PendingAnswererIndex = -1;
-        _data.AnswererPressDuration = -1;
-        _data.PendingAnswererIndicies.Clear();
-        _data.IsQuestionAskPlaying = true;
-        _data.IsPlayingMedia = false;
-        _data.IsPlayingMediaPaused = false;
-        _data.CurPriceRight = _data.CurPriceWrong = question.Price;
-        _data.Order = Array.Empty<int>();
-        _data.OrderIndex = -1;
-        _data.AnswererIndex = -1;
-        _data.CanMarkQuestion = false;
-        _data.QuestionPlayState.Clear();
+        _state.QuestionHistory.Clear();
+        _state.PendingAnswererIndex = -1;
+        _state.AnswererPressDuration = -1;
+        _state.PendingAnswererIndicies.Clear();
+        _state.IsQuestionAskPlaying = true;
+        _state.IsPlayingMedia = false;
+        _state.IsPlayingMediaPaused = false;
+        _state.CurPriceRight = _state.CurPriceWrong = question.Price;
+        _state.Order = Array.Empty<int>();
+        _state.OrderIndex = -1;
+        _state.AnswererIndex = -1;
+        _state.CanMarkQuestion = false;
+        _state.QuestionPlay.Clear();
 
-        var key = _data.QuestionPlayState.QuestionKey = $"{Engine.RoundIndex}:{_data.ThemeIndex}:{_data.QuestionIndex}";
-        var humanPlayerCount = _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count();
-        _data.GameResultInfo.IncrementQuestionSeenCount(key, humanPlayerCount);
+        var key = _state.QuestionPlay.QuestionKey = $"{Engine.RoundIndex}:{_state.ThemeIndex}:{_state.QuestionIndex}";
+        var humanPlayerCount = _state.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count();
+        _state.GameResultInfo.IncrementQuestionSeenCount(key, humanPlayerCount);
     }
 
     internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration)
     {
         var contentTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length);
 
-        if (_data.QuestionPlayState.IsAnswer)
+        if (_state.QuestionPlay.IsAnswer)
         {
-            contentTime += _data.TimeSettings.RightAnswer * 10;
+            contentTime += _state.TimeSettings.RightAnswer * 10;
         }
 
-        _data.AtomTime = contentTime;
-        _data.AtomStart = DateTime.UtcNow;
-        _data.UseBackgroundAudio = !waitForFinish;
+        _state.AtomTime = contentTime;
+        _state.AtomStart = DateTime.UtcNow;
+        _state.UseBackgroundAudio = !waitForFinish;
 
-        _data.IsPartial = waitForFinish && IsPartial();
+        _state.IsPartial = waitForFinish && IsPartial();
 
-        if (_data.IsPartial)
+        if (_state.IsPartial)
         {
-            _data.Text = text;
+            _state.Text = text;
             _gameActions.SendContentShape();
-            _data.InformStages |= InformStages.ContentShape;
-            _data.InitialPartialTextLength = 0;
-            _data.PartialIterationCounter = 0;
-            _data.TextLength = 0;
+            _state.InformStages |= InformStages.ContentShape;
+            _state.InitialPartialTextLength = 0;
+            _state.PartialIterationCounter = 0;
+            _state.TextLength = 0;
             ScheduleExecution(Tasks.PrintPartial, 1);
             return;
         }
 
         var message = string.Join(Message.ArgsSeparator, Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
 
-        _data.ComplexVisualState ??= new IReadOnlyList<string>[1];
-        _data.ComplexVisualState[0] = new string[] { message };
+        _state.ComplexVisualState ??= new IReadOnlyList<string>[1];
+        _state.ComplexVisualState[0] = new string[] { message };
 
         _gameActions.SendMessage(message);
         _gameActions.SystemReplic(text); // TODO: REMOVE: replaced by CONTENT message
@@ -482,46 +482,46 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         ScheduleExecution(Tasks.MoveNext, nextTime);
 
-        _data.TimeThinking = 0.0;
+        _state.TimeThinking = 0.0;
     }
 
     /// <summary>
     /// Should the question be displayed partially.
     /// </summary>
     private bool IsPartial() =>
-        _data.QuestionPlayState.UseButtons
-            && !_data.Settings.AppSettings.FalseStart
-            && _data.Settings.AppSettings.PartialText
-            && !_data.QuestionPlayState.IsAnswer;
+        _state.QuestionPlay.UseButtons
+            && !_state.Settings.AppSettings.FalseStart
+            && _state.Settings.AppSettings.PartialText
+            && !_state.QuestionPlay.IsAnswer;
 
     internal void OnContentReplicText(string text, bool waitForFinish, TimeSpan duration)
     {
-        _data.IsPartial = false;
+        _state.IsPartial = false;
         // There is no need to send content for now, as we can send replic directly
         //_gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Replic, 0, ContentTypes.Text, text.EscapeNewLines());
         _gameActions.ShowmanReplic(text);
 
         var atomTime = !waitForFinish ? 1 : (duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length));
 
-        _data.AtomTime = atomTime;
-        _data.AtomStart = DateTime.UtcNow;
+        _state.AtomTime = atomTime;
+        _state.AtomStart = DateTime.UtcNow;
 
         ScheduleExecution(Tasks.MoveNext, atomTime);
 
-        _data.TimeThinking = 0.0;
-        _data.UseBackgroundAudio = !waitForFinish;
+        _state.TimeThinking = 0.0;
+        _state.UseBackgroundAudio = !waitForFinish;
     }
 
     private (bool success, string? globalUri, string? localUri, string? error) TryShareContent(ContentItem contentItem)
     {
-        if (_data.PackageDoc == null || _data.Package == null)
+        if (_state.PackageDoc == null || _state.Package == null)
         {
             throw new InvalidOperationException("_data.Package == null; game not running");
         }
 
         if (!contentItem.IsRef) // External link
         {
-            if (_data.Package.HasQualityControl)
+            if (_state.Package.HasQualityControl)
             {
                 return (false, null, null, LO[nameof(R.ExternalLinksForbidden)]);
             }
@@ -539,7 +539,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return (false, link, null, null);
         }
 
-        if (_data.Package.HasQualityControl)
+        if (_state.Package.HasQualityControl)
         {
             var fileExtension = Path.GetExtension(contentItem.Value)?.ToLowerInvariant();
 
@@ -551,7 +551,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         
         var contentType = contentItem.Type;
         var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
-        var media = _data.PackageDoc.TryGetMedia(contentItem);
+        var media = _state.PackageDoc.TryGetMedia(contentItem);
 
         if (!media.HasValue || media.Value.Uri == null)
         {
@@ -601,8 +601,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 var message = string.Join(Message.ArgsSeparator, Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
                 _gameActions.SendMessage(message);
 
-                _data.ComplexVisualState ??= new IReadOnlyList<string>[1];
-                _data.ComplexVisualState[0] = new string[] { message };
+                _state.ComplexVisualState ??= new IReadOnlyList<string>[1];
+                _state.ComplexVisualState[0] = new string[] { message };
 
                 return null;
             }
@@ -618,16 +618,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         catch (Exception exc)
         {
-            _data.Host.SendError(exc, true);
+            _state.Host.SendError(exc, true);
             return null;
         }
     }
 
     private (bool success, string? error) CheckFileLength(string contentType, long fileLength)
     {
-        int? maxRecommendedFileLength = contentType == ContentTypes.Image ? _data.Host.MaxImageSizeKb
-            : (contentType == ContentTypes.Audio ? _data.Host.MaxAudioSizeKb
-            : (contentType == ContentTypes.Video ? _data.Host.MaxVideoSizeKb
+        int? maxRecommendedFileLength = contentType == ContentTypes.Image ? _state.Host.MaxImageSizeKb
+            : (contentType == ContentTypes.Audio ? _state.Host.MaxAudioSizeKb
+            : (contentType == ContentTypes.Video ? _state.Host.MaxVideoSizeKb
             : null));
 
         if (!maxRecommendedFileLength.HasValue || fileLength <= (long)maxRecommendedFileLength * 1024)
@@ -635,9 +635,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return (true, null);
         }
 
-        var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
+        var fileLocation = $"{_state.Theme?.Name}, {_state.Question?.Price}";
 
-        if (_data.Package.HasQualityControl)
+        if (_state.Package.HasQualityControl)
         {
             var error = string.Format(LO[nameof(R.OversizedFileForbidden)], R.File, fileLocation, maxRecommendedFileLength);
             return (false, error);
@@ -648,9 +648,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage); // TODO: REMOVE: replaced by USER_ERROR message
         _gameActions.SendMessageWithArgs(Messages.UserError, ErrorCode.OversizedFile, contentType, maxRecommendedFileLength);
 
-        if (_data.OversizedMediaNotificationsCount < MaxMediaNotifications)
+        if (_state.OversizedMediaNotificationsCount < MaxMediaNotifications)
         {
-            _data.OversizedMediaNotificationsCount++;
+            _state.OversizedMediaNotificationsCount++;
 
             // Show message on table
             _gameActions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
@@ -661,26 +661,26 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnContentScreenImage(ContentItem contentItem)
     {
-        _data.IsPartial = false;
+        _state.IsPartial = false;
         ShareMedia(contentItem);
 
-        var appSettings = _data.Settings.AppSettings;
+        var appSettings = _state.Settings.AppSettings;
         // TODO: provide this flag to client as part of the CONTENT message
-        var partialImage = appSettings.PartialImages && !appSettings.FalseStart && _data.QuestionPlayState.UseButtons && !_data.QuestionPlayState.IsAnswer;
+        var partialImage = appSettings.PartialImages && !appSettings.FalseStart && _state.QuestionPlay.UseButtons && !_state.QuestionPlay.IsAnswer;
 
         var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
         
-        var waitTime = GetContentItemDuration(contentItem, _data.TimeSettings.Image * 10);
+        var waitTime = GetContentItemDuration(contentItem, _state.TimeSettings.Image * 10);
 
         var contentTime = renderTime + waitTime;
 
-        _data.AtomTime = contentTime;
-        _data.AtomStart = DateTime.UtcNow;
+        _state.AtomTime = contentTime;
+        _state.AtomStart = DateTime.UtcNow;
 
         ScheduleExecution(Tasks.MoveNext, contentTime);
 
-        _data.TimeThinking = 0.0;
-        _data.UseBackgroundAudio = !contentItem.WaitForFinish;
+        _state.TimeThinking = 0.0;
+        _state.UseBackgroundAudio = !contentItem.WaitForFinish;
     }
 
     private static int GetContentItemDuration(ContentItem contentItem, int defaultValue) =>
@@ -688,68 +688,68 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             ? (contentItem.Duration > TimeSpan.Zero ? (int)(contentItem.Duration.TotalMilliseconds / 100) : defaultValue)
             : 1;
 
-    private void ClearMediaContent() => _data.QuestionPlayState.MediaContentCompletions.Clear();
+    private void ClearMediaContent() => _state.QuestionPlay.MediaContentCompletions.Clear();
 
     internal void OnContentBackgroundAudio(ContentItem contentItem)
     {
-        _data.IsPartial = false;
+        _state.IsPartial = false;
         var globalUri = ShareMedia(contentItem);
 
         var defaultTime = DefaultMediaTime + TimeSettings.TimeForMediaDelay * 10;
 
         if (globalUri != null)
         {
-            _data.QuestionPlayState.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_data.ActiveHumanCount);
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
             _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
 
         var atomTime = GetContentItemDuration(contentItem, defaultTime);
 
-        _data.AtomTime = atomTime;
-        _data.AtomStart = DateTime.UtcNow;
-        _data.IsPlayingMedia = true;
-        _data.IsPlayingMediaPaused = false;
+        _state.AtomTime = atomTime;
+        _state.AtomStart = DateTime.UtcNow;
+        _state.IsPlayingMedia = true;
+        _state.IsPlayingMediaPaused = false;
 
         ScheduleExecution(Tasks.MoveNext, atomTime);
 
-        _data.TimeThinking = 0.0;
+        _state.TimeThinking = 0.0;
     }
 
     internal void OnContentScreenVideo(ContentItem contentItem)
     {
-        _data.IsPartial = false;
+        _state.IsPartial = false;
         var globalUri = ShareMedia(contentItem);
 
         var defaultTime = DefaultMediaTime + TimeSettings.TimeForMediaDelay * 10;
 
         if (globalUri != null)
         {
-            _data.QuestionPlayState.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_data.ActiveHumanCount);
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
             _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
 
         int atomTime = GetContentItemDuration(contentItem, defaultTime);
 
-        _data.AtomTime = atomTime;
-        _data.AtomStart = DateTime.UtcNow;
-        _data.IsPlayingMedia = true;
-        _data.IsPlayingMediaPaused = false;
+        _state.AtomTime = atomTime;
+        _state.AtomStart = DateTime.UtcNow;
+        _state.IsPlayingMedia = true;
+        _state.IsPlayingMediaPaused = false;
 
         ScheduleExecution(Tasks.MoveNext, atomTime);
 
-        _data.TimeThinking = 0.0;
+        _state.TimeThinking = 0.0;
     }
 
     // Let's add a random offset so it will be difficult to press the button in advance (before the frame appears)
-    internal void AskToPress() => ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : Random.Shared.Next(10)), force: true);
+    internal void AskToPress() => ScheduleExecution(Tasks.AskToTry, 1 + (_state.Settings.AppSettings.Managed ? 0 : Random.Shared.Next(10)), force: true);
 
     internal void AskDirectAnswer()
     {
-        if (_data.QuestionTypeName == QuestionTypes.StakeAll)
+        if (_state.QuestionTypeName == QuestionTypes.StakeAll)
         {
-            _gameActions.SendMessageWithArgs(Messages.FinalThink, _data.TimeSettings.HiddenAnswering);
+            _gameActions.SendMessageWithArgs(Messages.FinalThink, _state.TimeSettings.HiddenAnswering);
         }
 
         ScheduleExecution(Tasks.AskAnswer, 1, force: true);
@@ -757,18 +757,18 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRoundEnded()
     {
-        _data.IsQuestionAskPlaying = false;
-        _data.IsPlayingMedia = false;
+        _state.IsQuestionAskPlaying = false;
+        _state.IsPlayingMedia = false;
 
         _gameActions.InformSums();
         _gameActions.SendMessage(Messages.Stop); // Timers STOP
 
-        _data.IsThinking = false;
+        _state.IsThinking = false;
 
-        _data.IsWaiting = false;
-        _data.Decision = DecisionType.None;
+        _state.IsWaiting = false;
+        _state.Decision = DecisionType.None;
 
-        _data.InformStages &= ~(InformStages.RoundContent | 
+        _state.InformStages &= ~(InformStages.RoundContent | 
             InformStages.RoundThemesNames | 
             InformStages.RoundThemesComments | 
             InformStages.Table | 
@@ -781,7 +781,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         // (or we could replace it with a normal move)
         ClearContinuation();
 
-        if (_data.TInfo.Pause)
+        if (_state.TInfo.Pause)
         {
             OnPauseCore(false);
         }
@@ -797,14 +797,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (isPauseEnabled)
         {
-            if (_data.TInfo.Pause)
+            if (_state.TInfo.Pause)
             {
                 return;
             }
 
             if (Stop(StopReason.Pause))
             {
-                _data.TInfo.Pause = true;
+                _state.TInfo.Pause = true;
                 AddHistory("Pause activated");
             }
 
@@ -814,46 +814,46 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         if (StopReason == StopReason.Pause)
         {
             // We are currently moving into pause mode. Resuming
-            _data.TInfo.Pause = false;
+            _state.TInfo.Pause = false;
             AddHistory("Immediate pause resume");
             CancelStop();
             return;
         }
 
-        if (!_data.TInfo.Pause)
+        if (!_state.TInfo.Pause)
         {
             return;
         }
 
-        _data.TInfo.Pause = false;
+        _state.TInfo.Pause = false;
 
-        var pauseDuration = DateTime.UtcNow.Subtract(_data.PauseStartTime);
+        var pauseDuration = DateTime.UtcNow.Subtract(_state.PauseStartTime);
 
         var times = new int[Constants.TimersCount];
 
         for (var i = 0; i < Constants.TimersCount; i++)
         {
-            times[i] = (int)(_data.PauseStartTime.Subtract(_data.TimerStartTime[i]).TotalMilliseconds / 100);
-            _data.TimerStartTime[i] = _data.TimerStartTime[i].Add(pauseDuration);
+            times[i] = (int)(_state.PauseStartTime.Subtract(_state.TimerStartTime[i]).TotalMilliseconds / 100);
+            _state.TimerStartTime[i] = _state.TimerStartTime[i].Add(pauseDuration);
         }
 
-        if (_data.IsPlayingMediaPaused)
+        if (_state.IsPlayingMediaPaused)
         {
-            _data.IsPlayingMediaPaused = false;
-            _data.IsPlayingMedia = true;
+            _state.IsPlayingMediaPaused = false;
+            _state.IsPlayingMedia = true;
         }
 
-        if (_data.IsThinkingPaused)
+        if (_state.IsThinkingPaused)
         {
-            _data.IsThinkingPaused = false;
-            _data.IsThinking = true;
+            _state.IsThinkingPaused = false;
+            _state.IsThinking = true;
         }
 
         AddHistory($"Pause resumed ({Runner.PrintOldTasks()} {StopReason})");
 
         try
         {
-            var maxPressingTime = _data.TimeSettings.ButtonPressing * 10;
+            var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
             times[1] = maxPressingTime - ResumeExecution();
         }
         catch (Exception exc)
@@ -892,36 +892,36 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnThemeDeleted(int themeIndex)
     {
-        if (themeIndex < 0 || themeIndex >= _data.TInfo.RoundInfo.Count)
+        if (themeIndex < 0 || themeIndex >= _state.TInfo.RoundInfo.Count)
         {
             var errorMessage = new StringBuilder(themeIndex.ToString())
                 .Append(' ')
-                .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"({t.Name != QuestionHelper.InvalidThemeName} {t.Questions.Count})")))
+                .Append(string.Join("|", _state.TInfo.RoundInfo.Select(t => $"({t.Name != QuestionHelper.InvalidThemeName} {t.Questions.Count})")))
                 .Append(' ')
-                .Append(_data.ThemeIndexToDelete);
+                .Append(_state.ThemeIndexToDelete);
 
             throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
         }
 
-        if (_data.ThemeDeleters == null || _data.ThemeDeleters.IsEmpty())
+        if (_state.ThemeDeleters == null || _state.ThemeDeleters.IsEmpty())
         {
             throw new InvalidOperationException("_data.ThemeDeleters are undefined");
         }
 
-        _data.TInfo.RoundInfo[themeIndex].Name = QuestionHelper.InvalidThemeName;
+        _state.TInfo.RoundInfo[themeIndex].Name = QuestionHelper.InvalidThemeName;
 
         _gameActions.SendMessageWithArgs(Messages.Out, themeIndex);
 
-        var playerIndex = _data.ThemeDeleters.Current.PlayerIndex;
-        var themeName = _data.TInfo.RoundInfo[themeIndex].Name;
+        var playerIndex = _state.ThemeDeleters.Current.PlayerIndex;
+        var themeName = _state.TInfo.RoundInfo[themeIndex].Name;
 
         ScheduleExecution(Tasks.MoveNext, 10);
     }
 
     internal void AnnounceFinalTheme(Question question)
     {
-        _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_data.Theme.Name}");
-        _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _data.Theme.Name);
+        _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_state.Theme.Name}");
+        _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _state.Theme.Name);
         _gameActions.SendThemeInfo(overridenQuestionCount: 1);
         
         InitQuestionState(question);
@@ -934,9 +934,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.SendMessage(Messages.Stop);
         _gameActions.SystemReplic($"{LO[nameof(R.GameResults)]}: "); // TODO: REMOVE: replaced by WINNER message
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            _gameActions.SystemReplic($"{_data.Players[i].Name}: {Notion.FormatNumber(_data.Players[i].Sum)}"); // TODO: REMOVE: replaced by WINNER message
+            _gameActions.SystemReplic($"{_state.Players[i].Name}: {Notion.FormatNumber(_state.Players[i].Sum)}"); // TODO: REMOVE: replaced by WINNER message
         }
 
         FillReport();
@@ -944,12 +944,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     }
 
     public void Dispose() =>
-        _data.TaskLock.WithLock(
+        _state.TaskLock.WithLock(
             () =>
             {
                 _taskRunner.Dispose();
 
-                if (_data.Stage != GameStage.Before)
+                if (_state.Stage != GameStage.Before)
                 {
                     SendReport();
                 }
@@ -960,40 +960,40 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void SendReport()
     {
-        if (_data.ReportSent)
+        if (_state.ReportSent)
         {
             return;
         }
 
         FillReport();
 
-        var reviewers = _data.GameResultInfo.Reviews.Keys;
+        var reviewers = _state.GameResultInfo.Reviews.Keys;
 
         foreach (var reviewer in reviewers)
         {
-            if (string.IsNullOrEmpty(_data.GameResultInfo.Reviews[reviewer]))
+            if (string.IsNullOrEmpty(_state.GameResultInfo.Reviews[reviewer]))
             {
-                _data.GameResultInfo.Reviews.Remove(reviewer);
+                _state.GameResultInfo.Reviews.Remove(reviewer);
             }
         }
 
-        _data.Host.SaveReport(_data.GameResultInfo);
-        _data.ReportSent = true;
+        _state.Host.SaveReport(_state.GameResultInfo);
+        _state.ReportSent = true;
     }
 
     private void FillReport()
     {
-        if (_data.GameResultInfo.Duration > TimeSpan.Zero)
+        if (_state.GameResultInfo.Duration > TimeSpan.Zero)
         {
             return;
         }
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            _data.GameResultInfo.Results[_data.Players[i].Name] = _data.Players[i].Sum;
+            _state.GameResultInfo.Results[_state.Players[i].Name] = _state.Players[i].Sum;
         }
 
-        _data.GameResultInfo.Duration = DateTimeOffset.UtcNow.Subtract(_data.GameResultInfo.StartTime);
+        _state.GameResultInfo.Duration = DateTimeOffset.UtcNow.Subtract(_state.GameResultInfo.StartTime);
     }
 
     internal bool Stop(StopReason reason)
@@ -1006,9 +1006,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (reason == StopReason.Decision)
         {
-            _data.IsWaiting = false; // Preventing double message processing
+            _state.IsWaiting = false; // Preventing double message processing
         }
-        else if (reason == StopReason.Appellation && _data.IsWaiting)
+        else if (reason == StopReason.Appellation && _state.IsWaiting)
         {
             StopWaiting();
         }
@@ -1036,7 +1036,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     /// <summary>
     /// Processes decision been made.
     /// </summary>
-    private bool OnDecision() => _data.Decision switch
+    private bool OnDecision() => _state.Decision switch
     {
         DecisionType.StarterChoosing => OnDecisionStarterChoosing(),
         DecisionType.QuestionSelection => OnDecisionQuestionSelection(),
@@ -1055,11 +1055,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private bool OnDecisionQuestionSelection()
     {
-        if (_data.ThemeIndex == -1
-            || _data.ThemeIndex >= _data.TInfo.RoundInfo.Count
-            || _data.QuestionIndex == -1
-            || _data.QuestionIndex >= _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count
-            || !_data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].IsActive())
+        if (_state.ThemeIndex == -1
+            || _state.ThemeIndex >= _state.TInfo.RoundInfo.Count
+            || _state.QuestionIndex == -1
+            || _state.QuestionIndex >= _state.TInfo.RoundInfo[_state.ThemeIndex].Questions.Count
+            || !_state.TInfo.RoundInfo[_state.ThemeIndex].Questions[_state.QuestionIndex].IsActive())
         {
             return false;
         }
@@ -1071,34 +1071,34 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private bool OnDecisionQuestionAnswererSelection()
     {
-        if (_data.Answerer == null)
+        if (_state.Answerer == null)
         {
             return false;
         }
 
         StopWaiting();
 
-        var s = _data.ChooserIndex == _data.AnswererIndex ? LO[nameof(R.ToMyself)] : _data.Answerer.Name;
+        var s = _state.ChooserIndex == _state.AnswererIndex ? LO[nameof(R.ToMyself)] : _state.Answerer.Name;
 
-        _data.ChooserIndex = _data.AnswererIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, "+");
+        _state.ChooserIndex = _state.AnswererIndex;
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
         ScheduleExecution(Tasks.MoveNext, 10);
         return true;
     }
 
     private bool OnDecisionQuestionPriceSelection()
     {
-        if (_data.CurPriceRight == -1)
+        if (_state.CurPriceRight == -1)
         {
             return false;
         }
 
         StopWaiting();
 
-        _data.CurPriceWrong = _data.CurPriceRight;
+        _state.CurPriceWrong = _state.CurPriceRight;
 
-        _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, "+");
+        _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
 
         ScheduleExecution(Tasks.MoveNext, 20);
 
@@ -1107,7 +1107,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private bool OnDecisionHiddenStakeMaking()
     {
-        if (_data.HiddenStakerCount != 0)
+        if (_state.HiddenStakerCount != 0)
         {
             return false;
         }
@@ -1126,14 +1126,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private bool OnDecisionNextPersonFinalThemeDeleting()
     {
-        if (_data.ThemeDeleters == null || _data.ThemeDeleters.Current.PlayerIndex == -1)
+        if (_state.ThemeDeleters == null || _state.ThemeDeleters.Current.PlayerIndex == -1)
         {
             return false;
         }
 
         StopWaiting();
-        _gameActions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {_data.Players[_data.ThemeDeleters.Current.PlayerIndex].Name}");
-        _data.ThemeDeleters.MoveBack();
+        _gameActions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {_state.Players[_state.ThemeDeleters.Current.PlayerIndex].Name}");
+        _state.ThemeDeleters.MoveBack();
         ScheduleExecution(Tasks.AskToDelete, 1);
         return true;
     }
@@ -1147,7 +1147,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private bool OnDecisionThemeDeleting()
     {
-        if (_data.ThemeIndexToDelete == -1)
+        if (_state.ThemeIndexToDelete == -1)
         {
             return false;
         }
@@ -1159,70 +1159,70 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private bool OnDecisionStakeMaking()
     {
-        if (!_data.StakeType.HasValue)
+        if (!_state.StakeType.HasValue)
         {
             return false;
         }
 
         StopWaiting();
 
-        if (_data.OrderIndex == -1)
+        if (_state.OrderIndex == -1)
         {
-            throw new ArgumentException($"{nameof(_data.OrderIndex)} == -1! {_data.OrderHistory}", nameof(_data.OrderIndex));
+            throw new ArgumentException($"{nameof(_state.OrderIndex)} == -1! {_state.OrderHistory}", nameof(_state.OrderIndex));
         }
 
-        var playerIndex = _data.Order[_data.OrderIndex];
+        var playerIndex = _state.Order[_state.OrderIndex];
 
-        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+        if (playerIndex < 0 || playerIndex >= _state.Players.Count)
         {
-            throw new ArgumentException($"{nameof(playerIndex)} == ${playerIndex} but it must be in [0; ${_data.Players.Count - 1}]! ${_data.OrderHistory}", nameof(playerIndex));
+            throw new ArgumentException($"{nameof(playerIndex)} == ${playerIndex} but it must be in [0; ${_state.Players.Count - 1}]! ${_state.OrderHistory}", nameof(playerIndex));
         }
 
-        var stakeMaking = string.Join(",", _data.Players.Select(p => p.StakeMaking));
-        var stakeSum = _data.StakeType == StakeMode.Sum ? _data.StakeSum.ToString() : "";
-        _data.OrderHistory.Append($"Stake received: {playerIndex} {_data.StakeType.Value} {stakeSum} {stakeMaking}").AppendLine();
+        var stakeMaking = string.Join(",", _state.Players.Select(p => p.StakeMaking));
+        var stakeSum = _state.StakeType == StakeMode.Sum ? _state.StakeSum.ToString() : "";
+        _state.OrderHistory.Append($"Stake received: {playerIndex} {_state.StakeType.Value} {stakeSum} {stakeMaking}").AppendLine();
 
-        if (_data.StakeType == StakeMode.Nominal)
+        if (_state.StakeType == StakeMode.Nominal)
         {
-            _data.Stake = _data.CurPriceRight;
-            _data.Stakes.StakerIndex = playerIndex;
+            _state.Stake = _state.CurPriceRight;
+            _state.Stakes.StakerIndex = playerIndex;
         }
-        else if (_data.StakeType == StakeMode.Sum)
+        else if (_state.StakeType == StakeMode.Sum)
         {
-            _data.Stake = _data.StakeSum;
-            _data.Stakes.StakerIndex = playerIndex;
+            _state.Stake = _state.StakeSum;
+            _state.Stakes.StakerIndex = playerIndex;
         }
-        else if (_data.StakeType == StakeMode.Pass)
+        else if (_state.StakeType == StakeMode.Pass)
         {
-            _data.Players[playerIndex].StakeMaking = false;
+            _state.Players[playerIndex].StakeMaking = false;
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass, playerIndex);
             _gameActions.SendMessage(passMsg.ToString());
         }
         else
         {
-            _data.Stake = _data.Players[playerIndex].Sum;
-            _data.Stakes.StakerIndex = playerIndex;
-            _data.AllIn = true;
+            _state.Stake = _state.Players[playerIndex].Sum;
+            _state.Stakes.StakerIndex = playerIndex;
+            _state.AllIn = true;
         }
 
-        var printedStakeType = _data.StakeType == StakeMode.Nominal ? StakeMode.Sum : _data.StakeType;
+        var printedStakeType = _state.StakeType == StakeMode.Nominal ? StakeMode.Sum : _state.StakeType;
 
         var stakeMessage = new MessageBuilder(Messages.PersonStake, playerIndex, (int)printedStakeType);
 
         if (printedStakeType == StakeMode.Sum)
         {
-            stakeMessage.Add(_data.Stake);
+            stakeMessage.Add(_state.Stake);
         }
 
         _gameActions.SendMessage(stakeMessage.Build());
 
-        if (_data.StakeType != StakeMode.Pass)
+        if (_state.StakeType != StakeMode.Pass)
         {
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                var player = _data.Players[i];
+                var player = _state.Players[i];
 
-                if (i != _data.Stakes.StakerIndex && player.StakeMaking && player.Sum <= _data.Stake)
+                if (i != _state.Stakes.StakerIndex && player.StakeMaking && player.Sum <= _state.Stake)
                 {
                     player.StakeMaking = false;
                     _gameActions.SendMessageWithArgs(Messages.PersonStake, i, 2);
@@ -1230,20 +1230,20 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        var stakeMaking2 = string.Join(",", _data.Players.Select(p => p.StakeMaking));
-        _data.OrderHistory.Append($"Stake making updated: {stakeMaking2}").AppendLine();
+        var stakeMaking2 = string.Join(",", _state.Players.Select(p => p.StakeMaking));
+        _state.OrderHistory.Append($"Stake making updated: {stakeMaking2}").AppendLine();
 
         if (TryDetectStakesWinner())
         {
             return true;
         }
 
-        var stakerCount = _data.Players.Count(p => p.StakeMaking);
+        var stakerCount = _state.Players.Count(p => p.StakeMaking);
 
         if (stakerCount == 0)
         {
             _tasksHistory.AddLogEntry("Skipping question");
-            _data.SkipQuestion?.Invoke();
+            _state.SkipQuestion?.Invoke();
             ScheduleExecution(Tasks.MoveNext, 10);
 
             return true;
@@ -1255,12 +1255,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private bool OnDecisionAnswerValidating()
     {
-        if (!_data.ShowmanDecision)
+        if (!_state.ShowmanDecision)
         {
             return false;
         }
 
-        if (_data.Answerer == null)
+        if (_state.Answerer == null)
         {
             throw new Exception("_data.Answerer == null");
         }
@@ -1270,39 +1270,39 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         int updateSum;
         var multipleAnswerers = HaveMultipleAnswerers();
 
-        if (_data.Answerer.AnswerIsRight)
+        if (_state.Answerer.AnswerIsRight)
         {
-            var showmanReplic = _data.QuestionPlayState.UseButtons ? nameof(R.Right) : nameof(R.Bravo);
+            var showmanReplic = _state.QuestionPlay.UseButtons ? nameof(R.Right) : nameof(R.Bravo);
             var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
-            var canonicalAnswer = _data.Question?.Right.FirstOrDefault();
-            var isAnswerCanonical = canonicalAnswer != null && (_data.Answerer.Answer ?? "").Simplify().Contains(canonicalAnswer.Simplify());
+            var canonicalAnswer = _state.Question?.Right.FirstOrDefault();
+            var isAnswerCanonical = canonicalAnswer != null && (_state.Answerer.Answer ?? "").Simplify().Contains(canonicalAnswer.Simplify());
 
             if (canonicalAnswer != null && !isAnswerCanonical)
             {
-                _data.GameResultInfo.AcceptedAnswers.Add(new QuestionReport
+                _state.GameResultInfo.AcceptedAnswers.Add(new QuestionReport
                 {
-                    ThemeName = _data.Theme.Name,
-                    QuestionText = _data.Question?.GetText(),
-                    ReportText = _data.Answerer.Answer
+                    ThemeName = _state.Theme.Name,
+                    QuestionText = _state.Question?.GetText(),
+                    ReportText = _state.Answerer.Answer
                 });
             }
 
-            if (_data.Answerer.IsHuman)
+            if (_state.Answerer.IsHuman)
             {
-                _data.GameResultInfo.IncrementQuestionCorrectCount(_data.QuestionPlayState.QuestionKey);
+                _state.GameResultInfo.IncrementQuestionCorrectCount(_state.QuestionPlay.QuestionKey);
             }
 
-            if (!_data.QuestionPlayState.HiddenStakes)
+            if (!_state.QuestionPlay.HiddenStakes)
             {
-                var outcome = _data.CurPriceRight;
-                updateSum = (int)(outcome * _data.Answerer.AnswerValidationFactor);
+                var outcome = _state.CurPriceRight;
+                updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
 
-                s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerValidationFactor)})");
+                s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");
 
                 _gameActions.ShowmanReplic(s.ToString());
-                _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, updateSum);
-                AddRightSum(_data.Answerer, updateSum);
+                _gameActions.SendMessageWithArgs(Messages.Person, '+', _state.AnswererIndex, updateSum);
+                AddRightSum(_state.Answerer, updateSum);
                 _gameActions.InformSums();
 
                 if (multipleAnswerers)
@@ -1312,17 +1312,17 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 else
                 {
                     if (GetTurnSwitchingStrategy() == TurnSwitchingStrategy.ByRightAnswerOnButton &&
-                        _data.QuestionPlayState.UseButtons &&
-                        _data.ChooserIndex != _data.AnswererIndex)
+                        _state.QuestionPlay.UseButtons &&
+                        _state.ChooserIndex != _state.AnswererIndex)
                     {
-                        _data.ChooserIndex = _data.AnswererIndex;
-                        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
+                        _state.ChooserIndex = _state.AnswererIndex;
+                        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
                     }
 
                     // TODO: many of these lines are redundand in Special questions
-                    _data.IsQuestionAskPlaying = false;
+                    _state.IsQuestionAskPlaying = false;
 
-                    _data.IsThinking = false;
+                    _state.IsThinking = false;
                     _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Stop);
 
                     MoveToAnswer(); // Question is answered correctly
@@ -1332,8 +1332,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             else
             {
                 _gameActions.ShowmanReplic(s.ToString());
-                _data.PlayerIsRight = true;
-                updateSum = _data.Answerer.PersonalStake;
+                _state.PlayerIsRight = true;
+                updateSum = _state.Answerer.PersonalStake;
                 ScheduleExecution(Tasks.AnnounceStake, 15);
             }
         }
@@ -1341,16 +1341,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             var s = new StringBuilder();
 
-            if (_data.Answerer.Answer != LO[nameof(R.IDontKnow)])
+            if (_state.Answerer.Answer != LO[nameof(R.IDontKnow)])
             {
                 s.Append(GetRandomString(LO[nameof(R.Wrong)])).Append(' ');
             }
 
-            var outcome = _data.CurPriceWrong;
+            var outcome = _state.CurPriceWrong;
 
-            if (_data.QuestionPlayState.AnswerOptions != null && _data.Answerer.Answer != null)
+            if (_state.QuestionPlay.AnswerOptions != null && _state.Answerer.Answer != null)
             {
-                var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
+                var answerIndex = Array.FindIndex(_state.QuestionPlay.AnswerOptions, o => o.Label == _state.Answerer.Answer);
 
                 if (answerIndex > -1)
                 {
@@ -1359,39 +1359,39 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 if (!HaveMultipleAnswerers())
                 {
-                    _data.QuestionPlayState.UsedAnswerOptions.Add(_data.Answerer.Answer);
+                    _state.QuestionPlay.UsedAnswerOptions.Add(_state.Answerer.Answer);
                 }
             }
 
-            if (_data.Answerer.IsHuman)
+            if (_state.Answerer.IsHuman)
             {
-                _data.GameResultInfo.IncrementQuestionWrongCount(_data.QuestionPlayState.QuestionKey);
+                _state.GameResultInfo.IncrementQuestionWrongCount(_state.QuestionPlay.QuestionKey);
             }
 
-            if (!_data.QuestionPlayState.HiddenStakes)
+            if (!_state.QuestionPlay.HiddenStakes)
             {
-                s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_data.Answerer.AnswerValidationFactor)})");                
+                s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");                
                 _gameActions.ShowmanReplic(s.ToString());
 
-                if (_data.Answerer.AnswerValidationFactor == 0)
+                if (_state.Answerer.AnswerValidationFactor == 0)
                 {
-                    _gameActions.SendMessageWithArgs(Messages.Pass, _data.AnswererIndex);
+                    _gameActions.SendMessageWithArgs(Messages.Pass, _state.AnswererIndex);
                     updateSum = -1;
                 }
                 else
                 {
-                    updateSum = (int)(outcome * _data.Answerer.AnswerValidationFactor);
-                    _gameActions.SendMessageWithArgs(Messages.Person, '-', _data.AnswererIndex, updateSum);
-                    SubtractWrongSum(_data.Answerer, updateSum);
+                    updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
+                    _gameActions.SendMessageWithArgs(Messages.Person, '-', _state.AnswererIndex, updateSum);
+                    SubtractWrongSum(_state.Answerer, updateSum);
                     _gameActions.InformSums();
 
-                    if (_data.Answerer.IsHuman)
+                    if (_state.Answerer.IsHuman)
                     {
-                        _data.GameResultInfo.RejectedAnswers.Add(new QuestionReport
+                        _state.GameResultInfo.RejectedAnswers.Add(new QuestionReport
                         {
-                            ThemeName = _data.Theme.Name,
-                            QuestionText = _data.Question?.GetText(),
-                            ReportText = _data.Answerer.Answer
+                            ThemeName = _state.Theme.Name,
+                            QuestionText = _state.Question?.GetText(),
+                            ReportText = _state.Answerer.Answer
                         });
                     }
                 }
@@ -1402,15 +1402,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 }
                 else
                 {
-                    _data.Answerer.CanPress = false;
+                    _state.Answerer.CanPress = false;
                     ScheduleExecution(Tasks.ContinueQuestion, 1);
                 }
             }
             else
             {
                 _gameActions.ShowmanReplic(s.ToString());
-                _data.PlayerIsRight = false;
-                updateSum = _data.Answerer.PersonalStake;
+                _state.PlayerIsRight = false;
+                updateSum = _state.Answerer.PersonalStake;
 
                 ScheduleExecution(Tasks.AnnounceStake, 15);
             }
@@ -1418,14 +1418,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (updateSum >= 0)
         {
-            var answerResult = new AnswerResult(_data.AnswererIndex, _data.Answerer.AnswerIsRight, updateSum);
-            _data.QuestionHistory.Add(answerResult);
+            var answerResult = new AnswerResult(_state.AnswererIndex, _state.Answerer.AnswerIsRight, updateSum);
+            _state.QuestionHistory.Add(answerResult);
         }
 
         return true;
     }
 
-    private TurnSwitchingStrategy GetTurnSwitchingStrategy() => _data.Settings.AppSettings.GameMode switch
+    private TurnSwitchingStrategy GetTurnSwitchingStrategy() => _state.Settings.AppSettings.GameMode switch
     {
         GameModes.Tv => TurnSwitchingStrategy.ByRightAnswerOnButton,
         GameModes.Sport => TurnSwitchingStrategy.Never,
@@ -1441,12 +1441,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     /// </summary>
     internal void MoveToAnswer()
     {
-        if (_data.IsQuestionFinished)
+        if (_state.IsQuestionFinished)
         {
             return;
         }
 
-        if (_data.QuestionPlayState.AnswerOptions != null)
+        if (_state.QuestionPlay.AnswerOptions != null)
         {
             _continuation = null; // Erase AskAnswer continuation (TODO: very difficult to track everywhere - can this be simplified?)
         }
@@ -1459,7 +1459,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     /// </summary>
     public void ContinueQuestion()
     {
-        if (!_data.QuestionPlayState.UseButtons)
+        if (!_state.QuestionPlay.UseButtons)
         {
             // No need to move to answer as special questions could be different
             // TODO: in the future there could be situations when special questions could be unfinished here
@@ -1467,7 +1467,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        var canAnybodyPress = _data.Players.Any(player => player.CanPress && player.IsConnected);
+        var canAnybodyPress = _state.Players.Any(player => player.CanPress && player.IsConnected);
 
         if (!canAnybodyPress)
         {
@@ -1476,9 +1476,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        if (_data.QuestionPlayState.AnswerOptions != null)
+        if (_state.QuestionPlay.AnswerOptions != null)
         {
-            var oneOptionLeft = _data.QuestionPlayState.UsedAnswerOptions.Count + 1 == _data.QuestionPlayState.AnswerOptions.Length;
+            var oneOptionLeft = _state.QuestionPlay.UsedAnswerOptions.Count + 1 == _state.QuestionPlay.AnswerOptions.Length;
 
             if (oneOptionLeft)
             {
@@ -1488,76 +1488,76 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        _data.PendingAnswererIndex = -1;
-        _data.AnswererPressDuration = -1;
-        _data.PendingAnswererIndicies.Clear();
+        _state.PendingAnswererIndex = -1;
+        _state.AnswererPressDuration = -1;
+        _state.PendingAnswererIndicies.Clear();
 
         _gameActions.SendMessage(Messages.Resume); // To resume the media
 
-        if (_data.Settings.AppSettings.FalseStart || _data.IsQuestionFinished)
+        if (_state.Settings.AppSettings.FalseStart || _state.IsQuestionFinished)
         {
             ScheduleExecution(Tasks.AskToTry, 1, 1, true);
             return;
         }
 
         _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
-        _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
+        _state.IsPlayingMedia = _state.IsPlayingMediaPaused;
 
         // Resume question playing
-        if (_data.IsPartial)
+        if (_state.IsPartial)
         {
-            _data.InitialPartialTextLength = _data.TextLength;
-            _data.PartialIterationCounter = 0;
+            _state.InitialPartialTextLength = _state.TextLength;
+            _state.PartialIterationCounter = 0;
             ScheduleExecution(Tasks.PrintPartial, 5, force: true);
         }
         else
         {
-            var waitTime = _data.IsPlayingMedia && _data.QuestionPlayState.MediaContentCompletions.All(p => p.Value.Current > 0)
-                ? 30 + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10
-                : _data.AtomTime;
+            var waitTime = _state.IsPlayingMedia && _state.QuestionPlay.MediaContentCompletions.All(p => p.Value.Current > 0)
+                ? 30 + _state.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10
+                : _state.AtomTime;
 
             ScheduleExecution(Tasks.MoveNext, waitTime, force: true);
         }
 
         SendTryToPlayers();
-        _data.Decision = DecisionType.Pressing;
+        _state.Decision = DecisionType.Pressing;
     }
 
     private bool OnDecisionNextPersonStakeMaking()
     {
-        var playerIndex = _data.Order[_data.OrderIndex];
+        var playerIndex = _state.Order[_state.OrderIndex];
         if (playerIndex == -1)
         {
             return false;
         }
 
-        if (playerIndex >= _data.Players.Count)
+        if (playerIndex >= _state.Players.Count)
         {
-            throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0;{_data.Players.Count - 1}]");
+            throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0;{_state.Players.Count - 1}]");
         }
 
         StopWaiting();
 
-        var s = $"{LO[nameof(R.StakeMakes)]} {_data.Players[playerIndex].Name}";
+        var s = $"{LO[nameof(R.StakeMakes)]} {_state.Players[playerIndex].Name}";
         _gameActions.ShowmanReplic(s);
 
-        _data.OrderIndex--;
+        _state.OrderIndex--;
         ScheduleExecution(Tasks.AskStake, 10);
         return true;
     }
 
     private bool OnDecisionStarterChoosing()
     {
-        if (_data.ChooserIndex == -1)
+        if (_state.ChooserIndex == -1)
         {
             return false;
         }
 
         StopWaiting();
 
-        var msg = string.Format(GetRandomString(LO[nameof(R.InformChooser)]), _data.Chooser.Name);
+        var msg = string.Format(GetRandomString(LO[nameof(R.InformChooser)]), _state.Chooser.Name);
         _gameActions.ShowmanReplic(msg); // TODO: REMOVE: replaced by SETCHOOSER message
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, "-", "INITIAL");
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");
         
         ScheduleExecution(Tasks.MoveNext, 20);
 
@@ -1566,24 +1566,24 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void RunRoundTimer()
     {
-        _data.TimerStartTime[0] = DateTime.UtcNow;
-        _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _data.TimeSettings.Round * 10);
+        _state.TimerStartTime[0] = DateTime.UtcNow;
+        _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _state.TimeSettings.Round * 10);
     }
 
     private bool OnDecisionAnswering()
     {
         if (!HaveMultipleAnswerers())
         {
-            if (_data.Answerer == null || string.IsNullOrEmpty(_data.Answerer.Answer))
+            if (_state.Answerer == null || string.IsNullOrEmpty(_state.Answerer.Answer))
             {
                 return false;
             }
 
             StopWaiting();
 
-            if (_data.QuestionPlayState.AnswerOptions != null)
+            if (_state.QuestionPlay.AnswerOptions != null)
             {
-                var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
+                var answerIndex = Array.FindIndex(_state.QuestionPlay.AnswerOptions, o => o.Label == _state.Answerer.Answer);
 
                 if (answerIndex > -1)
                 {
@@ -1595,11 +1595,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _gameActions.PlayerReplic(_data.AnswererIndex, _data.Answerer.Answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
-                _gameActions.SendMessageWithArgs(Messages.PlayerAnswer, _data.AnswererIndex, _data.Answerer.Answer);
+                _gameActions.PlayerReplic(_state.AnswererIndex, _state.Answerer.Answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
+                _gameActions.SendMessageWithArgs(Messages.PlayerAnswer, _state.AnswererIndex, _state.Answerer.Answer);
             }
 
-            if (_data.IsOralNow)
+            if (_state.IsOralNow)
             {
                 AskRight();
             }
@@ -1616,12 +1616,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var s = GetRandomString(LO[nameof(R.LetsSee)]);
         _gameActions.ShowmanReplic(s);
 
-        var answererIndicies = _data.QuestionPlayState.AnswererIndicies.OrderBy(index => _data.Players[index].Sum);
-        _data.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
+        var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
+        _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
 
-        if (_data.QuestionPlayState.AnswerOptions != null)
+        if (_state.QuestionPlay.AnswerOptions != null)
         {
-            var m = new MessageBuilder(Messages.Answers).AddRange(_data.Players.Select(p => p.Answer ?? ""));
+            var m = new MessageBuilder(Messages.Answers).AddRange(_state.Players.Select(p => p.Answer ?? ""));
             _gameActions.SendMessage(m.ToString());
             ScheduleExecution(Tasks.MoveNext, 30, 1, true);
             return true;
@@ -1631,12 +1631,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         return true;
     }
 
-    public bool HaveMultipleAnswerers() => _data.QuestionPlayState.AreMultipleAnswerers;
+    public bool HaveMultipleAnswerers() => _state.QuestionPlay.AreMultipleAnswerers;
 
     public void StopWaiting()
     {
-        _data.IsWaiting = false;
-        _data.Decision = DecisionType.None;
+        _state.IsWaiting = false;
+        _state.Decision = DecisionType.None;
 
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
     }
@@ -1648,7 +1648,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void PlanExecution(Tasks task, double taskTime, int arg = 0)
     {
-        _tasksHistory.AddLogEntry($"PlanExecution {task} {taskTime} {arg} ({_data.TInfo.Pause})");
+        _tasksHistory.AddLogEntry($"PlanExecution {task} {taskTime} {arg} ({_state.TInfo.Pause})");
 
         if (_taskRunner.IsExecutionPaused)
         {
@@ -1662,7 +1662,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
     {
-        if (_data.IsDeferringAnswer)
+        if (_state.IsDeferringAnswer)
         {
             // AskAnswerDeferred task cannot be avoided
             _tasksHistory.AddLogEntry($"AskAnswerDeferred task blocks scheduling ({_taskRunner.CurrentTask}): {task} {arg} {taskTime / 10}");
@@ -1673,7 +1673,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _taskRunner.ScheduleExecution(task, taskTime, arg, force || ShouldRunTimer());
     }
 
-    private bool ShouldRunTimer() => !_data.Settings.AppSettings.Managed || _data.HostName == null || !_data.AllPersons.ContainsKey(_data.HostName);
+    private bool ShouldRunTimer() => !_state.Settings.AppSettings.Managed || _state.HostName == null || !_state.AllPersons.ContainsKey(_state.HostName);
 
     /// <summary>
     /// Executes current task of the game state machine.
@@ -1682,7 +1682,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         try
         {
-            _data.TaskLock.WithLock(() =>
+            _state.TaskLock.WithLock(() =>
             {
                 if (Engine == null) // disposed
                 {
@@ -1710,7 +1710,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     static string oldTaskPrinter(Tuple<Tasks, int, int> t) => $"{t.Item1}:{t.Item2}";
 
-                    _data.Host.SendError(
+                    _state.Host.SendError(
                         new Exception(
                             $"Hanging old tasks: {string.Join(", ", _taskRunner.OldTasks.Select(oldTaskPrinter))};" +
                             $" Task: {task}, param: {arg}, history: {_tasksHistory}"),
@@ -1730,11 +1730,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         break;
 
                     case Tasks.Package:
-                        OnPackage(_data.Package, arg);
+                        OnPackage(_state.Package, arg);
                         break;
 
                     case Tasks.Round:
-                        OnRound(_data.Round, arg);
+                        OnRound(_state.Round, arg);
                         break;
 
                     case Tasks.RoundTheme:
@@ -1759,7 +1759,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                     case Tasks.Theme:
                     case Tasks.ThemeInfo:
-                        OnTheme(_data.Theme, arg, task == Tasks.Theme);
+                        OnTheme(_state.Theme, arg, task == Tasks.Theme);
                         break;
 
                     case Tasks.QuestionStartInfo:
@@ -1899,9 +1899,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         catch (Exception exc)
         {
-            _data.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
+            _state.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
             ScheduleExecution(Tasks.NoTask, 10);
-            _data.MoveNextBlocked = true;
+            _state.MoveNextBlocked = true;
             _gameActions.SpecialReplic("Game ERROR"); // TODO: REMOVE+
             _gameActions.SendMessageWithArgs(Messages.GameError);
         }
@@ -1909,37 +1909,37 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void OnRoundTheme(int themeIndex)
     {
-        if (themeIndex < 0 || themeIndex >= _data.TInfo.RoundInfo.Count)
+        if (themeIndex < 0 || themeIndex >= _state.TInfo.RoundInfo.Count)
         {
-            throw new ArgumentException($"{nameof(themeIndex)} {themeIndex} must be in [0;{_data.TInfo.RoundInfo.Count - 1}]");
+            throw new ArgumentException($"{nameof(themeIndex)} {themeIndex} must be in [0;{_state.TInfo.RoundInfo.Count - 1}]");
         }
 
         _gameActions.SendThemeInfo(themeIndex, true);
 
-        if (themeIndex + 1 < _data.TInfo.RoundInfo.Count)
+        if (themeIndex + 1 < _state.TInfo.RoundInfo.Count)
         {
             ScheduleExecution(Tasks.RoundTheme, 19, themeIndex + 1);
         }
         else
         {
             InformTable();
-            _data.ThemesPlayMode = ThemesPlayMode.None;
+            _state.ThemesPlayMode = ThemesPlayMode.None;
             ScheduleExecution(Tasks.AskFirst, 19);
         }
     }
 
-    private void InformTable() => _data.TableInformStageLock.WithLock(
+    private void InformTable() => _state.TableInformStageLock.WithLock(
         () =>
         {
             _gameActions.InformTable();
-            _data.InformStages |= InformStages.Table;
+            _state.InformStages |= InformStages.Table;
         },
         5000);
 
     private void AskAnswerDeferred()
     {
-        _data.Decision = DecisionType.None;
-        _data.IsDeferringAnswer = false;
+        _state.Decision = DecisionType.None;
+        _state.IsDeferringAnswer = false;
 
         if (!PrepareForAskAnswer())
         {
@@ -1956,8 +1956,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var newTask = task;
 
         var stopReasonDetails = _stopReason == StopReason.Move
-            ? _data.MoveDirection.ToString()
-            : (_stopReason == StopReason.Decision ? _data.Decision.ToString() : "");
+            ? _state.MoveDirection.ToString()
+            : (_stopReason == StopReason.Decision ? _state.Decision.ToString() : "");
 
         _tasksHistory.AddLogEntry($"StopReason {_stopReason} {stopReasonDetails}");
 
@@ -1968,31 +1968,30 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {_taskRunner.PrintOldTasks()}");
                 _taskRunner.PauseExecution(task, arg, _leftTime);
 
-                _data.PauseStartTime = DateTime.UtcNow;
+                _state.PauseStartTime = DateTime.UtcNow;
 
-                if (_data.IsPlayingMedia)
+                if (_state.IsPlayingMedia)
                 {
-                    _data.IsPlayingMediaPaused = true;
-                    _data.IsPlayingMedia = false;
+                    _state.IsPlayingMediaPaused = true;
+                    _state.IsPlayingMedia = false;
                 }
 
-                if (_data.IsThinking)
+                if (_state.IsThinking)
                 {
-                    var startTime = _data.TimerStartTime[1];
+                    var startTime = _state.TimerStartTime[1];
 
-                    _data.TimeThinking += _data.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
-                    _data.IsThinkingPaused = true;
-                    _data.IsThinking = false;
+                    _state.TimeThinking += _state.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
+                    _state.IsThinkingPaused = true;
+                    _state.IsThinking = false;
                 }
 
                 var times = new int[Constants.TimersCount];
 
                 for (var i = 0; i < Constants.TimersCount; i++)
                 {
-                    times[i] = (int)(_data.PauseStartTime.Subtract(_data.TimerStartTime[i]).TotalMilliseconds / 100);
+                    times[i] = (int)(_state.PauseStartTime.Subtract(_state.TimerStartTime[i]).TotalMilliseconds / 100);
                 }
 
-                _gameActions.SystemReplic(LO[nameof(R.PauseInGame)]); // TODO: REMOVE: replaced by PAUSE message
                 _gameActions.SendMessageWithArgs(Messages.Pause, '+', times[0], times[1], times[2]);
                 break;
 
@@ -2019,7 +2018,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 break;
 
             case StopReason.Move:
-                switch (_data.MoveDirection)
+                switch (_state.MoveDirection)
                 {
                     case MoveDirections.RoundBack:
                         if (Engine.CanMoveBackRound)
@@ -2056,22 +2055,22 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                         if (task == Tasks.PrintPartial) // Skip partial printing
                         {
-                            var subText = _data.Text[_data.TextLength..];
+                            var subText = _state.Text[_state.TextLength..];
 
                             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
                             _gameActions.SystemReplic(subText); // TODO: REMOVE: replaced by CONTENT_APPEND message
 
                             newTask = Tasks.MoveNext;
                         }
-                        else if (task == Tasks.RoundTheme && !_data.Settings.AppSettings.Managed) // Skip all round themes
+                        else if (task == Tasks.RoundTheme && !_state.Settings.AppSettings.Managed) // Skip all round themes
                         {
-                            for (var themeIndex = arg; themeIndex < _data.TInfo.RoundInfo.Count; themeIndex++)
+                            for (var themeIndex = arg; themeIndex < _state.TInfo.RoundInfo.Count; themeIndex++)
                             {
                                 _gameActions.SendThemeInfo(themeIndex, true);
                             }
 
                             InformTable();
-                            _data.ThemesPlayMode = ThemesPlayMode.None;
+                            _state.ThemesPlayMode = ThemesPlayMode.None;
                             newTask = Tasks.AskFirst;
                         }
 
@@ -2097,7 +2096,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     case MoveDirections.Round:
                         if (Engine.CanMoveNextRound || Engine.CanMoveBackRound)
                         {
-                            stop = Engine.MoveToRound(_data.TargetRoundIndex);
+                            stop = Engine.MoveToRound(_state.TargetRoundIndex);
 
                             if (!stop)
                             {
@@ -2118,7 +2117,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 if (stop)
                 {
-                    ScheduleExecution(Tasks.MoveNext, _data.MoveDirection == MoveDirections.Next ? 10 : 30);
+                    ScheduleExecution(Tasks.MoveNext, _state.MoveDirection == MoveDirections.Next ? 10 : 30);
                 }
 
                 break;
@@ -2127,8 +2126,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 // TODO: if someone overrides Task after that (skipping AskAnswerDeferred execution), nobody could press the button during this question
                 // That's very fragile logic. Think about alternatives
                 // The order of calls is important here!
-                ScheduleExecution(Tasks.AskAnswerDeferred, _data.WaitInterval, force: true);
-                _data.IsDeferringAnswer = true;
+                ScheduleExecution(Tasks.AskAnswerDeferred, _state.WaitInterval, force: true);
+                _state.IsDeferringAnswer = true;
                 break;
         }
 
@@ -2141,7 +2140,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         _gameActions.ShowmanReplic(LO[nameof(R.GoodLuck)]);
 
-        _data.Stage = GameStage.After;
+        _state.Stage = GameStage.After;
         OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
         _gameActions.InformStage();
 
@@ -2155,7 +2154,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var message = new StringBuilder(LO[nameof(R.GameStatistics)]).Append(':').AppendLine().AppendLine();
 
-        foreach (var (name, statistic) in _data.Statistics)
+        foreach (var (name, statistic) in _state.Statistics)
         {
             msg.AddRange(name, statistic.RightAnswerCount, statistic.WrongAnswerCount, statistic.RightTotal, statistic.WrongTotal);
 
@@ -2174,15 +2173,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void AskForPlayerReviews()
     {
-        _data.ReportsCount = _data.Players.Count;
-        _data.GameResultInfo.Reviews.Clear();
+        _state.ReportsCount = _state.Players.Count;
+        _state.GameResultInfo.Reviews.Clear();
 
         ScheduleExecution(Tasks.WaitReport, 10 * 60 * 2); // 2 minutes
         WaitFor(DecisionType.Reporting, 10 * 60 * 2, -3);
 
-        var reportString = _data.GameResultInfo.ToString(LO);
+        var reportString = _state.GameResultInfo.ToString(LO);
 
-        foreach (var item in _data.Players)
+        foreach (var item in _state.Players)
         {
             _gameActions.SendMessageToWithArgs(item.Name, Messages.Report, reportString);
         }
@@ -2190,26 +2189,26 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitRight()
     {
-        _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+        _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
 
-        if (_data.Answerer == null)
+        if (_state.Answerer == null)
         {
             ScheduleExecution(Tasks.MoveNext, 10);
             return;
         }
 
-        if (_data.Question == null)
+        if (_state.Question == null)
         {
             throw new ArgumentException("_data.Question == null");
         }
 
-        var answer = _data.Answerer.Answer;
-        var isRight = answer != null && AnswerChecker.IsAnswerRight(answer, _data.Question.Right);
+        var answer = _state.Answerer.Answer;
+        var isRight = answer != null && AnswerChecker.IsAnswerRight(answer, _state.Question.Right);
 
-        _data.Answerer.AnswerIsRight = isRight;
-        _data.Answerer.AnswerValidationFactor = 1.0;
+        _state.Answerer.AnswerIsRight = isRight;
+        _state.Answerer.AnswerValidationFactor = 1.0;
 
-        _data.ShowmanDecision = true;
+        _state.ShowmanDecision = true;
         OnDecision();
     }
 
@@ -2217,20 +2216,20 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitSelectQuestionPrice()
     {
-        if (_data.AnswererIndex == -1)
+        if (_state.AnswererIndex == -1)
         {
-            throw new ArgumentException($"{nameof(_data.AnswererIndex)} == -1", nameof(_data.AnswererIndex));
+            throw new ArgumentException($"{nameof(_state.AnswererIndex)} == -1", nameof(_state.AnswererIndex));
         }
 
-        _gameActions.SendMessage(Messages.Cancel, _data.Answerer.Name);
+        _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
-        _data.CurPriceRight = _data.StakeRange.Minimum;
-        _data.CurPriceWrong = _data.StakeRange.Minimum;
+        _state.CurPriceRight = _state.StakeRange.Minimum;
+        _state.CurPriceWrong = _state.StakeRange.Minimum;
 
         OnDecision();
     }
@@ -2243,7 +2242,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void SendCancellationsToActivePlayers()
     {
-        foreach (var player in _data.Players)
+        foreach (var player in _state.Players)
         {
             if (player.Flag)
             {
@@ -2268,29 +2267,29 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         Engine?.MoveNext();
-        _data.MoveNextBlocked = false;
+        _state.MoveNextBlocked = false;
 
         _tasksHistory.AddLogEntry($"Moved -> {Engine?.Stage}");
     }
 
     private void OnAnnounceStakesWinner()
     {
-        var stakerIndex = _data.Stakes.StakerIndex;
+        var stakerIndex = _state.Stakes.StakerIndex;
 
         if (stakerIndex == -1)
         {
-            throw new ArgumentException($"{nameof(OnAnnounceStakesWinner)}: {nameof(stakerIndex)} == -1 {_data.OrderHistory}", nameof(stakerIndex));
+            throw new ArgumentException($"{nameof(OnAnnounceStakesWinner)}: {nameof(stakerIndex)} == -1 {_state.OrderHistory}", nameof(stakerIndex));
         }
 
-        _data.ChooserIndex = stakerIndex;
-        _data.AnswererIndex = stakerIndex;
-        _data.QuestionPlayState.SetSingleAnswerer(stakerIndex);
-        _data.CurPriceRight = _data.Stake;
-        _data.CurPriceWrong = _data.Stake;
+        _state.ChooserIndex = stakerIndex;
+        _state.AnswererIndex = stakerIndex;
+        _state.QuestionPlay.SetSingleAnswerer(stakerIndex);
+        _state.CurPriceRight = _state.Stake;
+        _state.CurPriceWrong = _state.Stake;
 
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, "+");
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
 
-        var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_data.Players[stakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_data.Stake)}";
+        var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_state.Players[stakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_state.Stake)}";
 
         _gameActions.ShowmanReplic(msg.ToString());
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10));
@@ -2298,44 +2297,44 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitNext(bool isSelectingStaker)
     {
-        _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+        _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
-        if (!isSelectingStaker && _data.ThemeDeleters != null && _data.ThemeDeleters.IsEmpty())
+        if (!isSelectingStaker && _state.ThemeDeleters != null && _state.ThemeDeleters.IsEmpty())
         {
             throw new InvalidOperationException("_data.ThemeDeleters are empty");
         }
 
-        var playerIndex = isSelectingStaker ? _data.Order[_data.OrderIndex] : _data.ThemeDeleters?.Current.PlayerIndex;
+        var playerIndex = isSelectingStaker ? _state.Order[_state.OrderIndex] : _state.ThemeDeleters?.Current.PlayerIndex;
 
         if (playerIndex == -1) // The showman has not made a decision
         {
-            var candidates = _data.Players.Where(p => p.Flag).ToArray();
+            var candidates = _state.Players.Where(p => p.Flag).ToArray();
 
             if (candidates.Length == 0)
             {
                 throw new Exception(
                     "Wait next error (candidates.Length == 0): " +
-                    (isSelectingStaker ? "" : _data.ThemeDeleters?.GetRemoveLog()));
+                    (isSelectingStaker ? "" : _state.ThemeDeleters?.GetRemoveLog()));
             }
 
             var index = Random.Shared.Next(candidates.Length);
-            var newPlayerIndex = _data.Players.IndexOf(candidates[index]);
+            var newPlayerIndex = _state.Players.IndexOf(candidates[index]);
 
             if (isSelectingStaker)
             {
-                _data.Order[_data.OrderIndex] = newPlayerIndex;
-                CheckOrder(_data.OrderIndex);
+                _state.Order[_state.OrderIndex] = newPlayerIndex;
+                CheckOrder(_state.OrderIndex);
             }
             else
             {
                 try
                 {
-                    _data.ThemeDeleters?.Current.SetIndex(newPlayerIndex);
+                    _state.ThemeDeleters?.Current.SetIndex(newPlayerIndex);
                 }
                 catch (Exception exc)
                 {
-                    throw new Exception($"Wait delete error ({newPlayerIndex}): " + _data.ThemeDeleters?.GetRemoveLog(), exc);
+                    throw new Exception($"Wait delete error ({newPlayerIndex}): " + _state.ThemeDeleters?.GetRemoveLog(), exc);
                 }
             }
         }
@@ -2345,44 +2344,44 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitStake()
     {
-        if (_data.OrderIndex == -1)
+        if (_state.OrderIndex == -1)
         {
-            throw new ArgumentException($"{nameof(_data.OrderIndex)} == -1: {_data.OrderHistory}");
+            throw new ArgumentException($"{nameof(_state.OrderIndex)} == -1: {_state.OrderHistory}");
         }
 
-        var playerIndex = _data.Order[_data.OrderIndex];
+        var playerIndex = _state.Order[_state.OrderIndex];
 
-        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+        if (playerIndex < 0 || playerIndex >= _state.Players.Count)
         {
-            throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0; {_data.Players.Count - 1}]: {_data.OrderHistory}");
+            throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0; {_state.Players.Count - 1}]: {_state.OrderHistory}");
         }
 
-        _gameActions.SendMessage(Messages.Cancel, _data.Players[playerIndex].Name);
+        _gameActions.SendMessage(Messages.Cancel, _state.Players[playerIndex].Name);
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
-        _data.StakeType = _data.StakeTypes.HasFlag(StakeTypes.Nominal) ? StakeMode.Nominal : StakeMode.Pass;
+        _state.StakeType = _state.StakeTypes.HasFlag(StakeTypes.Nominal) ? StakeMode.Nominal : StakeMode.Pass;
 
         OnDecision();
     }
 
     private void AskToSelectQuestionPrice()
     {
-        var answerer = _data.Answerer ?? throw new InvalidOperationException("Answerer not defined");
+        var answerer = _state.Answerer ?? throw new InvalidOperationException("Answerer not defined");
 
-        var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.StakeRange.Minimum, _data.StakeRange.Maximum, _data.StakeRange.Step);
+        var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _state.StakeRange.Minimum, _state.StakeRange.Maximum, _state.StakeRange.Step);
 
-        var waitTime = _data.TimeSettings.StakeMaking * 10;
+        var waitTime = _state.TimeSettings.StakeMaking * 10;
 
-        _data.IsOralNow = _data.IsOral && answerer.IsHuman;
+        _state.IsOralNow = _state.IsOral && answerer.IsHuman;
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(s, _data.ShowMan.Name);
+            _gameActions.SendMessage(s, _state.ShowMan.Name);
         }
         
         if (CanPlayerAct())
@@ -2395,20 +2394,20 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        _data.StakeModes = StakeModes.Stake;
-        AskToMakeStake(StakeReason.Simple, answerer.Name, _data.StakeRange);
+        _state.StakeModes = StakeModes.Stake;
+        AskToMakeStake(StakeReason.Simple, answerer.Name, _state.StakeRange);
 
         ScheduleExecution(Tasks.WaitSelectQuestionPrice, waitTime);
-        WaitFor(DecisionType.QuestionPriceSelection, waitTime, _data.AnswererIndex);
+        WaitFor(DecisionType.QuestionPriceSelection, waitTime, _state.AnswererIndex);
     }
 
     private void WaitFirst()
     {
-        _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+        _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
 
-        if (_data.ChooserIndex == -1)
+        if (_state.ChooserIndex == -1)
         {
-            _data.ChooserIndex = _data.Players.SelectRandom(p => p.Flag);
+            _state.ChooserIndex = _state.Players.SelectRandom(p => p.Flag);
         }
 
         OnDecision();
@@ -2416,46 +2415,46 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitAnswer()
     {
-        if (_data.Round == null)
+        if (_state.Round == null)
         {
-            throw new ArgumentNullException(nameof(_data.Round));
+            throw new ArgumentNullException(nameof(_state.Round));
         }
 
         if (!HaveMultipleAnswerers())
         {
-            if (_data.Answerer == null)
+            if (_state.Answerer == null)
             {
                 ScheduleExecution(Tasks.MoveNext, 10);
                 return;
             }
 
-            _gameActions.SendMessage(Messages.Cancel, _data.Answerer.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
 
-            if (string.IsNullOrEmpty(_data.Answerer.Answer))
+            if (string.IsNullOrEmpty(_state.Answerer.Answer))
             {
-                _data.Answerer.Answer = LO[nameof(R.IDontKnow)];
-                _data.Answerer.AnswerIsWrong = !_data.IsOralNow;
+                _state.Answerer.Answer = LO[nameof(R.IDontKnow)];
+                _state.Answerer.AnswerIsWrong = !_state.IsOralNow;
             }
         }
         else
         {
-            if (_data.QuestionPlayState.ActiveValidationCount > 0)
+            if (_state.QuestionPlay.ActiveValidationCount > 0)
             {
-                _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name); // Cancel validation
+                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name); // Cancel validation
             }
 
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && string.IsNullOrEmpty(_data.Players[i].Answer))
+                if (_state.QuestionPlay.AnswererIndicies.Contains(i) && string.IsNullOrEmpty(_state.Players[i].Answer))
                 {
-                    _data.Players[i].Answer = LO[nameof(R.IDontKnow)];
-                    _data.Players[i].AnswerIsWrong = true;
+                    _state.Players[i].Answer = LO[nameof(R.IDontKnow)];
+                    _state.Players[i].AnswerIsWrong = true;
                 }
 
-                _gameActions.SendMessage(Messages.Cancel, _data.Players[i].Name);
+                _gameActions.SendMessage(Messages.Cancel, _state.Players[i].Name);
             }
 
-            _data.IsWaiting = true;
+            _state.IsWaiting = true;
         }
 
         OnDecision();
@@ -2463,52 +2462,52 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitQuestionAnswererSelection()
     {
-        _gameActions.SendMessage(Messages.Cancel, _data.Chooser.Name);
+        _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
-        var index = _data.Players.SelectRandomOnIndex(index => index != _data.ChooserIndex);
+        var index = _state.Players.SelectRandomOnIndex(index => index != _state.ChooserIndex);
 
-        _data.AnswererIndex = index;
-        _data.QuestionPlayState.SetSingleAnswerer(index);
+        _state.AnswererIndex = index;
+        _state.QuestionPlay.SetSingleAnswerer(index);
 
         OnDecision();
     }
 
     private void WaitTry()
     {
-        _data.IsThinking = false;
-        _data.Decision = DecisionType.None;
+        _state.IsThinking = false;
+        _state.Decision = DecisionType.None;
 
-        if (_data.QuestionPlayState.UseButtons)
+        if (_state.QuestionPlay.UseButtons)
         {
             _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All); // Timer 1 STOP
         }
 
         ScheduleExecution(Tasks.MoveNext, 1, force: true);
 
-        _data.IsQuestionAskPlaying = false;
+        _state.IsQuestionAskPlaying = false;
     }
 
     private void WaitHiddenStake()
     {
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && _data.Players[i].PersonalStake == -1)
+            if (_state.QuestionPlay.AnswererIndicies.Contains(i) && _state.Players[i].PersonalStake == -1)
             {
-                _gameActions.SendMessage(Messages.Cancel, _data.Players[i].Name);
-                _data.Players[i].PersonalStake = 1;
+                _gameActions.SendMessage(Messages.Cancel, _state.Players[i].Name);
+                _state.Players[i].PersonalStake = 1;
 
                 _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
             }
         }
 
-        _data.HiddenStakerCount = 0;
+        _state.HiddenStakerCount = 0;
         OnDecision();
     }
 
@@ -2516,7 +2515,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         try
         {
-            foreach (var item in _data.Players)
+            foreach (var item in _state.Players)
             {
                 _gameActions.SendMessage(Messages.Cancel, item.Name);
             }
@@ -2526,22 +2525,22 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         catch (Exception exc)
         {
-            _data.Host.SendError(exc);
+            _state.Host.SendError(exc);
         }
     }
 
     private void AnnouncePostStakeWithAnswerOptions()
     {
-        if (_data.AnnouncedAnswerersEnumerator == null || !_data.AnnouncedAnswerersEnumerator.MoveNext())
+        if (_state.AnnouncedAnswerersEnumerator == null || !_state.AnnouncedAnswerersEnumerator.MoveNext())
         {
             PostprocessQuestion();
             return;
         }
 
-        var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
-        _data.AnswererIndex = answererIndex;
+        var answererIndex = _state.AnnouncedAnswerersEnumerator.Current;
+        _state.AnswererIndex = answererIndex;
 
-        _data.PlayerIsRight = _data.Answerer?.Answer == _data.RightOptionLabel;
+        _state.PlayerIsRight = _state.Answerer?.Answer == _state.RightOptionLabel;
         AnnounceStakeCore();
         ScheduleExecution(Tasks.AnnouncePostStakeWithAnswerOptions, 15);
     }
@@ -2554,7 +2553,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void AnnounceStakeCore()
     {
-        var answerer = _data.Answerer;
+        var answerer = _state.Answerer;
 
         if (answerer == null)
         {
@@ -2566,7 +2565,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var message = new MessageBuilder(Messages.Person);
 
-        if (_data.PlayerIsRight)
+        if (_state.PlayerIsRight)
         {
             message.Add('+');
             AddRightSum(answerer, stake);
@@ -2577,12 +2576,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             SubtractWrongSum(answerer, stake);
         }
 
-        message.Add(_data.AnswererIndex).Add(stake);
+        message.Add(_state.AnswererIndex).Add(stake);
 
         _gameActions.SendMessage(message.ToString());
         _gameActions.InformSums();
 
-        _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, stake);
+        _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, stake);
     }
 
     private void AskHiddenStakes()
@@ -2590,71 +2589,71 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var s = GetRandomString(LO[nameof(R.MakeStake)]);
         _gameActions.ShowmanReplic(s);
 
-        _data.HiddenStakerCount = 0;
+        _state.HiddenStakerCount = 0;
         var stakers = new List<(string, StakeSettings)>();
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            if (_data.QuestionPlayState.AnswererIndicies.Contains(i))
+            if (_state.QuestionPlay.AnswererIndicies.Contains(i))
             {
-                if (_data.Players[i].Sum <= 1)
+                if (_state.Players[i].Sum <= 1)
                 {
-                    _data.Players[i].PersonalStake = 1; // only one choice
+                    _state.Players[i].PersonalStake = 1; // only one choice
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                     continue;
                 }
 
-                _data.Players[i].PersonalStake = -1;
-                _data.HiddenStakerCount++;
-                _gameActions.SendMessage(Messages.FinalStake, _data.Players[i].Name);
+                _state.Players[i].PersonalStake = -1;
+                _state.HiddenStakerCount++;
+                _gameActions.SendMessage(Messages.FinalStake, _state.Players[i].Name);
 
-                stakers.Add((_data.Players[i].Name, new(1, _data.Players[i].Sum, 1)));
+                stakers.Add((_state.Players[i].Name, new(1, _state.Players[i].Sum, 1)));
             }
         }
 
-        if (_data.HiddenStakerCount == 0)
+        if (_state.HiddenStakerCount == 0)
         {
             ProceedToHiddenStakesQuestion();
             return;
         }
 
-        _data.IsOralNow = false;
-        _data.StakeModes = StakeModes.Stake;
+        _state.IsOralNow = false;
+        _state.StakeModes = StakeModes.Stake;
         AskToMakeStake(StakeReason.Hidden, stakers);
 
-        var waitTime = _data.TimeSettings.StakeMaking * 10;
+        var waitTime = _state.TimeSettings.StakeMaking * 10;
         ScheduleExecution(Tasks.WaitHiddenStake, waitTime);
         WaitFor(DecisionType.HiddenStakeMaking, waitTime, -2);
     }
 
     private void WaitDelete()
     {
-        _gameActions.SendMessage(Messages.Cancel, _data.ActivePlayer.Name);
+        _gameActions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
-        _data.ThemeIndexToDelete = _data.TInfo.RoundInfo.SelectRandom(item => item.Name != null);
+        _state.ThemeIndexToDelete = _state.TInfo.RoundInfo.SelectRandom(item => item.Name != null);
 
         OnDecision();
     }
 
     private void Winner()
     {
-        var winnerScore = _data.Players.Max(player => player.Sum);
-        var winnerCount = _data.Players.Count(player => player.Sum == winnerScore);
+        var winnerScore = _state.Players.Max(player => player.Sum);
+        var winnerCount = _state.Players.Count(player => player.Sum == winnerScore);
 
         if (winnerCount == 1)
         {
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (_data.Players[i].Sum == winnerScore)
+                if (_state.Players[i].Sum == winnerScore)
                 {
-                    var s = new StringBuilder(_data.Players[i].Name).Append(", ");
+                    var s = new StringBuilder(_state.Players[i].Name).Append(", ");
                     s.Append(GetRandomString(LO[nameof(R.YouWin)]));
 
                     _gameActions.ShowmanReplic(s.ToString());
@@ -2674,50 +2673,50 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void AskToTry(int arg)
     {
-        if (_data.Players.All(p => !p.CanPress))
+        if (_state.Players.All(p => !p.CanPress))
         {
             ScheduleExecution(Tasks.WaitTry, 3, force: true);
             return;
         }
 
-        if (_data.Settings.AppSettings.FalseStart || arg == 1)
+        if (_state.Settings.AppSettings.FalseStart || arg == 1)
         {
             _gameActions.SendMessage(Messages.Try);
         }
 
         SendTryToPlayers();
 
-        var maxTime = _data.TimeSettings.ButtonPressing * 10;
+        var maxTime = _state.TimeSettings.ButtonPressing * 10;
 
-        _data.TimerStartTime[1] = DateTime.UtcNow;
-        _data.IsThinking = true;
+        _state.TimerStartTime[1] = DateTime.UtcNow;
+        _state.IsThinking = true;
         _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Resume);
-        _data.Decision = DecisionType.Pressing;
+        _state.Decision = DecisionType.Pressing;
 
-        ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _data.TimeThinking, 10), force: true);
+        ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _state.TimeThinking, 10), force: true);
     }
 
     private void SendTryToPlayers()
     {
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            if (_data.Players[i].CanPress)
+            if (_state.Players[i].CanPress)
             {
-                _gameActions.SendMessage(Messages.YouTry, _data.Players[i].Name);
+                _gameActions.SendMessage(Messages.YouTry, _state.Players[i].Name);
             }
         }
     }
 
     private void WaitChoose()
     {
-        _gameActions.SendMessage(Messages.Cancel, _data.Chooser.Name);
+        _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
-        var canChooseTheme = _data.TInfo.RoundInfo.Select(t => t.Questions.Any(QuestionHelper.IsActive)).ToArray();
+        var canChooseTheme = _state.TInfo.RoundInfo.Select(t => t.Questions.Any(QuestionHelper.IsActive)).ToArray();
         var numberOfThemes = canChooseTheme.Where(can => can).Count();
 
         if (numberOfThemes == 0)
@@ -2731,7 +2730,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         do if (canChooseTheme[++i]) k1--; while (k1 >= 0);
 
-        var theme = _data.TInfo.RoundInfo[i];
+        var theme = _state.TInfo.RoundInfo[i];
         var numberOfQuestions = theme.Questions.Count(QuestionHelper.IsActive);
 
         // Random question index selection
@@ -2740,15 +2739,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         do if (theme.Questions[++j].IsActive()) k2--; while (k2 >= 0);
 
-        _data.ThemeIndex = i;
-        _data.QuestionIndex = j;
+        _state.ThemeIndex = i;
+        _state.QuestionIndex = j;
 
         OnDecision();
     }
 
     private void OnQuestionStartInfo(int arg)
     {
-        var authors = _data.PackageDoc.ResolveAuthors(_data.Question.Info.Authors);
+        var authors = _state.PackageDoc.ResolveAuthors(_state.Question.Info.Authors);
 
         if (authors.Length > 0)
         {
@@ -2756,7 +2755,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.SendMessage(msg.ToString());
         }
 
-        var themeComments = _data.Theme.Info.Comments.Text;
+        var themeComments = _state.Theme.Info.Comments.Text;
 
         if (themeComments.Length > 0)
         {
@@ -2771,7 +2770,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         if (!isDefault) // TODO: This announcement should be handled by the client in the future
         {
-            switch (_data.QuestionTypeName)
+            switch (_state.QuestionTypeName)
             {
                 case QuestionTypes.Stake:
                 case QuestionTypes.Secret:
@@ -2784,21 +2783,21 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     break;
 
                 default:
-                    OnUnsupportedQuestionType(_data.QuestionTypeName); // TODO: emit this by Game Engine
+                    OnUnsupportedQuestionType(_state.QuestionTypeName); // TODO: emit this by Game Engine
                     return;
             }
         }
 
-        _data.QuestionTypeSettings.TryGetValue(_data.QuestionTypeName, out var questionTypeRules);
+        _state.QuestionTypeSettings.TryGetValue(_state.QuestionTypeName, out var questionTypeRules);
         
         var isNoRisk = questionTypeRules?.PenaltyType == PenaltyType.None;
 
         if (isNoRisk)
         {
-            _data.CurPriceWrong = 0;
+            _state.CurPriceWrong = 0;
         }
 
-        _gameActions.SendVisualMessageWithArgs(Messages.QType, _data.QuestionTypeName, isDefault, isNoRisk);
+        _gameActions.SendVisualMessageWithArgs(Messages.QType, _state.QuestionTypeName, isDefault, isNoRisk);
         ScheduleExecution(Tasks.MoveNext, isDefault ? 1 : 22, force: true);
     }
 
@@ -2814,56 +2813,56 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         _gameActions.ShowmanReplicNew(MessageCode.UnsupportedQuestion);
 
-        _data.SkipQuestion?.Invoke();
+        _state.SkipQuestion?.Invoke();
         ScheduleExecution(Tasks.MoveNext, 150, 1);
     }
 
     private void PrintPartial()
     {
-        var text = _data.Text;
+        var text = _state.Text;
 
         // TODO: try to avoid getting here when such condition is met
-        if (_data.TextLength >= text.Length)
+        if (_state.TextLength >= text.Length)
         {
-            _data.TimeThinking = 0.0;
+            _state.TimeThinking = 0.0;
             ScheduleExecution(Tasks.MoveNext, 1, force: true);
             return;
         }
 
-        _data.PartialIterationCounter++;
+        _state.PartialIterationCounter++;
 
         var newTextLength = Math.Min(
-            _data.InitialPartialTextLength
-                + (int)(_data.Settings.AppSettings.ReadingSpeed * PartialPrintFrequencyPerSecond * _data.PartialIterationCounter),
+            _state.InitialPartialTextLength
+                + (int)(_state.Settings.AppSettings.ReadingSpeed * PartialPrintFrequencyPerSecond * _state.PartialIterationCounter),
             text.Length);
 
-        if (newTextLength > _data.TextLength)
+        if (newTextLength > _state.TextLength)
         {
-            var printingLength = newTextLength - _data.TextLength;
+            var printingLength = newTextLength - _state.TextLength;
 
             // Align to next space position
-            while (_data.TextLength + printingLength < text.Length && !char.IsWhiteSpace(text[_data.TextLength + printingLength]))
+            while (_state.TextLength + printingLength < text.Length && !char.IsWhiteSpace(text[_state.TextLength + printingLength]))
             {
                 printingLength++;
             }
 
-            var subText = text.Substring(_data.TextLength, printingLength);
+            var subText = text.Substring(_state.TextLength, printingLength);
 
             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
             _gameActions.SystemReplic(subText); // TODO: REMOVE: replaced by CONTENT_APPEND message
 
-            _data.TextLength += printingLength;
+            _state.TextLength += printingLength;
         }
 
-        if (_data.TextLength < text.Length)
+        if (_state.TextLength < text.Length)
         {
-            _data.AtomTime -= (int)(10 * PartialPrintFrequencyPerSecond);
+            _state.AtomTime -= (int)(10 * PartialPrintFrequencyPerSecond);
             ScheduleExecution(Tasks.PrintPartial, 10 * PartialPrintFrequencyPerSecond, force: true);
         }
         else
         {
-            _data.TimeThinking = 0.0;
-            ScheduleExecution(Tasks.MoveNext, Math.Max(_data.AtomTime, 10), force: true);
+            _state.TimeThinking = 0.0;
+            ScheduleExecution(Tasks.MoveNext, Math.Max(_state.AtomTime, 10), force: true);
         }
     }
 
@@ -2875,7 +2874,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         _gameActions.SendMessageWithArgs(Messages.QuestionEnd); // Should be here because only here question is fully processed
 
-        var sources = _data.PackageDoc.ResolveSources(_data.Question.Info.Sources);
+        var sources = _state.PackageDoc.ResolveSources(_state.Question.Info.Sources);
 
         if (sources.Count > 0)
         {
@@ -2883,7 +2882,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.SendMessage(msg.Build());
         }
 
-        var comments = _data.Question.Info.Comments.Text;
+        var comments = _state.Question.Info.Comments.Text;
 
         if (comments.Length > 0)
         {
@@ -2897,27 +2896,27 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private int GetReadingDurationForTextLength(int textLength)
     {
-        var readingSpeed = Math.Max(1, _data.Settings.AppSettings.ReadingSpeed);
+        var readingSpeed = Math.Max(1, _state.Settings.AppSettings.ReadingSpeed);
         return Math.Max(1, 10 * textLength / readingSpeed);
     }
 
     internal void Announce()
     {
-        if (_data.AnnouncedAnswerersEnumerator == null || !_data.AnnouncedAnswerersEnumerator.MoveNext())
+        if (_state.AnnouncedAnswerersEnumerator == null || !_state.AnnouncedAnswerersEnumerator.MoveNext())
         {
             ScheduleExecution(Tasks.MoveNext, 15, 1, true);
             return;
         }
 
-        var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
-        _data.AnswererIndex = answererIndex;
-        var playerAnswer = _data.Answerer?.Answer;
+        var answererIndex = _state.AnnouncedAnswerersEnumerator.Current;
+        _state.AnswererIndex = answererIndex;
+        var playerAnswer = _state.Answerer?.Answer;
         var answer = string.IsNullOrEmpty(playerAnswer) ? LO[nameof(R.IDontKnow)] : playerAnswer;
 
         _gameActions.PlayerReplic(answererIndex, answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
         _gameActions.SendMessageWithArgs(Messages.PlayerAnswer, answererIndex, playerAnswer ?? "");
 
-        if (_data.QuestionPlayState.ValidateAfterRightAnswer)
+        if (_state.QuestionPlay.ValidateAfterRightAnswer)
         {
             ScheduleExecution(Tasks.Announce, 25, force: true);
         }
@@ -2929,48 +2928,48 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal bool PrepareForAskAnswer()
     {
-        var buttonPressMode = _data.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = _state.Settings.AppSettings.ButtonPressMode;
 
         if (buttonPressMode == ButtonPressMode.RandomWithinInterval)
         {
-            if (_data.PendingAnswererIndicies.Count == 0)
+            if (_state.PendingAnswererIndicies.Count == 0)
             {
                 DumpButtonPressError("_data.PendingAnswererIndicies.Count == 0");
                 return false;
             }
 
-            var index = _data.PendingAnswererIndicies.Count == 1 ? 0 : Random.Shared.Next(_data.PendingAnswererIndicies.Count);
-            _data.PendingAnswererIndex = _data.PendingAnswererIndicies[index];
+            var index = _state.PendingAnswererIndicies.Count == 1 ? 0 : Random.Shared.Next(_state.PendingAnswererIndicies.Count);
+            _state.PendingAnswererIndex = _state.PendingAnswererIndicies[index];
         }
 
-        if (_data.PendingAnswererIndex < 0 || _data.PendingAnswererIndex >= _data.Players.Count)
+        if (_state.PendingAnswererIndex < 0 || _state.PendingAnswererIndex >= _state.Players.Count)
         {
-            DumpButtonPressError($"_data.PendingAnswererIndex = {_data.PendingAnswererIndex}; _data.Players.Count = {_data.Players.Count}");
+            DumpButtonPressError($"_data.PendingAnswererIndex = {_state.PendingAnswererIndex}; _data.Players.Count = {_state.Players.Count}");
             return false;
         }
 
-        _data.AnswererIndex = _data.PendingAnswererIndex;
-        _data.QuestionPlayState.SetSingleAnswerer(_data.PendingAnswererIndex);
+        _state.AnswererIndex = _state.PendingAnswererIndex;
+        _state.QuestionPlay.SetSingleAnswerer(_state.PendingAnswererIndex);
 
-        if (!_data.Settings.AppSettings.FalseStart)
+        if (!_state.Settings.AppSettings.FalseStart)
         {
             // Stop question reading
-            if (!_data.IsQuestionFinished)
+            if (!_state.IsQuestionFinished)
             {
-                var timeDiff = (int)DateTime.UtcNow.Subtract(_data.AtomStart).TotalSeconds * 10;
-                _data.AtomTime = Math.Max(1, _data.AtomTime - timeDiff);
+                var timeDiff = (int)DateTime.UtcNow.Subtract(_state.AtomStart).TotalSeconds * 10;
+                _state.AtomTime = Math.Max(1, _state.AtomTime - timeDiff);
             }
         }
 
-        if (_data.IsThinking)
+        if (_state.IsThinking)
         {
-            var startTime = _data.TimerStartTime[1];
+            var startTime = _state.TimerStartTime[1];
             var currentTime = DateTime.UtcNow;
 
-            _data.TimeThinking += currentTime.Subtract(startTime).TotalMilliseconds / 100;
+            _state.TimeThinking += currentTime.Subtract(startTime).TotalMilliseconds / 100;
         }
 
-        var answerer = _data.Answerer;
+        var answerer = _state.Answerer;
 
         if (answerer == null)
         {
@@ -2980,20 +2979,20 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         answerer.CanPress = false;
 
-        _data.IsThinking = false;
+        _state.IsThinking = false;
 
-        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Pause, (int)_data.TimeThinking);
+        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Pause, (int)_state.TimeThinking);
 
-        _data.IsPlayingMediaPaused = _data.IsPlayingMedia;
-        _data.IsPlayingMedia = false;
+        _state.IsPlayingMediaPaused = _state.IsPlayingMedia;
+        _state.IsPlayingMedia = false;
 
         return true;
     }
 
     internal void DumpButtonPressError(string reason)
     {
-        var pressMode = _data.Settings.AppSettings.ButtonPressMode;
-        _data.Host.SendError(new Exception($"{reason} {pressMode}"));
+        var pressMode = _state.Settings.AppSettings.ButtonPressMode;
+        _state.Host.SendError(new Exception($"{reason} {pressMode}"));
     }
 
     private void StartGame(int arg)
@@ -3010,7 +3009,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 break;
 
             case 2:
-                _gameActions.ShowmanReplic($"{LO[nameof(R.GameRules)]}: {BuildRulesString(_data.Settings.AppSettings)}"); // TODO: REMOVE (replaced by OPTIONS2 message)
+                _gameActions.ShowmanReplic($"{LO[nameof(R.GameRules)]}: {BuildRulesString(_state.Settings.AppSettings)}"); // TODO: REMOVE (replaced by OPTIONS2 message)
                 nextArg = -1;
                 extraTime = 20;
                 break;
@@ -3067,7 +3066,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.InformSums();
         _gameActions.SendVisualMessage(Messages.ShowTable);
 
-        if (_data.Chooser == null)
+        if (_state.Chooser == null)
         {
             throw new Exception("_data.Chooser == null");
         }
@@ -3077,7 +3076,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             throw new Exception("_actor.Client.CurrentServer == null");
         }
 
-        var msg = new StringBuilder(_data.Chooser.Name).Append(", ");
+        var msg = new StringBuilder(_state.Chooser.Name).Append(", ");
         var activeQuestionsCount = GetRoundActiveQuestionsCount();
 
         if (activeQuestionsCount == 0)
@@ -3088,34 +3087,34 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         msg.Append(GetRandomString(LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
 
         _gameActions.ShowmanReplic(msg.ToString()); // TODO: REMOVE (localized by MessageCode)
-        _gameActions.ShowmanReplicNew(MessageCode.SelectQuestion, _data.Chooser.Name);
+        _gameActions.ShowmanReplicNew(MessageCode.SelectQuestion, _state.Chooser.Name);
 
-        _data.ThemeIndex = -1;
-        _data.QuestionIndex = -1;
+        _state.ThemeIndex = -1;
+        _state.QuestionIndex = -1;
 
-        _data.UsedWrongVersions.Clear();
+        _state.UsedWrongVersions.Clear();
 
         int time;
 
         if (activeQuestionsCount > 1)
         {
-            time = _data.TimeSettings.QuestionSelection * 10;
+            time = _state.TimeSettings.QuestionSelection * 10;
 
             var message = $"{Messages.Choose}{Message.ArgsSeparatorChar}1";
-            _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;
+            _state.IsOralNow = _state.IsOral && _state.Chooser.IsHuman;
 
-            if (_data.IsOralNow)
+            if (_state.IsOralNow)
             {
-                _gameActions.SendMessage(message, _data.ShowMan.Name);
+                _gameActions.SendMessage(message, _state.ShowMan.Name);
             }
-            else if (!_data.Chooser.IsConnected)
+            else if (!_state.Chooser.IsConnected)
             {
                 time = 20;
             }
 
             if (CanPlayerAct())
             {
-                _gameActions.SendMessage(message, _data.Chooser.Name);
+                _gameActions.SendMessage(message, _state.Chooser.Name);
             }
         }
         else
@@ -3124,57 +3123,57 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         ScheduleExecution(Tasks.WaitChoose, time);
-        WaitFor(DecisionType.QuestionSelection, time, _data.ChooserIndex);
+        WaitFor(DecisionType.QuestionSelection, time, _state.ChooserIndex);
     }
 
-    internal bool CanPlayerAct() => !_data.IsOralNow || _data.Settings.AppSettings.OralPlayersActions;
+    internal bool CanPlayerAct() => !_state.IsOralNow || _state.Settings.AppSettings.OralPlayersActions;
 
     private void AskToSelectQuestionAnswerer()
     {
-        if (_data.Chooser == null)
+        if (_state.Chooser == null)
         {
             throw new Exception("_data.Chooser == null");
         }
 
-        var canGiveThemselves = _data.Chooser.Flag;
+        var canGiveThemselves = _state.Chooser.Flag;
         var append = canGiveThemselves ? $" {LO[nameof(R.YouCanKeepCat)]}" : "";
-        _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {LO[nameof(R.GiveCat)]}{append}"); // TODO: REMOVE (localized by MessageCode)
-        _gameActions.ShowmanReplicNew(MessageCode.SelectPlayer, _data.Chooser.Name);
+        _gameActions.ShowmanReplic($"{_state.Chooser.Name}, {LO[nameof(R.GiveCat)]}{append}"); // TODO: REMOVE (localized by MessageCode)
+        _gameActions.ShowmanReplicNew(MessageCode.SelectPlayer, _state.Chooser.Name);
 
         // -- Deprecated
         var msg = new StringBuilder(Messages.Cat);
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
+            msg.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Flag ? '+' : '-');
         }
 
-        _data.AnswererIndex = -1;
+        _state.AnswererIndex = -1;
 
-        var waitTime = _data.TimeSettings.PlayerSelection * 10;
+        var waitTime = _state.TimeSettings.PlayerSelection * 10;
 
-        _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;
+        _state.IsOralNow = _state.IsOral && _state.Chooser.IsHuman;
         var playerSelectors = new List<string>();
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            playerSelectors.Add(_data.ShowMan.Name);
-            _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
+            playerSelectors.Add(_state.ShowMan.Name);
+            _gameActions.SendMessage(msg.ToString(), _state.ShowMan.Name);
         }
-        else if (!_data.Chooser.IsConnected)
+        else if (!_state.Chooser.IsConnected)
         {
             waitTime = 20;
         }
 
-        if (CanPlayerAct() && _data.Chooser != null)
+        if (CanPlayerAct() && _state.Chooser != null)
         {
-            playerSelectors.Add(_data.Chooser.Name);
-            _gameActions.SendMessage(msg.ToString(), _data.Chooser.Name);
+            playerSelectors.Add(_state.Chooser.Name);
+            _gameActions.SendMessage(msg.ToString(), _state.Chooser.Name);
         }
 
         AskToSelectPlayer(SelectPlayerReason.Answerer, playerSelectors.ToArray());
         ScheduleExecution(Tasks.WaitQuestionAnswererSelection, waitTime);
-        WaitFor(DecisionType.QuestionAnswererSelection, waitTime, _data.ChooserIndex);
+        WaitFor(DecisionType.QuestionAnswererSelection, waitTime, _state.ChooserIndex);
     }
 
     /// <summary>
@@ -3184,56 +3183,56 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     /// </summary>
     private void GiveMoveToPlayerWithMinimumScore()
     {
-        var min = _data.Players.Min(player => player.Sum);
+        var min = _state.Players.Min(player => player.Sum);
         var total = 0;
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            if (_data.Players[i].Sum == min)
+            if (_state.Players[i].Sum == min)
             {
-                _data.Players[i].Flag = true;
+                _state.Players[i].Flag = true;
                 total++;
             }
             else
             {
-                _data.Players[i].Flag = false;
+                _state.Players[i].Flag = false;
             }
         }
 
         if (total == 1)
         {
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (_data.Players[i].Flag)
+                if (_state.Players[i].Flag)
                 {
-                    _data.ChooserIndex = i;
+                    _state.ChooserIndex = i;
                     break;
                 }
             }
 
-            _data.IsWaiting = true;
-            _data.Decision = DecisionType.StarterChoosing;
+            _state.IsWaiting = true;
+            _state.Decision = DecisionType.StarterChoosing;
             OnDecision();
         }
         else
         {
             _gameActions.SendVisualMessage(Messages.ShowTable); // Everybody will see the table during showman's decision
 
-            _data.ChooserIndex = -1;
+            _state.ChooserIndex = -1;
 
             // -- Deprecated
             var msg = new StringBuilder(Messages.First);
 
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
+                msg.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Flag ? '+' : '-');
             }
 
-            _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
+            _gameActions.SendMessage(msg.ToString(), _state.ShowMan.Name);
             // -- end
-            AskToSelectPlayer(SelectPlayerReason.Chooser, _data.ShowMan.Name);
+            AskToSelectPlayer(SelectPlayerReason.Chooser, _state.ShowMan.Name);
 
-            var waitTime = _data.TimeSettings.ShowmanDecision * 10;
+            var waitTime = _state.TimeSettings.ShowmanDecision * 10;
             ScheduleExecution(Tasks.WaitFirst, waitTime);
             WaitFor(DecisionType.StarterChoosing, waitTime, -1);
         }
@@ -3243,9 +3242,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         var msg = new MessageBuilder(Messages.AskSelectPlayer, reason);
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            msg.Add(_data.Players[i].Flag ? '+' : '-');
+            msg.Add(_state.Players[i].Flag ? '+' : '-');
         }
 
         foreach (var selector in selectors)
@@ -3253,79 +3252,79 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.SendMessage(msg.ToString(), selector);
         }
 
-        _data.DecisionMakers.Clear();
-        _data.DecisionMakers.AddRange(selectors);
+        _state.DecisionMakers.Clear();
+        _state.DecisionMakers.AddRange(selectors);
     }
 
     private void AskRight()
     {
-        if (_data.Answerer == null)
+        if (_state.Answerer == null)
         {
             throw new InvalidOperationException("Answerer is null");
         }
 
-        if (_data.QuestionPlayState.AnswerOptions != null)
+        if (_state.QuestionPlay.AnswerOptions != null)
         {
-            _data.IsWaiting = true;
-            _data.Decision = DecisionType.AnswerValidating;
+            _state.IsWaiting = true;
+            _state.Decision = DecisionType.AnswerValidating;
 
-            var rightLabel = _data.Question?.Right.FirstOrDefault();
+            var rightLabel = _state.Question?.Right.FirstOrDefault();
 
-            _data.Answerer.AnswerIsRight = _data.Answerer.Answer == rightLabel;
-            _data.Answerer.AnswerValidationFactor = 1.0;
-            _data.ShowmanDecision = true;
+            _state.Answerer.AnswerIsRight = _state.Answerer.Answer == rightLabel;
+            _state.Answerer.AnswerValidationFactor = 1.0;
+            _state.ShowmanDecision = true;
 
             OnDecision();
         }
-        else if (!_data.Answerer.IsHuman || _data.Answerer.AnswerIsWrong)
+        else if (!_state.Answerer.IsHuman || _state.Answerer.AnswerIsWrong)
         {
-            _data.IsWaiting = true;
-            _data.Decision = DecisionType.AnswerValidating;
+            _state.IsWaiting = true;
+            _state.Decision = DecisionType.AnswerValidating;
 
-            _data.Answerer.AnswerIsRight = !_data.Answerer.AnswerIsWrong;
-            _data.Answerer.AnswerValidationFactor = 1.0;
-            _data.ShowmanDecision = true;
+            _state.Answerer.AnswerIsRight = !_state.Answerer.AnswerIsWrong;
+            _state.Answerer.AnswerValidationFactor = 1.0;
+            _state.ShowmanDecision = true;
 
             OnDecision();
         }
-        else if (_data.Answerer.Answer != null
-            && _data.QuestionPlayState.Validations.TryGetValue(_data.Answerer.Answer, out var validation)
+        else if (_state.Answerer.Answer != null
+            && _state.QuestionPlay.Validations.TryGetValue(_state.Answerer.Answer, out var validation)
             && validation.HasValue)
         {
-            _data.IsWaiting = true;
-            _data.Decision = DecisionType.AnswerValidating;
+            _state.IsWaiting = true;
+            _state.Decision = DecisionType.AnswerValidating;
 
-            _data.Answerer.AnswerIsRight = validation.Value.Item1;
-            _data.Answerer.AnswerValidationFactor = validation.Value.Item2;
-            _data.ShowmanDecision = true;
+            _state.Answerer.AnswerIsRight = validation.Value.Item1;
+            _state.Answerer.AnswerValidationFactor = validation.Value.Item2;
+            _state.ShowmanDecision = true;
 
             OnDecision();
         }
-        else if (_data.QuestionPlayState.IsNumericAnswer &&
-            int.TryParse(_data.Question?.Right.FirstOrDefault() ?? "", out var rightNumber))
+        else if (_state.QuestionPlay.IsNumericAnswer &&
+            int.TryParse(_state.Question?.Right.FirstOrDefault() ?? "", out var rightNumber))
         {
-            _data.IsWaiting = true;
-            _data.Decision = DecisionType.AnswerValidating;
+            _state.IsWaiting = true;
+            _state.Decision = DecisionType.AnswerValidating;
 
-            var deviation = _data.QuestionPlayState.NumericAnswerDeviation;
+            var deviation = _state.QuestionPlay.NumericAnswerDeviation;
 
-            _data.Answerer.AnswerIsRight = int.TryParse(_data.Answerer.Answer, out var playerNumber) && 
+            _state.Answerer.AnswerIsRight = int.TryParse(_state.Answerer.Answer, out var playerNumber) && 
                 Math.Abs(playerNumber - rightNumber) <= deviation;
             
-            _data.Answerer.AnswerValidationFactor = 1.0;
-            _data.ShowmanDecision = true;
+            _state.Answerer.AnswerValidationFactor = 1.0;
+            _state.ShowmanDecision = true;
             OnDecision();
         }
         else
         {
-            _data.ShowmanDecision = false;
+            _state.ShowmanDecision = false;
 
-            if (!_data.IsOralNow || HaveMultipleAnswerers())
+            if (!_state.IsOralNow || HaveMultipleAnswerers())
             {
-                SendAnswersInfoToShowman(_data.Answerer.Answer ?? "");
+                SendAnswersInfoToShowman(_state.Answerer.Answer ?? "");
             }
 
-            var waitTime = _data.TimeSettings.ShowmanDecision * 10;
+            var waitTime = _state.TimeSettings.ShowmanDecision * 10;
             ScheduleExecution(Tasks.WaitRight, waitTime);
             WaitFor(DecisionType.AnswerValidating, waitTime, -1);
         }
@@ -3334,25 +3333,25 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private void SendAnswersInfoToShowman(string answer)
     {
         _gameActions.SendMessage(
-            BuildValidation2Message(_data.Answerer.Name, answer, !_data.QuestionPlayState.FlexiblePrice),
-            _data.ShowMan.Name);
+            BuildValidation2Message(_state.Answerer.Name, answer, !_state.QuestionPlay.FlexiblePrice),
+            _state.ShowMan.Name);
     }
 
     private string BuildValidation2Message(string name, string answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
     {
-        var question = _data.Question ?? throw new InvalidOperationException("Question is null");
+        var question = _state.Question ?? throw new InvalidOperationException("Question is null");
 
         var rightAnswers = question.Right;
         var wrongAnswers = question.Wrong;
 
         ICollection<string> appellatedAnswers = Array.Empty<string>();
 
-        if (_data.PackageStatistisProvider != null && !_data.ShowMan.IsHuman)
+        if (_state.PackageStatistisProvider != null && !_state.ShowMan.IsHuman)
         {
-            appellatedAnswers = _data.PackageStatistisProvider.GetAppellatedAnswers(
+            appellatedAnswers = _state.PackageStatistisProvider.GetAppellatedAnswers(
                 Engine.RoundIndex,
-                _data.ThemeIndex,
-                _data.QuestionIndex);
+                _state.ThemeIndex,
+                _state.QuestionIndex);
         }
 
         return new MessageBuilder(
@@ -3374,99 +3373,99 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             _gameActions.ShowmanReplic(LO[nameof(R.StartThink)]);
 
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (_data.QuestionPlayState.AnswererIndicies.Contains(i))
+                if (_state.QuestionPlay.AnswererIndicies.Contains(i))
                 {
-                    _data.Players[i].Answer = "";
-                    _data.Players[i].Flag = true;
+                    _state.Players[i].Answer = "";
+                    _state.Players[i].Flag = true;
 
                     _gameActions.SendMessageToWithArgs(
-                        _data.Players[i].Name,
+                        _state.Players[i].Name,
                         Messages.Answer,
-                        _data.QuestionPlayState.IsNumericAnswer ? "number" : "");
+                        _state.QuestionPlay.IsNumericAnswer ? "number" : "");
                 }
             }
 
-            var waitTime = _data.TimeSettings.HiddenAnswering * 10;
+            var waitTime = _state.TimeSettings.HiddenAnswering * 10;
 
-            _data.AnswerCount = _data.QuestionPlayState.AnswererIndicies.Count;
+            _state.AnswerCount = _state.QuestionPlay.AnswererIndicies.Count;
             ScheduleExecution(Tasks.WaitAnswer, waitTime, force: true);
             WaitFor(DecisionType.Answering, waitTime, -2, false);
             return;
         }
 
-        if (_data.Answerer == null)
+        if (_state.Answerer == null)
         {
             ScheduleExecution(Tasks.MoveNext, 10);
             return;
         }
 
-        var useButtons = _data.QuestionPlayState.UseButtons;
+        var useButtons = _state.QuestionPlay.UseButtons;
 
         if (useButtons)
         {
-            _gameActions.SendMessageWithArgs(Messages.EndTry, _data.AnswererIndex);
+            _gameActions.SendMessageWithArgs(Messages.EndTry, _state.AnswererIndex);
         }
         else
         {
             _gameActions.SendMessageWithArgs(Messages.StopPlay);
         }
 
-        var waitAnswerTime = useButtons ? _data.TimeSettings.Answering * 10 : _data.TimeSettings.SoloAnswering * 10;
+        var waitAnswerTime = useButtons ? _state.TimeSettings.Answering * 10 : _state.TimeSettings.SoloAnswering * 10;
 
-        var useAnswerOptions = _data.QuestionPlayState.AnswerOptions != null;
-        _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
+        var useAnswerOptions = _state.QuestionPlay.AnswerOptions != null;
+        _state.IsOralNow = _state.IsOral && _state.Answerer.IsHuman;
 
         if (useAnswerOptions)
         {
-            if (_data.IsOralNow)
+            if (_state.IsOralNow)
             {
-                _gameActions.SendMessage(Messages.Answer, _data.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Answer, _state.ShowMan.Name);
             }
 
-            _gameActions.SendMessage(CanPlayerAct() ? Messages.Answer : Messages.OralAnswer, _data.Answerer.Name);
+            _gameActions.SendMessage(CanPlayerAct() ? Messages.Answer : Messages.OralAnswer, _state.Answerer.Name);
         }
         else
         {
-            if (_data.IsOralNow)
+            if (_state.IsOralNow)
             {
                 // Showman accepts answer orally
                 SendAnswersInfoToShowman($"({LO[nameof(R.AnswerIsOral)]})");
-                _gameActions.SendMessage(Messages.OralAnswer, _data.Answerer.Name);
+                _gameActions.SendMessage(Messages.OralAnswer, _state.Answerer.Name);
             }
             else // The only place where we do not check CanPlayerAct()
             {
                 _gameActions.SendMessageToWithArgs(
-                    _data.Answerer.Name,
+                    _state.Answerer.Name,
                     Messages.Answer,
-                    _data.QuestionPlayState.IsNumericAnswer ? "number" : "");
+                    _state.QuestionPlay.IsNumericAnswer ? "number" : "");
             }
         }
 
         var answerReplic = useAnswerOptions ? ", " + LO[nameof(R.SelectAnswerOption)] : GetRandomString(LO[nameof(R.YourAnswer)]);
-        _gameActions.ShowmanReplic(_data.Answerer.Name + answerReplic); // TODO: REMOVE (localized by MessageCode)
-        _gameActions.ShowmanReplicNew(useAnswerOptions ? MessageCode.SelectAnswerOption : MessageCode.Answer, _data.Answerer.Name);
+        _gameActions.ShowmanReplic(_state.Answerer.Name + answerReplic); // TODO: REMOVE (localized by MessageCode)
+        _gameActions.ShowmanReplicNew(useAnswerOptions ? MessageCode.SelectAnswerOption : MessageCode.Answer, _state.Answerer.Name);
 
-        _data.Answerer.Answer = "";
+        _state.Answerer.Answer = "";
 
-        var buttonPressMode = _data.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = _state.Settings.AppSettings.ButtonPressMode;
 
         if (buttonPressMode != ButtonPressMode.FirstWins)
         {
             InformWrongTries();
         }
 
-        _data.AnswerCount = 1;
+        _state.AnswerCount = 1;
         ScheduleExecution(Tasks.WaitAnswer, waitAnswerTime);
-        WaitFor(DecisionType.Answering, waitAnswerTime, _data.AnswererIndex);
+        WaitFor(DecisionType.Answering, waitAnswerTime, _state.AnswererIndex);
     }
 
     internal void SendQuestionAnswersToShowman()
     {
-        var question = _data.Question;
+        var question = _state.Question;
 
-        if (question == null || _data.QuestionPlayState.AnswerOptions != null)
+        if (question == null || _state.QuestionPlay.AnswerOptions != null)
         {
             return;
         }
@@ -3476,12 +3475,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         ICollection<string> appellatedAnswers = Array.Empty<string>();
 
-        if (_data.PackageStatistisProvider != null && !_data.ShowMan.IsHuman)
+        if (_state.PackageStatistisProvider != null && !_state.ShowMan.IsHuman)
         {
-            appellatedAnswers = _data.PackageStatistisProvider.GetAppellatedAnswers(
+            appellatedAnswers = _state.PackageStatistisProvider.GetAppellatedAnswers(
                 Engine.RoundIndex,
-                _data.ThemeIndex,
-                _data.QuestionIndex);
+                _state.ThemeIndex,
+                _state.QuestionIndex);
         }
 
         var message = new MessageBuilder(Messages.QuestionAnswers, rightAnswers.Count + appellatedAnswers.Count)
@@ -3490,16 +3489,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             .AddRange(wrongAnswers)
             .Build();
 
-        _gameActions.SendMessage(message, _data.ShowMan.Name);
+        _gameActions.SendMessage(message, _state.ShowMan.Name);
     }
 
     private void InformWrongTries()
     {
-        for (var i = 0; i < _data.PendingAnswererIndicies.Count; i++)
+        for (var i = 0; i < _state.PendingAnswererIndicies.Count; i++)
         {
-            var playerIndex = _data.PendingAnswererIndicies[i];
+            var playerIndex = _state.PendingAnswererIndicies[i];
 
-            if (playerIndex == _data.PendingAnswererIndex)
+            if (playerIndex == _state.PendingAnswererIndex)
             {
                 continue;
             }
@@ -3515,8 +3514,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         try
         {
-            _data.ThemeDeleters.MoveNext();
-            var currentDeleter = _data.ThemeDeleters.Current;
+            _state.ThemeDeleters.MoveNext();
+            var currentDeleter = _state.ThemeDeleters.Current;
 
             if (currentDeleter.PlayerIndex == -1)
             {
@@ -3529,7 +3528,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 }
                 else if (indicies.Count == 0)
                 {
-                    throw new Exception("indicies.Count == 0: " + _data.ThemeDeleters.GetRemoveLog());
+                    throw new Exception("indicies.Count == 0: " + _state.ThemeDeleters.GetRemoveLog());
                 }
 
                 currentDeleter.SetIndex(indicies.First());
@@ -3537,73 +3536,73 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             playerIndex = currentDeleter.PlayerIndex;
 
-            if (playerIndex < -1 || playerIndex >= _data.Players.Count)
+            if (playerIndex < -1 || playerIndex >= _state.Players.Count)
             {
-                throw new ArgumentException($"{nameof(playerIndex)}: {_data.ThemeDeleters.GetRemoveLog()}");
+                throw new ArgumentException($"{nameof(playerIndex)}: {_state.ThemeDeleters.GetRemoveLog()}");
             }
 
-            _data.ActivePlayer = _data.Players[playerIndex];
+            _state.ActivePlayer = _state.Players[playerIndex];
 
             RequestForThemeDelete();
         }
         catch (Exception exc)
         {
-            _data.Host.SendError(new Exception(string.Format("AskToDelete {0}/{1}/{2}", _data.ThemeDeleters.Current.PlayerIndex, playerIndex, _data.Players.Count), exc));
+            _state.Host.SendError(new Exception(string.Format("AskToDelete {0}/{1}/{2}", _state.ThemeDeleters.Current.PlayerIndex, playerIndex, _state.Players.Count), exc));
         }
     }
 
     private void RequestForThemeDelete()
     {
-        var msg = new StringBuilder(_data.ActivePlayer.Name)
+        var msg = new StringBuilder(_state.ActivePlayer.Name)
             .Append(", ")
             .Append(GetRandomString(LO[nameof(R.DeleteTheme)]));
 
         _gameActions.ShowmanReplic(msg.ToString());
 
         var message = string.Join(Message.ArgsSeparator, Messages.Choose, 2);
-        _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
+        _state.IsOralNow = _state.IsOral && _state.ActivePlayer.IsHuman;
 
-        var waitTime = _data.TimeSettings.ThemeSelection * 10;
+        var waitTime = _state.TimeSettings.ThemeSelection * 10;
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(message, _data.ShowMan.Name);
+            _gameActions.SendMessage(message, _state.ShowMan.Name);
         }
-        else if (!_data.ActivePlayer.IsConnected)
+        else if (!_state.ActivePlayer.IsConnected)
         {
             waitTime = 20;
         }
 
         if (CanPlayerAct())
         {
-            _gameActions.SendMessage(message, _data.ActivePlayer.Name);
+            _gameActions.SendMessage(message, _state.ActivePlayer.Name);
         }
 
-        _data.ThemeIndexToDelete = -1;
+        _state.ThemeIndexToDelete = -1;
         ScheduleExecution(Tasks.WaitDelete, waitTime);
-        WaitFor(DecisionType.ThemeDeleting, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
+        WaitFor(DecisionType.ThemeDeleting, waitTime, _state.Players.IndexOf(_state.ActivePlayer));
     }
 
     private void RequestForCurrentDeleter(ICollection<int> indicies)
     {
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            _data.Players[i].Flag = indicies.Contains(i);
+            _state.Players[i].Flag = indicies.Contains(i);
         }
 
         // -- deprecated
         var msg = new StringBuilder(Messages.FirstDelete);
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
+            msg.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Flag ? '+' : '-');
         }
 
-        _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
+        _gameActions.SendMessage(msg.ToString(), _state.ShowMan.Name);
         // -- end
-        AskToSelectPlayer(SelectPlayerReason.Deleter, _data.ShowMan.Name);
+        AskToSelectPlayer(SelectPlayerReason.Deleter, _state.ShowMan.Name);
 
-        var waitTime = _data.TimeSettings.ShowmanDecision * 10;
+        var waitTime = _state.TimeSettings.ShowmanDecision * 10;
         ScheduleExecution(Tasks.WaitNext, waitTime, 1);
         WaitFor(DecisionType.NextPersonFinalThemeDeleting, waitTime, -1);
     }
@@ -3614,38 +3613,38 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     /// <returns>Стоит ли продолжать выполнение</returns>
     private bool DetectNextStaker()
     {
-        var candidatesAll = Enumerable.Range(0, _data.Order.Length).Except(_data.Order).ToArray(); // Незадействованные игроки
+        var candidatesAll = Enumerable.Range(0, _state.Order.Length).Except(_state.Order).ToArray(); // Незадействованные игроки
 
-        if (_data.OrderIndex < _data.Order.Length - 1)
+        if (_state.OrderIndex < _state.Order.Length - 1)
         {
             // Ещё есть, из кого выбирать
 
             // Сначала отбросим тех, у кого недостаточно денег для ставки
-            var candidates = candidatesAll.Where(n => _data.Players[n].StakeMaking);
+            var candidates = candidatesAll.Where(n => _state.Players[n].StakeMaking);
 
             if (candidates.Count() > 1)
             {
                 // У кандидатов должна быть минимальная сумма
-                var minSum = candidates.Min(n => _data.Players[n].Sum);
-                candidates = candidates.Where(n => _data.Players[n].Sum == minSum);
+                var minSum = candidates.Min(n => _state.Players[n].Sum);
+                candidates = candidates.Where(n => _state.Players[n].Sum == minSum);
             }
 
             if (!candidates.Any()) // Никто из оставшихся не может перебить ставку
             {
-                var ind = _data.OrderIndex;
+                var ind = _state.OrderIndex;
 
-                if (_data.OrderIndex + candidatesAll.Length > _data.Order.Length)
+                if (_state.OrderIndex + candidatesAll.Length > _state.Order.Length)
                 {
                     throw new InvalidOperationException(
-                        $"Invalid order index. Order index: {_data.OrderIndex}; " +
-                        $"candidates length: {candidatesAll.Length}; order length: {_data.Order.Length}");
+                        $"Invalid order index. Order index: {_state.OrderIndex}; " +
+                        $"candidates length: {candidatesAll.Length}; order length: {_state.Order.Length}");
                 }
 
                 for (var i = 0; i < candidatesAll.Length; i++)
                 {
-                    _data.Order[ind + i] = candidatesAll[i];
+                    _state.Order[ind + i] = candidatesAll[i];
                     CheckOrder(ind + i);
-                    _data.Players[candidatesAll[i]].StakeMaking = false;
+                    _state.Players[candidatesAll[i]].StakeMaking = false;
                 }
 
                 var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(candidatesAll.Select(i => (object)i));
@@ -3656,40 +3655,40 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     return false;
                 }
 
-                _data.OrderIndex = -1;
+                _state.OrderIndex = -1;
                 AskStake(false);
                 return false;
             }
 
-            _data.IsWaiting = false;
+            _state.IsWaiting = false;
 
             if (candidates.Count() == 1)
             {
-                _data.Order[_data.OrderIndex] = candidates.First();
-                CheckOrder(_data.OrderIndex);
+                _state.Order[_state.OrderIndex] = candidates.First();
+                CheckOrder(_state.OrderIndex);
             }
             else
             {
                 // Showman should choose the next staker
-                for (var i = 0; i < _data.Players.Count; i++)
+                for (var i = 0; i < _state.Players.Count; i++)
                 {
-                    _data.Players[i].Flag = candidates.Contains(i);
+                    _state.Players[i].Flag = candidates.Contains(i);
                 }
 
                 // -- deprecated
                 var msg = new StringBuilder(Messages.FirstStake);
 
-                for (var i = 0; i < _data.Players.Count; i++)
+                for (var i = 0; i < _state.Players.Count; i++)
                 {
-                    msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
+                    msg.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Flag ? '+' : '-');
                 }
 
-                _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
+                _gameActions.SendMessage(msg.ToString(), _state.ShowMan.Name);
                 // -- end
-                AskToSelectPlayer(SelectPlayerReason.Staker, _data.ShowMan.Name);
-                _data.OrderHistory.AppendLine("Asking showman for the next staker");
+                AskToSelectPlayer(SelectPlayerReason.Staker, _state.ShowMan.Name);
+                _state.OrderHistory.AppendLine("Asking showman for the next staker");
 
-                var time = _data.TimeSettings.ShowmanDecision * 10;
+                var time = _state.TimeSettings.ShowmanDecision * 10;
                 ScheduleExecution(Tasks.WaitNext, time);
                 WaitFor(DecisionType.NextPersonStakeMaking, time, -1);
                 return false;
@@ -3699,8 +3698,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             // Остался последний игрок, выбор очевиден
             var leftIndex = candidatesAll[0];
-            _data.Order[_data.OrderIndex] = leftIndex;
-            CheckOrder(_data.OrderIndex);
+            _state.Order[_state.OrderIndex] = leftIndex;
+            CheckOrder(_state.OrderIndex);
         }
 
         return true;
@@ -3708,21 +3707,21 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     public void CheckOrder(int index)
     {
-        if (index < 0 || index >= _data.Order.Length)
+        if (index < 0 || index >= _state.Order.Length)
         {
-            throw new ArgumentException($"Value {index} must be in [0; {_data.Order.Length}]", nameof(index));
+            throw new ArgumentException($"Value {index} must be in [0; {_state.Order.Length}]", nameof(index));
         }
 
-        var checkedValue = _data.Order[index];
+        var checkedValue = _state.Order[index];
 
         if (checkedValue == -1)
         {
             throw new Exception("_data.Order[index] == -1");
         }
 
-        for (var i = 0; i < _data.Order.Length; i++)
+        for (var i = 0; i < _state.Order.Length; i++)
         {
-            var value = _data.Order[i];
+            var value = _state.Order[i];
 
             if (value == -1 || i == index)
             {
@@ -3738,19 +3737,19 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void AskStake(bool canDetectNextStakerGuard)
     {
-        var cost = _data.Question.Price;
+        var cost = _state.Question.Price;
 
         try
         {
-            _data.OrderHistory
-                .Append($"AskStake: Order = {string.Join(",", _data.Order)};")
-                .Append($" OrderIndex = {_data.OrderIndex};")
-                .Append($" StakeMaking = {string.Join(",", _data.Players.Select(p => p.StakeMaking))}")
+            _state.OrderHistory
+                .Append($"AskStake: Order = {string.Join(",", _state.Order)};")
+                .Append($" OrderIndex = {_state.OrderIndex};")
+                .Append($" StakeMaking = {string.Join(",", _state.Players.Select(p => p.StakeMaking))}")
                 .AppendLine();
 
             IncrementOrderIndex();
 
-            if (_data.Order[_data.OrderIndex] == -1) // Необходимо определить следующего ставящего
+            if (_state.Order[_state.OrderIndex] == -1) // Необходимо определить следующего ставящего
             {
                 if (!canDetectNextStakerGuard)
                 {
@@ -3762,29 +3761,29 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     return;
                 }
 
-                _data.OrderHistory.Append($"NextStaker = {_data.Order[_data.OrderIndex]}").AppendLine();
+                _state.OrderHistory.Append($"NextStaker = {_state.Order[_state.OrderIndex]}").AppendLine();
             }
 
-            var playerIndex = _data.Order[_data.OrderIndex];
+            var playerIndex = _state.Order[_state.OrderIndex];
 
-            var others = _data.Players.Where((p, index) => index != playerIndex); // Other players
+            var others = _state.Players.Where((p, index) => index != playerIndex); // Other players
             
-            if (others.All(p => !p.StakeMaking) && _data.Stake > -1) // Others cannot make stakes
+            if (others.All(p => !p.StakeMaking) && _state.Stake > -1) // Others cannot make stakes
             {
                 // Staker cannot raise anymore
                 ScheduleExecution(Tasks.AnnounceStakesWinner, 10);
                 return;
             }
 
-            if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+            if (playerIndex < 0 || playerIndex >= _state.Players.Count)
             {
-                throw new ArgumentException($"Bad {nameof(playerIndex)} value {playerIndex}! It must be in [0; {_data.Players.Count - 1}]");
+                throw new ArgumentException($"Bad {nameof(playerIndex)} value {playerIndex}! It must be in [0; {_state.Players.Count - 1}]");
             }
 
-            var activePlayer = _data.Players[playerIndex];
+            var activePlayer = _state.Players[playerIndex];
             var playerMoney = activePlayer.Sum;
 
-            if (_data.Stake != -1 && playerMoney <= _data.Stake || !activePlayer.StakeMaking) // Could not make stakes
+            if (_state.Stake != -1 && playerMoney <= _state.Stake || !activePlayer.StakeMaking) // Could not make stakes
             {
                 if (activePlayer.StakeMaking)
                 {
@@ -3804,7 +3803,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             // Detecting possible stake outcomes
 
             // Only nominal
-            if (_data.Stake == -1 && (playerMoney < cost || playerMoney == cost && others.All(p => playerMoney >= p.Sum)))
+            if (_state.Stake == -1 && (playerMoney < cost || playerMoney == cost && others.All(p => playerMoney >= p.Sum)))
             {
                 var s = new StringBuilder(activePlayer.Name)
                     .Append(", ").Append(LO[nameof(R.YouCanSayOnly)])
@@ -3812,113 +3811,113 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 _gameActions.ShowmanReplic(s.ToString());
 
-                _data.Stakes.StakerIndex = playerIndex;
-                _data.Stake = cost;
+                _state.Stakes.StakerIndex = playerIndex;
+                _state.Stake = cost;
                 _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
                 ScheduleExecution(Tasks.AskStake, 5, force: true);
                 return;
             }
 
-            var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + _data.StakeStep;
-            var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / _data.StakeStep) * _data.StakeStep;
+            var minimumStake = (_state.Stake != -1 ? _state.Stake : cost) + _state.StakeStep;
+            var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / _state.StakeStep) * _state.StakeStep;
 
-            _data.StakeTypes = StakeTypes.AllIn | (_data.Stake == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
+            _state.StakeTypes = StakeTypes.AllIn | (_state.Stake == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
 
-            if (!_data.AllIn && playerMoney >= minimumStakeAligned)
+            if (!_state.AllIn && playerMoney >= minimumStakeAligned)
             {
-                _data.StakeTypes |= StakeTypes.Stake;
+                _state.StakeTypes |= StakeTypes.Stake;
             }
 
-            _data.StakeVariants[0] = _data.Stake == -1;
-            _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + _data.StakeStep;
-            _data.StakeVariants[2] = !_data.StakeVariants[0];
-            _data.StakeVariants[3] = true;
+            _state.StakeVariants[0] = _state.Stake == -1;
+            _state.StakeVariants[1] = !_state.AllIn && playerMoney != cost && playerMoney > _state.Stake + _state.StakeStep;
+            _state.StakeVariants[2] = !_state.StakeVariants[0];
+            _state.StakeVariants[3] = true;
 
-            _data.ActivePlayer = activePlayer;
+            _state.ActivePlayer = activePlayer;
 
-            _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
+            _state.IsOralNow = _state.IsOral && _state.ActivePlayer.IsHuman;
 
             var stakeMsg = new MessageBuilder(Messages.Stake);
             var stakeMsg2 = new MessageBuilder(Messages.Stake2);
 
-            for (var i = 0; i < _data.StakeVariants.Length; i++)
+            for (var i = 0; i < _state.StakeVariants.Length; i++)
             {
-                stakeMsg.Add(_data.StakeVariants[i] ? '+' : '-');
+                stakeMsg.Add(_state.StakeVariants[i] ? '+' : '-');
             }
 
-            stakeMsg2.Add(_data.StakeTypes);
+            stakeMsg2.Add(_state.StakeTypes);
 
             stakeMsg.Add(minimumStakeAligned);
             stakeMsg2.Add(minimumStakeAligned);
-            stakeMsg2.Add(_data.StakeStep);
+            stakeMsg2.Add(_state.StakeStep);
 
-            var waitTime = _data.TimeSettings.StakeMaking * 10;
+            var waitTime = _state.TimeSettings.StakeMaking * 10;
 
             if (CanPlayerAct())
             {
-                _gameActions.SendMessage(stakeMsg.Build(), _data.ActivePlayer.Name);
-                _gameActions.SendMessage(stakeMsg2.Build(), _data.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg.Build(), _state.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg2.Build(), _state.ActivePlayer.Name);
 
-                if (!_data.ActivePlayer.IsConnected)
+                if (!_state.ActivePlayer.IsConnected)
                 {
                     waitTime = 20;
                 }
             }
 
-            if (_data.IsOralNow)
+            if (_state.IsOralNow)
             {
-                stakeMsg.Add(_data.ActivePlayer.Sum); // Send maximum possible value to showman
-                stakeMsg.Add(_data.ActivePlayer.Name);
-                _gameActions.SendMessage(stakeMsg.Build(), _data.ShowMan.Name);
+                stakeMsg.Add(_state.ActivePlayer.Sum); // Send maximum possible value to showman
+                stakeMsg.Add(_state.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg.Build(), _state.ShowMan.Name);
 
-                stakeMsg2.Add(_data.ActivePlayer.Sum); // Send maximum possible value to showman
-                stakeMsg2.Add(_data.ActivePlayer.Name);
-                _gameActions.SendMessage(stakeMsg2.Build(), _data.ShowMan.Name);
+                stakeMsg2.Add(_state.ActivePlayer.Sum); // Send maximum possible value to showman
+                stakeMsg2.Add(_state.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg2.Build(), _state.ShowMan.Name);
             }
 
-            var minimumStakeNew = _data.Stake != -1 ? _data.Stake + _data.StakeStep : cost;
-            var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStakeNew / _data.StakeStep) * _data.StakeStep;
+            var minimumStakeNew = _state.Stake != -1 ? _state.Stake + _state.StakeStep : cost;
+            var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStakeNew / _state.StakeStep) * _state.StakeStep;
             
-            _data.StakeModes = StakeModes.AllIn;
+            _state.StakeModes = StakeModes.AllIn;
 
-            if (_data.Stake != -1)
+            if (_state.Stake != -1)
             {
-                _data.StakeModes |= StakeModes.Pass;
+                _state.StakeModes |= StakeModes.Pass;
             }
 
-            if (!_data.AllIn && playerMoney >= minimumStakeAlignedNew)
+            if (!_state.AllIn && playerMoney >= minimumStakeAlignedNew)
             {
-                _data.StakeModes |= StakeModes.Stake;
+                _state.StakeModes |= StakeModes.Stake;
             }
 
-            var stakeLimit = new StakeSettings(minimumStakeAlignedNew, _data.ActivePlayer.Sum, _data.StakeStep);
-            AskToMakeStake(StakeReason.HighestPlays, _data.ActivePlayer.Name, stakeLimit);
+            var stakeLimit = new StakeSettings(minimumStakeAlignedNew, _state.ActivePlayer.Sum, _state.StakeStep);
+            AskToMakeStake(StakeReason.HighestPlays, _state.ActivePlayer.Name, stakeLimit);
 
-            _data.StakeType = null;
-            _data.StakeSum = -1;
+            _state.StakeType = null;
+            _state.StakeSum = -1;
             ScheduleExecution(Tasks.WaitStake, waitTime);
-            WaitFor(DecisionType.StakeMaking, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
+            WaitFor(DecisionType.StakeMaking, waitTime, _state.Players.IndexOf(_state.ActivePlayer));
         }
         catch (Exception exc)
         {
-            var orders = string.Join(",", _data.Order);
-            var sums = string.Join(",", _data.Players.Select(p => p.Sum));
-            var stakeMaking = string.Join(",", _data.Players.Select(p => p.StakeMaking));
-            throw new Exception($"AskStake error {sums} {stakeMaking} {orders} {_data.Stake} {_data.OrderIndex} {_data.Players.Count} {_data.OrderHistory}", exc);
+            var orders = string.Join(",", _state.Order);
+            var sums = string.Join(",", _state.Players.Select(p => p.Sum));
+            var stakeMaking = string.Join(",", _state.Players.Select(p => p.StakeMaking));
+            throw new Exception($"AskStake error {sums} {stakeMaking} {orders} {_state.Stake} {_state.OrderIndex} {_state.Players.Count} {_state.OrderHistory}", exc);
         }
     }
 
     internal bool TryDetectStakesWinner()
     {
-        var stakerCount = _data.Players.Count(p => p.StakeMaking);
+        var stakerCount = _state.Players.Count(p => p.StakeMaking);
 
         if (stakerCount == 1) // Answerer is detected
         {
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (_data.Players[i].StakeMaking)
+                if (_state.Players[i].StakeMaking)
                 {
-                    _data.Stakes.StakerIndex = i;
+                    _state.Stakes.StakerIndex = i;
                 }
             }
 
@@ -3940,31 +3939,31 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void AskToMakeStake(StakeReason reason, IEnumerable<(string name, StakeSettings limit)> persons)
     {
-        _data.DecisionMakers.Clear();
-        _data.StakeLimits.Clear();
+        _state.DecisionMakers.Clear();
+        _state.StakeLimits.Clear();
 
         foreach (var (name, limit) in persons)
         {
-            var stakeMessage = new MessageBuilder(Messages.AskStake, _data.StakeModes, limit.Minimum, limit.Maximum, limit.Step, reason);
+            var stakeMessage = new MessageBuilder(Messages.AskStake, _state.StakeModes, limit.Minimum, limit.Maximum, limit.Step, reason);
 
             if (CanPlayerAct())
             {
                 _gameActions.SendMessage(stakeMessage.Build(), name);
             }
 
-            if (_data.IsOralNow)
+            if (_state.IsOralNow)
             {
                 stakeMessage.Add(name);
-                _gameActions.SendMessage(stakeMessage.Build(), _data.ShowMan.Name);
+                _gameActions.SendMessage(stakeMessage.Build(), _state.ShowMan.Name);
             }
 
-            _data.DecisionMakers.Add(name);
-            _data.StakeLimits[name] = limit;
+            _state.DecisionMakers.Add(name);
+            _state.StakeLimits[name] = limit;
         }
 
-        if (_data.IsOralNow)
+        if (_state.IsOralNow)
         {
-            _data.DecisionMakers.Add(_data.ShowMan.Name);
+            _state.DecisionMakers.Add(_state.ShowMan.Name);
         }
     }
 
@@ -3972,16 +3971,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         var breakerGuard = 20; // Temp var
 
-        var initialOrderIndex = _data.OrderIndex == -1 ? _data.Order.Length - 1 : _data.OrderIndex;
+        var initialOrderIndex = _state.OrderIndex == -1 ? _state.Order.Length - 1 : _state.OrderIndex;
 
         // TODO: Rewrite as for
         do
         {
-            _data.OrderIndex++;
+            _state.OrderIndex++;
 
-            if (_data.OrderIndex == _data.Order.Length)
+            if (_state.OrderIndex == _state.Order.Length)
             {
-                _data.OrderIndex = 0;
+                _state.OrderIndex = 0;
             }
 
             breakerGuard--;
@@ -3991,23 +3990,23 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 throw new Exception($"{nameof(breakerGuard)} == {breakerGuard} ({initialOrderIndex})");
             }
 
-        } while (_data.OrderIndex != initialOrderIndex &&
-            _data.Order[_data.OrderIndex] != -1 &&
-            !_data.Players[_data.Order[_data.OrderIndex]].StakeMaking);
+        } while (_state.OrderIndex != initialOrderIndex &&
+            _state.Order[_state.OrderIndex] != -1 &&
+            !_state.Players[_state.Order[_state.OrderIndex]].StakeMaking);
 
-        if (_data.OrderIndex == initialOrderIndex)
+        if (_state.OrderIndex == initialOrderIndex)
         {
-            throw new Exception($"{nameof(_data.OrderIndex)} == {nameof(initialOrderIndex)} ({initialOrderIndex})");
+            throw new Exception($"{nameof(_state.OrderIndex)} == {nameof(initialOrderIndex)} ({initialOrderIndex})");
         }
 
-        _data.OrderHistory.AppendFormat("New order index: {0}", _data.OrderIndex).AppendLine();
+        _state.OrderHistory.AppendFormat("New order index: {0}", _state.OrderIndex).AppendLine();
     }
 
     private void OnStartAppellation()
     {
-        if (_data.AppelaerIndex < 0 ||
-            _data.AppelaerIndex >= _data.Players.Count ||
-            _data.AppellationCallerIndex != -1 && (_data.AppellationCallerIndex < 0 || _data.AppellationCallerIndex >= _data.Players.Count))
+        if (_state.AppelaerIndex < 0 ||
+            _state.AppelaerIndex >= _state.Players.Count ||
+            _state.AppellationCallerIndex != -1 && (_state.AppellationCallerIndex < 0 || _state.AppellationCallerIndex >= _state.Players.Count))
         {
             _tasksHistory.AddLogEntry($"OnStartAppellation resumed ({_taskRunner.PrintOldTasks()})");
             ResumeExecution(40);
@@ -4016,9 +4015,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         
         _gameActions.SendMessageWithArgs(Messages.Appellation, '+');
 
-        var appelaer = _data.Players[_data.AppelaerIndex];
-        var isAppellationForRightAnswer = _data.AppellationCallerIndex == -1;
-        var appellationSource = isAppellationForRightAnswer ? appelaer : _data.Players[_data.AppellationCallerIndex];
+        var appelaer = _state.Players[_state.AppelaerIndex];
+        var isAppellationForRightAnswer = _state.AppellationCallerIndex == -1;
+        var appellationSource = isAppellationForRightAnswer ? appelaer : _state.Players[_state.AppellationCallerIndex];
 
         var given = LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
         var apellationReplic = string.Format(LO[nameof(R.PleaseCheckApellation)], given);
@@ -4031,44 +4030,44 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
 
-        _data.AppellationAwaitedVoteCount = 0;
-        _data.AppellationTotalVoteCount = _data.Players.Count(p => p.IsConnected) + 1; // players and showman
-        _data.AppellationPositiveVoteCount = 0;
-        _data.AppellationNegativeVoteCount = 0;
+        _state.AppellationAwaitedVoteCount = 0;
+        _state.AppellationTotalVoteCount = _state.Players.Count(p => p.IsConnected) + 1; // players and showman
+        _state.AppellationPositiveVoteCount = 0;
+        _state.AppellationNegativeVoteCount = 0;
 
         // Showman vote
         if (isAppellationForRightAnswer)
         {
-            _data.AppellationNegativeVoteCount++;
+            _state.AppellationNegativeVoteCount++;
         }
         else
         {
-            _data.AppellationPositiveVoteCount++;
+            _state.AppellationPositiveVoteCount++;
         }
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            if (i == _data.AppelaerIndex)
+            if (i == _state.AppelaerIndex)
             {
-                _data.Players[i].AppellationFlag = false;
-                _data.AppellationPositiveVoteCount++;
+                _state.Players[i].AppellationFlag = false;
+                _state.AppellationPositiveVoteCount++;
             }
-            else if (!isAppellationForRightAnswer && i == _data.AppellationCallerIndex)
+            else if (!isAppellationForRightAnswer && i == _state.AppellationCallerIndex)
             {
-                _data.Players[i].AppellationFlag = false;
-                _data.AppellationNegativeVoteCount++;
+                _state.Players[i].AppellationFlag = false;
+                _state.AppellationNegativeVoteCount++;
                 _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
                 _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
             }
-            else if (_data.Players[i].IsConnected)
+            else if (_state.Players[i].IsConnected)
             {
-                _data.AppellationAwaitedVoteCount++;
-                _data.Players[i].AppellationFlag = true;
-                _gameActions.SendMessage(validation2Message, _data.Players[i].Name);
+                _state.AppellationAwaitedVoteCount++;
+                _state.Players[i].AppellationFlag = true;
+                _gameActions.SendMessage(validation2Message, _state.Players[i].Name);
             }
         }
 
-        var waitTime = _data.AppellationAwaitedVoteCount > 0 ? _data.TimeSettings.ShowmanDecision * 10 : 1;
+        var waitTime = _state.AppellationAwaitedVoteCount > 0 ? _state.TimeSettings.ShowmanDecision * 10 : 1;
         ScheduleExecution(Tasks.WaitAppellationDecision, waitTime);
         WaitFor(DecisionType.Appellation, waitTime, -2);
     }
@@ -4079,15 +4078,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         try
         {
-            if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
+            if (_state.AppelaerIndex < 0 || _state.AppelaerIndex >= _state.Players.Count)
             {
                 _tasksHistory.AddLogEntry($"CheckAppellation resumed ({_taskRunner.PrintOldTasks()})");
                 return;
             }
 
-            var votingForRight = _data.AppellationCallerIndex == -1;
-            var positiveVoteCount = _data.AppellationPositiveVoteCount;
-            var negativeVoteCount = _data.AppellationNegativeVoteCount;
+            var votingForRight = _state.AppellationCallerIndex == -1;
+            var positiveVoteCount = _state.AppellationPositiveVoteCount;
+            var negativeVoteCount = _state.AppellationNegativeVoteCount;
 
             if (votingForRight && positiveVoteCount <= negativeVoteCount || !votingForRight && positiveVoteCount >= negativeVoteCount)
             {
@@ -4112,7 +4111,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         finally
         {
-            if (_data.QuestionPlayState.AppellationIndex >= _data.QuestionPlayState.Appellations.Count || !ProcessNextAppellationRequest(false))
+            if (_state.QuestionPlay.AppellationIndex >= _state.QuestionPlay.Appellations.Count || !ProcessNextAppellationRequest(false))
             {
                 _gameActions.SendMessageWithArgs(Messages.Appellation, '-');
                 ResumeExecution(40);
@@ -4126,13 +4125,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void ApplyAppellationForRightAnswer()
     {
-        var appelaer = _data.Players[_data.AppelaerIndex];
+        var appelaer = _state.Players[_state.AppelaerIndex];
 
-        var themeName = _data.Theme.Name;
-        var questionText = _data.Question?.GetText();
+        var themeName = _state.Theme.Name;
+        var questionText = _state.Question?.GetText();
 
         // Add appellated answer to game report
-        var answerInfo = _data.GameResultInfo.RejectedAnswers.FirstOrDefault(
+        var answerInfo = _state.GameResultInfo.RejectedAnswers.FirstOrDefault(
             answer =>
                 answer.ThemeName == themeName
                 && answer.QuestionText == questionText
@@ -4140,10 +4139,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (answerInfo != null)
         {
-            _data.GameResultInfo.RejectedAnswers.Remove(answerInfo);
+            _state.GameResultInfo.RejectedAnswers.Remove(answerInfo);
         }
 
-        _data.GameResultInfo.ApellatedAnswers.Add(new QuestionReport
+        _state.GameResultInfo.ApellatedAnswers.Add(new QuestionReport
         {
             ThemeName = themeName,
             QuestionText = questionText,
@@ -4160,19 +4159,19 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var wrong = new List<object>();
         var passed = new List<object>();
 
-        for (var i = 0; i < _data.QuestionHistory.Count; i++)
+        for (var i = 0; i < _state.QuestionHistory.Count; i++)
         {
-            var historyItem = _data.QuestionHistory[i];
+            var historyItem = _state.QuestionHistory[i];
             var index = historyItem.PlayerIndex;
 
-            if (index < 0 || index >= _data.Players.Count)
+            if (index < 0 || index >= _state.Players.Count)
             {
                 continue;
             }
 
-            var player = _data.Players[index];
+            var player = _state.Players[index];
 
-            if (isVotingForRightAnswer && singleAnswerer && index != _data.AppelaerIndex)
+            if (isVotingForRightAnswer && singleAnswerer && index != _state.AppelaerIndex)
             {
                 if (!change)
                 {
@@ -4190,7 +4189,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 passed.Add(index);
             }
-            else if (index == _data.AppelaerIndex)
+            else if (index == _state.AppelaerIndex)
             {
                 if (singleAnswerer)
                 {
@@ -4199,22 +4198,22 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     if (historyItem.IsRight)
                     {
                         UndoRightSum(player, historyItem.Sum);
-                        SubtractWrongSum(player, _data.CurPriceWrong);
+                        SubtractWrongSum(player, _state.CurPriceWrong);
 
                         wrong.Add(index);
                     }
                     else
                     {
                         UndoWrongSum(player, historyItem.Sum);
-                        AddRightSum(player, _data.CurPriceRight);
+                        AddRightSum(player, _state.CurPriceRight);
 
                         right.Add(index);
 
                         // TODO: that should be handled by question selection strategy
                         if (Engine.CanMoveBack) // Not the beginning of a round
                         {
-                            _data.ChooserIndex = index;
-                            _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
+                            _state.ChooserIndex = index;
+                            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
                         }
                     }
                 }
@@ -4265,7 +4264,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (arg == 1)
         {
-            var authors = _data.PackageDoc.ResolveAuthors(theme.Info.Authors);
+            var authors = _state.PackageDoc.ResolveAuthors(theme.Info.Authors);
 
             if (authors.Length > 0)
             {
@@ -4282,7 +4281,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (arg == 2)
         {
-            var sources = _data.PackageDoc.ResolveSources(theme.Info.Sources);
+            var sources = _state.PackageDoc.ResolveSources(theme.Info.Sources);
 
             if (sources.Count > 0)
             {
@@ -4303,7 +4302,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            _data.ThemeInfoShown.Add(_data.Theme);
+            _state.ThemeInfoShown.Add(_state.Theme);
             var delay = informed ? 20 : 1;
 
             if (isFull)
@@ -4319,10 +4318,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitFor(DecisionType decision, int time, int person, bool isWaiting = true)
     {
-        _data.TimerStartTime[2] = DateTime.UtcNow;
+        _state.TimerStartTime[2] = DateTime.UtcNow;
 
-        _data.IsWaiting = isWaiting;
-        _data.Decision = decision;
+        _state.IsWaiting = isWaiting;
+        _state.Decision = decision;
 
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, time, person);
     }
@@ -4335,7 +4334,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (stage == 1)
         {
-            var authors = _data.PackageDoc.ResolveAuthors(package.Info.Authors);
+            var authors = _state.PackageDoc.ResolveAuthors(package.Info.Authors);
 
             if (package.Name != Constants.RandomIndicator && authors.Length > 0)
             {
@@ -4376,7 +4375,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             _gameActions.SendVisualMessage(messageBuilder);
 
-            var sources = _data.PackageDoc.ResolveSources(package.Info.Sources);
+            var sources = _state.PackageDoc.ResolveSources(package.Info.Sources);
 
             if (sources.Count > 0)
             {
@@ -4447,17 +4446,17 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var roundIndex = Engine.RoundIndex;
             var roundName = round.Name;
 
-            _data.Stage = GameStage.Round;
-            OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _data.Rounds.Length);
+            _state.Stage = GameStage.Round;
+            OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _state.Rounds.Length);
 
-            _gameActions.InformRound(roundName, roundIndex, _data.RoundStrategy);
+            _gameActions.InformRound(roundName, roundIndex, _state.RoundStrategy);
             _gameActions.InformRoundContent();
-            _data.InformStages |= InformStages.RoundContent;
+            _state.InformStages |= InformStages.RoundContent;
 
             _gameActions.SystemReplic(" "); // new line // TODO: REMOVE: replaced by STAGE message
             _gameActions.SystemReplic(roundName); // TODO: REMOVE: replaced by STAGE message
 
-            var authors = _data.PackageDoc.ResolveAuthors(round.Info.Authors);
+            var authors = _state.PackageDoc.ResolveAuthors(round.Info.Authors);
 
             if (authors.Length > 0)
             {
@@ -4465,7 +4464,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 _gameActions.SendMessage(msg.ToString());
             }
 
-            var sources = _data.PackageDoc.ResolveSources(round.Info.Sources);
+            var sources = _state.PackageDoc.ResolveSources(round.Info.Sources);
 
             if (sources.Count > 0)
             {
@@ -4496,7 +4495,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             // Showing advertisement
             try
             {
-                var ad = _data.Host.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
+                var ad = _state.Host.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
 
                 if (!string.IsNullOrEmpty(ad))
                 {
@@ -4519,7 +4518,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
             catch (Exception exc)
             {
-                _data.Host.SendError(exc);
+                _state.Host.SendError(exc);
                 stage++;
             }
         }
@@ -4540,51 +4539,51 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void SetAnswererAsActive()
     {
-        _data.AnswererIndex = _data.ChooserIndex;
-        _data.QuestionPlayState.SetSingleAnswerer(_data.ChooserIndex);
+        _state.AnswererIndex = _state.ChooserIndex;
+        _state.QuestionPlay.SetSingleAnswerer(_state.ChooserIndex);
 
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex, '+');
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, '+');
 
         ScheduleExecution(Tasks.MoveNext, 5);
     }
 
     internal void SetAnswererByActive(bool canGiveThemselves)
     {
-        if (_data.ChooserIndex == -1)
+        if (_state.ChooserIndex == -1)
         {
-            _data.ChooserIndex = DetectPlayerIndexWithLowestSum();
+            _state.ChooserIndex = DetectPlayerIndexWithLowestSum();
         }
 
-        if (_data.Chooser == null)
+        if (_state.Chooser == null)
         {
             throw new InvalidOperationException("_data.Chooser == null");
         }
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            _data.Players[i].Flag = true;
+            _state.Players[i].Flag = true;
         }
 
         if (!canGiveThemselves)
         {
-            _data.Chooser.Flag = false;
+            _state.Chooser.Flag = false;
         }
 
-        var optionCount = _data.Players.Count(player => player.Flag);
+        var optionCount = _state.Players.Count(player => player.Flag);
 
         if (optionCount == 1)
         {
-            for (var i = 0; i < _data.Players.Count; i++)
+            for (var i = 0; i < _state.Players.Count; i++)
             {
-                if (_data.Players[i].Flag)
+                if (_state.Players[i].Flag)
                 {
-                    _data.ChooserIndex = _data.AnswererIndex = i;
-                    _data.QuestionPlayState.SetSingleAnswerer(i);
-                    _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
+                    _state.ChooserIndex = _state.AnswererIndex = i;
+                    _state.QuestionPlay.SetSingleAnswerer(i);
+                    _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
                 }
             }
 
-            _gameActions.ShowmanReplic($"{_data.Answerer.Name}, {LO[nameof(R.CatIsYours)]}!");
+            _gameActions.ShowmanReplic($"{_state.Answerer.Name}, {LO[nameof(R.CatIsYours)]}!");
             ScheduleExecution(Tasks.MoveNext, 10);
         }
         else
@@ -4598,11 +4597,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var allConnectedIndicies = new List<int>();
         var allDisconnectedIndicies = new List<object>();
 
-        var hasConnectedPlayers = _data.Players.Any(p => p.IsConnected);
+        var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            if (_data.Players[i].IsConnected || !hasConnectedPlayers)
+            if (_state.Players[i].IsConnected || !hasConnectedPlayers)
             {
                 allConnectedIndicies.Add(i);
             }
@@ -4612,7 +4611,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        _data.QuestionPlayState.SetMultipleAnswerers(allConnectedIndicies);
+        _state.QuestionPlay.SetMultipleAnswerers(allConnectedIndicies);
         
         var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(allConnectedIndicies.Select(i => (object)i));
         _gameActions.SendMessage(msg.ToString());
@@ -4628,7 +4627,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnButtonPressStart()
     {
-        _data.Decision = DecisionType.Pressing;
+        _state.Decision = DecisionType.Pressing;
         _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
 
         SendTryToPlayers();
@@ -4638,7 +4637,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         if (string.IsNullOrWhiteSpace(themeName))
         {
-            themeName = _data.Theme?.Name ?? "";
+            themeName = _state.Theme?.Name ?? "";
         }
 
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, themeName);
@@ -4657,19 +4656,21 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.SendVisualMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
 
         var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length)
-            + _data.TimeSettings.RightAnswer * 10;
+            + _state.TimeSettings.RightAnswer * 10;
         
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
+    // TODO: There are two different messages to inform rigt answer options, refactor this
+
     internal void OnComplexAnswer()
     {
-        var answer = _data.Question?.Right.FirstOrDefault() ?? ""; // TODO: this value should come from engine
+        var answer = _state.QuestionPlay.RightAnswers.FirstOrDefault() ?? "";
 
-        if (_data.QuestionPlayState.AnswerOptions != null)
+        if (_state.QuestionPlay.AnswerOptions != null)
         {
-            _data.RightOptionLabel = answer;
-            var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == answer);
+            OnRightAnswerOptionCore(answer);
+            var answerIndex = Array.FindIndex(_state.QuestionPlay.AnswerOptions, o => o.Label == answer);
 
             if (answerIndex > -1)
             {
@@ -4682,18 +4683,39 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRightAnswerOption(string rightOptionLabel)
     {
-        _data.RightOptionLabel = rightOptionLabel;
+        OnRightAnswerOptionCore(rightOptionLabel);
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
-        var answerTime = _data.TimeSettings.RightAnswer;
+        var answerTime = _state.TimeSettings.RightAnswer;
         answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
+    internal void OnRightAnswerOptionCore(string rightOptionLabel)
+    {
+        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
+        {
+            OnAnswerOptions();
+            _state.QuestionPlay.LayoutShown = true;
+        }
+
+        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
+        {
+            for (var i = 0; i < _state.QuestionPlay.AnswerOptions.Length; i++)
+            {
+                InformAnswerOption(i);
+            }
+
+            _state.QuestionPlay.AnswerOptionsShown = true;
+        }
+
+        _state.RightOptionLabel = rightOptionLabel;
+    }
+
     private bool DetectRoundTimeout()
     {
-        var roundDuration = DateTime.UtcNow.Subtract(_data.TimerStartTime[0]).TotalMilliseconds / 100;
+        var roundDuration = DateTime.UtcNow.Subtract(_state.TimerStartTime[0]).TotalMilliseconds / 100;
 
-        if (_data.Stage == GameStage.Round && roundDuration >= _data.TimeSettings.Round * 10)
+        if (_state.Stage == GameStage.Round && roundDuration >= _state.TimeSettings.Round * 10)
         {
             // Round timeout
             _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
@@ -4708,7 +4730,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var timeout = DetectRoundTimeout();
         var nextTaskTime = 1;
 
-        if (HaveMultipleAnswerers() && _data.QuestionPlayState.ValidateAfterRightAnswer)
+        if (HaveMultipleAnswerers() && _state.QuestionPlay.ValidateAfterRightAnswer)
         {
             var validationResult = ValidatePlayersAnswers();
 
@@ -4729,11 +4751,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private bool? ValidatePlayersAnswers()
     {
-        if (_data.AnnouncedAnswerersEnumerator != null)
+        if (_state.AnnouncedAnswerersEnumerator != null)
         {
-            _data.AnnouncedAnswerersEnumerator.Reset();
+            _state.AnnouncedAnswerersEnumerator.Reset();
 
-            if (_data.QuestionPlayState.HiddenStakes)
+            if (_state.QuestionPlay.HiddenStakes)
             {
                 ScheduleExecution(Tasks.AnnouncePostStakeWithAnswerOptions, 1);
                 return true;
@@ -4750,22 +4772,22 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void CalculateOutcomesByRightAnswerOption()
     {
-        if (_data.AnnouncedAnswerersEnumerator == null)
+        if (_state.AnnouncedAnswerersEnumerator == null)
         {
             return;
         }
 
-        while (_data.AnnouncedAnswerersEnumerator.MoveNext())
+        while (_state.AnnouncedAnswerersEnumerator.MoveNext())
         {
-            var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
+            var answererIndex = _state.AnnouncedAnswerersEnumerator.Current;
 
-            if (answererIndex < 0 || answererIndex >= _data.Players.Count)
+            if (answererIndex < 0 || answererIndex >= _state.Players.Count)
             {
                 continue;
             }
 
-            var answerer = _data.Players[answererIndex];
-            var isRight = answerer.Answer == _data.RightOptionLabel;
+            var answerer = _state.Players[answererIndex];
+            var isRight = answerer.Answer == _state.RightOptionLabel;
 
             var message = new MessageBuilder(Messages.Person);
             int outcome;
@@ -4773,14 +4795,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             if (isRight)
             {
                 message.Add('+');
-                AddRightSum(answerer, _data.CurPriceRight);
-                outcome = _data.CurPriceRight;
+                AddRightSum(answerer, _state.CurPriceRight);
+                outcome = _state.CurPriceRight;
             }
             else
             {
                 message.Add('-');
-                SubtractWrongSum(answerer, _data.CurPriceWrong);
-                outcome = _data.CurPriceWrong;
+                SubtractWrongSum(answerer, _state.CurPriceWrong);
+                outcome = _state.CurPriceWrong;
             }
 
             message.Add(answererIndex).Add(outcome);
@@ -4828,29 +4850,29 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             if (_minRoundPrice == _maxRoundPrice)
             {
-                _data.CurPriceRight = _minRoundPrice;
-                _data.CurPriceWrong = _data.CurPriceRight;
-                _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
+                _state.CurPriceRight = _minRoundPrice;
+                _state.CurPriceWrong = _state.CurPriceRight;
+                _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
                 ScheduleExecution(Tasks.MoveNext, 1);
             }
             else
             {
-                _data.CurPriceRight = -1;
-                _data.StakeRange = new StakeSettings(_minRoundPrice, _maxRoundPrice, _maxRoundPrice - _minRoundPrice);
+                _state.CurPriceRight = -1;
+                _state.StakeRange = new StakeSettings(_minRoundPrice, _maxRoundPrice, _maxRoundPrice - _minRoundPrice);
 
                 ScheduleExecution(Tasks.AskToSelectQuestionPrice, 1, force: true);
             }
         }
         else if (availableRange.Minimum == availableRange.Maximum)
         {
-            _data.CurPriceWrong = _data.CurPriceRight = availableRange.Minimum;
-            _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
+            _state.CurPriceWrong = _state.CurPriceRight = availableRange.Minimum;
+            _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
             ScheduleExecution(Tasks.MoveNext, 1);
         }
         else
         {
-            _data.CurPriceRight = -1;
-            _data.StakeRange = new StakeSettings(availableRange.Minimum, availableRange.Maximum, availableRange.Step);
+            _state.CurPriceRight = -1;
+            _state.StakeRange = new StakeSettings(availableRange.Minimum, availableRange.Maximum, availableRange.Step);
 
             ScheduleExecution(Tasks.AskToSelectQuestionPrice, 1, force: true);
         }
@@ -4858,26 +4880,26 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void SetAnswererByHighestVisibleStake()
     {
-        if (_data.Question == null)
+        if (_state.Question == null)
         {
             throw new InvalidOperationException("_data.Question == null");
         }
 
-        var nominal = _data.Question.Price;
+        var nominal = _state.Question.Price;
 
-        if (_data.ChooserIndex == -1)
+        if (_state.ChooserIndex == -1)
         {
-            _data.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
+            _state.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
         }
 
-        _data.Order = new int[_data.Players.Count];
+        _state.Order = new int[_state.Players.Count];
         var passes = new List<object>();
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            var canMakeStake = i == _data.ChooserIndex || _data.Players[i].Sum > nominal;
-            _data.Players[i].StakeMaking = canMakeStake;
-            _data.Order[i] = -1;
+            var canMakeStake = i == _state.ChooserIndex || _state.Players[i].Sum > nominal;
+            _state.Players[i].StakeMaking = canMakeStake;
+            _state.Order[i] = -1;
 
             if (!canMakeStake)
             {
@@ -4891,35 +4913,35 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.SendMessage(passMsg.ToString());
         }
 
-        _data.Stake = -1;
-        Stakes.Reset(_data.ChooserIndex);
-        _data.Order[0] = _data.ChooserIndex;
-        _data.OrderHistory.Clear();
+        _state.Stake = -1;
+        Stakes.Reset(_state.ChooserIndex);
+        _state.Order[0] = _state.ChooserIndex;
+        _state.OrderHistory.Clear();
 
-        _data.OrderHistory.Append("Stake making. Initial state. ")
+        _state.OrderHistory.Append("Stake making. Initial state. ")
             .AppendLine()
             .Append("Sums: ")
-            .Append(string.Join(",", _data.Players.Select(p => p.Sum)))
+            .Append(string.Join(",", _state.Players.Select(p => p.Sum)))
             .AppendLine()
             .Append("StakeMaking: ")
-            .Append(string.Join(",", _data.Players.Select(p => p.StakeMaking)))
+            .Append(string.Join(",", _state.Players.Select(p => p.StakeMaking)))
             .AppendLine()
             .Append(" Order: ")
-            .Append(string.Join(",", _data.Order))
+            .Append(string.Join(",", _state.Order))
             .AppendLine()
             .Append(" Nominal: ")
-            .Append(_data.CurPriceRight)
+            .Append(_state.CurPriceRight)
             .AppendLine();
 
-        _data.AllIn = false;
-        _data.OrderIndex = -1;
+        _state.AllIn = false;
+        _state.OrderIndex = -1;
         ScheduleExecution(Tasks.AskStake, 10);
     }
 
     private int DetectPlayerIndexWithLowestSum()
     {
-        var minSum = _data.Players.Min(p => p.Sum);
-        return _data.Players.TakeWhile(p => p.Sum != minSum).Count();
+        var minSum = _state.Players.Min(p => p.Sum);
+        return _state.Players.TakeWhile(p => p.Sum != minSum).Count();
     }
 
     internal void SetAnswerersByAllHiddenStakes()
@@ -4927,12 +4949,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var answerers = new List<int>();
         var passes = new List<object>();
 
-        var hasConnectedPlayers = _data.Players.Any(p => p.IsConnected);
+        var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
 
-        for (var i = 0; i < _data.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            if ((!hasConnectedPlayers || _data.Players[i].IsConnected) &&
-                (_data.Players[i].Sum > 0 || _data.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes))
+            if ((!hasConnectedPlayers || _state.Players[i].IsConnected) &&
+                (_state.Players[i].Sum > 0 || _state.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes))
             {
                 answerers.Add(i);
             }
@@ -4951,86 +4973,94 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.SendMessage(passMsg.ToString());
         }
 
-        _data.QuestionPlayState.SetMultipleAnswerers(answerers);
-        _data.QuestionPlayState.HiddenStakes = true;
+        _state.QuestionPlay.SetMultipleAnswerers(answerers);
+        _state.QuestionPlay.HiddenStakes = true;
         AskHiddenStakes();
     }
 
     internal void OnMultiplyPrice()
     {
-        if (_data.ChooserIndex == -1)
+        if (_state.ChooserIndex == -1)
         {
-            _data.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
+            _state.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
         }
 
-        var factor = _data.Settings.AppSettings.QuestionForYourselfFactor;
+        var factor = _state.Settings.AppSettings.QuestionForYourselfFactor;
 
-        _data.CurPriceRight *= factor;
-        _data.CurPriceWrong *= factor;
+        _state.CurPriceRight *= factor;
+        _state.CurPriceWrong *= factor;
 
-        if (factor != 1 || _data.CurPriceRight != _data.CurPriceWrong)
+        if (factor != 1 || _state.CurPriceRight != _state.CurPriceWrong)
         {
             var replic = string.Format(
                 LO[nameof(R.QuestionForYourselfInfo)],
-                Notion.FormatNumber(_data.CurPriceRight),
-                Notion.FormatNumber(_data.CurPriceWrong),
+                Notion.FormatNumber(_state.CurPriceRight),
+                Notion.FormatNumber(_state.CurPriceWrong),
                 factor);
 
-            _gameActions.ShowmanReplic($"{_data.Chooser!.Name}, {replic}");
+            _gameActions.ShowmanReplic($"{_state.Chooser!.Name}, {replic}");
         }
 
-        _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
+        _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight, _state.CurPriceWrong);
 
         ScheduleExecution(Tasks.MoveNext, 20);
     }
 
     internal void AcceptQuestion()
     {
-        if (_data.Answerer == null)
+        if (_state.Answerer == null)
         {
             throw new InvalidOperationException("_data.Answerer == null");
         }
 
         _gameActions.ShowmanReplic(LO[nameof(R.EasyCat)]);
-        _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, _data.CurPriceRight);
+        _gameActions.SendMessageWithArgs(Messages.Person, '+', _state.AnswererIndex, _state.CurPriceRight);
 
-        AddRightSum(_data.Answerer, _data.CurPriceRight);
-        _data.ChooserIndex = _data.AnswererIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _data.ChooserIndex);
+        AddRightSum(_state.Answerer, _state.CurPriceRight);
+        _state.ChooserIndex = _state.AnswererIndex;
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
         _gameActions.InformSums();
 
-        _data.SkipQuestion?.Invoke();
+        _state.SkipQuestion?.Invoke();
         ScheduleExecution(Tasks.MoveNext, 20, 1);
     }
 
     internal void OnAnswerOptions()
     {
         _gameActions.InformLayout();
-        _data.InformStages |= InformStages.Layout;
-        _data.LastVisualMessage = null;
-        _data.ComplexVisualState = new IReadOnlyList<string>[1 + (_data.QuestionPlayState.AnswerOptions?.Length ?? 0)];
+        _state.InformStages |= InformStages.Layout;
+        _state.LastVisualMessage = null;
+        _state.ComplexVisualState = new IReadOnlyList<string>[1 + (_state.QuestionPlay.AnswerOptions?.Length ?? 0)];
     }
 
     internal void ShowAnswerOptions(Action? continuation)
     {
-        if (_data.QuestionPlayState.AnswerOptions == null)
+        if (_state.QuestionPlay.AnswerOptions == null)
         {
             throw new InvalidOperationException("AnswerOptions == null");
         }
 
-        var nextTask = _data.QuestionPlayState.AnswerOptions.Length > 0 ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
+        var nextTask = _state.QuestionPlay.AnswerOptions.Length > 0 ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
         ScheduleExecution(nextTask, 1, 0);
         _continuation = continuation;
     }
 
     internal void ShowNextAnswerOption(int optionIndex)
     {
-        if (_data.QuestionPlayState.AnswerOptions == null)
+        int contentDuration = InformAnswerOption(optionIndex);
+
+        var nextTask = optionIndex + 1 < _state.QuestionPlay.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
+        ScheduleExecution(nextTask, _state.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? contentDuration : 1, optionIndex + 1);
+    }
+
+    internal int InformAnswerOption(int optionIndex)
+    {
+        if (_state.QuestionPlay.AnswerOptions == null)
         {
             throw new InvalidOperationException("AnswerOptions == null");
         }
 
-        var answerOption = _data.QuestionPlayState.AnswerOptions[optionIndex];        
+        var answerOption = _state.QuestionPlay.AnswerOptions[optionIndex];
 
         var messageBuilder = new MessageBuilder(Messages.Content)
             .Add(ContentPlacements.Screen)
@@ -5062,13 +5092,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         _gameActions.SendMessage(messageBuilder.ToString());
 
-        if (_data.ComplexVisualState != null && optionIndex + 1 < _data.ComplexVisualState.Length)
+        if (_state.ComplexVisualState != null && optionIndex + 1 < _state.ComplexVisualState.Length)
         {
-            _data.ComplexVisualState[optionIndex + 1] = new string[] { messageBuilder.ToString() };
+            _state.ComplexVisualState[optionIndex + 1] = new string[] { messageBuilder.ToString() };
         }
 
-        var nextTask = optionIndex + 1 < _data.QuestionPlayState.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
-        ScheduleExecution(nextTask, _data.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? contentDuration : 1, optionIndex + 1);
+        return contentDuration;
     }
 
     internal void OnComplexContent(Dictionary<string, List<ContentItem>> contentTable)
@@ -5097,9 +5126,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         ? (int)(contentItem.Duration.TotalMilliseconds / 100)
                         : GetContentItemDefaultDuration(contentItem);
 
-                    if (_data.QuestionPlayState.IsAnswer)
+                    if (_state.QuestionPlay.IsAnswer)
                     {
-                        duration += _data.TimeSettings.RightAnswer * 10;
+                        duration += _state.TimeSettings.RightAnswer * 10;
                     }
                 }
                 else
@@ -5119,10 +5148,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         if ((contentItem.Type == ContentTypes.Audio || contentItem.Type == ContentTypes.Video) && !registeredMediaPlay)
                         {
                             registeredMediaPlay = true;
-                            _data.IsPlayingMedia = true;
-                            _data.IsPlayingMediaPaused = false;
+                            _state.IsPlayingMedia = true;
+                            _state.IsPlayingMediaPaused = false;
 
-                            _data.QuestionPlayState.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_data.ActiveHumanCount);
+                            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
                             _completion = ClearMediaContent;
                         }
 
@@ -5142,13 +5171,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             contentTime = Math.Max(contentTime, contentListDuration);
         }
 
-        _data.ComplexVisualState ??= new IReadOnlyList<string>[1];
-        _data.ComplexVisualState[0] = visualState;
-        _data.IsPartial = false;
-        _data.AtomStart = DateTime.UtcNow;
-        _data.AtomTime = contentTime;
+        _state.ComplexVisualState ??= new IReadOnlyList<string>[1];
+        _state.ComplexVisualState[0] = visualState;
+        _state.IsPartial = false;
+        _state.AtomStart = DateTime.UtcNow;
+        _state.AtomTime = contentTime;
         ScheduleExecution(Tasks.MoveNext, contentTime);
-        _data.TimeThinking = 0.0;
+        _state.TimeThinking = 0.0;
     }
 
     private static string GetRandomString(string resource) => Random.Shared.GetRandomString(resource);
@@ -5156,7 +5185,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private int GetContentItemDefaultDuration(ContentItem contentItem) => contentItem.Type switch
     {
         ContentTypes.Text => GetReadingDurationForTextLength(contentItem.Value.Length),
-        ContentTypes.Image or ContentTypes.Html => _data.TimeSettings.Image * 10,
+        ContentTypes.Image or ContentTypes.Html => _state.TimeSettings.Image * 10,
         ContentTypes.Audio or ContentTypes.Video => DefaultAudioVideoTime,
         _ => 0,
     };
@@ -5200,22 +5229,22 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private PlayerStatistic GetStatistic(string name)
     {
-        if (!_data.Statistics.TryGetValue(name, out var statistic))
+        if (!_state.Statistics.TryGetValue(name, out var statistic))
         {
-            _data.Statistics[name] = statistic = new PlayerStatistic();
+            _state.Statistics[name] = statistic = new PlayerStatistic();
         }
 
         return statistic;
     }
 
-    internal void OnNumericAnswer() => _gameActions.InformAnswerDeviation(_data.QuestionPlayState.NumericAnswerDeviation);
+    internal void OnNumericAnswer() => _gameActions.InformAnswerDeviation(_state.QuestionPlay.NumericAnswerDeviation);
 
     internal void OnQuestionStart()
     {
-        if (_data.Settings.AppSettings.HintShowman)
+        if (_state.Settings.AppSettings.HintShowman)
         {
             // TODO: use SendAnswerInfoToShowman()
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, _data.QuestionPlayState.RightAnswers.FirstOrDefault() ?? ""), _data.ShowMan.Name);
+            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, _state.QuestionPlay.RightAnswers.FirstOrDefault() ?? ""), _state.ShowMan.Name);
         }
 
         SendQuestionAnswersToShowman();
