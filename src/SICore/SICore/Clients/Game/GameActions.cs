@@ -414,4 +414,6 @@ public sealed class GameActions
 
     internal void InformAnswerDeviation(int deviation, string person = NetworkConstants.Everybody) =>
         SendMessageToWithArgs(person, Messages.AnswerDeviation, deviation);
+
+    internal void AskAnswer(string person, string answerType) => SendMessageToWithArgs(person, Messages.Answer, answerType);
 }

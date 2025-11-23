@@ -351,11 +351,6 @@ public static class Messages
     public const string NextDelete = "NEXTDELETE";
 
     /// <summary>
-    /// Игра не существует
-    /// </summary>
-    public const string NoGame = "NOGAME";
-
-    /// <summary>
     /// Game options.
     /// </summary>
     [IdempotencyRequired]

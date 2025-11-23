@@ -27,7 +27,20 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
     public string Title => _document.Document.Package.Name;
 
-    public string Description { get; set; }
+    private string _desription = "";
+
+    public string Description
+    {
+        get => _desription;
+        set
+        {
+            if (_desription != value)
+            {
+                _desription = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public string Tags => string.Join(", ", _document.Document.Package.Tags);
 
@@ -92,6 +105,11 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
             {
                 _selectedItem = value;
                 OnPropertyChanged();
+
+                if (_selectedItem != null)
+                {
+                    Description = _selectedItem.Description;
+                }
             }
         }
     }
@@ -147,7 +165,27 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         _document = document;
 
         var preview = new PreviewViewModel(_document.Document);
+        Description = BuildDescription(preview);
 
+        _metadata["questionCount"] = preview.QuestionCount;
+        _metadata["content"] = preview.Content;
+
+        Upload = new SimpleCommand(Upload_Executed);
+
+        _getUserItemsCallback = CallResult<SteamUGCQueryCompleted_t>.Create(OnGetUserItems);
+        _createItemCallback = CallResult<CreateItemResult_t>.Create(OnCreateItem);
+        _submitItemCallback = CallResult<SubmitItemUpdateResult_t>.Create(OnSubmitItem);
+        _submitPreviewCallback = CallResult<SubmitItemUpdateResult_t>.Create(OnSubmitPreview);
+
+        _callbackTimer = new System.Timers.Timer(100);
+        _callbackTimer.Elapsed += (s, e) => SteamAPI.RunCallbacks();
+        _callbackTimer.Start();
+
+        LoadUserItems();
+    }
+
+    private string BuildDescription(PreviewViewModel preview)
+    {
         var description = new StringBuilder();
 
         description.Append($"{Resources.QuestionCount}: {preview.QuestionCount}").AppendLine();
@@ -172,23 +210,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
             description.AppendLine();
         }
 
-        Description = description.ToString();
-
-        _metadata["questionCount"] = preview.QuestionCount;
-        _metadata["content"] = preview.Content;
-
-        Upload = new SimpleCommand(Upload_Executed);
-
-        _getUserItemsCallback = CallResult<SteamUGCQueryCompleted_t>.Create(OnGetUserItems);
-        _createItemCallback = CallResult<CreateItemResult_t>.Create(OnCreateItem);
-        _submitItemCallback = CallResult<SubmitItemUpdateResult_t>.Create(OnSubmitItem);
-        _submitPreviewCallback = CallResult<SubmitItemUpdateResult_t>.Create(OnSubmitPreview);
-
-        _callbackTimer = new System.Timers.Timer(100);
-        _callbackTimer.Elapsed += (s, e) => SteamAPI.RunCallbacks();
-        _callbackTimer.Start();
-
-        LoadUserItems();
+        return description.ToString();
     }
 
     private void LoadUserItems()

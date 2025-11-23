@@ -2515,6 +2515,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Replay.
+        /// </summary>
+        public static string Replay {
+            get {
+                return ResourceManager.GetString("Replay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cannot connect to server while sending error report. The report will be sent later.
         /// </summary>
         public static string ReportDelayed {

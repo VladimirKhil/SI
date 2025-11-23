@@ -654,7 +654,6 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="HtmlExportHint" xml:space="preserve">
     <value>Set the parameters of the output document and press the "Export" button</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -956,6 +955,9 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="RemoveUnusedMedia" xml:space="preserve">
     <value>Remove multimedia from the package when the last link to it is deleted</value>
+  </data>
+  <data name="Replay" xml:space="preserve">
+    <value>Replay</value>
   </data>
   <data name="ReportDelayed" xml:space="preserve">
     <value>Cannot connect to server while sending error report. The report will be sent later</value>

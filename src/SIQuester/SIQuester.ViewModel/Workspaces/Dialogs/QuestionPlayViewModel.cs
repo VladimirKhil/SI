@@ -3,6 +3,7 @@ using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Workspaces.Dialogs.Play;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Utils.Commands;
 using Utils.Web;
@@ -19,8 +20,9 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    private readonly QuestionEngine _questionEngine;
+    private QuestionEngine _questionEngine;
     private readonly QDocument _qDocument;
+    private readonly QuestionViewModel _originalQuestion;
 
     private bool _singleAnswerer = true;
     private bool _isFinished;
@@ -38,27 +40,35 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     public SimpleCommand Play { get; private set; }
 
     /// <summary>
+    /// Replays the question from the beginning.
+    /// </summary>
+    public SimpleCommand Replay { get; private set; }
+
+    /// <summary>
+    /// Closes the question player dialog.
+    /// </summary>
+    public SimpleCommand CloseDialog { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the Replay button should be visible.
+    /// </summary>
+    public bool IsReplayVisible => _isFinished;
+
+    /// <summary>
     /// Initializes a new instance of <see cref="QuestionPlayViewModel" /> class.
     /// </summary>
     /// <param name="question">Question to play.</param>
     /// <param name="document">Document that holds the question media content.</param>
     public QuestionPlayViewModel(QuestionViewModel question, QDocument document)
     {
-        var questionClone = question.Model.Clone();
-
-        _questionEngine = new QuestionEngine(
-            questionClone,
-            new QuestionEngineOptions
-            {
-                FalseStarts = FalseStartMode.Enabled,
-                ShowSimpleRightAnswers = true,
-                DefaultTypeName = question.OwnerTheme?.OwnerRound?.Model.Type == RoundTypes.Final ? QuestionTypes.StakeAll : QuestionTypes.Simple
-            },
-            this);
-
+        _originalQuestion = question;
         _qDocument = document;
 
         Play = new SimpleCommand(Play_Executed);
+        Replay = new SimpleCommand(Replay_Executed);
+        CloseDialog = new SimpleCommand(CloseDialog_Executed);
+
+        InitializeQuestionEngine();
 
         if (!File.Exists(Source.AbsolutePath))
         {
@@ -66,6 +76,30 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         }
     }
 
+    [MemberNotNull(nameof(_questionEngine))]
+    private void InitializeQuestionEngine()
+    {
+        _questionEngine = new QuestionEngine(
+            _originalQuestion.Model,
+            new QuestionEngineOptions
+            {
+                FalseStarts = FalseStartMode.Enabled,
+                ShowSimpleRightAnswers = true,
+                DefaultTypeName = _originalQuestion.OwnerTheme?.OwnerRound?.Model.Type == RoundTypes.Final ? QuestionTypes.StakeAll : QuestionTypes.Simple
+            },
+            this);
+
+        _isFinished = false;
+        _options = null;
+        Play.CanBeExecuted = true;
+        
+        // Notify visibility changes
+        OnPropertyChanged(nameof(IsReplayVisible));
+    }
+
+    /// <summary>
+    /// Plays the next question fragment.
+    /// </summary>
     public void Play_Executed(object? arg)
     {
         try
@@ -79,6 +113,9 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             {
                 _isFinished = true;
                 Play.CanBeExecuted = false;
+                
+                // Notify visibility changes when question finishes
+                OnPropertyChanged(nameof(IsReplayVisible));
                 return;
             }
 
@@ -88,11 +125,42 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             });
 
             _isFinished = !_questionEngine.PlayNext();
+            
+            // Check if question finished after playing
+            if (_isFinished)
+            {
+                Play.CanBeExecuted = false;
+                OnPropertyChanged(nameof(IsReplayVisible));
+            }
         }
         catch (Exception exc)
         {
             OnError(exc);
         }
+    }
+
+    private void Replay_Executed(object? arg)
+    {
+        try
+        {
+            // Reset the question engine to start from the beginning
+            InitializeQuestionEngine();
+
+            // Reset UI state
+            _singleAnswerer = true;
+
+            Play.Execute(null);
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
+    }
+
+    private void CloseDialog_Executed(object? arg)
+    {
+        // Close the dialog by calling the inherited Close command
+        Close.ExecuteAsync(arg);
     }
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)

@@ -108,13 +108,17 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
     {
         try
         {
+            using var change = OwnerDocument?.OperationsManager.BeginComplexChange();
+
             if (arg != null)
             {
                 Remove((T)arg);
+                change?.Commit();
             }
             else if (_currentPosition > -1 && _currentPosition < Count)
             {
                 OnRemoveAt(_currentPosition);
+                change?.Commit();
             }
 
             UpdateCommands();

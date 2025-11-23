@@ -953,6 +953,9 @@
   <data name="RemoveUnusedMedia" xml:space="preserve">
     <value>Удалять мультимедиа из пакета при удалении последней ссылки на него</value>
   </data>
+  <data name="Replay" xml:space="preserve">
+    <value>Сыграть заново</value>
+  </data>
   <data name="ReportDelayed" xml:space="preserve">
     <value>Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.</value>
   </data>

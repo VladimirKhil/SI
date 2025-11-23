@@ -3379,11 +3379,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     _state.Players[i].Answer = "";
                     _state.Players[i].Flag = true;
-
-                    _gameActions.SendMessageToWithArgs(
-                        _state.Players[i].Name,
-                        Messages.Answer,
-                        _state.QuestionPlay.IsNumericAnswer ? "number" : "");
+                    _gameActions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.IsNumericAnswer ? "number" : "");
                 }
             }
 
