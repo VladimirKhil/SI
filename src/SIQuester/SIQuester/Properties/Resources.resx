@@ -307,7 +307,7 @@
     <value>Reset to default</value>
   </data>
   <data name="Bytes" xml:space="preserve">
-    <value>byte</value>
+    <value>KB</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>

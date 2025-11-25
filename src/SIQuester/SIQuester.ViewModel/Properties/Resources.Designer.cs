@@ -133,6 +133,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ascending.
+        /// </summary>
+        public static string Ascending {
+            get {
+                return ResourceManager.GetString("Ascending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Audio.
         /// </summary>
         public static string Audio {
@@ -344,27 +353,21 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ## Topic Selection Protocol
+        ///   Ищет локализованную строку, похожую на Generate simple, catchy quiz-topic name (2–4 words) for provided categories, similar to collection names, book/movie titles, or short cites/catchphrases. Avoid long or overly complex themes.
         ///
-        ///Follow this exact 2-step ritual for EACH generation.
+        ///Requirements
         ///
-        ///---
+        ///- 2–4 words long
+        ///- Snappy, memorable, and fun, or some collection name
+        ///- Works as a trivia category title
+        ///- Accessible to a general audience
+        ///- Has light, game-show energy
+        ///- Never reuse topics from previous generations
         ///
-        ///### STEP 1 – Category Roulette
+        ///Style
         ///
-        ///1. Take the random number provided by the user (REQUIRED - do not proceed without it)
-        ///2. Calculate: (random_number mod 16) + 1
-        ///3. Use that category number from the table below
-        ///
-        ///---
-        ///
-        ///### CATEGORY TABLE
-        ///
-        ///1. Food, drinks, regional recipes, cooking
-        ///2. Movies &amp; cinema (any country, era, genre)
-        ///3. Music (any language, decade, style)
-        ///4. History &amp; historical figures
-        ///5. Science, [остаток строки не уместился]&quot;;.
+        ///- Use a single unified style:
+        ///- Either straightforward or creative [остаток строки не уместился]&quot;;.
         /// </summary>
         public static string DefaultGTPTopicGeneration {
             get {
@@ -403,6 +406,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string DefaultTags {
             get {
                 return ResourceManager.GetString("DefaultTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Descending.
+        /// </summary>
+        public static string Descending {
+            get {
+                return ResourceManager.GetString("Descending", resourceCulture);
             }
         }
         
@@ -785,6 +797,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Alphabet|Anime|Animals &amp; Nature|Architecture &amp; Design|Art|Astronomy|Biology|Books &amp; Literature|Cars|Cartoons|Celebrities &amp; Pop Culture|Chemistry|Comics|Cooking &amp; Food|Erudition &amp; Intellectual Games|Fashion &amp; Beauty|Games (Board, Video, Esports)|Geography &amp; Travel|History|Humor|Internet Culture &amp; Memes|Language &amp; Words|Mathematics|Mixed|Movies &amp; Cinema|Music|Mythology &amp; Folklore|Photography &amp; Sculpture|Physics|Politics (light / trivia-level)|Rebuses &amp; Puzzles|Science (General)|Science Fiction|Sports|Technolo [остаток строки не уместился]&quot;;.
+        /// </summary>
+        public static string GPTCategories {
+            get {
+                return ResourceManager.GetString("GPTCategories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Generate topic {0} with {1} hard quiz question that requires some time to think, some knowledge and maybe guessing. Each question has 3-4 sentences.
         /// </summary>
         public static string GPTCreateTopicFinalRoundPrompt {
@@ -794,7 +815,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Generate {0} unique topics. Use random numbers.
+        ///   Ищет локализованную строку, похожую на Generate {0} unique topics for the following categories.
         /// </summary>
         public static string GPTTopisHint {
             get {
@@ -1042,6 +1063,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string MissingLogoFile {
             get {
                 return ResourceManager.GetString("MissingLogoFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Name.
+        /// </summary>
+        public static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
             }
         }
         
@@ -1717,6 +1747,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string SIStorage {
             get {
                 return ResourceManager.GetString("SIStorage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Size.
+        /// </summary>
+        public static string Size {
+            get {
+                return ResourceManager.GetString("Size", resourceCulture);
             }
         }
         

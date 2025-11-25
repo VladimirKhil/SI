@@ -307,7 +307,7 @@
     <value>По умолчанию</value>
   </data>
   <data name="Bytes" xml:space="preserve">
-    <value>байт</value>
+    <value>КБ</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Отмена</value>

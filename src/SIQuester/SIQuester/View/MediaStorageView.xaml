@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:lb="clr-namespace:SIQuester.Behaviors"
     xmlns:ls="clr-namespace:SIQuester.Selectors"
+    xmlns:lc="clr-namespace:SIQuester.Converters"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,6 +15,10 @@
     Name="root"
     DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>        
+        <lc:FileSizeConverter x:Key="FileSizeConverter" />
+        <lc:MediaSortFieldConverter x:Key="MediaSortFieldConverter" />
+        <lc:SortDirectionConverter x:Key="SortDirectionConverter" />
+        
         <Style x:Key="Editor" TargetType="{x:Type TextBox}">
             <Setter Property="Control.BorderThickness" Value="0" />
             
@@ -34,7 +39,7 @@
                     <Image Margin="0,0,0,5" Source="{Binding MediaSource.Uri, Converter={StaticResource ImageConverter}}" />
                 </DataTemplate>
             </ls:AtomTypeSelector.ImageTemplate>
-            
+
             <ls:AtomTypeSelector.AudioTemplate>
                 <DataTemplate>
                     <DockPanel VerticalAlignment="Center" Margin="4">                        
@@ -45,7 +50,7 @@
                             UnloadedBehavior="Manual"
                             lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
                             lb:MediaController.Progress="{Binding ElementName=progress}" />
-                        
+
                         <ToggleButton Style="{StaticResource playButton}" Name="play" DockPanel.Dock="Left" />
                         <Slider Style="{StaticResource playSlider}" Name="progress" Width="Auto" VerticalAlignment="Center" />
                     </DockPanel>
@@ -96,11 +101,7 @@
             </ls:AtomTypeSelector.HtmlTemplate>
         </ls:AtomTypeSelector>
 
-        <CollectionViewSource x:Key="files" Source="{Binding Files}" Filter="CollectionViewSource_Filter">
-            <CollectionViewSource.SortDescriptions>
-                <scm:SortDescription PropertyName="Name" Direction="Ascending" />
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
+        <CollectionViewSource x:Key="files" Source="{Binding Files}" Filter="CollectionViewSource_Filter" />
     </UserControl.Resources>
     
     <DockPanel Margin="6">
@@ -116,6 +117,36 @@
                 Padding="4"
                 Background="Lavender"
                 BorderThickness="0" />
+        </DockPanel>
+
+        <!-- Sorting Controls -->
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+            <TextBlock Text="Sort by:" VerticalAlignment="Center" Margin="0,0,10,0" />
+            
+            <ComboBox 
+                ItemsSource="{Binding SortFields}"
+                SelectedItem="{Binding SortField}"
+                Width="80"
+                VerticalAlignment="Center"
+                Margin="0,0,10,0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource MediaSortFieldConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            
+            <ComboBox 
+                ItemsSource="{Binding SortDirections}"
+                SelectedItem="{Binding SortDirection}"
+                Width="100"
+                VerticalAlignment="Center">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource SortDirectionConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </DockPanel>
 
         <StackPanel Orientation="Horizontal" Background="Lavender" DockPanel.Dock="Top">
@@ -281,7 +312,7 @@
                         </DockPanel>
 
                         <TextBlock Grid.Row="2">
-                            <Run Text="{Binding MediaSource.StreamLength, Mode=OneWay}" />
+                            <Run Text="{Binding MediaSource.StreamLength, Mode=OneWay, Converter={StaticResource FileSizeConverter}}" />
                             <Run Text="{x:Static lp:Resources.Bytes}" />
                         </TextBlock>
                     </Grid>

@@ -755,12 +755,12 @@ public sealed class AppSettings : INotifyPropertyChanged
 
     public SpecialsAliases SpecialsAliases { get; set; } = new SpecialsAliases();
 
-    private bool _useSIGameEngine = true;
+    private bool _useSIGameEngine = false;
 
     /// <summary>
     /// Use SIGame engine for game creation.
     /// </summary>
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     public bool UseSIGameEngine
     {
         get => _useSIGameEngine;

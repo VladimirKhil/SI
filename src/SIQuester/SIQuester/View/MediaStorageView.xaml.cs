@@ -36,6 +36,7 @@ public partial class MediaStorageView : UserControl
         if (e.NewValue != null)
         {
             ((MediaStorageViewModel)e.NewValue).PropertyChanged += MediaStorageView_PropertyChanged;
+            ApplySorting(); // Apply initial sorting
         }
     }
 
@@ -50,5 +51,38 @@ public partial class MediaStorageView : UserControl
         {
             ((CollectionViewSource)Resources["files"]).View.Refresh();
         }
+        else if (e.PropertyName == nameof(MediaStorageViewModel.SortField) || 
+                 e.PropertyName == nameof(MediaStorageViewModel.SortDirection))
+        {
+            ApplySorting();
+        }
+    }
+
+    private void ApplySorting()
+    {
+        var storage = DataContext as MediaStorageViewModel;
+        if (storage == null)
+            return;
+
+        var collectionViewSource = (CollectionViewSource)Resources["files"];
+        var view = collectionViewSource.View;
+
+        if (view == null)
+            return;
+
+        view.SortDescriptions.Clear();
+
+        string propertyName = storage.SortField switch
+        {
+            MediaSortField.Name => "Model.Name",
+            MediaSortField.Size => "MediaSource.StreamLength",
+            _ => "Model.Name"
+        };
+
+        var direction = storage.SortDirection == ViewModel.SortDirection.Ascending 
+            ? ListSortDirection.Ascending 
+            : ListSortDirection.Descending;
+
+        view.SortDescriptions.Add(new SortDescription(propertyName, direction));
     }
 }

@@ -158,7 +158,7 @@ public interface IPersonController
 
     void OnAnswerOptions(bool questionHasScreenContent, IEnumerable<string> optionsTypes) { }
 
-    void OnContent(string[] mparams) { }
+    void OnContent(string placement, List<ContentInfo> content) { }
 
     void OnContentAppend(string[] mparams) { }
 

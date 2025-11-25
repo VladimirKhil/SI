@@ -128,7 +128,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool OnButtonPressStart()
     {
-        GameViewModel?.AskAnswerButton();
+        GameViewModel.AskAnswerButton();
         return false;
     }
 
@@ -421,6 +421,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     {
         PresentationController.SelectionCallback = selectCallback;
         PresentationController.SetRoundTable();
+        PresentationController.AskToSelectQuestion();
         GameViewModel.LocalInfo.TStage = TableStage.RoundTable;
     }
 

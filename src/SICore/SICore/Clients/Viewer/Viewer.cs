@@ -6,6 +6,7 @@ using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
 using SIData;
 using SIEngine.Rules;
+using SIPackages;
 using SIPackages.Core;
 using SIUI.Model;
 using System.Text;
@@ -347,7 +348,7 @@ public class Viewer : MessageHandler, IViewerClient
                     break;
 
                 case Messages.Content:
-                    _controller.OnContent(mparams);
+                    OnContent(mparams);
                     break;
 
                 case Messages.ContentAppend:
@@ -512,6 +513,48 @@ public class Viewer : MessageHandler, IViewerClient
         {
             _client.Node.OnError(exc, true);
         }
+    }
+
+    private void OnContent(string[] mparams)
+    {
+        if (mparams.Length < 5)
+        {
+            return;
+        }
+
+        var placement = mparams[1];
+
+        var content = new List<ContentInfo>();
+
+        for (var i = 2; i + 2 < mparams.Length; i++)
+        {
+            _ = int.TryParse(mparams[i], out var layoutId);
+
+            if (layoutId == 0)
+            {
+                var contentType = mparams[i + 1];
+                var contentValue = mparams[i + 2];
+
+                content.Add(new ContentInfo(0, "", contentType, contentValue));
+
+                i += 2;
+            }
+            else if (i + 3 < mparams.Length && layoutId > 0)
+            {
+                var label = mparams[i + 1];
+                var contentType = mparams[i + 2];
+                var contentValue = mparams[i + 3];
+
+                if (contentType == ContentTypes.Text || contentType == ContentTypes.Image)
+                {
+                    content.Add(new ContentInfo(layoutId, label, contentType, contentValue));
+                }
+
+                i += 3;
+            }
+        }
+
+        _controller.OnContent(placement, content);
     }
 
     private void OnGameThemes(string[] mparams)

@@ -32,9 +32,23 @@ internal static class QuestionsGenerator
         }
 
         var themeNameSet = !string.IsNullOrEmpty(theme.Name);
-        var topicName = themeNameSet ? $"\"{theme.Name}\"" : "<generate topic>";
+        string topicName;
+        string topicPrompt;
 
-        var prompt = Resources.DefaultGPTPrompt + (!themeNameSet ? " " + Resources.DefaultGTPTopicGeneration + " Use random number: " + new Random().Next(1, 1_000_000) : "");
+        if (themeNameSet)
+        {
+            topicName = theme.Name;
+            topicPrompt = "";
+        }
+        else
+        {
+            topicName = "<generate topic>";
+            var categories = Resources.GPTCategories.Split('|');
+            var category = categories[new Random().Next(categories.Length)];
+            topicPrompt = Resources.DefaultGTPTopicGeneration + " Use category: " + category;
+        }
+
+        var prompt = Resources.DefaultGPTPrompt + topicPrompt;
 
         var questionToGenerateCount = themeViewModel.OwnerRound.Model.Type == RoundTypes.Final ? 1 : 5;
         var promptExamples = new StringBuilder();
@@ -205,8 +219,22 @@ internal static class QuestionsGenerator
         }
 
         var topicCount = packageViewModel.Rounds.SelectMany(r => r.Themes).Count(t => t.Model.Name.Length == 0);
-        var prompt = Resources.DefaultGTPTopicGeneration;
-        var userPrompt = $"{string.Format(Resources.GPTTopisHint, topicCount)}: {string.Join(", ", Enumerable.Range(0, topicCount).Select(_ => new Random().Next(1, 1_000_000)))}";
+
+        if (topicCount == 0)
+        {
+            return;
+        }
+
+        var categories = Resources.GPTCategories.Split('|');
+        
+        var selectedCategories = Enumerable.Range(0, Math.Min(topicCount, categories.Length))
+            .Select(_ => categories[new Random().Next(categories.Length)])
+            .Distinct()
+            .Take(topicCount)
+            .ToArray();
+
+        var prompt = Resources.DefaultGTPTopicGeneration + "\nReturn array of theme names and comments (empty if not needed)";
+        var userPrompt = $"{string.Format(Resources.GPTTopisHint, topicCount)}: {string.Join(", ", selectedCategories)}";
 
         List<ChatMessage> messages = new()
         {
@@ -252,9 +280,15 @@ internal static class QuestionsGenerator
         {
             foreach (var theme in round.Themes)
             {
-                if (theme.Model.Name.Length == 0)
+                if (theme.Model.Name.Length == 0 && themeIndex < themes.Count)
                 {
-                    theme.Model.Name = themes[themeIndex++];
+                    var themeData = themes[themeIndex++];
+                    theme.Model.Name = themeData.Name;
+
+                    if (!string.IsNullOrEmpty(themeData.Comment))
+                    {
+                        theme.Info.Comments.Text = themeData.Comment;
+                    }
 
                     if (themeIndex >= themes.Count)
                     {
@@ -295,10 +329,19 @@ internal static class QuestionsGenerator
         public List<QuestionInfo> Questions { get; set; } = new List<QuestionInfo>();
     }
 
+    public sealed class ThemeData
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("comment")]
+        public string Comment { get; set; } = string.Empty;
+    }
+
     public sealed class ThemesResponse
     {
         [JsonPropertyName("themes")]
-        public List<string> Themes { get; set; } = new List<string>();
+        public List<ThemeData> Themes { get; set; } = new List<ThemeData>();
     }
 
     private static readonly BinaryData ThemesJsonSchema = BinaryData.FromBytes(
@@ -309,7 +352,17 @@ internal static class QuestionsGenerator
                 ""themes"": {
                     ""type"": ""array"",
                     ""items"": {
-                        ""type"": ""string""
+                        ""type"": ""object"",
+                        ""properties"": {
+                            ""name"": {
+                                ""type"": ""string""
+                            },
+                            ""comment"": {
+                                ""type"": ""string""
+                            }
+                        },
+                        ""required"": [""name"", ""comment""],
+                        ""additionalProperties"": false
                     }
                 }
             },

@@ -523,7 +523,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             AppSettings = new AppSettingsCore
             {
                 Managed = true,
-                Culture = "ru-RU"
+                Culture = "ru-RU",
+                Oral = true
             },
             Showman = new Account
             {

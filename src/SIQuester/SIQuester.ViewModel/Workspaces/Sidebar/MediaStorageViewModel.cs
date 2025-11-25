@@ -15,6 +15,24 @@ using Utils.Commands;
 namespace SIQuester.ViewModel;
 
 /// <summary>
+/// Defines sorting field options for media storage.
+/// </summary>
+public enum MediaSortField
+{
+    Name,
+    Size
+}
+
+/// <summary>
+/// Defines sorting direction options.
+/// </summary>
+public enum SortDirection
+{
+    Ascending,
+    Descending
+}
+
+/// <summary>
 /// Defines a media storage view model.
 /// </summary>
 public sealed class MediaStorageViewModel : WorkspaceViewModel
@@ -47,6 +65,8 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     private bool _blockFlag = false;
 
     private bool _hasPendingChanges = false;
+
+    private bool _sortingScheduled = false;
 
     public bool HasPendingChanges
     {
@@ -137,6 +157,51 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         }
     }
 
+    private MediaSortField _sortField = MediaSortField.Name;
+    private SortDirection _sortDirection = SortDirection.Ascending;
+
+    /// <summary>
+    /// Current sort field (Name or Size).
+    /// </summary>
+    public MediaSortField SortField
+    {
+        get => _sortField;
+        set
+        {
+            if (_sortField != value)
+            {
+                _sortField = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Current sort direction (Ascending or Descending).
+    /// </summary>
+    public SortDirection SortDirection
+    {
+        get => _sortDirection;
+        set
+        {
+            if (_sortDirection != value)
+            {
+                _sortDirection = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Available sort fields.
+    /// </summary>
+    public MediaSortField[] SortFields { get; } = new[] { MediaSortField.Name, MediaSortField.Size };
+
+    /// <summary>
+    /// Available sort directions.
+    /// </summary>
+    public SortDirection[] SortDirections { get; } = new[] { SortDirection.Ascending, SortDirection.Descending };
+
     public MediaStorageViewModel(QDocument document, DataCollection collection, string header, ILogger<MediaStorageViewModel> logger, bool canCompress = false)
     {
         _document = document;
@@ -159,13 +224,44 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             var named = CreateItem(item);
             Files.Add(named);
         }
+
+        // Apply initial sorting after all items are loaded
+        ApplySorting();
     }
 
     private MediaItemViewModel CreateItem(string item)
     {
         var named = new MediaItemViewModel(new Named(item), _name, () => Wrap(item));
         named.Model.PropertyChanged += Named_PropertyChanged;
+        
+        // Subscribe to media loading completion for re-sorting if needed
+        named.PropertyChanged += MediaItem_PropertyChanged;
+        
+        // Trigger MediaSource loading for proper sorting
+        _ = named.LoadMediaAsync();
+        
         return named;
+    }
+
+    private async void MediaItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // If MediaSource is loaded and we're sorting by size, re-apply sorting
+        if (e.PropertyName == nameof(MediaItemViewModel.MediaSource) && 
+            _sortField == MediaSortField.Size &&
+            !_sortingScheduled)
+        {
+            _sortingScheduled = true;
+            
+            // Schedule re-sorting to avoid multiple rapid updates
+            await Task.Delay(100);
+            
+            if (_sortField == MediaSortField.Size) // Check again in case sort field changed
+            {
+                ApplySorting();
+            }
+            
+            _sortingScheduled = false;
+        }
     }
 
     private void Named_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -245,7 +341,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                     HasPendingChanges = IsChanged();
                 }
             }));
-        
+
         HasPendingChanges = IsChanged();
     }
 
@@ -426,6 +522,10 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             return;
         }
 
+        // Clean up event subscriptions
+        item.Model.PropertyChanged -= Named_PropertyChanged;
+        item.PropertyChanged -= MediaItem_PropertyChanged;
+
         if (_added.Contains(item))
         {
             _added.Remove(item);
@@ -446,15 +546,16 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         foreach (var item in _removed.ToArray())
         {
             collection.RemoveFile(item.Model.Name);
-            item.PropertyChanged -= Named_PropertyChanged;
+            item.Model.PropertyChanged -= Named_PropertyChanged;
+            item.PropertyChanged -= MediaItem_PropertyChanged;
             _removed.Remove(item);
         }
 
         foreach (var item in _removedStreams)
         {
             item.Value.Item2.Dispose();
-            _removedStreams.Remove(item.Key);
         }
+        _removedStreams.Clear();
 
         foreach (var item in _added.ToArray())
         {
@@ -737,6 +838,75 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         foreach (var item in storageChanges.Renamed)
         {
             _renamed.Add(Tuple.Create(item.Key, item.Value));
+        }
+    }
+
+    /// <summary>
+    /// Applies current sorting to the Files collection.
+    /// </summary>
+    private void ApplySorting()
+    {
+        if (Files.Count == 0)
+        {
+            return;
+        }
+
+        var sortedFiles = _sortField switch
+        {
+            MediaSortField.Name => _sortDirection == SortDirection.Ascending
+                ? Files.OrderBy(f => f.Model.Name).ToList()
+                : Files.OrderByDescending(f => f.Model.Name).ToList(),
+            MediaSortField.Size => _sortDirection == SortDirection.Ascending
+                ? Files.OrderBy(f => GetMediaSize(f)).ToList()
+                : Files.OrderByDescending(f => GetMediaSize(f)).ToList(),
+            _ => Files.ToList()
+        };
+
+        // Clear and refill to maintain proper collection change notifications
+        var selectedFile = CurrentFile;
+        Files.Clear();
+        
+        foreach (var file in sortedFiles)
+        {
+            Files.Add(file);
+        }
+
+        // Restore selection if it was set
+        if (selectedFile != null && Files.Contains(selectedFile))
+        {
+            CurrentFile = selectedFile;
+        }
+    }
+
+    /// <summary>
+    /// Gets the size of media item, with fallback for pending streams and file system lookup.
+    /// </summary>
+    /// <param name="mediaItem">Media item to get size for.</param>
+    /// <returns>Size in bytes, or 0 if not available.</returns>
+    private long GetMediaSize(MediaItemViewModel mediaItem)
+    {
+        // First try to get size from loaded MediaSource
+        if (mediaItem.MediaSource != null)
+        {
+            return mediaItem.MediaSource.StreamLength;
+        }
+
+        // Try to get size from pending stream
+        var pendingStream = _streams.FirstOrDefault(s => s.Key == mediaItem);
+        if (pendingStream.Key != null)
+        {
+            return pendingStream.Value.Item2.Length;
+        }
+
+        // Fallback: try to get size using the document's GetLength method
+        try
+        {
+            return GetLength(mediaItem.Model.Name);
+        }
+        catch
+        {
+            // If all else fails, return 0
+            return 0;
         }
     }
 }

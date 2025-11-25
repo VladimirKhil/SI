@@ -27,7 +27,7 @@ namespace SICore;
 /// </summary>
 public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 {
-    private record struct ContentInfo(string Type, string Uri, string OriginalUri);
+    private record struct ContentInfoLocal(string Type, string Uri, string OriginalUri);
 
     /// <summary>
     /// Maximum length of text that could be automatically added to game table.
@@ -792,57 +792,34 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
     }
 
-    public void OnContent(string[] mparams)
+    public void OnContent(string placement, List<Models.ContentInfo> content)
     {
-        if (mparams.Length < 5)
+        var localContent = new List<ContentInfoLocal>();
+
+        foreach (var item in content)
         {
-            OnSpecialReplic("Invalid content message");
-            return;
-        }
-
-        var placement = mparams[1];
-
-        var content = new List<ContentInfo>();
-
-        for (var i = 2; i + 2 < mparams.Length; i++)
-        {
-            _ = int.TryParse(mparams[i], out var layoutId);
-
-            if (layoutId == 0)
+            if (item.LayoutId == 0)
             {
-                var contentType = mparams[i + 1];
-                var contentValue = mparams[i + 2];
-
-                var processedContentValue = PreprocessUri(contentType, contentValue);
-
-                content.Add(new ContentInfo(contentType, processedContentValue, contentValue));
-
-                i += 2;
+                var processedContentValue = PreprocessUri(item.Type, item.Uri);
+                localContent.Add(new ContentInfoLocal(item.Type, processedContentValue, item.Uri));
             }
-            else if (TInfo.LayoutMode == LayoutMode.AnswerOptions && i + 3 < mparams.Length && layoutId > 0 && layoutId - 1 < TInfo.AnswerOptions.Options.Length)
+            else if (TInfo.LayoutMode == LayoutMode.AnswerOptions && item.LayoutId > 0 && item.LayoutId - 1 < TInfo.AnswerOptions.Options.Length)
             {
-                var label = mparams[i + 1];
-                var contentType = mparams[i + 2];
-                var contentValue = mparams[i + 3];
-
-                contentValue = PreprocessUri(contentType, contentValue);
-
-                var option = TInfo.AnswerOptions.Options[layoutId - 1];
-
-                if (contentType == ContentTypes.Text || contentType == ContentTypes.Image)
+                var option = TInfo.AnswerOptions.Options[item.LayoutId - 1];
+                
+                if (item.Type == ContentTypes.Text || item.Type == ContentTypes.Image)
                 {
-                    option.Label = label;
-                    option.Content = new ContentViewModel(contentType == ContentTypes.Text ? ContentType.Text : ContentType.Image, contentValue);
+                    option.Label = item.Label;
+                    var processedContentValue = PreprocessUri(item.Type, item.Uri);
+                    option.Content = new ContentViewModel(item.Type == ContentTypes.Text ? ContentType.Text : ContentType.Image, processedContentValue);
                     option.IsVisible = true;
                 }
-
-                i += 3;
             }
         }
 
         _externalContent.Clear();
 
-        if (content.Count == 0)
+        if (localContent.Count == 0)
         {
             return;
         }
@@ -850,11 +827,11 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         switch (placement)
         {
             case ContentPlacements.Screen:
-                OnScreenContent(content);
+                OnScreenContent(localContent);
                 break;
 
             case ContentPlacements.Replic:
-                var (contentType, contentValue, _) = content.LastOrDefault();
+                var (contentType, contentValue, _) = localContent.LastOrDefault();
 
                 if (contentType == ContentTypes.Text)
                 {
@@ -863,7 +840,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 break;
 
             case ContentPlacements.Background:
-                var (contentType2, contentValue2, originalValue) = content.LastOrDefault();
+                var (contentType2, contentValue2, originalValue) = localContent.LastOrDefault();
 
                 if (contentType2 == ContentTypes.Audio)
                 {
@@ -957,7 +934,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
-    private void OnScreenContent(IEnumerable<ContentInfo> contentInfo)
+    private void OnScreenContent(IEnumerable<ContentInfoLocal> contentInfo)
     {
         if (TInfo.TStage != TableStage.Answer && _gameViewModel.Speaker != null && !_gameViewModel.Speaker.IsShowman)
         {
@@ -2119,7 +2096,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnPackage(string packageName, string? packageLogoUri)
     {
-        var screenContent = new List<ContentInfo>();
+        var screenContent = new List<ContentInfoLocal>();
 
         if (!string.IsNullOrEmpty(packageLogoUri))
         {
@@ -2127,11 +2104,11 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             
             if (preprocessedUri != null)
             {
-                screenContent.Add(new ContentInfo(ContentTypes.Image, preprocessedUri, ""));
+                screenContent.Add(new ContentInfoLocal(ContentTypes.Image, preprocessedUri, ""));
             }
         }
 
-        screenContent.Add(new ContentInfo(ContentTypes.Text, packageName, ""));
+        screenContent.Add(new ContentInfoLocal(ContentTypes.Text, packageName, ""));
 
         OnScreenContent(screenContent);
     }

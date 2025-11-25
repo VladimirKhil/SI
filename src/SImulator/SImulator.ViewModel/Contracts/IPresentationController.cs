@@ -41,6 +41,8 @@ public interface IPresentationController : IDisposable
 
     void SetRoundTable();
 
+    void AskToSelectQuestion() { }
+
     void OnPackage(string packageName, MediaInfo? packageLogo);
 
     void SetRound(string roundName, QuestionSelectionStrategyType selectionStrategyType);

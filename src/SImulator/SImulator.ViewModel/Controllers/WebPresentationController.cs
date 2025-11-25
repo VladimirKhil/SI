@@ -255,18 +255,15 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetStage(TableStage stage) { }
 
-    public void SetRoundTable()
+    public void SetRoundTable() => SendMessage(new
     {
-        SendMessage(new
-        {
-            Type = "showTable"
-        });
+        Type = "showTable"
+    });
 
-        SendMessage(new
-        {
-            Type = "choose"
-        });
-    }
+    public void AskToSelectQuestion() => SendMessage(new
+    {
+        Type = "choose"
+    });
 
     public void OnPackage(string packageName, MediaInfo? packageLogo) => SendMessage(new
     {

@@ -2,7 +2,9 @@
 using SICore.Models;
 using SIData;
 using SIEngine.Rules;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.Properties;
+using SIPackages;
 using SIPackages.Core;
 using SIUI.Model;
 using System.Diagnostics;
@@ -31,6 +33,33 @@ internal sealed class GameController : IPersonController
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel.OnQuestionSelected(themeIndex, questionIndex);
 
+    public void OnContent(string placement, List<ContentInfo> content)
+    {
+        GameViewModel.OnContentStart();
+        GameViewModel.PresentationController.OnContentStart();
+
+        switch (placement)
+        {
+            case ContentPlacements.Screen:
+                var contentItems = content.Select(ci => new ContentItem
+                {
+                    Type = ci.Type,
+                    Value = ci.Uri,
+                    IsRef = true,
+                    Placement = ContentPlacements.Screen
+                }).ToList();
+
+                GameViewModel.ContentItems = contentItems;
+                GameViewModel.ActiveMediaCommand = null;
+                GameViewModel.DecisionMode = DecisionMode.None;
+
+                GameViewModel.PresentationController.OnQuestionContent(contentItems, TryGetMediaUri, "");
+                break;
+        }
+    }
+
+    private string? TryGetMediaUri(ContentItem contentItem) => contentItem.Value;
+
     public void ClearSelections(bool full = false)
     {
         
@@ -48,7 +77,7 @@ internal sealed class GameController : IPersonController
 
     public void EndTry(string text)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void FinalThink()
@@ -116,10 +145,20 @@ internal sealed class GameController : IPersonController
     }
 
     public void OnPackageComments(string comments) => GameViewModel.ShowmanReplic = $"{Resources.PackageComments}: {comments}";
-    
-    public void OnRightAnswer(string answer) => GameViewModel.PresentationController.OnSimpleRightAnswer(answer);
 
-    public void OnRightAnswerStart(string answer) => GameViewModel.PresentationController.OnComplexRightAnswer(answer);
+    public void OnRightAnswer(string answer)
+    {
+        GameViewModel.State = QuestionState.Normal;
+        GameViewModel.OnRightAnswer();
+        GameViewModel.PresentationController.OnSimpleRightAnswer(answer);
+    }
+
+    public void OnRightAnswerStart(string answer)
+    {
+        GameViewModel.State = QuestionState.Normal;
+        GameViewModel.OnRightAnswer();
+        GameViewModel.PresentationController.OnComplexRightAnswer(answer);
+    }
 
     public void RoundThemes(List<string> themes, ThemesPlayMode playMode) 
     {
@@ -147,6 +186,34 @@ internal sealed class GameController : IPersonController
         if (timerIndex == 1 && timerCommand == "MAXTIME" && int.TryParse(arg, out var maxTime))
         {
             GameViewModel.RoundTimeMax = maxTime;
+            return;
+        }
+
+        switch (timerIndex)
+        {
+            case 0:
+                if (timerCommand == "GO")
+                {
+                    GameViewModel.RunRoundTimer.Execute(0); return;
+                }
+
+                break;
+
+            case 1:
+                if (timerCommand == "RESUME")
+                {
+                    GameViewModel.RunQuestionTimer.Execute(0); return;
+                }
+
+                break;
+
+            case 2:
+                if (timerCommand == "GO")
+                {
+                    return;
+                }
+
+                break;
         }
     }
 
@@ -175,10 +242,7 @@ internal sealed class GameController : IPersonController
         throw new NotImplementedException();
     }
 
-    public void SelectQuestion()
-    {
-        throw new NotImplementedException();
-    }
+    public void SelectQuestion() => GameViewModel.PresentationController.AskToSelectQuestion();
 
     public void ShowTablo()
     {
@@ -188,6 +252,7 @@ internal sealed class GameController : IPersonController
         };
 
         GameViewModel.PresentationController.SetRoundTable();
+        GameViewModel.LocalInfo.TStage = SIUI.ViewModel.TableStage.RoundTable;
     }
 
     public void OnStage(bool informOnly, GameStage stage, string stageName, int stageIndex, QuestionSelectionStrategyType? questionSelectionStrategyType)
@@ -221,4 +286,6 @@ internal sealed class GameController : IPersonController
     {
         throw new NotImplementedException();
     }
+
+    public void Try(bool questionNotFinished) => GameViewModel.AskAnswerButton();
 }
