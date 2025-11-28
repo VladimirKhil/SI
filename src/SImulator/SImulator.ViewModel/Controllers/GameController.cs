@@ -89,12 +89,12 @@ internal sealed class GameController : IPersonController
 
     public void IsRight(string name, bool voteForRight, string answer)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void MakeStake()
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnPauseChanged(bool isPaused)
@@ -146,6 +146,16 @@ internal sealed class GameController : IPersonController
 
     public void OnPackageComments(string comments) => GameViewModel.ShowmanReplic = $"{Resources.PackageComments}: {comments}";
 
+    public void OnQuestionStart(string typeName, bool isDefaultType)
+    {
+        if (isDefaultType)
+        {
+            return;
+        }
+
+        GameViewModel.OnQuestionType(typeName, isDefaultType);
+    }
+
     public void OnRightAnswer(string answer)
     {
         GameViewModel.State = QuestionState.Normal;
@@ -168,6 +178,28 @@ internal sealed class GameController : IPersonController
         }
     }
 
+    public void OnSelectPlayer(SelectPlayerReason reason)
+    {
+        switch (reason)
+        {
+            case SelectPlayerReason.Chooser:
+                GameViewModel.OnSelectChooser();
+                break;
+            
+            case SelectPlayerReason.Staker:
+                break;
+            
+            case SelectPlayerReason.Deleter:
+                break;
+            
+            case SelectPlayerReason.Answerer:
+                break;
+            
+            default:
+                break;
+        }
+    }
+
     public void OnTheme(string themeName, string themeComments, int questionCount, bool animate)
     {
         GameViewModel.ShowmanReplic = "";
@@ -185,7 +217,7 @@ internal sealed class GameController : IPersonController
     {
         if (timerIndex == 1 && timerCommand == "MAXTIME" && int.TryParse(arg, out var maxTime))
         {
-            GameViewModel.RoundTimeMax = maxTime;
+            GameViewModel.QuestionTimeMax = maxTime / 10;
             return;
         }
 
@@ -208,9 +240,9 @@ internal sealed class GameController : IPersonController
                 break;
 
             case 2:
-                if (timerCommand == "GO")
+                if (timerCommand == "GO" && int.TryParse(arg, out var thinkTime))
                 {
-                    return;
+                    GameViewModel.RunThinkingTimer(thinkTime / 10); return;
                 }
 
                 break;

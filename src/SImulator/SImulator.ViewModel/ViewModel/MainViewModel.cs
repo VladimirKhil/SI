@@ -604,7 +604,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             gameActions,
             presentationListener,
             presentationController,
-            gameLogger);
+            gameLogger,
+            true);
 
         gameController.GameViewModel = gameViewModel;
 
@@ -661,7 +662,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             gameActions,
             presentationListener,
             presentationController,
-            gameLogger)
+            gameLogger,
+            false)
         {
             RoundTimeMax = Settings.RoundTime
         };

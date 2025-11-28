@@ -87,7 +87,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     private readonly UserSettings _userSettings;
     private readonly ILogger<ViewerHumanLogic> _logger;
 
-    private readonly ViewerData _data;
+    private readonly ViewerData _state;
 
     private bool _isAnswer;
 
@@ -100,7 +100,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
-        ViewerData data,
+        ViewerData state,
         ViewerActions viewerActions,
         UserSettings userSettings,
         string serverAddress,
@@ -109,7 +109,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         string[]? contentPublicUrls = null)
     {
         _gameViewModel = gameViewModel;
-        _data = data;
+        _state = state;
         _viewerActions = viewerActions;
         _userSettings = userSettings;
         _logger = logger;
@@ -316,7 +316,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         if (replicCode == ReplicCodes.Showman.ToString())
         {
             _gameViewModel.ClearReplic();
-            _gameViewModel.Speaker = _data.ShowMan;
+            _gameViewModel.Speaker = _state.ShowMan;
             _gameViewModel.Speaker.Replic = TrimReplic(text);
 
             logString = $"<span class=\"sh\">{_gameViewModel.Speaker.Name}: </span><span class=\"r\">{text}</span>";
@@ -330,10 +330,10 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         {
             var indexString = replicCode[1..];
 
-            if (int.TryParse(indexString, out var index) && index >= 0 && index < _data.Players.Count)
+            if (int.TryParse(indexString, out var index) && index >= 0 && index < _state.Players.Count)
             {
                 _gameViewModel.ClearReplic();
-                _gameViewModel.Speaker = _data.Players[index];
+                _gameViewModel.Speaker = _state.Players[index];
                 _gameViewModel.Speaker.Replic = TrimReplic(text);
 
                 logString = $"<span class=\"sr n{index}\">{_gameViewModel.Speaker.Name}: </span><span class=\"r\">{text}</span>";
@@ -492,11 +492,11 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     TInfo.TStage = TableStage.Sign;
                     OnReplic(ReplicCodes.Special.ToString(), $"{Resources.GameStarted} {DateTime.Now}");
 
-                    var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{_data.ShowMan?.Name}\"");
+                    var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{_state.ShowMan?.Name}\"");
 
-                    for (var i = 0; i < _data.Players.Count; i++)
+                    for (var i = 0; i < _state.Players.Count; i++)
                     {
-                        gameMeta.Append($" data-player-{i}=\"{_data.Players[i].Name}\"");
+                        gameMeta.Append($" data-player-{i}=\"{_state.Players[i].Name}\"");
                     }
 
                     AddToFileLog(gameMeta + "></span>");
@@ -505,10 +505,10 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 break;
 
             case GameStage.Round:
-                if (stageIndex > -1 && stageIndex < _data.RoundNames.Length)
+                if (stageIndex > -1 && stageIndex < _state.RoundNames.Length)
                 {
                     _gameViewModel.RoundIndex = stageIndex;
-                    _gameViewModel.StageName = _data.RoundNames[_gameViewModel.RoundIndex];
+                    _gameViewModel.StageName = _state.RoundNames[_gameViewModel.RoundIndex];
                 }
 
                 _themeCounter = 0;
@@ -521,7 +521,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     TInfo.Selectable = false;
                     PlatformManager.Instance.PlaySound(Sounds.RoundBegin);
 
-                    foreach (var player in _data.Players)
+                    foreach (var player in _state.Players)
                     {
                         player.ClearState();
                     }
@@ -556,7 +556,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     private void OnGameFinished()
     {
-        var packageId = _data.PackageId;
+        var packageId = _state.PackageId;
         
         UI.Execute(
             () =>
@@ -759,7 +759,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     if (int.TryParse(optionValue, out var timeForBlockingButton))
                     {
                         // TODO _appSettings.TimeSettings.TimeForBlockingButton = timeForBlockingButton;
-                        _data.ButtonBlockingTime = timeForBlockingButton;
+                        _state.ButtonBlockingTime = timeForBlockingButton;
                     }
 
                     break;
@@ -768,7 +768,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     if (bool.TryParse(optionValue, out var useApellations))
                     {
                         _appSettings.UseApellations = useApellations;
-                        _data.ApellationEnabled = useApellations;
+                        _state.ApellationEnabled = useApellations;
                     }
 
                     break;
@@ -999,7 +999,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                     // TODO: this logic should be moved to server; client should receive just boolean flag
                     if (contentType == ContentTypes.Image
-                        && _data.QuestionType == QuestionTypes.Simple
+                        && _state.QuestionType == QuestionTypes.Simple
                         && !_isAnswer
                         && !_appSettings.FalseStart
                         && _appSettings.PartialImages
@@ -1267,12 +1267,12 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             return;
         }
 
-        if (number < 0 || number >= _data.Players.Count)
+        if (number < 0 || number >= _state.Players.Count)
         {
             return;
         }
 
-        _data.Players[number].State = PlayerState.Answering;
+        _state.Players[number].State = PlayerState.Answering;
     }
 
     public void OnStopPlay()
@@ -1287,13 +1287,13 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         if (isRight)
         {
             PlatformManager.Instance.PlaySound(sum >= 2000 ? Sounds.ApplauseBig : Sounds.ApplauseSmall);
-            _data.Players[playerIndex].State = PlayerState.Right;
+            _state.Players[playerIndex].State = PlayerState.Right;
         }
         else
         {
             PlatformManager.Instance.PlaySound(Sounds.AnswerWrong);
-            _data.Players[playerIndex].Pass = true;
-            _data.Players[playerIndex].State = PlayerState.Wrong;
+            _state.Players[playerIndex].Pass = true;
+            _state.Players[playerIndex].State = PlayerState.Wrong;
         }
 
         AddToFileLog($"<span data-tag=\"sumChange\" data-playerIndex=\"{playerIndex}\" data-change=\"{(isRight ? 1 : -1) * sum}\"></span>");
@@ -1301,15 +1301,15 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnPersonFinalStake(int playerIndex)
     {
-        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+        if (playerIndex < 0 || playerIndex >= _state.Players.Count)
         {
             return;
         }
 
-        _data.Players[playerIndex].Stake = -4;
+        _state.Players[playerIndex].Stake = -4;
     }
 
-    public void OnQuestionStart(bool isDefaultType)
+    public void OnQuestionStart(string questionTypeName, bool isDefaultType)
     {
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
@@ -1325,7 +1325,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         _runTimer = false;
         _initialTime = 0;
 
-        switch (_data.QuestionType)
+        switch (questionTypeName)
         {
             case QuestionTypes.Stake:
                 {
@@ -1414,7 +1414,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         {
             for (int i = 0; i < TInfo.RoundInfo.Count; i++)
             {
-                TInfo.RoundInfo[i].Active = i == _data.ThemeIndex;
+                TInfo.RoundInfo[i].Active = i == _state.ThemeIndex;
             }
         }
     }
@@ -1445,7 +1445,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             PlatformManager.Instance.PlaySound(Sounds.ApplauseFinal);
         }
 
-        SaveBestPlayers(_data.Players);
+        SaveBestPlayers(_state.Players);
     }
 
     private static void SaveBestPlayers(IEnumerable<PlayerAccount> players)
@@ -1689,11 +1689,11 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                         {
                             if (personIndex == -1)
                             {
-                                _data.ShowMan.IsDeciding = true;
+                                _state.ShowMan.IsDeciding = true;
                             }
-                            else if (personIndex > -1 && personIndex < _data.Players.Count)
+                            else if (personIndex > -1 && personIndex < _state.Players.Count)
                             {
-                                _data.Players[personIndex].IsDeciding = true;
+                                _state.Players[personIndex].IsDeciding = true;
                             }
                         }
 
@@ -1707,9 +1707,9 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 }
 
             case MessageParams.Timer_Stop:
-                _data.ShowMan.IsDeciding = false;
+                _state.ShowMan.IsDeciding = false;
 
-                foreach (var player in _data.Players)
+                foreach (var player in _state.Players)
                 {
                     player.IsDeciding = false;
                 }
@@ -1721,12 +1721,12 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnPersonPass(int playerIndex)
     {
-        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+        if (playerIndex < 0 || playerIndex >= _state.Players.Count)
         {
             return;
         }
 
-        _data.Players[playerIndex].State = PlayerState.Pass;
+        _state.Players[playerIndex].State = PlayerState.Pass;
     }
 
     public void OnRoundContent(string[] mparams)
@@ -1833,7 +1833,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
         if (!string.IsNullOrEmpty(voiceChatUri) && Uri.IsWellFormedUriString(voiceChatUri, UriKind.Absolute))
         {
-            _data.VoiceChatUri = voiceChatUri;
+            _state.VoiceChatUri = voiceChatUri;
         }
     }
 
@@ -1862,7 +1862,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             {
                 _gameViewModel.Players.Clear();
 
-                foreach (var player in _data.Players)
+                foreach (var player in _state.Players)
                 {
                     _gameViewModel.Players.Add(new PlayerViewModel(player));
                 }
@@ -1877,7 +1877,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             Greet();
         }
 
-        if (!_data.IsNetworkGame && _gameViewModel.Ready.CanBeExecuted)
+        if (!_state.IsNetworkGame && _gameViewModel.Ready.CanBeExecuted)
         {
             _gameViewModel.Ready.Execute(null);
         }
@@ -1912,7 +1912,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void SelectQuestion()
     {
-        _data.ThemeIndex = _data.QuestionIndex = -1;
+        _state.ThemeIndex = _state.QuestionIndex = -1;
         _gameViewModel.Hint = Resources.HintSelectQuestion;
         TInfo.Selectable = true;
         TInfo.SelectQuestion.CanBeExecuted = true;
@@ -1935,14 +1935,14 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void ValidateAnswer(int playerIndex, string answer)
     {
-        if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+        if (playerIndex < 0 || playerIndex >= _state.Players.Count)
         {
             return;
         }
 
-        var playerName = _data.Players[playerIndex].Name;
+        var playerName = _state.Players[playerIndex].Name;
         _gameViewModel.NewValidation = true;
-        _data.ShowExtraRightButtons = false;
+        _state.ShowExtraRightButtons = false;
         _gameViewModel.Hint = Resources.HintCheckAnswer;
         _gameViewModel.AddValidation(playerName, answer);
         _gameViewModel.DialogMode = DialogModes.AnswerValidation;
@@ -1957,7 +1957,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         {
             _gameViewModel.Answer = "";
             _gameViewModel.DialogMode = DialogModes.Answer;
-            var me = (PlayerAccount?)_data.Me;
+            var me = (PlayerAccount?)_state.Me;
             
             if (me != null)
             {
@@ -2001,8 +2001,8 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnPlayerOutcome(int playerIndex, bool isRight)
     {
-        if (_data.QuestionType != QuestionTypes.Simple
-            && _data.Players[playerIndex].Name == _viewerActions.Client.Name
+        if (_state.QuestionType != QuestionTypes.Simple
+            && _state.Players[playerIndex].Name == _viewerActions.Client.Name
             || isRight)
         {
             _gameViewModel.Apellate.CanBeExecuted = _gameViewModel.ApellationCount > 0;
@@ -2049,7 +2049,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void DeleteTheme()
     {
-        _data.ThemeIndex = -1;
+        _state.ThemeIndex = -1;
 
         TInfo.Selectable = true;
         TInfo.SelectTheme.CanBeExecuted = true;
@@ -2060,20 +2060,20 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void MakeStake()
     {
-        if (_data.StakeInfo == null)
+        if (_state.StakeInfo == null)
         {
             return;
         }
 
-        _gameViewModel.SendStakeNew.CanBeExecuted = _data.StakeInfo.Modes.HasFlag(Models.StakeModes.Stake);
-        _gameViewModel.SendPassNew.CanBeExecuted = _data.StakeInfo.Modes.HasFlag(Models.StakeModes.Pass);
-        _gameViewModel.SendAllInNew.CanBeExecuted = _data.StakeInfo.Modes.HasFlag(Models.StakeModes.AllIn);
+        _gameViewModel.SendStakeNew.CanBeExecuted = _state.StakeInfo.Modes.HasFlag(Models.StakeModes.Stake);
+        _gameViewModel.SendPassNew.CanBeExecuted = _state.StakeInfo.Modes.HasFlag(Models.StakeModes.Pass);
+        _gameViewModel.SendAllInNew.CanBeExecuted = _state.StakeInfo.Modes.HasFlag(Models.StakeModes.AllIn);
 
         _gameViewModel.DialogMode = DialogModes.StakeNew;
         _gameViewModel.Hint = Resources.HintMakeAStake;
         PlatformManager.Instance.Activate();
 
-        foreach (var player in _data.Players)
+        foreach (var player in _state.Players)
         {
             player.IsDeciding = false;
         }

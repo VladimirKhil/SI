@@ -77,8 +77,9 @@ public interface IPersonController
     /// <summary>
     /// Handles question start.
     /// </summary>
+    /// <param name="questionType">Question type name.</param>
     /// <param name="isDefaultType">Does the question have a default type for the current round.</param>
-    void OnQuestionStart(bool isDefaultType) { }
+    void OnQuestionStart(string questionTypeName, bool isDefaultType) { }
 
     /// <summary>
     /// Завершение раунда

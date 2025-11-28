@@ -647,18 +647,22 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     #endregion
 
+    private readonly bool _managedTimers;
+
     public GameViewModel(
         AppSettingsViewModel settings,
         IGameActions gameActions,
         IExtendedListener presentationListener,
         IPresentationController presentationController,
-        IGameLogger gameLogger)
+        IGameLogger gameLogger,
+        bool managedTimers)
     {
         Settings = settings;
         _gameActions = gameActions;
         _presentationListener = presentationListener;
         _gameLogger = gameLogger;
         PresentationController = presentationController;
+        _managedTimers = managedTimers;
 
         LocalInfo = new TableInfoViewModel();
         Players = new ObservableCollection<PlayerInfo>();
@@ -1023,13 +1027,16 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                     return;
                 }
 
-                PresentationController.NoAnswer();
-                StopQuestionTimer_Executed(1);
-                ActiveQuestionCommand = null;
-
-                if (!Settings.Model.SignalsAfterTimer)
+                if (!_managedTimers)
                 {
-                    StopButtons();
+                    PresentationController.NoAnswer();
+                    StopQuestionTimer_Executed(1);
+                    ActiveQuestionCommand = null;
+
+                    if (!Settings.Model.SignalsAfterTimer)
+                    {
+                        StopButtons();
+                    }
                 }
             },
             exc => OnError(exc.ToString()));
@@ -1365,6 +1372,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.UpdateSettings(Settings.SIUISettings.Model);
         PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
         PresentationController.ClearPlayersState();
+        PresentationController.SetTimerMaxTime(QuestionTimeMax * 10);
     }
 
     internal void OnQuestion(int price)
@@ -1580,9 +1588,26 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.SetRoundTable();
         _gameActions.MoveNext();
 
+        ChooseStarter();
+
+        return true;
+    }
+
+    internal void OnSelectChooser()
+    {
+        ChooseStarter();
+
+        if (DecisionMode != DecisionMode.StarterChoosing)
+        {
+            _gameActions.MoveNext();
+        }
+    }
+
+    private void ChooseStarter()
+    {
         if (!Players.Any())
         {
-            return false;
+            return;
         }
 
         var minSum = Players.Min(p => p.Sum);
@@ -1592,14 +1617,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (playersWithMinSumCount == 1)
         {
             ChooserIndex = playersWithMinSum[0].i;
-            return false;
+            return;
         }
         else if (playersWithMinSumCount > 1)
         {
             DecisionMode = DecisionMode.StarterChoosing;
         }
-
-        return true;
     }
 
     public void StartQuestionTimer()
@@ -2539,5 +2562,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         return true;
+    }
+
+    internal void RunThinkingTimer(int maxTime)
+    {
+        ThinkingTime = 0;
+        ThinkingTimeMax = maxTime;
+        _thinkingTimer.Change(1000, 1000);
     }
 }

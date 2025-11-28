@@ -2693,7 +2693,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Resume);
         _state.Decision = DecisionType.Pressing;
 
-        ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _state.TimeThinking, 10), force: true);
+        ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _state.TimeThinking, 10));
     }
 
     private void SendTryToPlayers()

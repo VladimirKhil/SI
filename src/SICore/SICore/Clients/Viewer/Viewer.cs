@@ -6,7 +6,6 @@ using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
 using SIData;
 using SIEngine.Rules;
-using SIPackages;
 using SIPackages.Core;
 using SIUI.Model;
 using System.Text;
@@ -952,7 +951,7 @@ public class Viewer : MessageHandler, IViewerClient
     private void OnQuestionType(string[] mparams)
     {
         State.QuestionType = mparams[1];
-        _controller.OnQuestionStart(mparams.Length > 2 && bool.TryParse(mparams[2], out var isDefault) && isDefault);
+        _controller.OnQuestionStart(State.QuestionType, mparams.Length > 2 && bool.TryParse(mparams[2], out var isDefault) && isDefault);
     }
 
     private void OnQuestionSelected(string[] mparams)
