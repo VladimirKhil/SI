@@ -517,6 +517,18 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         node.Error += (error, _) => ShowError(error);
 
+        var playerCount = Math.Min(2, Settings.PlayerCount);
+        var players = new Account[playerCount];
+        
+        for (var i = 0; i < playerCount; i++)
+        {
+            players[i] = new Account
+            {
+                IsHuman = true,
+                Name = ""
+            };
+        }
+
         var gameSettings = new GameSettingsCore<AppSettingsCore>
         {
             HumanPlayerName = "HOST",
@@ -531,19 +543,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 IsHuman = true,
                 Name = "HOST"
             },
-            Players = new[]
-            {
-                new Account
-                {
-                    IsHuman = true,
-                    Name = ""
-                },
-                new Account
-                {
-                    IsHuman = true,
-                    Name = ""
-                }
-            }
+            Players = players,
         };
 
         var gameHost = new GameHost();
@@ -563,6 +563,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
            computerPlayers,
            computerShowmans,
            avatarHelper,
+           null,
            null);
 
         var client = new Client("HOST");
