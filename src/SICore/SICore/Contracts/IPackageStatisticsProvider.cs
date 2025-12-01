@@ -14,4 +14,12 @@ public interface IPackageStatisticsProvider
     /// <param name="themeIndex">Theme index.</param>
     /// <param name="questionIndex">Question index.</param>
     ICollection<string> GetAppellatedAnswers(int roundIndex, int themeIndex, int questionIndex);
+
+    /// <summary>
+    /// Gets rejected answers for a question.
+    /// </summary>
+    /// <param name="roundIndex">Round index.</param>
+    /// <param name="themeIndex">Theme index.</param>
+    /// <param name="questionIndex">Question index.</param>
+    ICollection<string> GetRejectedAnswers(int roundIndex, int themeIndex, int questionIndex);
 }

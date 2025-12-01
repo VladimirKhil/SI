@@ -24,16 +24,18 @@ public sealed class GameActions
     /// </summary>
     private const string ContentShapeCharacter = "&";
 
-    private readonly GameData _gameData;
+    private static readonly string[] ReviewablePackageSources = new string[] { "https://steamcommunity.com" };
+
+    private readonly GameData _state;
 
     public Client Client { get; }
 
     private readonly IFileShare _fileShare;
 
-    public GameActions(Client client, GameData gameData, IFileShare fileShare)
+    public GameActions(Client client, GameData state, IFileShare fileShare)
     {
         Client = client;
-        _gameData = gameData;
+        _state = state;
         _fileShare = fileShare;
     }
 
@@ -50,8 +52,8 @@ public sealed class GameActions
     public void SendVisualMessage(MessageBuilder messageBuilder)
     {
         var message = messageBuilder.ToString();
-        _gameData.LastVisualMessage = message;
-        _gameData.ComplexVisualState = null;
+        _state.LastVisualMessage = message;
+        _state.ComplexVisualState = null;
         SendMessage(message);
     }
 
@@ -60,8 +62,8 @@ public sealed class GameActions
     /// </summary>
     public void SendVisualMessage(string message)
     {
-        _gameData.LastVisualMessage = message;
-        _gameData.ComplexVisualState = null;
+        _state.LastVisualMessage = message;
+        _state.ComplexVisualState = null;
         SendMessage(message);
     }
 
@@ -71,8 +73,8 @@ public sealed class GameActions
     public void SendVisualMessageWithArgs(params object[] args)
     {
         var message = string.Join(Message.ArgsSeparator, args);
-        _gameData.LastVisualMessage = message;
-        _gameData.ComplexVisualState = null;
+        _state.LastVisualMessage = message;
+        _state.ComplexVisualState = null;
         SendMessage(message);
     }
 
@@ -127,9 +129,9 @@ public sealed class GameActions
     {
         var message = new StringBuilder(Messages.Sums);
 
-        for (var i = 0; i < _gameData.Players.Count; i++)
+        for (var i = 0; i < _state.Players.Count; i++)
         {
-            message.Append(Message.ArgsSeparatorChar).Append(_gameData.Players[i].Sum);
+            message.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Sum);
         }
 
         SendMessage(message.ToString(), person);
@@ -143,9 +145,9 @@ public sealed class GameActions
     {
         var message = new StringBuilder(Messages.RoundsNames);
 
-        for (var i = 0; i < _gameData.Rounds.Length; i++)
+        for (var i = 0; i < _state.Rounds.Length; i++)
         {
-            message.Append(Message.ArgsSeparatorChar).Append(_gameData.Rounds[i].Name);
+            message.Append(Message.ArgsSeparatorChar).Append(_state.Rounds[i].Name);
         }
 
         SendMessage(message.ToString(), person);
@@ -153,7 +155,7 @@ public sealed class GameActions
 
     public void SendThemeInfo(int themeIndex = -1, bool animate = false, int? overridenQuestionCount = null)
     {
-        var theme = themeIndex > -1 ? _gameData.Themes?[themeIndex] : _gameData.Theme;
+        var theme = themeIndex > -1 ? _state.Themes?[themeIndex] : _state.Theme;
 
         if (theme == null)
         {
@@ -178,7 +180,7 @@ public sealed class GameActions
 
     internal void InformTheme(string person)
     {
-        var theme = _gameData.Theme;
+        var theme = _state.Theme;
 
         if (theme == null)
         {
@@ -202,12 +204,12 @@ public sealed class GameActions
     {
         var message = new StringBuilder(Messages.Table);
 
-        for (var i = 0; i < _gameData.TInfo.RoundInfo.Count; i++)
+        for (var i = 0; i < _state.TInfo.RoundInfo.Count; i++)
         {
-            for (var j = 0; j < _gameData.TInfo.RoundInfo[i].Questions.Count; j++)
+            for (var j = 0; j < _state.TInfo.RoundInfo[i].Questions.Count; j++)
             {
                 message.Append(Message.ArgsSeparatorChar);
-                message.Append(_gameData.TInfo.RoundInfo[i].Questions[j].Price);
+                message.Append(_state.TInfo.RoundInfo[i].Questions[j].Price);
             }
 
             message.Append(Message.ArgsSeparatorChar);
@@ -221,7 +223,7 @@ public sealed class GameActions
     /// </summary>
     public void InformStage(string person = NetworkConstants.Everybody)
     {
-        var messageBuilder = new MessageBuilder(Messages.Stage, _gameData.Stage);
+        var messageBuilder = new MessageBuilder(Messages.Stage, _state.Stage);
         SendMessage(messageBuilder.ToString(), person);
     }
 
@@ -229,10 +231,10 @@ public sealed class GameActions
         string roundName,
         int roundIndex,
         QuestionSelectionStrategyType roundStrategy) =>
-        SendVisualMessageWithArgs(Messages.Stage, _gameData.Stage, roundName, roundIndex, roundStrategy);
+        SendVisualMessageWithArgs(Messages.Stage, _state.Stage, roundName, roundIndex, roundStrategy);
 
     public void InformStageInfo(string person, int stageIndex) =>
-        SendMessageToWithArgs(person, Messages.StageInfo, _gameData.Stage.ToString(), _gameData.Round?.Name ?? "", stageIndex);
+        SendMessageToWithArgs(person, Messages.StageInfo, _state.Stage.ToString(), _state.Round?.Name ?? "", stageIndex);
 
     internal void InformRoundThemesNames(string person = NetworkConstants.Everybody, ThemesPlayMode playMode = ThemesPlayMode.None)
     {
@@ -240,22 +242,22 @@ public sealed class GameActions
             .Append(Message.ArgsSeparatorChar)
             .Append(playMode != ThemesPlayMode.None ? '+' : '-')
             .Append(Message.ArgsSeparatorChar)
-            .Append(string.Join(Message.ArgsSeparator, _gameData.TInfo.RoundInfo.Select(info => info.Name)));
+            .Append(string.Join(Message.ArgsSeparator, _state.TInfo.RoundInfo.Select(info => info.Name)));
 
         SendMessage(msg.ToString(), person);
 
-        var messageBuilder = new MessageBuilder(Messages.RoundThemes2, playMode).AddRange(_gameData.TInfo.RoundInfo.Select(info => info.Name));
+        var messageBuilder = new MessageBuilder(Messages.RoundThemes2, playMode).AddRange(_state.TInfo.RoundInfo.Select(info => info.Name));
         SendMessage(messageBuilder.ToString(), person);
     }
 
     internal void InformRoundThemesComments(string person = NetworkConstants.Everybody)
     {
-        if (_gameData.ThemeComments.All(comment => comment.Length == 0))
+        if (_state.ThemeComments.All(comment => comment.Length == 0))
         {
             return;
         }
 
-        var messageBuilder = new MessageBuilder(Messages.RoundThemesComments).AddRange(_gameData.ThemeComments);
+        var messageBuilder = new MessageBuilder(Messages.RoundThemesComments).AddRange(_state.ThemeComments);
         SendMessage(messageBuilder.ToString(), person);
     }
 
@@ -265,7 +267,7 @@ public sealed class GameActions
     /// <param name="person">Person name (everybody by default).</param>
     internal void InformRoundContent(string person = NetworkConstants.Everybody)
     {
-        if (!_gameData.Settings.AppSettings.PreloadRoundContent)
+        if (!_state.Settings.AppSettings.PreloadRoundContent)
         {
             return;
         }
@@ -284,7 +286,7 @@ public sealed class GameActions
         else
         {
             // local persons do not need to preload anything
-            var personsList = _gameData.AllPersons.Keys.Where(name => !Client.CurrentNode.Contains(name)).ToList();
+            var personsList = _state.AllPersons.Keys.Where(name => !Client.CurrentNode.Contains(name)).ToList();
 
             if (personsList.Count == 0)
             {
@@ -296,7 +298,7 @@ public sealed class GameActions
 
         var contentUris = new HashSet<string>();
 
-        foreach (var theme in _gameData.Round.Themes)
+        foreach (var theme in _state.Round.Themes)
         {
             foreach (var question in theme.Questions)
             {
@@ -328,7 +330,7 @@ public sealed class GameActions
                                 else
                                 {
                                     var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
-                                    var media = _gameData.PackageDoc.TryGetMedia(contentItem);
+                                    var media = _state.PackageDoc.TryGetMedia(contentItem);
 
                                     if (!media.HasValue || media.Value.Uri == null)
                                     {
@@ -378,8 +380,8 @@ public sealed class GameActions
 
     internal void InformLayout(string person = NetworkConstants.Everybody)
     {
-        var screenContentSequence = _gameData.QuestionPlay.ScreenContentSequence;
-        var answerOptions = _gameData.QuestionPlay.AnswerOptions;
+        var screenContentSequence = _state.QuestionPlay.ScreenContentSequence;
+        var answerOptions = _state.QuestionPlay.AnswerOptions;
 
         if (answerOptions == null || screenContentSequence == null)
         {
@@ -404,7 +406,7 @@ public sealed class GameActions
         // Real question text is sent later and it sequentially replaces test shape
         // Text shape is required to display partial question on the screen correctly
         // (font size and number of lines must be calculated in the beginning to prevent UI flickers on question text growth)
-        var shape = Regex.Replace(_gameData.Text, "[^\r\n\t\f ]", ContentShapeCharacter);
+        var shape = Regex.Replace(_state.Text, "[^\r\n\t\f ]", ContentShapeCharacter);
         SendMessageToWithArgs(person, Messages.TextShape, shape);
         SendMessageToWithArgs(person, Messages.ContentShape, ContentPlacements.Screen, 0, ContentTypes.Text, shape.EscapeNewLines());
     }
@@ -416,4 +418,19 @@ public sealed class GameActions
         SendMessageToWithArgs(person, Messages.AnswerDeviation, deviation);
 
     internal void AskAnswer(string person, string answerType) => SendMessageToWithArgs(person, Messages.Answer, answerType);
+
+    internal void AskReview()
+    {
+        var packageSource = _state.GameResultInfo.PackageSource?.ToString() ?? "";
+
+        if (!ReviewablePackageSources.Any(allowed => packageSource.StartsWith(allowed, StringComparison.OrdinalIgnoreCase)))
+        {
+            packageSource = "";
+        }
+
+        foreach (var player in _state.Players)
+        {
+            SendMessageToWithArgs(player.Name, Messages.AskReview, packageSource);
+        }
+    }
 }

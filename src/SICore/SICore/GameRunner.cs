@@ -35,10 +35,11 @@ public static class GameRunner
         ComputerAccount[] defaultShowmans,
         IAvatarHelper avatarHelper,
         IPinHelper? pinHelper,
+        Uri? packageSource,
         string? gameName = null,
         IPackageStatisticsProvider? packageStatisticsProvider = null)
     {
-        var gameData = new GameData(gameHost, new GamePersonAccount(settings.Showman), settings, packageStatisticsProvider)
+        var gameData = new GameData(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, packageStatisticsProvider)
         {
             HostName = settings.IsAutomatic ? null : settings.HumanPlayerName,
             GameName = gameName ?? "",

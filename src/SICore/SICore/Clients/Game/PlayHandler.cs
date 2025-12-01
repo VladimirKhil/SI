@@ -210,7 +210,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     public void OnQuestionType(string typeName, bool isDefault)
     {
         _state.QuestionTypeName = typeName;
-        GameLogic?.OnQuestionType(isDefault);
+        GameLogic?.OnQuestionType(typeName, isDefault);
     }
 
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)

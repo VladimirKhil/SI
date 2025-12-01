@@ -55,6 +55,11 @@ public static class Messages
     public const string Appellation = "APPELLATION";
 
     /// <summary>
+    /// Asks for game review.
+    /// </summary>
+    public const string AskReview = "ASK_REVIEW";
+
+    /// <summary>
     /// Asks to select a player.
     /// </summary>
     public const string AskSelectPlayer = "ASK_SELECT_PLAYER";

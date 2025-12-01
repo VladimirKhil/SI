@@ -759,6 +759,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             _computerPlayers.ToArray(),
             _computerShowmans.ToArray(),
             avatarHelper,
+            null,
             null);
 
         var data = new ViewerData();

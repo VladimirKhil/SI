@@ -2443,10 +2443,22 @@ public sealed class Game : MessageHandler
                     }
                 }
 
-                var wrongAnswers = LO[nameof(R.WrongAnswer)].Split(';');
-                var wrongCount = restwrong.Count;
+                if (restwrong.Count == 0 && _state.PackageStatistisProvider != null)
+                {
+                    var rejectedAnswers = _state.PackageStatistisProvider.GetRejectedAnswers(Logic.Engine.RoundIndex, _state.ThemeIndex, _state.QuestionIndex);
 
-                if (wrongCount == 0)
+                    foreach (var wrong in rejectedAnswers)
+                    {
+                        if (!_state.UsedWrongVersions.Contains(wrong))
+                        {
+                            restwrong.Add(wrong);
+                        }
+                    }
+                }
+
+                var wrongAnswers = LO[nameof(R.WrongAnswer)].Split(';');
+
+                if (restwrong.Count == 0)
                 {
                     for (int i = 0; i < wrongAnswers.Length; i++)
                     {
@@ -2462,7 +2474,7 @@ public sealed class Game : MessageHandler
                     }
                 }
 
-                wrongCount = restwrong.Count;
+                var wrongCount = restwrong.Count;
 
                 if (wrongCount == 0)
                 {
@@ -3492,6 +3504,11 @@ public sealed class Game : MessageHandler
                 newAccount = isPlayer
                     ? ReplaceComputerPlayer(index, account.Name, replacer)
                     : ReplaceComputerShowman(account.Name, replacer);
+
+                if (newAccount is GamePlayerAccount playerAccount)
+                {
+                    InheritAccountState(playerAccount, account);
+                }
             }
             finally
             {

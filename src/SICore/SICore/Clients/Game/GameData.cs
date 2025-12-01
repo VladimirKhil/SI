@@ -220,7 +220,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Game results.
     /// </summary>
-    internal GameResult GameResultInfo { get; } = new();
+    internal GameResult GameResultInfo { get; }
 
     /// <summary>
     /// Has the game report been sent.
@@ -618,12 +618,18 @@ public sealed class GameData : Data
     /// </summary>
     public SIData.GameStage Stage { get; internal set; }
 
-    public GameData(IGameHost gameHost, GamePersonAccount showman, IGameSettingsCore<AppSettingsCore> settings, IPackageStatisticsProvider? packageStatisticsProvider)
+    public GameData(
+        IGameHost gameHost,
+        GamePersonAccount showman,
+        Uri? packageSource,
+        IGameSettingsCore<AppSettingsCore> settings,
+        IPackageStatisticsProvider? packageStatisticsProvider)
     {
         Host = gameHost;
         ShowMan = showman;
         Stakes = new StakesState(Players);
         Settings = settings;
+        GameResultInfo = new GameResult(packageSource);
 
         var timeSettings = settings.AppSettings.TimeSettings;
 

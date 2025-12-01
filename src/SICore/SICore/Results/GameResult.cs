@@ -33,6 +33,11 @@ public sealed class GameResult
     public string? PackageName { get; set; }
 
     /// <summary>
+    /// Package source URI.
+    /// </summary>
+    public Uri? PackageSource { get; }
+
+    /// <summary>
     /// Game package authors.
     /// </summary>
     public string[] PackageAuthors { get; set; } = Array.Empty<string>();
@@ -76,6 +81,11 @@ public sealed class GameResult
     /// Defines statistics for questions.
     /// </summary>
     public Dictionary<string, QuestionStats> QuestionsStats { get; } = new();
+
+    public GameResult(Uri? packageSource = null)
+    {
+        PackageSource = packageSource;
+    }
 
     internal void IncrementQuestionSeenCount(string questionKey, int humanPlayerCount)
     {

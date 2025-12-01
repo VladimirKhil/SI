@@ -72,6 +72,7 @@ public sealed class ScenariosTests
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             avatarHelper,
+            null,
             null);
 
         game.Run();

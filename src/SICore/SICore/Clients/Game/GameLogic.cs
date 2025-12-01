@@ -14,6 +14,7 @@ using SIPackages;
 using SIPackages.Core;
 using SIPackages.Models;
 using SIUI.Model;
+using System.Numerics;
 using System.Text;
 using Utils.Timers;
 using R = SICore.Properties.Resources;
@@ -747,7 +748,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void AskDirectAnswer()
     {
-        if (_state.QuestionTypeName == QuestionTypes.StakeAll)
+        if (HaveMultipleAnswerers())
         {
             _gameActions.SendMessageWithArgs(Messages.FinalThink, _state.TimeSettings.HiddenAnswering);
         }
@@ -2152,23 +2153,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         var msg = new MessageBuilder(Messages.GameStatistics);
 
-        var message = new StringBuilder(LO[nameof(R.GameStatistics)]).Append(':').AppendLine().AppendLine();
-
         foreach (var (name, statistic) in _state.Statistics)
         {
             msg.AddRange(name, statistic.RightAnswerCount, statistic.WrongAnswerCount, statistic.RightTotal, statistic.WrongTotal);
-
-            message.Append(name).Append(':').AppendLine();
-            message.Append("   ").Append(LO[nameof(R.RightAnswers)]).Append(": ").Append(statistic.RightAnswerCount).AppendLine();
-            message.Append("   ").Append(LO[nameof(R.WrongAnswers)]).Append(": ").Append(statistic.WrongAnswerCount).AppendLine();
-            message.Append("   ").Append(LO[nameof(R.ScoreEarned)]).Append(": ").Append(statistic.RightTotal).AppendLine();
-            message.Append("   ").Append(LO[nameof(R.ScoreLost)]).Append(": ").Append(statistic.WrongTotal).AppendLine();
-
-            message.AppendLine();
         }
 
         _gameActions.SendVisualMessage(msg.Build());
-        _gameActions.SpecialReplic(message.ToString()); // TODO: REMOVE+
     }
 
     private void AskForPlayerReviews()
@@ -2179,12 +2169,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.WaitReport, 10 * 60 * 2); // 2 minutes
         WaitFor(DecisionType.Reporting, 10 * 60 * 2, -3);
 
-        var reportString = _state.GameResultInfo.ToString(LO);
-
-        foreach (var item in _state.Players)
+        foreach (var player in _state.Players)
         {
-            _gameActions.SendMessageToWithArgs(item.Name, Messages.Report, reportString);
+            _gameActions.SendMessageToWithArgs(player.Name, Messages.Report, "");
         }
+
+        _gameActions.AskReview();
     }
 
     private void WaitRight()
@@ -2766,11 +2756,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.MoveNext, 1, arg + 1, force: true);
     }
 
-    internal void OnQuestionType(bool isDefault)
+    internal void OnQuestionType(string typeName, bool isDefault)
     {
         if (!isDefault) // TODO: This announcement should be handled by the client in the future
         {
-            switch (_state.QuestionTypeName)
+            switch (typeName)
             {
                 case QuestionTypes.Stake:
                 case QuestionTypes.Secret:
@@ -2783,12 +2773,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     break;
 
                 default:
-                    OnUnsupportedQuestionType(_state.QuestionTypeName); // TODO: emit this by Game Engine
+                    OnUnsupportedQuestionType(typeName); // TODO: emit this by Game Engine
                     return;
             }
         }
 
-        _state.QuestionTypeSettings.TryGetValue(_state.QuestionTypeName, out var questionTypeRules);
+        _state.QuestionTypeSettings.TryGetValue(typeName, out var questionTypeRules);
         
         var isNoRisk = questionTypeRules?.PenaltyType == PenaltyType.None;
 
@@ -2797,7 +2787,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _state.CurPriceWrong = 0;
         }
 
-        _gameActions.SendVisualMessageWithArgs(Messages.QType, _state.QuestionTypeName, isDefault, isNoRisk);
+        _gameActions.SendVisualMessageWithArgs(Messages.QType, typeName, isDefault, isNoRisk);
         ScheduleExecution(Tasks.MoveNext, isDefault ? 1 : 22, force: true);
     }
 
@@ -4501,7 +4491,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
 #if !DEBUG
                     // Advertisement could not be skipped
-                    _data.MoveNextBlocked = !_data.Settings.AppSettings.Managed;
+                    _state.MoveNextBlocked = !_state.Settings.AppSettings.Managed;
 #endif
                     adShown = true;
 
