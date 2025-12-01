@@ -109,16 +109,11 @@ internal class ViewerComputerLogic : IPersonController
 
     public void OnPlayerOutcome(int playerIndex, bool isRight) => _player.PersonAnswered(playerIndex, isRight);
 
-    public void OnQuestionStart(bool isDefaultType) => _player.OnQuestionStart();
+    public void OnQuestionStart(string questionTypeName, bool isDefaultType) => _player.OnQuestionStart();
 
     public void Report(string report) => _player.SendReport();
 
     public void ReceiveText(Message m)
-    {
-        // Do nothing
-    }
-
-    public void RoundThemes(bool print)
     {
         // Do nothing
     }
