@@ -48,6 +48,11 @@ public sealed class GameResult
     public string? PackageAuthorsContacts { get; set; }
 
     /// <summary>
+    /// Was the game completed.
+    /// </summary>
+    public bool Completed { get; set; }
+
+    /// <summary>
     /// Players results.
     /// </summary>
     public Dictionary<string, int> Results { get; } = new();

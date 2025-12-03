@@ -2275,11 +2275,6 @@ public sealed class Game : MessageHandler
 
             if (!completions.TryGetValue((contentType, contentValue), out completion))
             {
-                if (completions.Count > 0)
-                {
-                    _state.Host.LogWarning($"Completion for content ({contentType}, {contentValue}) not found among completions: {string.Join("|", completions.Keys)}");
-                }
-
                 return;
             }
         }
