@@ -9,12 +9,12 @@ body {
 
 .replicAndTable {
 	height: 100%;
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 }
 
 .showmanReplic {
-    opacity: 1 !important;
+	opacity: 1 !important;
 }
 
 #table {

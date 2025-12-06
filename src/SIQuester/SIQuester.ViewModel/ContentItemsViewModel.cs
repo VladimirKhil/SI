@@ -233,20 +233,18 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     protected override void OnRemoveAt(int index)
     {
-        if (Count == 1)
-        {
-            using var change = OwnerDocument?.OperationsManager.BeginComplexChange();
-            
-            this[0].Model.Type = ContentTypes.Text;
-            this[0].Model.IsRef = false;
-            this[0].Model.Value = "";
-            this[0].Model.Placement = ContentPlacements.Screen;
-
-            change?.Commit();
-            return;
-        }
-
         base.OnRemoveAt(index);
+
+        if (Count == 0)
+        {
+            Add(new ContentItemViewModel(new ContentItem
+            {
+                Type = ContentTypes.Text,
+                IsRef = false,
+                Value = "",
+                Placement = ContentPlacements.Screen
+            }));
+        }
     }
 
     private void UpdateContentItemCommands()

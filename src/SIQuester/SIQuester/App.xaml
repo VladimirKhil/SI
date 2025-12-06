@@ -343,8 +343,8 @@
 
             <siqcv:StringDictionary x:Key="AnswerTypes">
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Text}" Member="lp:Resources.SetAnswerTypeType_Text" />
-                <!--<x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Number}" Member="lp:Resources.SetAnswerTypeType_Number" />
-                <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Point}" Member="lp:Resources.SetAnswerTypeType_Point" />-->
+                <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Number}" Member="lp:Resources.SetAnswerTypeType_Number" />
+                <!--<x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Point}" Member="lp:Resources.SetAnswerTypeType_Point" />-->
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Select}" Member="lp:Resources.SetAnswerTypeType_Select" />
             </siqcv:StringDictionary>
 
