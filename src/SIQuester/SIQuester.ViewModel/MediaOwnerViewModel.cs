@@ -1,5 +1,4 @@
-﻿using SIPackages;
-using SIPackages.Models;
+﻿using SIPackages.Models;
 using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Properties;

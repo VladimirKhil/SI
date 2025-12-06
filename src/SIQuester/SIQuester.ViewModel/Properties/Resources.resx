@@ -675,7 +675,7 @@ Humor</value>
     <value>No questions to generate</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Question for yourself</value>
+    <value>For yourself</value>
   </data>
   <data name="NoSource" xml:space="preserve">
     <value>Source is missing</value>
@@ -798,7 +798,7 @@ Humor</value>
     <value>Question count</value>
   </data>
   <data name="QuestionForAll" xml:space="preserve">
-    <value>Question for all</value>
+    <value>For all</value>
   </data>
   <data name="QuestionPlay" xml:space="preserve">
     <value>Question playback</value>
@@ -831,13 +831,13 @@ Humor</value>
     <value>The original file has been modified. Save it?</value>
   </data>
   <data name="SecretNoQuestion" xml:space="preserve">
-    <value>Secret question without a question</value>
+    <value>With secret without a question</value>
   </data>
   <data name="SecretPublicPrice" xml:space="preserve">
-    <value>Secret question with cost announced before giving</value>
+    <value>With secret and cost announced before giving</value>
   </data>
   <data name="SecretQuestion" xml:space="preserve">
-    <value>Secret question</value>
+    <value>With secret</value>
   </data>
   <data name="SendPackageErrorHeader" xml:space="preserve">
     <value>Failed to send the package</value>
@@ -858,7 +858,7 @@ Humor</value>
     <value>Regular</value>
   </data>
   <data name="SimpleQuestion" xml:space="preserve">
-    <value>Question with button</value>
+    <value>With button</value>
   </data>
   <data name="SIQuestions" xml:space="preserve">
     <value>SI questions</value>
@@ -888,10 +888,10 @@ Humor</value>
     <value>Error searching for questions</value>
   </data>
   <data name="StakeAllQuestion" xml:space="preserve">
-    <value>Question for all with stake</value>
+    <value>For all with stake</value>
   </data>
   <data name="StakeQuestion" xml:space="preserve">
-    <value>Question with stake</value>
+    <value>With stake</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>

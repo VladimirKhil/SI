@@ -673,7 +673,7 @@
     <value>Нет вопросов для генерации</value>
   </data>
   <data name="NoRiskQuestion" xml:space="preserve">
-    <value>Вопрос для себя</value>
+    <value>Для себя</value>
   </data>
   <data name="NoSource" xml:space="preserve">
     <value>Отсутствует источник</value>
@@ -796,7 +796,7 @@
     <value>Число вопросов</value>
   </data>
   <data name="QuestionForAll" xml:space="preserve">
-    <value>Вопрос для всех</value>
+    <value>Для всех</value>
   </data>
   <data name="QuestionPlay" xml:space="preserve">
     <value>Проигрывание вопроса</value>
@@ -829,13 +829,13 @@
     <value>Оригинальный файл был изменён. Сохранить его?</value>
   </data>
   <data name="SecretNoQuestion" xml:space="preserve">
-    <value>Вопрос с секретом без вопроса</value>
+    <value>С секретом без вопроса</value>
   </data>
   <data name="SecretPublicPrice" xml:space="preserve">
-    <value>Вопрос с секретом и стоимостью, объявляемой до передачи</value>
+    <value>С секретом и стоимостью, объявляемой до передачи</value>
   </data>
   <data name="SecretQuestion" xml:space="preserve">
-    <value>Вопрос с секретом</value>
+    <value>С секретом</value>
   </data>
   <data name="SendPackageErrorHeader" xml:space="preserve">
     <value>Не удалось отправить пакет</value>
@@ -856,7 +856,7 @@
     <value>Обычный</value>
   </data>
   <data name="SimpleQuestion" xml:space="preserve">
-    <value>Вопрос с кнопкой</value>
+    <value>С кнопкой</value>
   </data>
   <data name="SIQuestions" xml:space="preserve">
     <value>Вопросы СИ</value>
@@ -886,10 +886,10 @@
     <value>Ошибка при поиске вопросов</value>
   </data>
   <data name="StakeAllQuestion" xml:space="preserve">
-    <value>Вопрос для всех со ставкой</value>
+    <value>Для всех со ставкой</value>
   </data>
   <data name="StakeQuestion" xml:space="preserve">
-    <value>Вопрос со ставкой</value>
+    <value>Со ставкой</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Старт</value>

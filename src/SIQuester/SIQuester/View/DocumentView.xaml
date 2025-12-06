@@ -394,6 +394,25 @@
                     </Style>
                 </StackPanel.Resources>
                 
+                <ToggleButton
+                    Name="helpToggle"
+                    ToolTip="{x:Static lp:Resources.ShowHelp}"
+                    Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+                    Width="25"
+                    Height="22"
+                    Margin="0,0,5,0"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center">
+                    <TextBlock
+                        Text="?"
+                        FontWeight="Bold"
+                        FontSize="14"
+                        Foreground="#FF555555"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center" />
+                </ToggleButton>
+                
                 <TextBox
                     Name="searchText"
                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -730,6 +749,164 @@
             Stretch="Fill"
             Stroke="#FFAEAEAE"
             StrokeThickness="1" />
+
+        <!-- Help Panel Popup -->
+        <Popup
+            Name="helpPopup"
+            PlacementTarget="{Binding ElementName=helpToggle}"
+            Placement="Bottom"
+            StaysOpen="False"
+            IsOpen="{Binding ElementName=helpToggle, Path=IsChecked, Mode=TwoWay}"
+            AllowsTransparency="True"
+            PopupAnimation="Slide">
+            <Border
+                Background="White"
+                BorderBrush="#FFAEAEAE"
+                BorderThickness="1"
+                CornerRadius="3"
+                Padding="10"
+                MaxWidth="450"
+                MaxHeight="500">
+                <Border.Effect>
+                    <DropShadowEffect Color="Gray" Opacity="0.3" BlurRadius="10" ShadowDepth="3" />
+                </Border.Effect>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock
+                            Text="{x:Static lp:Resources.HelpPanelTitle}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Margin="0,0,0,10" />
+                        
+                        <!-- Round Types Section -->
+                        <TextBlock
+                            Text="{x:Static lp:Resources.RoundTypesHeader}"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#FF2060A0"
+                            Margin="0,5,0,5" />
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static lp:Resources.RoundTypeStandard}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.RoundTypeStandardHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static lp:Resources.RoundTypeFinal}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.RoundTypeFinalHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Question Types Section -->
+                        <TextBlock
+                            Text="{x:Static lp:Resources.QuestionTypesHeader}"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#FF2060A0"
+                            Margin="0,5,0,5" />
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static vmp:Resources.SimpleQuestion}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.QuestionTypeSimpleHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static vmp:Resources.StakeQuestion}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.QuestionTypeStakeHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static vmp:Resources.SecretQuestion}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.QuestionTypeSecretHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static vmp:Resources.SecretPublicPrice}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.QuestionTypeSecretPublicPriceHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static vmp:Resources.SecretNoQuestion}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.QuestionTypeSecretNoQuestionHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static vmp:Resources.NoRiskQuestion}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.QuestionTypeNoRiskHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static vmp:Resources.QuestionForAll}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.QuestionTypeForAllHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#FFF5F5F5" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                            <StackPanel>
+                                <TextBlock Text="{x:Static vmp:Resources.StakeAllQuestion}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.QuestionTypeStakeAllHint}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#FF555555"
+                                    Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Popup>
         
         <ProgressBar
             Grid.ColumnSpan="3"
