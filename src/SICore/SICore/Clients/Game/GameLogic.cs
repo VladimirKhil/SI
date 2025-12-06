@@ -2165,6 +2165,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         _state.ReportsCount = _state.Players.Count;
         _state.GameResultInfo.Reviews.Clear();
+        _state.GameResultInfo.Completed = true;
 
         ScheduleExecution(Tasks.WaitReport, 10 * 60 * 2); // 2 minutes
         WaitFor(DecisionType.Reporting, 10 * 60 * 2, -3);
