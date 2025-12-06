@@ -195,22 +195,10 @@
 				<File Id="_2a5071f65c1b80d54617.ttf" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\2a5071f65c1b80d54617.ttf" />
 			</Component>
 			<Component Guid="{57f363f7-3af1-474e-b87e-e7ad93b9cf9a}">
-				<File Id="_2aba74f212047926d07a.woff" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\2aba74f212047926d07a.woff" />
-			</Component>
-			<Component Guid="{cbbe39b6-79fc-4cc1-ac74-1f7fb490b100}">
-				<File Id="_2f129bbaf640c05d1cb2.woff" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\2f129bbaf640c05d1cb2.woff" />
-			</Component>
-			<Component Guid="{da0d6f86-472f-4241-ba15-50595f6c4128}">
-				<File Id="c884553b974be0f58c33.ttf" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\c884553b974be0f58c33.ttf" />
-			</Component>
-			<Component Guid="{6fb4e1ff-0fe0-427a-af88-ee3ef39d534f}">
-				<File Id="ca33bfb0214ee2e6936a.ttf" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\ca33bfb0214ee2e6936a.ttf" />
+				<File Id="_c367c21f39a95abeddff.ttf" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\c367c21f39a95abeddff.ttf" />
 			</Component>
 			<Component Guid="{8a08cd92-92d3-462e-82fe-1e29b87ba4f2}">
-				<File Id="d26e8e629f57716e90a0.ttf" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\d26e8e629f57716e90a0.ttf" />
-			</Component>
-			<Component Guid="{3c6b2db3-6182-4cd3-b72b-5db15f4efd5b}">
-				<File Id="f3b6c856600603273a89.ttf" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\f3b6c856600603273a89.ttf" />
+				<File Id="d660f85b3fc88581c86b.jpg" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\d660f85b3fc88581c86b.jpg" />
 			</Component>
 			<Component Guid="{564f0b39-4189-4e20-a61d-47334c10cd82}">
 				<File Id="index.html" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\index.html" />

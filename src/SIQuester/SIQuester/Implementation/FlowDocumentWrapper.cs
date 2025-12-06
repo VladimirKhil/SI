@@ -98,7 +98,13 @@ internal sealed class FlowDocumentWrapper : IFlowDocumentWrapper
         docxPackage.Close();
     }
 
-    public void WalkAndSave(string filename, Encoding encoding, Action<StreamWriter> onLineBreak, Action<StreamWriter, string> onText, Action<StreamWriter> onHeader = null, Action<StreamWriter> onFooter = null)
+    public void WalkAndSave(
+        string filename,
+        Encoding encoding,
+        Action<StreamWriter> onLineBreak,
+        Action<StreamWriter, string> onText,
+        Action<StreamWriter>? onHeader = null,
+        Action<StreamWriter>? onFooter = null)
     {
         using var sr = new StreamWriter(filename, false, encoding);
         
@@ -112,9 +118,9 @@ internal sealed class FlowDocumentWrapper : IFlowDocumentWrapper
                 {
                     onLineBreak(sr);
                 }
-                else
+                else if (inline is Run run)
                 {
-                    onText(sr, (inline as Run).Text);
+                    onText(sr, run.Text);
                 }
             }
         }

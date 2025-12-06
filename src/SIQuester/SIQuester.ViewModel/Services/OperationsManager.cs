@@ -158,7 +158,6 @@ public sealed class OperationsManager
         CanUndoChanged();
     }
 
-
     /// <summary>
     /// Starts complex group of changes that should be reverted as a single change.
     /// </summary>

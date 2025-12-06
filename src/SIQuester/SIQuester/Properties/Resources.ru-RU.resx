@@ -1304,4 +1304,52 @@
   <data name="GenerateThemes" xml:space="preserve">
     <value>Сгенерировать темы при помощи GPT</value>
   </data>
+  <data name="HelpPanelTitle" xml:space="preserve">
+    <value>Справка</value>
+  </data>
+  <data name="RoundTypesHeader" xml:space="preserve">
+    <value>Типы раундов</value>
+  </data>
+  <data name="QuestionTypesHeader" xml:space="preserve">
+    <value>Типы вопросов</value>
+  </data>
+  <data name="RoundTypeStandard" xml:space="preserve">
+    <value>Таблица</value>
+  </data>
+  <data name="RoundTypeStandardHint" xml:space="preserve">
+    <value>Классический раунд, где вопросы отображаются в виде таблицы. Игроки выбирают вопросы по теме и стоимости. Каждая тема содержит вопросы с возрастающей сложностью и стоимостью.</value>
+  </data>
+  <data name="RoundTypeFinal" xml:space="preserve">
+    <value>Список тем</value>
+  </data>
+  <data name="RoundTypeFinalHint" xml:space="preserve">
+    <value>Финальный раунд, в котором темы отображаются списком. Игроки могут убирать темы, которые не хотят играть. Оставшаяся тема разыгрывается со ставками.</value>
+  </data>
+  <data name="QuestionTypeSimpleHint" xml:space="preserve">
+    <value>Обычный вопрос, где игроки нажимают кнопку для ответа. Первый нажавший получает право ответить.</value>
+  </data>
+  <data name="QuestionTypeStakeHint" xml:space="preserve">
+    <value>Игроки делают ставки до того, как увидят вопрос. Игрок с наибольшей ставкой отвечает. При правильном ответе он выигрывает свою ставку; при неправильном — теряет её.</value>
+  </data>
+  <data name="QuestionTypeSecretHint" xml:space="preserve">
+    <value>Секретный вопрос, который можно передать другому игроку. Получатель должен ответить и выиграет или потеряет стоимость вопроса.</value>
+  </data>
+  <data name="QuestionTypeSecretPublicPriceHint" xml:space="preserve">
+    <value>Секретный вопрос, где тема и стоимость объявляются до того, как вопрос передаётся другому игроку.</value>
+  </data>
+  <data name="QuestionTypeSecretNoQuestionHint" xml:space="preserve">
+    <value>Секретный вопрос, где стоимость начисляется сразу без вопроса. Используется как бонус или штраф.</value>
+  </data>
+  <data name="QuestionTypeNoRiskHint" xml:space="preserve">
+    <value>Вопрос для себя. При правильном ответе вы выигрываете стоимость. При неправильном — ничего не теряете, риска нет.</value>
+  </data>
+  <data name="QuestionTypeForAllHint" xml:space="preserve">
+    <value>Все игроки отвечают на этот вопрос одновременно. За каждый правильный ответ начисляется стоимость вопроса.</value>
+  </data>
+  <data name="QuestionTypeStakeAllHint" xml:space="preserve">
+    <value>Вопрос для всех игроков со ставками. Каждый игрок делает ставку и отвечает. Правильные ответы выигрывают ставку, неправильные — теряют её.</value>
+  </data>
+  <data name="ShowHelp" xml:space="preserve">
+    <value>Показать справку</value>
+  </data>
 </root>

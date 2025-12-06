@@ -2241,7 +2241,6 @@
                                 Padding="{TemplateBinding Control.Padding}"
                                 Background="{TemplateBinding Panel.Background}"
                                 SnapsToDevicePixels="True">
-                                
                                 <ContentPresenter
                                     x:Name="PART_Header"
                                     Content="{TemplateBinding HeaderedContentControl.Header}"
