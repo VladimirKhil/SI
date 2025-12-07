@@ -1907,7 +1907,22 @@
                     <CheckBox
                         IsChecked="{Binding HasQualityControl}"
                         VerticalAlignment="Center" />
+
+                    <TextBlock
+                        x:Name="QualityWarning"
+                        ToolTip="{x:Static lp:Resources.QualityControlWarning}"
+                        Text="⚠️"
+                        VerticalAlignment="Center"
+                        Margin="5,0,5,0"
+                        Foreground="OrangeRed"
+                        Visibility="Collapsed" />
                 </DockPanel>
+
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding HasQualityControl}" Value="False">
+                        <Setter TargetName="QualityWarning" Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
             </DataTemplate>
 
             <Style x:Key="QualityStyle" TargetType="{x:Type ContentControl}">
@@ -2241,7 +2256,6 @@
                                 Padding="{TemplateBinding Control.Padding}"
                                 Background="{TemplateBinding Panel.Background}"
                                 SnapsToDevicePixels="True">
-                                
                                 <ContentPresenter
                                     x:Name="PART_Header"
                                     Content="{TemplateBinding HeaderedContentControl.Header}"

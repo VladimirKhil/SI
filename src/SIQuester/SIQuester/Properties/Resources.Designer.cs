@@ -637,7 +637,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на byte.
+        ///   Ищет локализованную строку, похожую на KB.
         /// </summary>
         public static string Bytes {
             get {
@@ -1594,6 +1594,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Help.
+        /// </summary>
+        public static string HelpPanelTitle {
+            get {
+                return ResourceManager.GetString("HelpPanelTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на How to use the program….
         /// </summary>
         public static string HowToUse {
@@ -2317,6 +2326,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Without quality control your package could not be played in SIGame in the future.
+        /// </summary>
+        public static string QualityControlWarning {
+            get {
+                return ResourceManager.GetString("QualityControlWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Question.
         /// </summary>
         public static string Question {
@@ -2367,6 +2385,87 @@ namespace SIQuester.Properties {
         public static string QuestionType {
             get {
                 return ResourceManager.GetString("QuestionType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на All players answer this question simultaneously. Each correct answer earns the question&apos;s price..
+        /// </summary>
+        public static string QuestionTypeForAllHint {
+            get {
+                return ResourceManager.GetString("QuestionTypeForAllHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A question for yourself. If answered correctly, you win the price. If wrong, you lose nothing - no risk involved..
+        /// </summary>
+        public static string QuestionTypeNoRiskHint {
+            get {
+                return ResourceManager.GetString("QuestionTypeNoRiskHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A secret question that can be given to another player. The recipient must answer and will win or lose the question&apos;s price..
+        /// </summary>
+        public static string QuestionTypeSecretHint {
+            get {
+                return ResourceManager.GetString("QuestionTypeSecretHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A secret question where the price is given immediately without asking a question. Used as a bonus or penalty..
+        /// </summary>
+        public static string QuestionTypeSecretNoQuestionHint {
+            get {
+                return ResourceManager.GetString("QuestionTypeSecretNoQuestionHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A secret question where the theme and price are announced before the question is given to another player..
+        /// </summary>
+        public static string QuestionTypeSecretPublicPriceHint {
+            get {
+                return ResourceManager.GetString("QuestionTypeSecretPublicPriceHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Question Types.
+        /// </summary>
+        public static string QuestionTypesHeader {
+            get {
+                return ResourceManager.GetString("QuestionTypesHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A regular question where players press a button to answer. The first player to press the button gets the right to answer..
+        /// </summary>
+        public static string QuestionTypeSimpleHint {
+            get {
+                return ResourceManager.GetString("QuestionTypeSimpleHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A question for all players with stakes. Each player makes a stake and answers. Correct answers win the stake, wrong answers lose it..
+        /// </summary>
+        public static string QuestionTypeStakeAllHint {
+            get {
+                return ResourceManager.GetString("QuestionTypeStakeAllHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Players make stakes before seeing the question. The player with the highest stake answers. If correct, they win their stake; if wrong, they lose it..
+        /// </summary>
+        public static string QuestionTypeStakeHint {
+            get {
+                return ResourceManager.GetString("QuestionTypeStakeHint", resourceCulture);
             }
         }
         
@@ -2583,6 +2682,51 @@ namespace SIQuester.Properties {
         public static string RoundThemeCount {
             get {
                 return ResourceManager.GetString("RoundThemeCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Theme List.
+        /// </summary>
+        public static string RoundTypeFinal {
+            get {
+                return ResourceManager.GetString("RoundTypeFinal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A final round where themes are displayed as a list. Players can remove themes they don&apos;t want to play. The remaining theme is played with stakes..
+        /// </summary>
+        public static string RoundTypeFinalHint {
+            get {
+                return ResourceManager.GetString("RoundTypeFinalHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Round Types.
+        /// </summary>
+        public static string RoundTypesHeader {
+            get {
+                return ResourceManager.GetString("RoundTypesHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Table.
+        /// </summary>
+        public static string RoundTypeStandard {
+            get {
+                return ResourceManager.GetString("RoundTypeStandard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A classic round where questions are displayed in a table format. Players select questions by theme and price. Each theme contains questions with increasing difficulty and price..
+        /// </summary>
+        public static string RoundTypeStandardHint {
+            get {
+                return ResourceManager.GetString("RoundTypeStandardHint", resourceCulture);
             }
         }
         
@@ -2934,6 +3078,15 @@ namespace SIQuester.Properties {
         public static string SettingsSavingError {
             get {
                 return ResourceManager.GetString("SettingsSavingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Show help.
+        /// </summary>
+        public static string ShowHelp {
+            get {
+                return ResourceManager.GetString("ShowHelp", resourceCulture);
             }
         }
         

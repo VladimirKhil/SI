@@ -654,6 +654,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="HtmlExportHint" xml:space="preserve">
     <value>Set the parameters of the output document and press the "Export" button</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -1306,5 +1307,56 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="GenerateThemes" xml:space="preserve">
     <value>Generate themes with GPT</value>
+  </data>
+  <data name="HelpPanelTitle" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="RoundTypesHeader" xml:space="preserve">
+    <value>Round Types</value>
+  </data>
+  <data name="QuestionTypesHeader" xml:space="preserve">
+    <value>Question Types</value>
+  </data>
+  <data name="RoundTypeStandard" xml:space="preserve">
+    <value>Table</value>
+  </data>
+  <data name="RoundTypeStandardHint" xml:space="preserve">
+    <value>A classic round where questions are displayed in a table format. Players select questions by theme and price. Each theme contains questions with increasing difficulty and price.</value>
+  </data>
+  <data name="RoundTypeFinal" xml:space="preserve">
+    <value>Theme List</value>
+  </data>
+  <data name="RoundTypeFinalHint" xml:space="preserve">
+    <value>A final round where themes are displayed as a list. Players can remove themes they don't want to play. The remaining theme is played with stakes.</value>
+  </data>
+  <data name="QuestionTypeSimpleHint" xml:space="preserve">
+    <value>A regular question where players press a button to answer. The first player to press the button gets the right to answer.</value>
+  </data>
+  <data name="QuestionTypeStakeHint" xml:space="preserve">
+    <value>Players make stakes before seeing the question. The player with the highest stake answers. If correct, they win their stake; if wrong, they lose it.</value>
+  </data>
+  <data name="QuestionTypeSecretHint" xml:space="preserve">
+    <value>A secret question that can be given to another player. The recipient must answer and will win or lose the question's price.</value>
+  </data>
+  <data name="QuestionTypeSecretPublicPriceHint" xml:space="preserve">
+    <value>A secret question where the theme and price are announced before the question is given to another player.</value>
+  </data>
+  <data name="QuestionTypeSecretNoQuestionHint" xml:space="preserve">
+    <value>A secret question where the price is given immediately without asking a question. Used as a bonus or penalty.</value>
+  </data>
+  <data name="QuestionTypeNoRiskHint" xml:space="preserve">
+    <value>A question for yourself. If answered correctly, you win the price. If wrong, you lose nothing - no risk involved.</value>
+  </data>
+  <data name="QuestionTypeForAllHint" xml:space="preserve">
+    <value>All players answer this question simultaneously. Each correct answer earns the question's price.</value>
+  </data>
+  <data name="QuestionTypeStakeAllHint" xml:space="preserve">
+    <value>A question for all players with stakes. Each player makes a stake and answers. Correct answers win the stake, wrong answers lose it.</value>
+  </data>
+  <data name="ShowHelp" xml:space="preserve">
+    <value>Show help</value>
+  </data>
+  <data name="QualityControlWarning" xml:space="preserve">
+    <value>Without quality control your package could not be played in SIGame in the future</value>
   </data>
 </root>

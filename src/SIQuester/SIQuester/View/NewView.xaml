@@ -147,14 +147,24 @@
             <TextBlock Grid.Row="5" Margin="4" Text="{x:Static lp:Resources.PackageAuthor}" />
             <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding PackageAuthor}" Margin="4" />
 
-            <CheckBox
-                Grid.Row="6"
-                IsChecked="{Binding QualityControl}"
-                Margin="0,15,0,0"
-                VerticalAlignment="Center"
-                VerticalContentAlignment="Center">
-                <TextBlock Text="{x:Static lp:Resources.QualityControl}" VerticalAlignment="Center" Margin="1,0,0,0" />
-            </CheckBox>
+            <StackPanel Grid.Row="6" Orientation="Horizontal">
+                <CheckBox
+                    IsChecked="{Binding QualityControl}"
+                    Margin="0,15,0,0"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center">
+                    <TextBlock Text="{x:Static lp:Resources.QualityControl}" VerticalAlignment="Center" Margin="1,0,0,0" />
+                </CheckBox>
+
+                <TextBlock
+                    x:Name="QualityWarning"
+                    ToolTip="{x:Static lp:Resources.QualityControlWarning}"
+                    Text="⚠️"
+                    VerticalAlignment="Center"
+                    Margin="5,15,5,0"
+                    Foreground="OrangeRed"
+                    Visibility="{Binding QualityControl, Converter={StaticResource FalseToVisiblityConverter}}" />
+            </StackPanel>
 
             <TextBlock
                 Grid.Row="7"
