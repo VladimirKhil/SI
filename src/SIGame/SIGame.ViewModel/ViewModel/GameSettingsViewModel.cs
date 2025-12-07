@@ -763,8 +763,10 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             null);
 
         var data = new ViewerData();
+        var client = new Client(_model.HumanPlayerName);
+        var actions = new ViewerActions(client);
 
-        var gameViewModel = new GameViewModel(data, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
+        var gameViewModel = new GameViewModel(data, actions, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
         {
             NetworkGame = NetworkGame,
             NetworkGamePort = NetworkPort,
@@ -772,9 +774,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             IsHost = true,
             TempDocFolder = documentPath
         };
-
-        var client = new Client(_model.HumanPlayerName);
-        var actions = new ViewerActions(client);
         var logic = new ViewerHumanLogic(gameViewModel, data, actions, _userSettings, LocalAddress, _loggerFactory.CreateLogger<ViewerHumanLogic>());
 
         IViewerClient? host = null;

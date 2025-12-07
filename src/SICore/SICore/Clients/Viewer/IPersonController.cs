@@ -155,7 +155,7 @@ public interface IPersonController
 
     void RemovePlayerAt(int index) { }
 
-    void OnInfo() { }
+    void OnInfo(PersonAccount showman, ICollection<PlayerAccount> players, ICollection<ViewerAccount> viewers) { }
 
     void OnAnswerOptions(bool questionHasScreenContent, IEnumerable<string> optionsTypes) { }
 

@@ -679,8 +679,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
+    private readonly ViewerActions _viewerActions;
+
     public GameViewModel(
         ViewerData viewerData,
+        ViewerActions viewerActions,
         Node node,
         UserSettings userSettings,
         SettingsViewModel settings,
@@ -688,6 +691,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         ILogger<GameViewModel> logger)
     {
         _node = node;
+        _viewerActions = viewerActions;
         _fileShare = fileShare;
         _logger = logger;
 
@@ -798,12 +802,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         switch (SelectionMode)
         {
             case SelectionMode.SelectPlayer:
-                Host?.Actions.SendMessageWithArgs(Messages.SelectPlayer, playerIndex);
+                _viewerActions.SendMessageWithArgs(Messages.SelectPlayer, playerIndex);
                 ClearSelections();
                 break;
 
             case SelectionMode.SetActivePlayer:
-                Host?.Actions.SendMessageWithArgs(Messages.SetChooser, playerIndex);
+                _viewerActions.SendMessageWithArgs(Messages.SetChooser, playerIndex);
                 ClearSelections();
                 break;
 
@@ -825,9 +829,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public void AddLog(string s) => StringAdding?.Invoke(null, s, LogMode.Log);
 
-    private void Ready_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Ready);
+    private void Ready_Executed(object? arg) => _viewerActions.SendMessage(Messages.Ready);
 
-    private void UnReady_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Ready, "-");
+    private void UnReady_Executed(object? arg) => _viewerActions.SendMessage(Messages.Ready, "-");
 
     private void IsRight_Executed(object? arg)
     {
@@ -840,7 +844,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         
         if (NewValidation)
         {
-            Host?.Actions.SendMessage(Messages.Validate, validation.Answer, "+");
+            _viewerActions.SendMessage(Messages.Validate, validation.Answer, "+");
 
             if (ValidationInfo == null)
             {
@@ -849,7 +853,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
         else
         {
-            Host?.Actions.SendMessage(Messages.IsRight, "+", arg?.ToString() ?? "1");
+            _viewerActions.SendMessage(Messages.IsRight, "+", arg?.ToString() ?? "1");
             ClearSelections();
         }
     }
@@ -865,7 +869,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         
         if (NewValidation)
         {
-            Host?.Actions.SendMessage(Messages.Validate, validation.Answer, "-");
+            _viewerActions.SendMessage(Messages.Validate, validation.Answer, "-");
 
             if (ValidationInfo == null)
             {
@@ -874,16 +878,16 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
         else
         {
-            Host?.Actions.SendMessage(Messages.IsRight, "-", arg?.ToString() ?? "1");
+            _viewerActions.SendMessage(Messages.IsRight, "-", arg?.ToString() ?? "1");
             ClearSelections();
         }
     }
 
-    private void Pass_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Pass);
+    private void Pass_Executed(object? arg) => _viewerActions.SendMessage(Messages.Pass);
 
     private void SendNoReport_Executed(object? arg)
     {
-        Host?.Actions.SendMessage(Messages.Report, "DECLINE");
+        _viewerActions.SendMessage(Messages.Report, "DECLINE");
         ClearSelections();
     }
 
@@ -891,17 +895,17 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     {
         if (_data.SystemLog.Length > 0)
         {
-            Host?.Actions.SendMessage(Messages.Report, MessageParams.Report_Log, _data.SystemLog.ToString());
+            _viewerActions.SendMessage(Messages.Report, MessageParams.Report_Log, _data.SystemLog.ToString());
         }
 
-        Host?.Actions.SendMessage(Messages.Report, "ACCEPT", Report.Comment);
+        _viewerActions.SendMessage(Messages.Report, "ACCEPT", Report.Comment);
         ClearSelections();
     }
 
     private void Apellate_Executed(object? arg)
     {
         _apellationCount--;
-        Host?.Actions.SendMessage(Messages.Apellate, arg?.ToString() ?? "");
+        _viewerActions.SendMessage(Messages.Apellate, arg?.ToString() ?? "");
     }
 
     private void ManageTable_Executed(object? arg) => TInfo.IsEditable = !TInfo.IsEditable;
@@ -913,49 +917,49 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host?.Actions.SendMessageWithArgs(Messages.Change, SelectedPlayer.PlayerIndex, SelectedPlayer.PlayerScore);
+        _viewerActions.SendMessageWithArgs(Messages.Change, SelectedPlayer.PlayerIndex, SelectedPlayer.PlayerScore);
         ClearSelections();
     }
 
     private void SendPass_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.Stake, 2);
+        _viewerActions.SendMessageWithArgs(Messages.Stake, 2);
         ClearSelections();
     }
 
     private void SendStake_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.Stake, 1, _data.StakeInfo.Stake);
+        _viewerActions.SendMessageWithArgs(Messages.Stake, 1, _data.StakeInfo.Stake);
         ClearSelections();
     }
 
     private void SendVabank_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.Stake, 3);
+        _viewerActions.SendMessageWithArgs(Messages.Stake, 3);
         ClearSelections();
     }
 
     private void SendNominal_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.Stake, 0);
+        _viewerActions.SendMessageWithArgs(Messages.Stake, 0);
         ClearSelections();
     }
 
     private void SendPassNew_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.SetStake, StakeModes.Pass);
+        _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Pass);
         ClearSelections();
     }
 
     private void SendStakeNew_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, _data.StakeInfo?.Stake ?? 1);
+        _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.Stake, _data.StakeInfo?.Stake ?? 1);
         ClearSelections();
     }
 
     private void SendAllInNew_Executed(object? arg)
     {
-        Host?.Actions.SendMessageWithArgs(Messages.SetStake, StakeModes.AllIn);
+        _viewerActions.SendMessageWithArgs(Messages.SetStake, StakeModes.AllIn);
         ClearSelections();
     }
 
@@ -968,7 +972,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     }
 
     private void OnJoinModeChanged(JoinMode joinMode) =>
-        Host?.Actions.SendMessage(Messages.SetJoinMode, joinMode.ToString());
+        _viewerActions.SendMessage(Messages.SetJoinMode, joinMode.ToString());
 
     private void PressGameButton_Execute(object? arg)
     {
@@ -977,7 +981,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host.Actions.PressButton(_data.TryStartTime);
+        _viewerActions.PressButton(_data.TryStartTime);
         GameButtonPressed?.Invoke();
         DisableGameButton(false);
         ReleaseGameButton();
@@ -1027,12 +1031,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private void AddTable_Executed(object? arg) => Host?.Actions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
+    private void AddTable_Executed(object? arg) => _viewerActions.AddTable();
 
     internal void UpdateAddTableCommand() =>
         AddTable.CanBeExecuted = IsHost && _data.Players.Count < Constants.MaxPlayers;
 
-    private void ForceStart_Executed(object? arg) => Host?.Actions.Start();
+    private void ForceStart_Executed(object? arg) => _viewerActions.Start();
 
     private void Unban_Executed(object? arg)
     {
@@ -1041,7 +1045,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host?.Actions.SendMessage(Messages.Unban, bannedInfo.Ip);
+        _viewerActions.SendMessage(Messages.Unban, bannedInfo.Ip);
     }
 
     private void SetHost_Executed(object? arg)
@@ -1063,7 +1067,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host?.Actions.SendMessage(Messages.SetHost, person.Name);
+        _viewerActions.SendMessage(Messages.SetHost, person.Name);
     }
 
     private void SendMessage_Executed(object? arg)
@@ -1091,7 +1095,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host?.Actions.SendMessage(Messages.Ban, person.Name);
+        _viewerActions.SendMessage(Messages.Ban, person.Name);
     }
 
     private void Kick_Executed(object? arg)
@@ -1113,11 +1117,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host?.Actions.SendMessage(Messages.Kick, person.Name);
+        _viewerActions.SendMessage(Messages.Kick, person.Name);
     }
 
     public void OnMediaContentCompleted(string contentType, string contentValue) =>
-        Host?.Actions.SendMessageWithArgs(Messages.Atom, contentType, contentValue);
+        _viewerActions.SendMessageWithArgs(Messages.Atom, contentType, contentValue);
 
     private void ChangeActivePlayer_Executed(object? arg)
     {
@@ -1165,12 +1169,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void SendAnswer_Executed(object? arg)
     {
-        _host?.Actions.SendMessage(Messages.Answer, (string?)arg ?? Answer);
+        _viewerActions.SendMessage(Messages.Answer, (string?)arg ?? Answer);
         Hint = "";
         DialogMode = DialogModes.None;
     }
 
-    private void SendAnswerVersion_Executed(object? arg) => _host?.Actions.SendMessage(Messages.AnswerVersion, Answer);
+    private void SendAnswerVersion_Executed(object? arg) => _viewerActions.SendMessage(Messages.AnswerVersion, Answer);
 
     private void SetVideoAvatar_Executed(object? arg)
     {
@@ -1178,11 +1182,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         if (avatarUri != null)
         {
-            Host?.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, avatarUri);
+            _viewerActions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, avatarUri);
         }
     }
 
-    private void DeleteVideoAvatar_Executed(object? arg) => Host?.Actions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, "");
+    private void DeleteVideoAvatar_Executed(object? arg) => _viewerActions.SendMessageWithArgs(Messages.Avatar, ContentTypes.Video, "");
 
     private void UpdateCurrentPlayerCommands()
     {
@@ -1216,7 +1220,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             indexString = index.ToString();
         }
 
-        Host?.Actions.SendMessage(
+        _viewerActions.SendMessage(
             Messages.Config,
             MessageParams.Config_Free,
             player != null ? Constants.Player : Constants.Showman,
@@ -1237,7 +1241,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host?.Actions.SendMessage(Messages.Config, MessageParams.Config_DeleteTable, playerIndex.ToString());
+        _viewerActions.RemoveTable(playerIndex);
     }
 
     private void ChangeType_Executed(object? arg)
@@ -1263,7 +1267,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             indexString = index.ToString();
         }
 
-        Host?.Actions.SendMessage(
+        _viewerActions.SendMessage(
             Messages.Config,
             MessageParams.Config_ChangeType,
             player != null ? Constants.Player : Constants.Showman,
@@ -1297,7 +1301,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             index = "";
         }
 
-        Host?.Actions.SendMessage(
+        _viewerActions.SendMessage(
             Messages.Config,
             MessageParams.Config_Set,
             player != null ? Constants.Player : Constants.Showman,
@@ -1342,7 +1346,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     private void Server_Reconnected()
     {
         AddLog(Resources.ReconnectedMessage);
-        Host?.Actions.GetInfo(); // Invalidate game state
+        _viewerActions.GetInfo(); // Invalidate game state
     }
 
     private void Server_Reconnecting() => AddLog(Resources.ReconnectingMessage);
@@ -1444,8 +1448,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             return;
         }
 
-        Host?.Actions.Move((MoveDirections)intArg);
-        
+        _viewerActions.Move((MoveDirections)intArg);
+
         if (intArg == 1)
         {
             NextButtonPressed?.Invoke();
@@ -1459,7 +1463,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         ClearValidation();
     }
 
-    private void ChangePauseInGame_Executed(object? arg) => Host?.Actions.Pause(!Data.TInfo.Pause);
+    private void ChangePauseInGame_Executed(object? arg) => _viewerActions.Pause(!Data.TInfo.Pause);
 
     private void EndGame_Executed(object? arg) => GameEnded?.Invoke();
 
@@ -1489,7 +1493,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         try
         {
             string uriParams;
-            
+
             if (HostKey != null)
             {
                 uriParams = $"_{ HostKey}{GameId}";

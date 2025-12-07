@@ -16,4 +16,8 @@ public interface IGameActions : IDisposable
     void MoveBackRound();
 
     void IsRightAnswer();
+
+    void AddPlayer();
+
+    void RemovePlayerAt(int index);
 }

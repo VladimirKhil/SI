@@ -289,7 +289,7 @@ internal class ViewerComputerLogic : IPersonController
 
     public void DeleteTheme() => _player.DeleteTheme();
 
-    public void OnInfo()
+    public void OnInfo(PersonAccount showman, ICollection<PlayerAccount> players, ICollection<ViewerAccount> viewers)
     {
         if (_role == GameRole.Showman)
         {

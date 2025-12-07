@@ -54,6 +54,10 @@ internal sealed class NewGameActions : IGameActions
 
     public void Dispose()
     {
-        
+
     }
+
+    public void AddPlayer() => _viewerActions.AddTable();
+
+    public void RemovePlayerAt(int index) => _viewerActions.RemoveTable(index);
 }

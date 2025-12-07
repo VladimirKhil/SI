@@ -24,6 +24,29 @@ internal sealed class GameController : IPersonController
 
     public bool CanSwitchType => false;
 
+    public void OnInfo(PersonAccount showman, ICollection<PlayerAccount> players, ICollection<ViewerAccount> viewers)
+    {
+        GameViewModel.ClearPlayers.Execute(null);
+
+        foreach (var player in players)
+        {
+            GameViewModel.AddPlayerCore(new PlayerInfo
+            {
+                Name = player.Name
+            });
+        }
+    }
+
+    public void AddPlayer(PlayerAccount account)
+    {
+        GameViewModel.AddPlayerCore(new PlayerInfo
+        {
+            Name = account.Name
+        });
+    }
+
+    public void RemovePlayerAt(int index) => GameViewModel.RemovePlayerCore(GameViewModel.Players[index]);
+
     public void AddLog(string message)
     {
         Trace.TraceInformation(message);

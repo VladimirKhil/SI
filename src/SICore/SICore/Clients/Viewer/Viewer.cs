@@ -1772,7 +1772,7 @@ public class Viewer : MessageHandler, IViewerClient
             State.Viewers = newViewers;
             State.IsInfoInitialized = true;
 
-            _controller.OnInfo();
+            _controller.OnInfo(showman, newPlayers, newViewers);
         }
         finally
         {

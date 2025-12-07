@@ -42,4 +42,10 @@ public sealed class ViewerActions
     public void ValidateAnswer(string answer, bool isRight) => SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
 
     public void SelectQuestion(int themeIndex, int questionIndex) => SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
+
+    public void AddTable() => SendMessage(Messages.Config, MessageParams.Config_AddTable);
+
+    public void RemoveTable(int index) => SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
+
+    public void ReportMediaPreloadProgress(int progress) => SendMessageWithArgs(Messages.MediaPreloadProgress, progress);
 }

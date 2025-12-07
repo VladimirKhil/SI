@@ -1734,6 +1734,8 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         // We do not start from 0 and increment it to avoid issues when the value could accidentally reach zero
         // if the work is processed faster than it is queued
         var fileCounter = mparams.Length - 1;
+        var initialCounter = fileCounter;
+        var lastReportedProgress = 0;
 
         for (var i = 1; i < mparams.Length; i++)
         {
@@ -1767,9 +1769,15 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             
             _localFileManager.AddFile(mediaUri, () =>
             {
-                if (Interlocked.Decrement(ref fileCounter) == 0)
+                var currentCounter = Interlocked.Decrement(ref fileCounter);
+
+                var currentProgress = (initialCounter - currentCounter) * 100 / initialCounter;
+                var currentProgressRounded = currentProgress / 10 * 10;
+
+                if (currentProgressRounded > lastReportedProgress)
                 {
-                    _viewerActions.SendMessage(Messages.MediaPreloaded);
+                    lastReportedProgress = currentProgressRounded;
+                    _viewerActions.ReportMediaPreloadProgress(currentProgressRounded);
                 }
             });
         }
@@ -1855,14 +1863,14 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnPersonsUpdated() => _gameViewModel.UpdatePersons();
 
-    public void OnInfo()
+    public void OnInfo(PersonAccount showman, ICollection<PlayerAccount> players, ICollection<ViewerAccount> viewers)
     {
         UI.Execute(
             () =>
             {
                 _gameViewModel.Players.Clear();
 
-                foreach (var player in _state.Players)
+                foreach (var player in players)
                 {
                     _gameViewModel.Players.Add(new PlayerViewModel(player));
                 }

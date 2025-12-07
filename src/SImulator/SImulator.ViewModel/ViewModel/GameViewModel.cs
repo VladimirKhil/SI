@@ -125,11 +125,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     public ICommand Next => _next;
     public ICommand Back => _back;
 
-    public ICommand RunRoundTimer { get; private set; }
-    public ICommand StopRoundTimer { get; private set; }
+    public SimpleCommand RunRoundTimer { get; private set; }
+    public SimpleCommand StopRoundTimer { get; private set; }
 
-    public ICommand RunQuestionTimer { get; private set; }
-    public ICommand StopQuestionTimer { get; private set; }
+    public SimpleCommand RunQuestionTimer { get; private set; }
+    public SimpleCommand StopQuestionTimer { get; private set; }
 
     public ICommand? RunMediaTimer { get; private set; }
     public ICommand? StopMediaTimer { get; private set; }
@@ -140,7 +140,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public SimpleCommand KickPlayer { get; private set; }
 
-    public ICommand ResetSums { get; private set; }
+    public SimpleCommand ResetSums { get; private set; }
 
     public ICommand GiveTurn { get; private set; }
 
@@ -647,7 +647,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     #endregion
 
-    private readonly bool _managedTimers;
+    private readonly bool _managed;
 
     public GameViewModel(
         AppSettingsViewModel settings,
@@ -655,24 +655,17 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         IExtendedListener presentationListener,
         IPresentationController presentationController,
         IGameLogger gameLogger,
-        bool managedTimers)
+        bool managed)
     {
         Settings = settings;
         _gameActions = gameActions;
         _presentationListener = presentationListener;
         _gameLogger = gameLogger;
         PresentationController = presentationController;
-        _managedTimers = managedTimers;
+        _managed = managed;
 
         LocalInfo = new TableInfoViewModel();
         Players = new ObservableCollection<PlayerInfo>();
-
-        for (var i = 0; i < settings.Model.PlayerCount; i++)
-        {
-            var player = new PlayerInfo();
-            player.PropertyChanged += PlayerInfo_PropertyChanged;
-            Players.Add(player);
-        }
 
         LocalInfo.QuestionSelected += QuestionInfo_Selected;
         LocalInfo.ThemeSelected += ThemeInfo_Selected;
@@ -722,6 +715,16 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _presentationListener.MediaEnd += GameHost_MediaEnd;
         _presentationListener.RoundThemesFinished += GameHost_RoundThemesFinished;
         _presentationListener.AnswerSelected += PresentationListener_AnswerSelected;
+
+        if (managed)
+        {
+            ClearPlayers.CanBeExecuted = false;
+            ResetSums.CanBeExecuted = false;
+            RunRoundTimer.CanBeExecuted = false;
+            StopRoundTimer.CanBeExecuted = false;
+            RunQuestionTimer.CanBeExecuted = false;
+            StopQuestionTimer.CanBeExecuted = false;
+        }
     }
 
     private void AddStake_Executed(object? arg)
@@ -1027,7 +1030,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                     return;
                 }
 
-                if (!_managedTimers)
+                if (!_managed)
                 {
                     PresentationController.NoAnswer();
                     StopQuestionTimer_Executed(1);
@@ -1258,15 +1261,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveMediaCommand = RunMediaTimer;
     }
 
-    private void AddPlayer_Executed(object? arg)
+    internal void AddPlayerCore(PlayerInfo player)
     {
-        var playerInfo = new PlayerInfo();
-        playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
-
-        Players.Add(playerInfo);
-        PresentationController.AddPlayer(playerInfo.Name);
+        player.PropertyChanged += PlayerInfo_PropertyChanged;
+        Players.Add(player);
+        PresentationController.AddPlayer(player.Name);
         _buttonManager?.OnPlayersChanged();
     }
+
+    private void AddPlayer_Executed(object? arg) => _gameActions.AddPlayer();
 
     private void RemovePlayer_Executed(object? arg)
     {
@@ -1275,7 +1278,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        RemovePlayerCore(player);
+        _gameActions.RemovePlayerAt(Players.IndexOf(player));
     }
 
     private void ClearPlayers_Executed(object? arg)
@@ -2241,7 +2244,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         return false;
     }
 
-    private void RemovePlayerCore(PlayerInfo player)
+    internal void RemovePlayerCore(PlayerInfo player)
     {
         if (player.Id != null && player.IsConnected)
         {

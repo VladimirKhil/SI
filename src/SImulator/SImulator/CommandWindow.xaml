@@ -1573,7 +1573,7 @@
 
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding FalseStart}">
                         <CheckBox IsChecked="{Binding FalseStartMultimedia}" Margin="5,5,5,0" Content="{x:Static lp:Resources.FalseStartMultimedia}" />
-                        
+
                         <Button Style="{StaticResource HelpButton}">
                             <lb:TipBehavior.Tip>
                                 <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.FalseStartMultimediaHint}" />
@@ -1584,9 +1584,9 @@
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
                     <CheckBox Margin="5,5,0,0" IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
-                    <CheckBox Margin="5,5,0,0" IsChecked="{Binding UseSIGameEngine}" Content="{x:Static lp:Resources.UseSIGameEngine}" />
+                    <!--<CheckBox Margin="5,5,0,0" IsChecked="{Binding UseSIGameEngine}" Content="{x:Static lp:Resources.UseSIGameEngine}" />-->
                 </UniformGrid>
-                
+
                 <Expander
                     Style="{StaticResource Customizable}"
                     Header="{x:Static lp:Resources.SpecialQuestionsAliases}"

@@ -280,16 +280,16 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             IsNetworkGame = true
         };
 
+        var actions = new ViewerActions(_client);
+
         var loggerFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ILoggerFactory>();
 
-        var gameViewModel = new GameViewModel(data, _node, _userSettings, _settingsViewModel, null, loggerFactory.CreateLogger<GameViewModel>())
+        var gameViewModel = new GameViewModel(data, actions, _node, _userSettings, _settingsViewModel, null, loggerFactory.CreateLogger<GameViewModel>())
         {
             IsOnline = IsOnline,
             IsHost = isHost,
         };
 
-        var actions = new ViewerActions(_client);
-        
         var logic = new ViewerHumanLogic(
             gameViewModel,
             data,
@@ -323,7 +323,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
             await ClearConnectionAsync();
 
-            _host.Actions.GetInfo();
+            actions.GetInfo();
 
             Error = "";
 

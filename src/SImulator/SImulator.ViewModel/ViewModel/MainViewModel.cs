@@ -454,9 +454,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             presentationController.Error += ShowError;
 
-            var game = Settings.UseSIGameEngine 
+            var game = /*Settings.UseSIGameEngine 
                 ? await CreateGameNewAsync(presentationController, presentationListener)
-                : await CreateGameAsync(presentationController, presentationListener);
+                : */await CreateGameAsync(presentationController, presentationListener);
 
             Game = game;
 
@@ -517,9 +517,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         node.Error += (error, _) => ShowError(error);
 
-        var playerCount = Math.Min(2, Settings.PlayerCount);
+        var playerCount = Math.Max(2, Settings.PlayerCount);
         var players = new Account[playerCount];
-        
+
         for (var i = 0; i < playerCount; i++)
         {
             players[i] = new Account
@@ -670,6 +670,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         };
 
         gameEngineController.GameViewModel = game;
+        gameActions.GameViewModel = game;
+
+        for (var i = 0; i < SettingsViewModel.Model.PlayerCount; i++)
+        {
+            game.AddPlayer.Execute(null);
+        }
 
         return game;
     }

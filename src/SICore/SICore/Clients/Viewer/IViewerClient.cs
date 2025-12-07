@@ -12,8 +12,6 @@ public interface IViewerClient : IDisposable
 {
     GameRole Role { get; }
 
-    ViewerActions Actions { get; }
-
     string? Avatar { get; set; }
 
     void Say(string text, string whom = NetworkConstants.Everybody);

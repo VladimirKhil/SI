@@ -2987,21 +2987,6 @@ public sealed class Game : MessageHandler
         OnPersonsChanged();
     }
 
-    [Obsolete("Use Logic.PlanExecution()")]
-    private void PlanExecution(Tasks task, double taskTime, int arg = 0)
-    {
-        Logic.AddHistory($"PlanExecution old {task} {taskTime} {arg} ({_state.TInfo.Pause})");
-
-        if (Logic.Runner.IsExecutionPaused)
-        {
-            Logic.Runner.UpdatePausedTask(task, arg, (int)taskTime);
-        }
-        else
-        {
-            Logic.ScheduleExecution(task, taskTime, arg);
-        }
-    }
-
     /// <summary>
     /// Correctly removes player from the game adjusting game state.
     /// </summary>

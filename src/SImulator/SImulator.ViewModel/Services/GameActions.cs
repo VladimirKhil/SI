@@ -13,6 +13,8 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
 
     private string[] _themeNames = Array.Empty<string>();
 
+    public GameViewModel GameViewModel { get; internal set; } = null!;
+
     public GameActions(GameEngine engine, IPresentationController presentationController)
     {
         _engine = engine;
@@ -71,4 +73,8 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
         _taskRunner.Dispose();
         _engine.Dispose();
     }
+
+    public void AddPlayer() => GameViewModel.AddPlayerCore(new PlayerInfo());
+
+    public void RemovePlayerAt(int index) => GameViewModel.RemovePlayerCore(GameViewModel.Players[index]);
 }
