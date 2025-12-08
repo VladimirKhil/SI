@@ -181,7 +181,6 @@ public enum StopReason
 public enum MessageTypes
 {
     System,
-    Special,
     Replic
 }
 

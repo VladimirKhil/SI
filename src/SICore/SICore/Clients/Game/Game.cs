@@ -714,15 +714,6 @@ public sealed class Game : MessageHandler
                             {
                                 _state.JoinMode = joinMode;
                                 _gameActions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
-
-                                var replic = joinMode switch
-                                {
-                                    JoinMode.AnyRole => LO[nameof(R.JoinModeSwitchedToAny)],
-                                    JoinMode.OnlyViewer => LO[nameof(R.JoinModeSwitchedToViewers)],
-                                    _ => LO[nameof(R.JoinModeSwitchedToForbidden)]
-                                };
-
-                                _gameActions.SpecialReplic(string.Format(replic, _state.HostName)); // TODO: REMOVE+
                             }
                         }
                         break;
@@ -1152,8 +1143,6 @@ public sealed class Game : MessageHandler
         _state.ChooserIndex = playerIndex;
         _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "+");
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], _state.ShowMan.Name, _state.Chooser?.Name)); // TODO: REMOVE+
-
         if (isChoosingNow)
         {
             _controller.PlanExecution(Tasks.AskToSelectQuestion, 10);
@@ -1256,13 +1245,6 @@ public sealed class Game : MessageHandler
             var oldPrice = question.Price;
             question.Price = Question.InvalidPrice;
             _gameActions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, Question.InvalidPrice);
-
-            _gameActions.SpecialReplic(
-                string.Format(
-                    LO[nameof(R.QuestionRemoved)],
-                    message.Sender,
-                    _state.TInfo.RoundInfo[themeIndex].Name,
-                    oldPrice)); // TODO: REMOVE+
         }
         else
         {
@@ -1270,26 +1252,7 @@ public sealed class Game : MessageHandler
             {
                 return;
             }
-
-            _gameActions.SpecialReplic(
-                string.Format(
-                    LO[nameof(R.QuestionRestored)],
-                    message.Sender,
-                    _state.TInfo.RoundInfo[themeIndex].Name,
-                    question.Price)); // TODO: REMOVE+
         }
-
-        // TODO: remove after all clients upgrade to 7.12.0
-        _state.TableInformStageLock.WithLock(
-            () =>
-            {
-                if ((_state.InformStages & InformStages.Table) > 0)
-                {
-                    _gameActions.InformRoundThemesNames(playMode: ThemesPlayMode.None);
-                    _gameActions.InformTable();
-                }
-            },
-            5000);
     }
 
     private void OnKick(Message message, string[] args)
@@ -1329,8 +1292,6 @@ public sealed class Game : MessageHandler
         {
             _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
         }
-
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, clientName)); // TODO: REMOVE+
     }
 
     private void OnBan(Message message, string[] args)
@@ -1370,8 +1331,6 @@ public sealed class Game : MessageHandler
         {
             _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
         }
-
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, clientName)); // TODO: REMOVE+
     }
 
     private void OnSetHost(Message message, string[] args)
@@ -1853,7 +1812,6 @@ public sealed class Game : MessageHandler
             .Append(' ')
             .Append(account.Name);
 
-        _gameActions.SpecialReplic(res.ToString()); // TODO: REMOVE+
         _gameActions.SendMessageWithArgs(Messages.Disconnected, account.Name);
 
         _state.BeginUpdatePersons($"Disconnected {account.Name}");
@@ -2050,7 +2008,6 @@ public sealed class Game : MessageHandler
 
         _state.QuestionPlay.Appellations.Add((appellationSource, isAppellationForRightAnswer));
 
-        _gameActions.SpecialReplic($"{appellationSource} {LO[nameof(R.RequestedApellation)]}"); // TODO: REMOVE+
         _gameActions.SendMessageWithArgs(Messages.PlayerAppellating, appellationSource);
 
         if (_state.QuestionPlay.AppellationState == AppellationState.Collecting)
@@ -2114,7 +2071,6 @@ public sealed class Game : MessageHandler
 
         var verbEnding = _state.ShowMan.IsMale ? "" : LO[nameof(R.FemaleEnding)];
 
-        _gameActions.SpecialReplic(string.Format(LO[nameof(R.ScoreChanged)], _state.ShowMan.Name, player.Name, oldSum, sum, verbEnding)); // TODO: REMOVE+
         _gameActions.SendMessageWithArgs(Messages.PlayerScoreChanged, playerIndex - 1, sum);
         _gameActions.InformSums();
 
@@ -2901,7 +2857,6 @@ public sealed class Game : MessageHandler
         AppendAccountExt(newAccount, info);
 
         _gameActions.SendMessage(info.ToString());
-        _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Added)], host.IsMale)} {LO[nameof(R.NewGameTable)]}"); // TODO: REMOVE+
         OnPersonsChanged();
     }
 
@@ -2972,7 +2927,6 @@ public sealed class Game : MessageHandler
         }
 
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
-        _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Deleted)], host.IsMale)} {LO[nameof(R.GameTableNumber)]} {index + 1}"); // TODO: REMOVE+
 
         if (_state.Stage == GameStage.Before)
         {
@@ -3408,7 +3362,6 @@ public sealed class Game : MessageHandler
         }
 
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
-        _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Free)], host.IsMale)} {account.Name} {LO[nameof(R.FromTable)]}"); // TODO: REMOVE+
 
         OnPersonsChanged();
     }
@@ -3472,7 +3425,6 @@ public sealed class Game : MessageHandler
         {
             if (_state.AllPersons.ContainsKey(replacer))
             {
-                _gameActions.SpecialReplic(string.Format(LO[nameof(R.PersonAlreadyExists)], replacer)); // TODO: REMOVE+
                 _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.PersonAlreadyExists);
                 return;
             }
@@ -3511,7 +3463,6 @@ public sealed class Game : MessageHandler
         }
 
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
-        _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Replaced)], host.IsMale)} {oldName} {LO[nameof(R.To)]} {replacer}"); // TODO: REMOVE+
 
         InformAvatar(newAccount);
         OnPersonsChanged();
@@ -3830,12 +3781,6 @@ public sealed class Game : MessageHandler
 
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newIsMale ? '+' : '-');
 
-        if (responsePerson != null)
-        {
-            var newTypeString = newType ? LO[nameof(R.Human)] : LO[nameof(R.Computer)];
-            _gameActions.SpecialReplic($"{_state.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Changed)], responsePerson.IsMale)} {LO[nameof(R.PersonType)]} {oldName} {LO[nameof(R.To)]} \"{newTypeString}\""); // TODO: REMOVE+
-        }
-
         if (newAcc != null)
         {
             InformAvatar(newAcc);
@@ -3951,7 +3896,6 @@ public sealed class Game : MessageHandler
         }
 
         var connectedMessage = LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)];
-        _gameActions.SpecialReplic(string.Format(connectedMessage, name)); // TODO: REMOVE+
         _gameActions.SendMessageWithArgs(Messages.Connected, role.ToString().ToLowerInvariant(), index, name, isMale ? 'm' : 'f', "");
 
         if (_state.HostName == null && !_state.Settings.IsAutomatic)

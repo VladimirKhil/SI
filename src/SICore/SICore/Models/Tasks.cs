@@ -44,21 +44,11 @@ public enum Tasks
     /// Ask to select question on game table.
     /// </summary>
     AskToSelectQuestion,
-    
+
     /// <summary>
     /// Ожидание выбора вопроса
     /// </summary>
     WaitChoose,
-
-    /// <summary>
-    /// Theme information.
-    /// </summary>
-    Theme,
-
-    /// <summary>
-    /// Theme information without question play.
-    /// </summary>
-    ThemeInfo,
 
     /// <summary>
     /// Question start information.
@@ -84,7 +74,7 @@ public enum Tasks
     /// Display information after question.
     /// </summary>
     QuestionPostInfo,
-    
+
     /// <summary>
     /// Выяснение ответа игрока
     /// </summary>

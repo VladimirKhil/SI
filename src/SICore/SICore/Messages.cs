@@ -542,6 +542,7 @@ public static class Messages
     /// <summary>
     /// Отчёт об игре
     /// </summary>
+    [Obsolete("Use AskReview")]
     public const string Report = "REPORT";
 
     /// <summary>
@@ -739,6 +740,7 @@ public static class Messages
     /// <summary>
     /// Время вышло
     /// </summary>
+    [Obsolete("Use RoundEnd instead")]
     public const string Timeout = "TIMEOUT";
 
     /// <summary>

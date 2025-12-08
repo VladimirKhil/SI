@@ -78,8 +78,6 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         _state.InformStages |= InformStages.RoundThemesComments;
 
         // Filling initial questions table
-        _state.ThemeInfoShown.Clear();
-
         var maxQuestionsInTheme = themes.Max(t => t.Questions.Count);
 
         for (var i = 0; i < themes.Count; i++)
@@ -202,7 +200,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         _state.Theme = theme;
         GameActions?.SendThemeInfo();
         _state.InformStages |= InformStages.Theme;
-        GameLogic?.ScheduleExecution(Tasks.ThemeInfo, 20, 1);
+        GameLogic?.ScheduleExecution(Tasks.MoveNext, 20);
     }
 
     public void OnQuestion(Question question) => GameLogic?.OnQuestion(question);

@@ -14,7 +14,6 @@ using SIPackages;
 using SIPackages.Core;
 using SIPackages.Models;
 using SIUI.Model;
-using System.Numerics;
 using System.Text;
 using Utils.Timers;
 using R = SICore.Properties.Resources;
@@ -214,7 +213,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 // If there are 2 or 3 players, there are already 2 positive votes for the answer
                 // from answered player and showman. And only 1 or 2 votes left.
                 // So there is no chance to win a vote against the answer
-                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], appellationSource)); // TODO: REMOVE+
                 _gameActions.SendMessageToWithArgs(appellationSource, Messages.UserError, ErrorCode.AppellationFailedTooFewPlayers);
                 return false;
             }
@@ -410,17 +408,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         ProceedToThemeAndQuestion(20);
     }
 
-    private void ProceedToThemeAndQuestion(int delay = 10, bool force = true)
-    {
-        if (!_state.ThemeInfoShown.Contains(_state.Theme))
-        {
-            ScheduleExecution(Tasks.Theme, delay, 1, force);
-        }
-        else
-        {
-            ScheduleExecution(Tasks.QuestionStartInfo, delay, 1, force);
-        }
-    }
+    private void ProceedToThemeAndQuestion(int delay = 10, bool force = true) => ScheduleExecution(Tasks.QuestionStartInfo, delay, 1, force);
 
     private void InitQuestionState(Question question)
     {
@@ -867,7 +855,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             RescheduleTask(); // Decision could be ready
         }
 
-        _gameActions.SystemReplic(LO[nameof(R.GameResumed)]); // TODO: REMOVE: replaced by PAUSE message
         _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
     }
 
@@ -887,7 +874,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRoundEndedManually()
     {
-        _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToOtherRound)]); // TODO: REMOVE+
         _gameActions.SendMessage(Messages.RoundEnd, "manual");
     }
 
@@ -933,12 +919,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         // Clearing the table
         _gameActions.SendMessage(Messages.Stop);
-        _gameActions.SystemReplic($"{LO[nameof(R.GameResults)]}: "); // TODO: REMOVE: replaced by WINNER message
-
-        for (var i = 0; i < _state.Players.Count; i++)
-        {
-            _gameActions.SystemReplic($"{_state.Players[i].Name}: {Notion.FormatNumber(_state.Players[i].Sum)}"); // TODO: REMOVE: replaced by WINNER message
-        }
 
         FillReport();
         ScheduleExecution(Tasks.Winner, 15 + Random.Shared.Next(10), force: true);
@@ -1758,11 +1738,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         WaitChoose();
                         break;
 
-                    case Tasks.Theme:
-                    case Tasks.ThemeInfo:
-                        OnTheme(_state.Theme, arg, task == Tasks.Theme);
-                        break;
-
                     case Tasks.QuestionStartInfo:
                         OnQuestionStartInfo(arg);
                         break;
@@ -1903,7 +1878,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _state.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
             ScheduleExecution(Tasks.NoTask, 10);
             _state.MoveNextBlocked = true;
-            _gameActions.SpecialReplic("Game ERROR"); // TODO: REMOVE+
             _gameActions.SendMessageWithArgs(Messages.GameError);
         }
     }
@@ -2750,7 +2724,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (themeComments.Length > 0)
         {
-            _gameActions.ShowmanReplic(themeComments); // TODO: REMOVE: replaced by THEME message
             _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines()); // TODO: REMOVE: replaced by THEME message
         }
 
@@ -2797,8 +2770,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var sp = new StringBuilder(LO[nameof(R.UnknownType)]).Append(' ').Append(typeName);
 
         // TODO: REMOVE+
-        _gameActions.SpecialReplic(sp.ToString()); 
-        _gameActions.SpecialReplic(LO[nameof(R.GameWillResume)]);
         _gameActions.ShowmanReplic(LO[nameof(R.ManuallyPlayedQuestion)]);
         // TODO END
 
@@ -3006,7 +2977,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 break;
 
             default:
-                _gameActions.SpecialReplic(LO[nameof(R.WrongGameState)] + " - " + Tasks.StartGame); // TODO: REMOVE+
                 break;
         }
 
@@ -4245,64 +4215,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
     }
 
-    private void OnTheme(Theme theme, int arg, bool isFull)
-    {
-        var informed = false;
-
-        if (arg == 1)
-        {
-            var authors = _state.PackageDoc.ResolveAuthors(theme.Info.Authors);
-
-            if (authors.Length > 0)
-            {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfTheme)], string.Join(", ", authors));
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by THEME message)
-            }
-            else
-            {
-                arg++;
-            }
-        }
-
-        if (arg == 2)
-        {
-            var sources = _state.PackageDoc.ResolveSources(theme.Info.Sources);
-
-            if (sources.Count > 0)
-            {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfTheme)], string.Join(", ", sources));
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: REMOVE (replaced by THEME message)
-            }
-            else
-            {
-                arg++;
-            }
-        }
-
-        if (arg < 2)
-        {
-            ScheduleExecution(isFull ? Tasks.Theme : Tasks.ThemeInfo, 20, arg + 1);
-        }
-        else
-        {
-            _state.ThemeInfoShown.Add(_state.Theme);
-            var delay = informed ? 20 : 1;
-
-            if (isFull)
-            {
-                ScheduleExecution(Tasks.QuestionStartInfo, delay, 1, force: !informed);
-            }
-            else
-            {
-                ScheduleExecution(Tasks.MoveNext, delay);
-            }
-        }
-    }
-
     private void WaitFor(DecisionType decision, int time, int person, bool isWaiting = true)
     {
         _state.TimerStartTime[2] = DateTime.UtcNow;
@@ -4439,9 +4351,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.InformRound(roundName, roundIndex, _state.RoundStrategy);
             _gameActions.InformRoundContent();
             _state.InformStages |= InformStages.RoundContent;
-
-            _gameActions.SystemReplic(" "); // new line // TODO: REMOVE: replaced by STAGE message
-            _gameActions.SystemReplic(roundName); // TODO: REMOVE: replaced by STAGE message
 
             var authors = _state.PackageDoc.ResolveAuthors(round.Info.Authors);
 

@@ -81,8 +81,6 @@ public sealed class GameActions
     [Obsolete]
     internal void SystemReplic(string text) => UserMessage(MessageTypes.System, text);
 
-    internal void SpecialReplic(string text) => UserMessage(MessageTypes.Special, text);
-
     internal void ShowmanReplic(string text) => UserMessage(MessageTypes.Replic, text, GameRole.Showman);
 
     internal void ShowmanReplicNew(MessageCode messageCode) =>
@@ -112,11 +110,9 @@ public sealed class GameActions
     {
         var person = messageType == MessageTypes.System
             ? ReplicCodes.System.ToString()
-            : messageType == MessageTypes.Special
-                ? ReplicCodes.Special.ToString()
-                : (personRole == GameRole.Player && personIndex.HasValue
-                    ? ReplicCodes.Player + personIndex.Value.ToString()
-                    : ReplicCodes.Showman.ToString());
+            : (personRole == GameRole.Player && personIndex.HasValue
+                ? ReplicCodes.Player + personIndex.Value.ToString()
+                : ReplicCodes.Showman.ToString());
 
         SendMessageWithArgs(Messages.Replic, person, text);
     }

@@ -208,11 +208,6 @@ public sealed class GameData : Data
     internal List<string> UsedWrongVersions = new();
 
     /// <summary>
-    /// Marks whether theme info has been already shown.
-    /// </summary>
-    internal HashSet<Theme> ThemeInfoShown { get; } = new();
-
-    /// <summary>
     /// Is any decision being awaited now.
     /// </summary>
     internal bool IsWaiting { get; set; }
