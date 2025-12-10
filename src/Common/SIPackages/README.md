@@ -167,7 +167,7 @@ using var doc = SIDocument.Load(fs);
 
 var package = doc.Package;
 Console.WriteLine($"Package: {package.Name}");
-Console.WriteLine($"Version: {package.Version:F1}");
+Console.WriteLine($"Version: {package.Version}");
 Console.WriteLine($"Difficulty: {package.Difficulty}");
 
 // Iterate through content
@@ -372,8 +372,8 @@ foreach (var round in doc.Package.Rounds)
 - `ContentTypes.Html` - HTML content
 
 ### QuestionParameterNames
-- `QuestionParameterNames.Question` - Question body
-- `QuestionParameterNames.Answer` - Question answer
+- `QuestionParameterNames.Question` - Question body content parameter
+- `QuestionParameterNames.Answer` - Question answer content parameter
 
 ### StepParameterTypes
 - `StepParameterTypes.Content` - Content parameter (text/media)
