@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package name="Global Data Test" version="5" id="22222222-2222-2222-2222-222222222222" date="02.02.2024" difficulty="7" publisher="Test Publisher" restriction="18+" logo="testlogo.png" language="ru-RU" contactUri="http://example.com">
+  <tags>
+    <tag>Test Tag 1</tag>
+    <tag>Test Tag 2</tag>
+    <tag>Test Tag 3</tag>
+  </tags>
+  <global>
+    <Authors>
+      <Author id="auth1">
+        <Name>Author One</Name>
+      </Author>
+      <Author id="auth2">
+        <Name>Author Two</Name>
+      </Author>
+    </Authors>
+    <Sources>
+      <Source id="src1">
+        <Title>Source One</Title>
+      </Source>
+      <Source id="src2">
+        <Title>Source Two</Title>
+      </Source>
+    </Sources>
+  </global>
+  <rounds>
+    <round name="Test Round">
+      <themes>
+        <theme name="Test Theme">
+          <questions>
+            <question price="500">
+              <params>
+                <param name="question" type="content">
+                  <item>Global data test question</item>
+                </param>
+              </params>
+              <right>
+                <answer>Answer</answer>
+              </right>
+            </question>
+          </questions>
+        </theme>
+      </themes>
+    </round>
+  </rounds>
+</package>

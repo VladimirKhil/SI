@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package name="Content Placement Test" version="5" id="44444444-4444-4444-4444-444444444444" date="04.04.2024" difficulty="4" language="en">
+  <rounds>
+    <round name="Placement Round">
+      <themes>
+        <theme name="Content Placements">
+          <questions>
+            <question price="100">
+              <params>
+                <param name="question" type="content">
+                  <item placement="screen">Text on screen</item>
+                </param>
+              </params>
+              <right>
+                <answer>Screen Answer</answer>
+              </right>
+            </question>
+            <question price="200">
+              <params>
+                <param name="question" type="content">
+                  <item placement="background">Background text</item>
+                </param>
+              </params>
+              <right>
+                <answer>Background Answer</answer>
+              </right>
+            </question>
+            <question price="300">
+              <params>
+                <param name="question" type="content">
+                  <item placement="replic">Replic text - spoken by presenter</item>
+                </param>
+              </params>
+              <right>
+                <answer>Replic Answer</answer>
+              </right>
+            </question>
+            <question price="400">
+              <params>
+                <param name="question" type="content">
+                  <item duration="00:00:05">Text with 5 second duration</item>
+                </param>
+              </params>
+              <right>
+                <answer>Duration Answer</answer>
+              </right>
+            </question>
+            <question price="500">
+              <params>
+                <param name="question" type="content">
+                  <item waitForFinish="True">Wait for finish - true</item>
+                  <item waitForFinish="False">Wait for finish - false</item>
+                </param>
+              </params>
+              <right>
+                <answer>WaitForFinish Answer</answer>
+              </right>
+            </question>
+          </questions>
+        </theme>
+      </themes>
+    </round>
+  </rounds>
+</package>
