@@ -81,7 +81,7 @@ Represents a single quiz question.
 
 **Key Properties:**
 - `Price` - Question price/points
-- `TypeName` - Question type (default: "standard")
+- `TypeName` - Question type (default: "")
 - `Parameters` - Question parameters (question text, answer, etc.)
 - `Right` - List of correct answers
 - `Wrong` - List of wrong answers
