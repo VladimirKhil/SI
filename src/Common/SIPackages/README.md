@@ -40,8 +40,8 @@ The main entry point for working with SIQ files. Represents a complete package d
 - `Audio` - Collection of audio files
 - `Video` - Collection of video files
 - `Html` - Collection of HTML files
-- `Authors` - List of package authors
-- `Sources` - List of package sources
+- `Authors` - List of package authors (for version 5.0+, same as Package.Global.Authors)
+- `Sources` - List of package sources (for version 5.0+, same as Package.Global.Sources)
 
 ### Package
 
@@ -167,7 +167,7 @@ using var doc = SIDocument.Load(fs);
 
 var package = doc.Package;
 Console.WriteLine($"Package: {package.Name}");
-Console.WriteLine($"Version: {package.Version}");
+Console.WriteLine($"Version: {package.Version:F1}");
 Console.WriteLine($"Difficulty: {package.Difficulty}");
 
 // Iterate through content
@@ -374,8 +374,6 @@ foreach (var round in doc.Package.Rounds)
 ### QuestionParameterNames
 - `QuestionParameterNames.Question` - Question body
 - `QuestionParameterNames.Answer` - Question answer
-- `QuestionParameterNames.Theme` - Question theme
-- `QuestionParameterNames.Price` - Question price
 
 ### StepParameterTypes
 - `StepParameterTypes.Content` - Content parameter (text/media)
