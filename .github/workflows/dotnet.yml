@@ -31,3 +31,5 @@ jobs:
       run: dotnet build --no-restore SImulator.sln
     - name: Run SIPackages tests
       run: dotnet test test/Common/SIPackages.Tests/SIPackages.Tests.csproj --no-restore --verbosity normal
+    - name: Run SIEngine.Core tests
+      run: dotnet test test/Common/SIEngine.Core.Tests/SIEngine.Core.Tests.csproj --no-restore --verbosity normal
