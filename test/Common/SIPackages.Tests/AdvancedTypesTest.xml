@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package name="Advanced Question Types" version="5" id="33333333-3333-3333-3333-333333333333" date="03.03.2024" difficulty="5" language="en">
+  <rounds>
+    <round name="Advanced Types Round">
+      <themes>
+        <theme name="NumberSet Questions">
+          <questions>
+            <question price="100" type="secret">
+              <params>
+                <param name="theme">Secret Theme</param>
+                <param name="price" type="numberSet">
+                  <numberSet minimum="100" maximum="500" step="100" />
+                </param>
+                <param name="selectionMode">any</param>
+                <param name="question" type="content">
+                  <item>Question with NumberSet parameter</item>
+                </param>
+              </params>
+              <right>
+                <answer>Answer</answer>
+              </right>
+            </question>
+            <question price="200" type="secretPublicPrice">
+              <params>
+                <param name="theme">Another Theme</param>
+                <param name="price" type="numberSet">
+                  <numberSet minimum="200" maximum="1000" step="200" />
+                </param>
+                <param name="selectionMode">exceptCurrent</param>
+                <param name="question" type="content">
+                  <item>SecretPublicPrice question</item>
+                </param>
+              </params>
+              <right>
+                <answer>Answer 2</answer>
+              </right>
+            </question>
+            <question price="300" type="secretNoQuestion">
+              <params>
+                <param name="price" type="numberSet">
+                  <numberSet minimum="300" maximum="300" step="0" />
+                </param>
+                <param name="selectionMode">current</param>
+              </params>
+              <right>
+                <answer />
+              </right>
+            </question>
+          </questions>
+        </theme>
+        <theme name="Other Question Types">
+          <questions>
+            <question price="100" type="noRisk">
+              <params>
+                <param name="question" type="content">
+                  <item>NoRisk question - no penalty for wrong answer</item>
+                </param>
+              </params>
+              <right>
+                <answer>NoRisk Answer</answer>
+              </right>
+            </question>
+            <question price="200" type="stakeAll">
+              <params>
+                <param name="question" type="content">
+                  <item>StakeAll question - all players answer</item>
+                </param>
+              </params>
+              <right>
+                <answer>StakeAll Answer</answer>
+              </right>
+            </question>
+            <question price="300" type="forAll">
+              <params>
+                <param name="question" type="content">
+                  <item>ForAll question - all players answer with fixed price</item>
+                </param>
+              </params>
+              <right>
+                <answer>ForAll Answer</answer>
+              </right>
+            </question>
+          </questions>
+        </theme>
+      </themes>
+    </round>
+  </rounds>
+</package>

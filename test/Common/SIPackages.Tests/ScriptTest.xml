@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package name="Script Test Package" version="5" id="11111111-1111-1111-1111-111111111111" date="01.01.2024" difficulty="3" language="en">
+  <rounds>
+    <round name="Script Round">
+      <themes>
+        <theme name="Script Questions">
+          <questions>
+            <question price="100">
+              <script>
+                <step type="showContent">
+                  <param name="content" type="content">
+                    <item>Question text in script</item>
+                  </param>
+                </step>
+                <step type="accept">
+                  <param name="answer" type="content">
+                    <item>Answer in script</item>
+                  </param>
+                </step>
+              </script>
+              <right>
+                <answer>Correct answer</answer>
+              </right>
+            </question>
+            <question price="200">
+              <script>
+                <step type="showContent">
+                  <param name="content" type="content">
+                    <item type="text">First content item</item>
+                    <item type="text">Second content item</item>
+                  </param>
+                </step>
+                <step type="showContent">
+                  <param name="content" type="content">
+                    <item type="text">Third content item</item>
+                  </param>
+                </step>
+              </script>
+              <right>
+                <answer>Multi-step answer</answer>
+              </right>
+            </question>
+          </questions>
+        </theme>
+      </themes>
+    </round>
+  </rounds>
+</package>
