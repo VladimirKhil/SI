@@ -65,6 +65,7 @@ internal sealed class TvEngineTests
         AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.Question);
 
+        AssertMove(engine, GameStage.EndRound);
         AssertMove(engine, GameStage.EndGame);
         AssertMove(engine, GameStage.None);
     }

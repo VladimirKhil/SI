@@ -6,15 +6,9 @@ namespace SIEngine.Tests;
 
 internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 {
-    public bool OnAccept()
-    {
-        throw new NotImplementedException();
-    }
+    public bool OnAccept() => false;
 
-    public bool OnAnnouncePrice(NumberSet availableRange)
-    {
-        throw new NotImplementedException();
-    }
+    public bool OnAnnouncePrice(NumberSet availableRange) => false;
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence) => false;
 
@@ -45,20 +39,11 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         
     }
 
-    public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility)
-    {
-        throw new NotImplementedException();
-    }
+    public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility) => false;
 
-    public bool OnSetPrice(string mode, NumberSet? availableRange)
-    {
-        throw new NotImplementedException();
-    }
+    public bool OnSetPrice(string mode, NumberSet? availableRange) => false;
 
-    public bool OnSetTheme(string themeName)
-    {
-        throw new NotImplementedException();
-    }
+    public bool OnSetTheme(string themeName) => false;
 
     public void OnSimpleRightAnswerStart()
     {
@@ -67,8 +52,5 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public bool OnRightAnswerOption(string rightOptionLabel) => false;
 
-    public bool OnNumericAnswerType(int deviation)
-    {
-        throw new NotImplementedException();
-    }
+    public bool OnNumericAnswerType(int deviation) => false;
 }
