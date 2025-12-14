@@ -22,10 +22,6 @@ public sealed class ScenariosTests
     /// <summary>
     /// Tests the complete game flow with ForAll question type.
     /// Validates the message sequence as documented in GAME_AGENT_DOCUMENTATION.md.
-    /// </summary>
-    /// <summary>
-    /// Tests the complete game flow with ForAll question type.
-    /// Validates the message sequence as documented in GAME_AGENT_DOCUMENTATION.md.
     /// This is a positive scenario test validating messages are sent in expected order.
     /// </summary>
     [Test]
@@ -98,7 +94,6 @@ public sealed class ScenariosTests
         game.Join(playerAClient.Name, false, GameRole.Player, null, () => { });
         
         var playerBClient = new Client("B");
-        var playerBListener = new MessageListener(playerBClient);
         playerBClient.ConnectTo(node);
         game.Join(playerBClient.Name, false, GameRole.Player, null, () => { });
 
@@ -482,7 +477,7 @@ public sealed class ScenariosTests
         await showmanListener.AssertNextMessageAsync(Messages.Table);
         
         // Player selection messages - order may vary
-        var nextMsg = await showmanListener.AssertNextMessageAsync(Messages.ShowTable);
+        await showmanListener.AssertNextMessageAsync(Messages.ShowTable);
         await showmanListener.AssertNextMessageAsync(Messages.First);
         await showmanListener.AssertNextMessageAsync(Messages.AskSelectPlayer);
 
