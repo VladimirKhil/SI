@@ -23,6 +23,11 @@ public sealed class ScenariosTests
     /// Tests the complete game flow with ForAll question type.
     /// Validates the message sequence as documented in GAME_AGENT_DOCUMENTATION.md.
     /// </summary>
+    /// <summary>
+    /// Tests the complete game flow with ForAll question type.
+    /// Validates the message sequence as documented in GAME_AGENT_DOCUMENTATION.md.
+    /// This is a positive scenario test validating messages are sent in expected order.
+    /// </summary>
     [Test]
     public async Task MainTest()
     {
@@ -99,8 +104,10 @@ public sealed class ScenariosTests
 
         showmanClient.SendMessage(Messages.Start);
 
-        // Game Initialization Phase - validate sequence
-        await showmanListener.AssertNextMessageAsync(Messages.Stage);
+        // Game Initialization Phase - validate key messages are present
+        var stage = await showmanListener.AssertNextMessageAsync(Messages.Stage);
+        Assert.That(stage[1], Is.EqualTo("Begin"), "Should start with Begin stage");
+        
         await showmanListener.AssertNextMessageAsync(Messages.PackageId);
         await showmanListener.AssertNextMessageAsync(Messages.RoundsNames);
         await showmanListener.AssertNextMessageAsync(Messages.PackageAuthors); // Sent before PACKAGE if authors exist
@@ -109,11 +116,14 @@ public sealed class ScenariosTests
         await showmanListener.AssertNextMessageAsync(Messages.Sums);
 
         // Round Start Phase
-        await showmanListener.AssertNextMessageAsync(Messages.Stage);
+        var roundStage = await showmanListener.AssertNextMessageAsync(Messages.Stage);
+        Assert.That(roundStage.Length, Is.GreaterThan(1), "Round stage should have name");
+        
         await showmanListener.AssertNextMessageAsync(Messages.RoundThemes);
         await showmanListener.AssertNextMessageAsync(Messages.RoundThemes2);
         await showmanListener.AssertNextMessageAsync(Messages.Theme2);
         await showmanListener.AssertNextMessageAsync(Messages.Table);
+        await showmanListener.AssertNextMessageAsync(Messages.ShowTable); // Can come before FIRST
         await showmanListener.AssertNextMessageAsync(Messages.First);
         await showmanListener.AssertNextMessageAsync(Messages.AskSelectPlayer);
 
@@ -124,17 +134,21 @@ public sealed class ScenariosTests
         await showmanListener.AssertNextMessageAsync(Messages.SetChooser);
         await showmanListener.AssertNextMessageAsync(Messages.Sums);
         await showmanListener.AssertNextMessageAsync(Messages.ShowTable);
-        await showmanListener.AssertNextMessageAsync(Messages.Choice);
+        var choice = await showmanListener.AssertNextMessageAsync(Messages.Choice);
+        Assert.That(choice.Length, Is.GreaterThanOrEqualTo(3), "Choice should have theme and question index");
 
         // Question Playback Phase - Start
         await showmanListener.AssertNextMessageAsync(Messages.QType);
-        await showmanListener.AssertNextMessageAsync(Messages.Content);
-
-        // Answer collection metadata for showman
+        
+        // Answer collection metadata for showman (sent before content for ForAll questions)
         var complexValidationMessage = await showmanListener.AssertNextMessageAsync(Messages.QuestionAnswers);
+        Assert.That(complexValidationMessage, Is.Not.Null, "Should receive answer options");
+        
+        await showmanListener.AssertNextMessageAsync(Messages.Content);
 
         // Players receive answer request
         var answerMessage = await playerAListener.WaitForMessageAsync(Messages.Answer);
+        Assert.That(answerMessage, Is.Not.Null, "Player should receive answer request");
 
         // Player A submits answer
         playerAClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
@@ -177,8 +191,12 @@ public sealed class ScenariosTests
 
         // Game End Phase
         await showmanListener.AssertNextMessageAsync(Messages.Stop);
-        await showmanListener.AssertNextMessageAsync(Messages.Winner);
-        await showmanListener.AssertNextMessageAsync(Messages.Stage);
+        var winner = await showmanListener.AssertNextMessageAsync(Messages.Winner);
+        Assert.That(winner, Is.Not.Null, "Should announce winner");
+        
+        var endStage = await showmanListener.AssertNextMessageAsync(Messages.Stage);
+        Assert.That(endStage[1], Is.EqualTo("After"), "Should end with After stage");
+        
         await showmanListener.AssertNextMessageAsync(Messages.GameStatistics);
     }
 
@@ -551,6 +569,8 @@ public sealed class ScenariosTests
             Messages.PackageSources,
             Messages.PackageDate,
             Messages.PackageComments,
+            // Optional timing messages that may be sent for different question types
+            Messages.FinalThink,
         });
 
         public MessageListener(Client client)
