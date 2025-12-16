@@ -39,3 +39,5 @@ jobs:
       run: dotnet test test/SIQuester/SIQuester.ViewModel.Tests/SIQuester.ViewModel.Tests.csproj --no-restore --verbosity normal
     - name: Run SImulator.ViewModel tests
       run: dotnet test test/SImulator/SImulator.ViewModel.Tests/SImulator.ViewModel.Tests.csproj --no-restore --verbosity normal
+    - name: Run SIGame.ViewModel tests
+      run: dotnet test test/SIGame/SIGame.ViewModel.Tests/SIGame.ViewModel.Tests.csproj --no-restore --verbosity normal
