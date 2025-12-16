@@ -3,10 +3,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using SIPackages;
+using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
-using SIQuester.ViewModel.Services;
 using SIQuester.ViewModel.Tests.Mocks;
 using SIStorage.Service.Contract;
 
@@ -28,7 +28,7 @@ internal static class TestHelper
         services.AddSingleton<IClipboardService, ClipboardServiceMock>();
         services.AddSingleton<IPackageTemplatesRepository, PackageTemplatesRepositoryMock>();
         services.AddSingleton<StorageContextViewModel>(sp => CreateStorageContextViewModel(sp));
-        services.AddSingleton<IDocumentViewModelFactory, DocumentViewModelFactory>();
+        services.AddSingleton<IDocumentViewModelFactory, TestDocumentViewModelFactory>();
 
         return services.BuildServiceProvider();
     }
@@ -44,7 +44,25 @@ internal static class TestHelper
         var round = new Round { Name = "Round 1" };
         var theme = new Theme { Name = "Theme 1" };
         var question = new Question { Price = 100 };
-        question.Scenario.Add(new Atom { Text = "Test question text" });
+        
+        // Add question content using Script and Steps
+        question.Script = new Script();
+        question.Script.Steps.Add(new Step
+        {
+            Type = StepTypes.ShowContent,
+            Parameters =
+            {
+                [StepParameterNames.Content] = new StepParameter
+                {
+                    Type = StepParameterTypes.Content,
+                    ContentValue = new List<ContentItem>
+                    {
+                        new() { Type = ContentTypes.Text, Value = "Test question text" }
+                    }
+                }
+            }
+        });
+        
         question.Right.Add("Test answer");
         
         theme.Questions.Add(question);

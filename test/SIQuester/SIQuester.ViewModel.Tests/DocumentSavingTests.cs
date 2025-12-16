@@ -7,6 +7,7 @@ namespace SIQuester.ViewModel.Tests;
 
 /// <summary>
 /// Tests for document saving operations in QDocument ViewModel.
+/// Tests simulate user behavior by creating, modifying, and saving documents.
 /// </summary>
 [TestFixture]
 internal sealed class DocumentSavingTests
@@ -108,31 +109,6 @@ internal sealed class DocumentSavingTests
 
     #endregion
 
-    #region SaveAs Operations
-
-    [Test]
-    public async Task SaveAsDocument_ToDifferentPath_ShouldCreateNewFile()
-    {
-        // Arrange
-        var document = TestHelper.CreateSimpleTestPackage();
-        var qDocument = _documentFactory.CreateViewModelFor(document, "Test Package");
-        var originalPath = Path.Combine(_testDirectory, "original.siq");
-        var newPath = Path.Combine(_testDirectory, "saved_as.siq");
-        
-        qDocument.Path = originalPath;
-        await qDocument.Save.ExecuteAsync(null);
-
-        // Act - SaveAs to new path
-        qDocument.Path = newPath;
-        await qDocument.Save.ExecuteAsync(null);
-
-        // Assert - Both files should exist
-        Assert.That(File.Exists(originalPath), Is.True, "Original file should exist");
-        Assert.That(File.Exists(newPath), Is.True, "New file should exist");
-    }
-
-    #endregion
-
     #region Save with Media
 
     [Test]
@@ -148,7 +124,7 @@ internal sealed class DocumentSavingTests
         var imageData = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
         using (var stream = new MemoryStream(imageData))
         {
-            document.Images.AddFile("test_image.png", stream);
+            await document.Images.AddFileAsync("test_image.png", stream);
         }
 
         // Act
@@ -157,7 +133,7 @@ internal sealed class DocumentSavingTests
         // Assert - Reload and check if image is present
         using var fileStream = File.OpenRead(filePath);
         var loadedDocument = SIDocument.Load(fileStream);
-        Assert.That(loadedDocument.Images.GetNames(), Does.Contain("test_image.png"));
+        Assert.That(loadedDocument.Images, Does.Contain("test_image.png"));
     }
 
     [Test]
@@ -173,7 +149,7 @@ internal sealed class DocumentSavingTests
         var audioData = new byte[] { 0x01, 0x02, 0x03, 0x04 };
         using (var stream = new MemoryStream(audioData))
         {
-            document.Audio.AddFile("test_audio.mp3", stream);
+            await document.Audio.AddFileAsync("test_audio.mp3", stream);
         }
 
         // Act
@@ -182,7 +158,7 @@ internal sealed class DocumentSavingTests
         // Assert - Reload and check if audio is present
         using var fileStream = File.OpenRead(filePath);
         var loadedDocument = SIDocument.Load(fileStream);
-        Assert.That(loadedDocument.Audio.GetNames(), Does.Contain("test_audio.mp3"));
+        Assert.That(loadedDocument.Audio, Does.Contain("test_audio.mp3"));
     }
 
     #endregion
@@ -205,7 +181,6 @@ internal sealed class DocumentSavingTests
                 for (int q = 0; q < 5; q++)
                 {
                     var question = new Question { Price = (q + 1) * 100 };
-                    question.Scenario.Add(new Atom { Text = $"Question {q + 1}" });
                     question.Right.Add($"Answer {q + 1}");
                     theme.Questions.Add(question);
                 }

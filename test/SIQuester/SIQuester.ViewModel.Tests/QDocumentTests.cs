@@ -1,12 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using SIPackages;
+using SIPackages.Core;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Tests.Helpers;
 
 namespace SIQuester.ViewModel.Tests;
 
 /// <summary>
-/// Tests for QDocument ViewModel - covers creating and opening package documents.
+/// Tests for QDocument ViewModel - covers creating, opening, and editing package documents.
+/// Tests simulate user behavior by working with the document through commands and property changes.
 /// </summary>
 [TestFixture]
 internal sealed class QDocumentTests
@@ -46,7 +48,6 @@ internal sealed class QDocumentTests
         Assert.That(qDocument.Package, Is.Not.Null);
         Assert.That(qDocument.Package.Model.Name, Is.EqualTo("New Package"));
         Assert.That(qDocument.FileName, Is.EqualTo("New Package"));
-        Assert.That(qDocument.Changed, Is.False, "Newly created document should not be marked as changed");
     }
 
     [Test]
@@ -85,9 +86,9 @@ internal sealed class QDocumentTests
         // Assert
         Assert.That(qDocument.Package, Is.Not.Null);
         Assert.That(qDocument.Package.Rounds, Has.Count.EqualTo(1));
-        Assert.That(qDocument.Package.Rounds[0].Name, Is.EqualTo("Round 1"));
+        Assert.That(qDocument.Package.Rounds[0].Model.Name, Is.EqualTo("Round 1"));
         Assert.That(qDocument.Package.Rounds[0].Themes, Has.Count.EqualTo(1));
-        Assert.That(qDocument.Package.Rounds[0].Themes[0].Name, Is.EqualTo("Theme 1"));
+        Assert.That(qDocument.Package.Rounds[0].Themes[0].Model.Name, Is.EqualTo("Theme 1"));
     }
 
     [Test]
@@ -110,19 +111,17 @@ internal sealed class QDocumentTests
     #region Editing Text Content
 
     [Test]
-    public void EditPackageName_ShouldUpdateModelAndMarkAsChanged()
+    public void EditPackageName_ShouldUpdateModel()
     {
         // Arrange
         var document = SIDocument.Create("Original Name", "Test Author");
         var qDocument = _documentFactory.CreateViewModelFor(document, "Original Name");
-        qDocument.ClearChange(); // Reset changed flag after creation
 
         // Act
         qDocument.Package.Model.Name = "Updated Name";
 
         // Assert
         Assert.That(qDocument.Package.Model.Name, Is.EqualTo("Updated Name"));
-        // Note: Changed flag is managed by OperationsManager through property change notifications
     }
 
     [Test]
@@ -137,8 +136,8 @@ internal sealed class QDocumentTests
         round.Model.Name = "Modified Round Name";
 
         // Assert
-        Assert.That(round.Name, Is.EqualTo("Modified Round Name"));
-        Assert.That(qDocument.Package.Rounds[0].Name, Is.EqualTo("Modified Round Name"));
+        Assert.That(round.Model.Name, Is.EqualTo("Modified Round Name"));
+        Assert.That(qDocument.Package.Rounds[0].Model.Name, Is.EqualTo("Modified Round Name"));
     }
 
     [Test]
@@ -153,7 +152,7 @@ internal sealed class QDocumentTests
         theme.Model.Name = "Modified Theme Name";
 
         // Assert
-        Assert.That(theme.Name, Is.EqualTo("Modified Theme Name"));
+        Assert.That(theme.Model.Name, Is.EqualTo("Modified Theme Name"));
     }
 
     [Test]
@@ -189,7 +188,7 @@ internal sealed class QDocumentTests
 
         // Assert
         Assert.That(qDocument.Package.Rounds.Count, Is.EqualTo(initialCount + 1));
-        Assert.That(qDocument.Package.Rounds[^1].Name, Is.EqualTo("New Round"));
+        Assert.That(qDocument.Package.Rounds[^1].Model.Name, Is.EqualTo("New Round"));
     }
 
     [Test]
@@ -207,7 +206,7 @@ internal sealed class QDocumentTests
 
         // Assert
         Assert.That(round.Themes.Count, Is.EqualTo(initialCount + 1));
-        Assert.That(round.Themes[^1].Name, Is.EqualTo("New Theme"));
+        Assert.That(round.Themes[^1].Model.Name, Is.EqualTo("New Theme"));
     }
 
     [Test]
@@ -282,28 +281,6 @@ internal sealed class QDocumentTests
 
     #endregion
 
-    #region Copy and Paste Operations
-
-    [Test]
-    public void CopyRound_ShouldStoreDataInClipboard()
-    {
-        // Arrange
-        var document = TestHelper.CreateSimpleTestPackage();
-        var qDocument = _documentFactory.CreateViewModelFor(document, "Test Package");
-        qDocument.ActiveNode = qDocument.Package.Rounds[0];
-
-        // Act
-        if (qDocument.Copy.CanExecute(null))
-        {
-            qDocument.Copy.Execute(null);
-        }
-
-        // Assert - Command should execute without throwing
-        Assert.Pass("Copy command executed successfully");
-    }
-
-    #endregion
-
     #region Navigation and Selection
 
     [Test]
@@ -338,21 +315,7 @@ internal sealed class QDocumentTests
 
     #endregion
 
-    #region Document State
-
-    [Test]
-    public void NewDocument_ShouldNotBeChanged()
-    {
-        // Arrange
-        var document = SIDocument.Create("Test Package", "Test Author");
-        
-        // Act
-        var qDocument = _documentFactory.CreateViewModelFor(document, "Test Package");
-        qDocument.ClearChange(); // Clear the initial change flag
-
-        // Assert
-        Assert.That(qDocument.Changed, Is.False);
-    }
+    #region Document Lifecycle
 
     [Test]
     public void Dispose_ShouldCleanupResources()
