@@ -35,3 +35,5 @@ jobs:
       run: dotnet test test/Common/SIEngine.Core.Tests/SIEngine.Core.Tests.csproj --no-restore --verbosity normal
     - name: Run SICore tests
       run: dotnet test test/SICore/SICore.Tests/SICore.Tests.csproj --no-restore --verbosity normal
+    - name: Run SImulator.ViewModel tests
+      run: dotnet test test/SImulator/SImulator.ViewModel.Tests/SImulator.ViewModel.Tests.csproj --no-restore --verbosity normal
