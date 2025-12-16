@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Model;
+using SImulator.ViewModel.PlatformSpecific;
 
 namespace SImulator.ViewModel.Tests;
 
@@ -11,6 +12,7 @@ public sealed class CommonTests
     [SetUp]
     public void Setup()
     {
+        PlatformManager.Instance = _manager;
     }
 
     [Test]
@@ -38,6 +40,6 @@ public sealed class CommonTests
 
         Assert.That(
             ((PresentationController)game.PresentationController).TInfo.Text,
-            Is.EqualTo("В этой передаче гроссмейстеры «Своей игры» сражались с приглашёнными знаменитостями"));
+            Is.EqualTo("пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"));
     }
 }
