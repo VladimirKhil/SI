@@ -186,6 +186,18 @@ internal sealed class QuestionPlayState
                 AnswererIndicies.Add(answererIndices[i]);
             }
         }
+
+        // Update AppellationRightAnswerPlayerIndex when a player is removed
+        if (AppellationRightAnswerPlayerIndex == playerIndex)
+        {
+            // The player who received right answer points is being removed
+            AppellationRightAnswerPlayerIndex = -1;
+        }
+        else if (AppellationRightAnswerPlayerIndex > playerIndex)
+        {
+            // The player who received points has a higher index, decrement it
+            AppellationRightAnswerPlayerIndex--;
+        }
     }
 
     internal void SetSingleAnswerer(int index)
