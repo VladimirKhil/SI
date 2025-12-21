@@ -129,6 +129,12 @@ internal sealed class QuestionPlayState
     /// </summary>
     public string QuestionKey { get; internal set; } = "";
 
+    /// <summary>
+    /// Index of player who has already received right answer points during appellation.
+    /// -1 means no player has received points yet.
+    /// </summary>
+    internal int AppellationRightAnswerPlayerIndex { get; set; } = -1;
+
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -152,6 +158,7 @@ internal sealed class QuestionPlayState
         NumericAnswerDeviation = 0;
         FlexiblePrice = false;
         QuestionKey = "";
+        AppellationRightAnswerPlayerIndex = -1;
     }
 
     internal void RemovePlayer(int playerIndex)

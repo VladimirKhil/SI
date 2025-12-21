@@ -4116,6 +4116,23 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var wrong = new List<object>();
         var passed = new List<object>();
 
+        // Determine if this is the first player to receive right answer points
+        var isFirstRightAnswerer = _state.QuestionPlay.AppellationRightAnswerPlayerIndex == -1;
+
+        // For singleAnswerer mode with votingForRight, find the first wrong answerer in history
+        int firstWrongAnswererIndex = -1;
+        if (isVotingForRightAnswer && singleAnswerer)
+        {
+            for (var i = 0; i < _state.QuestionHistory.Count; i++)
+            {
+                if (!_state.QuestionHistory[i].IsRight)
+                {
+                    firstWrongAnswererIndex = _state.QuestionHistory[i].PlayerIndex;
+                    break;
+                }
+            }
+        }
+
         for (var i = 0; i < _state.QuestionHistory.Count; i++)
         {
             var historyItem = _state.QuestionHistory[i];
@@ -4161,16 +4178,30 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     }
                     else
                     {
+                        // Check if this player should receive full points or just restore score
+                        var shouldReceiveFullPoints = isFirstRightAnswerer && index == firstWrongAnswererIndex;
+
                         UndoWrongSum(player, historyItem.Sum);
-                        AddRightSum(player, _state.CurPriceRight);
 
-                        right.Add(index);
-
-                        // TODO: that should be handled by question selection strategy
-                        if (Engine.CanMoveBack) // Not the beginning of a round
+                        if (shouldReceiveFullPoints)
                         {
-                            _state.ChooserIndex = index;
-                            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+                            // First wrong answerer receives full right answer points
+                            AddRightSum(player, _state.CurPriceRight);
+                            _state.QuestionPlay.AppellationRightAnswerPlayerIndex = index;
+                            right.Add(index);
+
+                            // TODO: that should be handled by question selection strategy
+                            if (Engine.CanMoveBack) // Not the beginning of a round
+                            {
+                                _state.ChooserIndex = index;
+                                _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+                            }
+                        }
+                        else
+                        {
+                            // Subsequent appellants only restore their score (undo penalty)
+                            // No points added, just the penalty removed by UndoWrongSum above
+                            passed.Add(index);
                         }
                     }
                 }
