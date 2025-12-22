@@ -129,12 +129,6 @@ internal sealed class QuestionPlayState
     /// </summary>
     public string QuestionKey { get; internal set; } = "";
 
-    /// <summary>
-    /// Index of player who has already received right answer points during appellation.
-    /// -1 means no player has received points yet.
-    /// </summary>
-    internal int AppellationRightAnswerPlayerIndex { get; set; } = -1;
-
     internal void Clear()
     {
         AnswererIndicies.Clear();
@@ -158,7 +152,6 @@ internal sealed class QuestionPlayState
         NumericAnswerDeviation = 0;
         FlexiblePrice = false;
         QuestionKey = "";
-        AppellationRightAnswerPlayerIndex = -1;
     }
 
     internal void RemovePlayer(int playerIndex)
@@ -185,18 +178,6 @@ internal sealed class QuestionPlayState
             {
                 AnswererIndicies.Add(answererIndices[i]);
             }
-        }
-
-        // Update AppellationRightAnswerPlayerIndex when a player is removed
-        if (AppellationRightAnswerPlayerIndex == playerIndex)
-        {
-            // The player who received right answer points is being removed
-            AppellationRightAnswerPlayerIndex = -1;
-        }
-        else if (AppellationRightAnswerPlayerIndex > playerIndex)
-        {
-            // The player who received points has a higher index, decrement it
-            AppellationRightAnswerPlayerIndex--;
         }
     }
 

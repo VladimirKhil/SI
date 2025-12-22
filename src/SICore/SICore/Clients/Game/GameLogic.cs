@@ -4116,22 +4116,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var wrong = new List<object>();
         var passed = new List<object>();
 
-        // Determine if this is the first player to receive right answer points
-        var isFirstRightAnswerer = _state.QuestionPlay.AppellationRightAnswerPlayerIndex == -1;
-
-        // For singleAnswerer mode with votingForRight, find the first wrong answerer in history
-        int firstWrongAnswererIndex = -1;
-        if (isVotingForRightAnswer && singleAnswerer)
-        {
-            for (var i = 0; i < _state.QuestionHistory.Count; i++)
-            {
-                if (!_state.QuestionHistory[i].IsRight)
-                {
-                    firstWrongAnswererIndex = _state.QuestionHistory[i].PlayerIndex;
-                    break;
-                }
-            }
-        }
+        // Track if we had a player with positive outcome whose result is being erased
+        var hadPositiveOutcome = false;
 
         for (var i = 0; i < _state.QuestionHistory.Count; i++)
         {
@@ -4155,6 +4141,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 if (historyItem.IsRight)
                 {
                     UndoRightSum(player, historyItem.Sum);
+                    hadPositiveOutcome = true;
                 }
                 else
                 {
@@ -4178,30 +4165,23 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     }
                     else
                     {
-                        // Check if this player should receive full points or just restore score
-                        var shouldReceiveFullPoints = isFirstRightAnswerer && index == firstWrongAnswererIndex;
-
                         UndoWrongSum(player, historyItem.Sum);
+                        AddRightSum(player, _state.CurPriceRight);
 
-                        if (shouldReceiveFullPoints)
+                        right.Add(index);
+
+                        // TODO: that should be handled by question selection strategy
+                        if (Engine.CanMoveBack) // Not the beginning of a round
                         {
-                            // First wrong answerer receives full right answer points
-                            AddRightSum(player, _state.CurPriceRight);
-                            _state.QuestionPlay.AppellationRightAnswerPlayerIndex = index;
-                            right.Add(index);
-
-                            // TODO: that should be handled by question selection strategy
-                            if (Engine.CanMoveBack) // Not the beginning of a round
-                            {
-                                _state.ChooserIndex = index;
-                                _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
-                            }
+                            _state.ChooserIndex = index;
+                            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
                         }
-                        else
+
+                        // Remove all subsequent entries from QuestionHistory
+                        // This ensures that if subsequent players appellate, they won't get full points
+                        if (isVotingForRightAnswer)
                         {
-                            // Subsequent appellants only restore their score (undo penalty)
-                            // No points added, just the penalty removed by UndoWrongSum above
-                            passed.Add(index);
+                            RemoveSubsequentHistoryEntriesAndAppellations(i, hadPositiveOutcome);
                         }
                     }
                 }
@@ -4244,6 +4224,62 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passed);
             _gameActions.SendMessage(passMsg.ToString());
         }
+    }
+
+    /// <summary>
+    /// Removes all question history entries after the specified index and updates pending appellations.
+    /// </summary>
+    /// <param name="appelaerHistoryIndex">Index of the appelaer in question history.</param>
+    /// <param name="hadPositiveOutcome">Whether any subsequent player had a positive outcome that's being erased.</param>
+    private void RemoveSubsequentHistoryEntriesAndAppellations(int appelaerHistoryIndex, bool hadPositiveOutcome)
+    {
+        // Collect player indices that will be removed from history
+        var removedPlayerIndices = new HashSet<int>();
+        for (var i = appelaerHistoryIndex + 1; i < _state.QuestionHistory.Count; i++)
+        {
+            removedPlayerIndices.Add(_state.QuestionHistory[i].PlayerIndex);
+        }
+
+        // Remove all entries after the appelaer from QuestionHistory
+        _state.QuestionHistory.RemoveRange(appelaerHistoryIndex + 1, _state.QuestionHistory.Count - appelaerHistoryIndex - 1);
+
+        // Remove pending appellations for removed players
+        // If appellation is for right answer (positive), remove it
+        // If there was a positive outcome being erased and appellation is negative, also remove it
+        _state.QuestionPlay.Appellations.RemoveAll(appellation =>
+        {
+            var (appellationSource, isAppellationForRightAnswer) = appellation;
+            
+            // Find if this appellation is from a removed player
+            var isFromRemovedPlayer = false;
+            for (var i = 0; i < _state.Players.Count; i++)
+            {
+                if (_state.Players[i].Name == appellationSource && removedPlayerIndices.Contains(i))
+                {
+                    isFromRemovedPlayer = true;
+                    break;
+                }
+            }
+
+            if (!isFromRemovedPlayer)
+            {
+                return false;
+            }
+
+            // Remove positive appellations for removed players
+            if (isAppellationForRightAnswer)
+            {
+                return true;
+            }
+
+            // If there was a positive outcome being erased, also remove negative appellations
+            if (hadPositiveOutcome)
+            {
+                return true;
+            }
+
+            return false;
+        });
     }
 
     private void WaitFor(DecisionType decision, int time, int person, bool isWaiting = true)
