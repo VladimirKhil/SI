@@ -4116,7 +4116,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var wrong = new List<object>();
         var passed = new List<object>();
 
-        // Track if we had a player with positive outcome whose result is being erased
+        // Track for positive appellation cleanup
         var hadPositiveOutcome = false;
         var appelaerHistoryIndex = -1;
 
@@ -4161,6 +4161,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                     if (historyItem.IsRight)
                     {
+                        // Negative appellation: changing right to wrong
                         UndoRightSum(player, historyItem.Sum);
                         SubtractWrongSum(player, _state.CurPriceWrong);
 
@@ -4168,6 +4169,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     }
                     else
                     {
+                        // Positive appellation: changing wrong to right
                         UndoWrongSum(player, historyItem.Sum);
                         AddRightSum(player, _state.CurPriceRight);
 
@@ -4203,10 +4205,48 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        // After processing all players, remove subsequent history entries and appellations
+        // After processing all players, cleanup for positive appellations
         if (isVotingForRightAnswer && singleAnswerer && appelaerHistoryIndex >= 0)
         {
-            RemoveSubsequentHistoryAndAppellations(appelaerHistoryIndex, hadPositiveOutcome);
+            // Collect player indices that will be removed from history
+            var removedPlayerIndices = new HashSet<int>();
+            for (var i = appelaerHistoryIndex + 1; i < _state.QuestionHistory.Count; i++)
+            {
+                removedPlayerIndices.Add(_state.QuestionHistory[i].PlayerIndex);
+            }
+
+            // Remove all entries after the appelaer from QuestionHistory
+            if (_state.QuestionHistory.Count > appelaerHistoryIndex + 1)
+            {
+                _state.QuestionHistory.RemoveRange(appelaerHistoryIndex + 1, _state.QuestionHistory.Count - appelaerHistoryIndex - 1);
+            }
+
+            // Remove pending appellations for removed players
+            _state.QuestionPlay.Appellations.RemoveAll(appellation =>
+            {
+                var (appellationSource, isAppellationForRightAnswer) = appellation;
+                
+                // Find if this appellation is from a removed player
+                for (var i = 0; i < _state.Players.Count; i++)
+                {
+                    if (_state.Players[i].Name == appellationSource && removedPlayerIndices.Contains(i))
+                    {
+                        // Remove positive appellations for removed players
+                        if (isAppellationForRightAnswer)
+                        {
+                            return true;
+                        }
+
+                        // If there was a positive outcome being erased, also remove negative appellations
+                        if (hadPositiveOutcome)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            });
         }
 
         if (right.Any())
@@ -4226,54 +4266,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passed);
             _gameActions.SendMessage(passMsg.ToString());
         }
-    }
-
-    /// <summary>
-    /// Removes question history entries after the appelaer and their pending appellations.
-    /// </summary>
-    /// <param name="appelaerHistoryIndex">Index of the appelaer in question history.</param>
-    /// <param name="hadPositiveOutcome">Whether any subsequent player had a positive outcome that's being erased.</param>
-    private void RemoveSubsequentHistoryAndAppellations(int appelaerHistoryIndex, bool hadPositiveOutcome)
-    {
-        // Collect player indices that will be removed from history
-        var removedPlayerIndices = new HashSet<int>();
-        for (var i = appelaerHistoryIndex + 1; i < _state.QuestionHistory.Count; i++)
-        {
-            removedPlayerIndices.Add(_state.QuestionHistory[i].PlayerIndex);
-        }
-
-        // Remove all entries after the appelaer from QuestionHistory
-        if (_state.QuestionHistory.Count > appelaerHistoryIndex + 1)
-        {
-            _state.QuestionHistory.RemoveRange(appelaerHistoryIndex + 1, _state.QuestionHistory.Count - appelaerHistoryIndex - 1);
-        }
-
-        // Remove pending appellations for removed players
-        _state.QuestionPlay.Appellations.RemoveAll(appellation =>
-        {
-            var (appellationSource, isAppellationForRightAnswer) = appellation;
-            
-            // Find if this appellation is from a removed player
-            for (var i = 0; i < _state.Players.Count; i++)
-            {
-                if (_state.Players[i].Name == appellationSource && removedPlayerIndices.Contains(i))
-                {
-                    // Remove positive appellations for removed players
-                    if (isAppellationForRightAnswer)
-                    {
-                        return true;
-                    }
-
-                    // If there was a positive outcome being erased, also remove negative appellations
-                    if (hadPositiveOutcome)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        });
     }
 
     private void WaitFor(DecisionType decision, int time, int person, bool isWaiting = true)
