@@ -4109,101 +4109,78 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void UpdatePlayersSumsAfterAppellation(bool isVotingForRightAnswer)
     {
-        var change = false;
         var singleAnswerer = !HaveMultipleAnswerers();
 
         var right = new List<object>();
         var wrong = new List<object>();
         var passed = new List<object>();
 
-        // Track if we had a player with positive outcome whose result is being erased
-        var hadPositiveOutcome = false;
-
+        // Find the appelaer in question history
+        int appelaerHistoryIndex = -1;
         for (var i = 0; i < _state.QuestionHistory.Count; i++)
         {
-            var historyItem = _state.QuestionHistory[i];
-            var index = historyItem.PlayerIndex;
-
-            if (index < 0 || index >= _state.Players.Count)
+            if (_state.QuestionHistory[i].PlayerIndex == _state.AppelaerIndex)
             {
-                continue;
+                appelaerHistoryIndex = i;
+                break;
             }
+        }
 
-            var player = _state.Players[index];
+        if (appelaerHistoryIndex == -1)
+        {
+            return; // Appelaer not found in history
+        }
 
-            if (isVotingForRightAnswer && singleAnswerer && index != _state.AppelaerIndex)
+        var appelaerHistoryItem = _state.QuestionHistory[appelaerHistoryIndex];
+        var appelaer = _state.Players[_state.AppelaerIndex];
+
+        // Process the appelaer
+        if (singleAnswerer)
+        {
+            if (appelaerHistoryItem.IsRight)
             {
-                if (!change)
-                {
-                    continue;
-                }
-
-                if (historyItem.IsRight)
-                {
-                    UndoRightSum(player, historyItem.Sum);
-                    hadPositiveOutcome = true;
-                }
-                else
-                {
-                    UndoWrongSum(player, historyItem.Sum);
-                }
-
-                passed.Add(index);
+                // Appellation for wrong answer - changing right to wrong
+                UndoRightSum(appelaer, appelaerHistoryItem.Sum);
+                SubtractWrongSum(appelaer, _state.CurPriceWrong);
+                wrong.Add(_state.AppelaerIndex);
             }
-            else if (index == _state.AppelaerIndex)
+            else
             {
-                if (singleAnswerer)
+                // Appellation for right answer - changing wrong to right
+                UndoWrongSum(appelaer, appelaerHistoryItem.Sum);
+                AddRightSum(appelaer, _state.CurPriceRight);
+                right.Add(_state.AppelaerIndex);
+
+                // TODO: that should be handled by question selection strategy
+                if (Engine.CanMoveBack) // Not the beginning of a round
                 {
-                    change = true;
-
-                    if (historyItem.IsRight)
-                    {
-                        UndoRightSum(player, historyItem.Sum);
-                        SubtractWrongSum(player, _state.CurPriceWrong);
-
-                        wrong.Add(index);
-                    }
-                    else
-                    {
-                        UndoWrongSum(player, historyItem.Sum);
-                        AddRightSum(player, _state.CurPriceRight);
-
-                        right.Add(index);
-
-                        // TODO: that should be handled by question selection strategy
-                        if (Engine.CanMoveBack) // Not the beginning of a round
-                        {
-                            _state.ChooserIndex = index;
-                            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
-                        }
-
-                        // Remove all subsequent entries from QuestionHistory
-                        // This ensures that if subsequent players appellate, they won't get full points
-                        if (isVotingForRightAnswer)
-                        {
-                            RemoveSubsequentHistoryEntriesAndAppellations(i, hadPositiveOutcome);
-                        }
-                    }
+                    _state.ChooserIndex = _state.AppelaerIndex;
+                    _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
                 }
-                else
+
+                // Revert outcomes for all players after the appelaer and remove them
+                if (isVotingForRightAnswer)
                 {
-                    var stake = player.PersonalStake;
-
-                    if (historyItem.IsRight)
-                    {
-                        UndoRightSum(player, historyItem.Sum);
-                        SubtractWrongSum(player, stake);
-
-                        wrong.Add(index);
-                    }
-                    else
-                    {
-                        UndoWrongSum(player, historyItem.Sum);
-                        AddRightSum(player, stake);
-
-                        right.Add(index);
-                    }
+                    RevertAndRemoveSubsequentHistory(appelaerHistoryIndex, passed);
                 }
+            }
+        }
+        else
+        {
+            // Multiple answerers (hidden stakes scenario)
+            var stake = appelaer.PersonalStake;
+
+            if (appelaerHistoryItem.IsRight)
+            {
+                UndoRightSum(appelaer, appelaerHistoryItem.Sum);
+                SubtractWrongSum(appelaer, stake);
+                wrong.Add(_state.AppelaerIndex);
+            }
+            else
+            {
+                UndoWrongSum(appelaer, appelaerHistoryItem.Sum);
+                AddRightSum(appelaer, stake);
+                right.Add(_state.AppelaerIndex);
             }
         }
 
@@ -4227,55 +4204,73 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     }
 
     /// <summary>
-    /// Removes all question history entries after the specified index and updates pending appellations.
+    /// Reverts outcomes for all players after the appelaer, removes them from question history,
+    /// and removes their pending appellations.
     /// </summary>
     /// <param name="appelaerHistoryIndex">Index of the appelaer in question history.</param>
-    /// <param name="hadPositiveOutcome">Whether any subsequent player had a positive outcome that's being erased.</param>
-    private void RemoveSubsequentHistoryEntriesAndAppellations(int appelaerHistoryIndex, bool hadPositiveOutcome)
+    /// <param name="passed">List to add passed player indices to.</param>
+    private void RevertAndRemoveSubsequentHistory(int appelaerHistoryIndex, List<object> passed)
     {
-        // Collect player indices that will be removed from history
+        // Track if we had a player with positive outcome whose result is being erased
+        var hadPositiveOutcome = false;
         var removedPlayerIndices = new HashSet<int>();
+
+        // Revert outcomes for all players after the appelaer
         for (var i = appelaerHistoryIndex + 1; i < _state.QuestionHistory.Count; i++)
         {
-            removedPlayerIndices.Add(_state.QuestionHistory[i].PlayerIndex);
+            var historyItem = _state.QuestionHistory[i];
+            var playerIndex = historyItem.PlayerIndex;
+            
+            if (playerIndex < 0 || playerIndex >= _state.Players.Count)
+            {
+                continue;
+            }
+
+            var player = _state.Players[playerIndex];
+            removedPlayerIndices.Add(playerIndex);
+
+            // Revert the outcome
+            if (historyItem.IsRight)
+            {
+                UndoRightSum(player, historyItem.Sum);
+                hadPositiveOutcome = true;
+            }
+            else
+            {
+                UndoWrongSum(player, historyItem.Sum);
+            }
+
+            passed.Add(playerIndex);
         }
 
         // Remove all entries after the appelaer from QuestionHistory
-        _state.QuestionHistory.RemoveRange(appelaerHistoryIndex + 1, _state.QuestionHistory.Count - appelaerHistoryIndex - 1);
+        if (_state.QuestionHistory.Count > appelaerHistoryIndex + 1)
+        {
+            _state.QuestionHistory.RemoveRange(appelaerHistoryIndex + 1, _state.QuestionHistory.Count - appelaerHistoryIndex - 1);
+        }
 
         // Remove pending appellations for removed players
-        // If appellation is for right answer (positive), remove it
-        // If there was a positive outcome being erased and appellation is negative, also remove it
         _state.QuestionPlay.Appellations.RemoveAll(appellation =>
         {
             var (appellationSource, isAppellationForRightAnswer) = appellation;
             
             // Find if this appellation is from a removed player
-            var isFromRemovedPlayer = false;
             for (var i = 0; i < _state.Players.Count; i++)
             {
                 if (_state.Players[i].Name == appellationSource && removedPlayerIndices.Contains(i))
                 {
-                    isFromRemovedPlayer = true;
-                    break;
+                    // Remove positive appellations for removed players
+                    if (isAppellationForRightAnswer)
+                    {
+                        return true;
+                    }
+
+                    // If there was a positive outcome being erased, also remove negative appellations
+                    if (hadPositiveOutcome)
+                    {
+                        return true;
+                    }
                 }
-            }
-
-            if (!isFromRemovedPlayer)
-            {
-                return false;
-            }
-
-            // Remove positive appellations for removed players
-            if (isAppellationForRightAnswer)
-            {
-                return true;
-            }
-
-            // If there was a positive outcome being erased, also remove negative appellations
-            if (hadPositiveOutcome)
-            {
-                return true;
             }
 
             return false;
