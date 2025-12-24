@@ -4117,7 +4117,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var passed = new List<object>();
 
         // Track for positive appellation cleanup
-        var hadPositiveOutcome = false;
         var appelaerHistoryIndex = -1;
 
         for (var i = 0; i < _state.QuestionHistory.Count; i++)
@@ -4142,7 +4141,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 if (historyItem.IsRight)
                 {
                     UndoRightSum(player, historyItem.Sum);
-                    hadPositiveOutcome = true;
+                    
+                    // Clear all negative appellations when positive outcome is being reverted
+                    _state.QuestionPlay.Appellations.RemoveAll(appellation => !appellation.Item2);
                 }
                 else
                 {
@@ -4153,8 +4154,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
             else if (index == _state.AppelaerIndex)
             {
-                appelaerHistoryIndex = i;
-
                 if (singleAnswerer)
                 {
                     change = true;
@@ -4170,6 +4169,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     else
                     {
                         // Positive appellation: changing wrong to right
+                        appelaerHistoryIndex = i;
+                        
                         UndoWrongSum(player, historyItem.Sum);
                         AddRightSum(player, _state.CurPriceRight);
 
@@ -4206,7 +4207,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         // After processing all players, cleanup for positive appellations
-        if (isVotingForRightAnswer && singleAnswerer && appelaerHistoryIndex >= 0)
+        if (appelaerHistoryIndex >= 0)
         {
             // Collect player indices that will be removed from history
             var removedPlayerIndices = new HashSet<int>();
@@ -4221,27 +4222,23 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 _state.QuestionHistory.RemoveRange(appelaerHistoryIndex + 1, _state.QuestionHistory.Count - appelaerHistoryIndex - 1);
             }
 
-            // Remove pending appellations for removed players
+            // Remove pending positive appellations for removed players
             _state.QuestionPlay.Appellations.RemoveAll(appellation =>
             {
                 var (appellationSource, isAppellationForRightAnswer) = appellation;
                 
-                // Find if this appellation is from a removed player
+                if (!isAppellationForRightAnswer)
+                {
+                    // Negative appellations were already cleared if positive outcome was reverted
+                    return false;
+                }
+                
+                // Remove positive appellations for removed players
                 for (var i = 0; i < _state.Players.Count; i++)
                 {
                     if (_state.Players[i].Name == appellationSource && removedPlayerIndices.Contains(i))
                     {
-                        // Remove positive appellations for removed players
-                        if (isAppellationForRightAnswer)
-                        {
-                            return true;
-                        }
-
-                        // If there was a positive outcome being erased, also remove negative appellations
-                        if (hadPositiveOutcome)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
 
