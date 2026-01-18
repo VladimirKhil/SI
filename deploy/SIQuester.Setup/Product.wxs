@@ -200,6 +200,9 @@
 			<Component Guid="{8a08cd92-92d3-462e-82fe-1e29b87ba4f2}">
 				<File Id="d660f85b3fc88581c86b.jpg" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\d660f85b3fc88581c86b.jpg" />
 			</Component>
+			<Component Guid="{f9a7bc44-f308-414d-91f9-007d3bf7006e}">
+				<File Id="b70332fadc4dc242785f.ttf" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\b70332fadc4dc242785f.ttf" />
+			</Component>
 			<Component Guid="{564f0b39-4189-4e20-a61d-47334c10cd82}">
 				<File Id="index.html" KeyPath="yes" Source="$(var.PublishFolder)wwwroot\index.html" />
 			</Component>

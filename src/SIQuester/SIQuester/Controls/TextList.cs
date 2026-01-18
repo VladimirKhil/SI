@@ -183,6 +183,12 @@ public sealed class TextList : TextBox
 
     private void OnItemsReplaced(NotifyCollectionChangedEventArgs e)
     {
+        // When OldItems or NewItems is null, we cannot process the replacement
+        if (e.OldItems == null || e.NewItems == null || ItemsSource == null)
+        {
+            return;
+        }
+
         _blockSelection++;
 
         try
@@ -440,7 +446,7 @@ public sealed class TextList : TextBox
     {
         base.OnTextChanged(e);
 
-        if (_blockChanges)
+        if (_blockChanges || _infos.Count == 0)
         {
             return;
         }

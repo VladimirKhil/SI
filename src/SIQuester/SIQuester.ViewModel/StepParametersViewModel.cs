@@ -238,7 +238,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
     {
         if (this.Any(p => p.Key == key))
         {
-            throw new InvalidOperationException($"Key {key} alredy exist");
+            throw new InvalidOperationException($"Key {key} already exists");
         }
 
         InsertSorted(new StepParameterRecord(key, parameter));

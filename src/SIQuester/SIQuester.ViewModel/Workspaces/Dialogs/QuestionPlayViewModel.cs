@@ -28,6 +28,10 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     private bool _isFinished;
     private AnswerOptionViewModel[]? _options;
 
+    private bool _isAnswer = false;
+    private bool _isAnswerSimple = false;
+    private string _rightAnswer = "";
+
     public override string Header => Resources.QuestionPlay;
 
     public Uri Source { get; } = new($"file:///{AppDomain.CurrentDomain.BaseDirectory}wwwroot/index.html");
@@ -149,6 +153,13 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             // Reset UI state
             _singleAnswerer = true;
 
+            OnMessage(new
+            {
+                Type = "content",
+                Placement = "screen",
+                Content = Array.Empty<ContentInfo>()
+            });
+
             Play.Execute(null);
         }
         catch (Exception exc)
@@ -220,6 +231,15 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             }
         }
 
+        if (_isAnswerSimple)
+        {
+            OnMessage(new
+            {
+                Type = "rightAnswer",
+                Answer = content.First().Value
+            });
+        }
+
         if (screenContent.Count > 0)
         {
             OnMessage(new
@@ -268,13 +288,43 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public bool OnAccept() => false;
 
-    public void OnQuestionStart(bool buttonsRequired, ICollection<string> rightAnswers, Action skipQuestionCallback) { }
+    public void OnQuestionStart(bool buttonsRequired, ICollection<string> rightAnswers, Action skipQuestionCallback)
+    {
+        _isAnswerSimple = false;
+        _isAnswer = false;
+        _rightAnswer = rightAnswers.FirstOrDefault() ?? "";
 
-    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback) { }
+        OnMessage(new
+        {
+            Type = "setReadingSpeed",
+            ReadingSpeed = 0
+        });
+    }
 
-    public void OnSimpleRightAnswerStart() { }
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
+    {
+        if (_isAnswer && !_isAnswerSimple)
+        {
+            OnMessage(new
+            {
+                Type = "rightAnswerStart",
+                Answer = _rightAnswer
+            });
 
-    public void OnAnswerStart() => OnMessage(new { Type = "replic", PersonCode = "s", Text = "" });
+            _isAnswer = false;
+        }
+    }
+
+    public void OnSimpleRightAnswerStart() 
+    { 
+        _isAnswerSimple = true;
+    }
+
+    public void OnAnswerStart()
+    {
+        _isAnswer = true;
+        OnMessage(new { Type = "replic", PersonCode = "s", Text = "" });
+    }
 
     public bool OnAnnouncePrice(NumberSet availableRange) => false;
 

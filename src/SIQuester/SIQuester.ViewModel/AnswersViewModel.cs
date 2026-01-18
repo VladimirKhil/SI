@@ -254,7 +254,7 @@ public sealed class AnswersViewModel : ItemsViewModel<string>, IContentCollectio
             return;
         }
 
-        if (Owner.Parameters.Model.ContainsKey(QuestionParameterNames.Answer))
+        if (Owner.Parameters.TryGetValue(QuestionParameterNames.Answer, out _))
         {
             return;
         }
