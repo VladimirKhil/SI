@@ -18,6 +18,8 @@ using SIQuester.ViewModel.Serializers;
 using SIQuester.ViewModel.Services;
 using SIQuester.ViewModel.Workspaces.Dialogs;
 using SIQuester.ViewModel.Workspaces.Sidebar;
+using SIStatisticsService.Contract;
+using SIStatisticsService.Contract.Models;
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -645,7 +647,7 @@ public sealed class QDocument : WorkspaceViewModel
 
     public SearchResults? SearchResults { get; private set; } = null;
 
-    private AuthorsStorageViewModel _authors;
+    private AuthorsStorageViewModel? _authors;
 
     public AuthorsStorageViewModel Authors
     {
@@ -661,7 +663,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private SourcesStorageViewModel _sources;
+    private SourcesStorageViewModel? _sources;
 
     public SourcesStorageViewModel Sources
     {
@@ -692,7 +694,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private StatisticsViewModel _statistics;
+    private StatisticsViewModel? _statistics;
 
     public StatisticsViewModel Statistics
     {
@@ -1156,14 +1158,135 @@ public sealed class QDocument : WorkspaceViewModel
 
     private bool _isLinksClearingBlocked;
 
+
     private readonly IClipboardService _clipboardService;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly ISIStatisticsServiceClient _statisticsClient;
+
+    private bool _hasQuestionStatistics;
+
+    /// <summary>
+    /// Gets whether question statistics are loaded and available.
+    /// </summary>
+    public bool HasQuestionStatistics
+    {
+        get => _hasQuestionStatistics;
+        private set
+        {
+            if (_hasQuestionStatistics != value)
+            {
+                _hasQuestionStatistics = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _showQuestionStatistics;
+
+    /// <summary>
+    /// Gets or sets whether to show question statistics in the tree view.
+    /// </summary>
+    public bool ShowQuestionStatistics
+    {
+        get => _showQuestionStatistics;
+        set
+        {
+            if (_showQuestionStatistics != value)
+            {
+                _showQuestionStatistics = value;
+                OnPropertyChanged();
+
+                if (value)
+                {
+                    ExpandAll.Execute(true);
+
+                    if (!HasQuestionStatistics)
+                    {
+                        _ = LoadQuestionStatisticsAsync();
+                    }
+                }
+            }
+        }
+    }
+
+    private bool _isLoadingStatistics;
+
+    /// <summary>
+    /// Gets whether statistics are currently being loaded.
+    /// </summary>
+    public bool IsLoadingStatistics
+    {
+        get => _isLoadingStatistics;
+        private set
+        {
+            if (_isLoadingStatistics != value)
+            {
+                _isLoadingStatistics = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private int _gamesFinishedPercent;
+
+    /// <summary>
+    /// Gets the percentage of games finished (relative to games started).
+    /// </summary>
+    public int GamesFinishedPercent
+    {
+        get => _gamesFinishedPercent;
+        private set
+        {
+            if (_gamesFinishedPercent != value)
+            {
+                _gamesFinishedPercent = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private int _gamesStartedCount;
+
+    /// <summary>
+    /// Gets the number of games started for this package.
+    /// </summary>
+    public int GamesStartedCount
+    {
+        get => _gamesStartedCount;
+        private set
+        {
+            if (_gamesStartedCount != value)
+            {
+                _gamesStartedCount = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private int _gamesFinishedCount;
+
+    /// <summary>
+    /// Gets the number of games finished for this package.
+    /// </summary>
+    public int GamesFinishedCount
+    {
+        get => _gamesFinishedCount;
+        private set
+        {
+            if (_gamesFinishedCount != value)
+            {
+                _gamesFinishedCount = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     internal QDocument(
         SIDocument document,
         StorageContextViewModel storageContextViewModel,
         IClipboardService clipboardService,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        ISIStatisticsServiceClient statisticsClient)
     {
         Lock = new Lock(document.Package.Name);
 
@@ -1172,6 +1295,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         _clipboardService = clipboardService;
         _loggerFactory = loggerFactory;
+        _statisticsClient = statisticsClient;
         _logger = loggerFactory.CreateLogger<QDocument>();
 
         StorageContext = storageContextViewModel;
@@ -3580,6 +3704,97 @@ public sealed class QDocument : WorkspaceViewModel
                     }
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Loads question statistics from the statistics service.
+    /// </summary>
+    private async Task LoadQuestionStatisticsAsync()
+    {
+        if (IsLoadingStatistics)
+        {
+            return;
+        }
+
+        IsLoadingStatistics = true;
+
+        try
+        {
+            var packageStats = await _statisticsClient.GetPackageStats(new PackageStatsRequest(
+                Package.Model.Name,
+                "",
+                Package.Model.Info.Authors.ToArray()));
+
+            if (packageStats == null)
+            {
+                _logger.LogInformation("No statistics available for this package");
+                return;
+            }
+
+            // Load package-level statistics
+            GamesStartedCount = packageStats.TopLevelStats.StartedGameCount;
+            GamesFinishedCount = packageStats.TopLevelStats.CompletedGameCount;
+            GamesFinishedPercent = packageStats.TopLevelStats.StartedGameCount > 0
+                ? (int)Math.Round((double)packageStats.TopLevelStats.CompletedGameCount / packageStats.TopLevelStats.StartedGameCount * 100)
+                : 0;
+
+            if (packageStats.QuestionStats == null)
+            {
+                _logger.LogInformation("No question statistics available for this package");
+                HasQuestionStatistics = true; // Mark as loaded even if no question stats
+                return;
+            }
+
+            var loadedCount = 0;
+
+            for (var roundIndex = 0; roundIndex < Package.Rounds.Count; roundIndex++)
+            {
+                var round = Package.Rounds[roundIndex];
+
+                for (var themeIndex = 0; themeIndex < round.Themes.Count; themeIndex++)
+                {
+                    var theme = round.Themes[themeIndex];
+
+                    for (var questionIndex = 0; questionIndex < theme.Questions.Count; questionIndex++)
+                    {
+                        var question = theme.Questions[questionIndex];
+                        var key = $"{roundIndex}:{themeIndex}:{questionIndex}";
+                        
+                        if (packageStats.QuestionStats.TryGetValue(key, out var stats))
+                        {
+                            var totalTries = stats.CorrectCount + stats.WrongCount;
+
+                            question.TriesPercent = stats.ShownCount > 0 ? (int)Math.Round((double)stats.AnsweredCount / stats.ShownCount * 100) : 0;
+
+                            question.RightPercent = totalTries > 0
+                                ? (int)Math.Round((double)stats.CorrectCount / totalTries * 100)
+                                : 0;
+
+                            loadedCount++;
+                        }
+                    }
+                }
+            }
+
+            if (loadedCount > 0)
+            {
+                HasQuestionStatistics = true;
+                _logger.LogInformation("Loaded statistics for {count} questions", loadedCount);
+            }
+            else
+            {
+                _logger.LogInformation("No statistics available for this package");
+            }
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError(exc, "Failed to load question statistics: {message}", exc.Message);
+            OnError(exc);
+        }
+        finally
+        {
+            IsLoadingStatistics = false;
         }
     }
 }

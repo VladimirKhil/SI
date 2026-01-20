@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AppRegistryService.Client;
+using AppRegistryService.Contract;
+using AppRegistryService.Contract.Models;
+using AppRegistryService.Contract.Requests;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,9 +17,11 @@ using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
+using SIStatisticsService.Client;
 using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -24,10 +30,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xaml;
-using AppRegistryService.Client;
-using AppRegistryService.Contract;
-using AppRegistryService.Contract.Requests;
-using AppRegistryService.Contract.Models;
 
 #if UPDATE
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -171,6 +173,7 @@ public partial class App : Application
     private void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
     {
         services.AddAppRegistryServiceClient(ctx.Configuration);
+        services.AddSIStatisticsServiceClient(ctx.Configuration);
         services.AddSIStorageServiceClient(ctx.Configuration);
         services.AddChgkServiceClient(ctx.Configuration);
 

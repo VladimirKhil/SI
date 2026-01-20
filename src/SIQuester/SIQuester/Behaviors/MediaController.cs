@@ -1,4 +1,5 @@
-﻿using SIQuester.ViewModel.Contracts;
+﻿using SIQuester.Properties;
+using SIQuester.ViewModel.Contracts;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -10,6 +11,10 @@ namespace SIQuester.Behaviors;
 /// </summary>
 public static class MediaController
 {
+    private static readonly Lock _mediaPlaybackLock = new();
+
+    private static MediaElement? _currentMediaElement;
+
     public static IMediaOwner? GetSource(DependencyObject obj) => (IMediaOwner?)obj.GetValue(SourceProperty);
 
     public static void SetSource(DependencyObject obj, IMediaOwner value) => obj.SetValue(SourceProperty, value);
@@ -153,6 +158,13 @@ public static class MediaController
                 mediaUri = mediaElement.Source;
             }
 
+            if (playPauseButton.IsChecked != true)
+            {
+                return;
+            }
+
+            StopPreviousMedia(mediaElement, playPauseButton);
+
             try
             {
                 mediaElement.Play();
@@ -160,11 +172,8 @@ public static class MediaController
             }
             catch (Exception exc)
             {
-                MessageBox.Show(
-                    "Ошибка проигрывания мультимедиа: " + exc.Message,
-                    App.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Exclamation);
+                ReleaseCurrentMedia(mediaElement);
+                ShowMediaPlaybackError(exc);
             }
         };
 
@@ -174,14 +183,11 @@ public static class MediaController
             {
                 mediaElement.Pause();
                 SetIsPlaying(mediaElement, false);
+                ReleaseCurrentMedia(mediaElement);
             }
             catch (Exception exc)
             {
-                MessageBox.Show(
-                    "Ошибка проигрывания мультимедиа: " + exc.Message,
-                    App.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Exclamation);
+                ShowMediaPlaybackError(exc);
             }
         };
 
@@ -200,15 +206,12 @@ public static class MediaController
                     mediaElement.Stop();
                 }
 
+                ReleaseCurrentMedia(mediaElement);
                 mediaElement.SetValue(IsPlayingProperty, DependencyProperty.UnsetValue);
             }
             catch (Exception exc)
             {
-                MessageBox.Show(
-                    "Ошибка проигрывания мультимедиа: " + exc.Message,
-                    App.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Exclamation);
+                ShowMediaPlaybackError(exc);
             }
         };
     }
@@ -219,4 +222,62 @@ public static class MediaController
 
     public static readonly DependencyProperty IsPlayingProperty =
         DependencyProperty.RegisterAttached("IsPlaying", typeof(bool), typeof(MediaController), new PropertyMetadata(false));
+
+    private static void StopPreviousMedia(MediaElement mediaElement, ToggleButton playPauseButton)
+    {
+        MediaElement? mediaToStop;
+        lock (_mediaPlaybackLock)
+        {
+            if (ReferenceEquals(_currentMediaElement, mediaElement))
+            {
+                return;
+            }
+
+            mediaToStop = _currentMediaElement;
+            _currentMediaElement = mediaElement;
+        }
+
+        if (mediaToStop == null)
+        {
+            return;
+        }
+
+        var previousPlayPauseButton = GetPlayPauseButton(mediaToStop);
+
+        if (previousPlayPauseButton != null && !ReferenceEquals(previousPlayPauseButton, playPauseButton))
+        {
+            previousPlayPauseButton.IsChecked = false;
+            return;
+        }
+
+        try
+        {
+            mediaToStop.Stop();
+            SetIsPlaying(mediaToStop, false);
+        }
+        catch (Exception exc)
+        {
+            ShowMediaPlaybackError(exc);
+        }
+    }
+
+    private static void ReleaseCurrentMedia(MediaElement mediaElement)
+    {
+        lock (_mediaPlaybackLock)
+        {
+            if (ReferenceEquals(_currentMediaElement, mediaElement))
+            {
+                _currentMediaElement = null;
+            }
+        }
+    }
+
+    private static void ShowMediaPlaybackError(Exception exc)
+    {
+        MessageBox.Show(
+            string.Format(Resources.MediaPlaybackError, exc.Message),
+            App.ProductName,
+            MessageBoxButton.OK,
+            MessageBoxImage.Exclamation);
+    }
 }

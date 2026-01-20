@@ -1,8 +1,9 @@
-﻿<Project Sdk="WixToolset.Sdk/5.0.2">
+<Project Sdk="WixToolset.Sdk/5.0.2" ToolsVersion="4.0">
   <PropertyGroup>
     <OutputName>SIQuester.$(Platform)</OutputName>
     <DefineConstants>ProductVersion=$(MsiProductVersion)</DefineConstants>
     <SuppressIces>ICE38;ICE57;ICE60;ICE91</SuppressIces>
+    <ProjectGuid>{191be083-3920-4c18-8130-4d6b2bf0ab59}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>Debug</DefineConstants>

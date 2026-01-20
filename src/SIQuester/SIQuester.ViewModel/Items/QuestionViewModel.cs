@@ -52,7 +52,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public override ICommand Add { get; protected set; }
 
-    public override ICommand Remove { get; protected set; }
+    public override ICommand? Remove { get; protected set; }
 
     public ICommand Clone { get; private set; }
 
@@ -105,6 +105,44 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         {
             return Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
                 && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Number;
+        }
+    }
+
+    private int? _triesPercent;
+
+    /// <summary>
+    /// Gets the percentage of times the question was answered (answered / shown * 100).
+    /// Returns null if statistics are not available.
+    /// </summary>
+    public int? TriesPercent
+    {
+        get => _triesPercent;
+        set
+        {
+            if (_triesPercent != value)
+            {
+                _triesPercent = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    private int? _rightPercent;
+
+    /// <summary>
+    /// Gets the percentage of correct answers (correct / (correct + wrong) * 100).
+    /// Returns null if statistics are not available.
+    /// </summary>
+    public int? RightPercent
+    {
+        get => _rightPercent;
+        set
+        {
+            if (_rightPercent != value)
+            {
+                _rightPercent = value;
+                OnPropertyChanged();
+            }
         }
     }
 

@@ -1101,6 +1101,12 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ShowToolTipsInFlatView" xml:space="preserve">
     <value>Show tooltips in tile view</value>
   </data>
+  <data name="GamesStartedTooltip" xml:space="preserve">
+    <value>Number of games started with this package</value>
+  </data>
+  <data name="GamesFinishedTooltip" xml:space="preserve">
+    <value>Percentage of games completed</value>
+  </data>
   <data name="ShuffleQuestions" xml:space="preserve">
     <value>Shuffle questions and costs</value>
   </data>
@@ -1290,6 +1296,9 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="WrongMultimediaAddress" xml:space="preserve">
     <value>Incorrect multimedia address. The program terminated abnormally with an error</value>
   </data>
+  <data name="MediaPlaybackError" xml:space="preserve">
+    <value>Media playback error: {0}</value>
+  </data>
   <data name="Year" xml:space="preserve">
     <value>Year</value>
   </data>
@@ -1358,5 +1367,14 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="QualityControlWarning" xml:space="preserve">
     <value>Without quality control your package could not be played in SIGame in the future</value>
+  </data>
+  <data name="ShowQuestionStatistics" xml:space="preserve">
+    <value>Show question statistics</value>
+  </data>
+  <data name="TriesPercentTooltip" xml:space="preserve">
+    <value>Percentage of times players tried to answer</value>
+  </data>
+  <data name="RightPercentTooltip" xml:space="preserve">
+    <value>Percentage of correct answers</value>
   </data>
 </root>

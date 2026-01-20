@@ -15,12 +15,6 @@
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Lingware.Spard, Version=1.4.0.0, Culture=neutral, PublicKeyToken=4be120a55c5e67bd, processorArchitecture=MSIL">
       <HintPath>..\QTxtConverter\dlls\Lingware.Spard.dll</HintPath>
@@ -28,9 +22,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="OpenAI" Version="2.3.0" />
+    <PackageReference Include="OpenAI" Version="2.8.0" />
     <PackageReference Include="Steamworks.NET" Version="2024.8.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
+    <PackageReference Include="VKhil.SIStatisticsService.Client" Version="1.5.0" />
 	<PackageReference Include="YamlDotNet" Version="13.1.1" />
   </ItemGroup>
   <ItemGroup>
@@ -38,9 +33,6 @@
     <ProjectReference Include="..\..\Common\SIStorageService.ViewModel\SIStorageService.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\Utils\Utils.csproj" />
     <ProjectReference Include="..\QTxtConverter\QTxtConverter.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="key.snk" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

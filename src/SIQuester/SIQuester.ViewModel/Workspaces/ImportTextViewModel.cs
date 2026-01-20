@@ -304,8 +304,6 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private int _badLength = 0;
 
-    private bool _fileChanged = false;
-
     private Dictionary<string, EditAlias> Aliases { get; } = new();
 
     private string _info = "";
@@ -642,7 +640,6 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                 {
                     Text = $"{_text[.._position]}{_badText}{_text[(_position + _badLength)..]}";
                     _parts[_readError.Index.Item1][_readError.Index.Item2].Value = _badText;
-                    _fileChanged = true;
                 }
 
                 AddTemplate(_packageTemplate);
@@ -685,7 +682,6 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                 if (changedText != _badText)
                 {
                     Text = string.Concat(_text.AsSpan(0, _parseError.SourcePosition), _badText);
-                    _fileChanged = true;
                 }
 
                 Free = false;

@@ -2,9 +2,9 @@
 	<PropertyGroup>
 		<Authors>Vladimir Khil</Authors>
 		<Company>Khil-soft</Company>
-		<Copyright>Copyright © Khil-soft 2002 - 2025</Copyright>
+		<Copyright>Copyright © Khil-soft 2002 - 2026</Copyright>
 		<SIGameVersion>7.13.7</SIGameVersion>
-		<SIQuesterVersion>6.6.0</SIQuesterVersion>
+		<SIQuesterVersion>6.7.0</SIQuesterVersion>
 		<SImulatorVersion>3.3.3</SImulatorVersion>
 	</PropertyGroup>
 	

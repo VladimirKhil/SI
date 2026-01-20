@@ -47,7 +47,10 @@ public static class SmartTipBehavior
 
     private static void SetToolTip(object? sender, EventArgs e)
     {
-        var textBlock = sender as TextBlock;
+        if (sender is not TextBlock textBlock)
+        {
+            return;
+        }
 
         var ft = new FormattedText(
             textBlock.Text,
@@ -60,9 +63,13 @@ public static class SmartTipBehavior
         {
             TextAlignment = textBlock.TextAlignment,
             Trimming = TextTrimming.None,
-            LineHeight = textBlock.LineHeight
         };
-        
+
+        if (textBlock.LineHeight > 0)
+        {
+            ft.LineHeight = textBlock.LineHeight;
+        }
+
         var showTooltip = ft.WidthIncludingTrailingWhitespace > (textBlock.ActualWidth - textBlock.Padding.Left - textBlock.Padding.Right);
         textBlock.ToolTip = showTooltip ? textBlock.Text : null;
     }

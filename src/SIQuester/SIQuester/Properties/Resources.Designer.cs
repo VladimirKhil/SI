@@ -19,7 +19,7 @@ namespace SIQuester.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -1511,6 +1511,24 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Percentage of games completed.
+        /// </summary>
+        public static string GamesFinishedTooltip {
+            get {
+                return ResourceManager.GetString("GamesFinishedTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Number of games started with this package.
+        /// </summary>
+        public static string GamesStartedTooltip {
+            get {
+                return ResourceManager.GetString("GamesStartedTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Generate questions with GPT.
         /// </summary>
         public static string GenerateQuestions {
@@ -1807,6 +1825,15 @@ namespace SIQuester.Properties {
         public static string MakeRight {
             get {
                 return ResourceManager.GetString("MakeRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Media playback error: {0}.
+        /// </summary>
+        public static string MediaPlaybackError {
+            get {
+                return ResourceManager.GetString("MediaPlaybackError", resourceCulture);
             }
         }
         
@@ -2650,6 +2677,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Percentage of correct answers.
+        /// </summary>
+        public static string RightPercentTooltip {
+            get {
+                return ResourceManager.GetString("RightPercentTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         public static string Round {
@@ -3091,6 +3127,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Show question statistics.
+        /// </summary>
+        public static string ShowQuestionStatistics {
+            get {
+                return ResourceManager.GetString("ShowQuestionStatistics", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Show tooltips in tile view.
         /// </summary>
         public static string ShowToolTipsInFlatView {
@@ -3474,6 +3519,15 @@ namespace SIQuester.Properties {
         public static string Tour {
             get {
                 return ResourceManager.GetString("Tour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Percentage of times players tried to answer.
+        /// </summary>
+        public static string TriesPercentTooltip {
+            get {
+                return ResourceManager.GetString("TriesPercentTooltip", resourceCulture);
             }
         }
         

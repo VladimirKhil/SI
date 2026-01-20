@@ -16,7 +16,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
 {
     public PackageViewModel? OwnerPackage { get; set; }
 
-    public override IItemViewModel Owner => OwnerPackage;
+    public override IItemViewModel? Owner => OwnerPackage;
 
     public ObservableCollection<ThemeViewModel> Themes { get; } = new();
 
@@ -24,7 +24,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
 
     public override string AddHeader => Resources.AddTheme;
 
-    public override ICommand Remove { get; protected set; }
+    public override ICommand? Remove { get; protected set; }
 
     public ICommand Clone { get; private set; }
 

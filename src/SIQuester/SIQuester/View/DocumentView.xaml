@@ -314,6 +314,25 @@
                 </Button>
                 
                 <Separator Style="{StaticResource TreeOnly}" />
+
+                <ToggleButton
+                    ToolTip="{x:Static lp:Resources.ShowQuestionStatistics}"
+                    IsChecked="{Binding ShowQuestionStatistics}">
+                    <ToggleButton.Style>
+                        <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}">
+                            <Setter Property="Width" Value="35" />
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static m:AppSettings.Default},Path=View}" Value="{x:Static m:ViewMode.Flat}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
+                    <Path Stretch="Uniform" Fill="#FF5555AA" Margin="4" Data="M3,3 L3,14 L5,14 L5,8 L7,8 L7,14 L9,14 L9,5 L11,5 L11,14 L13,14 L13,3 Z" />
+                </ToggleButton>
+                
+                <Separator Style="{StaticResource TreeOnly}" />
                 
                 <Slider
                     Minimum="1"

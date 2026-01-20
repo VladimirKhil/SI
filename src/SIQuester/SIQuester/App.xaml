@@ -2148,13 +2148,35 @@
                     
                     <ContentControl Grid.RowSpan="5" Style="{StaticResource LogoStyle}" Content="{Binding}" />
                     
-                    <TextBox
-                        Grid.Column="1"
-                        Grid.ColumnSpan="2"
-                        FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.4}"
-                        Style="{StaticResource LightTextBox}"
-                        Text="{Binding Model.Name}"
-                        Padding="0,2" />
+                    <DockPanel Grid.Column="1" Grid.ColumnSpan="2">
+                        <StackPanel
+                            x:Name="packageStatsPanel"
+                            DockPanel.Dock="Left"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0"
+                            Visibility="Collapsed">
+                            <TextBlock
+                                Text="{Binding Document.GamesStartedCount, StringFormat=▶{0}}"
+                                ToolTip="{x:Static lp:Resources.GamesStartedTooltip}"
+                                Foreground="#FF5555AA"
+                                FontSize="12"
+                                VerticalAlignment="Center"
+                                Margin="0,0,8,0" />
+                            <TextBlock
+                                Text="{Binding Document.GamesFinishedPercent, StringFormat=✓{0}%}"
+                                ToolTip="{x:Static lp:Resources.GamesFinishedTooltip}"
+                                Foreground="#FF55AA55"
+                                FontSize="12"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <TextBox
+                            FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.4}"
+                            Style="{StaticResource LightTextBox}"
+                            Text="{Binding Model.Name}"
+                            Padding="0,2" />
+                    </DockPanel>
 
                     <DockPanel Grid.Column="1" Grid.Row="1">
                         <TextBlock
@@ -2183,6 +2205,16 @@
 
                     <ContentControl Grid.Row="5" Grid.ColumnSpan="3" Content="{Binding Info}" />
                 </Grid>
+
+                <HierarchicalDataTemplate.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Document.HasQuestionStatistics}" Value="True" />
+                            <Condition Binding="{Binding Document.ShowQuestionStatistics}" Value="True" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter TargetName="packageStatsPanel" Property="Visibility" Value="Visible" />
+                    </MultiDataTrigger>
+                </HierarchicalDataTemplate.Triggers>
             </HierarchicalDataTemplate>
 
             <Style x:Key="ThemeStyle" BasedOn="{StaticResource QTreeViewItem}" TargetType="{x:Type TreeViewItem}">
@@ -3121,6 +3153,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" MinWidth="400" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
@@ -3144,31 +3177,55 @@
                         Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}"
                         MinWidth="30"
                         TabIndex="1" />
+
+                    <StackPanel
+                        x:Name="statsPanel"
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Grid.RowSpan="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Margin="5,0,5,0"
+                        Visibility="Collapsed">
+                        <TextBlock
+                            Text="{Binding TriesPercent, StringFormat={}{0}%}"
+                            ToolTip="{x:Static lp:Resources.TriesPercentTooltip}"
+                            Foreground="#FF5555AA"
+                            FontSize="10"
+                            VerticalAlignment="Center"
+                            Margin="0,0,3,0" />
+                        <TextBlock
+                            Text="{Binding RightPercent, StringFormat={}{0}%}"
+                            ToolTip="{x:Static lp:Resources.RightPercentTooltip}"
+                            Foreground="#FF55AA55"
+                            FontSize="10"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
                     
                     <ContentControl
                         Grid.Row="0"
-                        Grid.Column="2"
+                        Grid.Column="3"
                         Style="{StaticResource QuestionTypeStyle}"
                         KeyboardNavigation.IsTabStop="False" />
 
                     <ItemsControl
                         Name="parameters"
                         Grid.Row="1"
-                        Grid.Column="2"
+                        Grid.Column="3"
                         Style="{StaticResource ParametersStyle}"
                         KeyboardNavigation.IsTabStop="False" />
 
                     <ContentControl
                         Grid.Row="2"
                         Grid.Column="1"
-                        Grid.ColumnSpan="5"
+                        Grid.ColumnSpan="6"
                         Content="{Binding Info}"
                         KeyboardNavigation.IsTabStop="False" />
 
                     <ContentControl
                         x:Name="answer"
                         Grid.Row="1"
-                        Grid.Column="4"
+                        Grid.Column="5"
                         Content="{Binding}"
                         Style="{StaticResource AnswerBlockStyle}" />
                 </Grid>
@@ -3181,6 +3238,10 @@
                     
                     <DataTrigger Binding="{Binding IsDragged}" Value="True">
                         <Setter Property="Opacity" Value="0.2" />
+                    </DataTrigger>
+
+                    <DataTrigger Binding="{Binding OwnerTheme.OwnerRound.OwnerPackage.Document.ShowQuestionStatistics}" Value="True">
+                        <Setter TargetName="statsPanel" Property="Visibility" Value="Visible" />
                     </DataTrigger>
                 </HierarchicalDataTemplate.Triggers>
             </HierarchicalDataTemplate>

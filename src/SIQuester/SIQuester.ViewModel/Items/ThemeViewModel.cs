@@ -33,7 +33,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
 
     public override string AddHeader => Resources.AddQuestion;
 
-    public override ICommand Remove { get; protected set; }
+    public override ICommand? Remove { get; protected set; }
 
     public ICommand Clone { get; private set; }
 

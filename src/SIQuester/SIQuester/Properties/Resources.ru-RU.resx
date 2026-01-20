@@ -1097,6 +1097,12 @@
   <data name="ShowToolTipsInFlatView" xml:space="preserve">
     <value>Показывать всплывающие подсказки в плиточном отображении</value>
   </data>
+  <data name="GamesStartedTooltip" xml:space="preserve">
+    <value>Количество начатых игр с этим пакетом</value>
+  </data>
+  <data name="GamesFinishedTooltip" xml:space="preserve">
+    <value>Процент завершённых игр</value>
+  </data>
   <data name="ShuffleQuestions" xml:space="preserve">
     <value>Перемешать вопросы и стоимости</value>
   </data>
@@ -1286,6 +1292,9 @@
   <data name="WrongMultimediaAddress" xml:space="preserve">
     <value>Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой</value>
   </data>
+  <data name="MediaPlaybackError" xml:space="preserve">
+    <value>Ошибка проигрывания мультимедиа: {0}</value>
+  </data>
   <data name="Year" xml:space="preserve">
     <value>Год</value>
   </data>
@@ -1354,5 +1363,14 @@
   </data>
   <data name="QualityControlWarning" xml:space="preserve">
     <value>Без контроля качества ваш пакет не сможет проигрываться в SIGame в будущем</value>
+  </data>
+  <data name="ShowQuestionStatistics" xml:space="preserve">
+    <value>Показать статистику вопросов</value>
+  </data>
+  <data name="TriesPercentTooltip" xml:space="preserve">
+    <value>Процент попыток ответить</value>
+  </data>
+  <data name="RightPercentTooltip" xml:space="preserve">
+    <value>Процент правильных ответов</value>
   </data>
 </root>
