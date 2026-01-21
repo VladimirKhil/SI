@@ -1,0 +1,31 @@
+<Window x:Class="SIQuester.View.Dialogs.SelectPointView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lp="clr-namespace:SIQuester.Properties"
+        Title="{x:Static lp:Resources.SelectPointHint}" Height="600" Width="800"
+        WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Grid Name="ReferenceGrid" Background="LightGray" SizeChanged="ReferenceGrid_SizeChanged" ClipToBounds="True">
+            <Image Name="TargetImage" Stretch="Uniform" />
+            <Canvas Name="OverlayCanvas" IsHitTestVisible="False">
+                <Ellipse Name="SelectionMarker" Stroke="Green" StrokeThickness="2" Fill="#5500FF00" Width="10" Height="10" Visibility="Hidden" />
+                <Ellipse Name="ErrorCircle" Stroke="Orange" StrokeThickness="2" Fill="#22FFA500" Visibility="Hidden" />
+            </Canvas>
+            <Border Background="Transparent" MouseLeftButtonDown="Image_MouseLeftButtonDown" />
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <TextBlock Text="{x:Static lp:Resources.AnswerDeviation}" VerticalAlignment="Center" Margin="5"/>
+            <Slider Minimum="0" Maximum="0.5" Width="200" VerticalAlignment="Center" Value="{Binding CurrentDeviation, RelativeSource={RelativeSource AncestorType=Window}}" LargeChange="0.05" SmallChange="0.01" IsMoveToPointEnabled="True" />
+            <TextBox Text="{Binding CurrentDeviation, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=Window}}" Width="50" Margin="5" VerticalAlignment="Center" />
+            
+            <Button Content="{x:Static lp:Resources.OK}" IsDefault="True" Click="Ok_Click" Width="75" Margin="5" />
+            <Button Content="{x:Static lp:Resources.Cancel}" IsCancel="True" Width="75" Margin="5" />
+        </StackPanel>
+    </Grid>
+</Window>

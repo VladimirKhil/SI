@@ -1377,4 +1377,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="RightPercentTooltip" xml:space="preserve">
     <value>Percentage of correct answers</value>
   </data>
+  <data name="SelectPointHint" xml:space="preserve">
+    <value>Select point on image</value>
+  </data>
 </root>

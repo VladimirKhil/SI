@@ -2965,6 +2965,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Select point on image.
+        /// </summary>
+        public static string SelectPointHint {
+            get {
+                return ResourceManager.GetString("SelectPointHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Select a folder to search.
         /// </summary>
         public static string SelectSearchFolder {

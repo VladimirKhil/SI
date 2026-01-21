@@ -1010,6 +1010,16 @@
                                 <lv:NumericAnswerTemplate DataContext="{Binding NumericAnswer}" />
                             </StackPanel>
 
+                            <!-- Show point answer template for point questions -->
+                            <StackPanel x:Name="pointAnswerSection" Visibility="Collapsed">
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.Answer}"
+                                    Margin="0,5,0,0"
+                                    Padding="0,1" />
+
+                                <lv:PointAnswerTemplate DataContext="{Binding PointAnswer}" />
+                            </StackPanel>
+
                             <!-- Show regular answer fields for non-numeric questions -->
                             <StackPanel x:Name="regularAnswerSection">
                                 <TextBlock
@@ -1061,6 +1071,12 @@
                         <!-- Show numeric answer template when IsNumericAnswer is true -->
                         <DataTrigger Binding="{Binding IsNumericAnswer}" Value="True">
                             <Setter TargetName="numericAnswerSection" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="regularAnswerSection" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+
+                        <!-- Show point answer template when IsPointAnswer is true -->
+                        <DataTrigger Binding="{Binding IsPointAnswer}" Value="True">
+                            <Setter TargetName="pointAnswerSection" Property="Visibility" Value="Visible" />
                             <Setter TargetName="regularAnswerSection" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </DataTemplate.Triggers>

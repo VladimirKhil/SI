@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 10.0.x
     - name: Restore SIGame dependencies
       run: dotnet restore SIGame.sln
     - name: Build SIGame

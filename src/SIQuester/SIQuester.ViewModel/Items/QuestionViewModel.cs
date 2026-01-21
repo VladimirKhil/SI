@@ -97,6 +97,29 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     }
 
     /// <summary>
+    /// Gets the point answer view model if the question uses point answers.
+    /// </summary>
+    public PointAnswerViewModel? PointAnswer
+    {
+        get
+        {
+            if (Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
+                && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Point)
+            {
+                 return _pointAnswer ??= new PointAnswerViewModel(this);
+            }
+
+            if (_pointAnswer != null)
+            {
+                _pointAnswer.Dispose();
+                _pointAnswer = null;
+            }
+
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Gets whether this question uses numeric answers.
     /// </summary>
     public bool IsNumericAnswer
@@ -105,6 +128,18 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         {
             return Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
                 && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Number;
+        }
+    }
+
+    /// <summary>
+    /// Gets whether this question uses point answers.
+    /// </summary>
+    public bool IsPointAnswer
+    {
+        get
+        {
+            return Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
+                && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Point;
         }
     }
 
@@ -128,6 +163,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     }
     
     private int? _rightPercent;
+    private PointAnswerViewModel? _pointAnswer;
 
     /// <summary>
     /// Gets the percentage of correct answers (correct / (correct + wrong) * 100).
@@ -358,6 +394,23 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                 // Remove answer options if they exist
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
             }
+            else if (answerType == StepParameterValues.SetAnswerTypeType_Point)
+            {
+                // Add default point deviation parameter
+                if (!Parameters.TryGetValue(QuestionParameterNames.AnswerDeviation, out var deviationParameter))
+                {
+                    deviationParameter = new StepParameterViewModel(this, new StepParameter
+                    {
+                        Type = StepParameterTypes.Simple,
+                        SimpleValue = "0"
+                    });
+
+                    Parameters.AddParameter(QuestionParameterNames.AnswerDeviation, deviationParameter);
+                }
+
+                // Remove answer options if they exist
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
+            }
             else if (answerType == StepParameterValues.SetAnswerTypeType_Select)
             {
                 var options = new StepParameter
@@ -403,6 +456,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             change.Commit();
             OnPropertyChanged(nameof(IsNumericAnswer));
             OnPropertyChanged(nameof(NumericAnswer));
+            OnPropertyChanged(nameof(IsPointAnswer));
+            OnPropertyChanged(nameof(PointAnswer));
         }
         catch (Exception exc)
         {

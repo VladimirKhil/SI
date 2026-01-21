@@ -1373,4 +1373,7 @@
   <data name="RightPercentTooltip" xml:space="preserve">
     <value>Процент правильных ответов</value>
   </data>
+  <data name="SelectPointHint" xml:space="preserve">
+    <value>Выберите точку на изображении</value>
+  </data>
 </root>

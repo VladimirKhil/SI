@@ -344,7 +344,7 @@
             <siqcv:StringDictionary x:Key="AnswerTypes">
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Text}" Member="lp:Resources.SetAnswerTypeType_Text" />
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Number}" Member="lp:Resources.SetAnswerTypeType_Number" />
-                <!--<x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Point}" Member="lp:Resources.SetAnswerTypeType_Point" />-->
+                <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Point}" Member="lp:Resources.SetAnswerTypeType_Point" />
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Select}" Member="lp:Resources.SetAnswerTypeType_Select" />
             </siqcv:StringDictionary>
 
@@ -2782,6 +2782,7 @@
                             ItemsSource="{Binding}"
                             siq:SmartMenuManager.SecondMenu="True"
                             vm1:ItemsControlWatcher.IsWatching="True"
+                            SelectedItem="{Binding CurrentItem}"
                             Style="{StaticResource ContentListStyle}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="vm:ContentItemViewModel">
@@ -2803,6 +2804,10 @@
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="vm:StepParameterViewModel">
+                        <ItemsControl ItemsSource="{Binding GroupValue}" ItemTemplate="{DynamicResource GroupItemTemplate}" />
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="vm:StepParameterViewModel">
@@ -3134,12 +3139,20 @@
                 </StackPanel>
             </DataTemplate>
 
+            <DataTemplate x:Key="PointAnswerTemplate">
+                <lv:PointAnswerTemplate DataContext="{Binding PointAnswer}" />
+            </DataTemplate>
+
             <Style x:Key="AnswerBlockStyle" TargetType="ContentControl">
                 <Setter Property="ContentTemplate" Value="{StaticResource SimpleAnswerTemplate}" />
 
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Parameters.AnswerType}" Value="number">
                         <Setter Property="ContentTemplate" Value="{StaticResource NumericAnswerTemplate}" />
+                    </DataTrigger>
+                    
+                    <DataTrigger Binding="{Binding Parameters.AnswerType}" Value="point">
+                        <Setter Property="ContentTemplate" Value="{StaticResource PointAnswerTemplate}" />
                     </DataTrigger>
 
                     <DataTrigger Binding="{Binding Parameters.AnswerType}" Value="select">
