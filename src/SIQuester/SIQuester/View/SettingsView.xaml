@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:l="clr-namespace:SIQuester"
+    xmlns:siqcv="clr-namespace:SIQuester.Converters"
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
@@ -12,7 +13,9 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
     d:DesignHeight="300"
-    d:DesignWidth="300">
+    d:DesignWidth="300"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <UserControl.Resources>
         <Style x:Key="Header" TargetType="TextBlock">
             <Setter Property="Margin" Value="0,15,0,0" />
@@ -22,10 +25,15 @@
 
         <Style x:Key="{x:Type CheckBox}" TargetType="CheckBox">
             <Setter Property="Margin" Value="0,7,0,0" />
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=UserControl}}" />
         </Style>
+
+        <siqcv:EnumConverter x:Key="ThemeOptionConverter" EnumType="{x:Type m:ThemeOption}" />
     </UserControl.Resources>
     
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+    <ScrollViewer
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical" Margin="10,0,0,10">
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
 
@@ -44,6 +52,23 @@
 
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.BasicSettings}" />
             
+            <!--<StackPanel Orientation="Vertical" Margin="0,7,0,0">
+                <TextBlock VerticalAlignment="Center" Text="{x:Static lp:Resources.Theme}" />
+
+                <ComboBox
+                    Margin="0,5"
+                    Width="120"
+                    HorizontalAlignment="Left"
+                    ItemsSource="{Binding ThemeOptions}"
+                    SelectedItem="{Binding Model.Theme}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource ThemeOptionConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>-->
+
             <CheckBox
                 Content="{x:Static lp:Resources.InstallUpdates}"
                 ToolTip="{x:Static lp:Resources.InstallUpdatesHint}"
@@ -105,7 +130,11 @@
                                 ToolTip="{x:Static lp:Resources.Delete}"
                                 Width="20"
                                 Height="20">
-                                <Path Data="M0,0L1,1M0,1L1,0" Stroke="Black" Stretch="Fill" Margin="3" />
+                                <Path
+                                    Data="M0,0L1,1M0,1L1,0"
+                                    Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    Stretch="Fill"
+                                    Margin="3" />
                             </Button>
                         </StackPanel>
                     </DataTemplate>

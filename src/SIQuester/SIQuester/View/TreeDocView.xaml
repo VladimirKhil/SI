@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lc="clr-namespace:SIQuester.Controls"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     mc:Ignorable="d"
     d:DesignHeight="300"
@@ -14,8 +15,16 @@
     PreviewDragOver="Main_DragOver"
     PreviewDrop="Main_Drop"
     d:DataContext="{d:DesignInstance vm:QDocument}">
-    <Grid Name="_grid">
-        <lc:PackageTreeView Style="{StaticResource QTreeView}" KeyboardNavigation.TabNavigation="Contained" />
+    <Grid
+        Name="_grid"
+        Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+        TextElement.Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
+        <lc:PackageTreeView
+            Style="{StaticResource QTreeView}"
+            KeyboardNavigation.TabNavigation="Contained"
+            Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+            Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}"
+            TextElement.Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}" />
         <Separator Name="_insertionMark" Height="3" Background="Black" Visibility="Hidden" VerticalAlignment="Top" />
     </Grid>
 </UserControl>

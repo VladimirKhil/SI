@@ -38,6 +38,54 @@
             <BooleanToVisibilityConverter x:Key="VisibilityConverter" />
             <siqcv:GreaterThanValueConverter BaseValue="0" x:Key="GreaterZero" />
 
+            <siqcv:ThemeToBrushConverter
+                x:Key="ThemeBackgroundConverter"
+                LightBrush="#FFFBFBFF"
+                DarkBrush="Black" />
+            <siqcv:ThemeToBrushConverter
+                x:Key="ThemeForegroundConverter"
+                LightBrush="Black"
+                DarkBrush="White" />
+            <siqcv:ThemeToColorConverter
+                x:Key="ThemeTextColorConverter"
+                LightColor="Black"
+                DarkColor="White" />
+            <siqcv:ThemeToColorConverter
+                x:Key="ToolBarHoverColorConverter"
+                LightColor="#330000FF"
+                DarkColor="#FF3A3A3A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="ToolBarHoverBorderColorConverter"
+                LightColor="#990000FF"
+                DarkColor="#FF6A6A6A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="ItemOverColorConverter"
+                LightColor="#FFE9E9FF"
+                DarkColor="#FF2B2B2B" />
+            <siqcv:ThemeToColorConverter
+                x:Key="ItemSelectedColorConverter"
+                LightColor="#FFD5D5FF"
+                DarkColor="#FF3A3A3A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="TreeItemOverColorConverter"
+                LightColor="#FFF3F3F3"
+                DarkColor="#FF3A3A3A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="SecondHighlightColorConverter"
+                LightColor="#FFFFFF84"
+                DarkColor="#FF5A5A5A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="SimpleAnswerBackgroundConverter"
+                LightColor="Honeydew"
+                DarkColor="#FF2A2A2A" />
+
+            <SolidColorBrush
+                x:Key="{x:Static SystemColors.ControlTextBrushKey}"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeTextColorConverter}, FallbackValue=Black, TargetNullValue=Black}" />
+            <SolidColorBrush
+                x:Key="{x:Static SystemColors.WindowTextBrushKey}"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeTextColorConverter}, FallbackValue=Black, TargetNullValue=Black}" />
+
             <siqcv:TextCollectionConverter2 x:Key="TextCollectionConverter2" />
             <siqcv:ListJoinConverter x:Key="ListJoinConverter" />
             <siqcv:FlatLayoutModeConverter x:Key="FlatLayoutModeConverter" />
@@ -349,14 +397,24 @@
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Select}" Member="lp:Resources.SetAnswerTypeType_Select" />
             </siqcv:StringDictionary>
 
-            <SolidColorBrush x:Key="ItemOverBrush" Color="#FFE9E9FF" />
-            <SolidColorBrush x:Key="ItemSelectedBrush" Color="#FFD5D5FF" />
+            <SolidColorBrush
+                x:Key="ItemOverBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ItemOverColorConverter}, FallbackValue=#FFE9E9FF, TargetNullValue=#FFE9E9FF}" />
+            <SolidColorBrush
+                x:Key="ItemSelectedBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ItemSelectedColorConverter}, FallbackValue=#FFD5D5FF, TargetNullValue=#FFD5D5FF}" />
+            <SolidColorBrush
+                x:Key="TreeItemOverBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource TreeItemOverColorConverter}, FallbackValue=#FFF3F3F3, TargetNullValue=#FFF3F3F3}" />
 
             <Style x:Key="QTreeViewItem" TargetType="{x:Type TreeViewItem}" >
                 <Setter Property="AllowDrop" Value="True" />
                 <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                 <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                 <Setter Property="siq:SmartMenuManager.SmartMenu" Value="True" />
+                <Setter
+                    Property="Foreground"
+                    Value="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}" />
                 
                 <Setter Property="Template">
                     <Setter.Value>
@@ -375,7 +433,10 @@
 
                                 <Border x:Name="HeaderArea" Grid.ColumnSpan="3" Background="Transparent" />
 
-                                <ToggleButton IsChecked="{Binding IsExpanded}" ClickMode="Press" Name="Expander">
+                                <ToggleButton
+                                    IsChecked="{Binding IsExpanded}"
+                                    ClickMode="Press"
+                                    Name="Expander">
                                     <ToggleButton.Style>
                                         <Style TargetType="ToggleButton">
                                             <Setter Property="UIElement.Focusable" Value="false" />
@@ -510,12 +571,21 @@
                 <Setter Property="Margin" Value="0,0,3,0" />
             </Style>
 
-            <SolidColorBrush x:Key="SecondHighlightColor" Color="#FFFFFF84" />
+            <SolidColorBrush
+                x:Key="SecondHighlightColor"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource SecondHighlightColorConverter}, FallbackValue=#FFFFFF84, TargetNullValue=#FFFFFF84}" />
+            <SolidColorBrush
+                x:Key="SimpleAnswerBackgroundBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource SimpleAnswerBackgroundConverter}, FallbackValue=Honeydew, TargetNullValue=Honeydew}" />
 
             <!--Default theme-->
 
-            <SolidColorBrush x:Key="ToolBarButtonHoverBorder" Color="#990000FF"/>
-            <SolidColorBrush x:Key="ToolBarButtonHover" Color="#330000FF"/>
+            <SolidColorBrush
+                x:Key="ToolBarButtonHoverBorder"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ToolBarHoverBorderColorConverter}, FallbackValue=#990000FF, TargetNullValue=#990000FF}" />
+            <SolidColorBrush
+                x:Key="ToolBarButtonHover"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ToolBarHoverColorConverter}, FallbackValue=#330000FF, TargetNullValue=#330000FF}" />
             <SolidColorBrush x:Key="ToolBarButtonPressedBorder" Color="#FF0000FF"/>
             <SolidColorBrush x:Key="ToolBarButtonPressed" Color="#770000FF"/>
             <SolidColorBrush x:Key="ToolBarButtonChecked" Color="#E6F0FA"/>
@@ -2750,7 +2820,7 @@
                 </Setter>
 
                 <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Background" Value="#F3F3F3" />
+                <Setter Property="Background" Value="{StaticResource TreeItemOverBrush}" />
                 <Setter Property="Margin" Value="1" />
             </Style>
 
@@ -3079,7 +3149,7 @@
                     Orientation="Vertical"
                     VerticalAlignment="Center"
                     TextBlock.FontStyle="Italic"
-                    Background="Honeydew">
+                    Background="{StaticResource SimpleAnswerBackgroundBrush}">
                     <siq:TextList
                         x:Name="right"
                         Style="{StaticResource LightTextBox}"

@@ -1211,6 +1211,12 @@
   <data name="ThemeNameFontSize" xml:space="preserve">
     <value>Размер шрифта в названии темы</value>
   </data>
+  <data name="ThemeOptionDark" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="ThemeOptionLight" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
   <data name="ThemeQuestionCount" xml:space="preserve">
     <value>Число вопросов в теме</value>
   </data>
@@ -1264,6 +1270,9 @@
   </data>
   <data name="UseImageDuration" xml:space="preserve">
     <value>Задавать длительность показа изображений по умолчанию</value>
+  </data>
+  <data name="UseDarkTheme" xml:space="preserve">
+    <value>Использовать тёмную тему</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>Версия</value>

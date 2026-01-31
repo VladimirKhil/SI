@@ -1215,6 +1215,12 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeNameFontSize" xml:space="preserve">
     <value>Theme name font size</value>
   </data>
+  <data name="ThemeOptionDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="ThemeOptionLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
   <data name="ThemeQuestionCount" xml:space="preserve">
     <value>Question per theme count</value>
   </data>
@@ -1268,6 +1274,9 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="UseImageDuration" xml:space="preserve">
     <value>Set default image duration</value>
+  </data>
+  <data name="UseDarkTheme" xml:space="preserve">
+    <value>Use dark theme</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>Version</value>

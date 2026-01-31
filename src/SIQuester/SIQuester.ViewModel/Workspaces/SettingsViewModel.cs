@@ -1,6 +1,7 @@
 ﻿using SIQuester.Model;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
+using System;
 using System.Windows.Input;
 using Utils.Commands;
 
@@ -22,6 +23,8 @@ public sealed class SettingsViewModel : WorkspaceViewModel
     public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
 
     public string[] GPTModels { get; } = new string[] { "gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06", "gpt-5-2025-08-07" };
+
+    public ThemeOption[] ThemeOptions { get; } = Enum.GetValues<ThemeOption>();
 
     public AppSettings Model => AppSettings.Default;
 

@@ -11,10 +11,16 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance lvm:NewViewModel}"
     FontSize="14"
-    FocusManager.FocusedElement="{Binding ElementName=bCreate}">
+    FocusManager.FocusedElement="{Binding ElementName=bCreate}"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type m:CustomPackageOptions}">
-            <GroupBox Header="{x:Static lp:Resources.NonStandardPackageParameters}" Padding="5">
+            <GroupBox
+                Header="{x:Static lp:Resources.NonStandardPackageParameters}"
+                Padding="5"
+                Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+                Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
                 <GroupBox.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="Margin" Value="0,3" />
@@ -70,8 +76,13 @@
         </Style>
     </UserControl.Resources>
     
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-        <Grid HorizontalAlignment="Left" Width="500" Margin="5">
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Auto"
+        VerticalScrollBarVisibility="Auto">
+        <Grid
+            HorizontalAlignment="Left"
+            Width="500"
+            Margin="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -99,7 +110,9 @@
                 Height="200"
                 Margin="4"
                 ItemsSource="{Binding Templates}"
-                SelectedItem="{Binding CurrentTemplate}">
+                SelectedItem="{Binding CurrentTemplate}"
+                Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+                Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}" />
@@ -143,16 +156,31 @@
             </StackPanel>
 
             <TextBlock Grid.Row="4" Margin="4" Text="{x:Static lp:Resources.PackageName}" />
-            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding PackageName}" Margin="4" />
+            
+            <TextBox
+                Grid.Row="4"
+                Grid.Column="1"
+                Text="{Binding PackageName}"
+                Margin="4"
+                Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+                Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}" />
             <TextBlock Grid.Row="5" Margin="4" Text="{x:Static lp:Resources.PackageAuthor}" />
-            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding PackageAuthor}" Margin="4" />
+            
+            <TextBox
+                Grid.Row="5"
+                Grid.Column="1"
+                Text="{Binding PackageAuthor}"
+                Margin="4"
+                Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+                Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}" />
 
             <StackPanel Grid.Row="6" Orientation="Horizontal">
                 <CheckBox
                     IsChecked="{Binding QualityControl}"
                     Margin="0,15,0,0"
                     VerticalAlignment="Center"
-                    VerticalContentAlignment="Center">
+                    VerticalContentAlignment="Center"
+                    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
                     <TextBlock Text="{x:Static lp:Resources.QualityControl}" VerticalAlignment="Center" Margin="1,0,0,0" />
                 </CheckBox>
 

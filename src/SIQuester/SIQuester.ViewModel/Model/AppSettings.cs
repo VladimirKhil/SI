@@ -57,6 +57,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     private const string DefaultGPTApiKey = "";
     private const string DefaultGPTModel = "gpt-4o-mini-2024-07-18";
     private const string DefaultGPTPrompt = "";
+    private const ThemeOption DefaultTheme = ThemeOption.Light;
 
     /// <summary>
     /// Auto-save interval.
@@ -85,6 +86,22 @@ public sealed class AppSettings : INotifyPropertyChanged
             if (_searchForUpdates != value)
             {
                 _searchForUpdates = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private ThemeOption _theme = DefaultTheme;
+
+    [DefaultValue(DefaultTheme)]
+    public ThemeOption Theme
+    {
+        get => _theme;
+        set
+        {
+            if (_theme != value)
+            {
+                _theme = value;
                 OnPropertyChanged();
             }
         }
@@ -723,5 +740,6 @@ public sealed class AppSettings : INotifyPropertyChanged
         AskToSetTagsOnSave = defaultSettings.AskToSetTagsOnSave;
         UseImageDuration = defaultSettings.UseImageDuration;
         ImageDurationSeconds = defaultSettings.ImageDurationSeconds;
+        Theme = defaultSettings.Theme;
     }
 }

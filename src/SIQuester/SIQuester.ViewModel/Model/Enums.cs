@@ -82,3 +82,11 @@ public enum FlatScale
     [Description("Question")]
     Question
 }
+
+public enum ThemeOption
+{
+    [Description("ThemeOptionLight")]
+    Light,
+    [Description("ThemeOptionDark")]
+    Dark
+}

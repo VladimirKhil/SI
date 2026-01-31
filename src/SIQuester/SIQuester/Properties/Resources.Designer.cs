@@ -3476,6 +3476,24 @@ namespace SIQuester.Properties {
                 return ResourceManager.GetString("ThemeNameFontSize", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Dark.
+        /// </summary>
+        public static string ThemeOptionDark {
+            get {
+                return ResourceManager.GetString("ThemeOptionDark", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Light.
+        /// </summary>
+        public static string ThemeOptionLight {
+            get {
+                return ResourceManager.GetString("ThemeOptionLight", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Question per theme count.
@@ -3645,6 +3663,15 @@ namespace SIQuester.Properties {
         public static string UseImageDuration {
             get {
                 return ResourceManager.GetString("UseImageDuration", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use dark theme.
+        /// </summary>
+        public static string UseDarkTheme {
+            get {
+                return ResourceManager.GetString("UseDarkTheme", resourceCulture);
             }
         }
         

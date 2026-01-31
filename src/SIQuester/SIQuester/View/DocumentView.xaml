@@ -20,7 +20,9 @@
     mc:Ignorable="d"
     d:DesignHeight="357.297"
     d:DesignWidth="584.402"
-    d:DataContext="{d:DesignInstance vm:QDocument}">
+    d:DataContext="{d:DesignInstance vm:QDocument}"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

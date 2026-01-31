@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:siq="clr-namespace:SIQuester"
     xmlns:siqcv="clr-namespace:SIQuester.Converters"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:st="clr-namespace:System.Threading;assembly=mscorlib"
@@ -24,7 +25,9 @@
     Loaded="Main_Loaded"
     SnapsToDevicePixels="True"
     TextOptions.TextFormattingMode="Display"
-    PreviewKeyDown="Main_PreviewKeyDown">
+    PreviewKeyDown="Main_PreviewKeyDown"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <Window.Resources>
         <siqcv:UnionConverter x:Key="UnionConverter" />
         <siqcv:DirectoryConverter x:Key="DirectoryConverter" />
@@ -182,7 +185,8 @@
                                         x:Name="grid"
                                         DataContext="{Binding Settings.History.Files}"
                                         HorizontalAlignment="Center"
-                                        VerticalAlignment="Center">
+                                        VerticalAlignment="Center"
+                                        TextBlock.Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=Black, TargetNullValue=Black}">
 
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
@@ -204,6 +208,7 @@
                                                         HorizontalAlignment="Stretch"
                                                         HorizontalContentAlignment="Left"
                                                         Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=Black, TargetNullValue=Black}"
                                                         Cursor="Hand">
                                                         <DockPanel Width="600">
                                                             <Button
@@ -217,10 +222,14 @@
                                                                 ToolTip="{x:Static lp:Resources.RemoveLink}"
                                                                 Width="20"
                                                                 Height="20">
-                                                                <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
+                                                                <Path
+                                                                    Data="M0,0L1,1M0,1L1,0"
+                                                                    Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=Black, TargetNullValue=Black}"
+                                                                    Stretch="Fill"
+                                                                    Margin="3" />
                                                             </Button>
 
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Foreground="#FF040629" TextAlignment="Left">
+                                                            <TextBlock TextTrimming="CharacterEllipsis" TextAlignment="Left">
                                                                 <Run Text="{Binding Mode=OneWay, Converter={StaticResource FileNameConverter}}" FontSize="18" />
                                                                 <LineBreak />
                                                                 <Run Text="{Binding Mode=OneWay, Converter={StaticResource DirectoryConverter}}" FontSize="11" />
@@ -237,7 +246,11 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
 
-                                        <Expander Grid.Row="2" Margin="0,10,0,10" FontSize="16">
+                                        <Expander
+                                            Grid.Row="2"
+                                            Margin="0,10,0,10"
+                                            FontSize="16"
+                                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=Black, TargetNullValue=Black}">
                                             <Expander.Header>
                                                 <TextBlock Text="{x:Static lp:Resources.ContentGuidelineHeader}" Margin="3,0,0,0" FontSize="20" />
                                             </Expander.Header>
