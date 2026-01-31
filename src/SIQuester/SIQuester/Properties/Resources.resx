@@ -1092,6 +1092,12 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="SetTime" xml:space="preserve">
     <value>Specify time interval</value>
   </data>
+  <data name="SetAnswerTime" xml:space="preserve">
+    <value>Set answer duration</value>
+  </data>
+  <data name="AnswerDuration" xml:space="preserve">
+    <value>Answer duration (seconds)</value>
+  </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
   </data>

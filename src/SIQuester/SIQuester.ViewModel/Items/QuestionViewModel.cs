@@ -13,6 +13,8 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class QuestionViewModel : ItemViewModel<Question>
 {
+    private const int DefaultAnswerDurationSeconds = 5;
+
     public ThemeViewModel? OwnerTheme { get; set; }
 
     public override IItemViewModel? Owner => OwnerTheme;
@@ -61,6 +63,56 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     public ICommand SetAnswerType { get; private set; }
 
     public ICommand SwitchEmpty { get; private set; }
+
+    public SimpleCommand SetAnswerTime { get; private set; }
+
+    /// <summary>
+    /// Gets the answer duration in seconds if set, or null if not set.
+    /// </summary>
+    public int? AnswerDuration
+    {
+        get
+        {
+            if (Parameters.TryGetValue(QuestionParameterNames.AnswerDuration, out var durationParam)
+                && int.TryParse(durationParam.Model.SimpleValue, out var duration)
+                && duration > 0)
+            {
+                return duration;
+            }
+
+            return null;
+        }
+        set
+        {
+            // Remove parameter when value is null or 0 (like content item duration)
+            if (value == null || value == 0)
+            {
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerDuration);
+                SetAnswerTime.CanBeExecuted = true;
+            }
+            else
+            {
+                if (!Parameters.TryGetValue(QuestionParameterNames.AnswerDuration, out var durationParam))
+                {
+                    durationParam = new StepParameterViewModel(this, new StepParameter
+                    {
+                        Type = StepParameterTypes.Simple,
+                        SimpleValue = value.Value.ToString()
+                    });
+
+                    Parameters.AddParameter(QuestionParameterNames.AnswerDuration, durationParam);
+                }
+                else
+                {
+                    durationParam.Model.SimpleValue = value.Value.ToString();
+                }
+
+                SetAnswerTime.CanBeExecuted = false;
+            }
+
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// Tries to get question answer options.
@@ -206,6 +258,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         SetQuestionType = new SimpleCommand(SetQuestionType_Executed);
         SetAnswerType = new SimpleCommand(SetAnswerType_Executed);
         SwitchEmpty = new SimpleCommand(SwitchEmpty_Executed);
+        SetAnswerTime = new SimpleCommand(SetAnswerTime_Executed);
 
         Wrong.CollectionChanged += Wrong_CollectionChanged;
     }
@@ -219,6 +272,11 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     }
 
     private void ClearType_Executed(object? arg) => TypeName = QuestionTypes.Default;
+
+    private void SetAnswerTime_Executed(object? arg)
+    {
+        AnswerDuration ??= DefaultAnswerDurationSeconds;
+    }
 
     private void Wrong_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;

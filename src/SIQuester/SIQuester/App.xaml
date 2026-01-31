@@ -327,6 +327,7 @@
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.SelectionMode}" Member="lp:Resources.SelectionMode" />
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.AnswerType}" Member="lp:Resources.AnswerType" />
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.AnswerOptions}" Member="lp:Resources.AnswerOptions" />
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.AnswerDuration}" Member="lp:Resources.AnswerDuration" />
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="QuestionParameterNamesConverter" Map="{StaticResource QuestionParameterNames}" />
@@ -1317,6 +1318,13 @@
                                                         Style="{StaticResource MenuButton}" />
 
                                                     <Button
+                                                        x:Name="answerTime"
+                                                        ToolTip="{x:Static lp:Resources.SetAnswerTime}"
+                                                        Content="{StaticResource AddTimeImage}"
+                                                        Command="{Binding SetAnswerTime}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
                                                         x:Name="play"
                                                         ToolTip="{x:Static lp:Resources.PlayQuestion}"
                                                         Content="{StaticResource PlayImage}"
@@ -1353,6 +1361,7 @@
                                                         <Setter TargetName="separator1" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="wrong" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="answerTime" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="play" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="separator2" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="authors" Property="Visibility" Value="Collapsed" />
@@ -3046,6 +3055,11 @@
                                     <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
 
+                                <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerDuration}">
+                                    <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+
                                 <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerOptions}">
                                     <Setter TargetName="name" Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
                                     <Setter TargetName="value" Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
@@ -3143,6 +3157,30 @@
                 <lv:PointAnswerTemplate DataContext="{Binding PointAnswer}" />
             </DataTemplate>
 
+            <ControlTemplate TargetType="ContentControl" x:Key="AnswerDurationTemplate">
+                <StackPanel Background="#DDDDDD" Margin="0,0,5,0" Orientation="Horizontal" ToolTip="{x:Static lp:Resources.AnswerDuration}" VerticalAlignment="Center">
+                    <Image Source="{StaticResource AddTimeImage}" Width="10" Margin="4,0,0,0" />
+
+                    <siq:NumericTextBox
+                        siq:ActivateManager.IsWatching="True"
+                        Style="{StaticResource CommonTextBox}"
+                        Padding="2"
+                        Maximum="120"
+                        Text="{Binding AnswerDuration, Mode=TwoWay}" />
+                </StackPanel>
+            </ControlTemplate>
+
+            <Style x:Key="AnswerDurationStyle" TargetType="{x:Type ContentControl}">
+                <Setter Property="Content" Value="{Binding}" />
+                <Setter Property="Template" Value="{StaticResource EmptyTemplate}" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding AnswerDuration, Converter={StaticResource NotNullConverter}}" Value="true">
+                        <Setter Property="Template" Value="{StaticResource AnswerDurationTemplate}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <Style x:Key="AnswerBlockStyle" TargetType="ContentControl">
                 <Setter Property="ContentTemplate" Value="{StaticResource SimpleAnswerTemplate}" />
 
@@ -3233,6 +3271,13 @@
                         Grid.Column="1"
                         Grid.ColumnSpan="6"
                         Content="{Binding Info}"
+                        KeyboardNavigation.IsTabStop="False" />
+
+                    <ContentControl
+                        x:Name="answerDuration"
+                        Grid.Row="1"
+                        Grid.Column="4"
+                        Style="{StaticResource AnswerDurationStyle}"
                         KeyboardNavigation.IsTabStop="False" />
 
                     <ContentControl

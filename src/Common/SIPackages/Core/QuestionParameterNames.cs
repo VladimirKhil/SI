@@ -44,4 +44,9 @@ public static class QuestionParameterNames
     /// Question selection mode.
     /// </summary>
     public const string SelectionMode = "selectionMode";
+
+    /// <summary>
+    /// Answer duration in seconds.
+    /// </summary>
+    public const string AnswerDuration = "answerDuration";
 }

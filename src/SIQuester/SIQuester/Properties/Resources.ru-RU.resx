@@ -1088,6 +1088,12 @@
   <data name="SetTime" xml:space="preserve">
     <value>Указать временной интервал</value>
   </data>
+  <data name="SetAnswerTime" xml:space="preserve">
+    <value>Задать время на ответ</value>
+  </data>
+  <data name="AnswerDuration" xml:space="preserve">
+    <value>Время на ответ (секунды)</value>
+  </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
   </data>

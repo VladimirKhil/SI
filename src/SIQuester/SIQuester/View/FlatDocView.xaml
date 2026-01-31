@@ -38,6 +38,7 @@
 
         <lc:EqualsToVisibilityConverter x:Key="Equals" />
         <lc:EqualityConverter x:Key="Equals2" />
+        <lc:NotNullConverter x:Key="NotNullConverter" />
 
         <Style x:Key="QHeaderStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{Binding TypeName, Converter={StaticResource QTypeToColorConverter}}" />
@@ -995,10 +996,35 @@
                                                 <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
                                                 <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
+
+                                            <!-- Hide answer duration - it is displayed separately -->
+                                            <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerDuration}">
+                                                <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                                <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
                                         </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            
+                            <!-- Answer duration section -->
+                            <StackPanel x:Name="answerDurationSection" Orientation="Vertical" Margin="0,5,0,0" Visibility="Collapsed">
+                                <TextBlock
+                                    Text="{x:Static lp:Resources.AnswerDuration}"
+                                    Foreground="Black"
+                                    VerticalAlignment="Center" />
+                                
+                                <l:NumericTextBox
+                                    Text="{Binding AnswerDuration, Mode=TwoWay}"
+                                    Minimum="1"
+                                    Maximum="120"
+                                    Padding="2"
+                                    Background="White"
+                                    BorderBrush="Gray"
+                                    BorderThickness="1"
+                                    Margin="0,5,0,0"
+                                    HorizontalAlignment="Stretch" />
+                            </StackPanel>
 
                             <!-- Show numeric answer template for numeric questions -->
                             <StackPanel x:Name="numericAnswerSection" Visibility="Collapsed">
@@ -1078,6 +1104,11 @@
                         <DataTrigger Binding="{Binding IsPointAnswer}" Value="True">
                             <Setter TargetName="pointAnswerSection" Property="Visibility" Value="Visible" />
                             <Setter TargetName="regularAnswerSection" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+
+                        <!-- Show answer duration when it has a value -->
+                        <DataTrigger Binding="{Binding AnswerDuration, Converter={StaticResource NotNullConverter}}" Value="True">
+                            <Setter TargetName="answerDurationSection" Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
