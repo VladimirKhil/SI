@@ -166,26 +166,6 @@ public sealed class TimeSettings
     }
 
     /// <summary>
-    /// Время на ожидание при показе мультимедиа
-    /// </summary>
-    [XmlAttribute]
-    [DefaultValue(0)]
-    [DataMember]
-    public int TimeForMediaDelay
-    {
-        get
-        {
-            if (All.TryGetValue(TimeSettingsTypes.MediaDelay, out int value))
-            {
-                return value;
-            }
-
-            return 0;
-        }
-        set { All[TimeSettingsTypes.MediaDelay] = value; }
-    }
-
-    /// <summary>
     /// Image time in seconds.
     /// </summary>
     [DefaultValue(DefaultImageTime)]

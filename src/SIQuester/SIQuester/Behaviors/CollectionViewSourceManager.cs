@@ -21,7 +21,8 @@ public static class CollectionViewSourceManager
 
     public static void OnFilterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var collection = d as CollectionViewSource;
+        var collection = (CollectionViewSource)d;
+
         if (e.OldValue is ICollectionFilter oldValue)
         {
             collection.Filter -= oldValue.Filter;

@@ -639,6 +639,7 @@ public sealed class GameData : Data
             HiddenAnswering = timeSettings.TimeForFinalThinking,
             StakeMaking = timeSettings.TimeForMakingStake,
             ShowmanDecision = timeSettings.TimeForShowmanDecisions,
+            Appellation = timeSettings.TimeForShowmanDecisions, // Backward compatibility
             Round = timeSettings.TimeOfRound,
             ButtonBlocking = timeSettings.TimeForBlockingButton,
             RightAnswer = timeSettings.TimeForRightAnswer,

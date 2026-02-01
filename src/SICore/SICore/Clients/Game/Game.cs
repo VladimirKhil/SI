@@ -2221,6 +2221,11 @@ public sealed class Game : MessageHandler
 
     private void OnAtom(string[] args)
     {
+        if (!_state.QuestionPlay.CollectMediaCompletions)
+        {
+            return;
+        }
+
         Completion? completion;
         var completions = _state.QuestionPlay.MediaContentCompletions;
 
@@ -2258,7 +2263,7 @@ public sealed class Game : MessageHandler
         else
         {
             // Sometimes someone drops out, and the process gets delayed by 120 seconds. This is unacceptable. We'll give 3 seconds
-            _controller.RescheduleTask(30 + _state.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
+            _controller.RescheduleTask(30);
         }
     }
 

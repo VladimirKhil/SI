@@ -403,7 +403,11 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         return true;
     }
 
+    public bool OnRightAnswerPoint(string rightAnswer) => false;
+
     private void OnMessage(object message) => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions));
 
     public bool OnNumericAnswerType(int deviation) => false;
+
+    public bool OnPointAnswerType(double deviation) => false;
 }

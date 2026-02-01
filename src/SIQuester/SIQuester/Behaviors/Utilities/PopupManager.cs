@@ -21,29 +21,44 @@ public sealed class PopupManager
     
     public static void OnOwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var popup = d as Popup;
+        var popup = (Popup)d;
 
-        void act(object sender, EventArgs e2)
+        void act(object? sender, EventArgs e2)
         {
-            var window = sender as Window;
+            if (sender is not Window window)
+            {
+                return;
+            }
+
             if (window.IsActive && window.WindowState != WindowState.Minimized)
             {
                 if (GetWasOpened(popup).HasValue)
-                    popup.IsOpen = GetWasOpened(popup).Value;
+                {
+                    popup.IsOpen = GetWasOpened(popup) ?? false;
+                }
 
                 SetWasOpened(popup, null);
             }
             else
+            {
                 popup.IsOpen = false;
+            }
         }
 
-        void state(object sender, EventArgs e2)
+        void state(object? sender, EventArgs e2)
         {
-            var window = sender as Window;
+            if (sender is not Window window)
+            {
+                return;
+            }
+
             if (window.IsActive && window.WindowState != WindowState.Minimized)
             {
                 if (GetWasOpened(popup).HasValue)
-                    popup.IsOpen = GetWasOpened(popup).Value;
+                {
+                    popup.IsOpen = GetWasOpened(popup) ?? false;
+                }
+
                 SetWasOpened(popup, null);
             }
             else if (!GetWasOpened(popup).HasValue)
@@ -53,7 +68,7 @@ public sealed class PopupManager
             }
         }
 
-        void deact(object sender, EventArgs e2)
+        void deact(object? sender, EventArgs e2)
         {
             if (!GetWasOpened(popup).HasValue)
             {

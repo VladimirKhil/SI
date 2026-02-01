@@ -4,7 +4,7 @@ namespace SIQuester.Utilities;
 
 internal sealed class LinkManager : ILinkManager
 {
-    public string GetLinkText(System.Collections.IList collection, int index, out bool canBeExtended, out string tail)
+    public string? GetLinkText(System.Collections.IList collection, int index, out bool canBeExtended, out string? tail)
     {
         if (collection is AuthorsViewModel authors)
         {

@@ -15,7 +15,7 @@ public interface IClipboardService
     /// Retrieves data in a specified format from the Clipboard.
     /// </summary>
     /// <param name="format">Data format.</param>
-    object GetData(string format);
+    object? GetData(string format);
 
     /// <summary>
     /// Stores the specified data on the Clipboard in the specified format.

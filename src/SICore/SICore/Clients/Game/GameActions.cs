@@ -410,10 +410,15 @@ public sealed class GameActions
     internal void InformQuestionCounter(int questionIndex, string person = NetworkConstants.Everybody) =>
         SendMessageToWithArgs(person, Messages.QuestionCounter, questionIndex);
 
-    internal void InformAnswerDeviation(int deviation, string person = NetworkConstants.Everybody) =>
+    internal void InformAnswerDeviation(double deviation, string person = NetworkConstants.Everybody) =>
         SendMessageToWithArgs(person, Messages.AnswerDeviation, deviation);
 
-    internal void AskAnswer(string person, string answerType) => SendMessageToWithArgs(person, Messages.Answer, answerType);
+    internal void AskAnswer(string person, AnswerType answerType, double deviation) =>
+        SendMessageToWithArgs(
+            person,
+            Messages.Answer,
+            answerType == AnswerType.Numeric ? "number" : (answerType == AnswerType.Point ? "point" : ""),
+            answerType == AnswerType.Point ? deviation : 0);
 
     internal void AskReview()
     {

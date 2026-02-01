@@ -30,6 +30,12 @@ public interface IQuestionEnginePlayHandler
     bool OnNumericAnswerType(int deviation);
 
     /// <summary>
+    /// Notifies about point answer type.
+    /// </summary>
+    /// <param name="deviation">Acceptable point answer deviation.</param>
+    bool OnPointAnswerType(double deviation);
+
+    /// <summary>
     /// Shows question content.
     /// </summary>
     /// <param name="content">Question content to display.</param>
@@ -96,6 +102,12 @@ public interface IQuestionEnginePlayHandler
     /// </summary>
     /// <param name="rightOptionLabel">Right option label.</param>
     bool OnRightAnswerOption(string rightOptionLabel);
+
+    /// <summary>
+    /// Handles right point answer.
+    /// </summary>
+    /// <param name="rightAnswer">Right point coordinates.</param>
+    bool OnRightAnswerPoint(string rightAnswer);
 
     /// <summary>
     /// Handles answer start.

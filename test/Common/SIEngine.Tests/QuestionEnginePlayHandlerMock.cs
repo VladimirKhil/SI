@@ -53,4 +53,8 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
     public bool OnRightAnswerOption(string rightOptionLabel) => false;
 
     public bool OnNumericAnswerType(int deviation) => false;
+
+    public bool OnPointAnswerType(double deviation) => false;
+
+    public bool OnRightAnswerPoint(string rightAnswer) => false;
 }

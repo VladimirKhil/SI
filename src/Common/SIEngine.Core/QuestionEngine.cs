@@ -21,6 +21,7 @@ public sealed class QuestionEngine : IQuestionEngine
     private bool _areButtonsEnabled = false;
 
     private bool _isAnswerTypeSelect = false;
+    private bool _isAnswerTypePoint = false;
 
     private readonly Script? _script;
 
@@ -207,6 +208,30 @@ public sealed class QuestionEngine : IQuestionEngine
                         break;
                     }
 
+                    if (answerType == StepParameterValues.SetAnswerTypeType_Point)
+                    {
+                        var deviation = 0.0;
+
+                        if (_question.Parameters.TryGetValue(
+                            QuestionParameterNames.AnswerDeviation,
+                            out var answerDeviation) &&
+                            answerDeviation.SimpleValue != null)
+                        {
+                            _ = double.TryParse(answerDeviation.SimpleValue, out deviation);
+                        }
+
+                        _isAnswerTypePoint = true;
+                        var setPointAnswerResult = _playHandler.OnPointAnswerType(deviation);
+                        _stepIndex++;
+                        
+                        if (setPointAnswerResult)
+                        {
+                            return true;
+                        }
+                        
+                        break;
+                    }
+
                     if (answerType != StepParameterValues.SetAnswerTypeType_Select) // Only "select" type is currently supported
                     {
                         _stepIndex++;
@@ -325,6 +350,19 @@ public sealed class QuestionEngine : IQuestionEngine
                                     if (_isAnswerTypeSelect && rightAnswer.Length > 0)
                                     {
                                         var handled = _playHandler.OnRightAnswerOption(rightAnswer);
+                                        _stepIndex++;
+
+                                        if (handled)
+                                        {
+                                            return true;
+                                        }
+
+                                        continue;
+                                    }
+
+                                    if (_isAnswerTypePoint && rightAnswer.Length > 0)
+                                    {
+                                        var handled = _playHandler.OnRightAnswerPoint(rightAnswer);
                                         _stepIndex++;
 
                                         if (handled)

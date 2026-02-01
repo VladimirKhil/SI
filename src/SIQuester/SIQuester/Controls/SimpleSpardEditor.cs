@@ -1,5 +1,4 @@
 ﻿using Lingware.Spard.Expressions;
-using SIQuester.Model;
 using SIQuester.ViewModel;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -10,12 +9,12 @@ namespace SIQuester;
 
 public sealed class SimpleSpardEditor : RichTextBox
 {
-    private Sequence _rootExpression = null;
+    private Sequence? _rootExpression = null;
     private readonly Dictionary<Inline, Expression> _indexTable = new();
     private bool _updateFlag = false;
 
-    private SpardTemplateViewModel _spardViewModel = null;
-    private readonly Paragraph _paragraph = null;
+    private SpardTemplateViewModel? _spardViewModel = null;
+    private readonly Paragraph? _paragraph = null;
 
     private readonly object _sync = new();
 
@@ -100,7 +99,7 @@ public sealed class SimpleSpardEditor : RichTextBox
 
         if (_spardViewModel == null && DataContext != null)
         {
-            System.Windows.FrameworkElement parent = this;
+            System.Windows.FrameworkElement? parent = this;
 
             do
             {
@@ -178,7 +177,7 @@ public sealed class SimpleSpardEditor : RichTextBox
 
         var newOperands = parent.Operands().Where(exp => !topExpressions.Contains(exp)).ToArray();
 
-        // Удалим второй Optional из parent.Operands
+        // Remove second Optional from parent.Operands
         var index = Array.LastIndexOf(newOperands, optional);
         parent.SetOperands(newOperands.Where((exc, ind) => ind != index).ToArray());
 

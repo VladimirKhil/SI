@@ -79,8 +79,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private readonly HistoryLog _tasksHistory = new();
 
-    private TimeSettings TimeSettings => _state.Settings.AppSettings.TimeSettings;
-
     public SIEngine.GameEngine Engine { get; } // TODO: remove dependency on GameEngine
 
     public event Action<GameLogic, GameStages, string, int, int>? StageChanged;
@@ -163,7 +161,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.IsPartial = false;
         ShareMedia(contentItem);
 
-        var contentTime = GetContentItemDuration(contentItem, _state.TimeSettings.Image * 10);
+        var (contentTime, _) = GetContentItemDuration(contentItem, _state.TimeSettings.Image * 10);
 
         _state.AtomTime = contentTime;
         _state.AtomStart = DateTime.UtcNow;
@@ -658,8 +656,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var partialImage = appSettings.PartialImages && !appSettings.FalseStart && _state.QuestionPlay.UseButtons && !_state.QuestionPlay.IsAnswer;
 
         var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
-        
-        var waitTime = GetContentItemDuration(contentItem, _state.TimeSettings.Image * 10);
+
+        var (waitTime, _) = GetContentItemDuration(contentItem, _state.TimeSettings.Image * 10);
 
         var contentTime = renderTime + waitTime;
 
@@ -672,10 +670,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.UseBackgroundAudio = !contentItem.WaitForFinish;
     }
 
-    private static int GetContentItemDuration(ContentItem contentItem, int defaultValue) =>
+    private static (int, bool) GetContentItemDuration(ContentItem contentItem, int defaultValue) =>
         contentItem.WaitForFinish
-            ? (contentItem.Duration > TimeSpan.Zero ? (int)(contentItem.Duration.TotalMilliseconds / 100) : defaultValue)
-            : 1;
+            ? (contentItem.Duration > TimeSpan.Zero ? ((int)(contentItem.Duration.TotalMilliseconds / 100), false) : (defaultValue, true))
+            : (1, false);
 
     private void ClearMediaContent() => _state.QuestionPlay.MediaContentCompletions.Clear();
 
@@ -684,7 +682,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.IsPartial = false;
         var globalUri = ShareMedia(contentItem);
 
-        var defaultTime = DefaultMediaTime + TimeSettings.TimeForMediaDelay * 10;
+        var defaultTime = DefaultMediaTime;
 
         if (globalUri != null)
         {
@@ -693,14 +691,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             defaultTime = DefaultAudioVideoTime;
         }
 
-        var atomTime = GetContentItemDuration(contentItem, defaultTime);
+        var (contentTime, isDefault) = GetContentItemDuration(contentItem, defaultTime);
 
-        _state.AtomTime = atomTime;
+        _state.AtomTime = contentTime;
         _state.AtomStart = DateTime.UtcNow;
         _state.IsPlayingMedia = true;
         _state.IsPlayingMediaPaused = false;
+        _state.QuestionPlay.CollectMediaCompletions = isDefault;
 
-        ScheduleExecution(Tasks.MoveNext, atomTime);
+        ScheduleExecution(Tasks.MoveNext, contentTime);
 
         _state.TimeThinking = 0.0;
     }
@@ -710,7 +709,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.IsPartial = false;
         var globalUri = ShareMedia(contentItem);
 
-        var defaultTime = DefaultMediaTime + TimeSettings.TimeForMediaDelay * 10;
+        var defaultTime = DefaultMediaTime;
 
         if (globalUri != null)
         {
@@ -719,14 +718,15 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             defaultTime = DefaultAudioVideoTime;
         }
 
-        int atomTime = GetContentItemDuration(contentItem, defaultTime);
+        var (contentTime, isDefault) = GetContentItemDuration(contentItem, defaultTime);
 
-        _state.AtomTime = atomTime;
+        _state.AtomTime = contentTime;
         _state.AtomStart = DateTime.UtcNow;
         _state.IsPlayingMedia = true;
         _state.IsPlayingMediaPaused = false;
+        _state.QuestionPlay.CollectMediaCompletions = isDefault;
 
-        ScheduleExecution(Tasks.MoveNext, atomTime);
+        ScheduleExecution(Tasks.MoveNext, contentTime);
 
         _state.TimeThinking = 0.0;
     }
@@ -1494,7 +1494,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         else
         {
             var waitTime = _state.IsPlayingMedia && _state.QuestionPlay.MediaContentCompletions.All(p => p.Value.Current > 0)
-                ? 30 + _state.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10
+                ? 30
                 : _state.AtomTime;
 
             ScheduleExecution(Tasks.MoveNext, waitTime, force: true);
@@ -3261,16 +3261,36 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             OnDecision();
         }
-        else if (_state.QuestionPlay.IsNumericAnswer &&
+        else if (_state.QuestionPlay.AnswerType == AnswerType.Numeric &&
             int.TryParse(_state.Question?.Right.FirstOrDefault() ?? "", out var rightNumber))
         {
             _state.IsWaiting = true;
             _state.Decision = DecisionType.AnswerValidating;
 
-            var deviation = _state.QuestionPlay.NumericAnswerDeviation;
+            var deviation = _state.QuestionPlay.AnswerDeviation;
 
             _state.Answerer.AnswerIsRight = int.TryParse(_state.Answerer.Answer, out var playerNumber) && 
                 Math.Abs(playerNumber - rightNumber) <= deviation;
+            
+            _state.Answerer.AnswerValidationFactor = 1.0;
+            _state.ShowmanDecision = true;
+            OnDecision();
+        }
+        else if (_state.QuestionPlay.AnswerType == AnswerType.Point)
+        {
+            _state.IsWaiting = true;
+            _state.Decision = DecisionType.AnswerValidating;
+
+            var rightAnswer = _state.Question?.Right.FirstOrDefault() ?? "";
+            var playerAnswer = _state.Answerer.Answer ?? "";
+            var deviation = _state.QuestionPlay.AnswerDeviation;
+
+            var rightPointParsed = ParsePoint(rightAnswer);
+            var playerPointParsed = ParsePoint(playerAnswer);
+
+            _state.Answerer.AnswerIsRight = rightPointParsed.HasValue &&
+                playerPointParsed.HasValue &&
+                CalculatePointDistance(rightPointParsed.Value, playerPointParsed.Value) <= deviation + 0.05;
             
             _state.Answerer.AnswerValidationFactor = 1.0;
             _state.ShowmanDecision = true;
@@ -3340,7 +3360,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     _state.Players[i].Answer = "";
                     _state.Players[i].Flag = true;
-                    _gameActions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.IsNumericAnswer ? "number" : "");
+                    _gameActions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.AnswerType, _state.QuestionPlay.AnswerDeviation);
                 }
             }
 
@@ -3393,10 +3413,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
             else // The only place where we do not check CanPlayerAct()
             {
-                _gameActions.SendMessageToWithArgs(
-                    _state.Answerer.Name,
-                    Messages.Answer,
-                    _state.QuestionPlay.IsNumericAnswer ? "number" : "");
+                _gameActions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType, _state.QuestionPlay.AnswerDeviation);
             }
         }
 
@@ -4024,7 +4041,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        var waitTime = _state.AppellationAwaitedVoteCount > 0 ? _state.TimeSettings.ShowmanDecision * 10 : 1;
+        var waitTime = _state.AppellationAwaitedVoteCount > 0 ? _state.TimeSettings.Appellation * 10 : 1;
         ScheduleExecution(Tasks.WaitAppellationDecision, waitTime);
         WaitFor(DecisionType.Appellation, waitTime, -2);
     }
@@ -4657,6 +4674,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.RightOptionLabel = rightOptionLabel;
     }
 
+    internal void OnRightAnswerPoint(string rightAnswer)
+    {
+        _gameActions.SendMessageWithArgs(Messages.RightAnswer, "point", rightAnswer);
+        var answerTime = _state.TimeSettings.RightAnswer;
+        answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
+        ScheduleExecution(Tasks.MoveNext, answerTime);
+    }
+
     private bool DetectRoundTimeout()
     {
         var roundDuration = DateTime.UtcNow.Subtract(_state.TimerStartTime[0]).TotalMilliseconds / 100;
@@ -5085,7 +5110,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     {
                         var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
                         messageBuilder.Add(ContentTypes.Text).Add(errorText);
-                        duration = DefaultMediaTime + TimeSettings.TimeForMediaDelay * 10;
+                        duration = DefaultMediaTime;
                     }
                     else
                     {
@@ -5183,7 +5208,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         return statistic;
     }
 
-    internal void OnNumericAnswer() => _gameActions.InformAnswerDeviation(_state.QuestionPlay.NumericAnswerDeviation);
+    internal void OnNumericAnswer() => _gameActions.InformAnswerDeviation(_state.QuestionPlay.AnswerDeviation);
 
     internal void OnQuestionStart()
     {
@@ -5194,5 +5219,43 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         SendQuestionAnswersToShowman();
+    }
+
+    /// <summary>
+    /// Parses a point answer in "x,y" format.
+    /// </summary>
+    /// <param name="pointString">String in "x,y" format where x and y are doubles.</param>
+    /// <returns>Parsed point as tuple (x, y), or null if parsing fails.</returns>
+    private static (double X, double Y)? ParsePoint(string pointString)
+    {
+        if (string.IsNullOrWhiteSpace(pointString))
+        {
+            return null;
+        }
+
+        var parts = pointString.Split(',');
+
+        if (parts.Length != 2)
+        {
+            return null;
+        }
+
+        if (!double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) ||
+            !double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y))
+        {
+            return null;
+        }
+
+        return (x, y);
+    }
+
+    /// <summary>
+    /// Calculates Euclidean distance between two points.
+    /// </summary>
+    private static double CalculatePointDistance((double X, double Y) point1, (double X, double Y) point2)
+    {
+        var dx = point1.X - point2.X;
+        var dy = point1.Y - point2.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
     }
 }

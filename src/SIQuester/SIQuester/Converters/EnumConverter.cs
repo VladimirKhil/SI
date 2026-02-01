@@ -39,5 +39,5 @@ public sealed class EnumConverter : IValueConverter
             value.ToString();
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null;
+    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null;
 }

@@ -110,14 +110,14 @@ internal sealed class QuestionPlayState
     internal int AppellationIndex { get; set; }
 
     /// <summary>
-    /// Gets a value indicating whether the answer is a numeric value.
+    /// Answer type.
     /// </summary>
-    public bool IsNumericAnswer { get; internal set; }
+    public AnswerType AnswerType { get; internal set; }
 
     /// <summary>
     /// Defines acceptable deviation for numeric answers.
     /// </summary>
-    public int NumericAnswerDeviation { get; internal set; }
+    public double AnswerDeviation { get; internal set; }
 
     /// <summary>
     /// Marks whether the question has flexible pricing.
@@ -128,6 +128,11 @@ internal sealed class QuestionPlayState
     /// Gets the unique identifier for the question.
     /// </summary>
     public string QuestionKey { get; internal set; } = "";
+
+    /// <summary>
+    /// Should media completions be collected from players.
+    /// </summary>
+    public bool CollectMediaCompletions { get; internal set; }
 
     internal void Clear()
     {
@@ -148,10 +153,11 @@ internal sealed class QuestionPlayState
         AppellationState = AppellationState.None;
         Appellations.Clear();
         AppellationIndex = 0;
-        IsNumericAnswer = false;
-        NumericAnswerDeviation = 0;
+        AnswerType = AnswerType.Text;
+        AnswerDeviation = 0;
         FlexiblePrice = false;
         QuestionKey = "";
+        CollectMediaCompletions = false;
     }
 
     internal void RemovePlayer(int playerIndex)

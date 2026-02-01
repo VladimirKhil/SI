@@ -698,6 +698,10 @@ public sealed class QuestionEngineTests
         public bool OnButtonPressStart() => false;
 
         public bool OnRightAnswerOption(string rightOptionLabel) => false;
+
+        public bool OnPointAnswerType(double deviation) => false;
+
+        public bool OnRightAnswerPoint(string rightAnswer) => false;
     }
 
     #endregion

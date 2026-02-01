@@ -29,9 +29,16 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public bool OnNumericAnswerType(int deviation)
     {
-        _state.QuestionPlay.IsNumericAnswer = true;
-        _state.QuestionPlay.NumericAnswerDeviation = deviation;
+        _state.QuestionPlay.AnswerType = AnswerType.Numeric;
+        _state.QuestionPlay.AnswerDeviation = deviation;
         _controller.OnNumericAnswer();
+        return false;
+    }
+
+    public bool OnPointAnswerType(double deviation)
+    {
+        _state.QuestionPlay.AnswerType = AnswerType.Point;
+        _state.QuestionPlay.AnswerDeviation = deviation;
         return false;
     }
 
@@ -370,6 +377,12 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
     public bool OnRightAnswerOption(string rightOptionLabel)
     {
         _controller.OnRightAnswerOption(rightOptionLabel);
+        return true;
+    }
+
+    public bool OnRightAnswerPoint(string rightAnswer)
+    {
+        _controller.OnRightAnswerPoint(rightAnswer);
         return true;
     }
 }

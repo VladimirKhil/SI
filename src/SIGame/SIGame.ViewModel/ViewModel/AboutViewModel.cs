@@ -1,9 +1,9 @@
-﻿using SICore;
-using SIGame.ViewModel.PlatformSpecific;
+﻿using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using System.Reflection;
 using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -26,17 +26,17 @@ public sealed class AboutViewModel: ViewModel<object>
 
     public AboutViewModel()
     {
-        NavigateHome = new CustomCommand(NavigateHome_Executed);
-        NavigateComposer = new CustomCommand(NavigateComposer_Executed);
-        OpenLicenses = new CustomCommand(OpenLicenses_Executed);
-        OpenPublicDomain = new CustomCommand(OpenPublicDomain_Executed);
+        NavigateHome = new SimpleCommand(NavigateHome_Executed);
+        NavigateComposer = new SimpleCommand(NavigateComposer_Executed);
+        OpenLicenses = new SimpleCommand(OpenLicenses_Executed);
+        OpenPublicDomain = new SimpleCommand(OpenPublicDomain_Executed);
     }
 
-    private void NavigateHome_Executed(object arg) => OpenSite("https://vladimirkhil.com/si/game");
+    private void NavigateHome_Executed(object? arg) => OpenSite("https://vladimirkhil.com/si/game");
 
-    private void NavigateComposer_Executed(object arg) => OpenSite("https://soundcloud.com/vladislav-hoshenko");
+    private void NavigateComposer_Executed(object? arg) => OpenSite("https://soundcloud.com/vladislav-hoshenko");
 
-    private void OpenLicenses_Executed(object arg)
+    private void OpenLicenses_Executed(object? arg)
     {
         var licensesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "licenses");
 
@@ -58,7 +58,7 @@ public sealed class AboutViewModel: ViewModel<object>
         }
     }
 
-    private void OpenPublicDomain_Executed(object arg) => OpenSite("https://en.wikipedia.org/wiki/Wikipedia:Public_domain");
+    private void OpenPublicDomain_Executed(object? arg) => OpenSite("https://en.wikipedia.org/wiki/Wikipedia:Public_domain");
 
     private static void OpenSite(string url)
     {

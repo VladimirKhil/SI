@@ -19,6 +19,7 @@ public sealed class TimeSettings
     public const int DefaultRightAnswer = 2;
     public const int DefaultImage = 5;
     public const int DefaultPartialImage = 3;
+    public const int DefaultAppellation = 30;
 
     public static readonly TimeSettings Default = new()
     {
@@ -36,6 +37,7 @@ public sealed class TimeSettings
         RightAnswer = DefaultRightAnswer,
         Image = DefaultImage,
         PartialImage = DefaultPartialImage,
+        Appellation = DefaultAppellation,
     };
 
     /// <summary>
@@ -107,4 +109,9 @@ public sealed class TimeSettings
     /// Gets or sets the time interval for partial image rendering.
     /// </summary>
     public int PartialImage { get; set; } = DefaultPartialImage;
+
+    /// <summary>
+    /// Gets or sets the time interval for appellation.
+    /// </summary>
+    public int Appellation { get; set; } = DefaultAppellation;
 }
