@@ -1395,4 +1395,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="SelectPointHint" xml:space="preserve">
     <value>Select point on image</value>
   </data>
+  <data name="OtherLanguage" xml:space="preserve">
+    <value>(other)</value>
+  </data>
 </root>

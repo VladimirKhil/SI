@@ -48,7 +48,7 @@ public sealed class StorageContextViewModel : INotifyPropertyChanged
         }
     }
 
-    public string[] Languages { get; } = new string[] { "ru-RU", "en-US", "sr-RS" };
+    public string[] Languages { get; } = new string[] { "ru-RU", "en-US", "sr-RS", "other" };
 
     public StorageContextViewModel(
         ISIStorageServiceClient siStorageService,

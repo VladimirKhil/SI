@@ -1391,4 +1391,7 @@
   <data name="SelectPointHint" xml:space="preserve">
     <value>Выберите точку на изображении</value>
   </data>
+  <data name="OtherLanguage" xml:space="preserve">
+    <value>(другой)</value>
+  </data>
 </root>

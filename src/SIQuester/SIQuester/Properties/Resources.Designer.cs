@@ -2153,6 +2153,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (other).
+        /// </summary>
+        public static string OtherLanguage {
+            get {
+                return ResourceManager.GetString("OtherLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Package.
         /// </summary>
         public static string Package {
@@ -3476,7 +3485,7 @@ namespace SIQuester.Properties {
                 return ResourceManager.GetString("ThemeNameFontSize", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Dark.
         /// </summary>
@@ -3485,7 +3494,7 @@ namespace SIQuester.Properties {
                 return ResourceManager.GetString("ThemeOptionDark", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Light.
         /// </summary>
@@ -3649,6 +3658,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use dark theme.
+        /// </summary>
+        public static string UseDarkTheme {
+            get {
+                return ResourceManager.GetString("UseDarkTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use GPT for generating questions.
         /// </summary>
         public static string UseGPT {
@@ -3663,15 +3681,6 @@ namespace SIQuester.Properties {
         public static string UseImageDuration {
             get {
                 return ResourceManager.GetString("UseImageDuration", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Use dark theme.
-        /// </summary>
-        public static string UseDarkTheme {
-            get {
-                return ResourceManager.GetString("UseDarkTheme", resourceCulture);
             }
         }
         

@@ -16,7 +16,8 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
     private static readonly Dictionary<string, string> _languages = new()
     {
         { "ru-RU", "Russian" },
-        { "sr-RS", "Serbian" }
+        { "sr-RS", "Serbian" },
+        { "other", "Other" }
     };
 
     private readonly bool _initialized = false;

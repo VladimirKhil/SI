@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using SIQuester.Properties;
+using System.Globalization;
 using System.Windows.Data;
 
 namespace SIQuester.Converters;
@@ -12,7 +13,8 @@ public sealed class LanguageConverter : IValueConverter
     private static readonly Dictionary<string, string> LanguageNames = new()
     {
         { "ru-RU", "Русский" },
-        { "sr-RS", "Srpski" }
+        { "sr-RS", "Srpski" },
+        { "other", Resources.OtherLanguage }
     };
 
     private static readonly string DefaultLanguage = "English";
