@@ -12,7 +12,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence) => false;
 
-    public void OnAskAnswer(string mode)
+    public void OnAskAnswer(string mode, int duration)
     {
         
     }

@@ -557,6 +557,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         var game = GameRunner.CreateGame(
            node,
            gameSettings,
+           new SI.Contracts.TimeSettings(),
            document,
            gameHost,
            fileShare,

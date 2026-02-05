@@ -45,7 +45,8 @@ public interface IQuestionEnginePlayHandler
     /// Asks for the answer.
     /// </summary>
     /// <param name="mode">Ask answer mode.</param>
-    void OnAskAnswer(string mode);
+    /// <param name="duration">Answering duration in seconds.</param>
+    void OnAskAnswer(string mode, int duration);
 
     /// <summary>
     /// Allows to press the button.

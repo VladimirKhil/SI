@@ -468,7 +468,14 @@ public sealed class QuestionEngine : IQuestionEngine
                             continue;
                         }
 
-                        _playHandler.OnAskAnswer(mode);
+                        var durationValue = TryGetParameter(step, StepParameterNames.Duration)?.SimpleValue;
+
+                        if (!int.TryParse(durationValue, out var duration) || duration < 0)
+                        {
+                            duration = 0;
+                        }
+
+                        _playHandler.OnAskAnswer(mode, duration);
                         _isAskingAnswer = true;
                         _stepIndex++;
                     }

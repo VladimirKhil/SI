@@ -39,4 +39,9 @@ public static class StepParameterNames
     /// Target options.
     /// </summary>
     public const string Options = "options";
+
+    /// <summary>
+    /// Target duration.
+    /// </summary>
+    public const string Duration = "duration";
 }

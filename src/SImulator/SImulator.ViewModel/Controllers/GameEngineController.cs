@@ -86,13 +86,13 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return false;
     }
 
-    public void OnAskAnswer(string mode)
+    public void OnAskAnswer(string mode, int duration)
     {
         if (_optionsShown.HasValue && !_optionsShown.Value)
         {
             GameViewModel.Continuation = () =>
             {
-                OnAskAnswer(mode);
+                OnAskAnswer(mode, duration);
                 return true;
             };
 

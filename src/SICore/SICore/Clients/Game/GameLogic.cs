@@ -734,15 +734,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     // Let's add a random offset so it will be difficult to press the button in advance (before the frame appears)
     internal void AskToPress() => ScheduleExecution(Tasks.AskToTry, 1 + (_state.Settings.AppSettings.Managed ? 0 : Random.Shared.Next(10)), force: true);
 
-    internal void AskDirectAnswer()
-    {
-        if (HaveMultipleAnswerers())
-        {
-            _gameActions.SendMessageWithArgs(Messages.FinalThink, _state.TimeSettings.HiddenAnswering);
-        }
-
-        ScheduleExecution(Tasks.AskAnswer, 1, force: true);
-    }
+    internal void AskDirectAnswer() => ScheduleExecution(Tasks.AskAnswer, 1, force: true);
 
     internal void OnRoundEnded()
     {
@@ -842,7 +834,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         try
         {
-            var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
+            var maxPressingTime = (_state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.ButtonPressing) * 10;
             times[1] = maxPressingTime - ResumeExecution();
         }
         catch (Exception exc)
@@ -2651,11 +2643,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         SendTryToPlayers();
 
-        var maxTime = _state.TimeSettings.ButtonPressing * 10;
+        var maxTime = (_state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.ButtonPressing) * 10;
 
         _state.TimerStartTime[1] = DateTime.UtcNow;
         _state.IsThinking = true;
-        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Resume);
+        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Go, maxTime);
         _state.Decision = DecisionType.Pressing;
 
         ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _state.TimeThinking, 10));
@@ -3352,7 +3344,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         if (HaveMultipleAnswerers())
         {
+            var answerTime = _state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.HiddenAnswering;
+
             _gameActions.ShowmanReplic(LO[nameof(R.StartThink)]);
+            _gameActions.SendMessageWithArgs(Messages.FinalThink, answerTime);
 
             for (var i = 0; i < _state.Players.Count; i++)
             {
@@ -3364,7 +3359,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 }
             }
 
-            var waitTime = _state.TimeSettings.HiddenAnswering * 10;
+            var waitTime = answerTime * 10;
 
             _state.AnswerCount = _state.QuestionPlay.AnswererIndicies.Count;
             ScheduleExecution(Tasks.WaitAnswer, waitTime, force: true);
@@ -3389,7 +3384,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.SendMessageWithArgs(Messages.StopPlay);
         }
 
-        var waitAnswerTime = useButtons ? _state.TimeSettings.Answering * 10 : _state.TimeSettings.SoloAnswering * 10;
+        var waitAnswerTime = useButtons ? _state.TimeSettings.Answering * 10 : (_state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.SoloAnswering) * 10;
 
         var useAnswerOptions = _state.QuestionPlay.AnswerOptions != null;
         _state.IsOralNow = _state.IsOral && _state.Answerer.IsHuman;

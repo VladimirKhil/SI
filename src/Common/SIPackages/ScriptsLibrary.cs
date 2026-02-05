@@ -311,6 +311,15 @@ public static class ScriptsLibrary
     {
         var askAnswerStep = new Step { Type = StepTypes.AskAnswer };
         askAnswerStep.AddSimpleParameter(StepParameterNames.Mode, mode);
+
+        var duration = new StepParameter
+        {
+            IsRef = true,
+            Type = StepParameterTypes.Simple,
+            SimpleValue = QuestionParameterNames.AnswerDuration
+        };
+
+        askAnswerStep.Parameters.Add(StepParameterNames.Duration, duration);
         return askAnswerStep;
     }
 

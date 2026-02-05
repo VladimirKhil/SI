@@ -32,15 +32,13 @@ public sealed class ScenariosTests
         var gameSettings = new GameSettingsCore<AppSettingsCore>
         {
             Showman = new Account { IsHuman = true, Name = Constants.FreePlace },
-            Players = new[]
-            {
+            Players =
+            [
                 new Account { IsHuman = true, Name = Constants.FreePlace },
                 new Account { IsHuman = true, Name = Constants.FreePlace }
-            },
+            ],
             HumanPlayerName = "Showman"
         };
-
-        var timeSettings = gameSettings.AppSettings.TimeSettings;
 
         var document = SIDocument.Create("Test Package", "Test Author");
 
@@ -56,10 +54,10 @@ public sealed class ScenariosTests
         question.Parameters[QuestionParameterNames.Question] = new StepParameter
         {
             Type = StepParameterTypes.Content,
-            ContentValue = new List<ContentItem>
-            {
+            ContentValue =
+            [
                 new() { Value = "Test question text", Type = ContentTypes.Text }
-            }
+            ]
         };
 
         question.Right.Add("right");
@@ -71,6 +69,7 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
+            new SI.Contracts.TimeSettings(),
             document,
             gameHost,
             fileShare,
@@ -239,6 +238,7 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
+            new SI.Contracts.TimeSettings(),
             document,
             gameHost,
             fileShare,
@@ -336,6 +336,7 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
+            new SI.Contracts.TimeSettings(),
             document,
             gameHost,
             fileShare,
@@ -434,6 +435,7 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
+            new SI.Contracts.TimeSettings(),
             document,
             gameHost,
             fileShare,

@@ -22,6 +22,7 @@ using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
 using SIStorageService.ViewModel;
 using SIUI.ViewModel;
+using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -750,9 +751,31 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         var avatarHelper = new AvatarHelper(Path.Combine(documentPath, "avatars"));
 
+        var timeSettings = _model.AppSettings.TimeSettings;
+
+        var timeSettingsNew = new SI.Contracts.TimeSettings
+        {
+            QuestionSelection = timeSettings.TimeForChoosingQuestion,
+            ThemeSelection = timeSettings.TimeForChoosingFinalTheme,
+            PlayerSelection = timeSettings.TimeForGivingACat,
+            ButtonPressing = timeSettings.TimeForThinkingOnQuestion,
+            Answering = timeSettings.TimeForPrintingAnswer,
+            SoloAnswering = timeSettings.TimeForThinkingOnSpecial,
+            HiddenAnswering = timeSettings.TimeForFinalThinking,
+            StakeMaking = timeSettings.TimeForMakingStake,
+            ShowmanDecision = timeSettings.TimeForShowmanDecisions,
+            Appellation = timeSettings.TimeForShowmanDecisions, // Backward compatibility
+            Round = timeSettings.TimeOfRound,
+            ButtonBlocking = timeSettings.TimeForBlockingButton,
+            RightAnswer = timeSettings.TimeForRightAnswer,
+            Image = timeSettings.ImageTime,
+            PartialImage = timeSettings.PartialImageTime,
+        };
+
         var game = GameRunner.CreateGame(
             node,
             _model,
+            timeSettingsNew,
             document,
             _gameHost,
             fileShare,
@@ -774,6 +797,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             IsHost = true,
             TempDocFolder = documentPath
         };
+
         var logic = new ViewerHumanLogic(gameViewModel, data, actions, _userSettings, LocalAddress, _loggerFactory.CreateLogger<ViewerHumanLogic>());
 
         IViewerClient? host = null;

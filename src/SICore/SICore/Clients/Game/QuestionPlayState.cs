@@ -120,6 +120,11 @@ internal sealed class QuestionPlayState
     public double AnswerDeviation { get; internal set; }
 
     /// <summary>
+    /// Defines answer duration in seconds.
+    /// </summary>
+    public int? AnswerDuration { get; internal set; }
+
+    /// <summary>
     /// Marks whether the question has flexible pricing.
     /// </summary>
     public bool FlexiblePrice { get; internal set; }
@@ -155,6 +160,7 @@ internal sealed class QuestionPlayState
         AppellationIndex = 0;
         AnswerType = AnswerType.Text;
         AnswerDeviation = 0;
+        AnswerDuration = null;
         FlexiblePrice = false;
         QuestionKey = "";
         CollectMediaCompletions = false;

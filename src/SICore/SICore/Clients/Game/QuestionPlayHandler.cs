@@ -48,7 +48,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         return true;
     }
 
-    public void OnAskAnswer(string mode)
+    public void OnAskAnswer(string mode, int duration)
     {
         if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
         {
@@ -58,7 +58,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
         if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
         {
-            _controller.ShowAnswerOptions(() => OnAskAnswer(mode));
+            _controller.ShowAnswerOptions(() => OnAskAnswer(mode, duration));
             _state.QuestionPlay.AnswerOptionsShown = true;
             return;
         }
@@ -67,6 +67,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         _state.IsPlayingMedia = false;
         _state.IsPlayingMediaPaused = false;
         _state.AnswerMode = mode;
+        _state.QuestionPlay.AnswerDuration = duration > 0 ? duration : null;
 
         switch (mode)
         {

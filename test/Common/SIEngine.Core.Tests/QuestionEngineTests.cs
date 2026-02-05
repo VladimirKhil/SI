@@ -636,7 +636,7 @@ public sealed class QuestionEngineTests
             LastContentItems = content;
         }
 
-        public void OnAskAnswer(string mode)
+        public void OnAskAnswer(string mode, int duration)
         {
             AskAnswerCalled = true;
         }

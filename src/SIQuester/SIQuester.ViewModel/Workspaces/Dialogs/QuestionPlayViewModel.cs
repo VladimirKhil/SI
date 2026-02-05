@@ -251,7 +251,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         }
     }
 
-    public void OnAskAnswer(string mode)
+    public void OnAskAnswer(string mode, int duration)
     {
         if (mode == StepParameterValues.AskAnswerMode_Button)
         {
