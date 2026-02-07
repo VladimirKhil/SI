@@ -458,6 +458,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         var message = string.Join(Message.ArgsSeparator, Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
+        _gameActions.SendContent(ContentPlacements.Screen, 0, "", ContentTypes.Text, "", text.EscapeNewLines());
 
         _state.ComplexVisualState ??= new IReadOnlyList<string>[1];
         _state.ComplexVisualState[0] = new string[] { message };
@@ -588,6 +589,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 var message = string.Join(Message.ArgsSeparator, Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
                 _gameActions.SendMessage(message);
 
+                _gameActions.SendContent(ContentPlacements.Screen, 0, "", ContentTypes.Text, "", errorText);
+
                 _state.ComplexVisualState ??= new IReadOnlyList<string>[1];
                 _state.ComplexVisualState[0] = new string[] { message };
 
@@ -599,6 +602,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 contentItem.Placement,
                 0,
                 contentItem.Type,
+                globalUri);
+
+            _gameActions.SendContent(
+                contentItem.Placement,
+                0,
+                "",
+                contentItem.Type,
+                "",
                 globalUri);
 
             return globalUri;
@@ -5035,9 +5046,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         int contentDuration;
 
-        if (answerOption.Content.Type == ContentTypes.Text)
+        var contentType = answerOption.Content.Type;
+        string contentValue;
+
+        if (contentType == ContentTypes.Text)
         {
-            messageBuilder.Add(ContentTypes.Text).Add(answerOption.Content.Value.EscapeNewLines());
+            contentValue = answerOption.Content.Value.EscapeNewLines();
+            messageBuilder.Add(ContentTypes.Text).Add(contentValue);
             contentDuration = Math.Max(10, GetReadingDurationForTextLength(answerOption.Content.Value.Length));
         }
         else
@@ -5046,15 +5061,26 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             if (!success || globalUri == null)
             {
-                messageBuilder.Add(ContentTypes.Text).Add(error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri));
+                contentType = ContentTypes.Text;
+                contentValue = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
+                messageBuilder.Add(ContentTypes.Text).Add(contentValue);
             }
             else
             {
-                messageBuilder.Add(answerOption.Content.Type).Add(globalUri);
+                contentValue = globalUri;
+                messageBuilder.Add(contentType).Add(contentValue);
             }
 
             contentDuration = 10;
         }
+
+        _gameActions.SendContent(
+            ContentPlacements.Screen,
+            optionIndex + 1,
+            answerOption.Label,
+            contentType,
+            "",
+            contentValue);
 
         _gameActions.SendMessage(messageBuilder.ToString());
 
@@ -5077,6 +5103,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var contentListDuration = 0;
 
             var messageBuilder = new MessageBuilder(Messages.Content).Add(placement);
+            var content = new List<(string Type, string Value)>();
 
             foreach (var contentItem in contentList)
             {
@@ -5087,6 +5114,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 if (contentItem.Type == ContentTypes.Text)
                 {
                     messageBuilder.Add(contentItem.Type).Add(contentItem.Value.EscapeNewLines());
+                    content.Add((contentItem.Type, contentItem.Value.EscapeNewLines()));
 
                     duration = contentItem.Duration > TimeSpan.Zero
                         ? (int)(contentItem.Duration.TotalMilliseconds / 100)
@@ -5105,11 +5133,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     {
                         var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
                         messageBuilder.Add(ContentTypes.Text).Add(errorText);
+                        content.Add((ContentTypes.Text, errorText));
                         duration = DefaultMediaTime;
                     }
                     else
                     {
                         messageBuilder.Add(contentItem.Type).Add(globalUri);
+                        content.Add((contentItem.Type, globalUri));
 
                         if ((contentItem.Type == ContentTypes.Audio || contentItem.Type == ContentTypes.Video) && !registeredMediaPlay)
                         {
@@ -5132,6 +5162,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             var message = messageBuilder.ToString();
             _gameActions.SendMessage(message);
+            _gameActions.SendContent(placement, 0, "", content);
             visualState.Add(message);
 
             contentTime = Math.Max(contentTime, contentListDuration);

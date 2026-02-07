@@ -173,6 +173,11 @@ public static class Messages
     public const string Content = "CONTENT";
 
     /// <summary>
+    /// Table content.
+    /// </summary>
+    public const string Content2 = "CONTENT2";
+
+    /// <summary>
     /// Appends content to existing table content.
     /// </summary>
     public const string ContentAppend = "CONTENT_APPEND";

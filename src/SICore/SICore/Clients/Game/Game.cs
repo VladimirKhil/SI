@@ -162,6 +162,7 @@ public sealed class Game : MessageHandler
                     if (bool.TryParse(optionValue, out var oral) && oral != appSettings.Oral)
                     {
                         appSettings.Oral = oral;
+                        _state.IsOral = appSettings.Oral && _state.ShowMan.IsHuman;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }

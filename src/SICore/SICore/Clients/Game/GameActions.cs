@@ -6,6 +6,7 @@ using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Utils;
 using SIData;
+using SIEngine.Core;
 using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
@@ -433,5 +434,35 @@ public sealed class GameActions
         {
             SendMessageToWithArgs(player.Name, Messages.AskReview, packageSource);
         }
+    }
+
+    internal void SendContent(string placement, int layoutId, string label, string contentType, string effects, string value)
+    {
+        var messageBuilder = new MessageBuilder(Messages.Content2)
+            .Add(placement)
+            .Add(layoutId)
+            .Add(label)
+            .Add(contentType)
+            .Add(effects)
+            .Add(value);
+
+        SendMessage(messageBuilder.ToString());
+    }
+
+    internal void SendContent(string placement, int layoutId, string label, List<(string Type, string Value)> content)
+    {
+        var messageBuilder = new MessageBuilder(Messages.Content)
+            .Add(placement)
+            .Add(layoutId)
+            .Add(label);
+
+        foreach (var item in content)
+        {
+            messageBuilder.Add(item.Type);
+            messageBuilder.Add("");
+            messageBuilder.Add(item.Value);
+        }
+
+        SendMessage(messageBuilder.ToString());
     }
 }
