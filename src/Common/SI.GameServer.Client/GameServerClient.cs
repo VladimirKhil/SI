@@ -78,9 +78,6 @@ public sealed class GameServerClient : IGameServerClient
         Games = new GamesApi(_client);
     }
 
-    public Task<RunGameResponse> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync<RunGameResponse>("RunGame", runGameRequest, cancellationToken);
-
     /// <summary>
     /// Opens a Server-Sent Events stream for receiving game updates.
     /// Automatically reconnects on connection drops.

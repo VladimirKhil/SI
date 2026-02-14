@@ -1580,7 +1580,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             else
             {
                 _gameActions.PlayerReplic(_state.AnswererIndex, _state.Answerer.Answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
-                _gameActions.SendMessageWithArgs(Messages.PlayerAnswer, _state.AnswererIndex, _state.Answerer.Answer);
+                _gameActions.OnPlayerAnswer(_state.AnswererIndex, _state.Answerer.Answer);
             }
 
             if (_state.IsOralNow)
@@ -2879,7 +2879,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var answer = string.IsNullOrEmpty(playerAnswer) ? LO[nameof(R.IDontKnow)] : playerAnswer;
 
         _gameActions.PlayerReplic(answererIndex, answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
-        _gameActions.SendMessageWithArgs(Messages.PlayerAnswer, answererIndex, playerAnswer ?? "");
+        _gameActions.OnPlayerAnswer(answererIndex, playerAnswer ?? "");
 
         if (_state.QuestionPlay.ValidateAfterRightAnswer)
         {
@@ -3264,7 +3264,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             OnDecision();
         }
-        else if (_state.QuestionPlay.AnswerType == AnswerType.Numeric &&
+        else if (_state.QuestionPlay.AnswerType == AnswerType.Number &&
             int.TryParse(_state.Question?.Right.FirstOrDefault() ?? "", out var rightNumber))
         {
             _state.IsWaiting = true;
@@ -3366,7 +3366,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     _state.Players[i].Answer = "";
                     _state.Players[i].Flag = true;
-                    _gameActions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.AnswerType, _state.QuestionPlay.AnswerDeviation);
+                    _gameActions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.AnswerType);
                 }
             }
 
@@ -3419,7 +3419,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
             else // The only place where we do not check CanPlayerAct()
             {
-                _gameActions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType, _state.QuestionPlay.AnswerDeviation);
+                _gameActions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
             }
         }
 
@@ -4622,7 +4622,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     internal void OnSimpleAnswer(string answer)
     {
         var normalizedAnswer = answer.LeaveFirst(MaxAnswerLength);
-        _gameActions.SendVisualMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
+        _gameActions.OnRightAnswer(AnswerType.Text, normalizedAnswer);
 
         var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length)
             + _state.TimeSettings.RightAnswer * 10;
@@ -4653,7 +4653,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     internal void OnRightAnswerOption(string rightOptionLabel)
     {
         OnRightAnswerOptionCore(rightOptionLabel);
-        _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
+        _gameActions.OnRightAnswer(AnswerType.Text, rightOptionLabel);
         var answerTime = _state.TimeSettings.RightAnswer;
         answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
         ScheduleExecution(Tasks.MoveNext, answerTime);
@@ -4661,11 +4661,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRightAnswerOptionCore(string rightOptionLabel)
     {
-        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
-        {
-            OnAnswerOptions();
-            _state.QuestionPlay.LayoutShown = true;
-        }
+        OnLayout();
 
         if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
         {
@@ -4682,10 +4678,29 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRightAnswerPoint(string rightAnswer)
     {
-        _gameActions.SendMessageWithArgs(Messages.RightAnswer, "point", rightAnswer);
-        var answerTime = _state.TimeSettings.RightAnswer;
+        _gameActions.OnRightAnswer(AnswerType.Point, rightAnswer);
+        var answerTime = _state.TimeSettings.Image + _state.TimeSettings.RightAnswer;
         answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
         ScheduleExecution(Tasks.MoveNext, answerTime);
+    }
+
+    internal void OnLayout()
+    {
+        if (_state.QuestionPlay.LayoutShown)
+        {
+            return;
+        }
+
+        if (_state.QuestionPlay.AnswerOptions != null)
+        {
+            OnAnswerOptions();
+        }
+        else if (_state.QuestionPlay.AnswerType == AnswerType.Point)
+        {
+            OnOverlayLayout();
+        }
+
+        _state.QuestionPlay.LayoutShown = true;
     }
 
     private bool DetectRoundTimeout()
@@ -5010,6 +5025,12 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.ComplexVisualState = new IReadOnlyList<string>[1 + (_state.QuestionPlay.AnswerOptions?.Length ?? 0)];
     }
 
+    internal void OnOverlayLayout()
+    {
+        _gameActions.InformLayout();
+        _state.InformStages |= InformStages.Layout;
+    }
+
     internal void ShowAnswerOptions(Action? continuation)
     {
         if (_state.QuestionPlay.AnswerOptions == null)
@@ -5148,6 +5169,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                             _state.IsPlayingMediaPaused = false;
 
                             _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+                            _state.QuestionPlay.CollectMediaCompletions = contentItem.Duration <= TimeSpan.Zero;
                             _completion = ClearMediaContent;
                         }
 

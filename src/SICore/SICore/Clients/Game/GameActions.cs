@@ -6,7 +6,6 @@ using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Utils;
 using SIData;
-using SIEngine.Core;
 using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
@@ -382,6 +381,11 @@ public sealed class GameActions
 
         if (answerOptions == null || screenContentSequence == null)
         {
+            if (_state.QuestionPlay.AnswerType == AnswerType.Point)
+            {
+                SendMessageToWithArgs(person, Messages.Layout, MessageParams.Layout_OverlayPoints, _state.QuestionPlay.AnswerDeviation);
+            }
+
             return;
         }
 
@@ -414,12 +418,11 @@ public sealed class GameActions
     internal void InformAnswerDeviation(double deviation, string person = NetworkConstants.Everybody) =>
         SendMessageToWithArgs(person, Messages.AnswerDeviation, deviation);
 
-    internal void AskAnswer(string person, AnswerType answerType, double deviation) =>
+    internal void AskAnswer(string person, AnswerType answerType) =>
         SendMessageToWithArgs(
             person,
             Messages.Answer,
-            answerType == AnswerType.Numeric ? "number" : (answerType == AnswerType.Point ? "point" : ""),
-            answerType == AnswerType.Point ? deviation : 0);
+            answerType.ToString().ToLowerInvariant());
 
     internal void AskReview()
     {
@@ -451,7 +454,7 @@ public sealed class GameActions
 
     internal void SendContent(string placement, int layoutId, string label, List<(string Type, string Value)> content)
     {
-        var messageBuilder = new MessageBuilder(Messages.Content)
+        var messageBuilder = new MessageBuilder(Messages.Content2)
             .Add(placement)
             .Add(layoutId)
             .Add(label);
@@ -465,4 +468,10 @@ public sealed class GameActions
 
         SendMessage(messageBuilder.ToString());
     }
+
+    internal void OnPlayerAnswer(int answererIndex, string answer) =>
+        SendMessageWithArgs(Messages.PlayerAnswer, answererIndex, answer);
+
+    internal void OnRightAnswer(AnswerType answerType, string rightAnswer) =>
+        SendVisualMessageWithArgs(Messages.RightAnswer, answerType.ToString().ToLowerInvariant(), rightAnswer);
 }

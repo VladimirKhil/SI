@@ -29,7 +29,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public bool OnNumericAnswerType(int deviation)
     {
-        _state.QuestionPlay.AnswerType = AnswerType.Numeric;
+        _state.QuestionPlay.AnswerType = AnswerType.Number;
         _state.QuestionPlay.AnswerDeviation = deviation;
         _controller.OnNumericAnswer();
         return false;
@@ -50,11 +50,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnAskAnswer(string mode, int duration)
     {
-        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
-        {
-            _controller.OnAnswerOptions();
-            _state.QuestionPlay.LayoutShown = true;
-        }
+        _controller.OnLayout();
 
         if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
         {
@@ -97,11 +93,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
     public bool OnButtonPressStart()
     {
         // TODO: merge somehow with GameLogic.AskToPress() and OnAskAnswer() for buttons
-        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
-        {
-            _controller.OnAnswerOptions();
-            _state.QuestionPlay.LayoutShown = true;
-        }
+        _controller.OnLayout();
 
         if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
         {
@@ -117,11 +109,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
-        if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.LayoutShown)
-        {
-            _controller.OnAnswerOptions();
-            _state.QuestionPlay.LayoutShown = true;
-        }
+        _controller.OnLayout();
 
         if (_state.QuestionPlay.IsAnswer && !_state.QuestionPlay.IsAnswerSimple && !_state.QuestionPlay.IsAnswerAnnounced)
         {

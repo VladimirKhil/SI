@@ -61,6 +61,11 @@ public static class MessageParams
     public const string Layout_AnswerOptions = "ANSWER_OPTIONS";
 
     /// <summary>
+    /// Overlay with points layout.
+    /// </summary>
+    public const string Layout_OverlayPoints = "OVERLAY_POINTS";
+
+    /// <summary>
     /// Report log.
     /// </summary>
     public const string Report_Log = "LOG";

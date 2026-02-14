@@ -13,7 +13,7 @@ public enum AnswerType
     /// <summary>
     /// Numeric answer.
     /// </summary>
-    Numeric,
+    Number,
 
     /// <summary>
     /// Point answer.

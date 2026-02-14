@@ -52,6 +52,4 @@ public interface IGameServerClient : IAsyncDisposable
     Task OpenGamesStreamAsync(CancellationToken cancellationToken = default);
 
     Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default);
-
-    Task<RunGameResponse> RunGameAsync(RunGameRequest runGameRequest, CancellationToken cancellationToken = default);
 }
