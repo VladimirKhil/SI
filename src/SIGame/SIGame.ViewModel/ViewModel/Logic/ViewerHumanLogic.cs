@@ -989,7 +989,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     }
 
                     var localUri = _localFileManager.TryGetFile(mediaUri) ?? uri;
-                    _logger.LogInformation($"Media uri conversion: {mediaUri} => {localUri}");
+                    _logger.LogInformation("Media uri conversion: {mediaUri} => {localUri}", mediaUri, localUri);
 
                     var tableContentType = contentType == ContentTypes.Image
                         ? ContentType.Image

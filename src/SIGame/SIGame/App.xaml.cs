@@ -106,6 +106,12 @@ public partial class App : Application
         services.AddAppRegistryServiceClient(configuration);
         services.AddSIGameServerClient(configuration);
         services.AddSIStatisticsServiceClient(configuration);
+
+        services.Configure<GameServerClientOptions>(options =>
+        {
+            options.Culture = _userSettings.Language ?? Thread.CurrentThread.CurrentUICulture.Name;
+        });
+        
         services.AddSIStorageServiceClient(configuration);
         services.AddSIContentServiceClient(configuration);
 

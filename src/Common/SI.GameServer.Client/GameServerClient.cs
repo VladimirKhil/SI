@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using SI.GameServer.Contract;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -13,26 +12,9 @@ namespace SI.GameServer.Client;
 /// </summary>
 public sealed class GameServerClient : IGameServerClient
 {
-    private bool _isOpened;
-
     private readonly GameServerClientOptions _options;
 
     private readonly HttpClient _client;
-
-    private HubConnection? _connection;
-
-    private HubConnection Connection
-    {
-        get
-        {
-            if (_connection == null)
-            {
-                throw new InvalidOperationException("Not connected");
-            }
-
-            return _connection;
-        }
-    }
 
     public string ServiceUri => _options.ServiceUri!;
 
@@ -143,13 +125,7 @@ public sealed class GameServerClient : IGameServerClient
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var line = await reader.ReadLineAsync();
-
-            if (line == null)
-            {
-                throw new IOException("SSE stream ended unexpectedly");
-            }
-
+            var line = await reader.ReadLineAsync() ?? throw new IOException("SSE stream ended unexpectedly");
             if (line.StartsWith("event:", StringComparison.Ordinal))
             {
                 eventType = line.Substring(6).Trim();
@@ -175,6 +151,8 @@ public sealed class GameServerClient : IGameServerClient
 
     private void ProcessGameEvent(string? eventType, string data, JsonSerializerOptions jsonOptions)
     {
+        Trace.TraceInformation("Received game event: {0} - {1}", eventType, data);
+
         var gameEvent = JsonSerializer.Deserialize<GameEvent>(data, jsonOptions);
 
         if (gameEvent == null)
@@ -222,65 +200,11 @@ public sealed class GameServerClient : IGameServerClient
         }
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        if (_connection != null)
-        {
-            _connection.Closed -= OnConnectionClosedAsync;
-
-            await _connection.DisposeAsync();
-            _connection = null;
-        }
-
         _client?.Dispose();
+        return ValueTask.CompletedTask;
     }
-
-    public Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default) =>
-        Connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
-
-    public async Task OpenAsync(CancellationToken cancellationToken = default)
-    {
-        if (_isOpened)
-        {
-            throw new InvalidOperationException("Client has been already opened");
-        }
-
-        _connection = new HubConnectionBuilder()
-            .WithUrl($"{ServiceUri}sionline")
-            .WithAutomaticReconnect(new ReconnectPolicy())
-            .AddMessagePackProtocol()
-            .Build();
-
-        _connection.Reconnecting += async e =>
-        {
-            if (Reconnecting != null)
-            {
-                await Reconnecting(e);
-            }
-        };
-
-        _connection.Reconnected += async s =>
-        {
-            if (Reconnected != null)
-            {
-                await Reconnected(s);
-            }
-        };
-
-        _connection.Closed += OnConnectionClosedAsync;
-        _connection.HandshakeTimeout = TimeSpan.FromMinutes(2);
-
-        _connection.On<GameInfo>("GameCreated", (gameInfo) => OnUI(() => GameCreated?.Invoke(gameInfo)));
-        _connection.On<int>("GameDeleted", (gameId) => OnUI(() => GameDeleted?.Invoke(gameId)));
-        _connection.On<GameInfo>("GameChanged", (gameInfo) => OnUI(() => GameChanged?.Invoke(gameInfo)));
-        _connection.On("Disconnect", () => _connection.StopAsync());
-
-        await _connection.StartAsync(cancellationToken);
-
-        _isOpened = true;
-    }
-
-    private Task OnConnectionClosedAsync(Exception? exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
 
     private void OnUI(Action action)
     {
@@ -291,10 +215,5 @@ public sealed class GameServerClient : IGameServerClient
         }
 
         action();
-    }
-
-    private sealed class ReconnectPolicy : IRetryPolicy
-    {
-        public TimeSpan? NextRetryDelay(RetryContext retryContext) => TimeSpan.FromSeconds(5);
     }
 }

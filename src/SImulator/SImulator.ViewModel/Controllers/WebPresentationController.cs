@@ -42,6 +42,10 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     private int _playerCount;
     private readonly SoundsSettings _soundsSettings;
+    
+    private Settings? _settings;
+    private bool _isFinalRound;
+    private int _previousCode = -1;
 
     public bool CanControlMedia => false;
     
@@ -231,6 +235,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void SetRoundThemes(string[] themes, bool isFinal)
     {
+        _isFinalRound = isFinal;
+        
         SendMessage(new
         {
             Type = "roundThemes",
@@ -416,12 +422,17 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public void OnFinalThink() => SendMessage(new { Type = "finalThink" });
     
-    public void UpdateSettings(Settings settings) => SendMessage(new
+    public void UpdateSettings(Settings settings)
     {
-        Type = "setOptions",
-        TableTextColor = ConvertWpfToHtmlColor(settings.TableColorString),
-        TableBackgroundColor = ConvertWpfToHtmlColor(settings.TableBackColorString)
-    });
+        _settings = settings;
+        
+        SendMessage(new
+        {
+            Type = "setOptions",
+            TableTextColor = ConvertWpfToHtmlColor(settings.TableColorString),
+            TableBackgroundColor = ConvertWpfToHtmlColor(settings.TableBackColorString),
+        });
+    }
 
     private static string ConvertWpfToHtmlColor(string wpfColor)
     {
@@ -678,10 +689,68 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
                 break;
 
+            case "keyPressed":
+                if (data.TryGetValue("key", out var keyElement))
+                {
+                    OnKeyPressed(keyElement.GetString());
+                }
+                break;
+
             default:
                 break;
         }
     }
+
+    /// <summary>
+    /// Handles key press events from the web view for keyboard-based selection.
+    /// </summary>
+    /// <param name="key">The key value from the keyboard event.</param>
+    private void OnKeyPressed(string? key)
+    {
+        if (_settings == null || !_settings.KeyboardControl || key == null)
+        {
+            return;
+        }
+
+        // Escape key resets the previous code
+        if (key == "Escape")
+        {
+            _previousCode = -1;
+            return;
+        }
+
+        var code = GetKeyNumber(key);
+        
+        if (code == -1)
+        {
+            _previousCode = -1;
+            return;
+        }
+
+        if (_isFinalRound)
+        {
+            DeletionCallback?.Invoke(code);
+        }
+        else
+        {
+            if (_previousCode == -1)
+            {
+                _previousCode = code;
+                return;
+            }
+
+            SelectionCallback?.Invoke(_previousCode, code);
+            _previousCode = -1;
+        }
+    }
+
+    /// <summary>
+    /// Converts a key string to a number (0-9).
+    /// </summary>
+    /// <param name="key">The key string.</param>
+    /// <returns>The number 0-9, or -1 if not a number key.</returns>
+    private static int GetKeyNumber(string key) =>
+        key.Length == 1 && char.IsDigit(key[0]) ? key[0] - '1' : -1;
 
     public void Dispose() { }
 

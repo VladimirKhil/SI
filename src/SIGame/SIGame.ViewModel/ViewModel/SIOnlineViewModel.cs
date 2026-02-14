@@ -18,7 +18,6 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Windows.Input;
-using Utils;
 
 namespace SIGame.ViewModel;
 
@@ -330,8 +329,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     private readonly IGameServerClient _gameServerClient;
 
-    private readonly object _usersLock = new();
-
     private readonly SIContentClientOptions? _defaultSIContentClientOptions;
     private readonly ILogger<SIOnlineViewModel> _logger;
     private readonly ISIStatisticsServiceClient _siStatisticsServiceClient;
@@ -354,8 +351,10 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         _gameServerClient.GameCreated += GameServerClient_GameCreated;
         _gameServerClient.GameDeleted += GameServerClient_GameDeleted;
         _gameServerClient.GameChanged += GameServerClient_GameChanged;
+        _gameServerClient.GamesLoaded += GameServerClient_GamesLoaded;
+        _gameServerClient.GamesClear += GameServerClient_GamesClear;
+        _gameServerClient.Reconnecting += GameServerClient_Reconnecting;
         _gameServerClient.Reconnected += GameServerClient_Reconnected;
-        _gameServerClient.Closed += GameServerClient_Closed;
 
         ServerAddress = _gameServerClient.ServiceUri;
 
@@ -368,42 +367,30 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         NewGame.CanBeExecuted = false;
     }
 
-    private Task GameServerClient_Reconnected(string? message)
+    private Task GameServerClient_Reconnecting(Exception? exception)
     {
-        var cancellationToken = _cancellationTokenSource.Token;
-
-        UI.Execute(
-            async () =>
-            {
-                IsProgress = true;
-
-                try
-                {
-                    await ReloadGamesAsync(cancellationToken);
-                }
-                finally
-                {
-                    IsProgress = false;
-                }
-            },
-            exc =>
-            {
-                Error = exc.Message;
-            },
-            cancellationToken);
-
+        IsProgress = true;
         return Task.CompletedTask;
     }
 
-    private Task GameServerClient_Closed(Exception? exception)
+    private Task GameServerClient_Reconnected(string? message)
     {
-        PlatformSpecific.PlatformManager.Instance.ShowMessage(
-            $"{Resources.LostConnection}: {exception?.Message}",
-            PlatformSpecific.MessageType.Warning);
-
-        Cancel.Execute(null);
-
+        IsProgress = false;
         return Task.CompletedTask;
+    }
+
+    private void GameServerClient_GamesLoaded()
+    {
+        IsProgress = false;
+    }
+
+    private void GameServerClient_GamesClear()
+    {
+        lock (_serverGamesLock)
+        {
+            ServerGamesCache.Clear();
+            RecountGames();
+        }
     }
 
     private void GameServerClient_GameChanged(SI.GameServer.Contract.GameInfo gameInfo)
@@ -550,7 +537,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
             OnPropertyChanged(nameof(ServerName));
 
-            await ReloadGamesAsync(_cancellationTokenSource.Token);
+            // Start SSE stream in background - it will fire events as games are received
+            _ = _gameServerClient.OpenGamesStreamAsync(_cancellationTokenSource.Token);
 
             _avatarLoadingTask = UploadUserAvatarAsync();
 
@@ -625,47 +613,13 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             _gameServerClient.GameCreated -= GameServerClient_GameCreated;
             _gameServerClient.GameDeleted -= GameServerClient_GameDeleted;
             _gameServerClient.GameChanged -= GameServerClient_GameChanged;
+            _gameServerClient.GamesLoaded -= GameServerClient_GamesLoaded;
+            _gameServerClient.GamesClear -= GameServerClient_GamesClear;
+            _gameServerClient.Reconnecting -= GameServerClient_Reconnecting;
             _gameServerClient.Reconnected -= GameServerClient_Reconnected;
-            _gameServerClient.Closed -= GameServerClient_Closed;
         }
 
         await base.ClearConnectionAsync();
-    }
-
-    private async Task ReloadGamesAsync(CancellationToken cancellationToken = default)
-    {
-        Error = "";
-
-        try
-        {
-            lock (_serverGamesLock)
-            {
-                ServerGamesCache.Clear();
-                RecountGames();
-            }
-
-            SI.GameServer.Contract.Slice<SI.GameServer.Contract.GameInfo>? gamesSlice = null;
-            var whileGuard = 100;
-
-            do
-            {
-                var fromId = gamesSlice != null && gamesSlice.Data.Length > 0 ? gamesSlice.Data.Last().GameID + 1 : 0;
-                gamesSlice = await _gameServerClient.GetGamesAsync(fromId, cancellationToken);
-
-                lock (_serverGamesLock)
-                {
-                    ServerGamesCache.AddRange(gamesSlice.Data.Select(ToSICoreGame));
-                    RecountGames();
-                }
-
-                whileGuard--;
-            } while (!gamesSlice.IsLastSlice && whileGuard > 0);
-        }
-        catch (Exception exc)
-        {
-            Error = exc.Message;
-            FullError = exc.ToString();
-        }
     }
 
     private void RecountGames()

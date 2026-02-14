@@ -38,3 +38,7 @@ window.addEventListener('click', function (e) {
 
     window.chrome.webview.postMessage({ type: 'move' });
 });
+
+window.addEventListener('keydown', function (e) {
+    window.chrome.webview.postMessage({ type: 'keyPressed', key: e.key });
+});

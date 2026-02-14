@@ -42,14 +42,10 @@ public interface IGameServerClient : IAsyncDisposable
     /// </summary>
     event Action? GamesClear;
 
-    Task OpenAsync(CancellationToken token = default);
-
     /// <summary>
     /// Opens a Server-Sent Events stream for receiving game updates.
     /// First receives initial games snapshot in chunks, then streams updates indefinitely.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token to stop the stream.</param>
     Task OpenGamesStreamAsync(CancellationToken cancellationToken = default);
-
-    Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default);
 }

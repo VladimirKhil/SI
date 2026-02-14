@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SI.GameServer.Client.Discovery;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace SI.GameServer.Client;
 
@@ -30,6 +31,11 @@ public static class ServiceCollectionExtensions
             {
                 client.BaseAddress = options.ServiceDiscoveryUri;
                 client.DefaultRequestVersion = HttpVersion.Version20;
+
+                if (options.Culture != null)
+                {
+                    client.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(options.Culture));
+                }
             });
 
         return services;

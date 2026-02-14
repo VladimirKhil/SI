@@ -89,8 +89,6 @@ public sealed class LoginViewModel : INotifyPropertyChanged, IDisposable
         {
             client = await _gameServerClientFactory.CreateClientAsync(_cancellationTokenSource.Token);
 
-            await client.OpenAsync(_cancellationTokenSource.Token);
-
             await Entered?.Invoke(_login, client);
         }
         catch (HttpRequestException exc)
