@@ -162,7 +162,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     }
 
     // As player is validating only during appellations, computer player always agrees with appellation
-    private void OnValidateAnswer(bool? voteForRight) => _viewerActions.SendMessage(Messages.IsRight, voteForRight == true ? "+" : "-");
+    private void OnValidateAnswer(bool? voteForRight) => _viewerActions.IsRight(voteForRight == true);
 
     // As player is validating only during appellations, computer player always agrees with appellation
     private void OnValidateAnswerNew(string answer, bool voteForRight) => _viewerActions.ValidateAnswer(answer, voteForRight);
@@ -191,7 +191,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 _state.TInfo.RoundInfo,
                 GetTimePercentage(0));
 
-            _viewerActions.SendMessageWithArgs(Messages.SelectPlayer, playerIndex);
+            _viewerActions.SelectPlayer(playerIndex);
         }
         catch (Exception exc)
         {

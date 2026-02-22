@@ -5,14 +5,15 @@ namespace SIQuester.Model;
 
 public sealed class SearchResults
 {
-    public string Query { get; set; }
+    public string Query { get; }
 
     public Collection<IItemViewModel> Results { get; set; }
 
     public int Index { get; set; }
 
-    public SearchResults()
+    public SearchResults(string query)
     {
+        Query = query;
         Results = new Collection<IItemViewModel>();
         Index = 0;
     }

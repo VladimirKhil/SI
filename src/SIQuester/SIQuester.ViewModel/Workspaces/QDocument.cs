@@ -207,16 +207,16 @@ public sealed class QDocument : WorkspaceViewModel
             return;
         }
 
-        SearchFailed = SearchResults == null || SearchResults.Results.Count == 0;
-
-        if (!_searchFailed)
+        if (SearchResults != null && SearchResults.Results.Count > 0)
         {
+            SearchFailed = false;
             NextSearchResult.CanBeExecuted = true;
             PreviousSearchResult.CanBeExecuted = true;
             Navigate.Execute(SearchResults.Results[SearchResults.Index]);
         }
         else
         {
+            SearchFailed = true;
             NextSearchResult.CanBeExecuted = false;
             PreviousSearchResult.CanBeExecuted = false;
             Navigate.Execute(null);
@@ -430,7 +430,7 @@ public sealed class QDocument : WorkspaceViewModel
     /// <summary>
     /// Current active node.
     /// </summary>
-    public IItemViewModel ActiveNode
+    public IItemViewModel? ActiveNode
     {
         get => _activeNode;
         set
@@ -1096,7 +1096,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                     for (int i = 0; i < e.NewItems.Count; i++)
                     {
-                        if (!e.NewItems[i].Equals(e.OldItems[i]))
+                        if (!Equals(e.NewItems[i], e.OldItems[i]))
                         {
                             equals = false;
                             break;
@@ -1634,7 +1634,13 @@ public sealed class QDocument : WorkspaceViewModel
         {
             using var change = OperationsManager.BeginComplexChange();
 
-            var itemData = (InfoOwnerData)_clipboardService.GetData(ClipboardKey);
+            var itemData = (InfoOwnerData?)_clipboardService.GetData(ClipboardKey);
+            
+            if (itemData == null)
+            {
+                return;
+            }
+
             var level = itemData.ItemLevel;
 
             if (level == InfoOwnerData.Level.Round)
@@ -1647,7 +1653,7 @@ public sealed class QDocument : WorkspaceViewModel
                 }
                 else
                 {
-                    if (_activeNode is RoundViewModel myRound)
+                    if (_activeNode is RoundViewModel myRound && myRound.OwnerPackage != null)
                     {
                         myRound.OwnerPackage.Rounds.Insert(myRound.OwnerPackage.Rounds.IndexOf(myRound), new RoundViewModel(round));
                     }
@@ -1667,7 +1673,7 @@ public sealed class QDocument : WorkspaceViewModel
                 }
                 else
                 {
-                    if (_activeNode is ThemeViewModel myTheme)
+                    if (_activeNode is ThemeViewModel myTheme && myTheme.OwnerRound != null)
                     {
                         myTheme.OwnerRound.Themes.Insert(
                             myTheme.OwnerRound.Themes.IndexOf(myTheme),
@@ -1689,7 +1695,7 @@ public sealed class QDocument : WorkspaceViewModel
                 }
                 else
                 {
-                    if (_activeNode is QuestionViewModel myQuestion)
+                    if (_activeNode is QuestionViewModel myQuestion && myQuestion.OwnerTheme != null)
                     {
                         myQuestion.OwnerTheme.Questions.Insert(
                             myQuestion.OwnerTheme.Questions.IndexOf(myQuestion),
@@ -1793,6 +1799,11 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void NextSearchResult_Executed(object? arg)
     {
+        if (SearchResults == null)
+        {
+            return;
+        }
+
         SearchResults.Index++;
 
         if (SearchResults.Index == SearchResults.Results.Count)
@@ -1805,6 +1816,11 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void PreviousSearchResult_Executed(object? arg)
     {
+        if (SearchResults == null)
+        {
+            return;
+        }
+
         SearchResults.Index--;
 
         if (SearchResults.Index == -1)
@@ -2549,7 +2565,7 @@ public sealed class QDocument : WorkspaceViewModel
 
     internal void Search(string query, CancellationToken token)
     {
-        SearchResults = new SearchResults { Query = query };
+        SearchResults = new SearchResults(query);
         var package = Package;
 
         if (package.Model.ContainsInfoOwner(query))

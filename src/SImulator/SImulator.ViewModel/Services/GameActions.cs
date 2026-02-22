@@ -62,7 +62,7 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
 
     public void MoveBackRound() => _engine.MoveBackRound();
 
-    public void IsRightAnswer()
+    public void OnRightAnswer()
     {
         _engine.MoveToAnswer();
         _engine.MoveNext();
@@ -77,4 +77,10 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
     public void AddPlayer() => GameViewModel.AddPlayerCore(new PlayerInfo());
 
     public void RemovePlayerAt(int index) => GameViewModel.RemovePlayerCore(GameViewModel.Players[index]);
+
+    public void IsRightAnswer() => throw new NotImplementedException();
+
+    public void IsWrongAnswer() => throw new NotImplementedException();
+
+    public void SelectPlayer(int playerIndex) => throw new NotImplementedException();
 }

@@ -1584,7 +1584,7 @@
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
                     <CheckBox Margin="5,5,0,0" IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
-                    <!--<CheckBox Margin="5,5,0,0" IsChecked="{Binding UseSIGameEngine}" Content="{x:Static lp:Resources.UseSIGameEngine}" />-->
+                    <CheckBox Margin="5,5,0,0" IsChecked="{Binding UseSIGameEngine}" Content="{x:Static lp:Resources.UseSIGameEngine}" />
                 </UniformGrid>
 
                 <Expander

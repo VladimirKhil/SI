@@ -64,13 +64,13 @@ internal sealed class ShowmanComputerController
     private void OnSelectPlayer()
     {
         var playerIndex = _state.Players.SelectRandomIndex();
-        _viewerActions.SendMessage(Messages.SelectPlayer, playerIndex.ToString());
+        _viewerActions.SelectPlayer(playerIndex);
     }
 
     private void OnValidateAnswer(string? answer)
     {
         var isRight = ValidateAnswerCore(answer);
-        _viewerActions.SendMessage(Messages.IsRight, isRight ? "+" : "-");
+        _viewerActions.IsRight(isRight);
     }
 
     private void OnValidateAnswerNew(string answer, bool voteForRight)

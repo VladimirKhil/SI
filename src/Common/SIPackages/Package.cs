@@ -331,6 +331,33 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                     break;
             }
         }
+
+        Upgrade();
+    }
+
+    /// <summary>
+    /// Upgrades package to new format.
+    /// </summary>
+    internal bool Upgrade()
+    {
+        if (Version >= 5.0)
+        {
+            return false;
+        }
+
+        foreach (var round in Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    question.Upgrade();
+                }
+            }
+        }
+
+        Version = 5;
+        return true;
     }
 
     /// <summary>

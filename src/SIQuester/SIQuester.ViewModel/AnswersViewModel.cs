@@ -35,7 +35,7 @@ public sealed class AnswersViewModel : ItemsViewModel<string>, IContentCollectio
 
     public ICommand AddFile { get; private set; }
 
-    public override QDocument OwnerDocument => Owner.OwnerTheme.OwnerRound.OwnerPackage.Document;
+    public override QDocument? OwnerDocument => Owner.OwnerTheme?.OwnerRound?.OwnerPackage?.Document;
 
     public bool IsRight { get; private set; }
 
@@ -79,7 +79,7 @@ public sealed class AnswersViewModel : ItemsViewModel<string>, IContentCollectio
 
     private void AnswerSpecial1_Executed(object? arg)
     {
-        var text = CurrentItem;
+        var text = CurrentItem ?? "";
         var words = text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         var s = words[^1];
         Add(s.GrowFirstLetter());
@@ -87,7 +87,12 @@ public sealed class AnswersViewModel : ItemsViewModel<string>, IContentCollectio
 
     private void AnswerSpecial2_Executed(object? arg)
     {
-        var document = Owner.OwnerTheme.OwnerRound.OwnerPackage.Document;
+        var document = OwnerDocument;
+
+        if (document == null)
+        {
+            return;
+        }
 
         try
         {
@@ -129,7 +134,7 @@ public sealed class AnswersViewModel : ItemsViewModel<string>, IContentCollectio
 
     private void AnswerSpecial3_Executed(object? arg)
     {
-        var text = CurrentItem;
+        var text = CurrentItem ?? "";
         var andIndex = text.IndexOf($" {Resources.And} ");
 
         if (andIndex > -1)

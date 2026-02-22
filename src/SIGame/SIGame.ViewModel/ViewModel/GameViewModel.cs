@@ -802,7 +802,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         switch (SelectionMode)
         {
             case SelectionMode.SelectPlayer:
-                _viewerActions.SendMessageWithArgs(Messages.SelectPlayer, playerIndex);
+                _viewerActions.SelectPlayer(playerIndex);
                 ClearSelections();
                 break;
 
@@ -844,7 +844,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         
         if (NewValidation)
         {
-            _viewerActions.SendMessage(Messages.Validate, validation.Answer, "+");
+            _viewerActions.ValidateAnswer(validation.Answer, true);
 
             if (ValidationInfo == null)
             {
@@ -853,7 +853,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
         else
         {
-            _viewerActions.SendMessage(Messages.IsRight, "+", arg?.ToString() ?? "1");
+            _viewerActions.IsRight(true, (double?)arg ?? 1.0);
             ClearSelections();
         }
     }
@@ -869,7 +869,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         
         if (NewValidation)
         {
-            _viewerActions.SendMessage(Messages.Validate, validation.Answer, "-");
+            _viewerActions.ValidateAnswer(validation.Answer, false);
 
             if (ValidationInfo == null)
             {
@@ -878,7 +878,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
         else
         {
-            _viewerActions.SendMessage(Messages.IsRight, "-", arg?.ToString() ?? "1");
+            _viewerActions.IsRight(false, (double?)arg ?? 1.0);
             ClearSelections();
         }
     }

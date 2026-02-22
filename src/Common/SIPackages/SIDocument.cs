@@ -315,22 +315,11 @@ public sealed class SIDocument : IDisposable
     /// <summary>
     /// Upgrades document to new format.
     /// </summary>
-    internal bool Upgrade()
+    internal void Upgrade()
     {
-        if (Package.Version >= 5.0)
+        if (_authors.Count == 0 && _sources.Count == 0)
         {
-            return false;
-        }
-
-        foreach (var round in Package.Rounds)
-        {
-            foreach (var theme in round.Themes)
-            {
-                foreach (var question in theme.Questions)
-                {
-                    question.Upgrade();
-                }
-            }
+            return;
         }
 
         foreach (var author in _authors)
@@ -346,9 +335,6 @@ public sealed class SIDocument : IDisposable
         }
 
         _sources.Clear();
-
-        Package.Version = 5;
-        return true;
     }
 
     /// <summary>

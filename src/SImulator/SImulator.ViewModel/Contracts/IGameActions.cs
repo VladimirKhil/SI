@@ -1,4 +1,6 @@
-﻿namespace SImulator.ViewModel.Contracts;
+﻿using SImulator.ViewModel.Model;
+
+namespace SImulator.ViewModel.Contracts;
 
 /// <summary>
 /// Controls the game process.
@@ -15,9 +17,19 @@ public interface IGameActions : IDisposable
 
     void MoveBackRound();
 
-    void IsRightAnswer();
-
     void AddPlayer();
 
     void RemovePlayerAt(int index);
+
+    void OnRightAnswer();
+
+    void IsRightAnswer();
+
+    void IsWrongAnswer();
+
+    void SelectPlayer(int playerIndex);
+
+    void ConnectPlayer(PlayerInfo player) { }
+
+    void PlayerPressed(PlayerInfo player) { }
 }

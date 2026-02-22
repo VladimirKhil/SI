@@ -6,7 +6,9 @@ namespace SImulator.ViewModel.Services;
 
 internal sealed class GameHost : IGameHost
 {
-    public HostOptions Options => throw new NotImplementedException();
+    private readonly HostOptions _options = new();
+
+    public HostOptions Options => _options;
 
     public int MaxImageSizeKb => int.MaxValue;
 

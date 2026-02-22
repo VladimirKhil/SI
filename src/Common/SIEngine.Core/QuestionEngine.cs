@@ -18,7 +18,6 @@ public sealed class QuestionEngine : IQuestionEngine
 
     private int? _enableButtonsStepIndex = null;
     private bool _isAskingAnswer = false;
-    private bool _areButtonsEnabled = false;
 
     private bool _isAnswerTypeSelect = false;
     private bool _isAnswerTypePoint = false;
@@ -317,7 +316,6 @@ public sealed class QuestionEngine : IQuestionEngine
                             return true;
                         }
 
-                        _areButtonsEnabled = true;
                         _enableButtonsStepIndex = null;
                     }
 
@@ -595,7 +593,6 @@ public sealed class QuestionEngine : IQuestionEngine
 
         _stepIndex = nextStepIndex;
         _contentIndex = 0;
-        _areButtonsEnabled = false;
         _isAskingAnswer = false;
 
         if (askAnswerFound)

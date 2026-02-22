@@ -39,6 +39,8 @@ public sealed class ViewerActions
 
     public void Move(MoveDirections direction = MoveDirections.Next) => SendMessageWithArgs(Messages.Move, (int)direction);
 
+    public void IsRight(bool isRight, double factor = 1.0) => SendMessage(Messages.IsRight, isRight ? "+" : "-", factor.ToString());
+
     public void ValidateAnswer(string answer, bool isRight) => SendMessage(Messages.Validate, answer, isRight ? "+" : "-");
 
     public void SelectQuestion(int themeIndex, int questionIndex) => SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
@@ -48,4 +50,6 @@ public sealed class ViewerActions
     public void RemoveTable(int index) => SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
 
     public void ReportMediaPreloadProgress(int progress) => SendMessageWithArgs(Messages.MediaPreloadProgress, progress);
+
+    public void SelectPlayer(int playerIndex) => SendMessage(Messages.SelectPlayer, playerIndex.ToString());
 }

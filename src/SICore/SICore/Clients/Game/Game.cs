@@ -9,7 +9,6 @@ using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
 using SICore.Results;
 using SICore.Services;
-using SICore.Special;
 using SICore.Utils;
 using SIData;
 using SIPackages;
@@ -1808,13 +1807,7 @@ public sealed class Game : MessageHandler
 
         var withError = args[2] == "+";
 
-        var res = new StringBuilder()
-            .Append(LO[account.IsMale ? nameof(R.Disconnected_Male) : nameof(R.Disconnected_Female)])
-            .Append(' ')
-            .Append(account.Name);
-
         _gameActions.SendMessageWithArgs(Messages.Disconnected, account.Name);
-
         _state.BeginUpdatePersons($"Disconnected {account.Name}");
 
         try
@@ -1877,7 +1870,6 @@ public sealed class Game : MessageHandler
     {
         if (args.Length < 4)
         {
-            _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongConnectionParameters)], message.Sender);
             return;
         }
 
@@ -2067,10 +2059,7 @@ public sealed class Game : MessageHandler
         }
 
         var player = _state.Players[playerIndex - 1];
-        var oldSum = player.Sum;
         player.Sum = sum;
-
-        var verbEnding = _state.ShowMan.IsMale ? "" : LO[nameof(R.FemaleEnding)];
 
         _gameActions.SendMessageWithArgs(Messages.PlayerScoreChanged, playerIndex - 1, sum);
         _gameActions.InformSums();
@@ -2458,7 +2447,7 @@ public sealed class Game : MessageHandler
             }
             else
             {
-                _state.Answerer.Answer = LO[nameof(R.IDontKnow)];
+                _state.Answerer.Answer = "-";
                 _state.Answerer.AnswerIsWrong = true;
             }
 
@@ -3901,7 +3890,6 @@ public sealed class Game : MessageHandler
             _state.EndUpdatePersons();
         }
 
-        var connectedMessage = LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)];
         _gameActions.SendMessageWithArgs(Messages.Connected, role.ToString().ToLowerInvariant(), index, name, isMale ? 'm' : 'f', "");
 
         if (_state.HostName == null && !_state.Settings.IsAutomatic)

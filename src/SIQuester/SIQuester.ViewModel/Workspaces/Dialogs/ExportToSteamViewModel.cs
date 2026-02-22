@@ -13,6 +13,8 @@ namespace SIQuester.ViewModel.Workspaces.Dialogs;
 
 public sealed class ExportToSteamViewModel : WorkspaceViewModel
 {
+    private const int MaxSteamTitleLength = 128;
+
     private static readonly Dictionary<string, string> _languages = new()
     {
         { "ru-RU", "Russian" },
@@ -26,7 +28,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
     public override string Header => Resources.ExportToSteam;
 
-    public string Title => _document.Document.Package.Name;
+    public string Title { get; }
 
     private string _desription = "";
 
@@ -171,6 +173,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         _metadata["questionCount"] = preview.QuestionCount;
         _metadata["content"] = preview.Content;
 
+        Title = TrimToUtf8ByteLimit(_document.Document.Package.Name, MaxSteamTitleLength);
         Upload = new SimpleCommand(Upload_Executed);
 
         _getUserItemsCallback = CallResult<SteamUGCQueryCompleted_t>.Create(OnGetUserItems);
@@ -497,6 +500,31 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
         Status += ". " + Resources.PreviewUploadSuccess;
     }
+
+    private static string TrimToUtf8ByteLimit(string input, int maxBytes)
+    {
+        var encoding = Encoding.UTF8;
+        var bytes = encoding.GetBytes(input);
+
+        if (bytes.Length <= maxBytes)
+            return input;
+
+        int byteCount = 0;
+        var sb = new StringBuilder();
+
+        foreach (var rune in input.EnumerateRunes())
+        {
+            var runeBytes = encoding.GetByteCount(rune.ToString());
+            if (byteCount + runeBytes > maxBytes)
+                break;
+
+            sb.Append(rune.ToString());
+            byteCount += runeBytes;
+        }
+
+        return sb.ToString();
+    }
+
 
     protected override void Dispose(bool disposing)
     {

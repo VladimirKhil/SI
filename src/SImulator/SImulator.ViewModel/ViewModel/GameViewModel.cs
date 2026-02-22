@@ -736,6 +736,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         try
         {
+            if (_managed)
+            {
+                _gameActions.IsRightAnswer();
+                return;
+            }
+
             var increment = IsCommonPrice ? Price : player.Stake;
 
             player.Sum += increment;
@@ -758,7 +764,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
                 if (Settings.Model.EndQuestionOnRightAnswer)
                 {
-                    _gameActions.IsRightAnswer();
+                    _gameActions.OnRightAnswer();
                 }
                 else
                 {
@@ -781,6 +787,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         try
         {
+            if (_managed)
+            {
+                _gameActions.IsWrongAnswer();
+                return;
+            }
+
             var decrement = IsCommonPrice ? (NegativePrice ?? Price) : player.Stake;
             var substract = Settings.Model.SubstractOnWrong ? decrement : 0;
 
@@ -1329,6 +1341,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (DecisionMode == DecisionMode.StarterChoosing)
         {
             DecisionMode = DecisionMode.None;
+
+            if (_managed)
+            {
+                _gameActions.SelectPlayer(Players.IndexOf(Chooser));
+            }
         }
         else if (DecisionMode == DecisionMode.AnswererChoosing)
         {
@@ -2147,6 +2164,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         BlockNextButtonForAWhile();
 
+        _gameActions.PlayerPressed(player);
+
         return true;
     }
 
@@ -2213,6 +2232,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
                 player.Id = connectionId;
                 player.IsConnected = true;
+
+                _gameActions.ConnectPlayer(player);
                 return true;
             }
         }
@@ -2224,6 +2245,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 player.Name = playerName;
                 player.Id = connectionId;
                 player.IsConnected = true;
+
+                _gameActions.ConnectPlayer(player);
                 return true;
             }
         }

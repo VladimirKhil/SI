@@ -43,12 +43,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.2.0" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.3" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.1.1" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="6.1.1" />
     <PackageReference Include="VKhil.AppRegistry.Client" Version="1.0.4" />
-    <PackageReference Include="WindowsAPICodePackShell" Version="7.0.4" />
-	<PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="WindowsAPICodePackShell" Version="8.0.14" />
+	<PackageReference Include="MahApps.Metro" Version="2.4.11" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\test\SIGame\SIGame.Tests\SIGameTestEn.siq" Link="templates\SIGameTestEn.siq">

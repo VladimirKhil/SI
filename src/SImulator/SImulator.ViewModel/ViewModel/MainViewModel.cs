@@ -454,9 +454,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             presentationController.Error += ShowError;
 
-            var game = /*Settings.UseSIGameEngine 
+            var game = Settings.UseSIGameEngine 
                 ? await CreateGameNewAsync(presentationController, presentationListener)
-                : */await CreateGameAsync(presentationController, presentationListener);
+                : await CreateGameAsync(presentationController, presentationListener);
 
             Game = game;
 
@@ -536,7 +536,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             {
                 Managed = true,
                 Culture = "ru-RU",
-                Oral = true
+                Oral = true,
+                ButtonPressMode = ButtonPressMode.FirstWins,
             },
             Showman = new Account
             {
@@ -588,7 +589,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         game.Run();
 
-        var gameActions = new NewGameActions(actions, state);
+        var gameActions = new NewGameActions(actions, state, game.Authenticate, game.OnMessageReceivedAsync);
 
         IGameLogger gameLogger;
 

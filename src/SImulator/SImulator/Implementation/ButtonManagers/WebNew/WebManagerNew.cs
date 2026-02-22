@@ -42,9 +42,9 @@ public sealed class WebManagerNew(WebApplication webApplication, IGameRepository
         var fileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "wwwroot2"));
 
         webApplication.UseDefaultFiles(new DefaultFilesOptions
-        {
-            FileProvider = fileProvider,
-        })
+            {
+                FileProvider = fileProvider,
+            })
             .UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = fileProvider,
