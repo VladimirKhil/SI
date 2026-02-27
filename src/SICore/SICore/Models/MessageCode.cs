@@ -23,4 +23,10 @@ public enum MessageCode
     /// No players to play the round.
     /// </summary>
     RoundSkippedNoPlayers,
+
+    RightAnswer,
+
+    DeleteTheme,
+
+    IncomeWithoutAnswering,
 }

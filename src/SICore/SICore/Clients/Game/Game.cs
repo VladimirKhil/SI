@@ -784,10 +784,6 @@ public sealed class Game : MessageHandler
                         OnMediaLoaded(message);
                         break;
 
-                    case Messages.MediaPreloaded:
-                        OnMediaPreloaded(message);
-                        break;
-
                     case Messages.MediaPreloadProgress:
                         OnMediaPreloadProgress(message, args);
                         break;
@@ -1194,8 +1190,6 @@ public sealed class Game : MessageHandler
 
     private void OnMediaLoaded(Message message) => _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.MediaLoaded, message.Sender);
 
-    private void OnMediaPreloaded(Message message) => _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.MediaPreloaded, message.Sender);
-
     private void OnMediaPreloadProgress(Message message, string[] args)
     {
         if (args.Length < 2 || !int.TryParse(args[1], out var progress) || progress < 0 || progress > 100)
@@ -1203,7 +1197,7 @@ public sealed class Game : MessageHandler
             return;
         }
         
-        _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.MediaPreloadProgress, message.Sender, progress);
+        _gameActions.InformMediaPreloadProgress(message.Sender, progress);
     }
 
     private void OnToggle(Message message, string[] args)

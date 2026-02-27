@@ -24,7 +24,8 @@
       "Names": {
         "ru": "Михаил Ломоносов",
         "en": "Mikhail Lomonosov",
-        "sr": "Mihailo Lomonosov"
+        "sr": "Mihailo Lomonosov",
+        "uz": "Mixail Lomonosov"
       },
       "IsMale": true,
       "Picture": "Mikhail_Lomonosov.jpg"
@@ -53,7 +54,8 @@
       "Names": {
         "ru": "Альберт Эйнштейн",
         "en": "Albert Einstein",
-        "sr": "Albert Ajnštajn"
+        "sr": "Albert Ajnštajn",
+        "uz": "Albert Eynshteyn"
       },
       "IsMale": true,
       "Picture": "Albert_Einstein.jpg"
@@ -82,7 +84,8 @@
       "Names": {
         "ru": "Стивен Хокинг",
         "en": "Stephen Hawking",
-        "sr": "Stiven Hoking"
+        "sr": "Stiven Hoking",
+        "uz": "Stiven Hoking"
       },
       "IsMale": true,
       "Picture": "Stephen_Hawking.jpg"
@@ -111,7 +114,8 @@
       "Names": {
         "ru": "Исаак Ньютон",
         "en": "Isaac Newton",
-        "sr": "Isak Njutn"
+        "sr": "Isak Njutn",
+        "uz": "Isaak Nyuton"
       },
       "IsMale": true,
       "Picture": "IsaacNewton.jpg"
@@ -140,7 +144,8 @@
       "Names": {
         "ru": "Аристотель",
         "en": "Aristotle",
-        "sr": "Aristotel"
+        "sr": "Aristotel",
+        "uz": "Arastu"
       },
       "IsMale": true,
       "Picture": "Aristotle.jpg"
@@ -169,7 +174,8 @@
       "Names": {
         "ru": "Николай Коперник",
         "en": "Nicolaus Copernicus",
-        "sr": "Nikola Kopernik"
+        "sr": "Nikola Kopernik",
+        "uz": "Nikolay Kopernik"
       },
       "IsMale": true,
       "Picture": "Nikolaus_Kopernikus.jpg"
@@ -198,7 +204,8 @@
       "Names": {
         "ru": "Нильс Бор",
         "en": "Niels Bohr",
-        "sr": "Nils Bor"
+        "sr": "Nils Bor",
+        "uz": "Nils Bor"
       },
       "IsMale": true,
       "Picture": "Niels_Bohr.jpg"
@@ -227,7 +234,8 @@
       "Names": {
         "ru": "Иоганн Кеплер",
         "en": "Johannes Kepler",
-        "sr": "Johan Kepler"
+        "sr": "Johan Kepler",
+        "uz": "Iogann Kepler"
       },
       "IsMale": true,
       "Picture": "Johannes_Kepler.jpg"
@@ -256,7 +264,8 @@
       "Names": {
         "ru": "Галилео Галилей",
         "en": "Galileo Galilei",
-        "sr": "Galileo Galilej"
+        "sr": "Galileo Galilej",
+        "uz": "Galileo Galiley"
       },
       "IsMale": true,
       "Picture": "Galileo.jpg"
@@ -285,7 +294,8 @@
       "Names": {
         "ru": "Иммануил Кант",
         "en": "Immanuel Kant",
-        "sr": "Imanuel Kant"
+        "sr": "Imanuel Kant",
+        "uz": "Immanuil Kant"
       },
       "IsMale": true,
       "Picture": "Kant.jpg"
@@ -314,7 +324,8 @@
       "Names": {
         "ru": "Конфуций",
         "en": "Confucius",
-        "sr": "Konfučije"
+        "sr": "Konfučije",
+        "uz": "Konfutsiy"
       },
       "IsMale": true,
       "Picture": "Konfuzius.jpg"
@@ -343,7 +354,8 @@
       "Names": {
         "ru": "Платон",
         "en": "Plato",
-        "sr": "Platon"
+        "sr": "Platon",
+        "uz": "Aflotun"
       },
       "IsMale": true,
       "Picture": "Platon.jpg"
@@ -372,7 +384,8 @@
       "Names": {
         "ru": "Никола Тесла",
         "en": "Nikola Tesla",
-        "sr": "Nikola Tesla"
+        "sr": "Nikola Tesla",
+        "uz": "Nikola Tesla"
       },
       "IsMale": true,
       "Picture": "Tesla.jpg"
@@ -401,7 +414,8 @@
       "Names": {
         "ru": "Лев Толстой",
         "en": "Leo Tolstoy",
-        "sr": "Lav Tolstoj"
+        "sr": "Lav Tolstoj",
+        "uz": "Lev Tolstoy"
       },
       "IsMale": true,
       "Picture": "Leo_Tolstoy.jpg"
@@ -430,7 +444,8 @@
       "Names": {
         "ru": "Карл Густав Юнг",
         "en": "Carl Gustav Jung",
-        "sr": "Karl Gustav Jung"
+        "sr": "Karl Gustav Jung",
+        "uz": "Karl Gustav Yung"
       },
       "IsMale": true,
       "Picture": "Carl_Gustav_Jung.jpg"
@@ -459,7 +474,8 @@
       "Names": {
         "ru": "Френсис Бэкон",
         "en": "Francis Bacon",
-        "sr": "Frensis Bejkon"
+        "sr": "Frensis Bejkon",
+        "uz": "Frensis Bekon"
       },
       "IsMale": true,
       "Picture": "Francis_Bacon.jpg"
@@ -488,7 +504,8 @@
       "Names": {
         "ru": "Ада Лавлейс",
         "en": "Ada Lovelace",
-        "sr": "Ada Lavlejs"
+        "sr": "Ada Lavlejs",
+        "uz": "Ada Lavleys"
       },
       "IsMale": false,
       "Picture": "Ada_Lovelace.jpg"
@@ -517,7 +534,8 @@
       "Names": {
         "ru": "Парацельс",
         "en": "Paracelsus",
-        "sr": "Paracelzus"
+        "sr": "Paracelzus",
+        "uz": "Parasels"
       },
       "IsMale": true,
       "Picture": "Paracelsus.jpg"
@@ -546,7 +564,8 @@
       "Names": {
         "ru": "Фридрих Ницше",
         "en": "Friedrich Nietzsche",
-        "sr": "Fridrih Niče"
+        "sr": "Fridrih Niče",
+        "uz": "Fridrix Nitsshe"
       },
       "IsMale": true,
       "Picture": "Nietzsche.jpg"
@@ -575,7 +594,8 @@
       "Names": {
         "ru": "Гераклит",
         "en": "Heraclitus",
-        "sr": "Heraklit"
+        "sr": "Heraklit",
+        "uz": "Geraklit"
       },
       "IsMale": true,
       "Picture": "Heraclite.JPG"
@@ -604,7 +624,8 @@
       "Names": {
         "ru": "Вернер Гейзенберг",
         "en": "Werner Heisenberg",
-        "sr": "Verner Hajzenberg"
+        "sr": "Verner Hajzenberg",
+        "uz": "Verner Xayzenberg"
       },
       "IsMale": true,
       "Picture": "Heisenberg.jpg"
@@ -633,7 +654,8 @@
       "Names": {
         "ru": "Томас Эдисон",
         "en": "Thomas Edison",
-        "sr": "Tomas Edison"
+        "sr": "Tomas Edison",
+        "uz": "Tomas Edison"
       },
       "IsMale": true,
       "Picture": "Thomas_Edison.jpg"
@@ -662,7 +684,8 @@
       "Names": {
         "ru": "Фёдор Достоевский",
         "en": "Fedor Dostoevskiy",
-        "sr": "Fjodor Dostojevski"
+        "sr": "Fjodor Dostojevski",
+        "uz": "Fyodor Dostoyevskiy"
       },
       "IsMale": true,
       "Picture": "Fedor_Dostoevskiy.jpg"
@@ -691,7 +714,8 @@
       "Names": {
         "ru": "Рене Декарт",
         "en": "Rene Descartes",
-        "sr": "Rene Dekart"
+        "sr": "Rene Dekart",
+        "uz": "Rene Dekart"
       },
       "IsMale": true,
       "Picture": "Rene_Descartes.jpg"
@@ -720,7 +744,8 @@
       "Names": {
         "ru": "Иоганн Вольфганг Гёте",
         "en": "Johann Wolfgang von Goethe",
-        "sr": "Johan Volfgang fon Gete"
+        "sr": "Johan Volfgang fon Gete",
+        "uz": "Yohann Volfgang fon Gyote"
       },
       "IsMale": true,
       "Picture": "Goethe.jpg"
@@ -749,7 +774,8 @@
       "Names": {
         "ru": "Фома Аквинский",
         "en": "Thomas Aquinas",
-        "sr": "Sveti Toma Akvinski"
+        "sr": "Sveti Toma Akvinski",
+        "uz": "Foma Akvinskiy"
       },
       "IsMale": true,
       "Picture": "Thomas-Aquinas.jpg"
@@ -778,7 +804,8 @@
       "Names": {
         "ru": "Пифагор",
         "en": "Pythagoras",
-        "sr": "Pitagora"
+        "sr": "Pitagora",
+        "uz": "Pifagor"
       },
       "IsMale": true,
       "Picture": "Pythagoras.jpg"
@@ -807,7 +834,8 @@
       "Names": {
         "ru": "Агата К Christi",
         "en": "Agatha Christie",
-        "sr": "Agata Kristi"
+        "sr": "Agata Kristi",
+        "uz": "Agata Kristi"
       },
       "IsMale": false,
       "Picture": "Agatha_Christie.jpg"
@@ -836,7 +864,8 @@
       "Names": {
         "ru": "Дмитрий Менделеев",
         "en": "Dmitriy Mendeleev",
-        "sr": "Dmitrij Mendelejev"
+        "sr": "Dmitrij Mendelejev",
+        "uz": "Dmitriy Mendeleyev"
       },
       "IsMale": true,
       "Picture": "Dmitriy_Mendeleev.jpg"
@@ -865,7 +894,8 @@
       "Names": {
         "ru": "Гипатия",
         "en": "Hypatia",
-        "sr": "Hipatija"
+        "sr": "Hipatija",
+        "uz": "Gipatiya"
       },
       "IsMale": false,
       "Picture": "Hypatia_Alexandria.jpg"
@@ -894,7 +924,8 @@
       "Names": {
         "ru": "Лиза Мейтнер",
         "en": "Lise Meitner",
-        "sr": "Liza Majtner"
+        "sr": "Liza Majtner",
+        "uz": "Liza Maytner"
       },
       "IsMale": false,
       "Picture": "Lise_Meitner.jpg"
@@ -923,7 +954,8 @@
       "Names": {
         "ru": "Франц Кафка",
         "en": "Franz Kafka",
-        "sr": "Franc Kafka"
+        "sr": "Franc Kafka",
+        "uz": "Frans Kafka"
       },
       "IsMale": true,
       "Picture": "Franz_Kafka.jpg"
@@ -952,7 +984,8 @@
       "Names": {
         "ru": "Мария Кюри",
         "en": "Marie Curie",
-        "sr": "Marija Kiri"
+        "sr": "Marija Kiri",
+        "uz": "Mariya Kyuri"
       },
       "IsMale": false,
       "Picture": "Marie_Curie.jpg"
@@ -981,7 +1014,8 @@
       "Names": {
         "ru": "Пьер Ферма",
         "en": "Pierre de Fermat",
-        "sr": "Pjer de Ferma"
+        "sr": "Pjer de Ferma",
+        "uz": "Pyer de Ferma"
       },
       "IsMale": true,
       "Picture": "Pierre_de_Fermat.jpg"
@@ -1010,7 +1044,8 @@
       "Names": {
         "ru": "Софья Ковалевская",
         "en": "Sofia Kovalevskaya",
-        "sr": "Sofija Kovalevska"
+        "sr": "Sofija Kovalevska",
+        "uz": "Sofya Kovalevskaya"
       },
       "IsMale": false,
       "Picture": "Sofja_Kovalevskaja.jpg"
@@ -1039,7 +1074,8 @@
       "Names": {
         "ru": "Лао-цзы",
         "en": "Laozi",
-        "sr": "Lao Ce"
+        "sr": "Lao Ce",
+        "uz": "Lao-szi"
       },
       "IsMale": true,
       "Picture": "Lao_Tzu.jpg"
@@ -1068,7 +1104,8 @@
       "Names": {
         "ru": "Николай Кузанский",
         "en": "Nicholas of Cusa",
-        "sr": "Nikola Kuzanski"
+        "sr": "Nikola Kuzanski",
+        "uz": "Nikolay Kuzanskiy"
       },
       "IsMale": true,
       "Picture": "Nicholas_of_Cusa.jpg"
@@ -1097,7 +1134,8 @@
       "Names": {
         "ru": "Джордано Бруно",
         "en": "Giordano Bruno",
-        "sr": "Đordano Bruno"
+        "sr": "Đordano Bruno",
+        "uz": "Jordano Bruno"
       },
       "IsMale": true,
       "Picture": "Giordano_Bruno.jpg"
@@ -1108,7 +1146,8 @@
       "Names": {
         "ru": "Леонардо да Винчи",
         "en": "Leonardo da Vinci",
-        "sr": "Leonardo da Vinči"
+        "sr": "Leonardo da Vinči",
+        "uz": "Leonardo da Vinchi"
       },
       "IsMale": true,
       "Picture": "Leonardo.jpg"

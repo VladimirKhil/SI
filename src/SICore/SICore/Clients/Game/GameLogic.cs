@@ -1284,7 +1284,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");
 
-                _gameActions.ShowmanReplic(s.ToString());
+                _gameActions.ShowmanReplic(s.ToString()); // TODO: REMOVE: replaced by MessageCode.RightAnswer
+                _gameActions.ShowmanReplicNew(MessageCode.RightAnswer, outcome, _state.Answerer.AnswerValidationFactor);
                 _gameActions.SendMessageWithArgs(Messages.Person, '+', _state.AnswererIndex, updateSum);
                 AddRightSum(_state.Answerer, updateSum);
                 _gameActions.InformSums();
@@ -1315,7 +1316,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _gameActions.ShowmanReplic(s.ToString());
+                _gameActions.ShowmanReplic(s.ToString()); // TODO: REMOVE: replaced by MessageCode.RightAnswer
+                _gameActions.ShowmanReplicNew(MessageCode.RightAnswer);
                 _state.PlayerIsRight = true;
                 updateSum = _state.Answerer.PersonalStake;
                 ScheduleExecution(Tasks.AnnounceStake, 15);
@@ -1325,7 +1327,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             var s = new StringBuilder();
 
-            if (_state.Answerer.Answer != LO[nameof(R.IDontKnow)])
+            if (_state.Answerer.Answer != "-")
             {
                 s.Append(GetRandomString(LO[nameof(R.Wrong)])).Append(' ');
             }
@@ -2400,7 +2402,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             if (string.IsNullOrEmpty(_state.Answerer.Answer))
             {
-                _state.Answerer.Answer = LO[nameof(R.IDontKnow)];
+                _state.Answerer.Answer = "-";
                 _state.Answerer.AnswerIsWrong = !_state.IsOralNow;
             }
         }
@@ -2415,7 +2417,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             {
                 if (_state.QuestionPlay.AnswererIndicies.Contains(i) && string.IsNullOrEmpty(_state.Players[i].Answer))
                 {
-                    _state.Players[i].Answer = LO[nameof(R.IDontKnow)];
+                    _state.Players[i].Answer = "-";
                     _state.Players[i].AnswerIsWrong = true;
                 }
 
@@ -2647,7 +2649,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        if (_state.Settings.AppSettings.FalseStart || arg == 1)
+        var resumePressing = arg == 1;
+
+        if (_state.Settings.AppSettings.FalseStart || resumePressing)
         {
             _gameActions.SendMessage(Messages.Try);
         }
@@ -2658,7 +2662,16 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         _state.TimerStartTime[1] = DateTime.UtcNow;
         _state.IsThinking = true;
-        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Go, maxTime);
+
+        if (resumePressing)
+        {
+            _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Resume);
+        }
+        else
+        {
+            _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Go, maxTime);
+        }
+
         _state.Decision = DecisionType.Pressing;
 
         ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _state.TimeThinking, 10));
@@ -2770,8 +2783,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void OnUnsupportedQuestionType(string typeName)
     {
-        var sp = new StringBuilder(LO[nameof(R.UnknownType)]).Append(' ').Append(typeName);
-
         // TODO: REMOVE+
         _gameActions.ShowmanReplic(LO[nameof(R.ManuallyPlayedQuestion)]);
         // TODO END
@@ -2876,7 +2887,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var answererIndex = _state.AnnouncedAnswerersEnumerator.Current;
         _state.AnswererIndex = answererIndex;
         var playerAnswer = _state.Answerer?.Answer;
-        var answer = string.IsNullOrEmpty(playerAnswer) ? LO[nameof(R.IDontKnow)] : playerAnswer;
+        var answer = string.IsNullOrEmpty(playerAnswer) ? "-" : playerAnswer;
 
         _gameActions.PlayerReplic(answererIndex, answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
         _gameActions.OnPlayerAnswer(answererIndex, playerAnswer ?? "");
@@ -3314,14 +3325,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
     }
 
-    private void SendAnswersInfoToShowman(string answer)
+    private void SendAnswersInfoToShowman(string? answer)
     {
         _gameActions.SendMessage(
             BuildValidation2Message(_state.Answerer.Name, answer, !_state.QuestionPlay.FlexiblePrice),
             _state.ShowMan.Name);
     }
 
-    private string BuildValidation2Message(string name, string answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
+    private string BuildValidation2Message(string name, string? answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
     {
         var question = _state.Question ?? throw new InvalidOperationException("Question is null");
 
@@ -3338,10 +3349,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 _state.QuestionIndex);
         }
 
+        // TODO: switch to AskValidation message; support oral answer flag; move whole method to _gameActions
         return new MessageBuilder(
             Messages.Validation2,
             name,
-            answer,
+            answer ?? "🗣",
             isCheckingForTheRight ? '+' : '-',
             allowPriceModifications ? '+' : '-',
             rightAnswers.Count + appellatedAnswers.Count)
@@ -3414,7 +3426,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             if (_state.IsOralNow)
             {
                 // Showman accepts answer orally
-                SendAnswersInfoToShowman($"({LO[nameof(R.AnswerIsOral)]})");
+                SendAnswersInfoToShowman(null);
                 _gameActions.SendMessage(Messages.OralAnswer, _state.Answerer.Name);
             }
             else // The only place where we do not check CanPlayerAct()
@@ -3537,7 +3549,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             .Append(", ")
             .Append(GetRandomString(LO[nameof(R.DeleteTheme)]));
 
-        _gameActions.ShowmanReplic(msg.ToString());
+        _gameActions.ShowmanReplic(msg.ToString()); // TODO: REMOVE (localized by MessageCode)
+        _gameActions.ShowmanReplicNew(MessageCode.DeleteTheme, _state.ActivePlayer.Name);
 
         var message = string.Join(Message.ArgsSeparator, Messages.Choose, 2);
         _state.IsOralNow = _state.IsOral && _state.ActivePlayer.IsHuman;
@@ -4006,7 +4019,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             ? LO[nameof(R.IsApellating)]
             : string.Format(LO[nameof(R.IsConsideringWrong)], appelaer.Name);
 
-        _gameActions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}");
+        _gameActions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}"); // TODO: REMOVE (replaced by Validation2Message)
 
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
 
@@ -4807,16 +4820,20 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     // TODO: OnAnnouncePrice and OnSelectPrice should utilize the same selection strategy
     internal void OnAnnouncePrice(NumberSet availableRange)
     {
-        // TODO: send QUESTION_PRICE_RANGE message instead of this
+        // TODO: REMOVE (replaced by QUESTION_PRICE_RANGE)
         var s = new StringBuilder(LO[nameof(R.Cost2)]).Append(": ");
 
         if (availableRange.Maximum == 0)
         {
             s.Append(LO[nameof(R.MinMaxChoice)]);
+            _gameActions.ShowmanReplic(s.ToString());
+            _gameActions.SendMessageWithArgs(Messages.QuestionPriceRange, 0);
         }
         else if (availableRange.Minimum == availableRange.Maximum)
         {
             s.Append(availableRange.Minimum);
+            _gameActions.ShowmanReplic(s.ToString());
+            _gameActions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum);
         }
         else
         {
@@ -4825,14 +4842,18 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 s.Append(
                     $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.UpTo)]} {Notion.FormatNumber(availableRange.Maximum)} " +
                     $"{LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(availableRange.Step)} ({LO[nameof(R.YourChoice)]})");
+
+                _gameActions.ShowmanReplic(s.ToString());
+                _gameActions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum, availableRange.Step);
             }
             else
             {
                 s.Append($"{Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.Or)]} {Notion.FormatNumber(availableRange.Maximum)} ({LO[nameof(R.YourChoice)]})");
+                _gameActions.ShowmanReplic(s.ToString());
+                _gameActions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum);
             }
         }
 
-        _gameActions.ShowmanReplic(s.ToString());
         ScheduleExecution(Tasks.MoveNext, 20);
     }
 
@@ -5005,7 +5026,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             throw new InvalidOperationException("_data.Answerer == null");
         }
 
-        _gameActions.ShowmanReplic(LO[nameof(R.EasyCat)]);
+        _gameActions.ShowmanReplic(LO[nameof(R.EasyCat)]); // TODO: REMOVE (localized by MessageCode)
+        _gameActions.ShowmanReplicNew(MessageCode.IncomeWithoutAnswering);
         _gameActions.SendMessageWithArgs(Messages.Person, '+', _state.AnswererIndex, _state.CurPriceRight);
 
         AddRightSum(_state.Answerer, _state.CurPriceRight);

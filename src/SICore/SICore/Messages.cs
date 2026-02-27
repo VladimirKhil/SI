@@ -328,12 +328,6 @@ public static class Messages
     public const string MediaLoaded = "MEDIALOADED";
 
     /// <summary>
-    /// Notifies that the client has preloaded the media.
-    /// </summary>
-    [Obsolete]
-    public const string MediaPreloaded = "MEDIA_PRELOADED";
-
-    /// <summary>
     /// Notifies about media preload progress.
     /// </summary>
     public const string MediaPreloadProgress = "MEDIA_PRELOAD_PROGRESS";
@@ -521,6 +515,11 @@ public static class Messages
     /// Question has ended.
     /// </summary>
     public const string QuestionEnd = "QUESTION_END";
+
+    /// <summary>
+    /// Question possible price range.
+    /// </summary>
+    public const string QuestionPriceRange = "QUESTION_PRICE_RANGE";
 
     /// <summary>
     /// Sources of the question (if any).

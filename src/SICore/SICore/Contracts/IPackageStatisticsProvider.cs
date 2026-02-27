@@ -22,4 +22,9 @@ public interface IPackageStatisticsProvider
     /// <param name="themeIndex">Theme index.</param>
     /// <param name="questionIndex">Question index.</param>
     ICollection<string> GetRejectedAnswers(int roundIndex, int themeIndex, int questionIndex);
+
+    /// <summary>
+    /// Gets package source.
+    /// </summary>
+    string? GetPackageSource();
 }

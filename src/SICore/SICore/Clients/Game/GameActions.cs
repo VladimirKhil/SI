@@ -96,6 +96,12 @@ public sealed class GameActions
             messageCode.ToString(),
             arg);
 
+    internal void ShowmanReplicNew(MessageCode rightAnswer, params object[] args) =>
+        SendMessageWithArgs(
+            new object[] { Messages.ShowmanReplic, Random.Shared.Next(1, 20), rightAnswer.ToString() }
+                .Concat(args ?? Array.Empty<object>())
+                .ToArray());
+
     [Obsolete]
     internal void PlayerReplic(int playerIndex, string text) => UserMessage(MessageTypes.Replic, text, GameRole.Player, playerIndex);
 
@@ -426,7 +432,7 @@ public sealed class GameActions
 
     internal void AskReview()
     {
-        var packageSource = _state.GameResultInfo.PackageSource?.ToString() ?? "";
+        var packageSource = _state.GameResultInfo.PackageSource?.ToString() ?? (_state.PackageStatistisProvider?.GetPackageSource() ?? "");
 
         if (!ReviewablePackageSources.Any(allowed => packageSource.StartsWith(allowed, StringComparison.OrdinalIgnoreCase)))
         {
@@ -474,4 +480,6 @@ public sealed class GameActions
 
     internal void OnRightAnswer(AnswerType answerType, string rightAnswer) =>
         SendVisualMessageWithArgs(Messages.RightAnswer, answerType.ToString().ToLowerInvariant(), rightAnswer);
+
+    internal void InformMediaPreloadProgress(string sender, int progress) => SendMessageWithArgs(Messages.MediaPreloadProgress, sender, progress);
 }
