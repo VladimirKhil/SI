@@ -541,7 +541,7 @@
     <value>You get Question with a stake</value>
   </data>
   <data name="YourAnswer" xml:space="preserve">
-    <value>, what's your answer?; your answer is..?;?;, answer, please!;, I'm waiting for your answer;, please, answer the question</value>
+    <value>what's your answer?; your answer is..?;?;answer, please!;I'm waiting for your answer;please, answer the question</value>
   </data>
   <data name="YourChoice" xml:space="preserve">
     <value>on the choice</value>

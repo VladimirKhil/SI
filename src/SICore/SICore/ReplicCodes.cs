@@ -3,6 +3,7 @@
 /// <summary>
 /// Defines codes that represent replic sources.
 /// </summary>
+[Obsolete]
 public static class ReplicCodes
 {
     public const char System = 't';

@@ -234,12 +234,6 @@ public interface IPersonController
     void EndThink();
 
     /// <summary>
-    /// Handles game report request.
-    /// </summary>
-    /// <param name="report">Report text.</param>
-    void Report(string report);
-
-    /// <summary>
     /// Handles game theme.
     /// </summary>
     /// <param name="themeName">Theme name.</param>
@@ -292,7 +286,9 @@ public interface IPersonController
 
     void OnQuestionSources(IEnumerable<string> sources) { }
 
-    void OnShowmanReplic(int messageIndex, MessageCode messageCode) { }
+    void OnShowmanReplic(int messageIndex, MessageCode messageCode, params string[] args) { }
 
     void OnPackage(string packageName, string? packageLogoUri) { }
+
+    void OnPlayerAnswer(int playerIndex, string answer) { }
 }

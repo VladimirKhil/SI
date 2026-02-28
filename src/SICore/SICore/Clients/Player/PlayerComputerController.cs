@@ -342,18 +342,6 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
 
     public void OnAskValidateAnswer(string answer, bool voteForRight) => ScheduleExecution(PlayerTasks.ValidateAnswerNew, 10 + Random.Shared.Next(10), (answer, voteForRight));
 
-    public void SendReport()
-    {
-        if (_state.SystemLog.Length > 0)
-        {
-            _viewerActions.SendMessage(Messages.Report, MessageParams.Report_Log, _state.SystemLog.ToString());
-        }
-        else
-        {
-            _viewerActions.SendMessage(Messages.Report, "DECLINE");
-        }
-    }
-
     public void OnInitialized() => ScheduleExecution(PlayerTasks.Ready, 10);
 
     public void OnTheme(int questionCount)

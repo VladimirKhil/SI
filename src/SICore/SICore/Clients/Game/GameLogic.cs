@@ -3435,7 +3435,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        var answerReplic = useAnswerOptions ? ", " + LO[nameof(R.SelectAnswerOption)] : GetRandomString(LO[nameof(R.YourAnswer)]);
+        var answerReplic = useAnswerOptions ? ", " + LO[nameof(R.SelectAnswerOption)] : ", " + GetRandomString(LO[nameof(R.YourAnswer)]);
         _gameActions.ShowmanReplic(_state.Answerer.Name + answerReplic); // TODO: REMOVE (localized by MessageCode)
         _gameActions.ShowmanReplicNew(useAnswerOptions ? MessageCode.SelectAnswerOption : MessageCode.Answer, _state.Answerer.Name);
 

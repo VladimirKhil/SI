@@ -332,10 +332,6 @@ public class Viewer : MessageHandler, IViewerClient
                     OnLayout(mparams);
                     break;
 
-                case Messages.TextShape: // TODO: remove after v7.11.0 deprecation
-                    _controller.OnTextShape(mparams);
-                    break;
-
                 case Messages.ContentShape:
                     if (mparams.Length > 4
                         && mparams[1] == ContentPlacements.Screen
@@ -484,8 +480,11 @@ public class Viewer : MessageHandler, IViewerClient
                     OnGameStatistics(mparams);
                     break;
 
-                case Messages.Timeout:
-                    _controller.TimeOut();
+                case Messages.RoundEnd:
+                    if (mparams.Length > 1 && mparams[1] == "timeout")
+                    {
+                        _controller.TimeOut();
+                    }
                     break;
 
                 case Messages.FinalThink:
@@ -671,7 +670,11 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        _controller.OnShowmanReplic(messageIndex, messageCode);
+        var args = mparams.Length > 3
+            ? mparams.Skip(3).Select(s => s.UnescapeNewLines()).ToArray()
+            : Array.Empty<string>();
+
+        _controller.OnShowmanReplic(messageIndex, messageCode, args);
     }
 
     private void OnPlayerAnswer(string[] mparams)
@@ -682,7 +685,7 @@ public class Viewer : MessageHandler, IViewerClient
         }
 
         // ClientData.Players[playerIndex].Answer = mparams[2]; // TODO: for the future use
-        _controller.OnReplic(ReplicCodes.Player.ToString() + playerIndex, mparams[2]);
+        _controller.OnPlayerAnswer(playerIndex, mparams[2]);
     }
 
     private void OnMediaPreloadProgress(string[] mparams)
@@ -1781,7 +1784,7 @@ public class Viewer : MessageHandler, IViewerClient
 
         if (State.Me != null)
         {
-            State.Me.Picture = State.Picture;
+            State.Me.Picture = State.Picture ?? "";
         }
 
         if (!_client.Node.IsMain) // TODO: this should be handled on node level
@@ -1969,7 +1972,7 @@ public class Viewer : MessageHandler, IViewerClient
     {
         if (Avatar != null)
         {
-            _actions.SendMessage(Messages.Picture, Avatar);
+            _actions.SendMessage(Messages.Avatar, ContentTypes.Image, Avatar);
             return;
         }
 
@@ -1995,7 +1998,7 @@ public class Viewer : MessageHandler, IViewerClient
                 }
                 catch (Exception exc)
                 {
-                    _controller.OnReplic(ReplicCodes.Special.ToString(), exc.Message);
+                    _client.Node.OnError(exc, true);
                     return;
                 }
 
@@ -2005,11 +2008,11 @@ public class Viewer : MessageHandler, IViewerClient
                     return;
                 }
 
-                _actions.SendMessage(Messages.Picture, State.Picture, Convert.ToBase64String(data));
+                _actions.SendMessage(Messages.Avatar, ContentTypes.Image, State.Picture, Convert.ToBase64String(data));
             }
             else
             {
-                _actions.SendMessage(Messages.Picture, State.Picture);
+                _actions.SendMessage(Messages.Avatar, ContentTypes.Image, State.Picture);
             }
         }
     }

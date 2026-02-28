@@ -1852,7 +1852,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to , what&apos;s your answer?; your answer is..?;?;, answer, please!;, I&apos;m waiting for your answer;, please, answer the question.
+        ///   Looks up a localized string similar to what&apos;s your answer?; your answer is..?;?;answer, please!;I&apos;m waiting for your answer;please, answer the question.
         /// </summary>
         public static string YourAnswer {
             get {

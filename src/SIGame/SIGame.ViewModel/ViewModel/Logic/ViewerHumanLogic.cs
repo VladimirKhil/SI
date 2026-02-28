@@ -303,6 +303,27 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
+    public void OnPlayerAnswer(int playerIndex, string answer) 
+    {
+        _gameViewModel.ClearReplic();
+        _gameViewModel.Speaker = _state.Players[playerIndex];
+        _gameViewModel.Speaker.Replic = TrimReplic(answer);
+
+        var logString = $"<span class=\"sr n{playerIndex}\">{_gameViewModel.Speaker.Name}: </span><span class=\"r\">{answer}</span>";
+        var translateGameToChat = _userSettings.GameSettings.AppSettings.TranslateGameToChat;
+
+        if (translateGameToChat)
+        {
+            AddToChat(new Message(answer, _gameViewModel.Speaker.Name));
+        }
+
+        if (logString != null && _userSettings.GameSettings.AppSettings.MakeLogs)
+        {
+            logString += "<br/>";
+            AddToFileLog(logString);
+        }
+    }
+
     /// <summary>
     /// Вывод сообщения в лог файл и в чат игры
     /// </summary>
@@ -325,39 +346,6 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             {
                 AddToChat(new Message(text, _gameViewModel.Speaker.Name));
             }
-        }
-        else if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
-        {
-            var indexString = replicCode[1..];
-
-            if (int.TryParse(indexString, out var index) && index >= 0 && index < _state.Players.Count)
-            {
-                _gameViewModel.ClearReplic();
-                _gameViewModel.Speaker = _state.Players[index];
-                _gameViewModel.Speaker.Replic = TrimReplic(text);
-
-                logString = $"<span class=\"sr n{index}\">{_gameViewModel.Speaker.Name}: </span><span class=\"r\">{text}</span>";
-
-                if (translateGameToChat)
-                {
-                    AddToChat(new Message(text, _gameViewModel.Speaker.Name));
-                }
-            }
-        }
-        else if (replicCode == ReplicCodes.Special.ToString())
-        {
-            logString = $"<span class=\"sp\">{text}</span>";
-            _gameViewModel.OnAddString("* ", text, LogMode.Protocol);
-        }
-        else
-        {
-            if (translateGameToChat)
-            {
-                _gameViewModel.OnAddString(null, text, LogMode.Protocol);
-            }
-
-            // all other types of messages are printed only to logs
-            logString = $"<span class=\"s\">{text}</span>";
         }
 
         if (logString != null && _userSettings.GameSettings.AppSettings.MakeLogs)
@@ -490,7 +478,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 if (!informOnly)
                 {
                     TInfo.TStage = TableStage.Sign;
-                    OnReplic(ReplicCodes.Special.ToString(), $"{Resources.GameStarted} {DateTime.Now}");
+                    OnSpecialReplic($"{Resources.GameStarted} {DateTime.Now}");
 
                     var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{_state.ShowMan?.Name}\"");
 
@@ -576,7 +564,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
         foreach (var theme in themes)
         {
-            OnReplic(ReplicCodes.System.ToString(), theme);
+            OnSystemMessage(theme);
         }
     }
 
@@ -598,7 +586,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                 if (playMode != Models.ThemesPlayMode.None)
                 {
-                    OnReplic(ReplicCodes.System.ToString(), theme);
+                    OnSystemMessage(theme);
                 }
             }
         }
@@ -1783,7 +1771,35 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
-    private void OnSpecialReplic(string message) => OnReplic(ReplicCodes.Special.ToString(), message);
+    private void OnSystemMessage(string message)
+    {
+        var text = message;
+        var translateGameToChat = _userSettings.GameSettings.AppSettings.TranslateGameToChat;
+
+        if (translateGameToChat)
+        {
+            _gameViewModel.OnAddString(null, text, LogMode.Protocol);
+        }
+
+        var logString = $"<span class=\"s\">{text}</span>";
+
+        if (_userSettings.GameSettings.AppSettings.MakeLogs)
+        {
+            AddToFileLog(logString + "<br/>");
+        }
+    }
+
+    private void OnSpecialReplic(string message)
+    {
+        var text = message;
+        var logString = $"<span class=\"sp\">{text}</span>";
+        _gameViewModel.OnAddString("* ", text, LogMode.Protocol);
+
+        if (_userSettings.GameSettings.AppSettings.MakeLogs)
+        {
+            AddToFileLog(logString + "<br/>");
+        }
+    }
 
     public void OnUnbanned(string ip) =>
         UI.Execute(
@@ -2024,23 +2040,10 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         _gameViewModel.Apellate.CanBeExecuted = _gameViewModel.ApellationCount > 0;
     }
 
-    public void Report(string report)
-    {
-        if (!_userSettings.SendReport)
-        {
-            _gameViewModel.Report.SendNoReport.Execute(null);
-            return;
-        }
-
-        _gameViewModel.Report.Report = report;
-        _gameViewModel.DialogMode = DialogModes.Report;
-        PlatformManager.Instance.Activate();
-    }
-
     public void OnGameClosed()
     {
         PlatformManager.Instance.ShowMessage(Resources.GameClosedMessage, MessageType.Warning, true);
-        OnReplic(ReplicCodes.Special.ToString(), Resources.GameClosedMessage);
+        OnSpecialReplic(Resources.GameClosedMessage);
     }
 
     public void OnCanPressButton() => _gameViewModel.Apellate.CanBeExecuted = false;
@@ -2087,7 +2090,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
-    public void OnSelfDisconnected() => OnReplic(ReplicCodes.Special.ToString(), Resources.DisconnectMessage);
+    public void OnSelfDisconnected() => OnSpecialReplic(Resources.DisconnectMessage);
 
     public void OnHostChanged(string? initiator, string newHost)
     {
@@ -2096,9 +2099,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
         if (!string.IsNullOrEmpty(initiator))
         {
-            OnReplic(
-                ReplicCodes.Special.ToString(),
-                string.Format(Resources.HostChanged, initiator.Length > 0 ? initiator : Resources.ByGame, newHost));
+            OnSpecialReplic(string.Format(Resources.HostChanged, initiator.Length > 0 ? initiator : Resources.ByGame, newHost));
         }
     }
 
@@ -2124,45 +2125,137 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     public void OnPackageAuthors(IEnumerable<string> authors)
     {
         var authorsText = string.Join(", ", authors);
-        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.PackageAuthors}: {authorsText}");
+        OnSpecialReplic($"{Resources.PackageAuthors}: {authorsText}");
     }
 
     public void OnPackageSources(IEnumerable<string> sources)
     {
         var sourcesText = string.Join(", ", sources);
-        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.PackageSources}: {sourcesText}");
+        OnSpecialReplic($"{Resources.PackageSources}: {sourcesText}");
     }
 
     public void OnPackageComments(string comments)
     {
         var commentsText = comments.UnescapeNewLines();
-        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.PackageComments}: {commentsText}");
+        OnSpecialReplic($"{Resources.PackageComments}: {commentsText}");
     }
 
     public void OnQuestionAuthors(IEnumerable<string> authors)
     {
         var authorsText = string.Join(", ", authors);
-        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.QuestionAuthors}: {authorsText}");
+        OnSpecialReplic($"{Resources.QuestionAuthors}: {authorsText}");
     }
 
     public void OnQuestionSources(IEnumerable<string> sources)
     {
         var sourcesText = string.Join(", ", sources);
-        OnReplic(ReplicCodes.Special.ToString(), $"{Resources.QuestionSources}: {sourcesText}");
+        OnSpecialReplic($"{Resources.QuestionSources}: {sourcesText}");
     }
 
-    public void OnShowmanReplic(int messageIndex, Models.MessageCode messageCode)
+    private static string ChooseResourceVariant(string resourceText, int? selector, string? name = null)
     {
+        if (resourceText == null)
+        {
+            return string.Empty;
+        }
+
+        var variants = resourceText.Split(';').Select(s => s.Trim()).Where(s => s.Length > 0).ToArray();
+
+        if (variants.Length == 0)
+        {
+            variants = new[] { resourceText };
+        }
+
+        var index = 0;
+
+        if (selector.HasValue)
+        {
+            index = Math.Abs(selector.Value) % variants.Length;
+        }
+
+        var chosen = variants[index];
+
+        return string.IsNullOrEmpty(name) ? chosen : name + ", " + chosen;
+    }
+
+    public void OnShowmanReplic(int messageIndex, Models.MessageCode messageCode, params string[] args)
+    {
+        string? text = null;
+
+        int? selector = null;
+        string? namePrefix = null;
+
+        if (args != null && args.Length > 0)
+        {
+            if (int.TryParse(args[0], out var parsed))
+            {
+                // use exact int argument from args[0]
+                selector = parsed;
+
+                if (args.Length > 1)
+                {
+                    namePrefix = args[1];
+                }
+            }
+            else
+            {
+                namePrefix = args[0];
+            }
+        }
+
         switch (messageCode)
         {
             case Models.MessageCode.ShowmanGreeting:
-                OnReplic(ReplicCodes.Showman.ToString(), Properties.Resources.ShowmanGreeting);
+                text = ChooseResourceVariant(Properties.Resources.ShowmanGreeting, selector);
                 break;
 
-            // TODO: localize other messages
+            case Models.MessageCode.SelectQuestion:
+                text = ChooseResourceVariant(Properties.Resources.ChooseQuest, selector, namePrefix);
+                break;
+
+            case Models.MessageCode.UnsupportedQuestion:
+                text = ChooseResourceVariant(Properties.Resources.ManuallyPlayedQuestion, selector);
+                break;
+
+            case Models.MessageCode.SelectPlayer:
+                text = ChooseResourceVariant(Properties.Resources.GiveCat, selector, namePrefix);
+                break;
+
+            case Models.MessageCode.MakeStake:
+                text = ChooseResourceVariant(Properties.Resources.YourStake, selector, namePrefix);
+                break;
+
+            case Models.MessageCode.SelectAnswerOption:
+                text = ChooseResourceVariant(Properties.Resources.SelectAnswerOption, selector, namePrefix);
+                break;
+
+            case Models.MessageCode.Answer:
+                text = ChooseResourceVariant(Properties.Resources.YourAnswer, selector, namePrefix);
+                break;
+
+            case Models.MessageCode.RoundSkippedNoPlayers:
+                text = ChooseResourceVariant(Properties.Resources.NobodyInFinal, selector);
+                break;
+
+            case Models.MessageCode.RightAnswer:
+                text = ChooseResourceVariant(Properties.Resources.Right, selector);
+                break;
+
+            case Models.MessageCode.DeleteTheme:
+                text = ChooseResourceVariant(Properties.Resources.DeleteTheme, selector, namePrefix);
+                break;
+
+            case Models.MessageCode.IncomeWithoutAnswering:
+                text = ChooseResourceVariant(Properties.Resources.EasyCat, selector);
+                break;
 
             default:
                 break;
+        }
+
+        if (text != null)
+        {
+            OnReplic(ReplicCodes.Showman.ToString(), text);
         }
     }
 }

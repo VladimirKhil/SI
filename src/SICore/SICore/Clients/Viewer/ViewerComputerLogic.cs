@@ -111,8 +111,6 @@ internal class ViewerComputerLogic : IPersonController
 
     public void OnQuestionStart(string questionTypeName, bool isDefaultType) => _player.OnQuestionStart();
 
-    public void Report(string report) => _player.SendReport();
-
     public void ReceiveText(Message m)
     {
         // Do nothing

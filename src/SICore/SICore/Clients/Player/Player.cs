@@ -1,7 +1,6 @@
 ﻿using SICore.Network.Clients;
 using SIData;
 using SIPackages.Core;
-using System.Text;
 
 namespace SICore;
 
@@ -141,24 +140,6 @@ public sealed class Player : Viewer
                 }
 
                 Logic.OnPlayerOutcome(playerIndex, isRight);
-                break;
-
-            case Messages.Report:
-                var report = new StringBuilder();
-
-                for (var r = 1; r < mparams.Length; r++)
-                {
-                    report.AppendLine(mparams[r]);
-                }
-
-                var me = (PersonAccount?)State.Me;
-
-                if (me != null)
-                {
-                    me.IsDeciding = false;
-                }
-
-                Logic.Report(report.ToString());
                 break;
         }
     }

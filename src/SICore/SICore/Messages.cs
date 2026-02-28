@@ -445,13 +445,6 @@ public static class Messages
     public const string PersonStake = "PERSONSTAKE";
 
     /// <summary>
-    /// Картинка участника
-    /// </summary>
-    [IdempotencyRequired]
-    [Obsolete]
-    public const string Picture = "PICTURE";
-
-    /// <summary>
     /// Asks or receives game PIN.
     /// </summary>
     public const string Pin = "PIN";

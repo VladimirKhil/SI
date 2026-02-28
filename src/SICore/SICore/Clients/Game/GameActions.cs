@@ -96,9 +96,9 @@ public sealed class GameActions
             messageCode.ToString(),
             arg);
 
-    internal void ShowmanReplicNew(MessageCode rightAnswer, params object[] args) =>
+    internal void ShowmanReplicNew(MessageCode messageCode, params object[] args) =>
         SendMessageWithArgs(
-            new object[] { Messages.ShowmanReplic, Random.Shared.Next(1, 20), rightAnswer.ToString() }
+            new object[] { Messages.ShowmanReplic, Random.Shared.Next(1, 20), messageCode.ToString() }
                 .Concat(args ?? Array.Empty<object>())
                 .ToArray());
 
