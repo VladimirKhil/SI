@@ -8,6 +8,7 @@ using SIData;
 using SIEngine.Rules;
 using SIPackages.Core;
 using SIUI.Model;
+using System.Globalization;
 using System.Text;
 
 namespace SICore;
@@ -25,7 +26,7 @@ public class Viewer : MessageHandler, IViewerClient
 
     private readonly IPersonController _controller;
 
-    protected IPersonController Logic => _controller;
+    protected IPersonController Controller => _controller;
 
     protected ViewerData State { get; }
 
@@ -357,7 +358,7 @@ public class Viewer : MessageHandler, IViewerClient
                 case Messages.Atom_Hint:
                     if (mparams.Length > 1)
                     {
-                        _controller.OnAtomHint(mparams[1]);
+                        _controller.OnTableWarning(mparams[1]);
                     }
                     break;
 
@@ -505,12 +506,223 @@ public class Viewer : MessageHandler, IViewerClient
                         _controller.OnAd(mparams[1]);
                     }
                     break;
+
+                case Messages.AnswerDeviation:
+                    OnAnswerDeviation(mparams);
+                    break;
+
+                case Messages.Appellation:
+                    OnAppellation(mparams);
+                    break;
+
+                case Messages.GameError:
+                    OnGameError(mparams);
+                    break;
+
+                case Messages.PackageDate:
+                    OnPackageDate(mparams);
+                    break;
+
+                case Messages.Pin:
+                    OnPin(mparams);
+                    break;
+
+                case Messages.PlayerAppellating:
+                    OnPlayerAppellating(mparams);
+                    break;
+
+                case Messages.PlayerScoreChanged:
+                    OnPlayerScoreChanged(mparams);
+                    break;
+
+                case Messages.QuestionEnd:
+                    _controller.OnQuestionEnd();
+                    break;
+
+                case Messages.QuestionPriceRange:
+                    OnQuestionPriceRange(mparams);
+                    break;
+
+                case Messages.RoundAuthors:
+                    OnRoundAuthors(mparams);
+                    break;
+
+                case Messages.RoundComments:
+                    OnRoundComments(mparams);
+                    break;
+
+                case Messages.RoundSources:
+                    OnRoundSources(mparams);
+                    break;
+
+                case Messages.UserError:
+                    OnUserError(mparams);
+                    break;
             }
         }
         catch (Exception exc)
         {
             _client.Node.OnError(exc, true);
         }
+    }
+
+    private void OnAnswerDeviation(string[] mparams)
+    {
+        if (mparams.Length < 2 || !int.TryParse(mparams[1], out var deviation))
+        {
+            return;
+        }
+
+        // TODO: store deviation in state and use it for numeric answer checking UI
+        _controller.OnAnswerDeviation(deviation);
+    }
+
+    private void OnAppellation(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        // Backward-compatible format: APPELLATION\n+/-
+        if (mparams[1] == "+" || mparams[1] == "-")
+        {
+            State.ApellationEnabled = mparams[1] == "+";
+            _controller.OnAppellation(State.ApellationEnabled);
+            return;
+        }
+
+        // New format: APPELLATION\n<mode>\n<player_index>
+        if (mparams.Length < 3 || !int.TryParse(mparams[2], out var playerIndex))
+        {
+            return;
+        }
+
+        // TODO: implement a full appellation UI flow (start/vote/end)
+        _controller.OnAppellation(mparams[1], playerIndex);
+    }
+
+    private void OnGameError(string[] mparams)
+    {
+        var message = mparams.Length > 1 ? mparams[1].UnescapeNewLines() : null;
+        // TODO: show an error popup / notification
+        _controller.OnGameError(message);
+    }
+
+    private void OnPackageDate(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        // TODO: display package date in UI
+        _controller.OnPackageDate(mparams[1]);
+    }
+
+    private void OnPin(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        // TODO: display PIN in UI
+        _controller.OnPin(mparams[1]);
+    }
+
+    private void OnPlayerAppellating(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        // TODO: indicate that player started an appellation
+        _controller.OnPlayerAppellating(mparams[1]);
+    }
+
+    private void OnPlayerScoreChanged(string[] mparams)
+    {
+        if (mparams.Length < 3
+            || !int.TryParse(mparams[1], out var playerIndex)
+            || playerIndex < 0
+            || playerIndex >= State.Players.Count
+            || !int.TryParse(mparams[2], out var newScore))
+        {
+            return;
+        }
+
+        State.Players[playerIndex].Sum = newScore;
+        _controller.OnPlayerScoreChanged(playerIndex, newScore);
+    }
+
+    private void OnQuestionPriceRange(string[] mparams)
+    {
+        if (mparams.Length < 2 || !int.TryParse(mparams[1], out var minPrice))
+        {
+            return;
+        }
+
+        int? maxPrice = null;
+        int? step = null;
+
+        if (mparams.Length > 2 && int.TryParse(mparams[2], out var max))
+        {
+            maxPrice = max;
+        }
+
+        if (mparams.Length > 3 && int.TryParse(mparams[3], out var s))
+        {
+            step = s;
+        }
+
+        // TODO: use this range for stake UI and/or question price selection UI
+        _controller.OnQuestionPriceRange(minPrice, maxPrice, step);
+    }
+
+    private void OnRoundAuthors(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        // TODO: show round authors in UI
+        _controller.OnRoundAuthors(mparams.Skip(1));
+    }
+
+    private void OnRoundComments(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        // TODO: show round comments in UI
+        _controller.OnRoundComments(mparams[1].UnescapeNewLines());
+    }
+
+    private void OnRoundSources(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        // TODO: show round sources in UI
+        _controller.OnRoundSources(mparams.Skip(1));
+    }
+
+    private void OnUserError(string[] mparams)
+    {
+        if (mparams.Length < 2 || !int.TryParse(mparams[1], out var errorCode))
+        {
+            return;
+        }
+
+        // TODO: map error codes to localized user-facing messages
+        _controller.OnUserError(errorCode, mparams.Skip(2).ToArray());
     }
 
     private void OnContent(string[] mparams)
@@ -933,9 +1145,10 @@ public class Viewer : MessageHandler, IViewerClient
         {
             return;
         }
-        
+
         if (mparams[1] != MessageParams.Layout_AnswerOptions)
         {
+            _controller.OnLayout(mparams[1]);
             return;
         }
 

@@ -1118,7 +1118,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnSetJoinMode(Models.JoinMode joinMode) => _gameViewModel.JoinMode = joinMode;
 
-    public void OnAtomHint(string hint)
+    public void OnTableWarning(string hint)
     {
         TInfo.Hint = hint;
 
@@ -2152,6 +2152,24 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         OnSpecialReplic($"{Resources.QuestionSources}: {sourcesText}");
     }
 
+    public void OnRoundAuthors(IEnumerable<string> authors)
+    {
+        var authorsText = string.Join(", ", authors);
+        OnSpecialReplic($"{Resources.RoundAuthors}: {authorsText}");
+    }
+
+    public void OnRoundComments(string comments)
+    {
+        var commentsText = comments.UnescapeNewLines();
+        OnSpecialReplic($"{Resources.RoundComments}: {commentsText}");
+    }
+
+    public void OnRoundSources(IEnumerable<string> sources)
+    {
+        var sourcesText = string.Join(", ", sources);
+        OnSpecialReplic($"{Resources.RoundSources}: {sourcesText}");
+    }
+
     private static string ChooseResourceVariant(string resourceText, int? selector, string? name = null)
     {
         if (resourceText == null)
@@ -2258,4 +2276,6 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             OnReplic(ReplicCodes.Showman.ToString(), text);
         }
     }
+
+    public void OnLayout(string layoutType) => OnTableWarning(Resources.UnsupportedQuestion);
 }

@@ -47,14 +47,14 @@ public sealed class Player : Viewer
                     State.QuestionIndex = -1;
                     State.ThemeIndex = -1;
 
-                    Logic.ClearSelections(true);
+                    Controller.ClearSelections(true);
                 }
 
                 #endregion
                 break;
 
             case Messages.Cancel:
-                Logic.ClearSelections(true);
+                Controller.ClearSelections(true);
                 break;
 
             case Messages.Choose:
@@ -62,11 +62,11 @@ public sealed class Player : Viewer
 
                 if (mparams[1] == "1")
                 {
-                    Logic.SelectQuestion();
+                    Controller.SelectQuestion();
                 }
                 else
                 {
-                    Logic.DeleteTheme();
+                    Controller.DeleteTheme();
                 }
 
                 #endregion
@@ -85,31 +85,31 @@ public sealed class Player : Viewer
             case Messages.Content:
                 if (State.QuestionType == QuestionTypes.Simple)
                 {
-                    Logic.OnEnableButton();
+                    Controller.OnEnableButton();
                 }
                 break;
 
             case Messages.Try:
                 State.TryStartTime = DateTimeOffset.UtcNow;
-                Logic.OnCanPressButton();
+                Controller.OnCanPressButton();
                 break;
 
             case Messages.YouTry:
-                Logic.OnEnableButton();
-                Logic.StartThink();
+                Controller.OnEnableButton();
+                Controller.StartThink();
                 break;
 
             case Messages.EndTry:
-                Logic.OnDisableButton();
+                Controller.OnDisableButton();
 
                 if (mparams[1] == MessageParams.EndTry_All)
                 {
-                    Logic.EndThink();
+                    Controller.EndThink();
                 }
                 break;
 
             case Messages.Answer:
-                Logic.Answer();
+                Controller.Answer();
                 break;
 
             case Messages.AskSelectPlayer:
@@ -139,7 +139,7 @@ public sealed class Player : Viewer
                     break;
                 }
 
-                Logic.OnPlayerOutcome(playerIndex, isRight);
+                Controller.OnPlayerOutcome(playerIndex, isRight);
                 break;
         }
     }
@@ -179,6 +179,6 @@ public sealed class Player : Viewer
             me.IsDeciding = false;
         }
 
-        Logic.IsRight(mparams[1], mparams[3] == "+", mparams[2]);
+        Controller.IsRight(mparams[1], mparams[3] == "+", mparams[2]);
     }
 }

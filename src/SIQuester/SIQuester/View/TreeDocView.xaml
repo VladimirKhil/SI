@@ -11,6 +11,7 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     PreviewMouseLeftButtonDown="Main_MouseLeftButtonDown"
+    PreviewDragLeave="Main_DragLeave"
     PreviewDragEnter="Main_DragEnter"
     PreviewDragOver="Main_DragOver"
     PreviewDrop="Main_Drop"

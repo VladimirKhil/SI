@@ -3741,7 +3741,7 @@ public sealed class Game : MessageHandler
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var data = new ViewerData();
         var actions = new ViewerActions(playerClient);
-        var logic = new ViewerComputerLogic(data, actions, new Intelligence(account), GameRole.Player);
+        var logic = new PersonComputerController(data, actions, new Intelligence(account), GameRole.Player);
         _ = new Player(playerClient, account, logic, actions, data);
 
         OnInfo(newAccount.Name);
@@ -3771,7 +3771,7 @@ public sealed class Game : MessageHandler
         var data = new ViewerData();
         var actions = new ViewerActions(showmanClient);
         
-        var logic = new ViewerComputerLogic(
+        var logic = new PersonComputerController(
             data,
             actions,
             new Intelligence(account),

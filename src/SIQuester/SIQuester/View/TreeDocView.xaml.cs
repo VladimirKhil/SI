@@ -26,7 +26,28 @@ public partial class TreeDocView : UserControl
     
     private readonly object _dragLock = new();
 
-    public TreeDocView() => InitializeComponent();
+    public TreeDocView()
+    {
+        InitializeComponent();
+        IsVisibleChanged += TreeDocView_IsVisibleChanged;
+        Unloaded += (s, e) => { _insertionMark.Visibility = Visibility.Hidden; };
+    }
+
+    private void Main_DragLeave(object sender, DragEventArgs e)
+    {
+        // Hide insertion mark if drag leaves the control (for example when switching tabs)
+        _insertionMark.Visibility = Visibility.Hidden;
+        e.Handled = true;
+    }
+
+    // Ensure insertion mark is hidden when view becomes invisible/unloaded
+    private void TreeDocView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.NewValue is bool visible && !visible)
+        {
+            _insertionMark.Visibility = Visibility.Hidden;
+        }
+    }
 
     private void Main_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
@@ -374,7 +395,7 @@ public partial class TreeDocView : UserControl
 
                         for (var j = 0; j < themeViewModel.Questions.Count; j++)
                         {
-                            themeViewModel.Questions[i].Model.Price = basePrice * (j + 1);
+                            themeViewModel.Questions[j].Model.Price = basePrice * (j + 1);
                         }
                     }
                 }

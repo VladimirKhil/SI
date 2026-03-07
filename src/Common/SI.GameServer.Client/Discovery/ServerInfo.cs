@@ -11,6 +11,11 @@ internal sealed class ServerInfo
     public string? Uri { get; set; }
 
     /// <summary>
+    /// Proxy Uri to access the server if direct access is not possible.
+    /// </summary>
+    public string? ProxyUri { get; set; }
+
+    /// <summary>
     /// Server supported protocol version.
     /// </summary>
     public int ProtocolVersion { get; set; }

@@ -108,6 +108,30 @@ public interface IPersonController
 
     void OnAd(string? text = null) { }
 
+    void OnAnswerDeviation(int deviation) { }
+
+    /// <summary>
+    /// Handles change of appellation availability.
+    /// </summary>
+    void OnAppellation(bool enabled) { }
+
+    /// <summary>
+    /// Handles an appellation process event.
+    /// </summary>
+    /// <param name="mode">Appellation mode (e.g. start, vote, end).</param>
+    /// <param name="playerIndex">Player index.</param>
+    void OnAppellation(string mode, int playerIndex) { }
+
+    void OnGameError(string? message = null) { }
+
+    void OnPackageDate(string date) { }
+
+    void OnPin(string pin) { }
+
+    void OnPlayerAppellating(string playerName) { }
+
+    void OnPlayerScoreChanged(int playerIndex, int newScore) { }
+
     /// <summary>
     /// Updates account avatar.
     /// </summary>
@@ -137,7 +161,13 @@ public interface IPersonController
 
     void OnRoundContent(string[] mparams) { }
 
-    void OnAtomHint(string hint) { }
+    void OnRoundAuthors(IEnumerable<string> authors) { }
+
+    void OnRoundComments(string comments) { }
+
+    void OnRoundSources(IEnumerable<string> sources) { }
+
+    void OnTableWarning(string hint) { }
 
     void ReloadMedia() { }
 
@@ -233,6 +263,10 @@ public interface IPersonController
     /// </summary>
     void EndThink();
 
+    void OnQuestionEnd() { }
+
+    void OnQuestionPriceRange(int minimum, int? maximum, int? step) { }
+
     /// <summary>
     /// Handles game theme.
     /// </summary>
@@ -257,6 +291,8 @@ public interface IPersonController
     void OnPersonConnected() { }
 
     void OnPersonDisconnected() { }
+
+    void OnUserError(int errorCode, IReadOnlyList<string> args) { }
 
     void OnPersonStake(int stakerIndex) { }
 
@@ -291,4 +327,6 @@ public interface IPersonController
     void OnPackage(string packageName, string? packageLogoUri) { }
 
     void OnPlayerAnswer(int playerIndex, string answer) { }
+
+    void OnLayout(string layoutType) { }
 }

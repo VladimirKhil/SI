@@ -16,7 +16,11 @@ public sealed class GameServerClient : IGameServerClient
 
     private readonly HttpClient _client;
 
+    private readonly ProxyFailoverHandler? _proxyFailoverHandler;
+
     public string ServiceUri => _options.ServiceUri!;
+
+    public string? ProxyUri => _options.ProxyUri;
 
     public event Action<GameInfo>? GameCreated;
     public event Action<int>? GameDeleted;
@@ -44,12 +48,25 @@ public sealed class GameServerClient : IGameServerClient
             _options.ServiceUri += "/";
         }
 
-        _client = new HttpClient
+        if (!string.IsNullOrEmpty(_options.ProxyUri) && !_options.ProxyUri.EndsWith("/", StringComparison.Ordinal))
         {
-            BaseAddress = new Uri(ServiceUri),
-            Timeout = _options.Timeout,
-            DefaultRequestVersion = HttpVersion.Version20
-        };
+            _options.ProxyUri += "/";
+        }
+
+        var serviceUri = new Uri(_options.ServiceUri!, UriKind.Absolute);
+
+        Uri? proxyUri = null;
+
+        if (!string.IsNullOrEmpty(_options.ProxyUri))
+        {
+            proxyUri = new Uri(_options.ProxyUri, UriKind.Absolute);
+            _proxyFailoverHandler = new ProxyFailoverHandler(proxyUri, serviceUri);
+        }
+
+        _client = _proxyFailoverHandler != null ? new HttpClient(_proxyFailoverHandler) : new HttpClient();
+        _client.BaseAddress = proxyUri ?? serviceUri;
+        _client.Timeout = _options.Timeout;
+        _client.DefaultRequestVersion = HttpVersion.Version20;
 
         if (_options.Culture != null)
         {
@@ -215,5 +232,135 @@ public sealed class GameServerClient : IGameServerClient
         }
 
         action();
+    }
+
+    private sealed class ProxyFailoverHandler : DelegatingHandler
+    {
+        private readonly Uri _proxyBaseUri;
+        private readonly Uri _serviceBaseUri;
+        private int _useProxy = 1;
+
+        public string CurrentServiceUri => Volatile.Read(ref _useProxy) == 1
+            ? _proxyBaseUri.AbsoluteUri
+            : _serviceBaseUri.AbsoluteUri;
+
+        public ProxyFailoverHandler(Uri proxyBaseUri, Uri serviceBaseUri)
+            : base(new HttpClientHandler())
+        {
+            _proxyBaseUri = proxyBaseUri;
+            _serviceBaseUri = serviceBaseUri;
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            if (Volatile.Read(ref _useProxy) == 0)
+            {
+                RewriteRequestUriIfNeeded(request);
+                return await base.SendAsync(request, cancellationToken);
+            }
+
+            HttpRequestMessage? failoverRequest = null;
+
+            try
+            {
+                failoverRequest = await CloneAndBufferRequestAsync(request, cancellationToken);
+                var response = await base.SendAsync(request, cancellationToken);
+
+                if (!IsProxyFailure(response))
+                {
+                    failoverRequest.Dispose();
+                    return response;
+                }
+
+                response.Dispose();
+            }
+            catch (Exception exc) when (IsProxyException(exc, cancellationToken))
+            {
+                // fall through to failover
+            }
+
+            Interlocked.Exchange(ref _useProxy, 0);
+
+            if (failoverRequest == null)
+            {
+                failoverRequest = await CloneAndBufferRequestAsync(request, cancellationToken);
+            }
+
+            RewriteRequestUriIfNeeded(failoverRequest);
+            Trace.TraceWarning("Proxy request failed, falling back to direct server: {0}", failoverRequest.RequestUri);
+            var failoverResponse = await base.SendAsync(failoverRequest, cancellationToken);
+            failoverRequest.Dispose();
+            return failoverResponse;
+        }
+
+        private void RewriteRequestUriIfNeeded(HttpRequestMessage request)
+        {
+            if (request.RequestUri == null)
+            {
+                return;
+            }
+
+            if (!request.RequestUri.IsAbsoluteUri)
+            {
+                return;
+            }
+
+            if (!_proxyBaseUri.IsBaseOf(request.RequestUri))
+            {
+                return;
+            }
+
+            var relative = _proxyBaseUri.MakeRelativeUri(request.RequestUri);
+            request.RequestUri = new Uri(_serviceBaseUri, relative);
+        }
+
+        private static bool IsProxyException(Exception exc, CancellationToken cancellationToken) =>
+            exc is HttpRequestException
+            || (exc is TaskCanceledException && !cancellationToken.IsCancellationRequested);
+
+        private static bool IsProxyFailure(HttpResponseMessage response) =>
+            response.StatusCode == HttpStatusCode.BadGateway
+            || response.StatusCode == HttpStatusCode.ServiceUnavailable
+            || response.StatusCode == HttpStatusCode.GatewayTimeout
+            || response.StatusCode == HttpStatusCode.ProxyAuthenticationRequired;
+
+        private static async Task<HttpRequestMessage> CloneAndBufferRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var clone = new HttpRequestMessage(request.Method, request.RequestUri)
+            {
+                Version = request.Version,
+                VersionPolicy = request.VersionPolicy
+            };
+
+            foreach (var header in request.Headers)
+            {
+                clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+
+            if (request.Content != null)
+            {
+                var originalContent = request.Content;
+                var contentBytes = await originalContent.ReadAsByteArrayAsync(cancellationToken);
+                var originalHeaders = originalContent.Headers;
+
+                request.Content = CreateBufferedContent(contentBytes, originalHeaders);
+                clone.Content = CreateBufferedContent(contentBytes, originalHeaders);
+                originalContent.Dispose();
+            }
+
+            return clone;
+        }
+
+        private static HttpContent CreateBufferedContent(byte[] contentBytes, HttpContentHeaders originalHeaders)
+        {
+            var content = new ByteArrayContent(contentBytes);
+
+            foreach (var header in originalHeaders)
+            {
+                content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+
+            return content;
+        }
     }
 }

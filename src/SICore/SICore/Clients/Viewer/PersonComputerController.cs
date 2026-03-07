@@ -6,9 +6,9 @@ using SIPackages;
 namespace SICore;
 
 /// <summary>
-/// Defines a computer viewer logic.
+/// Defines a person computer controller.
 /// </summary>
-internal class ViewerComputerLogic : IPersonController
+internal class PersonComputerController : IPersonController
 {
     protected readonly ViewerActions _viewerActions;
 
@@ -23,7 +23,7 @@ internal class ViewerComputerLogic : IPersonController
 
     private readonly ViewerData _state;
 
-    internal ViewerComputerLogic(
+    internal PersonComputerController(
         ViewerData state,
         ViewerActions viewerActions,
         IIntelligence intelligence,

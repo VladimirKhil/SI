@@ -21,12 +21,6 @@ public enum GameStages
     Round,
 
     /// <summary>
-    /// Final round.
-    /// </summary>
-    [Obsolete]
-    Final,
-
-    /// <summary>
     /// Game has been finished.
     /// </summary>
     Finished

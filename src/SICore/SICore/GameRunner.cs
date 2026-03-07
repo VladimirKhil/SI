@@ -58,7 +58,7 @@ public static class GameRunner
                 var data = new ViewerData();
                 var actions = new ViewerActions(showmanClient);
 
-                var logic = new ViewerComputerLogic(
+                var logic = new PersonComputerController(
                     data,
                     actions,
                     new Intelligence((ComputerAccount)settings.Showman),
@@ -82,7 +82,7 @@ public static class GameRunner
                     var data = new ViewerData();
                     var actions = new ViewerActions(playerClient);
 
-                    var logic = new ViewerComputerLogic(
+                    var logic = new PersonComputerController(
                         data,
                         actions,
                         new Intelligence((ComputerAccount)settings.Players[i]),

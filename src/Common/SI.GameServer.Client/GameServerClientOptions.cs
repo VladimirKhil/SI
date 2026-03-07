@@ -13,6 +13,11 @@ public sealed class GameServerClientOptions
     public string? ServiceUri { get; set; }
 
     /// <summary>
+    /// Proxy Uri to access the server if direct access is not possible.
+    /// </summary>
+    public string? ProxyUri { get; set; }
+
+    /// <summary>
     /// SIGame service discovery Uri.
     /// </summary>
     public Uri? ServiceDiscoveryUri { get; set; } = new Uri("https://vladimirkhil.com/api/si/servers");

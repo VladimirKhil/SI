@@ -871,7 +871,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             _ => Resources.GameCreationError_UnknownReason,
         };
 
-    private async Task<List<ComputerAccountInfo>> ProcessCustomPersonsAsync(
+    private static async Task<List<ComputerAccountInfo>> ProcessCustomPersonsAsync(
         ISIContentServiceClient? contentServiceClient,
         GameSettings settings,
         CancellationToken cancellationToken)
@@ -888,7 +888,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         return computerAccounts;
     }
 
-    private async Task ProcessCustomPersonAsync(
+    private static async Task ProcessCustomPersonAsync(
         ISIContentServiceClient? contentServiceClient,
         List<ComputerAccountInfo> computerAccounts,
         Account account,
@@ -902,7 +902,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         }
     }
 
-    private async Task<(string? AvatarUrl, FileKey? FileKey)> UploadAvatarAsync(
+    private static async Task<(string? AvatarUrl, FileKey? FileKey)> UploadAvatarAsync(
         ISIContentServiceClient? contentServiceClient,
         Account account,
         CancellationToken cancellationToken = default)
@@ -1002,8 +1002,21 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
             _logger.LogInformation("Joining game");
 
+            Uri? proxyUri = null;
+
+            if (gameInfo.HostUri != null && !string.IsNullOrEmpty(_gameServerClient.ProxyUri))
+            {
+                var hostUriNormalized = new Uri(gameInfo.HostUri.ToString().TrimEnd('/') + "/");
+                var serverUriNormalized = new Uri(_gameServerClient.ServiceUri.TrimEnd('/') + "/");
+
+                if (hostUriNormalized == serverUriNormalized)
+                {
+                    proxyUri = new Uri(_gameServerClient.ProxyUri, UriKind.Absolute);
+                }
+            }
+
             var siHostClient = await SIHostClient.CreateAsync(
-                new SIHostClientOptions { ServiceUri = gameInfo.HostUri },
+                new SIHostClientOptions { ServiceUri = gameInfo.HostUri, ProxyUri = proxyUri },
                 cancellationToken);
 
             var result = await siHostClient.JoinGameAsync(
@@ -1094,7 +1107,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         GameStages.Created => Resources.GameStage_Created,
         GameStages.Started => Resources.GameStage_Started,
         GameStages.Round => $"{gameInfo.ProgressCurrent}/{gameInfo.ProgressTotal}: {gameInfo.StageName}",
-        GameStages.Final => Resources.GameStage_Final,
         _ => Resources.GameStage_Finished,
     };
 

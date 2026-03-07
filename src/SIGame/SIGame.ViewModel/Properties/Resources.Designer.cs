@@ -1483,6 +1483,33 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Round authors.
+        /// </summary>
+        public static string RoundAuthors {
+            get {
+                return ResourceManager.GetString("RoundAuthors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Round comments.
+        /// </summary>
+        public static string RoundComments {
+            get {
+                return ResourceManager.GetString("RoundComments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Round sources.
+        /// </summary>
+        public static string RoundSources {
+            get {
+                return ResourceManager.GetString("RoundSources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The round themes are; Here are the themes of the round.
         /// </summary>
         public static string RoundThemes {
@@ -1758,6 +1785,15 @@ namespace SIGame.ViewModel.Properties {
         public static string UnknownError {
             get {
                 return ResourceManager.GetString("UnknownError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This question is not supported by your client.
+        /// </summary>
+        public static string UnsupportedQuestion {
+            get {
+                return ResourceManager.GetString("UnsupportedQuestion", resourceCulture);
             }
         }
         

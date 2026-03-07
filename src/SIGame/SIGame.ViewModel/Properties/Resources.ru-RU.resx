@@ -702,4 +702,16 @@
   <data name="PackageComments" xml:space="preserve">
     <value>Комментарии пакета</value>
   </data>
+  <data name="RoundAuthors" xml:space="preserve">
+    <value>Авторы раунда</value>
+  </data>
+  <data name="RoundSources" xml:space="preserve">
+    <value>Источники раунда</value>
+  </data>
+  <data name="RoundComments" xml:space="preserve">
+    <value>Комментарии раунда</value>
+  </data>
+  <data name="UnsupportedQuestion" xml:space="preserve">
+    <value>Этот вопрос не поддерживается вашим клиентом</value>
+  </data>
 </root>

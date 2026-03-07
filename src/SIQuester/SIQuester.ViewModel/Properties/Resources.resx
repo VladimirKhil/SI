@@ -555,7 +555,7 @@ Humor</value>
     <value>Alphabet|Anime|Animals &amp; Nature|Architecture &amp; Design|Art|Astronomy|Biology|Books &amp; Literature|Cars|Cartoons|Celebrities &amp; Pop Culture|Chemistry|Comics|Cooking &amp; Food|Erudition &amp; Intellectual Games|Fashion &amp; Beauty|Games (Board, Video, Esports)|Geography &amp; Travel|History|Humor|Internet Culture &amp; Memes|Language &amp; Words|Mathematics|Mixed|Movies &amp; Cinema|Music|Mythology &amp; Folklore|Photography &amp; Sculpture|Physics|Politics (light / trivia-level)|Rebuses &amp; Puzzles|Science (General)|Science Fiction|Sports|Technology &amp; Gadgets|TV &amp; Streaming</value>
   </data>
   <data name="GPTCreateTopicFinalRoundPrompt" xml:space="preserve">
-    <value>Generate topic {0} with {1} hard quiz question that requires some time to think, some knowledge and maybe guessing. Each question has 3-4 sentences</value>
+    <value>Generate topic {0} with {1} hard quiz question that requires some time to think, some knowledge and maybe guessing. Each question has 4-5 sentences. The answer should be known for general audience. Add several clues, so the answering should not be a raw knowledge/guess</value>
   </data>
   <data name="GPTTopisHint" xml:space="preserve">
     <value>Generate {0} unique topics for the following categories</value>

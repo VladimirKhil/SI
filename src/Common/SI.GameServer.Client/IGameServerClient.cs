@@ -9,6 +9,8 @@ public interface IGameServerClient : IAsyncDisposable
 {
     string ServiceUri { get; }
 
+    string? ProxyUri { get; }
+
     IInfoApi Info { get; }
 
     IGamesApi Games { get; }

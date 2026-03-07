@@ -34,12 +34,13 @@ internal sealed class GameServerClientFactory : IGameServerClientFactory
         if (string.IsNullOrEmpty(_options.Value.ServiceUri))
         {
             // Server Uri is undefined. We should locate it
-            var serverUri = await LocateServerUriAsync(cancellationToken);
+            var serverInfo = await LocateServerInfoAsync(cancellationToken);
 
             options = new OptionsWrapper<GameServerClientOptions>(
                 new GameServerClientOptions
                 {
-                    ServiceUri = serverUri + (serverUri.EndsWith("/") ? "" : "/"),
+                    ServiceUri = serverInfo.Uri,
+                    ProxyUri = serverInfo.ProxyUri,
                     Timeout = _options.Value.Timeout
                 });
         }
@@ -48,11 +49,11 @@ internal sealed class GameServerClientFactory : IGameServerClientFactory
     }
 
     /// <summary>
-    /// Locates server Uri.
+    /// Locates server info.
     /// </summary>
     /// <remarks>The result is not cached because server configuration may change at any time.</remarks>
     /// <param name="cancellationToken">Cancellation token.</param>
-    private async Task<string> LocateServerUriAsync(CancellationToken cancellationToken)
+    private async Task<ServerInfo> LocateServerInfoAsync(CancellationToken cancellationToken)
     {
         var locator = _serviceProvider.GetRequiredService<IGameServerLocator>();
 
@@ -81,11 +82,11 @@ internal sealed class GameServerClientFactory : IGameServerClientFactory
 
         var serverInfo = acceptableByVersion.FirstOrDefault(info => info.Uri != null);
 
-        if (serverInfo == null)
+        if (serverInfo == null || string.IsNullOrEmpty(serverInfo.Uri))
         {
             throw new Exception(Resources.EmptyServerUri);
         }
 
-        return serverInfo.Uri!;
+        return serverInfo;
     }
 }

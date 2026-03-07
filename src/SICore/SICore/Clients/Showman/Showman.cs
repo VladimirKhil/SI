@@ -24,7 +24,7 @@ public sealed class Showman : Viewer
             switch (mparams[0])
             {
                 case Messages.Cancel:
-                    Logic.ClearSelections(true);
+                    Controller.ClearSelections(true);
                     break;
 
                 case Messages.AskSelectPlayer:
@@ -40,7 +40,7 @@ public sealed class Showman : Viewer
                         break;
                     }
 
-                    Logic.ValidateAnswer(playerIndex, mparams[2]);
+                    Controller.ValidateAnswer(playerIndex, mparams[2]);
                     break;
 
                 case Messages.Validation2:
@@ -53,7 +53,7 @@ public sealed class Showman : Viewer
                         break;
                     }
 
-                    Logic.OnHint(mparams[1]);
+                    Controller.OnHint(mparams[1]);
                     break;
 
                 case Messages.QuestionAnswers:
@@ -73,11 +73,11 @@ public sealed class Showman : Viewer
 
                     if (mparams[1] == "1")
                     {
-                        Logic.SelectQuestion();
+                        Controller.SelectQuestion();
                     }
                     else
                     {
-                        Logic.DeleteTheme();
+                        Controller.DeleteTheme();
                     }
 
                     #endregion
@@ -88,7 +88,7 @@ public sealed class Showman : Viewer
                     break;
 
                 case Messages.Answer:
-                    Logic.Answer();
+                    Controller.Answer();
                     break;
             }
         }
@@ -161,6 +161,6 @@ public sealed class Showman : Viewer
             me.IsDeciding = false;
         }
 
-        Logic.IsRight(mparams[1], true, mparams[2]);
+        Controller.IsRight(mparams[1], true, mparams[2]);
     }
 }

@@ -67,22 +67,55 @@ public sealed class SIHostClient : IGameClient
 
     public static async Task<SIHostClient> CreateAsync(SIHostClientOptions options, CancellationToken cancellationToken = default)
     {
-        var serviceUri = options.ServiceUri?.ToString() ?? "";
-
-        if (!serviceUri.EndsWith('/'))
+        if (options.ServiceUri == null)
         {
-            serviceUri += "/";
+            throw new ArgumentNullException(nameof(options.ServiceUri));
+        }
+
+        if (options.ProxyUri != null)
+        {
+            try
+            {
+                return await CreateWithUriAsync(options, options.ProxyUri, cancellationToken);
+            }
+            catch
+            {
+                // Fall back to direct host Uri
+            }
+        }
+
+        return await CreateWithUriAsync(options, options.ServiceUri, cancellationToken);
+    }
+
+    private static async Task<SIHostClient> CreateWithUriAsync(
+        SIHostClientOptions options,
+        Uri serviceUri,
+        CancellationToken cancellationToken)
+    {
+        var serviceUriString = serviceUri.ToString();
+
+        if (!serviceUriString.EndsWith('/'))
+        {
+            serviceUriString += "/";
         }
 
         var connection = new HubConnectionBuilder()
-            .WithUrl($"{serviceUri}sihost")
+            .WithUrl($"{serviceUriString}sihost")
                 .WithAutomaticReconnect(new ReconnectPolicy())
                 .AddMessagePackProtocol()
                 .Build();
 
         connection.HandshakeTimeout = options.HandshakeTimeout;
 
-        await connection.StartAsync(cancellationToken);
+        try
+        {
+            await connection.StartAsync(cancellationToken);
+        }
+        catch
+        {
+            await connection.DisposeAsync();
+            throw;
+        }
 
         return new SIHostClient(connection, options);
     }
