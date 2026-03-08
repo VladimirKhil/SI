@@ -229,9 +229,20 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
-                    if (int.TryParse(optionValue, out var value) && value != appSettings.TimeSettings.PartialImageTime)
+                case nameof(GameData.TimeSettings.PartialImage):
+                    if (int.TryParse(optionValue, out var partialImageTime) && partialImageTime != _state.TimeSettings.PartialImage)
                     {
-                        appSettings.TimeSettings.PartialImageTime = value;
+                        _state.TimeSettings.PartialImage = partialImageTime;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
+                case nameof(GameData.TimeSettings.ButtonBlocking):
+                    if (int.TryParse(optionValue, out var buttonBlockingTime) && buttonBlockingTime != _state.TimeSettings.ButtonBlocking)
+                    {
+                        _state.TimeSettings.ButtonBlocking = buttonBlockingTime;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -292,9 +303,9 @@ public sealed class Game : MessageHandler
             nameof(appSettings.ReadingSpeed), appSettings.Managed ? 0 : appSettings.ReadingSpeed,
             nameof(appSettings.PartialText), appSettings.PartialText,
             nameof(appSettings.PartialImages), appSettings.PartialImages,
-            nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime,
+            nameof(appSettings.TimeSettings.PartialImageTime), _state.TimeSettings.PartialImage,
             nameof(appSettings.UseApellations), appSettings.UseApellations,
-            nameof(appSettings.TimeSettings.TimeForBlockingButton), appSettings.TimeSettings.TimeForBlockingButton);
+            nameof(appSettings.TimeSettings.TimeForBlockingButton), _state.TimeSettings.ButtonBlocking);
 
         _gameActions.SendMessageToWithArgs(
             person,
@@ -307,9 +318,9 @@ public sealed class Game : MessageHandler
             nameof(appSettings.ReadingSpeed), appSettings.Managed ? 0 : appSettings.ReadingSpeed,
             nameof(appSettings.PartialText), appSettings.PartialText,
             nameof(appSettings.PartialImages), appSettings.PartialImages,
-            nameof(appSettings.TimeSettings.PartialImageTime), appSettings.TimeSettings.PartialImageTime,
+            nameof(appSettings.TimeSettings.PartialImageTime), _state.TimeSettings.PartialImage,
             nameof(appSettings.UseApellations), appSettings.UseApellations,
-            nameof(appSettings.TimeSettings.TimeForBlockingButton), appSettings.TimeSettings.TimeForBlockingButton,
+            nameof(appSettings.TimeSettings.TimeForBlockingButton), _state.TimeSettings.ButtonBlocking,
             nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
             nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
     }

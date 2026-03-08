@@ -666,7 +666,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         // TODO: provide this flag to client as part of the CONTENT message
         var partialImage = appSettings.PartialImages && !appSettings.FalseStart && _state.QuestionPlay.UseButtons && !_state.QuestionPlay.IsAnswer;
 
-        var renderTime = partialImage ? Math.Max(0, appSettings.TimeSettings.PartialImageTime * 10) : 0;
+        var renderTime = partialImage ? Math.Max(0, _state.TimeSettings.PartialImage * 10) : 0;
 
         var (waitTime, _) = GetContentItemDuration(contentItem, _state.TimeSettings.Image * 10);
 
