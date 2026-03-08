@@ -54,6 +54,10 @@ public class MainTest
         services.AddSIStorageServiceClient(configuration);
         services.AddSIStatisticsServiceClient(configuration);
 
+        services.AddSingleton(commonSettings);
+        services.AddSingleton(userSettings);
+        services.AddSingleton(appState);
+
         services.AddSIGame();
 
         var serviceProvider = services.BuildServiceProvider();
@@ -91,21 +95,21 @@ public class MainTest
 
             var storageInfo = (SIStorageViewModel)siOnline.Content.Content.Data;
 
-            storageInfo.Model.DefaultRestriction = null;
+            storageInfo.Model.CurrentRestriction = storageInfo.Model.Restrictions[0];
 
-            while (storageInfo.Model.Packages == null && counter > 0)
+            while ((storageInfo.Model.Packages == null || storageInfo.Model.Packages.Length == 0) && counter > 0)
             {
                 counter--;
                 await Task.Delay(1000);
             }
 
-            if (storageInfo.Model.Packages == null)
+            if (storageInfo.Model.Packages == null || storageInfo.Model.Packages.Length == 0)
             {
                 Assert.Fail("Could not load storage packages");
                 return;
             }
 
-            var packageId = Guid.Parse("3cb371d6-aaff-4623-bc3b-382be11d5f9a");
+            var packageId = Guid.Parse("45e8042a-9d5e-4a8f-8552-6cdf1b6d09b2");
 
             var package = storageInfo.Model.Packages.FirstOrDefault(p => p.Model.Id == packageId);
 

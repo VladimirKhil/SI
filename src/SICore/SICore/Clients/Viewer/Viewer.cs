@@ -1141,7 +1141,7 @@ public class Viewer : MessageHandler, IViewerClient
 
     private void OnLayout(string[] mparams)
     {
-        if (mparams.Length < 5)
+        if (mparams.Length < 2)
         {
             return;
         }
@@ -1152,7 +1152,12 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
-        var questionHasScreenContent = mparams[2] == "+";
+        if (mparams.Length < 5)
+        {
+            return;
+        }
+
+        var questionHasScreenContent = mparams[2].Length > 0;
 
         var optionsTypes = new List<string>();
 

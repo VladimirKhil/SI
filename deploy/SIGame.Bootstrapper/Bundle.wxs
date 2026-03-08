@@ -1,6 +1,6 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
 	
-    <Bundle AboutUrl="https://vladimirkhil.com/si/game" Name="SIGame" Condition="(VersionNT = v6.0 AND ServicePackLevel &gt;= 2) OR (VersionNT = v6.1 AND ServicePackLevel &gt;= 1) OR (VersionNT &gt;= v6.2)" Version="$(var.ProductVersion)" Manufacturer="Khil-soft" UpgradeCode="cb6fe944-ebb6-44a9-afcd-ba2ded1790b2" IconSourceFile="Resources\game.ico">
+    <Bundle AboutUrl="https://vladimirkhil.com/si/game" Name="SIGame" Condition="VersionNT &gt;= v10.0" Version="$(var.ProductVersion)" Manufacturer="Khil-soft" UpgradeCode="cb6fe944-ebb6-44a9-afcd-ba2ded1790b2" IconSourceFile="Resources\game.ico">
 		
         <BootstrapperApplication>
 			

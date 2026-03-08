@@ -9,7 +9,7 @@
   <?define PhotoPath="$(var.SIGame.ProjectDir)Photo\" ?>
 	
     <?define SolutionDir = "$(var.SIGame.ProjectDir)..\..\..\" ?>
-    <?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIGame\net6.0-windows\win-$(var.Platform)\publish\" ?>
+    <?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIGame\net10.0-windows7.0\win-$(var.Platform)\publish\" ?>
     
     <Package Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)" InstallerVersion="200" Scope="perUser">
         <MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />

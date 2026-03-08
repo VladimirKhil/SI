@@ -1128,7 +1128,7 @@
                                         lb:SelectionBehavior.IsSelectable="{Binding Selectable}" />
 
                                     <!-- Hint -->
-                                    <ContentControl Content="{Binding}">
+                                    <ContentControl Content="{Binding}" Grid.RowSpan="2" Grid.ColumnSpan="2" Panel.ZIndex="100">
                                         <ContentControl.Style>
                                             <Style TargetType="ContentControl">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />

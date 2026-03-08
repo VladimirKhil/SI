@@ -93,6 +93,8 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     private int _themeCounter;
 
+    private int _tableWarningVersion;
+
     /// <summary>
     /// External content that can be loaded only after user approval.
     /// </summary>
@@ -1120,20 +1122,31 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnTableWarning(string hint)
     {
-        TInfo.Hint = hint;
+        var version = Interlocked.Increment(ref _tableWarningVersion);
 
-        Task.Run(async () =>
-        {
-            try
+        UI.Execute(() => TInfo.Hint = hint, OnError);
+
+        _ = Task.Run(
+            async () =>
             {
-                await Task.Delay(HintLifetime);
-                TInfo.Hint = "";
-            }
-            catch (Exception exc)
-            {
-                OnError(exc);
-            }
-        });
+                try
+                {
+                    await Task.Delay(HintLifetime, _cancellationTokenSource.Token);
+
+                    if (version == Volatile.Read(ref _tableWarningVersion))
+                    {
+                        UI.Execute(() => TInfo.Hint = "", OnError);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception exc)
+                {
+                    OnError(exc);
+                }
+            },
+            _cancellationTokenSource.Token);
     }
 
     public void OnRightAnswer(string answer)
