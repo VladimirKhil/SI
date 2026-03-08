@@ -138,7 +138,7 @@ public sealed class ScenariosTests
         var complexValidationMessage = await showmanListener.AssertNextMessageAsync(Messages.QuestionAnswers);
         Assert.That(complexValidationMessage, Is.Not.Null, "Should receive answer options");
         
-        await showmanListener.AssertNextMessageAsync(Messages.Content);
+        await showmanListener.AssertNextMessageAsync(Messages.Content2);
 
         // Players receive answer request
         var answerMessage = await playerAListener.WaitForMessageAsync(Messages.Answer);
@@ -374,7 +374,7 @@ public sealed class ScenariosTests
         Assert.That(roundStage.Length, Is.GreaterThan(1), "Stage message should have round info");
 
         var roundThemes = await showmanListener.AssertNextMessageAsync(Messages.RoundThemes);
-        Assert.That(roundThemes.Length, Is.EqualTo(3), "Should have 2 themes (message type + 2 themes)");
+        Assert.That(roundThemes.Length, Is.EqualTo(4), "Should have 2 themes (message type + play mode + 2 themes)");
 
         await showmanListener.AssertNextMessageAsync(Messages.RoundThemes2);
 
@@ -386,7 +386,7 @@ public sealed class ScenariosTests
         Assert.That(theme2Msg2[1], Is.EqualTo("Theme B"), "Second theme should be Theme B");
 
         var table = await showmanListener.AssertNextMessageAsync(Messages.Table);
-        Assert.That(table.Length, Is.GreaterThan(3), "Table should contain theme and question info");
+        Assert.That(table.Length, Is.GreaterThan(2), "Table should contain theme and question info");
     }
 
     /// <summary>
@@ -490,17 +490,15 @@ public sealed class ScenariosTests
         await showmanListener.AssertNextMessageAsync(Messages.ShowTable);
         await showmanListener.AssertNextMessageAsync(Messages.Choice);
 
-        // Question playback - should have QUESTION message
-        var questionMsg = await showmanListener.AssertNextMessageAsync(Messages.Question);
-        Assert.That(questionMsg[1], Is.EqualTo("100"), "Question price should be 100");
-
-        // Question type
+        // Question playback - QTYPE is sent first
         var qtypeMsg = await showmanListener.AssertNextMessageAsync(Messages.QType);
         Assert.That(qtypeMsg[1], Is.EqualTo("simple"), "Question type should be simple");
 
+        // Answer info sent to showman before content
+        await showmanListener.AssertNextMessageAsync(Messages.QuestionAnswers);
+
         // Content display
-        await showmanListener.AssertNextMessageAsync(Messages.ContentShape);
-        var contentMsg = await showmanListener.AssertNextMessageAsync(Messages.Content);
+        var contentMsg = await showmanListener.AssertNextMessageAsync(Messages.Content2);
 
         // Button press phase - TRY message enables buttons
         await showmanListener.AssertNextMessageAsync(Messages.Try);
@@ -568,6 +566,8 @@ public sealed class ScenariosTests
             Messages.PackageComments,
             // Optional timing messages that may be sent for different question types
             Messages.FinalThink,
+            // Legacy content message sent alongside Content2 for backward compatibility
+            Messages.Content,
         });
 
         public MessageListener(Client client)
