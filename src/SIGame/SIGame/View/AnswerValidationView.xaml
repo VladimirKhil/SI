@@ -117,15 +117,18 @@
             <Button
                 Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsWrong}" 
-                CommandParameter="0"
+                Command="{Binding IsWrong}"
                 Content="−0"
                 Foreground="DarkRed"
                 FontSize="20"
                 Width="50"
                 BorderThickness="0"
                 ToolTip="{x:Static lp:Resources.CancelAnswer}"
-                Background="#22000000" />
+                Background="#22000000">
+                <Button.CommandParameter>
+                    <sys:Double>0</sys:Double>
+                </Button.CommandParameter>
+            </Button>
 
             <ToggleButton
                 IsChecked="{Binding AreAnswersShown}"
@@ -151,11 +154,13 @@
             <Button
                 Grid.ColumnSpan="3"
                 Command="{Binding IsRight}"
-                CommandParameter="1"
                 Content="{x:Static lp:Resources.Yes}"
                 FontSize="25"
                 FontWeight="SemiBold"
                 Padding="30,8">
+                <Button.CommandParameter>
+                    <sys:Double>1</sys:Double>
+                </Button.CommandParameter>
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource SIButton}">
                         <Setter Property="BorderThickness" Value="1.5" />
@@ -167,27 +172,33 @@
                     </Style>
                 </Button.Style>
             </Button>
-            
+
             <Button
                 Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsRight}" 
-                CommandParameter="0.5"
+                Command="{Binding IsRight}"
                 Content="×0.5"
                 Width="50"
                 BorderThickness="1.5,1.5,0,1.5"
-                ToolTip="{x:Static lp:Resources.Accept50Percent}" />
+                ToolTip="{x:Static lp:Resources.Accept50Percent}">
+                <Button.CommandParameter>
+                    <sys:Double>0.5</sys:Double>
+                </Button.CommandParameter>
+            </Button>
 
             <Button
                 Grid.Column="2"
                 Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsRight}" 
-                CommandParameter="2.0"
+                Command="{Binding IsRight}"
                 Content="×2"
                 Width="50"
                 BorderThickness="0,1.5,1.5,1.5"
-                ToolTip="{x:Static lp:Resources.Accept200Percent}" />
+                ToolTip="{x:Static lp:Resources.Accept200Percent}">
+                <Button.CommandParameter>
+                    <sys:Double>2</sys:Double>
+                </Button.CommandParameter>
+            </Button>
         </Grid>
 
         <Grid Grid.Row="2" Grid.Column="1" Margin="-1,0,0,0">
@@ -220,23 +231,29 @@
             <Button
                 Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsWrong}" 
-                CommandParameter="0.5"
+                Command="{Binding IsWrong}"
                 Content="×0.5"
                 Width="50"
                 BorderThickness="1.5,1.5,0,1.5"
-                ToolTip="{x:Static lp:Resources.Decline50Percent}" />
+                ToolTip="{x:Static lp:Resources.Decline50Percent}">
+                <Button.CommandParameter>
+                    <sys:Double>0.5</sys:Double>
+                </Button.CommandParameter>
+            </Button>
 
             <Button
                 Grid.Column="2"
                 Visibility="{Binding Data.ShowExtraRightButtons, Converter={StaticResource BooleanToVisibilityConverter1}}"
                 Style="{StaticResource SIButton}"
-                Command="{Binding IsWrong}" 
-                CommandParameter="2.0"
+                Command="{Binding IsWrong}"
                 Content="×2"
                 Width="50"
                 BorderThickness="0,1.5,1.5,1.5"
-                ToolTip="{x:Static lp:Resources.Decline200Percent}" />
+                ToolTip="{x:Static lp:Resources.Decline200Percent}">
+                <Button.CommandParameter>
+                    <sys:Double>2</sys:Double>
+                </Button.CommandParameter>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>
