@@ -190,7 +190,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 if (TInfo.RoundInfo[i].Questions[j] == question)
                 {
                     found = true;
-                    _viewerActions.SendMessageWithArgs(Messages.Choice, i, j);
+                    _viewerActions.SelectQuestion(i, j);
                     break;
                 }
             }
@@ -210,7 +210,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         {
             if (TInfo.RoundInfo[i] == theme)
             {
-                _viewerActions.SendMessageWithArgs(Messages.Delete, i);
+                _viewerActions.DeleteTheme(i);
                 break;
             }
         }

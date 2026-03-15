@@ -1272,14 +1272,12 @@ public sealed class Game : MessageHandler
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickYouself); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotKickBots); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
@@ -1311,14 +1309,12 @@ public sealed class Game : MessageHandler
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanYourself); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotBanBots); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
@@ -1350,14 +1346,12 @@ public sealed class Game : MessageHandler
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToYourself); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToYourself);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), GameError.CannotSetHostToBots); // TODO: REMOVE: replaced by USER_ERROR message
             _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToBots);
             return;
         }

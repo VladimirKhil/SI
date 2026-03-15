@@ -929,7 +929,7 @@
                                 Style="{StaticResource ToolButton}"
                                 Margin="5,0,0,0"
                                 Padding="9,5,7,5"
-                                ToolTip="Следующий раунд"
+                                ToolTip="{x:Static lp:Resources.NextRound}"
                                 Command="{Binding NextRound}">
                                 <Image Stretch="Uniform">
                                     <Image.Source>

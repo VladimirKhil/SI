@@ -66,6 +66,7 @@ public class ViewerAccount : Account
     /// <summary>
     /// Can the account be moved.
     /// </summary>
+    [Obsolete]
     public bool IsMoveable { get; set; }
 
     public ViewerAccount(string name, bool isMale, bool isConnected)

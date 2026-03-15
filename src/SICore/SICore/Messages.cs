@@ -340,6 +340,7 @@ public static class Messages
     /// <summary>
     /// Denotes that the person could be moved during the game.
     /// </summary>
+    [Obsolete]
     public const string Moveable = "MOVEABLE";
 
     /// <summary>

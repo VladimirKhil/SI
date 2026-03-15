@@ -7,6 +7,8 @@ namespace SImulator.ViewModel.Contracts;
 /// </summary>
 public interface IGameActions : IDisposable
 {
+    void Init() { }
+
     void MoveNext(int delayMs = 100);
 
     void ShowThemes(string[] themeNames);

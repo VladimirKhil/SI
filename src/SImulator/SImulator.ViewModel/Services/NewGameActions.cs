@@ -27,6 +27,8 @@ internal sealed class NewGameActions : IGameActions
         _onMessageReceivedAsync = onMessageReceivedAsync;
     }
 
+    public void Init() => _viewerActions.GetInfo();
+
     public void OnRightAnswer()
     {
         throw new NotImplementedException();
@@ -37,10 +39,7 @@ internal sealed class NewGameActions : IGameActions
 
     }
 
-    public void MoveBackRound()
-    {
-        throw new NotImplementedException();
-    }
+    public void MoveBackRound() => _viewerActions.Move(MoveDirections.RoundBack);
 
     public void MoveNext(int delayMs = 100)
     {
@@ -57,15 +56,7 @@ internal sealed class NewGameActions : IGameActions
 
     }
 
-    public void MoveNextRound()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Dispose()
-    {
-
-    }
+    public void MoveNextRound() => _viewerActions.Move(MoveDirections.RoundNext);
 
     public void AddPlayer() => _viewerActions.AddTable();
 
@@ -80,4 +71,9 @@ internal sealed class NewGameActions : IGameActions
     public void ConnectPlayer(PlayerInfo player) => _join(player.Name, false, GameRole.Player, null);
 
     public async void PlayerPressed(PlayerInfo player) => await _onMessageReceivedAsync(new Message("I", player.Name));
+
+    public void Dispose()
+    {
+
+    }
 }

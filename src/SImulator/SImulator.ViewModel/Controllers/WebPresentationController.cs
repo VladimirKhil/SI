@@ -454,7 +454,10 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     {
         Type = "theme",
         ThemeName = themeName,
-        Animate = animate
+        Animate = animate,
+        Comments = "",
+        Authors = Array.Empty<string>(),
+        Sources = Array.Empty<string>()
     });
 
     public void SetQuestionPrice(int questionPrice) => SendMessage(new

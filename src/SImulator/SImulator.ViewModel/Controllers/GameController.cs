@@ -52,6 +52,8 @@ internal sealed class GameController : IPersonController
         Trace.TraceInformation(message);
     }
 
+    public void OnRoundNames(string[] roundNames) => GameViewModel.OnRoundNames(roundNames);
+
     public void OnThemeComments(string comments) => GameViewModel.PresentationController.OnThemeComments(comments);
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel.OnQuestionSelected(themeIndex, questionIndex);
@@ -88,10 +90,7 @@ internal sealed class GameController : IPersonController
         
     }
 
-    public void DeleteTheme()
-    {
-        throw new NotImplementedException();
-    }
+    public void DeleteTheme() => GameViewModel.PresentationController.DeletionCallback = _viewerActions.DeleteTheme;
 
     public void EndThink()
     {
@@ -105,7 +104,10 @@ internal sealed class GameController : IPersonController
 
     public void FinalThink()
     {
-        throw new NotImplementedException();
+        GameViewModel.IsCommonPrice = false;
+        GameViewModel.QuestionForAll = true;
+        GameViewModel.AskAnswerDirect();
+        GameViewModel.State = QuestionState.Thinking;
     }
 
     public void OnGameThemes(IEnumerable<string> themes) => GameViewModel.OnGameThemes(themes);
@@ -135,10 +137,7 @@ internal sealed class GameController : IPersonController
         throw new NotImplementedException();
     }
 
-    public void OnPersonFinalStake(int playerIndex)
-    {
-        throw new NotImplementedException();
-    }
+    public void OnPersonFinalStake(int playerIndex) { }
 
     public void OnPersonPass(int playerIndex)
     {
@@ -198,6 +197,10 @@ internal sealed class GameController : IPersonController
         if (playMode == ThemesPlayMode.OneByOne)
         {
             GameViewModel.OnRoundThemes(themes);
+        }
+        else if (playMode == ThemesPlayMode.AllTogether)
+        {
+            GameViewModel.OnFinalThemes(themes);
         }
     }
 
@@ -272,10 +275,7 @@ internal sealed class GameController : IPersonController
         }
     }
 
-    public void Out(int themeIndex)
-    {
-        throw new NotImplementedException();
-    }
+    public void Out(int themeIndex) => GameViewModel.OnThemeDeleted(themeIndex);
 
     public void PrintGreeting()
     {
@@ -283,11 +283,6 @@ internal sealed class GameController : IPersonController
     }
 
     public void ReceiveText(Message m)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Report(string report)
     {
         throw new NotImplementedException();
     }
@@ -322,14 +317,14 @@ internal sealed class GameController : IPersonController
 
     public void StopRound()
     {
-        throw new NotImplementedException();
+
     }
 
-    public void TableLoaded(List<ThemeInfo> table) => GameViewModel.LoadTable(table);
+    public void TableLoaded(List<ThemeInfo> table) => GameViewModel.LoadTable(table, true);
 
     public void TimeOut()
     {
-        throw new NotImplementedException();
+
     }
 
     public void UpdatePicture(Account account, string path)

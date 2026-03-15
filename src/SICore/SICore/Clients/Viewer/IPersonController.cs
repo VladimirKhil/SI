@@ -329,4 +329,6 @@ public interface IPersonController
     void OnPlayerAnswer(int playerIndex, string answer) { }
 
     void OnLayout(string layoutType) { }
+
+    void OnRoundNames(string[] roundNames) { }
 }

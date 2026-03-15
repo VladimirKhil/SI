@@ -59,7 +59,7 @@ internal sealed class ShowmanComputerController
         }
     }
 
-    private void OnReady() => _viewerActions.SendMessage(Messages.Ready);
+    private void OnReady() => _viewerActions.SendReady();
 
     private void OnSelectPlayer()
     {

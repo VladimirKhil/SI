@@ -1366,6 +1366,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         await PresentationController.StartAsync(InitPresentation);
 
+        _gameActions.Init();
+
         _gameLogger.Write("Game started {0}", DateTime.Now);
 
         _selectedPlayers.Clear();
@@ -1579,7 +1581,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         Continuation = AfterRoundThemes;
     }
 
-    public void LoadTable(List<ThemeInfo> table) => UI.Execute(() =>
+    public void LoadTable(List<ThemeInfo> table, bool showTable = false) => UI.Execute(() =>
     {
         LocalInfo.RoundInfo.Clear();
 
@@ -1597,7 +1599,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             }
         }
 
-        PresentationController.SetTable(LocalInfo.RoundInfo.ToArray());
+        if (showTable)
+        {
+            PresentationController.SetTable(LocalInfo.RoundInfo.ToArray());
+        }
+
         LocalInfo.TStage = TableStage.RoundTable;
     },
     exc => OnError(exc.Message));
@@ -1605,6 +1611,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private bool AfterRoundThemes()
     {
         Continuation = null;
+        PresentationController.SetTable(LocalInfo.RoundInfo.ToArray());
         PresentationController.SetRoundTable();
         _gameActions.MoveNext();
 

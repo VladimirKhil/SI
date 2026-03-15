@@ -113,7 +113,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
     }
 
-    private void OnReady() => _viewerActions.SendMessage(Messages.Ready);
+    private void OnReady() => _viewerActions.SendReady();
 
     private void OnAnswer(bool knows, bool isSure)
     {
@@ -153,7 +153,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 BestOpponentScore(),
                 GetTimePercentage(0));
 
-            _viewerActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
+            _viewerActions.SelectQuestion(themeIndex, questionIndex);
         }
         catch (Exception exc)
         {
@@ -204,7 +204,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         try
         {
             var themeIndex = _intelligence.DeleteTheme(_state.TInfo.RoundInfo);
-            _viewerActions.SendMessageWithArgs(Messages.Delete, themeIndex);
+            _viewerActions.DeleteTheme(themeIndex);
         }
         catch (Exception exc)
         {

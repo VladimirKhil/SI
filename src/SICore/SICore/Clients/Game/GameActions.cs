@@ -78,10 +78,7 @@ public sealed class GameActions
         SendMessage(message);
     }
 
-    [Obsolete]
-    internal void SystemReplic(string text) => UserMessage(MessageTypes.System, text);
-
-    internal void ShowmanReplic(string text) => UserMessage(MessageTypes.Replic, text, GameRole.Showman);
+    internal void ShowmanReplic(string text) => UserMessage(text, GameRole.Showman);
 
     internal void ShowmanReplicNew(MessageCode messageCode) =>
         SendMessageWithArgs(
@@ -103,22 +100,13 @@ public sealed class GameActions
                 .ToArray());
 
     [Obsolete]
-    internal void PlayerReplic(int playerIndex, string text) => UserMessage(MessageTypes.Replic, text, GameRole.Player, playerIndex);
+    internal void PlayerReplic(int playerIndex, string text) => UserMessage(text, GameRole.Player, playerIndex);
 
-    /// <summary>
-    /// Пользовательское сообщение
-    /// </summary>
-    /// <param name="messageType">Тип сообщения</param>
-    /// <param name="text">Текст сообщения</param>
-    /// <param name="personRole">Роль источника сообщения (для реплик)</param>
-    /// <param name="personIndex">Индекс источника сообщения (для реплик игроков)</param>
-    internal void UserMessage(MessageTypes messageType, string text, GameRole? personRole = null, int? personIndex = null)
+    internal void UserMessage(string text, GameRole? personRole = null, int? personIndex = null)
     {
-        var person = messageType == MessageTypes.System
-            ? ReplicCodes.System.ToString()
-            : (personRole == GameRole.Player && personIndex.HasValue
-                ? ReplicCodes.Player + personIndex.Value.ToString()
-                : ReplicCodes.Showman.ToString());
+        var person = personRole == GameRole.Player && personIndex.HasValue
+            ? ReplicCodes.Player + personIndex.Value.ToString()
+            : ReplicCodes.Showman.ToString();
 
         SendMessageWithArgs(Messages.Replic, person, text);
     }

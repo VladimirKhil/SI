@@ -178,12 +178,6 @@ public enum StopReason
     Wait
 }
 
-public enum MessageTypes
-{
-    System,
-    Replic
-}
-
 /// <summary>
 /// Defines game move directions.
 /// </summary>

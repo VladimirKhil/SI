@@ -585,8 +585,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         game.ClientData.EndUpdatePersons();
 
-        actions.GetInfo();
-
         game.Run();
 
         var gameActions = new NewGameActions(actions, state, game.Authenticate, game.OnMessageReceivedAsync);

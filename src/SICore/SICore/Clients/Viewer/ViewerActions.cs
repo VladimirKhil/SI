@@ -10,16 +10,12 @@ public sealed class ViewerActions
 
     public ViewerActions(Client client) => Client = client;
 
-    /// <summary>
-    /// Отправить сообщение всем
-    /// </summary>
-    /// <param name="text">Текст сообщения</param>
     public void SendMessage(string text) => Client.SendMessage(text, receiver: NetworkConstants.GameName);
 
     public void SendMessage(params string[] args) =>
         Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
 
-    public void SendMessageWithArgs(params object[] args) =>
+    private void SendMessageWithArgs(params object[] args) =>
         Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
 
     public void PressButton(DateTimeOffset? tryStartTime)
@@ -52,4 +48,8 @@ public sealed class ViewerActions
     public void ReportMediaPreloadProgress(int progress) => SendMessageWithArgs(Messages.MediaPreloadProgress, progress);
 
     public void SelectPlayer(int playerIndex) => SendMessage(Messages.SelectPlayer, playerIndex.ToString());
+
+    public void DeleteTheme(int themeIndex) => SendMessageWithArgs(Messages.Delete, themeIndex);
+
+    public void SendReady() => SendMessage(Messages.Ready);
 }

@@ -223,6 +223,7 @@ public class Viewer : MessageHandler, IViewerClient
 
                 case Messages.RoundsNames:
                     State.RoundNames = mparams.Skip(1).ToArray();
+                    _controller.OnRoundNames(State.RoundNames);
                     break;
 
                 case Messages.Stage:

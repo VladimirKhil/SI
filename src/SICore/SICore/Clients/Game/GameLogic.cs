@@ -464,7 +464,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.ComplexVisualState[0] = new string[] { message };
 
         _gameActions.SendMessage(message);
-        _gameActions.SystemReplic(text); // TODO: REMOVE: replaced by CONTENT message
 
         var nextTime = !waitForFinish ? 1 : contentTime;
 
@@ -643,7 +642,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         // Notify users that the media file is too large and could be downloaded slowly
         var errorMessage = string.Format(LO[nameof(R.OversizedFile)], R.File, fileLocation, maxRecommendedFileLength);
-        _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage); // TODO: REMOVE: replaced by USER_ERROR message
         _gameActions.SendMessageWithArgs(Messages.UserError, ErrorCode.OversizedFile, contentType, maxRecommendedFileLength);
 
         if (_state.OversizedMediaNotificationsCount < MaxMediaNotifications)
@@ -2038,7 +2036,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                             var subText = _state.Text[_state.TextLength..];
 
                             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
-                            _gameActions.SystemReplic(subText); // TODO: REMOVE: replaced by CONTENT_APPEND message
 
                             newTask = Tasks.MoveNext;
                         }
@@ -2825,7 +2822,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var subText = text.Substring(_state.TextLength, printingLength);
 
             _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
-            _gameActions.SystemReplic(subText); // TODO: REMOVE: replaced by CONTENT_APPEND message
 
             _state.TextLength += printingLength;
         }

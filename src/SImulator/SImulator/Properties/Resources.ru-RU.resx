@@ -712,4 +712,7 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="UseSIGameEngine" xml:space="preserve">
     <value>Использовать движок SIGame</value>
   </data>
+  <data name="NextRound" xml:space="preserve">
+    <value>Следующий раунд</value>
+  </data>
 </root>

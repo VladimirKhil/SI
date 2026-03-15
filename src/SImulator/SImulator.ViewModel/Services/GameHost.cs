@@ -31,7 +31,7 @@ internal sealed class GameHost : IGameHost
 
     public void SaveReport(GameResult result)
     {
-        throw new NotImplementedException();
+
     }
 
     public void SendError(Exception exc, bool isWarning = false)
