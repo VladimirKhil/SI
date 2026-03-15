@@ -15,7 +15,7 @@ public sealed class ViewerActions
     public void SendMessage(params string[] args) =>
         Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
 
-    private void SendMessageWithArgs(params object[] args) =>
+    public void SendMessageWithArgs(params object[] args) =>
         Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
 
     public void PressButton(DateTimeOffset? tryStartTime)
