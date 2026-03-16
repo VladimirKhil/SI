@@ -126,7 +126,7 @@
                 ToolTip="{x:Static lp:Resources.CancelAnswer}"
                 Background="#22000000">
                 <Button.CommandParameter>
-                    <sys:Double>0</sys:Double>
+                    <sys:Double xml:lang="en-US">0</sys:Double>
                 </Button.CommandParameter>
             </Button>
 
@@ -159,7 +159,7 @@
                 FontWeight="SemiBold"
                 Padding="30,8">
                 <Button.CommandParameter>
-                    <sys:Double>1</sys:Double>
+                    <sys:Double xml:lang="en-US">1</sys:Double>
                 </Button.CommandParameter>
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource SIButton}">
@@ -182,7 +182,7 @@
                 BorderThickness="1.5,1.5,0,1.5"
                 ToolTip="{x:Static lp:Resources.Accept50Percent}">
                 <Button.CommandParameter>
-                    <sys:Double>0.5</sys:Double>
+                    <sys:Double xml:lang="en-US">0.5</sys:Double>
                 </Button.CommandParameter>
             </Button>
 
@@ -196,7 +196,7 @@
                 BorderThickness="0,1.5,1.5,1.5"
                 ToolTip="{x:Static lp:Resources.Accept200Percent}">
                 <Button.CommandParameter>
-                    <sys:Double>2</sys:Double>
+                    <sys:Double xml:lang="en-US">2</sys:Double>
                 </Button.CommandParameter>
             </Button>
         </Grid>
@@ -237,7 +237,7 @@
                 BorderThickness="1.5,1.5,0,1.5"
                 ToolTip="{x:Static lp:Resources.Decline50Percent}">
                 <Button.CommandParameter>
-                    <sys:Double>0.5</sys:Double>
+                    <sys:Double xml:lang="en-US">0.5</sys:Double>
                 </Button.CommandParameter>
             </Button>
 
@@ -251,7 +251,7 @@
                 BorderThickness="0,1.5,1.5,1.5"
                 ToolTip="{x:Static lp:Resources.Decline200Percent}">
                 <Button.CommandParameter>
-                    <sys:Double>2</sys:Double>
+                    <sys:Double xml:lang="en-US">2</sys:Double>
                 </Button.CommandParameter>
             </Button>
         </Grid>
