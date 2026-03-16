@@ -124,11 +124,8 @@
                 Width="50"
                 BorderThickness="0"
                 ToolTip="{x:Static lp:Resources.CancelAnswer}"
-                Background="#22000000">
-                <Button.CommandParameter>
-                    <sys:Double xml:lang="en-US">0</sys:Double>
-                </Button.CommandParameter>
-            </Button>
+                Background="#22000000"
+                CommandParameter="0" />
 
             <ToggleButton
                 IsChecked="{Binding AreAnswersShown}"
@@ -157,10 +154,8 @@
                 Content="{x:Static lp:Resources.Yes}"
                 FontSize="25"
                 FontWeight="SemiBold"
-                Padding="30,8">
-                <Button.CommandParameter>
-                    <sys:Double xml:lang="en-US">1</sys:Double>
-                </Button.CommandParameter>
+                Padding="30,8"
+                CommandParameter="1">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource SIButton}">
                         <Setter Property="BorderThickness" Value="1.5" />
@@ -180,11 +175,8 @@
                 Content="×0.5"
                 Width="50"
                 BorderThickness="1.5,1.5,0,1.5"
-                ToolTip="{x:Static lp:Resources.Accept50Percent}">
-                <Button.CommandParameter>
-                    <sys:Double xml:lang="en-US">0.5</sys:Double>
-                </Button.CommandParameter>
-            </Button>
+                ToolTip="{x:Static lp:Resources.Accept50Percent}"
+                CommandParameter="0.5" />
 
             <Button
                 Grid.Column="2"
@@ -194,11 +186,8 @@
                 Content="×2"
                 Width="50"
                 BorderThickness="0,1.5,1.5,1.5"
-                ToolTip="{x:Static lp:Resources.Accept200Percent}">
-                <Button.CommandParameter>
-                    <sys:Double xml:lang="en-US">2</sys:Double>
-                </Button.CommandParameter>
-            </Button>
+                ToolTip="{x:Static lp:Resources.Accept200Percent}"
+                CommandParameter="2" />
         </Grid>
 
         <Grid Grid.Row="2" Grid.Column="1" Margin="-1,0,0,0">
@@ -235,11 +224,8 @@
                 Content="×0.5"
                 Width="50"
                 BorderThickness="1.5,1.5,0,1.5"
-                ToolTip="{x:Static lp:Resources.Decline50Percent}">
-                <Button.CommandParameter>
-                    <sys:Double xml:lang="en-US">0.5</sys:Double>
-                </Button.CommandParameter>
-            </Button>
+                ToolTip="{x:Static lp:Resources.Decline50Percent}"
+                CommandParameter="0.5" />
 
             <Button
                 Grid.Column="2"
@@ -249,11 +235,8 @@
                 Content="×2"
                 Width="50"
                 BorderThickness="0,1.5,1.5,1.5"
-                ToolTip="{x:Static lp:Resources.Decline200Percent}">
-                <Button.CommandParameter>
-                    <sys:Double xml:lang="en-US">2</sys:Double>
-                </Button.CommandParameter>
-            </Button>
+                ToolTip="{x:Static lp:Resources.Decline200Percent}"
+                CommandParameter="2" />
         </Grid>
     </Grid>
 </UserControl>

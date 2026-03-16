@@ -853,7 +853,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
         else
         {
-            _viewerActions.IsRight(true, (double?)arg ?? 1.0);
+            var factor = arg is string s && double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var parsed) ? parsed : 1.0;
+            _viewerActions.IsRight(true, factor);
             ClearSelections();
         }
     }
@@ -878,14 +879,15 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
         else
         {
-            _viewerActions.IsRight(false, (double?)arg ?? 1.0);
+            var factor = arg is string s && double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var parsed) ? parsed : 1.0;
+            _viewerActions.IsRight(false, factor);
             ClearSelections();
         }
     }
 
     private void Pass_Executed(object? arg) => _viewerActions.SendMessage(Messages.Pass);
 
-    private void SendNoReport_Executed(object? arg)
+        private void SendNoReport_Executed(object? arg)
     {
         _viewerActions.SendMessage(Messages.Report, "DECLINE");
         ClearSelections();
