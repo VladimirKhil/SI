@@ -249,39 +249,47 @@ public partial class MainWindow : MetroWindow
             return;
         }
 
-        var files = Clipboard.GetFileDropList();
-
-        if (files.Count > 0)
+        try
         {
-            foreach (var file in files)
+
+            var files = Clipboard.GetFileDropList();
+
+            if (files.Count > 0)
             {
-                if (file != null)
+                foreach (var file in files)
                 {
-                    contentItemViewModel.TryImportMedia(file);
+                    if (file != null)
+                    {
+                        contentItemViewModel.TryImportMedia(file);
+                    }
                 }
+
+                return;
             }
 
-            return;
-        }
+            if (Clipboard.ContainsImage())
+            {
+                var bitmap = Clipboard.GetImage();
+                var stream = new MemoryStream();
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                encoder.Save(stream);
 
-        if (Clipboard.ContainsImage())
+                var tempMediaDirectory = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName);
+                Directory.CreateDirectory(tempMediaDirectory);
+
+                var fileName = Path.Combine(tempMediaDirectory, $"{Guid.NewGuid()}.png");
+                File.WriteAllBytes(fileName, stream.ToArray());
+
+                contentItemViewModel.TryImportMedia(fileName);
+                return;
+            }
+
+            doc.Paste.Execute(null);
+        }
+        catch (Exception ex)
         {
-            var bitmap = Clipboard.GetImage();
-            var stream = new MemoryStream();
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(bitmap));
-            encoder.Save(stream);
-
-            var tempMediaDirectory = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName);
-            Directory.CreateDirectory(tempMediaDirectory);
-
-            var fileName = Path.Combine(tempMediaDirectory, $"{Guid.NewGuid()}.png");
-            File.WriteAllBytes(fileName, stream.ToArray());
-
-            contentItemViewModel.TryImportMedia(fileName);
-            return;
+            MainViewModel.ShowError(ex);
         }
-
-        doc.Paste.Execute(null);
     }
 }

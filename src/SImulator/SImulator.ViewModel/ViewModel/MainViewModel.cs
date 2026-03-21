@@ -454,9 +454,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             presentationController.Error += ShowError;
 
-            var game = Settings.UseSIGameEngine 
+            var game = /*Settings.UseSIGameEngine 
                 ? await CreateGameNewAsync(presentationController, presentationListener)
-                : await CreateGameAsync(presentationController, presentationListener);
+                : */await CreateGameAsync(presentationController, presentationListener);
 
             Game = game;
 

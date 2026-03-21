@@ -1,6 +1,6 @@
 SIGame projects set
 
-.NET 6 SDK is required to compile solutions. Visual Studio 2022 is required to publish SImulator ClickOnce application.
+.NET 10 SDK is required to compile solutions. Visual Studio 2026 is required to publish SImulator ClickOnce application.
 
 WiX Toolset is required to build app installers.
 
