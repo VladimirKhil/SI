@@ -151,7 +151,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnFinalRoundSkip()
     {
-        _gameActions.ShowmanReplic(LO[nameof(R.NobodyInFinal)]); // TODO: REMOVE (localized by MessageCode)
         _gameActions.ShowmanReplicNew(MessageCode.RoundSkippedNoPlayers);
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10), 1);
     }
@@ -1254,9 +1253,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         if (_state.Answerer.AnswerIsRight)
         {
-            var showmanReplic = _state.QuestionPlay.UseButtons ? nameof(R.Right) : nameof(R.Bravo);
-            var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
-
             var canonicalAnswer = _state.Question?.Right.FirstOrDefault();
             var isAnswerCanonical = canonicalAnswer != null && (_state.Answerer.Answer ?? "").Simplify().Contains(canonicalAnswer.Simplify());
 
@@ -1280,9 +1276,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 var outcome = _state.CurPriceRight;
                 updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
 
-                s.AppendFormat($" (+{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");
-
-                _gameActions.ShowmanReplic(s.ToString()); // TODO: REMOVE: replaced by MessageCode.RightAnswer
                 _gameActions.ShowmanReplicNew(MessageCode.RightAnswer, outcome, _state.Answerer.AnswerValidationFactor);
                 _gameActions.SendMessageWithArgs(Messages.Person, '+', _state.AnswererIndex, updateSum);
                 AddRightSum(_state.Answerer, updateSum);
@@ -1314,7 +1307,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _gameActions.ShowmanReplic(s.ToString()); // TODO: REMOVE: replaced by MessageCode.RightAnswer
                 _gameActions.ShowmanReplicNew(MessageCode.RightAnswer);
                 _state.PlayerIsRight = true;
                 updateSum = _state.Answerer.PersonalStake;
@@ -1710,7 +1702,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         break;
 
                     case Tasks.StartGame:
-                        StartGame(arg);
+                        OnStartGame();
                         break;
 
                     case Tasks.Package:
@@ -2780,12 +2772,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void OnUnsupportedQuestionType(string typeName)
     {
-        // TODO: REMOVE+
-        _gameActions.ShowmanReplic(LO[nameof(R.ManuallyPlayedQuestion)]);
-        // TODO END
-
         _gameActions.ShowmanReplicNew(MessageCode.UnsupportedQuestion);
-
         _state.SkipQuestion?.Invoke();
         ScheduleExecution(Tasks.MoveNext, 150, 1);
     }
@@ -2967,69 +2954,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.Host.SendError(new Exception($"{reason} {pressMode}"));
     }
 
-    private void StartGame(int arg)
+    private void OnStartGame()
     {
-        var nextArg = arg + 1;
-        var extraTime = 0;
-
-        switch (arg)
-        {
-            case 1:
-                _gameActions.ShowmanReplic(LO[nameof(R.ShowmanGreeting)]); // TODO: REMOVE (localized by MessageCode)
-                _gameActions.ShowmanReplicNew(MessageCode.ShowmanGreeting);
-                nextArg = 2;
-                break;
-
-            case 2:
-                _gameActions.ShowmanReplic($"{LO[nameof(R.GameRules)]}: {BuildRulesString(_state.Settings.AppSettings)}"); // TODO: REMOVE (replaced by OPTIONS2 message)
-                nextArg = -1;
-                extraTime = 20;
-                break;
-
-            default:
-                break;
-        }
-
-        if (nextArg != -1)
-        {
-            ScheduleExecution(Tasks.StartGame, 10 + extraTime, nextArg);
-        }
-        else
-        {
-            ScheduleExecution(Tasks.MoveNext, 10 + extraTime, 0);
-        }
-    }
-
-    private string BuildRulesString(AppSettingsCore settings)
-    {
-        var rules = new List<string>();
-
-        if (settings.GameMode == GameModes.Sport)
-        {
-            rules.Add(LO[nameof(R.TypeSport)]);
-        }
-
-        if (!settings.FalseStart)
-        {
-            rules.Add(LO[nameof(R.TypeNoFalseStart)]);
-        }
-
-        if (settings.Oral)
-        {
-            rules.Add(LO[nameof(R.TypeOral)]);
-        }
-
-        if (settings.Managed)
-        {
-            rules.Add(LO[nameof(R.TypeManaged)]);
-        }
-
-        if (rules.Count == 0)
-        {
-            rules.Add(LO[nameof(R.TypeClassic)]);
-        }
-
-        return string.Join(", ", rules);
+        _gameActions.ShowmanReplicNew(MessageCode.ShowmanGreeting);
+        ScheduleExecution(Tasks.MoveNext, 20, 0);
     }
 
     private void OnAskToSelectQuestion()
@@ -3047,7 +2975,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             throw new Exception("_actor.Client.CurrentServer == null");
         }
 
-        var msg = new StringBuilder(_state.Chooser.Name).Append(", ");
         var activeQuestionsCount = GetRoundActiveQuestionsCount();
 
         if (activeQuestionsCount == 0)
@@ -3055,9 +2982,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             throw new Exception($"activeQuestionsCount == 0 {Engine.Stage}");
         }
 
-        msg.Append(GetRandomString(LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
-
-        _gameActions.ShowmanReplic(msg.ToString()); // TODO: REMOVE (localized by MessageCode)
         _gameActions.ShowmanReplicNew(MessageCode.SelectQuestion, _state.Chooser.Name);
 
         _state.ThemeIndex = -1;
@@ -3106,9 +3030,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             throw new Exception("_data.Chooser == null");
         }
 
-        var canGiveThemselves = _state.Chooser.Flag;
-        var append = canGiveThemselves ? $" {LO[nameof(R.YouCanKeepCat)]}" : "";
-        _gameActions.ShowmanReplic($"{_state.Chooser.Name}, {LO[nameof(R.GiveCat)]}{append}"); // TODO: REMOVE (localized by MessageCode)
         _gameActions.ShowmanReplicNew(MessageCode.SelectPlayer, _state.Chooser.Name);
 
         // -- Deprecated
@@ -3431,8 +3352,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        var answerReplic = useAnswerOptions ? ", " + LO[nameof(R.SelectAnswerOption)] : ", " + GetRandomString(LO[nameof(R.YourAnswer)]);
-        _gameActions.ShowmanReplic(_state.Answerer.Name + answerReplic); // TODO: REMOVE (localized by MessageCode)
         _gameActions.ShowmanReplicNew(useAnswerOptions ? MessageCode.SelectAnswerOption : MessageCode.Answer, _state.Answerer.Name);
 
         _state.Answerer.Answer = "";
@@ -3541,11 +3460,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void RequestForThemeDelete()
     {
-        var msg = new StringBuilder(_state.ActivePlayer.Name)
-            .Append(", ")
-            .Append(GetRandomString(LO[nameof(R.DeleteTheme)]));
-
-        _gameActions.ShowmanReplic(msg.ToString()); // TODO: REMOVE (localized by MessageCode)
         _gameActions.ShowmanReplicNew(MessageCode.DeleteTheme, _state.ActivePlayer.Name);
 
         var message = string.Join(Message.ArgsSeparator, Messages.Choose, 2);
@@ -3919,10 +3833,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void AskToMakeStake(StakeReason reason, string name, StakeSettings limit)
     {
-        var stakeReplic = new StringBuilder(name).Append(", ").Append(GetRandomString(LO[nameof(R.YourStake)]));
-        _gameActions.ShowmanReplic(stakeReplic.ToString()); // TODO: REMOVE (localized by MessageCode)
         _gameActions.ShowmanReplicNew(MessageCode.MakeStake, name);
-
         AskToMakeStake(reason, new[] { (name, limit) });
     }
 
@@ -4322,7 +4233,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 informed = true;
                 var msg = new MessageBuilder(Messages.PackageAuthors).AddRange(authors);
                 _gameActions.SendVisualMessage(msg);
-                baseTime = 20;
+                baseTime = 40;
             }
             else
             {
@@ -4355,6 +4266,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             }
 
             _gameActions.SendVisualMessage(messageBuilder);
+            baseTime = 40;
 
             var sources = _state.PackageDoc.ResolveSources(package.Info.Sources);
 
@@ -5022,7 +4934,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             throw new InvalidOperationException("_data.Answerer == null");
         }
 
-        _gameActions.ShowmanReplic(LO[nameof(R.EasyCat)]); // TODO: REMOVE (localized by MessageCode)
         _gameActions.ShowmanReplicNew(MessageCode.IncomeWithoutAnswering);
         _gameActions.SendMessageWithArgs(Messages.Person, '+', _state.AnswererIndex, _state.CurPriceRight);
 

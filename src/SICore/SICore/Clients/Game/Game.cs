@@ -2406,7 +2406,7 @@ public sealed class Game : MessageHandler
                         _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
                     }
                 }
-                else
+                else if (!Logic.HaveMultipleAnswerers())
                 {
                     _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
                 }
@@ -2875,7 +2875,7 @@ public sealed class Game : MessageHandler
 
             if (readyAll)
             {
-                StartGame();
+                 StartGame();
             }
         }
 
