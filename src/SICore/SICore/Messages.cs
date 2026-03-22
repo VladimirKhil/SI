@@ -404,6 +404,11 @@ public static class Messages
     public const string PackageId = "PACKAGEID";
 
     /// <summary>
+    /// Package restrictions.
+    /// </summary>
+    public const string PackageRestrictions = "PACKAGE_RESTRICTIONS";
+
+    /// <summary>
     /// Sources of the package (if any).
     /// </summary>
     public const string PackageSources = "PACKAGE_SOURCES";
@@ -536,12 +541,6 @@ public static class Messages
     /// Реплика игры/участника
     /// </summary>
     public const string Replic = "REPLIC";
-
-    /// <summary>
-    /// Отчёт об игре
-    /// </summary>
-    [Obsolete("Use AskReview")]
-    public const string Report = "REPORT";
 
     /// <summary>
     /// Продолжить отыгрыш атома сценария
@@ -734,6 +733,11 @@ public static class Messages
     /// </summary>
     [IdempotencyRequired]
     public const string Timer = "TIMER";
+
+    /// <summary>
+    /// Game start timer.
+    /// </summary>
+    public const string TimerGameStart = "TIMER_GAME_START";
 
     /// <summary>
     /// Время вышло

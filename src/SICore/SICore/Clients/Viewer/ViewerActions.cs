@@ -51,5 +51,5 @@ public sealed class ViewerActions
 
     public void DeleteTheme(int themeIndex) => SendMessageWithArgs(Messages.Delete, themeIndex);
 
-    public void SendReady() => SendMessage(Messages.Ready);
+    public void SendReady(bool ready = true) => SendMessage(Messages.Ready, ready ? "+" : "-");
 }

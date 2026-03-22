@@ -14,13 +14,13 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public GameLogic GameLogic { get; internal set; } = null!;
 
-    public GameActions? GameActions { get; internal set; }
+    public GameActions GameActions { get; internal set; } = null!;
 
     public PlayHandler(GameData state) => _state = state;
 
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
     {
-        GameLogic?.OnRoundStart(round, strategyType);
+        GameLogic.OnRoundStart(round, strategyType);
         // TODO: I do not like ANY logic dependency on strategyType outside the strategy factory but do not have any better idea for now
         _state.PlayersValidator = strategyType == QuestionSelectionStrategyType.RemoveOtherThemes ? ThemeRemovalPlayersValidator : DefaultPlayersValidator;
     }
@@ -30,33 +30,33 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         switch (reason)
         {
             case RoundEndReason.Completed:
-                GameLogic?.OnRoundEmpty();
+                GameLogic.OnRoundEmpty();
                 break;
             
             case RoundEndReason.Timeout:
-                GameLogic?.OnRoundTimeout();
+                GameLogic.OnRoundTimeout();
                 break;
             
             case RoundEndReason.Manual:
-                GameLogic?.OnRoundEndedManually();
+                GameLogic.OnRoundEndedManually();
                 break;
             
             default:
                 break;
         }
 
-        GameLogic?.OnRoundEnded();
+        GameLogic.OnRoundEnded();
     }
 
     public void OnRoundSkip(QuestionSelectionStrategyType strategyType)
     {
         if (strategyType == QuestionSelectionStrategyType.RemoveOtherThemes)
         {
-            GameLogic?.OnFinalRoundSkip();
+            GameLogic.OnFinalRoundSkip();
         }
         else
         {
-            GameLogic?.ScheduleExecution(Tasks.MoveNext, 10);
+            GameLogic.ScheduleExecution(Tasks.MoveNext, 10);
         }
     }
 
@@ -74,7 +74,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         _state.Themes = themes;
 
         // _gameData.TInfo.RoundInfo is initialized here
-        GameLogic?.InitThemes(themes, false, true, ThemesPlayMode.OneByOne);
+        GameLogic.InitThemes(themes, false, true, ThemesPlayMode.OneByOne);
         _state.InformStages |= InformStages.RoundThemesComments;
 
         // Filling initial questions table
@@ -97,7 +97,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
         _state.TableController = tableController;
         _state.IsQuestionAskPlaying = false;
-        GameLogic?.ScheduleExecution(Tasks.RoundTheme, 1, 0, true);
+        GameLogic.ScheduleExecution(Tasks.RoundTheme, 1, 0, true);
     }
 
     public bool ShouldPlayRoundWithRemovableThemes()
@@ -133,20 +133,20 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback)
     {
-        GameLogic?.SetContinuation(() => selectCallback(_state.ThemeIndex, _state.QuestionIndex));
-        GameLogic?.ScheduleExecution(Tasks.AskToSelectQuestion, 1, force: true); // TODO: why not calling AskToSelectQuestion directly?
+        GameLogic.SetContinuation(() => selectCallback(_state.ThemeIndex, _state.QuestionIndex));
+        GameLogic.ScheduleExecution(Tasks.AskToSelectQuestion, 1, force: true); // TODO: why not calling AskToSelectQuestion directly?
     }
 
-    public void OnQuestionSelected(int themeIndex, int questionIndex) => GameLogic?.OnQuestionSelected(themeIndex, questionIndex);
+    public void OnQuestionSelected(int themeIndex, int questionIndex) => GameLogic.OnQuestionSelected(themeIndex, questionIndex);
 
     public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
         InformActivePlayers();
 
-        GameLogic?.InitThemes(themes, willPlayAllThemes, isFirstPlay, ThemesPlayMode.AllTogether);
+        GameLogic.InitThemes(themes, willPlayAllThemes, isFirstPlay, ThemesPlayMode.AllTogether);
         _state.ThemeDeleters = new ThemeDeletersEnumerator(_state.Players, _state.TInfo.RoundInfo.Count(t => t.Name != null));
         _state.ThemeDeleters.Reset(true);
-        GameLogic?.ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));
+        GameLogic.ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));
     }
 
     private void InformActivePlayers()
@@ -164,17 +164,17 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         if (passed.Count > 0)
         {
             var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passed);
-            GameActions?.SendMessage(msg.ToString());
+            GameActions.SendMessage(msg.ToString());
         }
     }
 
     public void AskForThemeDelete(Action<int> deleteCallback)
     {
-        GameLogic?.SetContinuation(() => deleteCallback(_state.ThemeIndexToDelete));
-        GameLogic?.ScheduleExecution(Tasks.AskToDelete, 1, force: true); // TODO: why not calling AskToDelete directly?
+        GameLogic.SetContinuation(() => deleteCallback(_state.ThemeIndexToDelete));
+        GameLogic.ScheduleExecution(Tasks.AskToDelete, 1, force: true); // TODO: why not calling AskToDelete directly?
     }
 
-    public void OnThemeDeleted(int themeIndex) => GameLogic?.OnThemeDeleted(themeIndex);
+    public void OnThemeDeleted(int themeIndex) => GameLogic.OnThemeDeleted(themeIndex);
 
     public void OnThemeSelected(int themeIndex, int questionIndex)
     {
@@ -183,7 +183,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
             throw new InvalidOperationException("_gameData.Round == null");
         }
 
-        GameLogic?.AddHistory("::OnThemeSelected");
+        GameLogic.AddHistory("::OnThemeSelected");
         _state.ThemeIndex = themeIndex;
         _state.Theme = _state.Round.Themes[themeIndex];
         _state.ThemesPlayMode = ThemesPlayMode.None;
@@ -191,38 +191,38 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         _state.QuestionIndex = questionIndex;
         _state.Question = _state.Theme.Questions[_state.QuestionIndex];
 
-        GameLogic?.AnnounceFinalTheme(_state.Question);
+        GameLogic.AnnounceFinalTheme(_state.Question);
         _state.InformStages |= InformStages.Theme;
     }
 
     public void OnTheme(Theme theme)
     {
         _state.Theme = theme;
-        GameActions?.SendThemeInfo();
+        GameActions.SendThemeInfo();
         _state.InformStages |= InformStages.Theme;
-        GameLogic?.ScheduleExecution(Tasks.MoveNext, 20);
+        GameLogic.ScheduleExecution(Tasks.MoveNext, 20);
     }
 
-    public void OnQuestion(Question question) => GameLogic?.OnQuestion(question);
+    public void OnQuestion(Question question) => GameLogic.OnQuestion(question);
 
     public void OnQuestionType(string typeName, bool isDefault)
     {
         _state.QuestionTypeName = typeName;
-        GameLogic?.OnQuestionType(typeName, isDefault);
+        GameLogic.OnQuestionType(typeName, isDefault);
     }
 
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
     {
         var question = _state.TInfo.RoundInfo[themeIndex].Questions[questionIndex];
         question.Price = price;
-        GameActions?.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, price);
+        GameActions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, price);
     }
 
     public bool OnQuestionEnd(string comments) => GameLogic.OnQuestionEnd();
 
-    public void OnPackage(Package package) => GameLogic?.OnPackage(package);
+    public void OnPackage(Package package) => GameLogic.OnPackage(package);
 
-    public void OnGameThemes(IEnumerable<string> themes) => GameLogic?.OnGameThemes(themes);
+    public void OnGameThemes(IEnumerable<string> themes) => GameLogic.OnGameThemes(themes);
 
-    public void OnPackageEnd() => GameLogic?.OnEndGame();
+    public void OnPackageEnd() => GameLogic.OnEndGame();
 }

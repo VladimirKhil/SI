@@ -13,7 +13,13 @@ public enum MessageCode
 
     SelectPlayer,
 
+    PriceMultiplication,
+
     MakeStake,
+
+    HiddenStakesMade,
+
+    Theme,
 
     SelectAnswerOption,
 
@@ -25,6 +31,10 @@ public enum MessageCode
     RoundSkippedNoPlayers,
 
     RightAnswer,
+
+    WrongAnswer,
+
+    PlayerAnswers,
 
     DeleteTheme,
 

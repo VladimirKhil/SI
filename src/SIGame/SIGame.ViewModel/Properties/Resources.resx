@@ -717,4 +717,46 @@
   <data name="UnsupportedQuestion" xml:space="preserve">
     <value>This question is not supported by your client</value>
   </data>
+  <data name="EasyCat" xml:space="preserve">
+    <value>There's no question here! The money was just added to your score! Congratulations!</value>
+  </data>
+  <data name="Final" xml:space="preserve">
+    <value>Final</value>
+  </data>
+  <data name="GiveCat" xml:space="preserve">
+    <value>Who would you like to give the question to?</value>
+  </data>
+  <data name="ManuallyPlayedQuestion" xml:space="preserve">
+    <value>This question will be played manually (while pauses). The game will resume in 15 seconds</value>
+  </data>
+  <data name="NobodyInFinal" xml:space="preserve">
+    <value>We could have had the final round now, but none of the players reached it!</value>
+  </data>
+  <data name="VaBank" xml:space="preserve">
+    <value>ALL-IN!!!</value>
+  </data>
+  <data name="YourAnswer" xml:space="preserve">
+    <value>what's your answer?; your answer is..?;?;answer, please!;I'm waiting for your answer;please, answer the question</value>
+  </data>
+  <data name="YourStake" xml:space="preserve">
+    <value>what's your bet?;make your bet</value>
+  </data>
+  <data name="WrongAnswers" xml:space="preserve">
+    <value>Wrong answers</value>
+  </data>
+  <data name="Tables" xml:space="preserve">
+    <value>Tables</value>
+  </data>
+  <data name="ShowmanGreeting" xml:space="preserve">
+    <value>Greetings, ladies and gentlement, this is SIGame!</value>
+  </data>
+  <data name="SelectAnswerOption" xml:space="preserve">
+    <value>Select answer option on table</value>
+  </data>
+  <data name="Right" xml:space="preserve">
+    <value>Right!;You're right!;Yes, that's correct!;Yes!;Absolutely right!;That's it!;Of course!;For sure!;No doubt!; That's it!;Yes, you're correct!;You have given the correct answer!;Correct!</value>
+  </data>
+  <data name="DeleteTheme" xml:space="preserve">
+    <value>Remove a theme you don't like;remove one of the themes, please</value>
+  </data>
 </root>

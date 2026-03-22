@@ -545,11 +545,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public ICommand IsWrong { get; }
 
-    /// <summary>
-    /// Game report.
-    /// </summary>
-    public SIReport Report { get; } = new();
-
     public SimpleCommand Ready { get; }
 
     public SimpleCommand UnReady { get; }
@@ -773,12 +768,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         IsRight = new SimpleCommand(IsRight_Executed);
         IsWrong = new SimpleCommand(IsWrong_Executed);
 
-        Report.Title = Resources.ReportTitle;
-        Report.Subtitle = Resources.ReportTip;
-
-        Report.SendReport = new SimpleCommand(SendReport_Executed);
-        Report.SendNoReport = new SimpleCommand(SendNoReport_Executed);
-
         Ready = new SimpleCommand(Ready_Executed) { CanBeExecuted = IsPlayer || IsShowman };
         UnReady = new SimpleCommand(UnReady_Executed) { CanBeExecuted = IsPlayer || IsShowman };
 
@@ -829,9 +818,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public void AddLog(string s) => StringAdding?.Invoke(null, s, LogMode.Log);
 
-    private void Ready_Executed(object? arg) => _viewerActions.SendMessage(Messages.Ready);
+    private void Ready_Executed(object? arg) => _viewerActions.SendReady();
 
-    private void UnReady_Executed(object? arg) => _viewerActions.SendMessage(Messages.Ready, "-");
+    private void UnReady_Executed(object? arg) => _viewerActions.SendReady(false);
 
     private void IsRight_Executed(object? arg)
     {
@@ -886,23 +875,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     }
 
     private void Pass_Executed(object? arg) => _viewerActions.SendMessage(Messages.Pass);
-
-        private void SendNoReport_Executed(object? arg)
-    {
-        _viewerActions.SendMessage(Messages.Report, "DECLINE");
-        ClearSelections();
-    }
-
-    private void SendReport_Executed(object? arg)
-    {
-        if (_data.SystemLog.Length > 0)
-        {
-            _viewerActions.SendMessage(Messages.Report, MessageParams.Report_Log, _data.SystemLog.ToString());
-        }
-
-        _viewerActions.SendMessage(Messages.Report, "ACCEPT", Report.Comment);
-        ClearSelections();
-    }
 
     private void Apellate_Executed(object? arg)
     {

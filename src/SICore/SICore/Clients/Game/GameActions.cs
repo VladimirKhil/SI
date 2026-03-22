@@ -470,4 +470,10 @@ public sealed class GameActions
         SendVisualMessageWithArgs(Messages.RightAnswer, answerType.ToString().ToLowerInvariant(), rightAnswer);
 
     internal void InformMediaPreloadProgress(string sender, int progress) => SendMessageWithArgs(Messages.MediaPreloadProgress, sender, progress);
+
+    internal void InformTimerGameStart(int automaticGameStartDuration)
+    {
+        SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, automaticGameStartDuration, -2); // deprecaated
+        SendMessageWithArgs(Messages.TimerGameStart, automaticGameStartDuration);
+    }
 }

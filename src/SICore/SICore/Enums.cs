@@ -76,11 +76,6 @@ public enum DecisionType
     /// Appellating answer.
     /// </summary>
     Appellation,
-
-    /// <summary>
-    /// Waiting for the players reviews.
-    /// </summary>
-    Reporting
 }
 
 /// <summary>

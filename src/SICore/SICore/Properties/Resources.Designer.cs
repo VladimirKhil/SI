@@ -19,7 +19,7 @@ namespace SICore.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -97,38 +97,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The answer should be given orally.
-        /// </summary>
-        public static string AnswerIsOral {
-            get {
-                return ResourceManager.GetString("AnswerIsOral", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Answer is not defined.
-        /// </summary>
-        public static string AnswerNotSet {
-            get {
-                return ResourceManager.GetString("AnswerNotSet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Apellated answers.
         /// </summary>
         public static string ApellatedAnswers {
             get {
                 return ResourceManager.GetString("ApellatedAnswers", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Apellation.
-        /// </summary>
-        public static string Apellation {
-            get {
-                return ResourceManager.GetString("Apellation", resourceCulture);
             }
         }
         
@@ -151,47 +124,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Avatar not found: {0}.
-        /// </summary>
-        public static string AvatarNotFound {
-            get {
-                return ResourceManager.GetString("AvatarNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bad text in log.
-        /// </summary>
-        public static string BadTextInLog {
-            get {
-                return ResourceManager.GetString("BadTextInLog", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0} has kicked and banned {1}.
         /// </summary>
         public static string Banned {
             get {
                 return ResourceManager.GetString("Banned", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bravo!!!;Excellent!!!;Absolutely right!!!;That&apos;s right, congratulation!!!;You have given the correct answer!!!; You&apos;re absolutely right!.
-        /// </summary>
-        public static string Bravo {
-            get {
-                return ResourceManager.GetString("Bravo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot connect to server.
-        /// </summary>
-        public static string CannotConnectToServer {
-            get {
-                return ResourceManager.GetString("CannotConnectToServer", resourceCulture);
             }
         }
         
@@ -205,92 +142,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Has changed the score.
-        /// </summary>
-        public static string Change1 {
-            get {
-                return ResourceManager.GetString("Change1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to to.
-        /// </summary>
-        public static string Change2 {
-            get {
-                return ResourceManager.GetString("Change2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to , and now your score is.
-        /// </summary>
-        public static string Change3 {
-            get {
-                return ResourceManager.GetString("Change3", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Choose the question!;Please!;Choose!;Make a choice!;It&apos;s your choice;You&apos;re chosing the next question.
-        /// </summary>
-        public static string ChooseQuest {
-            get {
-                return ResourceManager.GetString("ChooseQuest", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A client with this name already exists!.
-        /// </summary>
-        public static string ClientWithThisNameAlreadyExists {
-            get {
-                return ResourceManager.GetString("ClientWithThisNameAlreadyExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Computer.
         /// </summary>
         public static string Computer {
             get {
                 return ResourceManager.GetString("Computer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} connected.
-        /// </summary>
-        public static string Connected_Female {
-            get {
-                return ResourceManager.GetString("Connected_Female", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} connected.
-        /// </summary>
-        public static string Connected_Male {
-            get {
-                return ResourceManager.GetString("Connected_Male", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You are denied to connect to this game.
-        /// </summary>
-        public static string ConnectionDenied {
-            get {
-                return ResourceManager.GetString("ConnectionDenied", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cost.
-        /// </summary>
-        public static string Cost {
-            get {
-                return ResourceManager.GetString("Cost", resourceCulture);
             }
         }
         
@@ -304,101 +160,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Date of creation.
-        /// </summary>
-        public static string CreationDate {
-            get {
-                return ResourceManager.GetString("CreationDate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select table to delete.
-        /// </summary>
-        public static string DeleteTableHint {
-            get {
-                return ResourceManager.GetString("DeleteTableHint", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Remove a theme you don&apos;t like;remove one of the themes, please.
-        /// </summary>
-        public static string DeleteTheme {
-            get {
-                return ResourceManager.GetString("DeleteTheme", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Has disconnected.
-        /// </summary>
-        public static string Disconnected_Female {
-            get {
-                return ResourceManager.GetString("Disconnected_Female", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Has disconnected.
-        /// </summary>
-        public static string Disconnected_Male {
-            get {
-                return ResourceManager.GetString("Disconnected_Male", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to There&apos;s no question here! The money was just added to your score! Congratulations!.
-        /// </summary>
-        public static string EasyCat {
-            get {
-                return ResourceManager.GetString("EasyCat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Error messages.
-        /// </summary>
-        public static string ErrorMessages {
-            get {
-                return ResourceManager.GetString("ErrorMessages", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot save logs. Access denied.
-        /// </summary>
-        public static string ErrorWritingLogs {
-            get {
-                return ResourceManager.GetString("ErrorWritingLogs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Question contains external link which is forbidden and will not be loaded.
         /// </summary>
         public static string ExternalLinksForbidden {
             get {
                 return ResourceManager.GetString("ExternalLinksForbidden", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Player {0} tried to appellate the last right answer, but there are not enough players to win the appellation currently in the game.
-        /// </summary>
-        public static string FailedToAppellateForWrongAnswer {
-            get {
-                return ResourceManager.GetString("FailedToAppellateForWrongAnswer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string FemaleEnding {
-            get {
-                return ResourceManager.GetString("FemaleEnding", resourceCulture);
             }
         }
         
@@ -412,15 +178,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Final.
-        /// </summary>
-        public static string Final {
-            get {
-                return ResourceManager.GetString("Final", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to From.
         /// </summary>
         public static string From {
@@ -430,38 +187,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to From the table.
-        /// </summary>
-        public static string FromTable {
-            get {
-                return ResourceManager.GetString("FromTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Start of the game.
         /// </summary>
         public static string GameBeginning {
             get {
                 return ResourceManager.GetString("GameBeginning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Game results.
-        /// </summary>
-        public static string GameResults {
-            get {
-                return ResourceManager.GetString("GameResults", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The game has resumed.
-        /// </summary>
-        public static string GameResumed {
-            get {
-                return ResourceManager.GetString("GameResumed", resourceCulture);
             }
         }
         
@@ -484,56 +214,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Game table number.
-        /// </summary>
-        public static string GameTableNumber {
-            get {
-                return ResourceManager.GetString("GameTableNumber", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Here are the themes of today&apos;s game; I offer these themes of today&apos;s game for your attention.
         /// </summary>
         public static string GameThemes {
             get {
                 return ResourceManager.GetString("GameThemes", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The game will skip this question, host can play it himself (taking a pause). Game will resume in 15 seconds.
-        /// </summary>
-        public static string GameWillResume {
-            get {
-                return ResourceManager.GetString("GameWillResume", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Who would you like to give the question to?.
-        /// </summary>
-        public static string GiveCat {
-            get {
-                return ResourceManager.GetString("GiveCat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Good afternoon!.
-        /// </summary>
-        public static string GoodAfternoon {
-            get {
-                return ResourceManager.GetString("GoodAfternoon", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Good evening!.
-        /// </summary>
-        public static string GoodEvening {
-            get {
-                return ResourceManager.GetString("GoodEvening", resourceCulture);
             }
         }
         
@@ -547,24 +232,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Good morning!.
-        /// </summary>
-        public static string GoodMorning {
-            get {
-                return ResourceManager.GetString("GoodMorning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to , greetings!.
-        /// </summary>
-        public static string GreetingNew {
-            get {
-                return ResourceManager.GetString("GreetingNew", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to he gave.
         /// </summary>
         public static string HeGave {
@@ -574,47 +241,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select the cost of this question.
-        /// </summary>
-        public static string HintChooseCatPrice {
-            get {
-                return ResourceManager.GetString("HintChooseCatPrice", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Player information initialization error!.
-        /// </summary>
-        public static string HintInitError {
-            get {
-                return ResourceManager.GetString("HintInitError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select a player who the question will be given to.
-        /// </summary>
-        public static string HintSelectCatPlayerForPlayer {
-            get {
-                return ResourceManager.GetString("HintSelectCatPlayerForPlayer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to A human.
         /// </summary>
         public static string Human {
             get {
                 return ResourceManager.GetString("Human", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to I don&apos;t know.
-        /// </summary>
-        public static string IDontKnow {
-            get {
-                return ResourceManager.GetString("IDontKnow", resourceCulture);
             }
         }
         
@@ -655,47 +286,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Its host is .
-        /// </summary>
-        public static string ItsShowmanIs {
-            get {
-                return ResourceManager.GetString("ItsShowmanIs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Join to this game is forbidden.
         /// </summary>
         public static string JoinForbidden {
             get {
                 return ResourceManager.GetString("JoinForbidden", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} allowed to join as any role.
-        /// </summary>
-        public static string JoinModeSwitchedToAny {
-            get {
-                return ResourceManager.GetString("JoinModeSwitchedToAny", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} disables join.
-        /// </summary>
-        public static string JoinModeSwitchedToForbidden {
-            get {
-                return ResourceManager.GetString("JoinModeSwitchedToForbidden", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} allowed to join only is viewer.
-        /// </summary>
-        public static string JoinModeSwitchedToViewers {
-            get {
-                return ResourceManager.GetString("JoinModeSwitchedToViewers", resourceCulture);
             }
         }
         
@@ -714,15 +309,6 @@ namespace SICore.Properties {
         public static string Kicked {
             get {
                 return ResourceManager.GetString("Kicked", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to the last question is yours!;and the last question is...;only one question is remaining.
-        /// </summary>
-        public static string LastQuest {
-            get {
-                return ResourceManager.GetString("LastQuest", resourceCulture);
             }
         }
         
@@ -754,24 +340,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This question will be played manually (while pauses). The game will resume in 15 seconds.
-        /// </summary>
-        public static string ManuallyPlayedQuestion {
-            get {
-                return ResourceManager.GetString("ManuallyPlayedQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Media file is too large and will be skipped.
-        /// </summary>
-        public static string MediaFiltered {
-            get {
-                return ResourceManager.GetString("MediaFiltered", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to File {0} was not found in the game package!.
         /// </summary>
         public static string MediaNotFound {
@@ -790,47 +358,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mixed.
-        /// </summary>
-        public static string Mixed {
-            get {
-                return ResourceManager.GetString("Mixed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Error while starting listening network: {0}. Network connections are unavailable..
-        /// </summary>
-        public static string NetworkOpeningError {
-            get {
-                return ResourceManager.GetString("NetworkOpeningError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to new game table.
-        /// </summary>
-        public static string NewGameTable {
-            get {
-                return ResourceManager.GetString("NewGameTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No answer.
         /// </summary>
         public static string NoAnswer {
             get {
                 return ResourceManager.GetString("NoAnswer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to We could have had the final round now, but none of the players reached it!.
-        /// </summary>
-        public static string NobodyInFinal {
-            get {
-                return ResourceManager.GetString("NobodyInFinal", resourceCulture);
             }
         }
         
@@ -849,33 +381,6 @@ namespace SICore.Properties {
         public static string Nominal {
             get {
                 return ResourceManager.GetString("Nominal", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to has negative score and is not taking part in the final.
-        /// </summary>
-        public static string NotInFinal {
-            get {
-                return ResourceManager.GetString("NotInFinal", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Is not set.
-        /// </summary>
-        public static string NotSet {
-            get {
-                return ResourceManager.GetString("NotSet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Probably, #?:#?;Maybe, #;#, I think;Is it #?;I guess, the answer is #;I assume, the answer is #;#, I guess;It seems to me that the answer is #;Isn&apos;t it #?;Is it really #?;Obviously #;I presume, #;#, as far as I can see;It should be #;Probably, it is #;It&apos;s apparently #.
-        /// </summary>
-        public static string NotSure {
-            get {
-                return ResourceManager.GetString("NotSure", resourceCulture);
             }
         }
         
@@ -903,33 +408,6 @@ namespace SICore.Properties {
         public static string OfPackage {
             get {
                 return ResourceManager.GetString("OfPackage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to of the question.
-        /// </summary>
-        public static string OfQuestion {
-            get {
-                return ResourceManager.GetString("OfQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to of the round.
-        /// </summary>
-        public static string OfRound {
-            get {
-                return ResourceManager.GetString("OfRound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to of the theme.
-        /// </summary>
-        public static string OfTheme {
-            get {
-                return ResourceManager.GetString("OfTheme", resourceCulture);
             }
         }
         
@@ -979,47 +457,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The game is paused....
-        /// </summary>
-        public static string PauseInGame {
-            get {
-                return ResourceManager.GetString("PauseInGame", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Authors.
-        /// </summary>
-        public static string PAuthors {
-            get {
-                return ResourceManager.GetString("PAuthors", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Comments.
-        /// </summary>
-        public static string PComments {
-            get {
-                return ResourceManager.GetString("PComments", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Person {0} already exists in the game!.
         /// </summary>
         public static string PersonAlreadyExists {
             get {
                 return ResourceManager.GetString("PersonAlreadyExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to player&apos;s type.
-        /// </summary>
-        public static string PersonType {
-            get {
-                return ResourceManager.GetString("PersonType", resourceCulture);
             }
         }
         
@@ -1042,29 +484,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to So, we are taking theme; We are taking theme.
-        /// </summary>
-        public static string PlayTheme {
-            get {
-                return ResourceManager.GetString("PlayTheme", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Dear players, please, check whether the answer of {0} was correct.
         /// </summary>
         public static string PleaseCheckApellation {
             get {
                 return ResourceManager.GetString("PleaseCheckApellation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Name.
-        /// </summary>
-        public static string PName {
-            get {
-                return ResourceManager.GetString("PName", resourceCulture);
             }
         }
         
@@ -1087,29 +511,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sources.
-        /// </summary>
-        public static string PSources {
-            get {
-                return ResourceManager.GetString("PSources", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Question.
         /// </summary>
         public static string Question {
             get {
                 return ResourceManager.GetString("Question", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You got a Question for yourself!.
-        /// </summary>
-        public static string QuestionForYourself {
-            get {
-                return ResourceManager.GetString("QuestionForYourself", resourceCulture);
             }
         }
         
@@ -1123,92 +529,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} removes question {1}, {2}.
-        /// </summary>
-        public static string QuestionRemoved {
-            get {
-                return ResourceManager.GetString("QuestionRemoved", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} restores question {1}, {2}.
-        /// </summary>
-        public static string QuestionRestored {
-            get {
-                return ResourceManager.GetString("QuestionRestored", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You got Question for all!.
-        /// </summary>
-        public static string QuestionTypeForAll {
-            get {
-                return ResourceManager.GetString("QuestionTypeForAll", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You got Question with Button! Press button to answer the question.
-        /// </summary>
-        public static string QuestionTypeSimple {
-            get {
-                return ResourceManager.GetString("QuestionTypeSimple", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You got Question for All with Stake! Everybody makes stake and plays.
-        /// </summary>
-        public static string QuestionTypeStakeAll {
-            get {
-                return ResourceManager.GetString("QuestionTypeStakeAll", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Random themes.
         /// </summary>
         public static string RandomPackageName {
             get {
                 return ResourceManager.GetString("RandomPackageName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Random theme set.
-        /// </summary>
-        public static string RandomThemes {
-            get {
-                return ResourceManager.GetString("RandomThemes", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Reconnection was successful!.
-        /// </summary>
-        public static string ReconnectEntered {
-            get {
-                return ResourceManager.GetString("ReconnectEntered", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Connection was established....
-        /// </summary>
-        public static string ReconnectOK {
-            get {
-                return ResourceManager.GetString("ReconnectOK", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to requested appellation.
-        /// </summary>
-        public static string RequestedApellation {
-            get {
-                return ResourceManager.GetString("RequestedApellation", resourceCulture);
             }
         }
         
@@ -1222,29 +547,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Right!;You&apos;re right!;Yes, that&apos;s correct!;Yes!;Absolutely right!;That&apos;s it!;Of course!;For sure!;No doubt!; That&apos;s it!;Yes, you&apos;re correct!;You have given the correct answer!;Correct!.
-        /// </summary>
-        public static string Right {
-            get {
-                return ResourceManager.GetString("Right", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The right answer.
         /// </summary>
         public static string RightAnswer {
             get {
                 return ResourceManager.GetString("RightAnswer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The right answer is on the screen.
-        /// </summary>
-        public static string RightAnswerInOnTheScreen {
-            get {
-                return ResourceManager.GetString("RightAnswerInOnTheScreen", resourceCulture);
             }
         }
         
@@ -1267,74 +574,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Round {0}.
-        /// </summary>
-        public static string RoundName {
-            get {
-                return ResourceManager.GetString("RoundName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Round themes are; Here are the themes of the round.
         /// </summary>
         public static string RoundThemes {
             get {
                 return ResourceManager.GetString("RoundThemes", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The score.
-        /// </summary>
-        public static string Score {
-            get {
-                return ResourceManager.GetString("Score", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} changed {1} score from {2} to {3}.
-        /// </summary>
-        public static string ScoreChanged {
-            get {
-                return ResourceManager.GetString("ScoreChanged", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Score earned.
-        /// </summary>
-        public static string ScoreEarned {
-            get {
-                return ResourceManager.GetString("ScoreEarned", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Score lost.
-        /// </summary>
-        public static string ScoreLost {
-            get {
-                return ResourceManager.GetString("ScoreLost", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select answer option on table.
-        /// </summary>
-        public static string SelectAnswerOption {
-            get {
-                return ResourceManager.GetString("SelectAnswerOption", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to choose the cost of the question, please.
-        /// </summary>
-        public static string SelectQuestionPrice {
-            get {
-                return ResourceManager.GetString("SelectQuestionPrice", resourceCulture);
             }
         }
         
@@ -1348,101 +592,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Has added.
-        /// </summary>
-        public static string Sex_Added {
-            get {
-                return ResourceManager.GetString("Sex_Added", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Has changed.
-        /// </summary>
-        public static string Sex_Changed {
-            get {
-                return ResourceManager.GetString("Sex_Changed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Has deleted.
-        /// </summary>
-        public static string Sex_Deleted {
-            get {
-                return ResourceManager.GetString("Sex_Deleted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Has freed.
-        /// </summary>
-        public static string Sex_Free {
-            get {
-                return ResourceManager.GetString("Sex_Free", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Has replaced.
-        /// </summary>
-        public static string Sex_Replaced {
-            get {
-                return ResourceManager.GetString("Sex_Replaced", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to She gave.
         /// </summary>
         public static string SheGave {
             get {
                 return ResourceManager.GetString("SheGave", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Greetings, ladies and gentlement, this is SIGame!.
-        /// </summary>
-        public static string ShowmanGreeting {
-            get {
-                return ResourceManager.GetString("ShowmanGreeting", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The showman has switched the game into the next round.
-        /// </summary>
-        public static string ShowmanSwitchedToNextRound {
-            get {
-                return ResourceManager.GetString("ShowmanSwitchedToNextRound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The showman has switched the game into other round.
-        /// </summary>
-        public static string ShowmanSwitchedToOtherRound {
-            get {
-                return ResourceManager.GetString("ShowmanSwitchedToOtherRound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The showman has switched the game into the previous round.
-        /// </summary>
-        public static string ShowmanSwitchedToPreviousRound {
-            get {
-                return ResourceManager.GetString("ShowmanSwitchedToPreviousRound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Waiting for the showman&apos;s decision....
-        /// </summary>
-        public static string ShowmanWaiting {
-            get {
-                return ResourceManager.GetString("ShowmanWaiting", resourceCulture);
             }
         }
         
@@ -1474,65 +628,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to to.
-        /// </summary>
-        public static string StakeTo {
-            get {
-                return ResourceManager.GetString("StakeTo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Think!.
         /// </summary>
         public static string StartThink {
             get {
                 return ResourceManager.GetString("StartThink", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Strange error.
-        /// </summary>
-        public static string StrangeError {
-            get {
-                return ResourceManager.GetString("StrangeError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to String parse error.
-        /// </summary>
-        public static string StringParseError {
-            get {
-                return ResourceManager.GetString("StringParseError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to I presume, it&apos;s #; The answer is #!;It&apos;s obviously #; The answer is #;It&apos;s # as far as I can guess;It&apos;s # for no doubt; i&apos;m sure it&apos;s #; It&apos;s clearly #;It&apos;s # for sure;It&apos;s # I think.
-        /// </summary>
-        public static string Sure {
-            get {
-                return ResourceManager.GetString("Sure", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string SureFemaleEnding {
-            get {
-                return ResourceManager.GetString("SureFemaleEnding", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tables.
-        /// </summary>
-        public static string Tables {
-            get {
-                return ResourceManager.GetString("Tables", resourceCulture);
             }
         }
         
@@ -1573,15 +673,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Our today&apos;s players are.
-        /// </summary>
-        public static string TodayPlays {
-            get {
-                return ResourceManager.GetString("TodayPlays", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to To myself.
         /// </summary>
         public static string ToMyself {
@@ -1591,137 +682,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Trying to reconnect....
-        /// </summary>
-        public static string TryReconnect {
-            get {
-                return ResourceManager.GetString("TryReconnect", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to classic.
-        /// </summary>
-        public static string TypeClassic {
-            get {
-                return ResourceManager.GetString("TypeClassic", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Right for a mistake.
-        /// </summary>
-        public static string TypeIgnoreWrong {
-            get {
-                return ResourceManager.GetString("TypeIgnoreWrong", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to managable.
-        /// </summary>
-        public static string TypeManaged {
-            get {
-                return ResourceManager.GetString("TypeManaged", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to no false starts.
-        /// </summary>
-        public static string TypeNoFalseStart {
-            get {
-                return ResourceManager.GetString("TypeNoFalseStart", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to oral.
-        /// </summary>
-        public static string TypeOral {
-            get {
-                return ResourceManager.GetString("TypeOral", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to simple.
-        /// </summary>
-        public static string TypeSport {
-            get {
-                return ResourceManager.GetString("TypeSport", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ping penalty.
-        /// </summary>
-        public static string TypeUsePingPenalty {
-            get {
-                return ResourceManager.GetString("TypeUsePingPenalty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown person.
-        /// </summary>
-        public static string UnknownPerson {
-            get {
-                return ResourceManager.GetString("UnknownPerson", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Message from unknown sender.
-        /// </summary>
-        public static string UnknownSenderMessage {
-            get {
-                return ResourceManager.GetString("UnknownSenderMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown question type is detected.
-        /// </summary>
-        public static string UnknownType {
-            get {
-                return ResourceManager.GetString("UnknownType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to until.
-        /// </summary>
-        public static string Until {
-            get {
-                return ResourceManager.GetString("Until", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to to.
         /// </summary>
         public static string UpTo {
             get {
                 return ResourceManager.GetString("UpTo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ALL-IN!!!.
-        /// </summary>
-        public static string VaBank {
-            get {
-                return ResourceManager.GetString("VaBank", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to We&apos;re starting round.
-        /// </summary>
-        public static string WeBeginRound {
-            get {
-                return ResourceManager.GetString("WeBeginRound", resourceCulture);
             }
         }
         
@@ -1744,15 +709,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to with parameters.
-        /// </summary>
-        public static string WithParams {
-            get {
-                return ResourceManager.GetString("WithParams", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to with step.
         /// </summary>
         public static string WithStepOf {
@@ -1771,47 +727,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Wrong answer.
-        /// </summary>
-        public static string WrongAns {
-            get {
-                return ResourceManager.GetString("WrongAns", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Shakespear;Oh, I have forgotten;Hm....
         /// </summary>
         public static string WrongAnswer {
             get {
                 return ResourceManager.GetString("WrongAnswer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong answers.
-        /// </summary>
-        public static string WrongAnswers {
-            get {
-                return ResourceManager.GetString("WrongAnswers", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong connection parameters.
-        /// </summary>
-        public static string WrongConnectionParameters {
-            get {
-                return ResourceManager.GetString("WrongConnectionParameters", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong game state.
-        /// </summary>
-        public static string WrongGameState {
-            get {
-                return ResourceManager.GetString("WrongGameState", resourceCulture);
             }
         }
         
@@ -1825,65 +745,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can keep this question for yourself.
-        /// </summary>
-        public static string YouCanKeepCat {
-            get {
-                return ResourceManager.GetString("YouCanKeepCat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to you can say only.
-        /// </summary>
-        public static string YouCanSayOnly {
-            get {
-                return ResourceManager.GetString("YouCanSayOnly", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You get Question with a stake.
-        /// </summary>
-        public static string YouGetAuction {
-            get {
-                return ResourceManager.GetString("YouGetAuction", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to what&apos;s your answer?; your answer is..?;?;answer, please!;I&apos;m waiting for your answer;please, answer the question.
-        /// </summary>
-        public static string YourAnswer {
-            get {
-                return ResourceManager.GetString("YourAnswer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to on the choice.
         /// </summary>
         public static string YourChoice {
             get {
                 return ResourceManager.GetString("YourChoice", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You got Question with a secret! You should give the question to another player.
-        /// </summary>
-        public static string YouReceiveCat {
-            get {
-                return ResourceManager.GetString("YouReceiveCat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to what&apos;s your bet?;make your bet.
-        /// </summary>
-        public static string YourStake {
-            get {
-                return ResourceManager.GetString("YourStake", resourceCulture);
             }
         }
         

@@ -279,33 +279,10 @@ public sealed class Game : MessageHandler
 
         var appSettings = _state.Settings.AppSettings;
 
-        _gameActions.SendMessageToWithArgs(
-            person,
-            Messages.ReadingSpeed,
-            appSettings.Managed ? 0 : appSettings.ReadingSpeed);
-
-        _gameActions.SendMessageToWithArgs(person, Messages.FalseStart, appSettings.FalseStart ? "+" : "-");
-        _gameActions.SendMessageToWithArgs(person, Messages.ButtonBlockingTime, appSettings.TimeSettings.TimeForBlockingButton);
-        _gameActions.SendMessageToWithArgs(person, Messages.ApellationEnabled, appSettings.UseApellations ? '+' : '-');
-
         var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
         _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
 
         _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, _state.JoinMode);
-
-        _gameActions.SendMessageToWithArgs(
-            person,
-            Messages.Options,
-            nameof(appSettings.Oral), appSettings.Oral,
-            nameof(appSettings.Managed), appSettings.Managed,
-            nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels,
-            nameof(appSettings.FalseStart), appSettings.FalseStart,
-            nameof(appSettings.ReadingSpeed), appSettings.Managed ? 0 : appSettings.ReadingSpeed,
-            nameof(appSettings.PartialText), appSettings.PartialText,
-            nameof(appSettings.PartialImages), appSettings.PartialImages,
-            nameof(appSettings.TimeSettings.PartialImageTime), _state.TimeSettings.PartialImage,
-            nameof(appSettings.UseApellations), appSettings.UseApellations,
-            nameof(appSettings.TimeSettings.TimeForBlockingButton), _state.TimeSettings.ButtonBlocking);
 
         _gameActions.SendMessageToWithArgs(
             person,
@@ -795,10 +772,6 @@ public sealed class Game : MessageHandler
                         OnMediaPreloadProgress(message, args);
                         break;
 
-                    case Messages.Report:
-                        OnReport(message, args);
-                        break;
-
                     case Messages.IsRight:
                         OnIsRight(message, args);
                         break;
@@ -1157,41 +1130,6 @@ public sealed class Game : MessageHandler
         if (_state.AllPersons.TryGetValue(message.Sender, out var person))
         {
             person.IsMoveable = true;
-        }
-    }
-
-    private void OnReport(Message message, string[] args)
-    {
-        if (_state.Decision != DecisionType.Reporting
-            || !_state.Players.Any(player => player.Name == message.Sender)
-            || _state.GameResultInfo.Reviews.ContainsKey(message.Sender))
-        {
-            return;
-        }
-
-        var review = new StringBuilder();
-
-        for (var i = 2; i < args.Length; i++)
-        {
-            review.AppendLine(args[i]);
-        }
-
-        if (args[1] == MessageParams.Report_Log)
-        {
-            _state.Host.LogWarning("Player error: " + review);
-            return;
-        }
-
-        _state.ReportsCount--;
-
-        if (review.Length > 0)
-        {
-            _state.GameResultInfo.Reviews[message.Sender] = review.ToString();
-        }
-
-        if (_state.ReportsCount == 0)
-        {
-            _controller.RescheduleTask();
         }
     }
 

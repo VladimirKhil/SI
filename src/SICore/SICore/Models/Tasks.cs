@@ -190,10 +190,6 @@ public enum Tasks
     /// </summary>
     CheckAppellation,
     /// <summary>
-    /// Ожидаем, пока игроки напишут отчёт
-    /// </summary>
-    WaitReport,
-    /// <summary>
     /// Автоматическая игра
     /// </summary>
     AutoGame

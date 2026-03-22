@@ -93,7 +93,26 @@ Schema definitions are in `assets/` directory.
 - Package handling is in `src/Common/SIPackages/`
 - Package format schemas in `assets/`
 
+## Resource Management
+
+The project uses `.resx` files for localization.
+
+### Designer File Generation
+
+`Resources.Designer.cs` files are generated from `.resx` files. In Visual Studio, this is handled by the `PublicResXFileCodeGenerator`. For CLI or automated environments, use the following PowerShell script:
+
+```powershell
+# Regenerate SICore resources
+powershell -ExecutionPolicy Bypass -File tools/regenerate-designer.ps1 -ResxPath "src/SICore/SICore/Properties/Resources.resx" -DesignerPath "src/SICore/SICore/Properties/Resources.Designer.cs" -Namespace "SICore.Properties" -ClassName "Resources"
+
+# Regenerate SIGame.ViewModel resources
+powershell -ExecutionPolicy Bypass -File tools/regenerate-designer.ps1 -ResxPath "src/SIGame/SIGame.ViewModel/Properties/Resources.resx" -DesignerPath "src/SIGame/SIGame.ViewModel/Properties/Resources.Designer.cs" -Namespace "SIGame.ViewModel.Properties" -ClassName "Resources"
+```
+
+The `regenerate-designer.ps1` script uses the standard .NET `StronglyTypedResourceBuilder` to ensure consistency.
+
 ## Important Notes
 
 - WPF applications are Windows-only
 - Some projects may have platform-specific configurations
+- **Do not edit Designer.cs files directly**. Always update the .resx and regenerate.

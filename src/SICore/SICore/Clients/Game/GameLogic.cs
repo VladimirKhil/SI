@@ -145,7 +145,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             ScheduleExecution(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
             _state.TimerStartTime[2] = DateTime.UtcNow;
 
-            _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
+            _gameActions.InformTimerGameStart(Constants.AutomaticGameStartDuration);
         }
     }
 
@@ -858,24 +858,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
     }
 
-    internal void OnRoundEmpty()
-    {
-        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)])); // TODO: REMOVE+
-        _gameActions.SendMessage(Messages.RoundEnd, "empty");
-    }
+    internal void OnRoundEmpty() => _gameActions.SendMessage(Messages.RoundEnd, "empty");
 
-    internal void OnRoundTimeout()
-    {
-        _gameActions.SendMessage(Messages.Timeout); // TODO: REMOVE: replaced by ROUND_END TIMEOUT message
-        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllTime)])); // TODO: REMOVE+
+    internal void OnRoundTimeout() => _gameActions.SendMessage(Messages.RoundEnd, "timeout");
 
-        _gameActions.SendMessage(Messages.RoundEnd, "timeout");
-    }
-
-    internal void OnRoundEndedManually()
-    {
-        _gameActions.SendMessage(Messages.RoundEnd, "manual");
-    }
+    internal void OnRoundEndedManually() => _gameActions.SendMessage(Messages.RoundEnd, "manual");
 
     internal void OnThemeDeleted(int themeIndex)
     {
@@ -907,7 +894,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void AnnounceFinalTheme(Question question)
     {
-        _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_state.Theme.Name}");
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _state.Theme.Name);
         _gameActions.SendThemeInfo(overridenQuestionCount: 1);
         
@@ -1101,7 +1087,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void ProceedToHiddenStakesQuestion()
     {
-        _gameActions.ShowmanReplic(LO[nameof(R.ThankYou)]);
+        _gameActions.ShowmanReplic(LO[nameof(R.ThankYou)]); // TODO: REMOVE (replaced by MessageCode.HiddenStakesMade)
+        _gameActions.ShowmanReplicNew(MessageCode.HiddenStakesMade);
         ScheduleExecution(Tasks.MoveNext, 20);
     }
 
@@ -1256,7 +1243,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var canonicalAnswer = _state.Question?.Right.FirstOrDefault();
             var isAnswerCanonical = canonicalAnswer != null && (_state.Answerer.Answer ?? "").Simplify().Contains(canonicalAnswer.Simplify());
 
-            if (canonicalAnswer != null && !isAnswerCanonical)
+            if (canonicalAnswer != null && !isAnswerCanonical && _state.Theme != null)
             {
                 _state.GameResultInfo.AcceptedAnswers.Add(new QuestionReport
                 {
@@ -1358,10 +1345,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 {
                     updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
                     _gameActions.SendMessageWithArgs(Messages.Person, '-', _state.AnswererIndex, updateSum);
+                    _gameActions.ShowmanReplicNew(MessageCode.WrongAnswer, outcome, _state.Answerer.AnswerValidationFactor);
                     SubtractWrongSum(_state.Answerer, updateSum);
                     _gameActions.InformSums();
 
-                    if (_state.Answerer.IsHuman)
+                    if (_state.Answerer.IsHuman && _state.Theme != null)
                     {
                         _state.GameResultInfo.RejectedAnswers.Add(new QuestionReport
                         {
@@ -1385,6 +1373,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             else
             {
                 _gameActions.ShowmanReplic(s.ToString());
+                _gameActions.ShowmanReplicNew(MessageCode.WrongAnswer);
                 _state.PlayerIsRight = false;
                 updateSum = _state.Answerer.PersonalStake;
 
@@ -1530,11 +1519,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         StopWaiting();
-
-        var msg = string.Format(GetRandomString(LO[nameof(R.InformChooser)]), _state.Chooser.Name);
-        _gameActions.ShowmanReplic(msg); // TODO: REMOVE: replaced by SETCHOOSER message
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");
-        
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");        
         ScheduleExecution(Tasks.MoveNext, 20);
 
         return true;
@@ -1591,6 +1576,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var s = GetRandomString(LO[nameof(R.LetsSee)]);
         _gameActions.ShowmanReplic(s);
+        _gameActions.ShowmanReplicNew(MessageCode.PlayerAnswers);
 
         var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
         _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
@@ -1849,10 +1835,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         AnnouncePostStakeWithAnswerOptions();
                         break;
 
-                    case Tasks.WaitReport:
-                        WaitReport();
-                        break;
-
                     case Tasks.Winner:
                         Winner();
                         break;
@@ -2107,7 +2089,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void GoodLuck()
     {
-        _gameActions.ShowmanReplic(LO[nameof(R.GoodLuck)]);
+        _gameActions.ShowmanReplic(LO[nameof(R.GoodLuck)]); // TODO: REMOVE (replaced by InformStage)
 
         _state.Stage = GameStage.After;
         OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
@@ -2135,15 +2117,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.GameResultInfo.Reviews.Clear();
         _state.GameResultInfo.Completed = true;
 
-        ScheduleExecution(Tasks.WaitReport, 10 * 60 * 2); // 2 minutes
-        WaitFor(DecisionType.Reporting, 10 * 60 * 2, -3);
-
-        foreach (var player in _state.Players)
-        {
-            _gameActions.SendMessageToWithArgs(player.Name, Messages.Report, "");
-        }
-
         _gameActions.AskReview();
+        SendReport();
     }
 
     private void WaitRight()
@@ -2175,9 +2150,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitSelectQuestionPrice()
     {
-        if (_state.AnswererIndex == -1)
+        if (_state.AnswererIndex == -1 || _state.Answerer == null)
         {
             throw new ArgumentException($"{nameof(_state.AnswererIndex)} == -1", nameof(_state.AnswererIndex));
+        }
+
+        if (_state.StakeRange == null)
+        {
+            throw new ArgumentException($"{nameof(_state.StakeRange)} == null", nameof(_state.StakeRange));
         }
 
         _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
@@ -2246,11 +2226,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.CurPriceRight = _state.Stake;
         _state.CurPriceWrong = _state.Stake;
 
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+", "ANNOUNCE");
 
         var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_state.Players[stakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_state.Stake)}";
 
-        _gameActions.ShowmanReplic(msg.ToString());
+        _gameActions.ShowmanReplic(msg.ToString()); // TODO: REMOVE (replaced by SET_CHOOSER + ANNOUNCE message)
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10));
     }
 
@@ -2332,25 +2312,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         var answerer = _state.Answerer ?? throw new InvalidOperationException("Answerer not defined");
 
-        var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _state.StakeRange.Minimum, _state.StakeRange.Maximum, _state.StakeRange.Step);
-
         var waitTime = _state.TimeSettings.StakeMaking * 10;
 
         _state.IsOralNow = _state.IsOral && answerer.IsHuman;
-
-        if (_state.IsOralNow)
-        {
-            _gameActions.SendMessage(s, _state.ShowMan.Name);
-        }
         
-        if (CanPlayerAct())
+        if (CanPlayerAct() && !answerer.IsConnected)
         {
-            _gameActions.SendMessage(s, answerer.Name);
-
-            if (!answerer.IsConnected)
-            {
-                waitTime = 20;
-            }
+            waitTime = 20;
         }
 
         _state.StakeModes = StakeModes.Stake;
@@ -2470,24 +2438,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         OnDecision();
     }
 
-    private void WaitReport()
-    {
-        try
-        {
-            foreach (var item in _state.Players)
-            {
-                _gameActions.SendMessage(Messages.Cancel, item.Name);
-            }
-
-            SendReport();
-            StopWaiting();
-        }
-        catch (Exception exc)
-        {
-            _state.Host.SendError(exc);
-        }
-    }
-
     private void AnnouncePostStakeWithAnswerOptions()
     {
         if (_state.AnnouncedAnswerersEnumerator == null || !_state.AnnouncedAnswerersEnumerator.MoveNext())
@@ -2520,7 +2470,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         var stake = answerer.PersonalStake;
-        _gameActions.ShowmanReplic($"{LO[nameof(R.Stake)]} {answerer.Name}: {Notion.FormatNumber(stake)}");
+        _gameActions.ShowmanReplic($"{LO[nameof(R.Stake)]} {answerer.Name}: {Notion.FormatNumber(stake)}"); // TODO: REMOVE (replaced by PersonStake message)
 
         var message = new MessageBuilder(Messages.Person);
 
@@ -3031,15 +2981,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _gameActions.ShowmanReplicNew(MessageCode.SelectPlayer, _state.Chooser.Name);
-
-        // -- Deprecated
-        var msg = new StringBuilder(Messages.Cat);
-
-        for (var i = 0; i < _state.Players.Count; i++)
-        {
-            msg.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Flag ? '+' : '-');
-        }
-
         _state.AnswererIndex = -1;
 
         var waitTime = _state.TimeSettings.PlayerSelection * 10;
@@ -3050,7 +2991,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         if (_state.IsOralNow)
         {
             playerSelectors.Add(_state.ShowMan.Name);
-            _gameActions.SendMessage(msg.ToString(), _state.ShowMan.Name);
         }
         else if (!_state.Chooser.IsConnected)
         {
@@ -3060,7 +3000,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         if (CanPlayerAct() && _state.Chooser != null)
         {
             playerSelectors.Add(_state.Chooser.Name);
-            _gameActions.SendMessage(msg.ToString(), _state.Chooser.Name);
         }
 
         AskToSelectPlayer(SelectPlayerReason.Answerer, playerSelectors.ToArray());
@@ -3109,19 +3048,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         else
         {
             _gameActions.SendVisualMessage(Messages.ShowTable); // Everybody will see the table during showman's decision
-
             _state.ChooserIndex = -1;
 
-            // -- Deprecated
-            var msg = new StringBuilder(Messages.First);
-
-            for (var i = 0; i < _state.Players.Count; i++)
-            {
-                msg.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Flag ? '+' : '-');
-            }
-
-            _gameActions.SendMessage(msg.ToString(), _state.ShowMan.Name);
-            // -- end
             AskToSelectPlayer(SelectPlayerReason.Chooser, _state.ShowMan.Name);
 
             var waitTime = _state.TimeSettings.ShowmanDecision * 10;
@@ -3286,7 +3214,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             var answerTime = _state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.HiddenAnswering;
 
-            _gameActions.ShowmanReplic(LO[nameof(R.StartThink)]);
+            _gameActions.ShowmanReplic(LO[nameof(R.StartThink)]); // TODO: REMOVE: replaced by FINALTHINK message
             _gameActions.SendMessageWithArgs(Messages.FinalThink, answerTime);
 
             for (var i = 0; i < _state.Players.Count; i++)
@@ -3410,7 +3338,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 continue;
             }
 
-            _gameActions.SendMessageWithArgs(Messages.WrongTry, playerIndex);
             _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, playerIndex);
         }
     }
@@ -3493,16 +3420,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _state.Players[i].Flag = indicies.Contains(i);
         }
 
-        // -- deprecated
-        var msg = new StringBuilder(Messages.FirstDelete);
-
-        for (var i = 0; i < _state.Players.Count; i++)
-        {
-            msg.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Flag ? '+' : '-');
-        }
-
-        _gameActions.SendMessage(msg.ToString(), _state.ShowMan.Name);
-        // -- end
         AskToSelectPlayer(SelectPlayerReason.Deleter, _state.ShowMan.Name);
 
         var waitTime = _state.TimeSettings.ShowmanDecision * 10;
@@ -3578,16 +3495,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                     _state.Players[i].Flag = candidates.Contains(i);
                 }
 
-                // -- deprecated
-                var msg = new StringBuilder(Messages.FirstStake);
-
-                for (var i = 0; i < _state.Players.Count; i++)
-                {
-                    msg.Append(Message.ArgsSeparatorChar).Append(_state.Players[i].Flag ? '+' : '-');
-                }
-
-                _gameActions.SendMessage(msg.ToString(), _state.ShowMan.Name);
-                // -- end
                 AskToSelectPlayer(SelectPlayerReason.Staker, _state.ShowMan.Name);
                 _state.OrderHistory.AppendLine("Asking showman for the next staker");
 
@@ -3708,12 +3615,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             // Only nominal
             if (_state.Stake == -1 && (playerMoney < cost || playerMoney == cost && others.All(p => playerMoney >= p.Sum)))
             {
-                var s = new StringBuilder(activePlayer.Name)
-                    .Append(", ").Append(LO[nameof(R.YouCanSayOnly)])
-                    .Append(' ').Append(LO[nameof(R.Nominal)]);
-
-                _gameActions.ShowmanReplic(s.ToString());
-
                 _state.Stakes.StakerIndex = playerIndex;
                 _state.Stake = cost;
                 _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
@@ -3956,7 +3857,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             {
                 _state.Players[i].AppellationFlag = false;
                 _state.AppellationNegativeVoteCount++;
-                _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
                 _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
             }
             else if (_state.Players[i].IsConnected)
@@ -4304,7 +4204,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 informed = true;
                 var res = new StringBuilder();
                 res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.Restrictions)], LO[nameof(R.OfPackage)], package.Restriction);
-                _gameActions.ShowmanReplic(res.ToString());
+                _gameActions.ShowmanReplic(res.ToString()); // TODO: Remove (replaced by PackageRestrictions Message)
+                _gameActions.SendMessageWithArgs(Messages.PackageRestrictions, package.Restriction);
             }
             else
             {
@@ -4534,9 +4435,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var s = new StringBuilder(LO[nameof(R.Theme)]).Append(": ").Append(themeName);
 
-        _gameActions.ShowmanReplic(s.ToString());
+        _gameActions.ShowmanReplic(s.ToString()); // TODO: Remove (replaced by MessageCode.Theme)
+        _gameActions.ShowmanReplicNew(MessageCode.Theme, themeName);
 
-        ScheduleExecution(Tasks.MoveNext, 15);
+        ScheduleExecution(Tasks.MoveNext, 30);
     }
 
     // TODO: think about always using only complex answers as simple answer is a subset of a complex one
@@ -4922,9 +4824,17 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _gameActions.ShowmanReplic($"{_state.Chooser!.Name}, {replic}");
         }
 
+        var delay = 20;
+
+        if (factor != 1)
+        {
+            _gameActions.ShowmanReplicNew(MessageCode.PriceMultiplication, factor);
+            delay += 20;
+        }
+
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight, _state.CurPriceWrong);
 
-        ScheduleExecution(Tasks.MoveNext, 20);
+        ScheduleExecution(Tasks.MoveNext, delay);
     }
 
     internal void AcceptQuestion()

@@ -1,5 +1,5 @@
 ﻿<Project>
-  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="5.0.1" />
+  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="5.0.2" />
   <PropertyGroup>
     <ProductVersion>3.9</ProductVersion>
     <OutputName>SIGame.$(Platform)</OutputName>
@@ -26,7 +26,7 @@
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="5.0.1" />
+  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="5.0.2" />
   <Target Name="AfterBuild">
   </Target>
 </Project>

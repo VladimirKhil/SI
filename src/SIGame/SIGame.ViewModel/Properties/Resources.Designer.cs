@@ -19,7 +19,7 @@ namespace SIGame.ViewModel.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -286,6 +286,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove a theme you don&apos;t like;remove one of the themes, please.
+        /// </summary>
+        public static string DeleteTheme {
+            get {
+                return ResourceManager.GetString("DeleteTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have disconnected.
         /// </summary>
         public static string DisconnectMessage {
@@ -300,6 +309,15 @@ namespace SIGame.ViewModel.Properties {
         public static string DownloadFileError {
             get {
                 return ResourceManager.GetString("DownloadFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There&apos;s no question here! The money was just added to your score! Congratulations!.
+        /// </summary>
+        public static string EasyCat {
+            get {
+                return ResourceManager.GetString("EasyCat", resourceCulture);
             }
         }
         
@@ -381,6 +399,15 @@ namespace SIGame.ViewModel.Properties {
         public static string FileTooLarge {
             get {
                 return ResourceManager.GetString("FileTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Final.
+        /// </summary>
+        public static string Final {
+            get {
+                return ResourceManager.GetString("Final", resourceCulture);
             }
         }
         
@@ -727,6 +754,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Who would you like to give the question to?.
+        /// </summary>
+        public static string GiveCat {
+            get {
+                return ResourceManager.GetString("GiveCat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome to SIGame! The game will begin as soon as all the players and the showman press &quot;Ready&quot; button.
         /// </summary>
         public static string Greeting {
@@ -1051,6 +1087,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This question will be played manually (while pauses). The game will resume in 15 seconds.
+        /// </summary>
+        public static string ManuallyPlayedQuestion {
+            get {
+                return ResourceManager.GetString("ManuallyPlayedQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Maximum file size: {0} MB.
         /// </summary>
         public static string MaximumFileSize {
@@ -1164,6 +1209,15 @@ namespace SIGame.ViewModel.Properties {
         public static string Next {
             get {
                 return ResourceManager.GetString("Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We could have had the final round now, but none of the players reached it!.
+        /// </summary>
+        public static string NobodyInFinal {
+            get {
+                return ResourceManager.GetString("NobodyInFinal", resourceCulture);
             }
         }
         
@@ -1474,6 +1528,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Right!;You&apos;re right!;Yes, that&apos;s correct!;Yes!;Absolutely right!;That&apos;s it!;Of course!;For sure!;No doubt!; That&apos;s it!;Yes, you&apos;re correct!;You have given the correct answer!;Correct!.
+        /// </summary>
+        public static string Right {
+            get {
+                return ResourceManager.GetString("Right", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The right answer.
         /// </summary>
         public static string RightAnswer {
@@ -1537,6 +1600,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select answer option on table.
+        /// </summary>
+        public static string SelectAnswerOption {
+            get {
+                return ResourceManager.GetString("SelectAnswerOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sending the pack to the server.
         /// </summary>
         public static string SendingPackageToServer {
@@ -1591,6 +1663,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Greetings, ladies and gentlement, this is SIGame!.
+        /// </summary>
+        public static string ShowmanGreeting {
+            get {
+                return ResourceManager.GetString("ShowmanGreeting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Questions storage.
         /// </summary>
         public static string SIStorage {
@@ -1623,6 +1704,15 @@ namespace SIGame.ViewModel.Properties {
         public static string SiteNavigationError {
             get {
                 return ResourceManager.GetString("SiteNavigationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tables.
+        /// </summary>
+        public static string Tables {
+            get {
+                return ResourceManager.GetString("Tables", resourceCulture);
             }
         }
         
@@ -1825,6 +1915,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ALL-IN!!!.
+        /// </summary>
+        public static string VaBank {
+            get {
+                return ResourceManager.GetString("VaBank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occured while following the web-site ({0}). Make sure you have a default browser.
         /// </summary>
         public static string VKThemesError {
@@ -1852,11 +1951,38 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wrong answers.
+        /// </summary>
+        public static string WrongAnswers {
+            get {
+                return ResourceManager.GetString("WrongAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You need to upgrade application to join this game.
         /// </summary>
         public static string YouNeedToUpgradeClientToJoinGame {
             get {
                 return ResourceManager.GetString("YouNeedToUpgradeClientToJoinGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to what&apos;s your answer?; your answer is..?;?;answer, please!;I&apos;m waiting for your answer;please, answer the question.
+        /// </summary>
+        public static string YourAnswer {
+            get {
+                return ResourceManager.GetString("YourAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to what&apos;s your bet?;make your bet.
+        /// </summary>
+        public static string YourStake {
+            get {
+                return ResourceManager.GetString("YourStake", resourceCulture);
             }
         }
     }
