@@ -19,6 +19,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
     {
         { "ru-RU", "Russian" },
         { "sr-RS", "Serbian" },
+        { "uz", "Uzbek" },
         { "other", "Other" }
     };
 

@@ -1610,7 +1610,7 @@ public sealed class QDocument : WorkspaceViewModel
         try
         {
             var itemData = new InfoOwnerData(this, _activeNode);
-            _clipboardService.SetData(ClipboardKey, itemData);
+            _clipboardService.SetData(ClipboardKey, JsonSerializer.Serialize(itemData));
         }
         catch (Exception exc)
         {
@@ -1634,8 +1634,15 @@ public sealed class QDocument : WorkspaceViewModel
         {
             using var change = OperationsManager.BeginComplexChange();
 
-            var itemData = (InfoOwnerData?)_clipboardService.GetData(ClipboardKey);
-            
+            var clipboardData = _clipboardService.GetData(ClipboardKey);
+
+            InfoOwnerData? itemData = clipboardData switch
+            {
+                InfoOwnerData data => data,
+                string json => JsonSerializer.Deserialize<InfoOwnerData>(json),
+                _ => null,
+            };
+
             if (itemData == null)
             {
                 return;

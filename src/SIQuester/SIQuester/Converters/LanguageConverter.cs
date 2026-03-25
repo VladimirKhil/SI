@@ -14,6 +14,7 @@ public sealed class LanguageConverter : IValueConverter
     {
         { "ru-RU", "Русский" },
         { "sr-RS", "Srpski" },
+        { "uz", "O'zbek" },
         { "other", Resources.OtherLanguage }
     };
 

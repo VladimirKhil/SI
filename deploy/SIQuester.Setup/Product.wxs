@@ -4,7 +4,7 @@
 	<?define ProductName="SIQuester" ?>
 	<?define ProductDescription="SIGame packages editor" ?>
 	<?define UpgradeCode="C2EAE409-B7B9-49C4-AE2C-B2AD43FDD0FE" ?>
-	<?define PublishFolder = "$(sys.SOURCEFILEDIR)..\..\bin\.Release\SIQuester\net6.0-windows\win-$(var.Platform)\publish\" ?>
+	<?define PublishFolder = "$(sys.SOURCEFILEDIR)..\..\bin\.Release\SIQuester\net10.0-windows7.0\win-$(var.Platform)\publish\" ?>
 	
 	<?ifndef var.ProductVersion ?>
 	  <?define ProductVersion="1.0.0" ?>

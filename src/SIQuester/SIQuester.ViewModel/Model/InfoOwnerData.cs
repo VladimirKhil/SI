@@ -16,7 +16,7 @@ public sealed class InfoOwnerData
 
     public Level ItemLevel { get; set; }
 
-    public string ItemData { get; set; }
+    public string ItemData { get; set; } = "";
 
     public AuthorInfo[] Authors { get; set; } = Array.Empty<AuthorInfo>();
 
