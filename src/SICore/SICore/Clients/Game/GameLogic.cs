@@ -3257,14 +3257,21 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var useAnswerOptions = _state.QuestionPlay.AnswerOptions != null;
         _state.IsOralNow = _state.IsOral && _state.Answerer.IsHuman;
 
-        if (useAnswerOptions)
+        if (useAnswerOptions || _state.QuestionPlay.AnswerType == AnswerType.Point)
         {
             if (_state.IsOralNow)
             {
                 _gameActions.SendMessage(Messages.Answer, _state.ShowMan.Name);
             }
 
-            _gameActions.SendMessage(CanPlayerAct() ? Messages.Answer : Messages.OralAnswer, _state.Answerer.Name);
+            if (CanPlayerAct())
+            {
+                _gameActions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
+            }
+            else
+            {
+                _gameActions.SendMessage(Messages.OralAnswer, _state.Answerer.Name);
+            }
         }
         else
         {

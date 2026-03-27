@@ -11,7 +11,7 @@ public sealed class FalseStartHelperTests
     {
         Script script = CreateScript();
 
-        var index = FalseStartHelper.GetAskAnswerStartIndex(script, null, FalseStartMode.Enabled);
+        var index = FalseStartHelper.GetAskAnswerStartIndex(script, [], FalseStartMode.Enabled);
 
         Assert.That(index, Is.Null);
     }
@@ -21,7 +21,7 @@ public sealed class FalseStartHelperTests
     {
         Script script = CreateScript();
 
-        var index = FalseStartHelper.GetAskAnswerStartIndex(script, null, FalseStartMode.Disabled);
+        var index = FalseStartHelper.GetAskAnswerStartIndex(script, [], FalseStartMode.Disabled);
 
         Assert.That(index, Is.EqualTo(0));
     }
@@ -31,7 +31,7 @@ public sealed class FalseStartHelperTests
     {
         Script script = CreateScript();
 
-        var index = FalseStartHelper.GetAskAnswerStartIndex(script, null, FalseStartMode.TextContentOnly);
+        var index = FalseStartHelper.GetAskAnswerStartIndex(script, [], FalseStartMode.TextContentOnly);
 
         Assert.That(index, Is.EqualTo(1));
     }

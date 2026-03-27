@@ -78,7 +78,9 @@ public class MainTest
 
         siOnline.NewGame.Execute(null);
 
-        var gameSettings = (GameSettingsViewModel)siOnline.Content.Content.Data;
+        Assert.That(siOnline.Content, Is.Not.Null);
+
+        var gameSettings = (GameSettingsViewModel)siOnline.Content!.Content.Data;
         gameSettings.NetworkGameName = "testGame" + new Random().Next(10000);
         gameSettings.NetworkGamePassword = "testpass";
         gameSettings.Role = gameRole;
