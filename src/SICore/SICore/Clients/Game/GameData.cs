@@ -35,6 +35,11 @@ public sealed class GameData : Data
     public SI.Contracts.TimeSettings TimeSettings { get; }
 
     /// <summary>
+    /// Gets game rules settings.
+    /// </summary>
+    public SI.Contracts.RulesSettings Rules { get; }
+
+    /// <summary>
     /// Game package document.
     /// </summary>
     internal SIDocument? PackageDoc { get; set; }
@@ -619,6 +624,7 @@ public sealed class GameData : Data
         Uri? packageSource,
         IGameSettingsCore<AppSettingsCore> settings,
         SI.Contracts.TimeSettings timeSettings,
+        SI.Contracts.RulesSettings rules,
         IPackageStatisticsProvider? packageStatisticsProvider)
     {
         Host = gameHost;
@@ -627,6 +633,7 @@ public sealed class GameData : Data
         Settings = settings;
         GameResultInfo = new GameResult(packageSource);
         TimeSettings = timeSettings;
+        Rules = rules;
         PackageStatistisProvider = packageStatisticsProvider;
         InitQuestionTypeSettings();
     }

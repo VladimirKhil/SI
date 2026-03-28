@@ -29,6 +29,7 @@ public static class GameRunner
         Node node,
         IGameSettingsCore<AppSettingsCore> settings,
         SI.Contracts.TimeSettings timeSettings,
+        SI.Contracts.RulesSettings rules,
         SIDocument document,
         IGameHost gameHost,
         IFileShare fileShare,
@@ -40,7 +41,7 @@ public static class GameRunner
         string? gameName = null,
         IPackageStatisticsProvider? packageStatisticsProvider = null)
     {
-        var gameData = new GameData(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, timeSettings, packageStatisticsProvider)
+        var gameData = new GameData(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, timeSettings, rules, packageStatisticsProvider)
         {
             HostName = settings.IsAutomatic ? null : settings.HumanPlayerName,
             GameName = gameName ?? "",

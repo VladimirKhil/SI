@@ -751,7 +751,8 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         var avatarHelper = new AvatarHelper(Path.Combine(documentPath, "avatars"));
 
-        var timeSettings = _model.AppSettings.TimeSettings;
+        var appSettings = _model.AppSettings;
+        var timeSettings = appSettings.TimeSettings;
 
         var timeSettingsNew = new SI.Contracts.TimeSettings
         {
@@ -772,16 +773,50 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             PartialImage = timeSettings.PartialImageTime,
         };
 
+        var rulesSettings = new SI.Contracts.RulesSettings
+        {
+            ReadingSpeed = appSettings.ReadingSpeed,
+            FalseStart = appSettings.FalseStart,
+            PartialText = appSettings.PartialText,
+            PartialImages = appSettings.PartialImages,
+            PlayAllThemesInThemesRemovalRound = appSettings.PlayAllQuestionsInFinalRound,
+            AllowEveryoneToPlayHiddenStakes = appSettings.AllowEveryoneToPlayHiddenStakes,
+            Oral = appSettings.Oral,
+            OralPlayersActions = appSettings.OralPlayersActions,
+            Managed = appSettings.Managed,
+            QuestionWithButtonPenalty = (SI.Contracts.PenaltyType)appSettings.QuestionWithButtonPenalty,
+            QuestionForYourselfPenalty = (SI.Contracts.PenaltyType)appSettings.QuestionForYourselfPenalty,
+            QuestionForAllPenalty = (SI.Contracts.PenaltyType)appSettings.QuestionForAllPenalty,
+            QuestionForYourselfFactor = appSettings.QuestionForYourselfFactor,
+            ButtonPressMode = (SI.Contracts.ButtonPressMode)appSettings.ButtonPressMode,
+            PreloadRoundContent = appSettings.PreloadRoundContent,
+            GameMode = appSettings.GameMode switch
+            {
+                GameModes.Tv => SI.Contracts.GameMode.Classic,
+                GameModes.Sport => SI.Contracts.GameMode.Sequential,
+                GameModes.Quiz => SI.Contracts.GameMode.Quiz,
+                GameModes.TurnTaking => SI.Contracts.GameMode.TurnTaking,
+                _ => SI.Contracts.RulesSettings.DefaultGameMode,
+            },
+            UseAppellations = appSettings.UseApellations,
+            DisplayAnswerOptionsOneByOne = appSettings.DisplayAnswerOptionsOneByOne,
+            DisplayAnswerOptionsLabels = appSettings.DisplayAnswerOptionsLabels,
+            PrependThemeCommentsToQuestion = SI.Contracts.RulesSettings.DefaultPrependThemeCommentsToQuestion,
+            AppendRightAnswerTextToComplexAnswer = SI.Contracts.RulesSettings.DefaultAppendRightAnswerTextToComplexAnswer,
+        };
+
         var game = GameRunner.CreateGame(
             node,
             _model,
             timeSettingsNew,
+            rulesSettings,
             document,
             _gameHost,
             fileShare,
             _computerPlayers.ToArray(),
             _computerShowmans.ToArray(),
             avatarHelper,
+            null,
             null,
             null);
 

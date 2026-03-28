@@ -547,6 +547,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             Players = players,
         };
 
+        var rules = new SI.Contracts.RulesSettings
+        {
+            
+        };
+
         var gameHost = new GameHost();
         var fileShare = new Services.FileShare(tempDir);
 
@@ -559,6 +564,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
            node,
            gameSettings,
            new SI.Contracts.TimeSettings(),
+           rules,
            document,
            gameHost,
            fileShare,
