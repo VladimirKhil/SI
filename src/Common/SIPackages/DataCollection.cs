@@ -10,6 +10,9 @@ namespace SIPackages;
 public sealed class DataCollection : IEnumerable<string>
 {
     private ISIPackageContainer _packageContainer;
+    private readonly Action<string>? _fileChanged;
+    private readonly Action<string>? _fileRemoved;
+    private readonly Action<string, string>? _fileRenamed;
 
     /// <summary>
     /// Current items in the collection.
@@ -31,10 +34,18 @@ public sealed class DataCollection : IEnumerable<string>
     /// </summary>
     /// <param name="package">Package that owns the collection.</param>
     /// <param name="name">Collection name.</param>
-    internal DataCollection(ISIPackageContainer package, string name)
+    internal DataCollection(
+        ISIPackageContainer package,
+        string name,
+        Action<string>? fileChanged = null,
+        Action<string>? fileRemoved = null,
+        Action<string, string>? fileRenamed = null)
     {
         Name = name;
         _packageContainer = package;
+        _fileChanged = fileChanged;
+        _fileRemoved = fileRemoved;
+        _fileRenamed = fileRenamed;
 
         _files = new List<string>(_packageContainer.GetEntries(Name));
     }
@@ -71,7 +82,13 @@ public sealed class DataCollection : IEnumerable<string>
     public async Task AddFileAsync(string fileName, Stream stream, CancellationToken cancellationToken = default)
     {
         await _packageContainer.CreateStreamAsync(Name, fileName, stream, cancellationToken);
-        _files.Add(fileName);
+
+        if (!_files.Contains(fileName))
+        {
+            _files.Add(fileName);
+        }
+
+        _fileChanged?.Invoke(fileName);
     }
 
     /// <summary>
@@ -80,8 +97,13 @@ public sealed class DataCollection : IEnumerable<string>
     /// <param name="fileName">File name.</param>
     public void RemoveFile(string fileName)
     {
-        _packageContainer.DeleteStream(Name, fileName);
-        _files.Remove(fileName);
+        var deleted = _packageContainer.DeleteStream(Name, fileName);
+        var removed = _files.Remove(fileName);
+
+        if (deleted || removed)
+        {
+            _fileRemoved?.Invoke(fileName);
+        }
     }
 
     /// <summary>
@@ -103,6 +125,7 @@ public sealed class DataCollection : IEnumerable<string>
         _files.Add(newName);
         _packageContainer.DeleteStream(Name, oldName);
         _files.Remove(oldName);
+        _fileRenamed?.Invoke(oldName, newName);
     }
 
     internal void UpdateContainer(ISIPackageContainer packageContainer) => _packageContainer = packageContainer;

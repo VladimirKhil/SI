@@ -5,6 +5,7 @@ using SIPackages.Helpers;
 using SIPackages.Models;
 using SIPackages.Serializers;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Xml;
 using ZipUtils;
 
@@ -39,6 +40,9 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private SourceInfoList _sources = new();
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private readonly Dictionary<string, string> _fileHashes = new();
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private readonly DataCollection _images;
@@ -87,6 +91,11 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     public DataCollection Html => _html;
 
+    /// <summary>
+    /// Document file hashes.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> FileHashes => _fileHashes;
+
     #region Document Functions
 
     private SIDocument(ISIPackageContainer packageContainer)
@@ -95,11 +104,18 @@ public sealed class SIDocument : IDisposable
 
         _packageContainer = packageContainer;
 
-        _images = new DataCollection(_packageContainer, CollectionNames.ImagesStorageName);
-        _audio = new DataCollection(_packageContainer, CollectionNames.AudioStorageName);
-        _video = new DataCollection(_packageContainer, CollectionNames.VideoStorageName);
-        _html = new DataCollection(_packageContainer, CollectionNames.HtmlStorageName);
+        _images = CreateDataCollection(CollectionNames.ImagesStorageName);
+        _audio = CreateDataCollection(CollectionNames.AudioStorageName);
+        _video = CreateDataCollection(CollectionNames.VideoStorageName);
+        _html = CreateDataCollection(CollectionNames.HtmlStorageName);
     }
+
+    private DataCollection CreateDataCollection(string collectionName) => new(
+        _packageContainer,
+        collectionName,
+        fileName => InvalidateFileHash(collectionName, fileName),
+        fileName => RemoveFileHash(collectionName, fileName),
+        (oldName, newName) => RenameFileHash(collectionName, oldName, newName));
 
     /// <summary>
     /// Creates an empty document.
@@ -237,7 +253,7 @@ public sealed class SIDocument : IDisposable
                 if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "package")
                 {
                     document.Package.Info.Authors.Clear();
-                    document.Package.ReadXml(reader, packageLimits);
+                        document.Package.ReadXml(reader, packageLimits, document._fileHashes);
                     break;
                 }
             }
@@ -275,7 +291,7 @@ public sealed class SIDocument : IDisposable
                 {
                     if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "package")
                     {
-                        _package.ReadXml(reader, limits);
+                        _package.ReadXml(reader, limits, _fileHashes);
                         break;
                     }
                 }
@@ -344,10 +360,12 @@ public sealed class SIDocument : IDisposable
 
     private void SaveCore(ISIPackageContainer packageContainer)
     {
+        EnsureFileHashes();
+
         using (var stream = CreateIfNotExists(packageContainer, ContentFileName).Stream)
         {
             using var writer = XmlWriter.Create(stream);
-            _package.WriteXml(writer);
+            _package.WriteXml(writer, _fileHashes);
         }
 
         if (_authors.Any())
@@ -493,7 +511,8 @@ public sealed class SIDocument : IDisposable
         }
 
         using var writer = XmlWriter.Create(stream);
-        package.WriteXml(writer);
+        EnsureFileHashes();
+        package.WriteXml(writer, _fileHashes);
     }
 
     /// <summary>
@@ -630,6 +649,33 @@ public sealed class SIDocument : IDisposable
     {
         var link = sources[index].ExtractLink(out tail);
         return _sources.FirstOrDefault(source => source.Id == link);
+    }
+
+    /// <summary>
+    /// Tries to get file hash by collection name and file name.
+    /// </summary>
+    /// <param name="collectionName">Collection name.</param>
+    /// <param name="fileName">File name.</param>
+    /// <param name="hash">File hash.</param>
+    public bool TryGetFileHash(string collectionName, string fileName, out string hash) =>
+        _fileHashes.TryGetValue(GetFileHashKey(collectionName, fileName), out hash!);
+
+    /// <summary>
+    /// Tries to get file hash for a content item.
+    /// </summary>
+    /// <param name="contentItem">Content item.</param>
+    /// <param name="hash">File hash.</param>
+    public bool TryGetFileHash(ContentItem contentItem, out string hash)
+    {
+        hash = "";
+
+        if (!contentItem.IsRef)
+        {
+            return false;
+        }
+
+        var collectionName = CollectionNames.TryGetCollectionName(contentItem.Type);
+        return collectionName != null && TryGetFileHash(collectionName, contentItem.Value, out hash);
     }
 
     /// <summary>
@@ -880,6 +926,12 @@ public sealed class SIDocument : IDisposable
         doc._package = _package;
         doc._authors = _authors;
         doc._sources = _sources;
+        doc._fileHashes.Clear();
+
+        foreach (var fileHash in _fileHashes)
+        {
+            doc._fileHashes[fileHash.Key] = fileHash.Value;
+        }
     }
 
     /// <summary>
@@ -903,5 +955,72 @@ public sealed class SIDocument : IDisposable
         _audio.UpdateContainer(_packageContainer);
         _video.UpdateContainer(_packageContainer);
         _html.UpdateContainer(_packageContainer);
+    }
+
+    private static string GetFileHashKey(string collectionName, string fileName) => $"{collectionName}/{fileName}";
+
+    private void EnsureFileHashes()
+    {
+        var existingFiles = new HashSet<string>(StringComparer.Ordinal);
+
+        EnsureFileHashes(_images, existingFiles);
+        EnsureFileHashes(_audio, existingFiles);
+        EnsureFileHashes(_video, existingFiles);
+        EnsureFileHashes(_html, existingFiles);
+
+        foreach (var fileName in _fileHashes.Keys.Except(existingFiles).ToArray())
+        {
+            _fileHashes.Remove(fileName);
+        }
+    }
+
+    private void EnsureFileHashes(DataCollection collection, HashSet<string> existingFiles)
+    {
+        foreach (var fileName in collection)
+        {
+            var key = GetFileHashKey(collection.Name, fileName);
+            existingFiles.Add(key);
+
+            if (_fileHashes.ContainsKey(key))
+            {
+                continue;
+            }
+
+            var file = collection.GetFile(fileName);
+
+            if (file == null)
+            {
+                continue;
+            }
+
+            using var stream = file.Stream;
+            _fileHashes[key] = ComputeHash(stream);
+        }
+    }
+
+    private static string ComputeHash(Stream stream)
+    {
+        if (stream.CanSeek)
+        {
+            stream.Position = 0;
+        }
+
+        using var sha256 = SHA256.Create();
+        return Convert.ToHexString(sha256.ComputeHash(stream));
+    }
+
+    private void InvalidateFileHash(string collectionName, string fileName) => _fileHashes.Remove(GetFileHashKey(collectionName, fileName));
+
+    private void RemoveFileHash(string collectionName, string fileName) => _fileHashes.Remove(GetFileHashKey(collectionName, fileName));
+
+    private void RenameFileHash(string collectionName, string oldName, string newName)
+    {
+        var oldKey = GetFileHashKey(collectionName, oldName);
+        var newKey = GetFileHashKey(collectionName, newName);
+
+        if (_fileHashes.Remove(oldKey, out var hash))
+        {
+            _fileHashes[newKey] = hash;
+        }
     }
 }

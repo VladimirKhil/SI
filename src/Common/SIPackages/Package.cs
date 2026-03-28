@@ -223,6 +223,18 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     /// <inheritdoc />
     public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
+        ReadXml(reader, limits, null);
+    }
+
+    /// <summary>
+    /// Reads data from XML reader.
+    /// </summary>
+    /// <param name="reader">XML reader.</param>
+    /// <param name="limits">Package limits.</param>
+    /// <param name="fileHashes">Package file hashes.</param>
+    public void ReadXml(XmlReader reader, PackageLimits? limits, IDictionary<string, string>? fileHashes)
+    {
+        fileHashes?.Clear();
         Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
 
         var versionString = reader.GetAttribute("version");
@@ -312,6 +324,19 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                             Global.ReadXml(reader, limits);
                             break;
 
+                        case "files":
+                            if (fileHashes != null)
+                            {
+                                FileHashInfoList.ReadXml(reader, fileHashes);
+                            }
+                            else
+                            {
+                                FileHashInfoList.ReadXml(reader);
+                            }
+
+                            read = false;
+                            break;
+
                         case "round":
                             if (limits == null || Rounds.Count < limits.RoundCount)
                             {
@@ -365,6 +390,16 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     /// </summary>
     /// <param name="writer">XML writer.</param>
     public override void WriteXml(XmlWriter writer)
+    {
+        WriteXml(writer, null);
+    }
+
+    /// <summary>
+    /// Writes data to XML writer.
+    /// </summary>
+    /// <param name="writer">XML writer.</param>
+    /// <param name="fileHashes">Package file hashes.</param>
+    public void WriteXml(XmlWriter writer, IReadOnlyDictionary<string, string>? fileHashes)
     {
         writer.WriteStartElement("package", "https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd");
         writer.WriteAttributeString("name", Name);
@@ -427,6 +462,11 @@ public sealed class Package : InfoOwner, IEquatable<Package>
             writer.WriteStartElement("global");
             Global.WriteXml(writer);
             writer.WriteEndElement();
+        }
+
+        if (fileHashes?.Count > 0)
+        {
+            FileHashInfoList.WriteXml(writer, fileHashes);
         }
 
         Info.WriteXml(writer);

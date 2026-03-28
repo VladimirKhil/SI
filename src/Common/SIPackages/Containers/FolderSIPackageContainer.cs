@@ -51,9 +51,21 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
         await stream.CopyToAsync(fs, cancellationToken);
     }
 
-    public bool DeleteStream(string name) => throw new NotImplementedException();
+    public bool DeleteStream(string name)
+    {
+        var mappedName = GetName(name);
+        var filePath = Path.Combine(_folder, mappedName);
 
-    public bool DeleteStream(string category, string name) => throw new NotImplementedException();
+        if (!File.Exists(filePath))
+        {
+            return false;
+        }
+
+        File.Delete(filePath);
+        return true;
+    }
+
+    public bool DeleteStream(string category, string name) => DeleteStream($"{category}/{name}");
 
     public void Dispose()
     {
