@@ -34,7 +34,7 @@ public sealed class SimulatorViewModelTests
     public async Task GameViewModel_BasicFlow_ShouldCompleteSuccessfully()
     {
         // Arrange
-        var main = new MainViewModel(_appSettings)
+        var main = new MainViewModel(_appSettings, _platformManager)
         {
             PackageSource = new TestPackageSource()
         };
@@ -73,7 +73,7 @@ public sealed class SimulatorViewModelTests
     public async Task GameViewModel_CompleteRound_ShouldProcessCorrectly()
     {
         // Arrange
-        var main = new MainViewModel(_appSettings)
+        var main = new MainViewModel(_appSettings, _platformManager)
         {
             PackageSource = new TestPackageSource()
         };
@@ -110,7 +110,7 @@ public sealed class SimulatorViewModelTests
     public async Task GameViewModel_PlayerManagement_ShouldWorkCorrectly()
     {
         // Arrange
-        var main = new MainViewModel(_appSettings)
+        var main = new MainViewModel(_appSettings, _platformManager)
         {
             PackageSource = new TestPackageSource()
         };
@@ -156,7 +156,7 @@ public sealed class SimulatorViewModelTests
     public async Task GameViewModel_PresentationCommands_ShouldBeIssuedInCorrectOrder()
     {
         // Arrange - Create MainViewModel with TestPackageSource
-        var main = new MainViewModel(_appSettings)
+        var main = new MainViewModel(_appSettings, _platformManager)
         {
             PackageSource = new TestPackageSource()
         };
@@ -190,7 +190,7 @@ public sealed class SimulatorViewModelTests
     public async Task GameViewModel_StateUpdates_ShouldReflectGameProgression()
     {
         // Arrange
-        var main = new MainViewModel(_appSettings)
+        var main = new MainViewModel(_appSettings, _platformManager)
         {
             PackageSource = new TestPackageSource()
         };
@@ -237,7 +237,7 @@ public sealed class SimulatorViewModelTests
         // Arrange - Explicitly set UseSIGameEngine to false
         _appSettings.UseSIGameEngine = false;
         
-        var main = new MainViewModel(_appSettings)
+        var main = new MainViewModel(_appSettings, _platformManager)
         {
             PackageSource = new TestPackageSource()
         };
@@ -270,7 +270,7 @@ public sealed class SimulatorViewModelTests
         // Arrange
         _appSettings.GameMode = GameModes.Sport; // Simple mode uses Sequential strategy
         
-        var main = new MainViewModel(_appSettings)
+        var main = new MainViewModel(_appSettings, _platformManager)
         {
             PackageSource = new TestPackageSource()
         };
@@ -306,7 +306,7 @@ public sealed class SimulatorViewModelTests
     public async Task GameViewModel_MultipleNextCommands_ShouldProgressWithoutErrors()
     {
         // Arrange
-        var main = new MainViewModel(_appSettings)
+        var main = new MainViewModel(_appSettings, _platformManager)
         {
             PackageSource = new TestPackageSource()
         };

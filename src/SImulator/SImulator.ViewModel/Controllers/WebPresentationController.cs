@@ -222,8 +222,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Themes = themes.ToArray()
     });
 
-    public void SetQuestionContentType(QuestionContentType questionContentType) { }
-
     public void BeginPressButton() => SendMessage(new { Type = "beginPressButton" });
 
     public void FinishQuestion() { }
@@ -258,8 +256,6 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         Type = "table",
         Table = table.Select(t => new { t.Name, Questions = t.Questions.Select(q => q.Price).ToArray() }).ToArray()
     });
-
-    public void SetStage(TableStage stage) { }
 
     public void SetRoundTable() => SendMessage(new
     {

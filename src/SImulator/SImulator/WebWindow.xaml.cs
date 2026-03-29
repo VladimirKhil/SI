@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using SImulator.Implementation;
+using System.Windows;
 
 namespace SImulator;
 
@@ -20,6 +21,6 @@ public partial class WebWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        e.Cancel = !MainWindow.CanClose;
+        e.Cancel = !DesktopManager.CanCloseMainView;
     }
 }

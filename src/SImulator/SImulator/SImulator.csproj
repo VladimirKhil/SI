@@ -89,8 +89,6 @@
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\..\Common\SIStorageService.ViewModel\SIStorageService.ViewModel.csproj" />
-    <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
-    <ProjectReference Include="..\..\Common\SIUI\SIUI.csproj" />
     <ProjectReference Include="..\..\Common\Utils.Wpf\Utils.Wpf.csproj" />
     <ProjectReference Include="..\SImulator.ViewModel\SImulator.ViewModel.csproj" />
   </ItemGroup>

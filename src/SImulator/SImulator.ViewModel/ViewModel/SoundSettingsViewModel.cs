@@ -11,7 +11,6 @@ public sealed class SoundSettingsViewModel
     {
         Items = new[]
         {
-            new SoundViewModel(Resources.GameStart, () => sounds.BeginGame, value => sounds.BeginGame = value),
             new SoundViewModel(Resources.GameThemes, () => sounds.GameThemes, value => sounds.GameThemes = value),
             new SoundViewModel(Resources.RoundStart, () => sounds.RoundBegin, value => sounds.RoundBegin = value),
             new SoundViewModel(Resources.RoundThemes, () => sounds.RoundThemes, value => sounds.RoundThemes = value),
@@ -33,22 +32,21 @@ public sealed class SoundSettingsViewModel
 
     internal void Reset(SoundsSettings defaultSounds)
     {
-        Items[0].Value = defaultSounds.BeginGame;
-        Items[1].Value = defaultSounds.GameThemes;
-        Items[2].Value = defaultSounds.RoundBegin;
-        Items[3].Value = defaultSounds.RoundThemes;
-        Items[4].Value = defaultSounds.QuestionSelected;
-        Items[5].Value = defaultSounds.PlayerPressed;
-        Items[6].Value = defaultSounds.SecretQuestion;
-        Items[7].Value = defaultSounds.StakeQuestion;
-        Items[8].Value = defaultSounds.StakeForAllQuestion;
-        Items[9].Value = defaultSounds.NoRiskQuestion;
-        Items[10].Value = defaultSounds.ForAllQuestion;
-        Items[11].Value = defaultSounds.AnswerRight;
-        Items[12].Value = defaultSounds.AnswerWrong;
-        Items[13].Value = defaultSounds.NoAnswer;
-        Items[14].Value = defaultSounds.RoundTimeout;
-        Items[15].Value = defaultSounds.FinalDelete;
-        Items[16].Value = defaultSounds.FinalThink;
+        Items[0].Value = defaultSounds.GameThemes;
+        Items[1].Value = defaultSounds.RoundBegin;
+        Items[2].Value = defaultSounds.RoundThemes;
+        Items[3].Value = defaultSounds.QuestionSelected;
+        Items[4].Value = defaultSounds.PlayerPressed;
+        Items[5].Value = defaultSounds.SecretQuestion;
+        Items[6].Value = defaultSounds.StakeQuestion;
+        Items[7].Value = defaultSounds.StakeForAllQuestion;
+        Items[8].Value = defaultSounds.NoRiskQuestion;
+        Items[9].Value = defaultSounds.ForAllQuestion;
+        Items[10].Value = defaultSounds.AnswerRight;
+        Items[11].Value = defaultSounds.AnswerWrong;
+        Items[12].Value = defaultSounds.NoAnswer;
+        Items[13].Value = defaultSounds.RoundTimeout;
+        Items[14].Value = defaultSounds.FinalDelete;
+        Items[15].Value = defaultSounds.FinalThink;
     }
 }

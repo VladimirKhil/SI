@@ -31,7 +31,7 @@ namespace SImulator.Implementation;
 /// <summary>
 /// Provides desktop implementation of SImulator API.
 /// </summary>
-internal sealed class DesktopManager : PlatformManager
+internal sealed class DesktopManager : PlatformManager, IPlatformService
 {
     private const string GameSiteUri = "https://vladimirkhil.com";
 
@@ -74,8 +74,10 @@ internal sealed class DesktopManager : PlatformManager
 
     public override Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen)
     {
-        _window = screen.IsWebView ? new WebWindow(screen.IsFullScreen) : new MainWindow(screen.IsFullScreen);
-        _window.DataContext = dataContext;
+        _window = new WebWindow(screen.IsFullScreen)
+        {
+            DataContext = dataContext
+        };
 
         if (screen.IsFullScreen && screen is ScreenDisplayDescriptor screenInfo) // Will be removed
         {
@@ -104,11 +106,13 @@ internal sealed class DesktopManager : PlatformManager
         return Task.CompletedTask;
     }
 
+    public static bool CanCloseMainView { get; set; }
+
     public override Task CloseMainViewAsync()
     {
         if (_window != null)
         {
-            MainWindow.CanClose = true;
+            CanCloseMainView = true;
 
             try
             {
@@ -117,7 +121,7 @@ internal sealed class DesktopManager : PlatformManager
             }
             finally
             {
-                MainWindow.CanClose = false;
+                CanCloseMainView = false;
             }
         }
 
@@ -129,6 +133,8 @@ internal sealed class DesktopManager : PlatformManager
             .. Screen.AllScreens.Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen)),
             WebDisplayDescriptor.Instance,
         ];
+
+    public override string[] GetFonts() => [.. Fonts.SystemFontFamilies.Select(ff => ff.ToString())];
 
     public override string[] GetLocalComputers()
     {

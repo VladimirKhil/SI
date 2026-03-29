@@ -29,6 +29,8 @@ public abstract class PlatformManager
 
     public abstract IDisplayDescriptor[] GetScreens();
 
+    public abstract string[] GetFonts();
+
     public abstract string[] GetLocalComputers();
 
     public abstract string[] GetComPorts();

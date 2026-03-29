@@ -8,7 +8,7 @@ using Utils.Timers;
 
 namespace SImulator.ViewModel.Tests;
 
-internal sealed class TestPlatformManager : PlatformManager
+internal sealed class TestPlatformManager : PlatformManager, IPlatformService
 {
     public override ButtonManagerFactory ButtonManagerFactory { get; } = new TestButtonManagerFactory();
 
@@ -64,6 +64,11 @@ internal sealed class TestPlatformManager : PlatformManager
     }
 
     public override string[] GetComPorts()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override string[] GetFonts()
     {
         throw new NotImplementedException();
     }

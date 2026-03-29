@@ -470,26 +470,6 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
-    private bool _showTextNoFalstart = false;
-
-    /// <summary>
-    /// Показывать текст вопросов
-    /// </summary>
-    [Obsolete]
-    [DefaultValue(false)]
-    public bool ShowTextNoFalstart
-    {
-        get => _showTextNoFalstart;
-        set
-        {
-            if (_showTextNoFalstart != value)
-            {
-                _showTextNoFalstart = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     private PlayerKeysModes _usePlayersKeys = PlayerKeysModes.None;
 
     [DefaultValue(PlayerKeysModes.None)]

@@ -1323,7 +1323,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         foreach (var player in Players)
         {
             player.Sum = 0;
-            player.State = PlayerState.None;
             player.Right = 0;
             player.Wrong = 0;
         }
@@ -2203,19 +2202,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         switch (_state)
         {
-            case QuestionState.Normal:
-                PresentationController.SetQuestionStyle(QuestionStyle.Normal);
-                break;
-
             case QuestionState.Pressing:
                 if (Settings.Model.ShowQuestionBorder)
                 {
                     PresentationController.BeginPressButton();
                 }
-                break;
-
-            case QuestionState.Pressed:
-                PresentationController.SetQuestionStyle(Settings.Model.ShowPlayers ? QuestionStyle.Normal : QuestionStyle.Pressed);
                 break;
 
             case QuestionState.Thinking:

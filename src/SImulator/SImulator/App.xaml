@@ -8,7 +8,6 @@
     xmlns:lc="clr-namespace:SImulator.Converters"
     xmlns:m="clr-namespace:SImulator.ViewModel.Model;assembly=SImulator.ViewModel"
     xmlns:lp="clr-namespace:SImulator.Properties"
-    xmlns:uic="clr-namespace:SIUI.Converters;assembly=SIUI"
     DispatcherUnhandledException="Application_DispatcherUnhandledException"
     Startup="Application_Startup"
     Exit="Application_Exit"
@@ -72,12 +71,12 @@
             <Setter Property="Background" Value="Silver" />
         </Style>
 
-        <uic:TemplateConverter x:Key="DecisionSelector">
-            <uic:TemplateConverter.DefaultTemplate>
+        <lc:TemplateConverter x:Key="DecisionSelector">
+            <lc:TemplateConverter.DefaultTemplate>
                 <DataTemplate />
-            </uic:TemplateConverter.DefaultTemplate>
+            </lc:TemplateConverter.DefaultTemplate>
 
-            <uic:TemplateConverter.Templates>
+            <lc:TemplateConverter.Templates>
                 <DataTemplate x:Key="{x:Static m:DecisionMode.StarterChoosing}">
                     <TextBlock
                         Text="{x:Static lp:Resources.ChoosePlayerToStart}"
@@ -149,8 +148,8 @@
                             Margin="10,0" />
                     </DockPanel>
                 </DataTemplate>
-            </uic:TemplateConverter.Templates>
-        </uic:TemplateConverter>
+            </lc:TemplateConverter.Templates>
+        </lc:TemplateConverter>
 
         <Style x:Key="ManagedColumn" TargetType="ColumnDefinition">
             <Setter Property="Width" Value="3*" />

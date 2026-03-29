@@ -37,8 +37,6 @@ public interface IPresentationController : IDisposable
 
     void SetTable(ThemeInfoViewModel[] table);
 
-    void SetStage(TableStage stage);
-
     void SetRoundTable();
 
     void AskToSelectQuestion() { }
@@ -54,10 +52,6 @@ public interface IPresentationController : IDisposable
     void SetQuestionComments(string comments) { }
 
     void SetText(string text = "");
-
-    void SetQuestionContentType(QuestionContentType questionContentType);
-
-    void SetQuestionStyle(QuestionStyle questionStyle) { }
 
     void OnContentStart() { }
 

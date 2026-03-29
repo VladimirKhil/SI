@@ -16,10 +16,9 @@
     xmlns:vm="clr-namespace:SImulator.ViewModel;assembly=SImulator.ViewModel"
     xmlns:vmm="clr-namespace:SImulator.ViewModel.Model;assembly=SImulator.ViewModel"
     xmlns:my="clr-namespace:SImulator.Converters"
-    xmlns:uic="clr-namespace:SIUI.Converters;assembly=SIUI"
-    xmlns:ui="clr-namespace:SIUI;assembly=SIUI"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:lb="clr-namespace:SImulator.Behaviors"
+    xmlns:lc="clr-namespace:SImulator.Converters"
     xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
     SnapsToDevicePixels="True"
     TextOptions.TextFormattingMode="Display"
@@ -223,14 +222,14 @@
                 </Style.Triggers>
             </Style>
 
-            <uic:TemplateConverter x:Key="ContentSelector">
-                <uic:TemplateConverter.DefaultTemplate>
+            <lc:TemplateConverter x:Key="ContentSelector">
+                <lc:TemplateConverter.DefaultTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Content.Value}" />
                     </DataTemplate>
-                </uic:TemplateConverter.DefaultTemplate>
+                </lc:TemplateConverter.DefaultTemplate>
 
-                <uic:TemplateConverter.Templates>
+                <lc:TemplateConverter.Templates>
                     <DataTemplate x:Key="{x:Static uim:ContentType.Image}">
                         <Image
                             Stretch="Uniform"
@@ -238,8 +237,8 @@
                             Width="100"
                             Height="100" />
                     </DataTemplate>
-                </uic:TemplateConverter.Templates>
-            </uic:TemplateConverter>
+                </lc:TemplateConverter.Templates>
+            </lc:TemplateConverter>
 
             <my:IncludeConverter x:Key="IncludeConverter" />
 
@@ -416,8 +415,8 @@
                 </ControlTemplate.Triggers>
             </ControlTemplate>
 
-            <uic:TemplateConverter x:Key="Selector">
-                <uic:TemplateConverter.DefaultTemplate>
+            <lc:TemplateConverter x:Key="Selector">
+                <lc:TemplateConverter.DefaultTemplate>
                     <DataTemplate>
                         <TextBlock
                             Text="{x:Static lp:Resources.HintBeforeStart}"
@@ -426,9 +425,9 @@
                             VerticalAlignment="Center"
                             Margin="30" />
                     </DataTemplate>
-                </uic:TemplateConverter.DefaultTemplate>
+                </lc:TemplateConverter.DefaultTemplate>
 
-                <uic:TemplateConverter.Templates>
+                <lc:TemplateConverter.Templates>
                     <DataTemplate x:Key="{x:Static uim:TableStage.Sign}">
                         <TextBlock Text="{x:Static lp:Resources.HintIntro}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
@@ -594,8 +593,8 @@
                     <DataTemplate x:Key="{x:Static uim:TableStage.Theme}">
                         <TextBlock Text="{Binding Text}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
-                </uic:TemplateConverter.Templates>
-            </uic:TemplateConverter>
+                </lc:TemplateConverter.Templates>
+            </lc:TemplateConverter>
 
             <CollectionViewSource x:Key="DemonstrationScreens" Source="{Binding Screens}" />
 
@@ -1292,7 +1291,7 @@
                         <ComboBox
                             HorizontalAlignment="Stretch"
                             Width="Auto"
-                            ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}"
+                            ItemsSource="{Binding Source={x:Static vm:MainViewModel.FontFamilies}}"
                             SelectedItem="{Binding SettingsViewModel.SIUISettings.TableFontFamily}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type sys:String}">
@@ -1308,7 +1307,7 @@
                         <ComboBox
                             HorizontalAlignment="Stretch"
                             Width="Auto"
-                            ItemsSource="{Binding Source={x:Static ui:SettingsHelper.LineSpaces}}"
+                            ItemsSource="{Binding Source={x:Static vm:MainViewModel.LineSpaces}}"
                             SelectedItem="{Binding SettingsViewModel.SIUISettings.QuestionLineSpacing}" />
                     </StackPanel>
 
@@ -1318,20 +1317,6 @@
                         IsChecked="{Binding Settings.ShowPlayers}"
                         Margin="5,0,0,0"
                         Content="{x:Static lp:Resources.ShowPlayersList}" />
-
-                    <CheckBox IsChecked="{Binding Settings.ShowTextNoFalstart}" Margin="0,0,5,0">
-                        <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.ShowTextNoFalseStartsHint}" />
-
-                        <CheckBox.Style>
-                            <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CurrentScreen.IsCustomizable}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </CheckBox.Style>
-                    </CheckBox>
 
                     <StackPanel Orientation="Horizontal">
                         <CheckBox IsChecked="{Binding Settings.OralText}" Margin="0,0,0,0" Content="{x:Static lp:Resources.OralText}" />

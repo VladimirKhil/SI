@@ -28,12 +28,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 {
     #region Constants
     /// <summary>
-    /// Максимальное число игровых кнопок, которое можно зарегистрировать в программе
+    /// Gets the maximum number of player buttons that can be assigned.
     /// </summary>
     private const int MaxNumberOfButtons = 12;
 
     /// <summary>
-    /// Название продукта
+    /// Gets the product name.
     /// </summary>
     public const string ProductName = "SImulator";
 
@@ -45,9 +45,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    /// <summary>
-    /// Менеджер игровых кнопок
-    /// </summary>
     private IButtonManager? _buttonManager;
 
     private readonly AsyncCommand _start;
@@ -201,9 +198,25 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public ICommand NavigateTo => _navigateTo;
 
-    public MainViewModel(AppSettings settings)
+    public static string[] FontFamilies { get; private set; }
+
+    public static double[] LineSpaces { get; private set; }
+
+    static MainViewModel()
+    {
+        FontFamilies = new string[] { SIUI.ViewModel.Core.Settings.DefaultTableFontFamily }
+            .Concat(PlatformManager.Instance.GetFonts().OrderBy(s => s))
+            .ToArray();
+
+        LineSpaces = new double[] { 1.0, SIUI.ViewModel.Core.Settings.DefaultQuestionLineSpacing };
+    }
+
+    private readonly IPlatformService _platformService;
+
+    public MainViewModel(AppSettings settings, IPlatformService platformService)
     {
         Settings = settings;
+        _platformService = platformService;
         SettingsViewModel = new AppSettingsViewModel(Settings);
 
         _start = new AsyncCommand(Start_Executed);
@@ -230,7 +243,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         UpdateStartCommand();
         UpdateCanAddPlayerButton();
 
-        Screens = PlatformManager.Instance.GetScreens();
+        Screens = _platformService.GetScreens();
         _comPorts = new Lazy<string[]>(LoadComPorts);
 
         var screensLength = Screens.Length;
@@ -271,7 +284,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         if (!Directory.Exists(licensesFolder))
         {
-            PlatformManager.Instance.ShowMessage(Resources.NoLicensesFolder);
+            _platformService.ShowMessage(Resources.NoLicensesFolder);
             return;
         }
 
@@ -281,7 +294,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.OpenLicensesError, exc.Message), true);
+            _platformService.ShowMessage(string.Format(Resources.OpenLicensesError, exc.Message), true);
         }
     }
 
@@ -397,25 +410,25 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             if (string.IsNullOrWhiteSpace(logsFolder))
             {
-                PlatformManager.Instance.ShowMessage(Resources.LogsFolderNotSetWarning);
-                return PlatformManager.Instance.CreateGameLogger(null);
+                _platformService.ShowMessage(Resources.LogsFolderNotSetWarning);
+                return _platformService.CreateGameLogger(null);
             }
             else
             {
                 try
                 {
-                    return PlatformManager.Instance.CreateGameLogger(logsFolder);
+                    return _platformService.CreateGameLogger(logsFolder);
                 }
                 catch (Exception exc)
                 {
-                    PlatformManager.Instance.ShowMessage(string.Format(Resources.LoggerCreationWarning, exc.Message), false);
-                    return PlatformManager.Instance.CreateGameLogger(null);
+                    _platformService.ShowMessage(string.Format(Resources.LoggerCreationWarning, exc.Message), false);
+                    return _platformService.CreateGameLogger(null);
                 }
             }
         }
         else
         {
-            return PlatformManager.Instance.CreateGameLogger(null);
+            return _platformService.CreateGameLogger(null);
         }
     }
 
@@ -444,13 +457,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsStarting = true;
 
             var presentationListener = new PresentationListener();
-
-            IPresentationController presentationController = screen.IsWebView
-                ? new WebPresentationController(screen, presentationListener, Settings.Sounds)
-                : new PresentationController(screen, Settings.Sounds)
-                {
-                    Listener = presentationListener
-                };
+            var presentationController = new WebPresentationController(screen, presentationListener, Settings.Sounds);
 
             presentationController.Error += ShowError;
 
@@ -482,7 +489,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, exc.Message), false);
+            _platformService.ShowMessage(string.Format(Resources.GameStartError, exc.Message), false);
 
             if (_game != null)
             {
@@ -734,7 +741,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     private async void SelectPackage_Executed(object? arg)
     {
         var stringArg = (arg?.ToString()) ?? throw new ArgumentNullException(nameof(arg));
-        var packageSource = await PlatformManager.Instance.AskSelectPackageAsync(stringArg);
+        var packageSource = await _platformService.AskSelectPackageAsync(stringArg);
 
         if (packageSource != null)
         {
@@ -744,7 +751,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async void SelectLogoFile_Executed(object? arg)
     {
-        var logoUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectLogoImage);
+        var logoUri = await _platformService.AskSelectFileAsync(Resources.SelectLogoImage);
 
         if (logoUri != null)
         {
@@ -754,7 +761,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async void SelectVideo_Executed(object? arg)
     {
-        var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectIntroVideo);
+        var videoUrl = await _platformService.AskSelectFileAsync(Resources.SelectIntroVideo);
 
         if (videoUrl != null)
         {
@@ -764,7 +771,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async void SelectBackgroundImageFile_Executed(object? arg)
     {
-        var imageUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundImage);
+        var imageUrl = await _platformService.AskSelectFileAsync(Resources.SelectBackgroundImage);
 
         if (imageUrl != null)
         {
@@ -774,7 +781,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private async void SelectBackgroundVideoFile_Executed(object? arg)
     {
-        var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundVideo);
+        var videoUrl = await _platformService.AskSelectFileAsync(Resources.SelectBackgroundVideo);
 
         if (videoUrl != null)
         {
@@ -784,7 +791,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void SelectLogsFolder_Executed(object? arg)
     {
-        var folder = PlatformManager.Instance.AskSelectLogsFolder();
+        var folder = _platformService.AskSelectLogsFolder();
 
         if (folder != null)
         {
@@ -799,7 +806,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        var fileUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectAudioFile);
+        var fileUri = await _platformService.AskSelectFileAsync(Resources.SelectAudioFile);
 
         if (fileUri == null)
         {
@@ -823,7 +830,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
                 if (_buttonManager == null)
                 {
-                    PlatformManager.Instance.ShowMessage($"Could not create button manager for mode {Settings.UsePlayersKeys}");
+                    _platformService.ShowMessage($"Could not create button manager for mode {Settings.UsePlayersKeys}");
                     return;
                 }
 
@@ -908,7 +915,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         // Do nothing; the command is activated by key press
     }
 
-    private void ShowError(string error) => PlatformManager.Instance.ShowMessage(error);
+    private void ShowError(string error) => _platformService.ShowMessage(error);
 
     /// <summary>
     /// Shows error message.

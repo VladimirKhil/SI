@@ -19,7 +19,7 @@ internal sealed class TestGameHost : IExtendedListener
     public event Action MediaEnd { add { } remove { } }
     public event Action<double> MediaProgress { add { } remove { } }
     public event Action RoundThemesFinished { add { } remove { } }
-    public event Action<int>? AnswerSelected;
+    public event Action<int>? AnswerSelected { add { } remove { } }
 
     public TestGameHost(EngineBase engine)
     {

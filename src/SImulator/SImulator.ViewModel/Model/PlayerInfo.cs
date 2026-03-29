@@ -1,4 +1,5 @@
-﻿using SIUI.ViewModel;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace SImulator.ViewModel.Model;
@@ -7,8 +8,30 @@ namespace SImulator.ViewModel.Model;
 /// Defines extended player info.
 /// </summary>
 [DataContract]
-public sealed class PlayerInfo : SimplePlayerInfo
+public sealed class PlayerInfo : INotifyPropertyChanged
 {
+    private string _name = "";
+
+    /// <summary>
+    /// Player name.
+    /// </summary>
+    public string Name
+    {
+        get => _name;
+        set { if (_name != value) { _name = value; OnPropertyChanged(); } }
+    }
+
+    private int _sum = 0;
+
+    /// <summary>
+    /// Player score.
+    /// </summary>
+    public int Sum
+    {
+        get => _sum;
+        set { if (_sum != value) { _sum = value; OnPropertyChanged(); } }
+    }
+
     /// <summary>
     /// Unique player identifier.
     /// </summary>
@@ -88,4 +111,9 @@ public sealed class PlayerInfo : SimplePlayerInfo
         get => _stake;
         set { if (_stake != value) { _stake = value; OnPropertyChanged(); } }
     }
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

@@ -14,7 +14,7 @@ namespace SImulator.ViewModel.Tests;
 /// </summary>
 internal sealed class TestWebPresentationController : IPresentationController
 {
-    private readonly List<string> _commands = new();
+    private readonly List<string> _commands = [];
     private readonly object _lock = new();
     
     /// <summary>
@@ -33,7 +33,7 @@ internal sealed class TestWebPresentationController : IPresentationController
 
     public Action<int, int>? SelectionCallback { get; set; }
     public Action<int>? DeletionCallback { get; set; }
-    public event Action<Exception>? Error;
+    public event Action<Exception>? Error { add { } remove { } }
     public bool CanControlMedia => false;
 
     private void AddCommand(string command)
@@ -70,11 +70,6 @@ internal sealed class TestWebPresentationController : IPresentationController
     public void SetTable(ThemeInfoViewModel[] table)
     {
         AddCommand($"SetTable: {table.Length} themes");
-    }
-
-    public void SetStage(TableStage stage)
-    {
-        AddCommand($"SetStage: {stage}");
     }
 
     public void SetRoundTable()
@@ -115,16 +110,6 @@ internal sealed class TestWebPresentationController : IPresentationController
     public void SetText(string text = "")
     {
         AddCommand($"SetText: {text}");
-    }
-
-    public void SetQuestionContentType(QuestionContentType questionContentType)
-    {
-        AddCommand($"SetQuestionContentType: {questionContentType}");
-    }
-
-    public void SetQuestionStyle(QuestionStyle questionStyle)
-    {
-        AddCommand($"SetQuestionStyle: {questionStyle}");
     }
 
     public void OnContentStart()

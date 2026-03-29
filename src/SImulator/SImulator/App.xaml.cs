@@ -23,6 +23,8 @@ using System.Windows;
 using System.Windows.Threading;
 using Utils;
 using Settings = SImulator.ViewModel.Model.AppSettings;
+using SImulator.ViewModel.Contracts;
+
 
 #if DEBUG
 using SIStorage.Service.Contract.Models;
@@ -83,9 +85,11 @@ public partial class App : Application
         services.AddAppRegistryServiceClient(configuration);
         services.AddSIStorageServiceClient(configuration);
 
-        services.AddSingleton(typeof(StorageViewModel));
-
+        services.AddSingleton<StorageViewModel>();
         services.AddTransient<CommandWindow>();
+        services.AddSingleton<IPlatformService>(_manager);
+        services.AddSingleton(Settings);
+        services.AddSingleton<MainViewModel>();
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -104,7 +108,7 @@ public partial class App : Application
             Settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
         }
 
-        var main = new MainViewModel(Settings);
+        var main = _manager.ServiceProvider.GetRequiredService<MainViewModel>();
 
         if (e.Args.Length > 0)
         {
