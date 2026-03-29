@@ -21,7 +21,7 @@ namespace SIGame
         /// <summary>
         /// Gets the current and or final selected folder path.
         /// </summary>
-        public string SelectedPath { get; private set; }
+        public string? SelectedPath { get; private set; }
         /// <summary>
         /// Gets or sets the string that is displayed above the tree view control in the dialog box (must set BEFORE calling ShowDialog()). 
         /// </summary>
@@ -33,15 +33,15 @@ namespace SIGame
         /// <summary>
         /// Gets or sets the initially selected folder path.
         /// </summary>
-        public string InitialFolder { get; set; }
+        public string? InitialFolder { get; set; }
         /// <summary>
         /// Gets or sets the initially selected and expanded folder path.  Overrides SelectedFolder.
         /// </summary>
-        public string InitialExpandedFolder { get; set; }
+        public string? InitialExpandedFolder { get; set; }
         /// <summary>
         /// Gets or sets the text for the dialog's OK button.
         /// </summary>
-        public string OKButtonText { get; set; }
+        public string? OKButtonText { get; set; }
 
         BROWSEINFOW browseInfo;
         /// <summary>
@@ -71,7 +71,7 @@ namespace SIGame
         /// </summary>
         public FolderBrowser()
         {
-            BrowseInfo = new BROWSEINFOW
+            browseInfo = new BROWSEINFOW
             {
                 hwndOwner = IntPtr.Zero,
                 pidlRoot = IntPtr.Zero,
@@ -110,7 +110,7 @@ namespace SIGame
 
         #region PInvoke Stuff
 
-        private Nullable<bool> PInvokeSHBrowseForFolder(Window owner)
+        private Nullable<bool> PInvokeSHBrowseForFolder(Window? owner)
         {
             WindowInteropHelper windowhelper;
             if (null != owner)
@@ -285,11 +285,11 @@ namespace SIGame
             /// <summary>
             /// The address of a buffer to receive the display name of the folder selected by the user. The size of this buffer is assumed to be MAX_PATH characters.
             /// </summary>
-            public string pszDisplayName;   // Output parameter! (length must be >= MAX_PATH)
+            public required string pszDisplayName;   // Output parameter! (length must be >= MAX_PATH)
             /// <summary>
             /// The address of a null-terminated string that is displayed above the tree view control in the dialog box. 
             /// </summary>
-            public string lpszTitle;
+            public required string lpszTitle;
             /// <summary>
             /// Flags specifying the options for the dialog box. 
             /// </summary>
@@ -297,7 +297,7 @@ namespace SIGame
             /// <summary>
             /// A BrowseCallbackProc delegate that the dialog box calls when an event occurs.
             /// </summary>
-            public BrowseCallbackProc lpfn;
+            public required BrowseCallbackProc lpfn;
             /// <summary>
             /// An application-defined value that the dialog box passes to the BrowseCallbackProc delegate, if one is specified.
             /// </summary>

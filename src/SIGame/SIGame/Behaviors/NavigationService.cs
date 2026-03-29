@@ -20,7 +20,7 @@ public static class NavigationService
         typeof(NavigationService),
         new PropertyMetadata(null, OnTextChanged));
 
-    public static string GetText(DependencyObject d) => d.GetValue(TextProperty) as string;
+    public static string? GetText(DependencyObject d) => d.GetValue(TextProperty) as string;
 
     public static void SetText(DependencyObject d, string value) => d.SetValue(TextProperty, value);
 
@@ -49,7 +49,7 @@ public static class NavigationService
             // Create a hyperlink for the match
             var link = new Hyperlink(new Run(match.Value))
             {
-                NavigateUri = Uri.TryCreate(match.Value, UriKind.Absolute, out Uri uri) ? uri : null,
+                NavigateUri = Uri.TryCreate(match.Value, UriKind.Absolute, out var uri) ? uri : null,
                 TextDecorations = null
             };
             link.Click += OnUrlClick;

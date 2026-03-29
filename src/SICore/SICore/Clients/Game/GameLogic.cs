@@ -429,6 +429,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _state.GameResultInfo.IncrementQuestionSeenCount(key, humanPlayerCount);
     }
 
+    private string? GetCurrentQuestionReportText() =>
+        _state.Question == null ? null : _state.PackageDoc?.GetQuestionReportText(_state.Question) ?? "";
+
     internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration)
     {
         var contentTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length);
@@ -1242,13 +1245,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         {
             var canonicalAnswer = _state.Question?.Right.FirstOrDefault();
             var isAnswerCanonical = canonicalAnswer != null && (_state.Answerer.Answer ?? "").Simplify().Contains(canonicalAnswer.Simplify());
+            var questionText = GetCurrentQuestionReportText();
 
             if (canonicalAnswer != null && !isAnswerCanonical && _state.Theme != null)
             {
                 _state.GameResultInfo.AcceptedAnswers.Add(new QuestionReport
                 {
                     ThemeName = _state.Theme.Name,
-                    QuestionText = _state.Question?.GetText(),
+                    QuestionText = questionText,
                     ReportText = _state.Answerer.Answer
                 });
             }
@@ -1331,6 +1335,8 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 _state.GameResultInfo.IncrementQuestionWrongCount(_state.QuestionPlay.QuestionKey);
             }
 
+            var questionText = GetCurrentQuestionReportText();
+
             if (!_state.QuestionPlay.HiddenStakes)
             {
                 s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");                
@@ -1354,7 +1360,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         _state.GameResultInfo.RejectedAnswers.Add(new QuestionReport
                         {
                             ThemeName = _state.Theme.Name,
-                            QuestionText = _state.Question?.GetText(),
+                            QuestionText = questionText,
                             ReportText = _state.Answerer.Answer
                         });
                     }
@@ -3935,7 +3941,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var appelaer = _state.Players[_state.AppelaerIndex];
 
         var themeName = _state.Theme.Name;
-        var questionText = _state.Question?.GetText();
+        var questionText = GetCurrentQuestionReportText();
 
         // Add appellated answer to game report
         var answerInfo = _state.GameResultInfo.RejectedAnswers.FirstOrDefault(

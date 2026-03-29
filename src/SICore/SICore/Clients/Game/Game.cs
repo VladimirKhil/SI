@@ -931,11 +931,11 @@ public sealed class Game : MessageHandler
                         {
                             break;
                         }
-
+                        
                         _state.GameResultInfo.ComplainedQuestions.Add(new QuestionReport
                         {
                             ThemeName = _state.Theme.Name,
-                            QuestionText = _state.Question?.GetText(),
+                            QuestionText = _state.Question == null ? null : _state.PackageDoc?.GetQuestionReportText(_state.Question) ?? "",
                             ReportText = args[2]
                         });
                         break;

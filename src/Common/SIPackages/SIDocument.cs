@@ -6,6 +6,7 @@ using SIPackages.Models;
 using SIPackages.Serializers;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using System.Text;
 using System.Xml;
 using ZipUtils;
 
@@ -676,6 +677,90 @@ public sealed class SIDocument : IDisposable
 
         var collectionName = CollectionNames.TryGetCollectionName(contentItem.Type);
         return collectionName != null && TryGetFileHash(collectionName, contentItem.Value, out hash);
+    }
+
+    /// <summary>
+    /// Gets question report text.
+    /// </summary>
+    /// <param name="question">Question.</param>
+    public string GetQuestionReportText(Question question)
+    {
+        var result = new StringBuilder();
+
+        if (question.Script == null)
+        {
+            if (question.Parameters.TryGetValue(QuestionParameterNames.Question, out var questionContent))
+            {
+                AppendQuestionReportText(result, questionContent);
+            }
+
+            return result.ToString();
+        }
+
+        for (var i = 0; i < question.Script.Steps.Count; i++)
+        {
+            if (question.Script.Steps[i].Type == StepTypes.AskAnswer)
+            {
+                break;
+            }
+
+            if (question.Script.Steps[i].Type != StepTypes.ShowContent
+                || !question.Script.Steps[i].Parameters.TryGetValue(StepParameterNames.Content, out var content))
+            {
+                continue;
+            }
+
+            AppendQuestionReportText(result, content);
+        }
+
+        return result.ToString();
+    }
+
+    private void AppendQuestionReportText(StringBuilder result, StepParameter content)
+    {
+        foreach (var part in GetQuestionReportTextParts(content))
+        {
+            if (result.Length > 0)
+            {
+                result.Append('\n');
+            }
+
+            result.Append(part);
+        }
+    }
+
+    private IEnumerable<string> GetQuestionReportTextParts(StepParameter content)
+    {
+        if (content.ContentValue == null)
+        {
+            if (content.GroupValue != null)
+            {
+                foreach (var parameter in content.GroupValue.Values)
+                {
+                    foreach (var part in GetQuestionReportTextParts(parameter))
+                    {
+                        yield return part;
+                    }
+                }
+            }
+
+            yield break;
+        }
+
+        foreach (var contentItem in content.ContentValue)
+        {
+            if (contentItem.Type == ContentTypes.Text)
+            {
+                if (contentItem.Value.Length > 0)
+                {
+                    yield return contentItem.Value;
+                }
+            }
+            else
+            {
+                yield return TryGetFileHash(contentItem, out var hash) ? $"{contentItem.Type}:{hash}" : "";
+            }
+        }
     }
 
     /// <summary>

@@ -8,7 +8,7 @@ public abstract class PlatformManager : IUIThreadExecutor
 {
     public static PlatformManager Instance;
 
-    public IServiceProvider? ServiceProvider { get; set; }
+    public IServiceProvider ServiceProvider { get; set; } = null!;
 
     public abstract double Volume { get; }
 
@@ -37,17 +37,17 @@ public abstract class PlatformManager : IUIThreadExecutor
     /// <param name="maxPackageSize">Maximum allowed package size.</param>
     public abstract string? SelectLocalPackage(long? maxPackageSize);
 
-    public abstract string SelectSettingsForExport();
+    public abstract string? SelectSettingsForExport();
 
-    public abstract string SelectSettingsForImport();
+    public abstract string? SelectSettingsForImport();
 
-    public abstract string SelectStudiaBackground();
+    public abstract string? SelectStudiaBackground();
 
-    public abstract string SelectMainBackground();
+    public abstract string? SelectMainBackground();
 
-    public abstract string SelectLogo();
+    public abstract string? SelectLogo();
 
-    public abstract string SelectSound();
+    public abstract string? SelectSound();
 
     public abstract void Activate(bool flash = true);
 

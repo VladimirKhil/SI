@@ -166,20 +166,6 @@ public partial class App : Application
                 return;
             }
 
-            if (Environment.OSVersion.Version < new Version(10, 0))
-            {
-                try
-                {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
-                        | SecurityProtocolType.Tls11
-                        | SecurityProtocolType.Tls12;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString(), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-
             UserSettings.Default.PropertyChanged += Default_PropertyChanged;
 
             var mainViewModel = _host!.Services.GetRequiredService<MainViewModel>();

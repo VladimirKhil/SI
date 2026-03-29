@@ -15,7 +15,7 @@ internal sealed class TestAnimatableTimer : IAnimatableTimer
 
     public bool KeepFinalValue { get; set; }
 
-    public event Action<IAnimatableTimer>? TimeChanged;
+    public event Action<IAnimatableTimer>? TimeChanged { add { } remove { } }
 
     public void Pause(int currentTime, bool byUser)
     {

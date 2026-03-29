@@ -7,9 +7,9 @@ namespace SIGame.Converters;
 
 public sealed class RequiredToColorConverter : IValueConverter
 {
-    public Brush ErrorBrush { get; set; }
+    public Brush? ErrorBrush { get; set; }
 
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var count = (int)value;
         return count > 0 ? System.Windows.SystemColors.ControlLightBrush : ErrorBrush;

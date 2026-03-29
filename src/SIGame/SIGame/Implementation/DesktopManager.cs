@@ -103,7 +103,7 @@ public sealed class DesktopManager : PlatformManager
             openDialog.InitialDirectory = _recentAvatarDir;
         }
 
-        if (openDialog.ShowDialog().Value)
+        if (openDialog.ShowDialog() == true)
         {
             try
             {
@@ -169,7 +169,7 @@ public sealed class DesktopManager : PlatformManager
         return null;
     }
 
-    public override string SelectStudiaBackground()
+    public override string? SelectStudiaBackground()
     {
         var dialog = new OpenFileDialog
         {
@@ -185,7 +185,7 @@ public sealed class DesktopManager : PlatformManager
         return dialog.FileName;
     }
 
-    public override string SelectMainBackground()
+    public override string? SelectMainBackground()
     {
         var dialog = new OpenFileDialog
         {
@@ -201,7 +201,7 @@ public sealed class DesktopManager : PlatformManager
         return dialog.FileName;
     }
 
-    public override string SelectLogo()
+    public override string? SelectLogo()
     {
         var dialog = new OpenFileDialog
         {
@@ -217,7 +217,7 @@ public sealed class DesktopManager : PlatformManager
         return dialog.FileName;
     }
 
-    public override string SelectSound()
+    public override string? SelectSound()
     {
         var dialog = new OpenFileDialog { Title = Resources.SelectSoundFile, Filter = Resources.Sounds + " (*.mp3)|*.mp3" };
         if (dialog.ShowDialog() != true)
@@ -228,7 +228,7 @@ public sealed class DesktopManager : PlatformManager
         return dialog.FileName;
     }
 
-    public override string SelectSettingsForExport()
+    public override string? SelectSettingsForExport()
     {
         var dialog = new SaveFileDialog
         {
@@ -245,7 +245,7 @@ public sealed class DesktopManager : PlatformManager
         return dialog.FileName;
     }
 
-    public override string SelectSettingsForImport()
+    public override string? SelectSettingsForImport()
     {
         var dialog = new OpenFileDialog
         {
