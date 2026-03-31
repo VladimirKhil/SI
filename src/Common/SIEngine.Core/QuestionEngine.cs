@@ -434,7 +434,7 @@ public sealed class QuestionEngine : IQuestionEngine
                         {
                             if (contentItems.Any())
                             {
-                                _playHandler.OnQuestionContent(contentItems);
+                                _playHandler.OnQuestionContent(contentItems, _contentIndex == content.ContentValue.Count);
                             }
 
                             if (_contentIndex == content.ContentValue.Count)
@@ -449,7 +449,7 @@ public sealed class QuestionEngine : IQuestionEngine
 
                     if (contentItems.Any())
                     {
-                        _playHandler.OnQuestionContent(contentItems);
+                        _playHandler.OnQuestionContent(contentItems, true);
                     }
 
                     _stepIndex++;

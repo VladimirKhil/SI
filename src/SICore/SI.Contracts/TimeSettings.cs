@@ -16,7 +16,7 @@ public sealed class TimeSettings
     public const int DefaultShowmanDecision = 30;
     public const int DefaultRound = 3600;
     public const int DefaultButtonBlocking = 3;
-    public const int DefaultRightAnswer = 2;
+    public const int DefaultReflection = 2;
     public const int DefaultImage = 5;
     public const int DefaultPartialImage = 3;
     public const int DefaultAppellation = 30;
@@ -34,7 +34,7 @@ public sealed class TimeSettings
         ShowmanDecision = DefaultShowmanDecision,
         Round = DefaultRound,
         ButtonBlocking = DefaultButtonBlocking,
-        RightAnswer = DefaultRightAnswer,
+        Reflection = DefaultReflection,
         Image = DefaultImage,
         PartialImage = DefaultPartialImage,
         Appellation = DefaultAppellation,
@@ -96,9 +96,9 @@ public sealed class TimeSettings
     public int ButtonBlocking { get; set; } = DefaultButtonBlocking;
 
     /// <summary>
-    /// Gets or sets the time interval for showing the right answer.
+    /// Gets or sets the time interval for reflection after reading.
     /// </summary>
-    public int RightAnswer { get; set; } = DefaultRightAnswer;
+    public int Reflection { get; set; } = DefaultReflection;
 
     /// <summary>
     /// Gets or sets the time interval for image display.

@@ -629,7 +629,7 @@ public sealed class QuestionEngineTests
             ContentStartCalled = true;
         }
 
-        public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
+        public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
         {
             QuestionContentCalled = true;
             QuestionContentCallCount++;

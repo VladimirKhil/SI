@@ -768,7 +768,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             Appellation = timeSettings.TimeForShowmanDecisions, // Backward compatibility
             Round = timeSettings.TimeOfRound,
             ButtonBlocking = timeSettings.TimeForBlockingButton,
-            RightAnswer = timeSettings.TimeForRightAnswer,
+            Reflection = timeSettings.TimeForRightAnswer, // Backward compatibility
             Image = timeSettings.ImageTime,
             PartialImage = timeSettings.PartialImageTime,
         };

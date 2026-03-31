@@ -432,13 +432,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private string? GetCurrentQuestionReportText() =>
         _state.Question == null ? null : _state.PackageDoc?.GetQuestionReportText(_state.Question) ?? "";
 
-    internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration)
+    internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration, bool isLast)
     {
         var contentTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length);
 
-        if (_state.QuestionPlay.IsAnswer)
+        if (_state.QuestionPlay.IsAnswer || !isLast)
         {
-            contentTime += _state.TimeSettings.RightAnswer * 10;
+            contentTime += _state.TimeSettings.Reflection * 10;
         }
 
         _state.AtomTime = contentTime;
@@ -4461,7 +4461,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         _gameActions.OnRightAnswer(AnswerType.Text, normalizedAnswer);
 
         var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length)
-            + _state.TimeSettings.RightAnswer * 10;
+            + _state.TimeSettings.Reflection * 10;
         
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
@@ -4490,8 +4490,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         OnRightAnswerOptionCore(rightOptionLabel);
         _gameActions.OnRightAnswer(AnswerType.Text, rightOptionLabel);
-        var answerTime = _state.TimeSettings.RightAnswer;
-        answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
+        var answerTime = Math.Max(2, _state.TimeSettings.Reflection) * 10;
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
@@ -4515,8 +4514,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     internal void OnRightAnswerPoint(string rightAnswer)
     {
         _gameActions.OnRightAnswer(AnswerType.Point, rightAnswer);
-        var answerTime = _state.TimeSettings.Image + _state.TimeSettings.RightAnswer;
-        answerTime = (answerTime == 0 ? 2 : answerTime) * 10;
+        var answerTime = Math.Max(_state.TimeSettings.Image, _state.TimeSettings.Reflection) * 10;
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
@@ -4965,7 +4963,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         return contentDuration;
     }
 
-    internal void OnComplexContent(Dictionary<string, List<ContentItem>> contentTable)
+    internal void OnComplexContent(Dictionary<string, List<ContentItem>> contentTable, bool isLast)
     {
         var contentTime = -1;
         var registeredMediaPlay = false;
@@ -4993,9 +4991,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         ? (int)(contentItem.Duration.TotalMilliseconds / 100)
                         : GetContentItemDefaultDuration(contentItem);
 
-                    if (_state.QuestionPlay.IsAnswer)
+                    if (_state.QuestionPlay.IsAnswer || !isLast)
                     {
-                        duration += _state.TimeSettings.RightAnswer * 10;
+                        duration += _state.TimeSettings.Reflection * 10;
                     }
                 }
                 else

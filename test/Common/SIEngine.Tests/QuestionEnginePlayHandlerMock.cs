@@ -29,7 +29,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         
     }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
     {
         
     }

@@ -39,7 +39,8 @@ public interface IQuestionEnginePlayHandler
     /// Shows question content.
     /// </summary>
     /// <param name="content">Question content to display.</param>
-    void OnQuestionContent(IReadOnlyCollection<ContentItem> content);
+    /// <param name="isLast">Whether this is the last content part in this set.</param>
+    void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast);
 
     /// <summary>
     /// Asks for the answer.

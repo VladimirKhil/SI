@@ -25,7 +25,6 @@ using Utils;
 using Settings = SImulator.ViewModel.Model.AppSettings;
 using SImulator.ViewModel.Contracts;
 
-
 #if DEBUG
 using SIStorage.Service.Contract.Models;
 #endif
@@ -108,7 +107,7 @@ public partial class App : Application
             Settings.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
         }
 
-        var main = _manager.ServiceProvider.GetRequiredService<MainViewModel>();
+        var main = _host!.Services.GetRequiredService<MainViewModel>();
 
         if (e.Args.Length > 0)
         {

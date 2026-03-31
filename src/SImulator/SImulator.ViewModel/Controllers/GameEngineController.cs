@@ -132,7 +132,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return false;
     }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
     {
         var textToShow =
             GameViewModel.Settings.Model.FalseStart

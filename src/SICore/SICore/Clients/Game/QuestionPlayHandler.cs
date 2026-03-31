@@ -118,7 +118,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         }
     }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
     {
         if (content.Count == 0)
         {
@@ -128,14 +128,14 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
         if (content.Count == 1)
         {
-            OnQuestionContentItem(content.First());
+            OnQuestionContentItem(content.First(), isLast);
             return;
         }
 
-        OnQuestionComplexContent(content);
+        OnQuestionComplexContent(content, isLast);
     }
 
-    private void OnQuestionComplexContent(IReadOnlyCollection<ContentItem> content)
+    private void OnQuestionComplexContent(IReadOnlyCollection<ContentItem> content, bool isLast)
     {
         var contentTable = new Dictionary<string, List<ContentItem>>();
 
@@ -183,10 +183,10 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
             contentList.Add(contentItem);
         }
 
-        _controller.OnComplexContent(contentTable);
+        _controller.OnComplexContent(contentTable, isLast);
     }
 
-    public void OnQuestionContentItem(ContentItem contentItem)
+    public void OnQuestionContentItem(ContentItem contentItem, bool isLast)
     {
         switch (contentItem.Placement)
         {
@@ -200,7 +200,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
                             break;
                         }
 
-                        _controller.OnContentScreenText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
+                        _controller.OnContentScreenText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration, isLast);
                         break;
 
                     case ContentTypes.Image:
