@@ -166,13 +166,12 @@ public partial class SelectPointView : Window
         Canvas.SetLeft(SelectionMarker, px - SelectionMarker.Width / 2);
         Canvas.SetTop(SelectionMarker, py - SelectionMarker.Height / 2);
         
-        var radX = CurrentDeviation * imageWidth;
-        var radY = CurrentDeviation * imageHeight;
-        
-        ErrorCircle.Width = radX * 2;
-        ErrorCircle.Height = radY * 2;
-        Canvas.SetLeft(ErrorCircle, px - radX);
-        Canvas.SetTop(ErrorCircle, py - radY);
+        var radius = CurrentDeviation * Math.Min(imageWidth, imageHeight);
+
+        ErrorCircle.Width = radius * 2;
+        ErrorCircle.Height = radius * 2;
+        Canvas.SetLeft(ErrorCircle, px - radius);
+        Canvas.SetTop(ErrorCircle, py - radius);
     }
     
     private void ReferenceGrid_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateVisuals();

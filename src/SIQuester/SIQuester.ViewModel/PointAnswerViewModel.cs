@@ -178,7 +178,7 @@ public sealed class PointAnswerViewModel : ModelViewBase
         var items = name.Split(new[] { '/', '\\' }, 2);
         if (items.Length > 1) name = items[1];
 
-        return document.Document.Images.GetFile(name);
+        return document.Images.TryGetStreamInfo(name);
     }
 
     protected override void Dispose(bool disposing)

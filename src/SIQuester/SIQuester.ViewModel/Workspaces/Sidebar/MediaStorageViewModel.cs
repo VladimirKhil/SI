@@ -783,6 +783,33 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             });
     }
 
+    internal StreamInfo? TryGetStreamInfo(string link)
+    {
+        foreach (var item in _renamed)
+        {
+            if (item.Item2 == link)
+            {
+                link = item.Item1;
+                break;
+            }
+        }
+
+        var pendingStream = _streams.FirstOrDefault(n => n.Key.Model.Name == link);
+
+        if (pendingStream.Key != null)
+        {
+            var fileInfo = new FileInfo(pendingStream.Value.Item1);
+            return new StreamInfo(File.OpenRead(fileInfo.FullName), fileInfo.Length);
+        }
+
+        return _document.Lock.WithLock(
+            () =>
+            {
+                var collection = _document.GetInternalCollection(_name);
+                return collection.GetFile(link);
+            });
+    }
+
     /// <summary>
     /// Tries to get global file path for a media file.
     /// </summary>

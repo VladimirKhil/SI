@@ -11,9 +11,14 @@
         </Grid.RowDefinitions>
         
         <Grid Name="ReferenceGrid" Background="LightGray" SizeChanged="ReferenceGrid_SizeChanged" ClipToBounds="True">
-            <Image Name="TargetImage" Stretch="Uniform" />
+            <Image Name="TargetImage" Stretch="Uniform" Opacity="0.6" />
             <Canvas Name="OverlayCanvas" IsHitTestVisible="False">
-                <Ellipse Name="SelectionMarker" Stroke="Green" StrokeThickness="2" Fill="#5500FF00" Width="10" Height="10" Visibility="Hidden" />
+                <Grid Name="SelectionMarker" Width="18" Height="18" Visibility="Hidden">
+                    <Ellipse Width="14" Height="14" Stroke="White" StrokeThickness="4" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Ellipse Width="14" Height="14" Stroke="Black" StrokeThickness="2" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Ellipse Width="6" Height="6" Stroke="White" StrokeThickness="2" Fill="#FF28C840" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Ellipse Width="6" Height="6" Stroke="Black" StrokeThickness="1" Fill="#FF28C840" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Grid>
                 <Ellipse Name="ErrorCircle" Stroke="Orange" StrokeThickness="2" Fill="#22FFA500" Visibility="Hidden" />
             </Canvas>
             <Border Background="Transparent" MouseLeftButtonDown="Image_MouseLeftButtonDown" />
