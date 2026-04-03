@@ -3,12 +3,54 @@ using SICore.Clients.Game;
 using SIData;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace SICore.Tests;
 
 [TestFixture]
 public sealed class GameTests
 {
+    [Test]
+    public void ParsePoint_AppliesAspectRatioToXCoordinate()
+    {
+        var parsePoint = typeof(GameLogic).GetMethod("ParsePoint", BindingFlags.NonPublic | BindingFlags.Static);
+
+        Assert.That(parsePoint, Is.Not.Null);
+
+        var result = ((double X, double Y, double AspectRatio)?)parsePoint!.Invoke(null, new object[] { "0.5,0.25,2", 1.0 });
+
+        Assert.That(result.HasValue, Is.True);
+        Assert.That(result.Value.X, Is.EqualTo(1.0).Within(1E-9));
+        Assert.That(result.Value.Y, Is.EqualTo(0.25).Within(1E-9));
+        Assert.That(result.Value.AspectRatio, Is.EqualTo(2.0).Within(1E-9));
+    }
+
+    [Test]
+    public void ParsePlayerPoint_AppliesReferenceAspectRatioToXCoordinate()
+    {
+        var parsePlayerPoint = typeof(GameLogic).GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
+
+        Assert.That(parsePlayerPoint, Is.Not.Null);
+
+        var result = ((double X, double Y)?)parsePlayerPoint!.Invoke(null, new object[] { "0.5,0.25", 2.0 });
+
+        Assert.That(result.HasValue, Is.True);
+        Assert.That(result.Value.X, Is.EqualTo(1.0).Within(1E-9));
+        Assert.That(result.Value.Y, Is.EqualTo(0.25).Within(1E-9));
+    }
+
+    [Test]
+    public void ParsePlayerPoint_RejectsAspectRatioInPlayerInput()
+    {
+        var parsePlayerPoint = typeof(GameLogic).GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
+
+        Assert.That(parsePlayerPoint, Is.Not.Null);
+
+        var result = ((double X, double Y)?)parsePlayerPoint!.Invoke(null, new object[] { "0.5,0.25,2", 1.0 });
+
+        Assert.That(result.HasValue, Is.False);
+    }
+
     [Test]
     [TestCase(new int[] { 100, 200, 200, -60, 700 }, 2, new int[] { 4, 0, -1, -1 })]
     [TestCase(new int[] { 100, 200, 200, -60, 700 }, 3, new int[] { -1, 4, 0, -1 })]

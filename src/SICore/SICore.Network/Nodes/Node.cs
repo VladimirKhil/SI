@@ -159,7 +159,7 @@ public abstract class Node : INode
 
             var messageText = m.Text;
 
-            if (!m.IsSystem && messageText != null)
+            if (!m.IsSystem)
             {
                 messageText = messageText.Shorten(_options.MaxChatMessageLength);
             }

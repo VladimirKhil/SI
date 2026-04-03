@@ -3151,12 +3151,20 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var deviation = _state.QuestionPlay.AnswerDeviation;
 
             var rightPointParsed = ParsePoint(rightAnswer);
-            var playerPointParsed = ParsePoint(playerAnswer);
 
-            _state.Answerer.AnswerIsRight = rightPointParsed.HasValue &&
-                playerPointParsed.HasValue &&
-                CalculatePointDistance(rightPointParsed.Value, playerPointParsed.Value) <= deviation + 0.05;
-            
+            if (rightPointParsed.HasValue)
+            {
+                var (x, y, aspectRatio) = rightPointParsed.Value;
+                var playerPointParsed = ParsePlayerPoint(playerAnswer, aspectRatio);
+
+                _state.Answerer.AnswerIsRight = playerPointParsed.HasValue &&
+                    CalculatePointDistance((x, y), playerPointParsed.Value) <= deviation + 0.05;
+            }
+            else
+            {
+                _state.Answerer.AnswerIsRight = false;
+            }
+
             _state.Answerer.AnswerValidationFactor = 1.0;
             _state.ShowmanDecision = true;
             OnDecision();
@@ -4466,7 +4474,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
-    // TODO: There are two different messages to inform rigt answer options, refactor this
+    // TODO: There are two different messages to inform right answer options - refactor this
 
     internal void OnComplexAnswer()
     {
@@ -5120,11 +5128,48 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     }
 
     /// <summary>
-    /// Parses a point answer in "x,y" format.
+    /// Parses a point answer in "x,y" or "x,y,aspectRatio" format.
     /// </summary>
-    /// <param name="pointString">String in "x,y" format where x and y are doubles.</param>
-    /// <returns>Parsed point as tuple (x, y), or null if parsing fails.</returns>
-    private static (double X, double Y)? ParsePoint(string pointString)
+    /// <param name="pointString">String in "x,y" or "x,y,aspectRatio" format where x and y are doubles.</param>
+    /// <returns>Parsed point as tuple (x, y, aspectRatio), or null if parsing fails.</returns>
+    private static (double X, double Y, double aspectRatio)? ParsePoint(string pointString, double defaultAspectRation = 1.0)
+    {
+        if (string.IsNullOrWhiteSpace(pointString))
+        {
+            return null;
+        }
+
+        var parts = pointString.Split(',');
+
+        if (parts.Length < 2 || parts.Length > 3)
+        {
+            return null;
+        }
+
+        var aspectRatio = parts.Length > 2
+            ? double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var ar)
+                ? ar
+                : defaultAspectRation
+            : defaultAspectRation;
+
+        if (!double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) ||
+            !double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y))
+        {
+            return null;
+        }
+
+        if (aspectRatio > 0.0 && Math.Abs(aspectRatio - 1.0) > double.Epsilon)
+        {
+            x *= aspectRatio;
+        }
+
+        return (x, y, aspectRatio);
+    }
+
+    /// <summary>
+    /// Parses player point answer in "x,y" format and normalizes it with a known aspect ratio.
+    /// </summary>
+    private static (double X, double Y)? ParsePlayerPoint(string pointString, double aspectRatio)
     {
         if (string.IsNullOrWhiteSpace(pointString))
         {
@@ -5142,6 +5187,11 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             !double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y))
         {
             return null;
+        }
+
+        if (aspectRatio > 0.0 && Math.Abs(aspectRatio - 1.0) > double.Epsilon)
+        {
+            x *= aspectRatio;
         }
 
         return (x, y);
