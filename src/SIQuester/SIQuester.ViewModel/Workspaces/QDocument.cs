@@ -843,7 +843,8 @@ public sealed class QDocument : WorkspaceViewModel
             if (parameter.Key == QuestionParameterNames.Question
                 || parameter.Key == QuestionParameterNames.Answer
                 || parameter.Key == QuestionParameterNames.AnswerType
-                || parameter.Key == QuestionParameterNames.AnswerOptions)
+                || parameter.Key == QuestionParameterNames.AnswerOptions
+                || parameter.Key == QuestionParameterNames.AnswerDeviation)
             {
                 continue;
             }

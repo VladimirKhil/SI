@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Tests.Helpers;
+using System.Text.Json;
 
 namespace SIQuester.ViewModel.Tests;
 
@@ -168,6 +170,49 @@ internal sealed class QDocumentTests
 
         // Assert
         Assert.That(question.Model.Price, Is.EqualTo(200));
+    }
+
+    [Test]
+    public void ChangeQuestionType_ShouldPreserveAnswerDeviation()
+    {
+        // Arrange
+        var document = TestHelper.CreateSimpleTestPackage();
+        var qDocument = _documentFactory.CreateViewModelFor(document, "Test Package");
+        var question = qDocument.Package.Rounds[0].Themes[0].Questions[0];
+
+        question.Parameters.AddParameter(QuestionParameterNames.AnswerType, new global::SIQuester.ViewModel.StepParameterViewModel(question, new StepParameter
+        {
+            Type = StepParameterTypes.Simple,
+            SimpleValue = StepParameterValues.SetAnswerTypeType_Number
+        }));
+
+        question.Parameters.AddParameter(QuestionParameterNames.AnswerDeviation, new global::SIQuester.ViewModel.StepParameterViewModel(question, new StepParameter
+        {
+            Type = StepParameterTypes.Simple,
+            SimpleValue = "7"
+        }));
+
+        // Act
+        question.TypeName = QuestionTypes.Secret;
+
+        // Assert
+        Assert.That(question.Parameters.Model.TryGetValue(QuestionParameterNames.AnswerDeviation, out var answerDeviation), Is.True);
+        Assert.That(answerDeviation?.SimpleValue, Is.EqualTo("7"));
+    }
+
+    [Test]
+    public void DeserializeClipboardQuestionData_ShouldSucceed()
+    {
+        // Arrange
+        const string json = "{\"ItemLevel\":3,\"ItemData\":\"\\u003Cquestion price=\\u0022300\\u0022\\u003E\\u003Cparams\\u003E\\u003Cparam name=\\u0022question\\u0022 type=\\u0022content\\u0022\\u003E\\u003Citem waitForFinish=\\u0022False\\u0022\\u003E\\u0412\\u043E\\u043F\\u0440\\u043E\\u0441 \\u0441 \\u043E\\u0442\\u0432\\u0435\\u0442\\u043E\\u043C \\u0432 \\u0432\\u0438\\u0434\\u0435 \\u0442\\u043E\\u0447\\u043A\\u0438 \\u043D\\u0430 \\u0438\\u0437\\u043E\\u0431\\u0440\\u0430\\u0436\\u0435\\u043D\\u0438\\u0438. \\u041D\\u0430\\u0439\\u0434\\u0438\\u0442\\u0435 \\u043B\\u043E\\u0434\\u043A\\u0443\\u003C/item\\u003E\\u003Citem type=\\u0022image\\u0022 isRef=\\u0022True\\u0022\\u003Esample-boat-400x300.png\\u003C/item\\u003E\\u003C/param\\u003E\\u003Cparam name=\\u0022answerType\\u0022\\u003Epoint\\u003C/param\\u003E\\u003Cparam name=\\u0022answer\\u0022 type=\\u0022content\\u0022\\u003E\\u003Citem type=\\u0022image\\u0022 isRef=\\u0022True\\u0022\\u003Esample-boat-400x300.png\\u003C/item\\u003E\\u003C/param\\u003E\\u003Cparam name=\\u0022answerDeviation\\u0022\\u003E0.05\\u003C/param\\u003E\\u003C/params\\u003E\\u003Cright\\u003E\\u003Canswer\\u003E0.46,0.7\\u003C/answer\\u003E\\u003C/right\\u003E\\u003C/question\\u003E\",\"Authors\":[],\"Sources\":[],\"Images\":{\"sample-boat-400x300.png\":\"C:\\\\Users\\\\Vladimir\\\\AppData\\\\Local\\\\Temp\\\\SIQuester\\\\Media\\\\3080206585Gue47iwYsaPILmamDv9Ow.png\"},\"Audio\":{},\"Video\":{},\"Html\":{}}";
+
+        // Act
+        var data = JsonSerializer.Deserialize<InfoOwnerData>(json);
+
+        // Assert
+        Assert.That(data, Is.Not.Null);
+        Assert.That(data!.ItemLevel, Is.EqualTo(InfoOwnerData.Level.Question));
+        Assert.That(data.Images, Contains.Key("sample-boat-400x300.png"));
     }
 
     #endregion

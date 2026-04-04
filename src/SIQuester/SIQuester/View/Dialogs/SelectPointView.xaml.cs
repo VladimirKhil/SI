@@ -121,7 +121,8 @@ public partial class SelectPointView : Window
         if (ry < 0) ry = 0;
         if (ry > 1) ry = 1;
 
-        _currentAnswer = $"{Math.Round(rx, 2).ToString(CultureInfo.InvariantCulture)},{Math.Round(ry, 2).ToString(CultureInfo.InvariantCulture)}";
+        var aspectRatio = Math.Round((double)_bitmap.PixelWidth / _bitmap.PixelHeight, 2);
+        _currentAnswer = $"{Math.Round(rx, 2).ToString(CultureInfo.InvariantCulture)},{Math.Round(ry, 2).ToString(CultureInfo.InvariantCulture)},{aspectRatio.ToString(CultureInfo.InvariantCulture)}";
         UpdateVisuals();
     }
 
@@ -130,7 +131,7 @@ public partial class SelectPointView : Window
         if (_bitmap == null) return;
         
         var parts = _currentAnswer.Split(',');
-        if (parts.Length != 2 || !double.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var rx) || !double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var ry))
+        if (parts.Length < 2 || !double.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var rx) || !double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var ry))
         {
             SelectionMarker.Visibility = Visibility.Hidden;
             ErrorCircle.Visibility = Visibility.Hidden;

@@ -8,6 +8,7 @@ using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Tests.Mocks;
+using SIStatisticsService.Contract;
 using SIStorage.Service.Contract;
 
 namespace SIQuester.ViewModel.Tests.Helpers;
@@ -27,6 +28,7 @@ internal static class TestHelper
         services.AddSingleton<ILoggerFactory, NullLoggerFactory>();
         services.AddSingleton<IClipboardService, ClipboardServiceMock>();
         services.AddSingleton<IPackageTemplatesRepository, PackageTemplatesRepositoryMock>();
+        services.AddSingleton(Substitute.For<ISIStatisticsServiceClient>());
         services.AddSingleton<StorageContextViewModel>(sp => CreateStorageContextViewModel(sp));
         services.AddSingleton<IDocumentViewModelFactory, TestDocumentViewModelFactory>();
 

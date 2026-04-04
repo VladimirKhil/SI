@@ -14,6 +14,10 @@ public sealed class InfoOwnerData
 {
     public enum Level { Package, Round, Theme, Question };
 
+    public InfoOwnerData()
+    {
+    }
+
     public Level ItemLevel { get; set; }
 
     public string ItemData { get; set; } = "";
