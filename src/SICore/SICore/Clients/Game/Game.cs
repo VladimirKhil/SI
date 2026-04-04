@@ -721,6 +721,10 @@ public sealed class Game : MessageHandler
                         OnReady(message, args);
                         break;
 
+                    case Messages.Picture:
+                        OnPicture(message, args);
+                        break;
+
                     case Messages.Pin:
                         if (message.Sender == _state.HostName)
                         {
@@ -1336,6 +1340,54 @@ public sealed class Game : MessageHandler
         _controller.Stop(StopReason.Decision);
     }
 
+    [Obsolete("Use OnAvatar instead")]
+    private void OnPicture(Message message, string[] args)
+    {
+        if (args.Length < 2)
+        {
+            return;
+        }
+
+        var path = args[1];
+        var person = _state.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
+
+        if (person == null)
+        {
+            return;
+        }
+
+        if (args.Length > 2)
+        {
+            if (!_state.Host.AreCustomAvatarsSupported)
+            {
+                return;
+            }
+
+            var file = $"{message.Sender}_{Path.GetFileName(path)}";
+
+            if (!_avatarHelper.FileExists(file))
+            {
+                var error = _avatarHelper.ExtractAvatarData(args[2], file);
+
+                if (error != null)
+                {
+                    _gameActions.SendMessageWithArgs(Messages.UserError, error.Value.Item1);
+                    return;
+                }
+            }
+
+            var uri = _fileShare.CreateResourceUri(ResourceKind.Avatar, new Uri(file, UriKind.Relative));
+
+            person.Picture = $"URI: {uri}";
+        }
+        else
+        {
+            person.Picture = path;
+        }
+
+        InformAvatar(person);
+    }
+
     private void OnAvatar(Message message, string[] args)
     {
         if (args.Length < 3)
@@ -1355,13 +1407,17 @@ public sealed class Game : MessageHandler
         if (contentType == ContentTypes.Image)
         {
             person.Picture = avatarUri;
-            _gameActions.SendMessageWithArgs(Messages.Avatar, person.Name, contentType, avatarUri);
         }
         else if (contentType == ContentTypes.Video && (avatarUri.Length == 0 || avatarUri.StartsWith(VideoAvatarUri)))
         {
             person.AvatarVideoUri = avatarUri;
-            _gameActions.SendMessageWithArgs(Messages.Avatar, person.Name, contentType, avatarUri);
         }
+        else
+        {
+            return;
+        }
+
+        InformAvatar(person);
     }
 
     private void OnSetStake(Message message, string[] args)
@@ -3548,13 +3604,11 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        var oldName = account.Name;
-
         var newType = !account.IsHuman;
         string newName = "";
         bool newIsMale = true;
 
-        ViewerAccount? newAcc = null;
+        ViewerAccount? newAcc;
 
         _state.BeginUpdatePersons($"ChangePersonType {personType} {indexStr}");
 
@@ -3659,12 +3713,6 @@ public sealed class Game : MessageHandler
         }
 
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newIsMale ? '+' : '-');
-
-        if (newAcc != null)
-        {
-            InformAvatar(newAcc);
-        }
-
         OnPersonsChanged();
     }
 

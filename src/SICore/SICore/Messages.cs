@@ -450,6 +450,9 @@ public static class Messages
     /// </summary>
     public const string PersonStake = "PERSONSTAKE";
 
+    [Obsolete]
+    public const string Picture = "PICTURE";
+
     /// <summary>
     /// Asks or receives game PIN.
     /// </summary>
