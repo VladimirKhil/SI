@@ -436,7 +436,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     {
         var contentTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length);
 
-        if (_state.QuestionPlay.IsAnswer || !isLast)
+        if (_state.QuestionPlay.IsAnswer || !isLast && duration <= TimeSpan.Zero)
         {
             contentTime += _state.TimeSettings.Reflection * 10;
         }
@@ -4999,7 +4999,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                         ? (int)(contentItem.Duration.TotalMilliseconds / 100)
                         : GetContentItemDefaultDuration(contentItem);
 
-                    if (_state.QuestionPlay.IsAnswer || !isLast)
+                    if (_state.QuestionPlay.IsAnswer || !isLast && contentItem.Duration <= TimeSpan.Zero)
                     {
                         duration += _state.TimeSettings.Reflection * 10;
                     }
