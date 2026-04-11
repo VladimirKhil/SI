@@ -1063,7 +1063,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        PresentationController.SetSound(soundName);
+        UI.Execute(() => PlatformManager.Instance.PlaySound(soundName), exc => OnError(exc.ToString()));
     }
 
     private void RoundTimer_Elapsed(object? state) => UI.Execute(
@@ -2210,6 +2210,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 break;
 
             case QuestionState.Thinking:
+            case QuestionState.Normal:
                 break;
 
             default:

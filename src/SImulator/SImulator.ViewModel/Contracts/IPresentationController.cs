@@ -73,8 +73,6 @@ public interface IPresentationController : IDisposable
 
     void UpdateShowPlayers(bool showPlayers);
 
-    void SetSound(string sound = "") { }
-
     void PlaySimpleSelection(int theme, int quest);
 
     void PlaySelection(int theme);

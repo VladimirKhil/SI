@@ -364,7 +364,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     public bool OnRightAnswerOption(string rightOptionLabel)
     {
         PresentationController.SetQuestionSound(false);
-        PresentationController.SetSound();
         GameViewModel.OnRightAnswer();
 
         var answerOptions = GameViewModel.LocalInfo.AnswerOptions.Options;
@@ -471,10 +470,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         {
             case RoundEndReason.Timeout:
                 GameViewModel.OnEndRoundTimeout();
-                break;
-
-            default:
-                PresentationController.SetSound();
                 break;
         }
 

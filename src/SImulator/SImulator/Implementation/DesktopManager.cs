@@ -35,7 +35,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 {
     private const string GameSiteUri = "https://vladimirkhil.com";
 
-    public IServiceProvider ServiceProvider { get; set; }
+    public IServiceProvider ServiceProvider { get; set; } = null!;
 
     private Window? _window = null;
     private PlayersWindow? _playersWindow = null;
