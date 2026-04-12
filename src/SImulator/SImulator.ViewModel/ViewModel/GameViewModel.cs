@@ -1186,6 +1186,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         PresentationController.RunTimer();
 
+        if (_managed)
+        {
+            return;
+        }
+
         _questionTimer.Change(1000, 1000);
 
         ActiveQuestionCommand = StopQuestionTimer;
@@ -2595,5 +2600,37 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ThinkingTime = 0;
         ThinkingTimeMax = maxTime;
         _thinkingTimer.Change(1000, 1000);
+    }
+
+    internal void StopThinkingTimer()
+    {
+        ThinkingTime = 0;
+        _buttonManager?.TryGetCommandExecutor()?.Cancel();
+
+        if (QuestionForAll)
+        {
+            foreach (var player in Players)
+            {
+                player.IsPreliminaryAnswer = false;
+            }
+        }
+
+        _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
+    }
+
+    internal void RunQuestionTimerNew(int maxTime)
+    {
+        QuestionTime = 0;
+        QuestionTimeMax = maxTime;
+        PresentationController.RunTimer();
+        _questionTimer.Change(1000, 1000);
+    }
+
+    internal void StopQuestionTimerNew()
+    {
+        QuestionTime = 0;
+        PresentationController.StopTimer();
+
+        _questionTimer.Change(Timeout.Infinite, Timeout.Infinite);
     }
 }

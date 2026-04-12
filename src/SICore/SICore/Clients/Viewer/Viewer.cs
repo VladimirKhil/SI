@@ -152,6 +152,10 @@ public class Viewer : MessageHandler, IViewerClient
                     OnPackageComments(mparams);
                     break;
 
+                case Messages.PackageRestrictions:
+                    OnPackageRestrictions(mparams);
+                    break;
+
                 case Messages.Replic:
                     OnReplic(mparams);
                     break;
@@ -565,6 +569,16 @@ public class Viewer : MessageHandler, IViewerClient
         {
             _client.Node.OnError(exc, true);
         }
+    }
+
+    private void OnPackageRestrictions(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        _controller.OnPackageRestrictions(mparams[1]);
     }
 
     private void OnAnswerDeviation(string[] mparams)

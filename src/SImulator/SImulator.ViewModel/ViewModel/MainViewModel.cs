@@ -204,11 +204,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     static MainViewModel()
     {
-        FontFamilies = new string[] { SIUI.ViewModel.Core.Settings.DefaultTableFontFamily }
-            .Concat(PlatformManager.Instance.GetFonts().OrderBy(s => s))
-            .ToArray();
-
-        LineSpaces = new double[] { 1.0, SIUI.ViewModel.Core.Settings.DefaultQuestionLineSpacing };
+        FontFamilies = [SIUI.ViewModel.Core.Settings.DefaultTableFontFamily, .. PlatformManager.Instance.GetFonts().OrderBy(s => s)];
+        LineSpaces = [1.0, SIUI.ViewModel.Core.Settings.DefaultQuestionLineSpacing];
     }
 
     private readonly IPlatformService _platformService;
@@ -461,9 +458,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             presentationController.Error += ShowError;
 
-            var game = /*Settings.UseSIGameEngine 
+            var game = Settings.UseSIGameEngine 
                 ? await CreateGameNewAsync(presentationController, presentationListener)
-                : */await CreateGameAsync(presentationController, presentationListener);
+                : await CreateGameAsync(presentationController, presentationListener);
 
             Game = game;
 

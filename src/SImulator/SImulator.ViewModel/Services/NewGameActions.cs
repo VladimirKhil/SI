@@ -2,18 +2,20 @@
 using SIData;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
+using Utils.Timers;
 
 namespace SImulator.ViewModel.Services;
 
 /// <summary>
 /// Provides new version of game actions.
 /// </summary>
-internal sealed class NewGameActions : IGameActions
+internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks>
 {
     private readonly ViewerActions _viewerActions;
     private readonly ViewerData _state;
     private readonly Func<string, bool, GameRole, string?, AuthenticationResult> _join;
     private readonly Func<Message, ValueTask> _onMessageReceivedAsync;
+    private readonly TaskRunner<Model.Tasks> _taskRunner;
 
     public NewGameActions(
         ViewerActions viewerActions,
@@ -25,6 +27,19 @@ internal sealed class NewGameActions : IGameActions
         _state = state;
         _join = join;
         _onMessageReceivedAsync = onMessageReceivedAsync;
+        _taskRunner = new TaskRunner<Model.Tasks>(this);
+    }
+
+    public void ExecuteTask(Model.Tasks taskId, int arg)
+    {
+        _taskRunner.ScheduleExecution(Model.Tasks.NoTask, 0, runTimer: false);
+
+        switch (taskId)
+        {
+            case Model.Tasks.MoveNext:
+                _viewerActions.Move();
+                break;
+        }
     }
 
     public void Init() => _viewerActions.GetInfo();
@@ -34,10 +49,7 @@ internal sealed class NewGameActions : IGameActions
         throw new NotImplementedException();
     }
 
-    public void MoveBack()
-    {
-
-    }
+    public void MoveBack() => _viewerActions.Move(MoveDirections.Back);
 
     public void MoveBackRound() => _viewerActions.Move(MoveDirections.RoundBack);
 
@@ -48,7 +60,7 @@ internal sealed class NewGameActions : IGameActions
             _viewerActions.Start();
         }
 
-        _viewerActions.Move();
+        _taskRunner.ScheduleExecution(Model.Tasks.MoveNext, delayMs / 100);
     }
 
     public void ShowThemes(string[] themeNames)

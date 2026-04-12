@@ -331,4 +331,6 @@ public interface IPersonController
     void OnLayout(string layoutType) { }
 
     void OnRoundNames(string[] roundNames) { }
+
+    void OnPackageRestrictions(string restrictions) { }
 }

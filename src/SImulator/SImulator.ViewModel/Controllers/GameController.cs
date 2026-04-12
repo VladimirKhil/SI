@@ -2,6 +2,7 @@
 using SICore.Models;
 using SIData;
 using SIEngine.Rules;
+using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.Properties;
 using SIPackages;
@@ -16,6 +17,8 @@ namespace SImulator.ViewModel.Controllers;
 /// </summary>
 internal sealed class GameController : IPersonController
 {
+    private static bool _fastMoving = true;
+
     public GameViewModel GameViewModel { get; set; } = null!;
 
     private readonly ViewerActions _viewerActions;
@@ -53,6 +56,8 @@ internal sealed class GameController : IPersonController
     }
 
     public void OnRoundNames(string[] roundNames) => GameViewModel.OnRoundNames(roundNames);
+
+    public void OnRoundComments(string comments) => MoveWhenFast();
 
     public void OnThemeComments(string comments) => GameViewModel.PresentationController.OnThemeComments(comments);
 
@@ -99,7 +104,12 @@ internal sealed class GameController : IPersonController
 
     public void EndTry(string text)
     {
-        
+        GameViewModel.PresentationController.StopTimer();
+
+        if (text == "A")
+        {
+            GameViewModel.PresentationController.NoAnswer();
+        }
     }
 
     public void FinalThink()
@@ -157,8 +167,16 @@ internal sealed class GameController : IPersonController
         }
     }
 
-    public void OnPackageAuthors(IEnumerable<string> authors) =>
+    public void OnShowmanReplic(int messageIndex, MessageCode messageCode, params string[] args)
+    {
+        // TODO
+    }
+
+    public void OnPackageAuthors(IEnumerable<string> authors)
+    {
         GameViewModel.ShowmanReplic = $"{Resources.PackageAuthors}: {string.Join(", ", authors)}";
+        MoveWhenFast();
+    }
 
     public void OnPackage(string packageName, string? logoUri)
     {
@@ -166,7 +184,16 @@ internal sealed class GameController : IPersonController
         GameViewModel.OnPackage(packageName, packageLogo);
     }
 
-    public void OnPackageComments(string comments) => GameViewModel.ShowmanReplic = $"{Resources.PackageComments}: {comments}";
+    public void OnPackageComments(string comments)
+    {
+        GameViewModel.ShowmanReplic = $"{Resources.PackageComments}: {comments}";
+        MoveWhenFast();
+    }
+
+    public void OnPackageRestrictions(string restrictions)
+    {
+        MoveWhenFast();
+    }
 
     public void OnQuestionStart(string typeName, bool isDefaultType)
     {
@@ -228,7 +255,7 @@ internal sealed class GameController : IPersonController
 
     public void OnTheme(string themeName, string themeComments, int questionCount, bool animate)
     {
-        GameViewModel.ShowmanReplic = "";
+        GameViewModel.ShowmanReplic = Resources.RoundThemes;
         GameViewModel.LocalInfo.Text = themeName;
         GameViewModel.LocalInfo.TStage = SIUI.ViewModel.TableStage.Theme;
         GameViewModel.PresentationController.SetTheme(themeName, animate);
@@ -252,15 +279,19 @@ internal sealed class GameController : IPersonController
             case 0:
                 if (timerCommand == "GO")
                 {
-                    GameViewModel.RunRoundTimer.Execute(0); return;
+                    GameViewModel.RunRoundTimer.Execute(0);
                 }
 
                 break;
 
             case 1:
-                if (timerCommand == "RESUME")
+                if (timerCommand == "GO" && int.TryParse(arg, out var pressTime))
                 {
-                    GameViewModel.RunQuestionTimer.Execute(0); return;
+                    GameViewModel.RunQuestionTimerNew(pressTime / 10);
+                }
+                else if (timerCommand == "STOP")
+                {
+                    GameViewModel.StopQuestionTimerNew();
                 }
 
                 break;
@@ -269,6 +300,10 @@ internal sealed class GameController : IPersonController
                 if (timerCommand == "GO" && int.TryParse(arg, out var thinkTime))
                 {
                     GameViewModel.RunThinkingTimer(thinkTime / 10); return;
+                }
+                else if (timerCommand == "STOP")
+                {
+                    GameViewModel.StopThinkingTimer();
                 }
 
                 break;
@@ -303,16 +338,32 @@ internal sealed class GameController : IPersonController
 
         GameViewModel.PresentationController.SetRoundTable();
         GameViewModel.LocalInfo.TStage = SIUI.ViewModel.TableStage.RoundTable;
+        GameViewModel.ShowmanReplic = "";
     }
 
     public void OnStage(bool informOnly, GameStage stage, string stageName, int stageIndex, QuestionSelectionStrategyType? questionSelectionStrategyType)
     {
+        GameViewModel.ShowmanReplic = "";
+
+        if (stage == GameStage.Begin)
+        {
+            MoveWhenFast();
+        }
+
         if (stage != GameStage.Round || questionSelectionStrategyType == null)
         {
             return;
         }
 
         GameViewModel.OnRound(stageName, questionSelectionStrategyType.Value);
+    }
+
+    private void MoveWhenFast()
+    {
+        if (_fastMoving)
+        {
+            _viewerActions.Move();
+        }
     }
 
     public void StopRound()
@@ -337,5 +388,9 @@ internal sealed class GameController : IPersonController
         throw new NotImplementedException();
     }
 
-    public void Try(bool questionNotFinished) => GameViewModel.AskAnswerButton();
+    public void Try(bool questionNotFinished)
+    {
+        GameViewModel.AskAnswerButton();
+        GameViewModel.StartQuestionTimer();
+    }
 }
