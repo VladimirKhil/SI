@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using SImulator.Implementation.ButtonManagers;
+using SImulator.Implementation.WinAPI;
 using SImulator.Properties;
 using SImulator.ViewModel;
 using SImulator.ViewModel.Contracts;
@@ -8,15 +9,10 @@ using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIStorageService.ViewModel;
-using System;
-using System.Collections.Generic;
 using System.DirectoryServices;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -24,7 +20,6 @@ using System.Xml.Serialization;
 using Utils;
 using Utils.Timers;
 using Utils.Wpf;
-using Screen = System.Windows.Forms.Screen;
 
 namespace SImulator.Implementation;
 
@@ -79,21 +74,12 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
             DataContext = dataContext
         };
 
-        if (screen.IsFullScreen && screen is ScreenDisplayDescriptor screenInfo) // Will be removed
+        if (screen.IsFullScreen && screen is WebScreenDisplayDescriptor webScreenInfo)
         {
-            var area = screenInfo.Screen.WorkingArea;
-            _window.Left = area.Left;
-            _window.Top = area.Top;
-            _window.Width = area.Width;
-            _window.Height = area.Height;
-        }
-        else if (screen.IsFullScreen && screen is WebScreenDisplayDescriptor webScreenInfo)
-        {
-            var area = webScreenInfo.Screen.WorkingArea;
-            _window.Left = area.Left;
-            _window.Top = area.Top;
-            _window.Width = area.Width;
-            _window.Height = area.Height;
+            _window.Left = webScreenInfo.Left;
+            _window.Top = webScreenInfo.Top;
+            _window.Width = webScreenInfo.Width;
+            _window.Height = webScreenInfo.Height;
         }
 
         _window.Show();
@@ -129,10 +115,10 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
     }
 
     public override IDisplayDescriptor[] GetScreens() =>
-        [
-            .. Screen.AllScreens.Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen)),
-            WebDisplayDescriptor.Instance,
-        ];
+    [
+        .. Win32.GetDisplays().Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen)),
+        WebDisplayDescriptor.Instance,
+    ];
 
     public override string[] GetFonts() => [.. Fonts.SystemFontFamilies.Select(ff => ff.ToString())];
 
@@ -255,13 +241,9 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     public override string? AskSelectColor()
     {
-        var diag = new System.Windows.Forms.ColorDialog();
-
-        if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+        if (Win32.TryChooseColor(out var color))
         {
-            var color = diag.Color;
-            var convertedColor = Color.FromRgb(color.R, color.G, color.B);
-            return convertedColor.ToString();
+            return color.ToString();
         }
 
         return null;
@@ -281,12 +263,14 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     public override string? AskSelectLogsFolder()
     {
-        using (var dialog = new System.Windows.Forms.FolderBrowserDialog { Description = Resources.SelectLogsFolder })
+        var dialog = new OpenFolderDialog
         {
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                return dialog.SelectedPath;
-            }
+            Title = Resources.SelectLogsFolder,
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            return dialog.FolderName;
         }
 
         return null;
@@ -349,10 +333,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         _mediaTimeline.Source = new Uri(source, UriKind.RelativeOrAbsolute);
         _mediaClock = _mediaTimeline.CreateClock();
 
-        if (_player != null)
-        {
-            _player.Clock = _mediaClock;
-        }
+        _player?.Clock = _mediaClock;
 
         _mediaClock.Controller.Begin();
     }

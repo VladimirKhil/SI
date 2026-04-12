@@ -5,12 +5,10 @@
     <AssemblyTitle>SImulator</AssemblyTitle>
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
-	<Version>$(SImulatorVersion)</Version>
+	  <Version>$(SImulatorVersion)</Version>
     <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
-    <!--<ImplicitUsings>enable</ImplicitUsings>-->
-	<LangVersion>12</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup>
     <SatelliteResourceLanguages>ru-RU</SatelliteResourceLanguages>
@@ -37,6 +35,7 @@
   </PropertyGroup>
     <PropertyGroup>
 	    <WebView2LoaderPreference>Static</WebView2LoaderPreference>
+	    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

@@ -2247,10 +2247,12 @@ public sealed class Game : MessageHandler
                 {
                     _state.AnswererIndex = i;
                     _state.Players[i].Flag = false;
-                    _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
                     _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
 
-                    if (_state.QuestionPlay.AnswerOptions == null && _state.Players[i].IsHuman && args[1].Length > 0)
+                    if (_state.QuestionPlay.AnswerOptions == null
+                        && _state.QuestionPlay.AnswerType == AnswerType.Text
+                        && _state.Players[i].IsHuman
+                        && args[1].Length > 0)
                     {
                         var answer = args[1];
 

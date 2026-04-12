@@ -2211,6 +2211,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             case QuestionState.Thinking:
             case QuestionState.Normal:
+            case QuestionState.Pressed:
                 break;
 
             default:

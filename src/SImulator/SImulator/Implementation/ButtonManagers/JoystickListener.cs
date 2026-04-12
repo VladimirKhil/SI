@@ -3,10 +3,8 @@ using SImulator.Properties;
 using SImulator.ViewModel;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace SImulator.Implementation.ButtonManagers;
 
@@ -23,7 +21,6 @@ internal sealed class JoystickListener : ButtonManagerBase
     private readonly System.Windows.Threading.Dispatcher _dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
 
     private readonly Timer _timer;
-    private readonly System.Windows.Forms.Form _form; // TODO: replace with HwndHost
 
     private bool _acquired = false;
 
@@ -31,7 +28,6 @@ internal sealed class JoystickListener : ButtonManagerBase
 
     public JoystickListener(IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
     {
-        _form = new System.Windows.Forms.Form();
         _timer = new Timer(Timer_Elapsed, null, Timeout.Infinite, Period);
     }
 
@@ -99,8 +95,12 @@ internal sealed class JoystickListener : ButtonManagerBase
                         return false;
                     }
 
+                    var mainWindow = Application.Current?.MainWindow ?? throw new InvalidOperationException("Main window handle is not available.");
+                    var windowInteropHelper = new WindowInteropHelper(mainWindow);
+                    var handle = windowInteropHelper.Handle != IntPtr.Zero ? windowInteropHelper.Handle : windowInteropHelper.EnsureHandle();
+
                     _joystick = new Joystick(_directInput, devices[0].InstanceGuid);
-                    _joystick.SetCooperativeLevel(_form.Handle, CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                    _joystick.SetCooperativeLevel(handle, CooperativeLevel.Background | CooperativeLevel.NonExclusive);
                     _joystick.Properties.BufferSize = 128;
                 }
 
@@ -119,11 +119,11 @@ internal sealed class JoystickListener : ButtonManagerBase
         }
     }
 
-    private static void ShowError(string error) => System.Windows.MessageBox.Show(
+    private static void ShowError(string error) => MessageBox.Show(
         error,
         MainViewModel.ProductName,
-        System.Windows.MessageBoxButton.OK,
-        System.Windows.MessageBoxImage.Error);
+        MessageBoxButton.OK,
+        MessageBoxImage.Error);
 
     public override void Stop()
     {
@@ -143,20 +143,13 @@ internal sealed class JoystickListener : ButtonManagerBase
     {
         lock (_sync)
         {
-            if (_joystick != null)
-            {
-                _joystick.Dispose();
-                _joystick = null;
-            }
+            _joystick?.Dispose();
+            _joystick = null;
 
-            if (_directInput != null)
-            {
-                _directInput.Dispose();
-                _directInput = null;
-            }
+            _directInput?.Dispose();
+            _directInput = null;
         }
 
-        _form.Dispose();
         _timer.Dispose();
 
         return new ValueTask();

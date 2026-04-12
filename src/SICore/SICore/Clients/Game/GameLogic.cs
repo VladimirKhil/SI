@@ -5118,7 +5118,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnQuestionStart()
     {
-        if (_state.Settings.AppSettings.HintShowman)
+        if (_state.Settings.AppSettings.HintShowman && _state.QuestionPlay.AnswerType != AnswerType.Point)
         {
             // TODO: use SendAnswerInfoToShowman()
             _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, _state.QuestionPlay.RightAnswers.FirstOrDefault() ?? ""), _state.ShowMan.Name);

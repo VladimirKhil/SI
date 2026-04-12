@@ -1,18 +1,23 @@
-﻿using SImulator.Properties;
+﻿using SImulator.Implementation.WinAPI;
+using SImulator.Properties;
 using SImulator.ViewModel.Contracts;
-using System.Windows.Forms;
 
 namespace SImulator.Implementation;
 
 /// <inheritdoc cref="IDisplayDescriptor" />.
-public sealed class WebScreenDisplayDescriptor : IDisplayDescriptor
+internal sealed class WebScreenDisplayDescriptor : IDisplayDescriptor
 {
-    /// <summary>
-    /// Screen information.
-    /// </summary>
-    public Screen Screen { get; set; }
+    public int Left { get; }
 
-    public string Name => Screen == Screen.PrimaryScreen ? Resources.MainScreen : Resources.SecondaryScreen;
+    public int Top { get; }
+
+    public int Width { get; }
+
+    public int Height { get; }
+
+    public bool IsPrimary { get; }
+
+    public string Name => IsPrimary ? Resources.MainScreen : Resources.SecondaryScreen;
 
     public bool IsFullScreen => true;
 
@@ -24,5 +29,12 @@ public sealed class WebScreenDisplayDescriptor : IDisplayDescriptor
     /// Initializes a new instance if <see cref="WebScreenDisplayDescriptor" />.
     /// </summary>
     /// <param name="screen">Screen information.</param>
-    public WebScreenDisplayDescriptor(Screen screen) => Screen = screen;
+    internal WebScreenDisplayDescriptor(DisplayInfo screen)
+    {
+        Left = screen.Left;
+        Top = screen.Top;
+        Width = screen.Width;
+        Height = screen.Height;
+        IsPrimary = screen.IsPrimary;
+    }
 }
