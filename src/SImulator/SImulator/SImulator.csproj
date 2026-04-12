@@ -59,12 +59,6 @@
     <None Remove="Images\vk_logo.png" />
     <None Remove="Images\yoomoney_logo.png" />
   </ItemGroup>
-    <ItemGroup>
-      <Content Update="ru-RU\SIUI.resources.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      </Content>
-    </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\active_player.png" />
     <Resource Include="Images\boosty_logo.png" />
@@ -85,7 +79,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\..\Common\SIStorageService.ViewModel\SIStorageService.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\Utils.Wpf\Utils.Wpf.csproj" />

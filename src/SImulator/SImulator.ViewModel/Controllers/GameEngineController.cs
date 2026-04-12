@@ -14,11 +14,6 @@ namespace SImulator.ViewModel.Controllers;
 /// <inheritdoc cref="IQuestionEnginePlayHandler" />
 internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEnginePlayHandler
 {
-    /// <summary>
-    /// Relative media content group weight on screen.
-    /// </summary>
-    private const double MediaContentGroupWeight = 5.0;
-
     public GameViewModel GameViewModel { get; set; } = null!;
 
     public IPresentationController PresentationController => GameViewModel!.PresentationController;
@@ -52,12 +47,12 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                         options.Add(new ItemViewModel
                         {
                             Label = label, 
-                            Content = new ContentViewModel(ContentType.Image, imageUri, MediaContentGroupWeight)
+                            Content = new ContentViewModel(ContentType.Image, imageUri)
                         });
                     }
                     else
                     {
-                        options.Add(new ItemViewModel { Label = label, Content = new ContentViewModel(ContentType.Void, "", MediaContentGroupWeight) });
+                        options.Add(new ItemViewModel { Label = label, Content = new ContentViewModel(ContentType.Void, "") });
                     }
                     break;
 

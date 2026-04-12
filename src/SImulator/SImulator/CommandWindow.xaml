@@ -19,7 +19,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:lb="clr-namespace:SImulator.Behaviors"
     xmlns:lc="clr-namespace:SImulator.Converters"
-    xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
+    xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SImulator.ViewModel"
     SnapsToDevicePixels="True"
     TextOptions.TextFormattingMode="Display"
     Icon="Images/logo.png"
@@ -441,10 +441,6 @@
                             Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1}, Path=DataContext.Game.ActiveRoundName}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center" />
-                    </DataTemplate>
-
-                    <DataTemplate x:Key="{x:Static uim:TableStage.RoundThemes}">
-                        <TextBlock Text="(Темы раунда)" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static uim:TableStage.RoundTable}">

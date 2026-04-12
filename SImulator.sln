@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.4.11620.152 stable
+VisualStudioVersion = 18.4.11620.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{069B16F1-8F70-4CFC-8651-E4763D225B60}"
 EndProject
@@ -53,8 +53,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notions", "src\Common\Notions\Notions.csproj", "{11D3D3B5-B554-4BCC-523F-BA1BBE08EEF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SI.Contracts", "src\SICore\SI.Contracts\SI.Contracts.csproj", "{30FAF908-D99B-AF83-C059-C818E8B9DABD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIUI.ViewModel", "src\Common\SIUI.ViewModel\SIUI.ViewModel.csproj", "{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -430,26 +428,6 @@ Global
 		{30FAF908-D99B-AF83-C059-C818E8B9DABD}.Release|x64.Build.0 = Release|Any CPU
 		{30FAF908-D99B-AF83-C059-C818E8B9DABD}.Release|x86.ActiveCfg = Release|Any CPU
 		{30FAF908-D99B-AF83-C059-C818E8B9DABD}.Release|x86.Build.0 = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|ARM.Build.0 = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|ARM64.ActiveCfg = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|x64.Build.0 = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Debug|x86.Build.0 = Debug|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|ARM.ActiveCfg = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|ARM.Build.0 = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|ARM64.ActiveCfg = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|ARM64.Build.0 = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|x64.ActiveCfg = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|x64.Build.0 = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|x86.ActiveCfg = Release|Any CPU
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -476,7 +454,6 @@ Global
 		{1AEC9C9A-7036-1BF7-0E6B-B37D45B7FE5F} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{11D3D3B5-B554-4BCC-523F-BA1BBE08EEF3} = {069B16F1-8F70-4CFC-8651-E4763D225B60}
 		{30FAF908-D99B-AF83-C059-C818E8B9DABD} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
-		{026DB9CD-AC84-73CF-CEAE-04D6BB6EE3EA} = {069B16F1-8F70-4CFC-8651-E4763D225B60}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F89D1FB6-3468-4F5A-A264-5FA73A287D25}

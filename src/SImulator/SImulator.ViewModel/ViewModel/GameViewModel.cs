@@ -1894,7 +1894,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     internal void OnThemeSelected(int themeIndex)
     {
         CurrentTheme = LocalInfo.RoundInfo[themeIndex].Name;
-        ThemeComments = LocalInfo.RoundInfo[themeIndex].Comments;
+        ThemeComments = _themesComments.Count > themeIndex ? _themesComments[themeIndex] : "";
 
         Price = 0;
 
