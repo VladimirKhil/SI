@@ -2262,12 +2262,7 @@ public sealed class Game : MessageHandler
                         }
 
                         _state.QuestionPlay.Validations[answer] = null;
-
-                        _gameActions.SendMessageToWithArgs(
-                            _state.ShowMan.Name,
-                            Messages.AskValidate,
-                            i,
-                            answer);
+                        _gameActions.AskValidate(_state.ShowMan.Name, i, answer, !_state.QuestionPlay.FlexiblePrice);
                     }
 
                     break;

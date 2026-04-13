@@ -433,6 +433,14 @@ public sealed class GameActions
         }
     }
 
+    internal void AskValidate(string person, int playerIndex, string answer, bool allowPriceModifications) =>
+        SendMessageToWithArgs(
+            person,
+            Messages.AskValidate,
+            playerIndex,
+            answer,
+            allowPriceModifications ? '+' : '-');
+
     internal void SendContent(string placement, int layoutId, string label, string contentType, string effects, string value)
     {
         var messageBuilder = new MessageBuilder(Messages.Content2)
