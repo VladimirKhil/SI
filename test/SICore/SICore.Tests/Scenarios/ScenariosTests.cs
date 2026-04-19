@@ -85,18 +85,17 @@ public sealed class ScenariosTests
         var showmanClient = new Client("Showman");
         var showmanListener = new MessageListener(showmanClient);
         showmanClient.ConnectTo(node);
-        var (res, _) = game.Join(showmanClient.Name, false, GameRole.Showman, null, () => { });
-        Assert.That(res, Is.True);
+        var res = game.Authenticate(showmanClient.Name, false, GameRole.Showman, null);
+        Assert.That(res, Is.EqualTo(AuthenticationResult.Ok));
         
         var playerAClient = new Client("A");
         var playerAListener = new MessageListener(playerAClient);
         playerAClient.ConnectTo(node);
-        game.Join(playerAClient.Name, false, GameRole.Player, null, () => { });
+        game.Authenticate(playerAClient.Name, false, GameRole.Player, null);
         
         var playerBClient = new Client("B");
         playerBClient.ConnectTo(node);
-        game.Join(playerBClient.Name, false, GameRole.Player, null, () => { });
-
+        game.Authenticate(playerBClient.Name, false, GameRole.Player, null);
         showmanClient.SendMessage(Messages.Start);
 
         // Game Initialization Phase - validate key messages are present
@@ -118,8 +117,7 @@ public sealed class ScenariosTests
         await showmanListener.AssertNextMessageAsync(Messages.RoundThemes2);
         await showmanListener.AssertNextMessageAsync(Messages.Theme2);
         await showmanListener.AssertNextMessageAsync(Messages.Table);
-        await showmanListener.AssertNextMessageAsync(Messages.ShowTable); // Can come before FIRST
-        await showmanListener.AssertNextMessageAsync(Messages.First);
+        await showmanListener.AssertNextMessageAsync(Messages.ShowTable);
         await showmanListener.AssertNextMessageAsync(Messages.AskSelectPlayer);
 
         // Question Selection Phase
@@ -255,12 +253,12 @@ public sealed class ScenariosTests
         var showmanClient = new Client("Showman");
         var showmanListener = new MessageListener(showmanClient);
         showmanClient.ConnectTo(node);
-        game.Join(showmanClient.Name, false, GameRole.Showman, null, () => { });
+        game.Authenticate(showmanClient.Name, false, GameRole.Showman, null);
         
         var playerClient = new Client("Player1");
         var playerListener = new MessageListener(playerClient);
         playerClient.ConnectTo(node);
-        game.Join(playerClient.Name, false, GameRole.Player, null, () => { });
+        game.Authenticate(playerClient.Name, false, GameRole.Player, null);
 
         showmanClient.SendMessage(Messages.Start);
 
@@ -354,11 +352,11 @@ public sealed class ScenariosTests
         var showmanClient = new Client("Showman");
         var showmanListener = new MessageListener(showmanClient);
         showmanClient.ConnectTo(node);
-        game.Join(showmanClient.Name, false, GameRole.Showman, null, () => { });
+        game.Authenticate(showmanClient.Name, false, GameRole.Showman, null);
         
         var playerClient = new Client("Player1");
         playerClient.ConnectTo(node);
-        game.Join(playerClient.Name, false, GameRole.Player, null, () => { });
+        game.Authenticate(playerClient.Name, false, GameRole.Player, null);
 
         showmanClient.SendMessage(Messages.Start);
 
@@ -455,17 +453,17 @@ public sealed class ScenariosTests
         var showmanClient = new Client("Showman");
         var showmanListener = new MessageListener(showmanClient);
         showmanClient.ConnectTo(node);
-        game.Join(showmanClient.Name, false, GameRole.Showman, null, () => { });
+        game.Authenticate(showmanClient.Name, false, GameRole.Showman, null);
         
         var playerAClient = new Client("PlayerA");
         var playerAListener = new MessageListener(playerAClient);
         playerAClient.ConnectTo(node);
-        game.Join(playerAClient.Name, false, GameRole.Player, null, () => { });
+        game.Authenticate(playerAClient.Name, false, GameRole.Player, null);
         
         var playerBClient = new Client("PlayerB");
         var playerBListener = new MessageListener(playerBClient);
         playerBClient.ConnectTo(node);
-        game.Join(playerBClient.Name, false, GameRole.Player, null, () => { });
+        game.Authenticate(playerBClient.Name, false, GameRole.Player, null);
 
         showmanClient.SendMessage(Messages.Start);
 
@@ -485,7 +483,6 @@ public sealed class ScenariosTests
         
         // Player selection messages - order may vary
         await showmanListener.AssertNextMessageAsync(Messages.ShowTable);
-        await showmanListener.AssertNextMessageAsync(Messages.First);
         await showmanListener.AssertNextMessageAsync(Messages.AskSelectPlayer);
 
         // Select question

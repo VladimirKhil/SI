@@ -1285,14 +1285,6 @@
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static vmm:DialogModes.Stake}">
-                        <ContentControl
-                            Style="{StaticResource windowStyleWithProgress}"
-                            Tag="{Binding Data.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
-                            <l:StakeView />
-                        </ContentControl>
-                    </DataTemplate>
-
                     <DataTemplate x:Key="{x:Static vmm:DialogModes.StakeNew}">
                         <ContentControl
                             Style="{StaticResource windowStyleWithProgress}"

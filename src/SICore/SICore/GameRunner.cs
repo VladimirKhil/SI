@@ -39,12 +39,14 @@ public static class GameRunner
         IPinHelper? pinHelper,
         Uri? packageSource,
         string? gameName = null,
-        IPackageStatisticsProvider? packageStatisticsProvider = null)
+        IPackageStatisticsProvider? packageStatisticsProvider = null,
+        bool hiddenPlayers = false)
     {
         var gameData = new GameData(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, timeSettings, rules, packageStatisticsProvider)
         {
             HostName = settings.IsAutomatic ? null : settings.HumanPlayerName,
             GameName = gameName ?? "",
+            HiddenPersons = hiddenPlayers,
         };
 
         var localizer = new Localizer(settings.AppSettings.Culture ?? "en-US");

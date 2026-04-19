@@ -33,11 +33,6 @@ public enum DialogModes
     /// <summary>
     /// Question stake selection.
     /// </summary>
-    Stake,
-
-    /// <summary>
-    /// Question stake selection.
-    /// </summary>
     StakeNew,
 
     /// <summary>

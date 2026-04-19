@@ -96,6 +96,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
+        GameViewModel.IsQuestionFinished = true;
+
         // Disabled for run timer command so in false start mode when host enables buttons before media finishes it is still possible to control media being played
         // Consider later will this lead to playing issues
         if (GameViewModel.ActiveMediaCommand == GameViewModel.StopMediaTimer)
@@ -313,6 +315,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             GameViewModel.StartButtons(); // Buttons are activated in advance for false starts to work
         }
 
+        GameViewModel.IsQuestionFinished = false;
         _optionsShown = null;
         _isAnswerSimple = false;
         _isAnswer = false;

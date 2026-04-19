@@ -258,22 +258,6 @@ public sealed class GameData : Data
     internal bool AllIn { get; set; } = false;
 
     /// <summary>
-    /// Допустимые варианты ставок: 
-    /// - номинал
-    /// - сумма
-    /// - пас
-    /// - ва-банк
-    /// </summary>
-    [Obsolete]
-    internal bool[] StakeVariants { get; set; } = new bool[4];
-
-    /// <summary>
-    /// Possible stake types.
-    /// </summary>
-    [Obsolete]
-    internal StakeTypes StakeTypes { get; set; }
-
-    /// <summary>
     /// Possible stake modes.
     /// </summary>
     internal StakeModes StakeModes { get; set; }
@@ -356,6 +340,11 @@ public sealed class GameData : Data
     /// Game players info.
     /// </summary>
     public List<GamePlayerAccount> Players { get; } = new();
+
+    /// <summary>
+    /// Defines hidden persons mode (when persons are not shown to each other).
+    /// </summary>
+    public bool HiddenPersons { get; set; }
 
     /// <summary>
     /// Defines players statistics.

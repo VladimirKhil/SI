@@ -44,7 +44,7 @@ internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks
 
     public void Init() => _viewerActions.GetInfo();
 
-    public void OnRightAnswer()
+    public void OnRightAnswer(bool moveToAnswer)
     {
         throw new NotImplementedException();
     }

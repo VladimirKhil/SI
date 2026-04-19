@@ -332,21 +332,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private SimpleCommand _kick;
-
-    public SimpleCommand Kick
-    {
-        get => _kick;
-        set
-        {
-            if (_kick != value)
-            {
-                _kick = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     private SimpleCommand _ban;
 
     public SimpleCommand Ban
@@ -489,14 +474,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public ShowmanVM Showman { get; }
 
     public SimpleCommand SelectPlayer { get; }
-
-    public SimpleCommand SendPass { get; set; }
-
-    public SimpleCommand SendStake { get; set; }
-
-    public SimpleCommand SendVabank { get; set; }
-
-    public SimpleCommand SendNominal { get; set; }
 
     public SimpleCommand SendPassNew { get; set; }
 
@@ -738,7 +715,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _changeSums = new SimpleCommand(ChangeSums_Executed) { CanBeExecuted = IsShowman };
         _changeActivePlayer = new SimpleCommand(ChangeActivePlayer_Executed) { CanBeExecuted = IsShowman };
 
-        _kick = new SimpleCommand(Kick_Executed);
         _ban = new SimpleCommand(Ban_Executed);
         _setHost = new SimpleCommand(SetHost_Executed);
         _unban = new SimpleCommand(Unban_Executed);
@@ -749,11 +725,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _addTable = new SimpleCommand(AddTable_Executed);
 
         PressGameButton = new SimpleCommand(PressGameButton_Execute) { CanBeExecuted = IsPlayer };
-
-        SendPass = new SimpleCommand(SendPass_Executed);
-        SendStake = new SimpleCommand(SendStake_Executed);
-        SendVabank = new SimpleCommand(SendVabank_Executed);
-        SendNominal = new SimpleCommand(SendNominal_Executed);
 
         SendPassNew = new SimpleCommand(SendPassNew_Executed);
         SendStakeNew = new SimpleCommand(SendStakeNew_Executed);
@@ -892,30 +863,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
 
         _viewerActions.SendMessageWithArgs(Messages.Change, SelectedPlayer.PlayerIndex, SelectedPlayer.PlayerScore);
-        ClearSelections();
-    }
-
-    private void SendPass_Executed(object? arg)
-    {
-        _viewerActions.SendMessageWithArgs(Messages.Stake, 2);
-        ClearSelections();
-    }
-
-    private void SendStake_Executed(object? arg)
-    {
-        _viewerActions.SendMessageWithArgs(Messages.Stake, 1, _data.StakeInfo.Stake);
-        ClearSelections();
-    }
-
-    private void SendVabank_Executed(object? arg)
-    {
-        _viewerActions.SendMessageWithArgs(Messages.Stake, 3);
-        ClearSelections();
-    }
-
-    private void SendNominal_Executed(object? arg)
-    {
-        _viewerActions.SendMessageWithArgs(Messages.Stake, 0);
         ClearSelections();
     }
 
@@ -1072,28 +1019,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _viewerActions.SendMessage(Messages.Ban, person.Name);
     }
 
-    private void Kick_Executed(object? arg)
-    {
-        if (arg is not ViewerAccount person)
-        {
-            return;
-        }
-
-        if (person.Name == Data.Name)
-        {
-            AddLog(Resources.CannotKickYouself);
-            return;
-        }
-
-        if (!person.IsHuman)
-        {
-            AddLog(Resources.CannotKickBots);
-            return;
-        }
-
-        _viewerActions.SendMessage(Messages.Kick, person.Name);
-    }
-
     public void OnMediaContentCompleted(string contentType, string contentValue) =>
         _viewerActions.SendMessageWithArgs(Messages.Atom, contentType, contentValue);
 
@@ -1168,7 +1093,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         DeleteTable.CanBeExecuted = IsHost && _data.Players.Count > 2 && CurrentPerson != null && CurrentPerson.IsPlayer;
         ChangeType.CanBeExecuted = IsHost;
         Replace.CanBeExecuted = IsHost && CurrentPerson != null && CurrentPerson.Others != null && CurrentPerson.Others.Any();
-        Kick.CanBeExecuted = Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = IsHost;
+        Ban.CanBeExecuted = SetHost.CanBeExecuted = Unban.CanBeExecuted = IsHost;
     }
 
     private void FreeTable_Executed(object? arg)

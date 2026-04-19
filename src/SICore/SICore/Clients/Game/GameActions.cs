@@ -117,6 +117,20 @@ public sealed class GameActions
     /// <param name="person">Кому выдаётся</param>
     public void InformSums(string person = NetworkConstants.Everybody)
     {
+        if (_state.HiddenPersons)
+        {
+            foreach (var player in _state.Players)
+            {
+                if (player.Name == person)
+                {
+                    SendMessageToWithArgs(person, Messages.Sums, player.Sum);
+                    break;
+                }
+            }
+
+            return;
+        }
+
         var message = new StringBuilder(Messages.Sums);
 
         for (var i = 0; i < _state.Players.Count; i++)
@@ -483,5 +497,23 @@ public sealed class GameActions
     {
         SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, automaticGameStartDuration, -2); // deprecaated
         SendMessageWithArgs(Messages.TimerGameStart, automaticGameStartDuration);
+    }
+
+    internal void OnArenaMode() => SendMessage(Messages.ArenaMode);
+
+    internal void OnReady(string person, bool ready)
+    {
+        var res = new StringBuilder(Messages.Ready).Append(Message.ArgsSeparatorChar).Append(person).Append(Message.ArgsSeparatorChar).Append(ready ? "+" : "-");
+        SendMessage(res.ToString());
+    }
+
+    internal void OnPlayerOutcome(int playerIndex, bool isRight, int scoreUpdate)
+    {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
+        SendMessageWithArgs(Messages.Person, isRight ? '+' : '-', playerIndex, scoreUpdate);
     }
 }

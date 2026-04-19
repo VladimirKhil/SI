@@ -23,7 +23,7 @@ public interface IGameActions : IDisposable
 
     void RemovePlayerAt(int index);
 
-    void OnRightAnswer();
+    void OnRightAnswer(bool moveToAnswer);
 
     void IsRightAnswer();
 

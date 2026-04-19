@@ -147,6 +147,7 @@ public sealed class Game : MessageHandler
         }
 
         var appSettings = _state.Settings.AppSettings;
+        var rules = _state.Rules;
         var msg = new MessageBuilder(Messages.Options2, _state.HostName);
         var changed = false;
 
@@ -161,6 +162,7 @@ public sealed class Game : MessageHandler
                     if (bool.TryParse(optionValue, out var oral) && oral != appSettings.Oral)
                     {
                         appSettings.Oral = oral;
+                        rules.Oral = oral;
                         _state.IsOral = appSettings.Oral && _state.ShowMan.IsHuman;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
@@ -172,6 +174,7 @@ public sealed class Game : MessageHandler
                     if (bool.TryParse(optionValue, out var managed) && managed != appSettings.Managed)
                     {
                         appSettings.Managed = managed;
+                        rules.Managed = managed;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -182,6 +185,7 @@ public sealed class Game : MessageHandler
                     if (bool.TryParse(optionValue, out var displayAnswerOptionsLabels) && displayAnswerOptionsLabels != appSettings.DisplayAnswerOptionsLabels)
                     {
                         appSettings.DisplayAnswerOptionsLabels = displayAnswerOptionsLabels;
+                        rules.DisplayAnswerOptionsLabels = displayAnswerOptionsLabels;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -192,6 +196,7 @@ public sealed class Game : MessageHandler
                     if (bool.TryParse(optionValue, out var falseStart) && falseStart != appSettings.FalseStart)
                     {
                         appSettings.FalseStart = falseStart;
+                        rules.FalseStart = falseStart;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -202,6 +207,7 @@ public sealed class Game : MessageHandler
                     if (int.TryParse(optionValue, out var readingSpeed) && readingSpeed != appSettings.ReadingSpeed)
                     {
                         appSettings.ReadingSpeed = readingSpeed;
+                        rules.ReadingSpeed = readingSpeed;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -212,6 +218,7 @@ public sealed class Game : MessageHandler
                     if (bool.TryParse(optionValue, out var partialText) && partialText != appSettings.PartialText)
                     {
                         appSettings.PartialText = partialText;
+                        rules.PartialText = partialText;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -222,6 +229,7 @@ public sealed class Game : MessageHandler
                     if (bool.TryParse(optionValue, out var partialImages) && partialImages != appSettings.PartialImages)
                     {
                         appSettings.PartialImages = partialImages;
+                        rules.PartialImages = partialImages;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -253,6 +261,7 @@ public sealed class Game : MessageHandler
                     if (bool.TryParse(optionValue, out var useApellations) && useApellations != appSettings.UseApellations)
                     {
                         appSettings.UseApellations = useApellations;
+                        rules.UseAppellations = useApellations;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -278,26 +287,33 @@ public sealed class Game : MessageHandler
             string.Join(Message.ArgsSeparator, _defaultPlayers.Select(p => p.Name)));
 
         var appSettings = _state.Settings.AppSettings;
+        var rules = _state.Rules;
 
         var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
         _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
 
         _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, _state.JoinMode);
 
+        if (_state.HiddenPersons)
+        {
+            _gameActions.OnArenaMode();
+        }
+
         _gameActions.SendMessageToWithArgs(
             person,
             Messages.Options2,
             "",
-            nameof(appSettings.Oral), appSettings.Oral,
-            nameof(appSettings.Managed), appSettings.Managed,
-            nameof(appSettings.DisplayAnswerOptionsLabels), appSettings.DisplayAnswerOptionsLabels,
-            nameof(appSettings.FalseStart), appSettings.FalseStart,
-            nameof(appSettings.ReadingSpeed), appSettings.Managed ? 0 : appSettings.ReadingSpeed,
-            nameof(appSettings.PartialText), appSettings.PartialText,
-            nameof(appSettings.PartialImages), appSettings.PartialImages,
-            nameof(appSettings.TimeSettings.PartialImageTime), _state.TimeSettings.PartialImage,
-            nameof(appSettings.UseApellations), appSettings.UseApellations,
-            nameof(appSettings.TimeSettings.TimeForBlockingButton), _state.TimeSettings.ButtonBlocking,
+            nameof(rules.Oral), rules.Oral,
+            nameof(rules.Managed), rules.Managed,
+            nameof(rules.DisplayAnswerOptionsLabels), rules.DisplayAnswerOptionsLabels,
+            nameof(rules.FalseStart), rules.FalseStart,
+            nameof(rules.ReadingSpeed), rules.Managed ? 0 : rules.ReadingSpeed,
+            nameof(rules.PartialText), rules.PartialText,
+            nameof(rules.PartialImages), rules.PartialImages,
+            nameof(appSettings.UseApellations), rules.UseAppellations, // legacy
+            nameof(rules.UseAppellations), rules.UseAppellations,
+            nameof(appSettings.TimeSettings.PartialImageTime), _state.TimeSettings.PartialImage, // legacy
+            nameof(appSettings.TimeSettings.TimeForBlockingButton), _state.TimeSettings.ButtonBlocking, // legacy
             nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
             nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
     }
@@ -321,6 +337,11 @@ public sealed class Game : MessageHandler
 
     private void InformAvatars(string person)
     {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
         // Send persons avatars info
         if (person != NetworkConstants.Everybody)
         {
@@ -344,9 +365,12 @@ public sealed class Game : MessageHandler
 
     private void InformPersons(string person)
     {
+        var isPlayer = _state.Players.Any(p => p.Name == person);
+        var hiddenPlayerCount = isPlayer ? 1 : 0;
+
         var info = new StringBuilder(Messages.Info2)
             .Append(Message.ArgsSeparatorChar)
-            .Append(_state.Players.Count)
+            .Append(_state.HiddenPersons ? hiddenPlayerCount : _state.Players.Count)
             .Append(Message.ArgsSeparatorChar);
 
         AppendAccountExt(_state.ShowMan, info);
@@ -355,6 +379,11 @@ public sealed class Game : MessageHandler
 
         foreach (var player in _state.Players)
         {
+            if (_state.HiddenPersons && player.Name != person)
+            {
+                continue;
+            }
+
             AppendAccountExt(player, info);
 
             info.Append(Message.ArgsSeparatorChar);
@@ -362,17 +391,8 @@ public sealed class Game : MessageHandler
 
         foreach (var viewer in _state.Viewers)
         {
-            if (!viewer.IsConnected)
+            if (_state.HiddenPersons && viewer.Name != person)
             {
-                _state.Host.LogWarning($"Viewer {viewer.Name} not connected\n" + _state.PersonsUpdateHistory);
-                continue;
-            }
-
-            if (_state.Players.Any(p => p.Name == viewer.Name)
-                || _state.ShowMan.Name == viewer.Name)
-            {
-                // Need to catch that state
-                _state.Host.LogWarning($"Viewer {viewer.Name} is already in players or showman\n" + _state.PersonsUpdateHistory);
                 continue;
             }
 
@@ -566,30 +586,6 @@ public sealed class Game : MessageHandler
     }
 
     /// <summary>
-    /// Adds person to the game.
-    /// </summary>
-    public (bool, string) Join(
-        string name,
-        bool isMale,
-        GameRole role,
-        string? password,
-        Action connectionAuthenticator) =>
-        _state.TaskLock.WithLock(() =>
-        {
-            var result = AuthenticateCore(name, isMale, role, password);
-
-            if (result != AuthenticationResult.Ok)
-            {
-                return (false, GetAuthenticationErrorMessage(result));
-            }
-
-            connectionAuthenticator();
-
-            return (true, "");
-        },
-        5000);
-
-    /// <summary>
     /// Authenticates person in the game.
     /// </summary>
     public AuthenticationResult Authenticate(
@@ -599,6 +595,7 @@ public sealed class Game : MessageHandler
         string? password) =>
         _state.TaskLock.WithLock(() => AuthenticateCore(name, isMale, role, password), 5000);
 
+    [Obsolete]
     private string GetAuthenticationErrorMessage(AuthenticationResult result) =>
         result switch
         {
@@ -687,23 +684,12 @@ public sealed class Game : MessageHandler
                         OnSetOptions(message, args);
                         break;
 
-                    case Messages.First:
-                        OnFirst(message, args);
-                        break;
-
                     case Messages.SetChooser:
                         OnSetChooser(message, args);
                         break;
 
                     case Messages.SetJoinMode:
-                        if (message.Sender == _state.HostName && args.Length > 1)
-                        {
-                            if (Enum.TryParse<JoinMode>(args[1], out var joinMode))
-                            {
-                                _state.JoinMode = joinMode;
-                                _gameActions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
-                            }
-                        }
+                        OnSetJoinMode(message, args);
                         break;
 
                     case Messages.Pause:
@@ -711,18 +697,11 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.Start:
-                        if (message.Sender == _state.HostName && _state.Stage == GameStage.Before)
-                        {
-                            StartGame();
-                        }
+                        OnStart(message.Sender);
                         break;
 
                     case Messages.Ready:
                         OnReady(message, args);
-                        break;
-
-                    case Messages.Picture:
-                        OnPicture(message, args);
                         break;
 
                     case Messages.Pin:
@@ -745,7 +724,7 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.I:
-                        OnI(message.Sender, args.Length > 1 && int.TryParse(args[1], out var pressDuration) ? pressDuration : -1);
+                        OnButtonPress(message.Sender, args.Length > 1 && int.TryParse(args[1], out var pressDuration) ? pressDuration : -1);
                         break;
 
                     case Messages.Pass:
@@ -760,12 +739,13 @@ public sealed class Game : MessageHandler
                         OnAnswer(message, args);
                         break;
 
-                    case Messages.Atom:
-                        OnAtom(args);
-                        break;
-
                     case Messages.MediaLoaded:
                         OnMediaLoaded(message);
+                        break;
+
+                    case Messages.Atom:
+                    case Messages.MediaCompleted:
+                        OnMediaCompleted(args);
                         break;
 
                     case Messages.MediaPreloadProgress:
@@ -774,61 +754,6 @@ public sealed class Game : MessageHandler
 
                     case Messages.IsRight:
                         OnIsRight(message, args);
-                        break;
-
-                    case Messages.Next:
-                        if (_state.IsWaiting &&
-                            _state.Decision == DecisionType.NextPersonStakeMaking &&
-                            message.Sender == _state.ShowMan.Name)
-                        {
-                            #region Next
-
-                            if (args.Length > 1 && int.TryParse(args[1], out int n) && n > -1 && n < _state.Players.Count)
-                            {
-                                if (_state.Players[n].Flag)
-                                {
-                                    _state.Order[_state.OrderIndex] = n;
-                                    Logic.CheckOrder(_state.OrderIndex);
-                                    _controller.Stop(StopReason.Decision);
-                                }
-                            }
-
-                            #endregion
-                        }
-                        break;
-
-                    case Messages.Cat:
-                        if (_state.IsWaiting
-                            && _state.Decision == DecisionType.QuestionAnswererSelection
-                            && (_state.Chooser != null && message.Sender == _state.Chooser.Name
-                                || _state.IsOralNow && message.Sender == _state.ShowMan.Name))
-                        {
-                            #region Cat
-
-                            try
-                            {
-                                if (int.TryParse(args[1], out int index) && index > -1 && index < _state.Players.Count && _state.Players[index].Flag)
-                                {
-                                    _state.AnswererIndex = index;
-                                    _state.QuestionPlay.SetSingleAnswerer(index);
-
-                                    if (_state.IsOralNow)
-                                    {
-                                        _gameActions.SendMessage(
-                                            Messages.Cancel,
-                                            message.Sender == _state.ShowMan.Name ? _state.Chooser.Name : _state.ShowMan.Name);
-                                    }
-
-                                    _controller.Stop(StopReason.Decision);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                _state.Host.SendError(ex, true);
-                            }
-
-                            #endregion
-                        }
                         break;
 
                     case Messages.SelectPlayer:
@@ -846,56 +771,12 @@ public sealed class Game : MessageHandler
                         }
                         break;
 
-                    case Messages.CatCost:
-                        OnCatCost(message, args);
-                        break;
-
-                    case Messages.Stake:
-                        OnStake(message, args);
-                        break;
-
                     case Messages.SetStake:
                         OnSetStake(message, args);
                         break;
 
-                    case Messages.NextDelete:
-                        OnNextDelete(message, args);
-                        break;
-
                     case Messages.Delete:
                         OnDelete(message, args);
-                        break;
-
-                    case Messages.FinalStake:
-                        if (_state.IsWaiting && _state.Decision == DecisionType.HiddenStakeMaking)
-                        {
-                            #region FinalStake
-
-                            for (var i = 0; i < _state.Players.Count; i++)
-                            {
-                                var player = _state.Players[i];
-
-                                if (_state.QuestionPlay.AnswererIndicies.Contains(i) && player.PersonalStake == -1 && message.Sender == player.Name)
-                                {
-                                    if (int.TryParse(args[1], out int finalStake) && finalStake >= 1 && finalStake <= player.Sum)
-                                    {
-                                        player.PersonalStake = finalStake;
-                                        _state.HiddenStakerCount--;
-
-                                        _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
-                                    }
-
-                                    break;
-                                }
-                            }
-
-                            if (_state.HiddenStakerCount == 0)
-                            {
-                                _controller.Stop(StopReason.Decision);
-                            }
-
-                            #endregion
-                        }
                         break;
 
                     case Messages.Apellate:
@@ -927,17 +808,7 @@ public sealed class Game : MessageHandler
                         break;
 
                     case Messages.Mark:
-                        if (!_state.CanMarkQuestion || args.Length < 3)
-                        {
-                            break;
-                        }
-                        
-                        _state.GameResultInfo.ComplainedQuestions.Add(new QuestionReport
-                        {
-                            ThemeName = _state.Theme.Name,
-                            QuestionText = _state.Question == null ? null : _state.PackageDoc?.GetQuestionReportText(_state.Question) ?? "",
-                            ReportText = args[2]
-                        });
+                        OnMark(args);
                         break;
 
                     case Messages.Validate:
@@ -950,6 +821,32 @@ public sealed class Game : MessageHandler
                 _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
+
+    private void OnSetJoinMode(Message message, string[] args)
+    {
+        if (message.Sender != _state.HostName || args.Length <= 1 || !Enum.TryParse<JoinMode>(args[1], out var joinMode))
+        {
+            return;
+        }
+
+        _state.JoinMode = joinMode;
+        _gameActions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
+    }
+
+    private void OnMark(string[] args)
+    {
+        if (!_state.CanMarkQuestion || args.Length < 3)
+        {
+            return;
+        }
+
+        _state.GameResultInfo.ComplainedQuestions.Add(new QuestionReport
+        {
+            ThemeName = _state.Theme.Name,
+            QuestionText = _state.Question == null ? null : _state.PackageDoc?.GetQuestionReportText(_state.Question) ?? "",
+            ReportText = args[2]
+        });
+    }
 
     private void OnValidate(Message message, string[] args)
     {
@@ -1063,25 +960,6 @@ public sealed class Game : MessageHandler
         _controller.Stop(StopReason.Decision);
     }
 
-    private void OnFirst(Message message, string[] args)
-    {
-        if (!_state.IsWaiting
-            || _state.Decision != DecisionType.StarterChoosing
-            || message.Sender != _state.ShowMan.Name
-            || args.Length <= 1)
-        {
-            return;
-        }
-
-        if (!int.TryParse(args[1], out int playerIndex) || playerIndex <= -1 || playerIndex >= _state.Players.Count || !_state.Players[playerIndex].Flag)
-        {
-            return;
-        }
-
-        _state.ChooserIndex = playerIndex;
-        _controller.Stop(StopReason.Decision);
-    }
-
     private void OnSetChooser(Message message, string[] args)
     {
         if (message.Sender != _state.ShowMan.Name || args.Length <= 1)
@@ -1129,7 +1007,7 @@ public sealed class Game : MessageHandler
 
     private void OnMediaPreloadProgress(Message message, string[] args)
     {
-        if (args.Length < 2 || !int.TryParse(args[1], out var progress) || progress < 0 || progress > 100)
+        if (args.Length < 2 || !int.TryParse(args[1], out var progress) || progress < 0 || progress > 100 || _state.HiddenPersons)
         {
             return;
         }
@@ -1219,7 +1097,14 @@ public sealed class Game : MessageHandler
 
         if (clientId.Length > 0)
         {
-            _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
+            if (!_state.HiddenPersons)
+            {
+                _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
+            }
+            else
+            {
+                _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.Banned, clientId, clientName);
+            }
         }
     }
 
@@ -1256,7 +1141,14 @@ public sealed class Game : MessageHandler
 
         if (clientId.Length > 0)
         {
-            _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
+            if (!_state.HiddenPersons)
+            {
+                _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
+            }
+            else
+            {
+                _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.Banned, clientId, clientName);
+            }
         }
     }
 
@@ -1298,82 +1190,6 @@ public sealed class Game : MessageHandler
 
         var clientId = args[1];
         Master.Unban(clientId);
-    }
-
-    private void OnNextDelete(Message message, string[] args)
-    {
-        if (!_state.IsWaiting ||
-            _state.Decision != DecisionType.NextPersonFinalThemeDeleting ||
-            message.Sender != _state.ShowMan.Name ||
-            args.Length <= 1 ||
-            !int.TryParse(args[1], out int playerIndex) ||
-            playerIndex <= -1 ||
-            playerIndex >= _state.Players.Count ||
-            !_state.Players[playerIndex].Flag)
-        {
-            return;
-        }
-
-        try
-        {
-            _state.ThemeDeleters?.Current.SetIndex(playerIndex);
-        }
-        catch (Exception exc)
-        {
-            throw new InvalidOperationException(
-                $"SetIndex error. Person history: {_state.PersonsUpdateHistory}; Logic history: {Logic.PrintHistory()}",
-                exc);
-        }
-
-        _controller.Stop(StopReason.Decision);
-    }
-
-    [Obsolete("Use OnAvatar instead")]
-    private void OnPicture(Message message, string[] args)
-    {
-        if (args.Length < 2)
-        {
-            return;
-        }
-
-        var path = args[1];
-        var person = _state.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
-
-        if (person == null)
-        {
-            return;
-        }
-
-        if (args.Length > 2)
-        {
-            if (!_state.Host.AreCustomAvatarsSupported)
-            {
-                return;
-            }
-
-            var file = $"{message.Sender}_{Path.GetFileName(path)}";
-
-            if (!_avatarHelper.FileExists(file))
-            {
-                var error = _avatarHelper.ExtractAvatarData(args[2], file);
-
-                if (error != null)
-                {
-                    _gameActions.SendMessageWithArgs(Messages.UserError, error.Value.Item1);
-                    return;
-                }
-            }
-
-            var uri = _fileShare.CreateResourceUri(ResourceKind.Avatar, new Uri(file, UriKind.Relative));
-
-            person.Picture = $"URI: {uri}";
-        }
-        else
-        {
-            person.Picture = path;
-        }
-
-        InformAvatar(person);
     }
 
     private void OnAvatar(Message message, string[] args)
@@ -1504,74 +1320,20 @@ public sealed class Game : MessageHandler
             _ => StakeMode.Sum
         };
 
-    [Obsolete]
-    private void OnStake(Message message, string[] args)
-    {
-        if (!_state.IsWaiting ||
-            _state.Decision != DecisionType.StakeMaking ||
-            (_state.ActivePlayer == null || message.Sender != _state.ActivePlayer.Name)
-            && (!_state.IsOralNow || message.Sender != _state.ShowMan.Name))
-        {
-            return;
-        }
-
-        if (!int.TryParse(args[1], out var stakeType) || stakeType < 0 || stakeType > 3)
-        {
-            return;
-        }
-
-        _state.StakeType = (StakeMode)stakeType;
-
-        if (!_state.StakeVariants[(int)_state.StakeType])
-        {
-            _state.StakeType = null;
-        }
-        else if (_state.StakeType == StakeMode.Sum)
-        {
-            var minimum = _state.Stake != -1 ? _state.Stake + _state.StakeStep : _state.CurPriceRight + _state.StakeStep;
-            
-            // TODO: optimize
-            while (minimum % _state.StakeStep != 0)
-            {
-                minimum++;
-            }
-
-            if (!int.TryParse(args[2], out var stakeSum))
-            {
-                _state.StakeType = null;
-                return;
-            }
-
-            if (stakeSum < minimum || stakeSum > _state.ActivePlayer.Sum || stakeSum % _state.StakeStep != 0)
-            {
-                _state.StakeType = null;
-                return;
-            }
-
-            _state.StakeSum = stakeSum;
-        }
-
-        if (_state.IsOralNow)
-        {
-            if (message.Sender == _state.ShowMan.Name)
-            {
-                if (_state.ActivePlayer != null)
-                {
-                    _gameActions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
-                }
-            }
-            else
-            {
-                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
-            }
-        }
-
-        _controller.Stop(StopReason.Decision);
-    }
-
     private void OnInfo(string person)
     {
         Inform(person);
+        InformReady(person);
+        _gameActions.InformSums(person);
+        InformGameStage(person);
+    }
+
+    private void InformReady(string person)
+    {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
 
         foreach (var item in _state.MainPersons)
         {
@@ -1580,9 +1342,6 @@ public sealed class Game : MessageHandler
                 _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", person);
             }
         }
-
-        _gameActions.InformSums(person);
-        InformGameStage(person);
     }
 
     private void InformGameStage(string person)
@@ -1678,12 +1437,39 @@ public sealed class Game : MessageHandler
 
         if (_state.Decision == DecisionType.Appellation)
         {
-            _gameActions.SendMessageToWithArgs(person, Messages.Appellation, '+');
+            var canProcessAppellation = _state.Players.Any(p => p.Name == person && p.AppellationFlag);
+
+            if (canProcessAppellation)
+            {
+                _gameActions.SendMessageToWithArgs(person, Messages.Appellation, '+');
+            }
         }
         else if (_state.Decision == DecisionType.Pressing)
         {
-            _gameActions.SendMessageToWithArgs(person, Messages.Try);
+            var personIsPlayerAndCanPress = _state.Players.Any(p => p.Name == person && p.Flag);
+
+            if (personIsPlayerAndCanPress)
+            {
+                _gameActions.SendMessageToWithArgs(person, Messages.Try);
+            }
         }
+        else if (_state.Decision == DecisionType.AnswerValidating)
+        {
+            if (person == _state.ShowMan.Name)
+            {
+                var answerer = _state.Answerer;
+
+                if (answerer != null)
+                {
+                    var answer = answerer.Answer ?? "";
+
+                    _gameActions.SendMessage(
+                        _controller.BuildValidation2Message(answerer.Name, answer, !_state.QuestionPlay.FlexiblePrice),
+                        _state.ShowMan.Name);
+                }
+            }
+        }
+        // TODO: support all other decision types with appropriate messages. It is much better to implement uviversal waiting cache and resend required messages
 
         if (_state.ChooserIndex != -1)
         {
@@ -1939,38 +1725,6 @@ public sealed class Game : MessageHandler
         _controller.ProcessNextAppellationRequest(true);
     }
 
-    [Obsolete]
-    private void OnCatCost(Message message, string[] args)
-    {
-        if (!_state.IsWaiting ||
-            _state.Decision != DecisionType.QuestionPriceSelection ||
-            (_state.Answerer == null || message.Sender != _state.Answerer.Name) &&
-            (!_state.IsOralNow || message.Sender != _state.ShowMan.Name))
-        {
-            return;
-        }
-
-        if (int.TryParse(args[1], out var sum)
-            && sum >= _state.StakeRange.Minimum
-            && sum <= _state.StakeRange.Maximum
-            && (_state.StakeRange.Step == 0 || (sum - _state.StakeRange.Minimum) % _state.StakeRange.Step == 0))
-        {
-            _state.CurPriceRight = sum;
-        }
-
-        if (_state.IsOralNow)
-        {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
-        }
-
-        if (Logic.CanPlayerAct() && _state.Answerer != null)
-        {
-            _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
-        }
-
-        _controller.Stop(StopReason.Decision);
-    }
-
     private void OnChanged(Message message, string[] args)
     {
         if (message.Sender != _state.ShowMan.Name || args.Length != 3)
@@ -1989,7 +1743,15 @@ public sealed class Game : MessageHandler
         var player = _state.Players[playerIndex - 1];
         player.Sum = sum;
 
-        _gameActions.SendMessageWithArgs(Messages.PlayerScoreChanged, playerIndex - 1, sum);
+        if (!_state.HiddenPersons)
+        {
+            _gameActions.SendMessageWithArgs(Messages.PlayerScoreChanged, playerIndex - 1, sum);
+        }
+        else
+        {
+            _gameActions.SendMessageToWithArgs(player.Name, Messages.PlayerScoreChanged, 0, sum);
+        }
+            
         _gameActions.InformSums();
 
         _controller.AddHistory($"Sum change: {playerIndex - 1} = {sum}");
@@ -2088,11 +1850,6 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        var res = new StringBuilder();
-
-        // Player or showman is ready to start the game
-        res.Append(Messages.Ready).Append(Message.ArgsSeparatorChar);
-
         var readyAll = true;
         var found = false;
         var toReady = args.Length == 1 || args[1] == "+";
@@ -2102,16 +1859,15 @@ public sealed class Game : MessageHandler
             if (message.Sender == item.Name && (toReady && !item.Ready || !toReady && item.Ready))
             {
                 item.Ready = toReady;
-                res.Append(message.Sender).Append(Message.ArgsSeparatorChar).Append(toReady ? "+" : "-");
                 found = true;
             }
 
             readyAll = readyAll && item.Ready;
         }
 
-        if (found)
+        if (found && !_state.HiddenPersons)
         {
-            _gameActions.SendMessage(res.ToString());
+            _gameActions.OnReady(message.Sender, toReady);
         }
 
         if (readyAll)
@@ -2137,7 +1893,7 @@ public sealed class Game : MessageHandler
         _controller.OnPauseCore(args[1] == "+");
     }
 
-    private void OnAtom(string[] args)
+    private void OnMediaCompleted(string[] args)
     {
         if (!_state.QuestionPlay.CollectMediaCompletions)
         {
@@ -2235,7 +1991,11 @@ public sealed class Game : MessageHandler
                 {
                     _state.AnswererIndex = i;
                     _state.Players[i].Flag = false;
-                    _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
+
+                    if (_state.HiddenPersons)
+                    {
+                        _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
+                    }
 
                     if (_state.QuestionPlay.AnswerOptions == null
                         && _state.QuestionPlay.AnswerType == AnswerType.Text
@@ -2327,33 +2087,12 @@ public sealed class Game : MessageHandler
                     }
                 }
 
-                var wrongAnswers = LO[nameof(R.WrongAnswer)].Split(';');
-
                 if (restwrong.Count == 0)
                 {
-                    for (int i = 0; i < wrongAnswers.Length; i++)
-                    {
-                        if (!_state.UsedWrongVersions.Contains(wrongAnswers[i]))
-                        {
-                            restwrong.Add(wrongAnswers[i]);
-                        }
-                    }
-
-                    if (!_state.UsedWrongVersions.Contains(LO[nameof(R.NoAnswer)]))
-                    {
-                        restwrong.Add(LO[nameof(R.NoAnswer)]);
-                    }
+                    restwrong.Add("-");
                 }
 
-                var wrongCount = restwrong.Count;
-
-                if (wrongCount == 0)
-                {
-                    restwrong.Add(wrongAnswers[0]);
-                    wrongCount = 1;
-                }
-
-                var wrongIndex = Random.Shared.Next(wrongCount);
+                var wrongIndex = Random.Shared.Next(restwrong.Count);
 
                 if (!Logic.HaveMultipleAnswerers())
                 {
@@ -2545,7 +2284,12 @@ public sealed class Game : MessageHandler
             if (player.Name == message.Sender && player.CanPress)
             {
                 player.CanPress = false;
-                _gameActions.SendMessageWithArgs(Messages.Pass, i);
+
+                if (!_state.HiddenPersons)
+                {
+                    _gameActions.SendMessageWithArgs(Messages.Pass, i);
+                }
+
                 canPressChanged = true;
                 break;
             }
@@ -2567,7 +2311,7 @@ public sealed class Game : MessageHandler
     /// </summary>
     /// <param name="playerName">Pressed player name.</param>
     /// <param name="pressDurationMs">Player reaction time.</param>
-    private void OnI(string playerName, int pressDurationMs)
+    private void OnButtonPress(string playerName, int pressDurationMs)
     {
         if (_state.TInfo.Pause)
         {
@@ -3727,12 +3471,22 @@ public sealed class Game : MessageHandler
         return newAccount;
     }
 
-    internal void StartGame()
+    internal void OnStart(string sender)
+    {
+        if (sender != _state.HostName || _state.Stage != GameStage.Before)
+        {
+            return;
+        }
+
+        StartGame();
+    }
+
+    private void StartGame()
     {
         _state.Stage = GameStage.Begin;
         _state.GameResultInfo.StartTime = DateTimeOffset.UtcNow;
 
-        _controller.OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
+        _controller.OnStageChanged(GameStages.Started, "");
         _gameActions.InformStage();
 
         _state.IsOral = _state.Settings.AppSettings.Oral && _state.ShowMan.IsHuman;
@@ -3794,6 +3548,11 @@ public sealed class Game : MessageHandler
 
     private void InformAvatar(ViewerAccount account)
     {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
         foreach (var personName in _state.AllPersons.Keys)
         {
             if (account.Name != personName && personName != NetworkConstants.GameName)

@@ -83,17 +83,6 @@
                         <Button
                             Style="{StaticResource SIButtonSimple}"
                             Background="{StaticResource WindowBackground}"
-                            Margin="-1,-1,0,-1"
-                            Padding="20,4"
-                            Command="{Binding Kick}"
-                            CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
-                            FontSize="18"
-                            TextBlock.LineHeight="18"
-                            Content="{x:Static lp:Resources.Kick}" />
-
-                        <Button
-                            Style="{StaticResource SIButtonSimple}"
-                            Background="{StaticResource WindowBackground}"
                             Margin="-1,-1,-1,-1"
                             Padding="20,4"
                             Command="{Binding Ban}"

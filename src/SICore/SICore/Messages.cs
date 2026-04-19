@@ -55,6 +55,11 @@ public static class Messages
     public const string Appellation = "APPELLATION";
 
     /// <summary>
+    /// Defines arena mode.
+    /// </summary>
+    public const string ArenaMode = "ARENA_MODE";
+
+    /// <summary>
     /// Asks for game review.
     /// </summary>
     public const string AskReview = "ASK_REVIEW";
@@ -77,6 +82,7 @@ public static class Messages
     /// <summary>
     /// Notifies the game that the client has completed viewing the media content.
     /// </summary>
+    [Obsolete("Use MediaCompleted")]
     public const string Atom = "ATOM";
 
     /// <summary>
@@ -117,18 +123,6 @@ public static class Messages
     /// Отмена ожидания решения
     /// </summary>
     public const string Cancel = "CANCEL";
-
-    /// <summary>
-    /// Вопрос с секретом
-    /// </summary>
-    [Obsolete("Use AskSelectPlayer")]
-    public const string Cat = "CAT";
-
-    /// <summary>
-    /// Стоимость Вопроса с секретом
-    /// </summary>
-    [Obsolete("Use AskStake")]
-    public const string CatCost = "CATCOST";
 
     /// <summary>
     /// Изменение суммы участника
@@ -215,21 +209,9 @@ public static class Messages
     public const string FalseStart = "FALSESTART";
 
     /// <summary>
-    /// Ставка в финале
-    /// </summary>
-    [Obsolete("Use AskStake")]
-    public const string FinalStake = "FINALSTAKE";
-
-    /// <summary>
     /// Начало размышления над финальным вопросом
     /// </summary>
     public const string FinalThink = "FINALTHINK";
-
-    /// <summary>
-    /// Showman should give a move to a player.
-    /// </summary>
-    [Obsolete("Use AskSelectPlayer")]
-    public const string First = "FIRST";
 
     /// <summary>
     /// Информация о том, кто будет первым удалять тему в финале
@@ -310,6 +292,7 @@ public static class Messages
     /// <summary>
     /// Выгнать участника
     /// </summary>
+    [Obsolete("Use Ban instead")]
     public const string Kick = "KICK";
 
     /// <summary>
@@ -321,6 +304,11 @@ public static class Messages
     /// Пометить вопрос
     /// </summary>
     public const string Mark = "MARK";
+
+    /// <summary>
+    /// Notifies the game that the client has completed viewing the media content.
+    /// </summary>
+    public const string MediaCompleted = "MEDIA_COMPLETED";
 
     /// <summary>
     /// Notifies that the client has loaded the media.
@@ -336,25 +324,6 @@ public static class Messages
     /// Сменить состояние игры
     /// </summary>
     public const string Move = "MOVE";
-
-    /// <summary>
-    /// Выбрать следующего игрока
-    /// </summary>
-    [Obsolete("Use SelectPlayer")]
-    public const string Next = "NEXT";
-
-    /// <summary>
-    /// Выбрать следующего игрока, убирающего тему
-    /// </summary>
-    [Obsolete("Use SelectPlayer")]
-    public const string NextDelete = "NEXTDELETE";
-
-    /// <summary>
-    /// Game options.
-    /// </summary>
-    [IdempotencyRequired]
-    [Obsolete("Use Options2")]
-    public const string Options = "OPTIONS";
 
     /// <summary>
     /// Game options.
@@ -443,9 +412,6 @@ public static class Messages
     /// Ставка игрока
     /// </summary>
     public const string PersonStake = "PERSONSTAKE";
-
-    [Obsolete]
-    public const string Picture = "PICTURE";
 
     /// <summary>
     /// Asks or receives game PIN.
@@ -659,18 +625,6 @@ public static class Messages
     /// Lightweight version of stage info (does not require to be announced).
     /// </summary>
     public const string StageInfo = "STAGE_INFO";
-
-    /// <summary>
-    /// Ставка
-    /// </summary>
-    [Obsolete("Use AskStake, SetStake")]
-    public const string Stake = "STAKE";
-
-    /// <summary>
-    /// Stake info.
-    /// </summary>
-    [Obsolete("Use AskStake")]
-    public const string Stake2 = "STAKE2";
 
     /// <summary>
     /// Начать игру

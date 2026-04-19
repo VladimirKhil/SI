@@ -1257,10 +1257,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 });
             }
 
-            if (_state.Answerer.IsHuman)
-            {
-                _state.GameResultInfo.IncrementQuestionCorrectCount(_state.QuestionPlay.QuestionKey);
-            }
+            RegisterQuestionAnswerStatistics(_state.Answerer, isRight: true);
 
             if (!_state.QuestionPlay.HiddenStakes)
             {
@@ -1268,7 +1265,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
 
                 _gameActions.ShowmanReplicNew(MessageCode.RightAnswer, outcome, _state.Answerer.AnswerValidationFactor);
-                _gameActions.SendMessageWithArgs(Messages.Person, '+', _state.AnswererIndex, updateSum);
+                _gameActions.OnPlayerOutcome(_state.AnswererIndex, true, updateSum);
                 AddRightSum(_state.Answerer, updateSum);
                 _gameActions.InformSums();
 
@@ -1330,10 +1327,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 }
             }
 
-            if (_state.Answerer.IsHuman)
-            {
-                _state.GameResultInfo.IncrementQuestionWrongCount(_state.QuestionPlay.QuestionKey);
-            }
+            RegisterQuestionAnswerStatistics(_state.Answerer, isRight: false);
 
             var questionText = GetCurrentQuestionReportText();
 
@@ -1350,7 +1344,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 else
                 {
                     updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
-                    _gameActions.SendMessageWithArgs(Messages.Person, '-', _state.AnswererIndex, updateSum);
+                    _gameActions.OnPlayerOutcome(_state.AnswererIndex, false, updateSum);
                     _gameActions.ShowmanReplicNew(MessageCode.WrongAnswer, outcome, _state.Answerer.AnswerValidationFactor);
                     SubtractWrongSum(_state.Answerer, updateSum);
                     _gameActions.InformSums();
@@ -2309,7 +2303,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
-        _state.StakeType = _state.StakeTypes.HasFlag(StakeTypes.Nominal) ? StakeMode.Nominal : StakeMode.Pass;
+        _state.StakeType = _state.StakeModes.HasFlag(StakeModes.Pass) ? StakeMode.Pass : StakeMode.Nominal;
 
         OnDecision();
     }
@@ -2455,7 +2449,10 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var answererIndex = _state.AnnouncedAnswerersEnumerator.Current;
         _state.AnswererIndex = answererIndex;
 
-        _state.PlayerIsRight = _state.Answerer?.Answer == _state.RightOptionLabel;
+        var answerer = _state.Players[answererIndex];
+        _state.PlayerIsRight = answerer.Answer == _state.RightOptionLabel;
+        RegisterQuestionAnswerStatistics(answerer, _state.PlayerIsRight);
+
         AnnounceStakeCore();
         ScheduleExecution(Tasks.AnnouncePostStakeWithAnswerOptions, 15);
     }
@@ -2476,24 +2473,17 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         var stake = answerer.PersonalStake;
-        _gameActions.ShowmanReplic($"{LO[nameof(R.Stake)]} {answerer.Name}: {Notion.FormatNumber(stake)}"); // TODO: REMOVE (replaced by PersonStake message)
-
-        var message = new MessageBuilder(Messages.Person);
 
         if (_state.PlayerIsRight)
         {
-            message.Add('+');
             AddRightSum(answerer, stake);
         }
         else
         {
-            message.Add('-');
             SubtractWrongSum(answerer, stake);
         }
 
-        message.Add(_state.AnswererIndex).Add(stake);
-
-        _gameActions.SendMessage(message.ToString());
+        _gameActions.OnPlayerOutcome(_state.AnswererIndex, _state.PlayerIsRight, stake);
         _gameActions.InformSums();
 
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, stake);
@@ -2520,7 +2510,6 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
                 _state.Players[i].PersonalStake = -1;
                 _state.HiddenStakerCount++;
-                _gameActions.SendMessage(Messages.FinalStake, _state.Players[i].Name);
 
                 stakers.Add((_state.Players[i].Name, new(1, _state.Players[i].Sum, 1)));
             }
@@ -3051,6 +3040,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             _state.Decision = DecisionType.StarterChoosing;
             OnDecision();
         }
+        else if (!_state.ShowMan.IsConnected || _state.HiddenPersons)
+        {
+            _state.ChooserIndex = _state.Players.SelectRandomOnIndex(i => _state.Players[i].Flag);
+            _state.IsWaiting = true;
+            _state.Decision = DecisionType.StarterChoosing;
+            OnDecision();
+        }
         else
         {
             _gameActions.SendVisualMessage(Messages.ShowTable); // Everybody will see the table during showman's decision
@@ -3186,12 +3182,19 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private void SendAnswersInfoToShowman(string? answer)
     {
+        var answerer = _state.Answerer;
+
+        if (answerer == null)
+        {
+            return;
+        }
+
         _gameActions.SendMessage(
-            BuildValidation2Message(_state.Answerer?.Name ?? "", answer, !_state.QuestionPlay.FlexiblePrice),
+            BuildValidation2Message(answerer.Name, answer, !_state.QuestionPlay.FlexiblePrice),
             _state.ShowMan.Name);
     }
 
-    private string BuildValidation2Message(string name, string? answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
+    internal string BuildValidation2Message(string name, string? answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
     {
         var question = _state.Question ?? throw new InvalidOperationException("Question is null");
 
@@ -3643,61 +3646,14 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 return;
             }
 
-            var minimumStake = (_state.Stake != -1 ? _state.Stake : cost) + _state.StakeStep;
-            var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / _state.StakeStep) * _state.StakeStep;
-
-            _state.StakeTypes = StakeTypes.AllIn | (_state.Stake == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
-
-            if (!_state.AllIn && playerMoney >= minimumStakeAligned)
-            {
-                _state.StakeTypes |= StakeTypes.Stake;
-            }
-
-            _state.StakeVariants[0] = _state.Stake == -1;
-            _state.StakeVariants[1] = !_state.AllIn && playerMoney != cost && playerMoney > _state.Stake + _state.StakeStep;
-            _state.StakeVariants[2] = !_state.StakeVariants[0];
-            _state.StakeVariants[3] = true;
-
             _state.ActivePlayer = activePlayer;
-
             _state.IsOralNow = _state.IsOral && _state.ActivePlayer.IsHuman;
-
-            var stakeMsg = new MessageBuilder(Messages.Stake);
-            var stakeMsg2 = new MessageBuilder(Messages.Stake2);
-
-            for (var i = 0; i < _state.StakeVariants.Length; i++)
-            {
-                stakeMsg.Add(_state.StakeVariants[i] ? '+' : '-');
-            }
-
-            stakeMsg2.Add(_state.StakeTypes);
-
-            stakeMsg.Add(minimumStakeAligned);
-            stakeMsg2.Add(minimumStakeAligned);
-            stakeMsg2.Add(_state.StakeStep);
 
             var waitTime = _state.TimeSettings.StakeMaking * 10;
 
-            if (CanPlayerAct())
+            if (CanPlayerAct() && !_state.ActivePlayer.IsConnected)
             {
-                _gameActions.SendMessage(stakeMsg.Build(), _state.ActivePlayer.Name);
-                _gameActions.SendMessage(stakeMsg2.Build(), _state.ActivePlayer.Name);
-
-                if (!_state.ActivePlayer.IsConnected)
-                {
-                    waitTime = 20;
-                }
-            }
-
-            if (_state.IsOralNow)
-            {
-                stakeMsg.Add(_state.ActivePlayer.Sum); // Send maximum possible value to showman
-                stakeMsg.Add(_state.ActivePlayer.Name);
-                _gameActions.SendMessage(stakeMsg.Build(), _state.ShowMan.Name);
-
-                stakeMsg2.Add(_state.ActivePlayer.Sum); // Send maximum possible value to showman
-                stakeMsg2.Add(_state.ActivePlayer.Name);
-                _gameActions.SendMessage(stakeMsg2.Build(), _state.ShowMan.Name);
+                waitTime = 20;
             }
 
             var minimumStakeNew = _state.Stake != -1 ? _state.Stake + _state.StakeStep : cost;
@@ -4383,17 +4339,29 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         var optionCount = _state.Players.Count(player => player.Flag);
 
-        if (optionCount == 1)
+        if (optionCount == 1 || _state.HiddenPersons)
         {
-            for (var i = 0; i < _state.Players.Count; i++)
+            var playerIndex = 0;
+
+            if (_state.HiddenPersons)
             {
-                if (_state.Players[i].Flag)
+                playerIndex = _state.Players.SelectRandom(p => p.Flag);
+            }
+            else
+            {
+                for (var i = 0; i < _state.Players.Count; i++)
                 {
-                    _state.ChooserIndex = _state.AnswererIndex = i;
-                    _state.QuestionPlay.SetSingleAnswerer(i);
-                    _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+                    if (_state.Players[i].Flag)
+                    {
+                        playerIndex = i;
+                        break;
+                    }
                 }
             }
+
+            _state.ChooserIndex = _state.AnswererIndex = playerIndex;
+            _state.QuestionPlay.SetSingleAnswerer(playerIndex);
+            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
 
             _gameActions.ShowmanReplic($"{_state.Answerer.Name}, {LO[nameof(R.CatIsYours)]}!");
             ScheduleExecution(Tasks.MoveNext, 10);
@@ -4623,24 +4591,22 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
             var answerer = _state.Players[answererIndex];
             var isRight = answerer.Answer == _state.RightOptionLabel;
 
-            var message = new MessageBuilder(Messages.Person);
+            RegisterQuestionAnswerStatistics(answerer, isRight);
+
             int outcome;
 
             if (isRight)
             {
-                message.Add('+');
                 AddRightSum(answerer, _state.CurPriceRight);
                 outcome = _state.CurPriceRight;
             }
             else
             {
-                message.Add('-');
                 SubtractWrongSum(answerer, _state.CurPriceWrong);
                 outcome = _state.CurPriceWrong;
             }
 
-            message.Add(answererIndex).Add(outcome);
-            _gameActions.SendMessage(message.ToString());
+            _gameActions.OnPlayerOutcome(answererIndex, isRight, outcome);
         }
 
         _gameActions.InformSums();
@@ -4864,7 +4830,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _gameActions.ShowmanReplicNew(MessageCode.IncomeWithoutAnswering);
-        _gameActions.SendMessageWithArgs(Messages.Person, '+', _state.AnswererIndex, _state.CurPriceRight);
+        _gameActions.OnPlayerOutcome(_state.AnswererIndex, true, _state.CurPriceRight);
 
         AddRightSum(_state.Answerer, _state.CurPriceRight);
         _state.ChooserIndex = _state.AnswererIndex;
@@ -5066,6 +5032,23 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         ContentTypes.Audio or ContentTypes.Video => DefaultAudioVideoTime,
         _ => 0,
     };
+
+    private void RegisterQuestionAnswerStatistics(GamePlayerAccount player, bool isRight)
+    {
+        if (!player.IsHuman)
+        {
+            return;
+        }
+
+        if (isRight)
+        {
+            _state.GameResultInfo.IncrementQuestionCorrectCount(_state.QuestionPlay.QuestionKey);
+        }
+        else
+        {
+            _state.GameResultInfo.IncrementQuestionWrongCount(_state.QuestionPlay.QuestionKey);
+        }
+    }
 
     private void AddRightSum(GamePlayerAccount player, int sum)
     {

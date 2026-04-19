@@ -756,4 +756,7 @@
   <data name="DeleteTheme" xml:space="preserve">
     <value>уберите тему, которая вам не нравится;уберите, пожалуйста, одну из тем</value>
   </data>
+  <data name="ChooseQuest" xml:space="preserve">
+    <value>выбирайте вопрос!;прошу вас!;выбирайте!;сделайте выбор!;вы выбираете;вы выбираете следующий вопрос</value>
+  </data>
 </root>

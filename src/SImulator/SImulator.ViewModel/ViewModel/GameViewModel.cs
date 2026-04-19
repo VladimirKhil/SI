@@ -764,7 +764,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
                 if (Settings.Model.EndQuestionOnRightAnswer)
                 {
-                    _gameActions.OnRightAnswer();
+                    _gameActions.OnRightAnswer(!IsQuestionFinished);
                 }
                 else
                 {
@@ -1969,6 +1969,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     }
 
     public bool QuestionForAll { get; internal set; }
+
+    public bool IsQuestionFinished { get; internal set; }
 
     private void UpdateCaption()
     {

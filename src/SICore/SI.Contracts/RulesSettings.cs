@@ -19,6 +19,7 @@ public sealed class RulesSettings
     public const PenaltyType DefaultQuestionForAllPenalty = PenaltyType.SubtractPoints;
     public const int DefaultQuestionForYourselfFactor = 2;
     public const ButtonPressMode DefaultButtonPressMode = ButtonPressMode.RandomWithinInterval;
+    public const int DefaultButtonsAcceptInterval = 300;
     public const bool DefaultPreloadRoundContent = true;
     public const GameMode DefaultGameMode = GameMode.Classic;
     public const bool DefaultUseAppellations = true;
@@ -43,6 +44,7 @@ public sealed class RulesSettings
         QuestionForAllPenalty = DefaultQuestionForAllPenalty,
         QuestionForYourselfFactor = DefaultQuestionForYourselfFactor,
         ButtonPressMode = DefaultButtonPressMode,
+        ButtonsAcceptInterval = DefaultButtonsAcceptInterval,
         PreloadRoundContent = DefaultPreloadRoundContent,
         GameMode = DefaultGameMode,
         UseAppellations = DefaultUseAppellations,
@@ -121,6 +123,11 @@ public sealed class RulesSettings
     /// Gets or sets the button press mode.
     /// </summary>
     public ButtonPressMode ButtonPressMode { get; set; } = DefaultButtonPressMode;
+
+    /// <summary>
+    /// Interval for accepting buttons when selecting random winner.
+    /// </summary>
+    public int ButtonsAcceptInterval { get; set; } = DefaultButtonsAcceptInterval;
 
     /// <summary>
     /// Gets or sets a value indicating whether round content is preloaded.

@@ -2133,6 +2133,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         screenContent.Add(new ContentInfoLocal(ContentTypes.Text, packageName, ""));
 
         OnScreenContent(screenContent);
+        _state.ShowMan.Replic = "";
     }
 
     public void OnPackageAuthors(IEnumerable<string> authors)
@@ -2237,47 +2238,47 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         switch (messageCode)
         {
             case Models.MessageCode.ShowmanGreeting:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.ShowmanGreeting, selector);
+                text = ChooseResourceVariant(Resources.ShowmanGreeting, selector);
                 break;
 
             case Models.MessageCode.SelectQuestion:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.Mixed, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.ChooseQuest, selector, namePrefix);
                 break;
 
             case Models.MessageCode.UnsupportedQuestion:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.ManuallyPlayedQuestion, selector);
+                text = ChooseResourceVariant(Resources.ManuallyPlayedQuestion, selector);
                 break;
 
             case Models.MessageCode.SelectPlayer:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.GiveCat, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.GiveCat, selector, namePrefix);
                 break;
 
             case Models.MessageCode.MakeStake:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.YourStake, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.YourStake, selector, namePrefix);
                 break;
 
             case Models.MessageCode.SelectAnswerOption:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.SelectAnswerOption, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.SelectAnswerOption, selector, namePrefix);
                 break;
 
             case Models.MessageCode.Answer:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.YourAnswer, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.YourAnswer, selector, namePrefix);
                 break;
 
             case Models.MessageCode.RoundSkippedNoPlayers:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.NobodyInFinal, selector);
+                text = ChooseResourceVariant(Resources.NobodyInFinal, selector);
                 break;
 
             case Models.MessageCode.RightAnswer:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.Right, selector);
+                text = ChooseResourceVariant(Resources.Right, selector);
                 break;
 
             case Models.MessageCode.DeleteTheme:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.DeleteTheme, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.DeleteTheme, selector, namePrefix);
                 break;
 
             case Models.MessageCode.IncomeWithoutAnswering:
-                text = ChooseResourceVariant(SIGame.ViewModel.Properties.Resources.EasyCat, selector);
+                text = ChooseResourceVariant(Resources.EasyCat, selector);
                 break;
 
             default:

@@ -818,7 +818,9 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             avatarHelper,
             null,
             null,
-            null);
+            null,
+            null,
+            false);
 
         var data = new ViewerData();
         var client = new Client(_model.HumanPlayerName);

@@ -62,9 +62,13 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
 
     public void MoveBackRound() => _engine.MoveBackRound();
 
-    public void OnRightAnswer()
+    public void OnRightAnswer(bool moveToAnswer)
     {
-        _engine.MoveToAnswer();
+        if (moveToAnswer)
+        {
+            _engine.MoveToAnswer();
+        }
+
         _engine.MoveNext();
     }
 
