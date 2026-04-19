@@ -1587,7 +1587,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
         _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
 
-        if (_state.QuestionPlay.AnswerOptions != null)
+        if (_state.QuestionPlay.AnswerOptions != null) // TODO: _state.QuestionPlay.ValidateAfterRightAnswer
         {
             var m = new MessageBuilder(Messages.Answers).AddRange(_state.Players.Select(p => p.Answer ?? ""));
             _gameActions.SendMessage(m.ToString());
@@ -3148,7 +3148,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
             var rightAnswer = _state.Question?.Right.FirstOrDefault() ?? "";
             var playerAnswer = _state.Answerer.Answer ?? "";
-            var deviation = _state.QuestionPlay.AnswerDeviation;
+            var deviation = Math.Max(0.02, _state.QuestionPlay.AnswerDeviation);
 
             var rightPointParsed = ParsePoint(rightAnswer);
 
@@ -3158,7 +3158,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
                 var playerPointParsed = ParsePlayerPoint(playerAnswer, aspectRatio);
 
                 _state.Answerer.AnswerIsRight = playerPointParsed.HasValue &&
-                    CalculatePointDistance((x, y), playerPointParsed.Value) <= deviation + 0.05;
+                    CalculatePointDistance((x, y), playerPointParsed.Value) <= deviation;
             }
             else
             {
@@ -3187,7 +3187,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     private void SendAnswersInfoToShowman(string? answer)
     {
         _gameActions.SendMessage(
-            BuildValidation2Message(_state.Answerer.Name, answer, !_state.QuestionPlay.FlexiblePrice),
+            BuildValidation2Message(_state.Answerer?.Name ?? "", answer, !_state.QuestionPlay.FlexiblePrice),
             _state.ShowMan.Name);
     }
 
@@ -5118,6 +5118,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnQuestionStart()
     {
+        // TODO: remove
         if (_state.Settings.AppSettings.HintShowman && _state.QuestionPlay.AnswerType != AnswerType.Point)
         {
             // TODO: use SendAnswerInfoToShowman()
@@ -5125,6 +5126,13 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
         }
 
         SendQuestionAnswersToShowman();
+
+        var question = _state.Question;
+
+        if (question != null && question.Info.ShowmanComments != null && question.Info.ShowmanComments.Text.Length > 0)
+        {
+            _gameActions.SendVisualMessageWithArgs(Messages.ShowmanComments, question.Info.ShowmanComments.Text.EscapeNewLines());
+        }
     }
 
     /// <summary>

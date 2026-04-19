@@ -2046,7 +2046,6 @@ public class Viewer : MessageHandler, IViewerClient
         }
 
         SendAvatar();
-        _actions.SendMessage(Messages.Moveable);
     }
 
     private void InsertPerson(string role, Account account, int index)

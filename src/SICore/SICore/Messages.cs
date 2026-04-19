@@ -338,12 +338,6 @@ public static class Messages
     public const string Move = "MOVE";
 
     /// <summary>
-    /// Denotes that the person could be moved during the game.
-    /// </summary>
-    [Obsolete]
-    public const string Moveable = "MOVEABLE";
-
-    /// <summary>
     /// Выбрать следующего игрока
     /// </summary>
     [Obsolete("Use SelectPlayer")]
@@ -640,6 +634,11 @@ public static class Messages
     /// Sets stake.
     /// </summary>
     public const string SetStake = "SET_STAKE";
+
+    /// <summary>
+    /// Defines comments for showman (hidden comments).
+    /// </summary>
+    public const string ShowmanComments = "SHOWMAN_COMMENTS";
 
     /// <summary>
     /// Defines localizable showman replic.

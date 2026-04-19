@@ -63,12 +63,6 @@ public class ViewerAccount : Account
     /// </remarks>
     public bool HasVideoAvatar => _avatarVideoUri != null;
 
-    /// <summary>
-    /// Can the account be moved.
-    /// </summary>
-    [Obsolete]
-    public bool IsMoveable { get; set; }
-
     public ViewerAccount(string name, bool isMale, bool isConnected)
         : base(name, isMale)
     {

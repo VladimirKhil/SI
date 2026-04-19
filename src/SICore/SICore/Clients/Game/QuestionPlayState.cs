@@ -67,7 +67,7 @@ internal sealed class QuestionPlayState
     /// <summary>
     /// Should the player answers be validated after right answer.
     /// </summary>
-    internal bool ValidateAfterRightAnswer => AnswerOptions != null;
+    internal bool ValidateAfterRightAnswer => AnswerOptions != null || AnswerType != AnswerType.Text;
 
     /// <summary>
     /// Is the question in answer display mode.

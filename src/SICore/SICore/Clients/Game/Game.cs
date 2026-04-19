@@ -736,10 +736,6 @@ public sealed class Game : MessageHandler
                         OnAvatar(message, args);
                         break;
 
-                    case Messages.Moveable:
-                        OnMoveable(message);
-                        break;
-
                     case Messages.Choice:
                         OnChoice(message, args);
                         break;
@@ -1126,14 +1122,6 @@ public sealed class Game : MessageHandler
         if (isChoosingNow)
         {
             _controller.PlanExecution(Tasks.AskToSelectQuestion, 10);
-        }
-    }
-
-    private void OnMoveable(Message message)
-    {
-        if (_state.AllPersons.TryGetValue(message.Sender, out var person))
-        {
-            person.IsMoveable = true;
         }
     }
 
@@ -2817,11 +2805,6 @@ public sealed class Game : MessageHandler
         var account = _state.Players[index];
         var isOnline = account.IsConnected;
 
-        if (_state.Stage != GameStage.Before && account.IsHuman && isOnline && !account.IsMoveable)
-        {
-            return;
-        }
-
         _state.BeginUpdatePersons("DeleteTable " + message.Text);
 
         try
@@ -3260,7 +3243,7 @@ public sealed class Game : MessageHandler
             account = _state.ShowMan;
         }
 
-        if (!account.IsConnected || !account.IsHuman || _state.Stage != GameStage.Before && !account.IsMoveable)
+        if (!account.IsConnected || !account.IsHuman)
         {
             return;
         }
@@ -3348,11 +3331,6 @@ public sealed class Game : MessageHandler
         else
         {
             account = _state.ShowMan;
-        }
-
-        if (_state.Stage != GameStage.Before && account.IsConnected && !account.IsMoveable)
-        {
-            return;
         }
 
         var oldName = account.Name;
@@ -3451,16 +3429,10 @@ public sealed class Game : MessageHandler
             {
                 otherAccount = _state.ShowMan;
 
-                if (_state.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
-                {
-                    return false;
-                }
-
                 _state.ShowMan = new GamePersonAccount(account)
                 {
                     Ready = account.Ready,
                     IsConnected = account.IsConnected,
-                    IsMoveable = account.IsMoveable
                 };
 
                 Logic.SendQuestionAnswersToShowman();
@@ -3473,16 +3445,10 @@ public sealed class Game : MessageHandler
                     {
                         otherAccount = _state.Players[i];
 
-                        if (_state.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
-                        {
-                            return false;
-                        }
-
                         _state.Players[i] = new GamePlayerAccount(account)
                         {
                             Ready = account.Ready,
                             IsConnected = account.IsConnected,
-                            IsMoveable = account.IsMoveable,
                             Flag = _state.Players[i].Flag,
                             Sum = _state.Players[i].Sum
                         };
@@ -3502,11 +3468,6 @@ public sealed class Game : MessageHandler
                         {
                             otherAccount = _state.Viewers[i];
                             otherIndex = i;
-
-                            if (_state.Stage != GameStage.Before && otherAccount.IsConnected && !otherAccount.IsMoveable)
-                            {
-                                return false;
-                            }
 
                             if (account.IsConnected)
                             {
@@ -3538,7 +3499,6 @@ public sealed class Game : MessageHandler
                 _state.Players[index] = new GamePlayerAccount(otherAccount)
                 {
                     IsConnected = otherAccount.IsConnected,
-                    IsMoveable = otherAccount.IsMoveable,
                     Sum = previousPlayer.Sum
                 };
 
@@ -3554,7 +3514,6 @@ public sealed class Game : MessageHandler
                 _state.ShowMan = new GamePersonAccount(otherAccount)
                 {
                     IsConnected = otherAccount.IsConnected,
-                    IsMoveable = otherAccount.IsMoveable
                 };
 
                 if (otherPerson != null)
@@ -3598,11 +3557,6 @@ public sealed class Game : MessageHandler
         if (account == null)
         {
             _state.Host.LogWarning("ChangePersonType: account == null");
-            return;
-        }
-
-        if (_state.Stage != GameStage.Before && account.IsConnected && !account.IsMoveable)
-        {
             return;
         }
 
