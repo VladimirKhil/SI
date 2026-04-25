@@ -1,3 +1,4 @@
+using SIData;
 using SIEngine.Rules;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
@@ -371,5 +372,10 @@ internal sealed class TestWebPresentationController : IPresentationController
     public void Dispose()
     {
         AddCommand("Dispose");
+    }
+
+    public void SendRawMessage(Message message)
+    {
+        AddCommand("SendRawMessage");
     }
 }
