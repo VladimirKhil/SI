@@ -454,7 +454,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsStarting = true;
 
             var presentationListener = new PresentationListener();
-            var presentationController = new WebPresentationController(screen, presentationListener, Settings.Sounds);
+            var presentationController = new WebPresentationController(screen, presentationListener, Settings.Sounds, !Settings.UseSIGameEngine);
 
             presentationController.Error += ShowError;
 
@@ -585,6 +585,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         var gameController = new GameController(actions);
 
         var host = new Showman(client, new Account(), gameController, actions, state);
+        var handler = new PresentationHandler(client, presentationController);
 
         client.ConnectTo(node);
 
@@ -616,6 +617,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             presentationListener,
             presentationController,
             gameLogger,
+            handler,
             true);
 
         gameController.GameViewModel = gameViewModel;
@@ -674,6 +676,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             presentationListener,
             presentationController,
             gameLogger,
+            null,
             false)
         {
             RoundTimeMax = Settings.RoundTime

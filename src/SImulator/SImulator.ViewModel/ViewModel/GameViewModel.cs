@@ -6,6 +6,7 @@ using SImulator.ViewModel.Helpers;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
+using SImulator.ViewModel.Services;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.Model;
@@ -649,12 +650,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private readonly bool _managed;
 
+    private readonly PresentationHandler? _presentationHandler;
+
     public GameViewModel(
         AppSettingsViewModel settings,
         IGameActions gameActions,
         IExtendedListener presentationListener,
         IPresentationController presentationController,
         IGameLogger gameLogger,
+        PresentationHandler? presentationHandler,
         bool managed)
     {
         Settings = settings;
@@ -662,6 +666,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _presentationListener = presentationListener;
         _gameLogger = gameLogger;
         PresentationController = presentationController;
+        _presentationHandler = presentationHandler;
         _managed = managed;
 
         LocalInfo = new TableInfoViewModel();
@@ -1885,6 +1890,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             _gameActions.Dispose();
             _gameLogger.Dispose();
+
+            _presentationHandler?.Dispose();
 
             PlatformManager.Instance.ClearMedia();
         }

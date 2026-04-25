@@ -1,4 +1,5 @@
-﻿using SIEngine.Rules;
+﻿using SIData;
+using SIEngine.Rules;
 using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -51,11 +52,18 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     
     public ICommand Stop { get; private set; }
 
-    public WebPresentationController(IDisplayDescriptor displayDescriptor, IPresentationListener presentationListener, SoundsSettings soundsSettings)
+    private readonly bool _sendCommonMessages;
+
+    public WebPresentationController(
+        IDisplayDescriptor displayDescriptor,
+        IPresentationListener presentationListener,
+        SoundsSettings soundsSettings,
+        bool sendCommonMessages)
     {
         _displayDescriptor = displayDescriptor;
         _presentationListener = presentationListener;
         _soundsSettings = soundsSettings;
+        _sendCommonMessages = sendCommonMessages;
 
         Stop = new SimpleCommand(arg =>
         {
@@ -330,7 +338,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         return Task.WhenAll(_loadTSC.Task, PlatformManager.Instance.CreateMainViewAsync(this, _displayDescriptor));
     }
 
-    private void InitInternal() => SendMessage(new
+    private void InitInternal() => SendMessageCore(new
     {
         Type = "setSoundMap",
         SoundMap = new Dictionary<string, string>
@@ -355,7 +363,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         }
     });
 
-    public void SetAppSound(bool isEnabled) => SendMessage(new { Type = "setAppSound", IsEnabled = isEnabled });
+    public void SetAppSound(bool isEnabled) => SendMessageCore(new { Type = "setAppSound", IsEnabled = isEnabled });
 
     private static string GetSoundUri(string sound)
     {
@@ -407,7 +415,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
         if (propertyName == nameof(PlayerInfo.Sum))
         {
-            SendMessage(new
+            SendMessageCore(new
             {
                 Type = "sum",
                 PlayerIndex = playerIndex,
@@ -421,8 +429,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     public void UpdateSettings(Settings settings)
     {
         _settings = settings;
-        
-        SendMessage(new
+
+        SendMessageCore(new
         {
             Type = "setOptions",
             TableTextColor = ConvertWpfToHtmlColor(settings.TableColorString),
@@ -560,13 +568,13 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         QuestionType = typeName
     });
 
-    public void SetLanguage(string language) => SendMessage(new
+    public void SetLanguage(string language) => SendMessageCore(new
     {
         Type = "setLanguage",
         Language = language
     });
 
-    public void SetReadingSpeed(int readingSpeed) => SendMessage(new
+    public void SetReadingSpeed(int readingSpeed) => SendMessageCore(new
     {
         Type = "setReadingSpeed",
         ReadingSpeed = readingSpeed
@@ -618,7 +626,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
         PlayerIndex = playerIndex
     });
 
-    public void ShowQRCode(string? value) => SendMessage(new
+    public void ShowQRCode(string? value) => SendMessageCore(new
     {
         Type = "qrCode",
         QrCode = value
@@ -751,9 +759,25 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     private static int GetKeyNumber(string key) =>
         key.Length == 1 && char.IsDigit(key[0]) ? key[0] - '1' : -1;
 
+    public void SendRawMessage(Message msg) => SendMessageCore(new
+    {
+        Type = "raw",
+        Message = msg
+    });
+
     public void Dispose() { }
 
-    private void SendMessage(object message) =>
+    private void SendMessage(object message)
+    {
+        if (!_sendCommonMessages)
+        {
+            return;
+        }
+
+        SendMessageCore(message);
+    }
+
+    private void SendMessageCore(object message) =>
         UI.Execute(
             () => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions)),
             OnError);

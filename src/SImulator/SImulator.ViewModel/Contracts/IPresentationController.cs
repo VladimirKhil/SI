@@ -1,4 +1,5 @@
-﻿using SIEngine.Rules;
+﻿using SIData;
+using SIEngine.Rules;
 using SImulator.ViewModel.Model;
 using SIPackages;
 using SIPackages.Core;
@@ -167,4 +168,6 @@ public interface IPresentationController : IDisposable
     void ShowQRCode(string? value) { }
 
     void OnPlayerPassed(int playerIndex) { }
+
+    public void SendRawMessage(Message message);
 }

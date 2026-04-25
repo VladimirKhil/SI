@@ -8,7 +8,6 @@ using SIData;
 using SIEngine.Rules;
 using SIPackages.Core;
 using SIUI.Model;
-using System.Globalization;
 using System.Text;
 
 namespace SICore;
