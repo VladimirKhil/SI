@@ -158,12 +158,24 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
     internal void OnContentScreenHtml(ContentItem contentItem)
     {
         _state.IsPartial = false;
-        ShareMedia(contentItem);
+        var globalUri = ShareMedia(contentItem);
 
-        var (contentTime, _) = GetContentItemDuration(contentItem, _state.TimeSettings.Image * 10);
+        var defaultTime = DefaultMediaTime;
+
+        if (globalUri != null)
+        {
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+            _completion = ClearMediaContent;
+            defaultTime = DefaultAudioVideoTime;
+        }
+
+        var (contentTime, isDefault) = GetContentItemDuration(contentItem, defaultTime);
 
         _state.AtomTime = contentTime;
         _state.AtomStart = DateTime.UtcNow;
+        _state.IsPlayingMedia = true;
+        _state.IsPlayingMediaPaused = false;
+        _state.QuestionPlay.CollectMediaCompletions = isDefault;
 
         ScheduleExecution(Tasks.MoveNext, contentTime);
 

@@ -2030,7 +2030,7 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        if (_state.Answerer == null)
+        if (_state.Answerer == null || _state.Question == null)
         {
             return;
         }
