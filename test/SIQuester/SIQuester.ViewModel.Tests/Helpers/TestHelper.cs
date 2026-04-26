@@ -40,7 +40,7 @@ internal static class TestHelper
     }
 
     /// <summary>
-    /// Initializes PlatformManager.Instance if it has not been set yet.
+    /// Initializes PlatformManager.Instance and AppSettings.Default if they have not been set yet.
     /// </summary>
     public static void EnsurePlatformManager()
     {
@@ -54,6 +54,8 @@ internal static class TestHelper
                 }
             }
         }
+
+        AppSettings.Default ??= new AppSettings();
     }
 
     private static readonly object _platformManagerLock = new();
