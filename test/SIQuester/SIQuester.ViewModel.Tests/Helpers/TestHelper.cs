@@ -46,9 +46,17 @@ internal static class TestHelper
     {
         if (PlatformManager.Instance == null)
         {
-            _ = new PlatformManagerMock();
+            lock (_platformManagerLock)
+            {
+                if (PlatformManager.Instance == null)
+                {
+                    _ = new PlatformManagerMock();
+                }
+            }
         }
     }
+
+    private static readonly object _platformManagerLock = new();
 
     /// <summary>
     /// Creates a simple test package with basic structure.
