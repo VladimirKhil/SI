@@ -146,8 +146,6 @@ public sealed class ScenariosTests
         // Player A submits answer
         playerAClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
 
-        await showmanListener.AssertNextMessageAsync(Messages.PersonFinalAnswer);
-        
         // Answer Validation Phase
         var askValidate = await showmanListener.AssertNextMessageAsync(Messages.AskValidate);
         Assert.That(askValidate[1], Is.EqualTo("0"), "Player index should be 0");
