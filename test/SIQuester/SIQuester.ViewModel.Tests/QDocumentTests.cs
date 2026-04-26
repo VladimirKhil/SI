@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Tests.Helpers;
 using System.Text.Json;
@@ -227,9 +228,9 @@ internal sealed class QDocumentTests
         var qDocument = _documentFactory.CreateViewModelFor(document, "Test Package");
         var initialCount = qDocument.Package.Rounds.Count;
 
-        // Act
+        // Act - add via the ViewModel collection (which syncs to Model)
         var newRound = new Round { Name = "New Round" };
-        qDocument.Package.Model.Rounds.Add(newRound);
+        qDocument.Package.Rounds.Add(new RoundViewModel(newRound));
 
         // Assert
         Assert.That(qDocument.Package.Rounds.Count, Is.EqualTo(initialCount + 1));
@@ -245,9 +246,9 @@ internal sealed class QDocumentTests
         var round = qDocument.Package.Rounds[0];
         var initialCount = round.Themes.Count;
 
-        // Act
+        // Act - add via the ViewModel collection (which syncs to Model)
         var newTheme = new Theme { Name = "New Theme" };
-        round.Model.Themes.Add(newTheme);
+        round.Themes.Add(new ThemeViewModel(newTheme));
 
         // Assert
         Assert.That(round.Themes.Count, Is.EqualTo(initialCount + 1));
@@ -263,10 +264,10 @@ internal sealed class QDocumentTests
         var theme = qDocument.Package.Rounds[0].Themes[0];
         var initialCount = theme.Questions.Count;
 
-        // Act
+        // Act - add via the ViewModel collection (which syncs to Model)
         var newQuestion = new Question { Price = 300 };
         newQuestion.Right.Add("New answer");
-        theme.Model.Questions.Add(newQuestion);
+        theme.Questions.Add(new QuestionViewModel(newQuestion));
 
         // Assert
         Assert.That(theme.Questions.Count, Is.EqualTo(initialCount + 1));
@@ -285,8 +286,8 @@ internal sealed class QDocumentTests
         var qDocument = _documentFactory.CreateViewModelFor(document, "Test Package");
         var initialCount = qDocument.Package.Rounds.Count;
 
-        // Act
-        qDocument.Package.Model.Rounds.RemoveAt(0);
+        // Act - remove via the ViewModel collection (which syncs to Model)
+        qDocument.Package.Rounds.RemoveAt(0);
 
         // Assert
         Assert.That(qDocument.Package.Rounds.Count, Is.EqualTo(initialCount - 1));
@@ -301,8 +302,8 @@ internal sealed class QDocumentTests
         var round = qDocument.Package.Rounds[0];
         var initialCount = round.Themes.Count;
 
-        // Act
-        round.Model.Themes.RemoveAt(0);
+        // Act - remove via the ViewModel collection (which syncs to Model)
+        round.Themes.RemoveAt(0);
 
         // Assert
         Assert.That(round.Themes.Count, Is.EqualTo(initialCount - 1));
@@ -317,8 +318,8 @@ internal sealed class QDocumentTests
         var theme = qDocument.Package.Rounds[0].Themes[0];
         var initialCount = theme.Questions.Count;
 
-        // Act
-        theme.Model.Questions.RemoveAt(0);
+        // Act - remove via the ViewModel collection (which syncs to Model)
+        theme.Questions.RemoveAt(0);
 
         // Assert
         Assert.That(theme.Questions.Count, Is.EqualTo(initialCount - 1));

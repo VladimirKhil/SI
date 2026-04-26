@@ -7,6 +7,7 @@ using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
+using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Tests.Mocks;
 using SIStatisticsService.Contract;
 using SIStorage.Service.Contract;
@@ -23,6 +24,9 @@ internal static class TestHelper
     /// </summary>
     public static IServiceProvider CreateServiceProvider()
     {
+        // Ensure PlatformManager.Instance is initialized before creating documents.
+        EnsurePlatformManager();
+
         var services = new ServiceCollection();
         
         services.AddSingleton<ILoggerFactory, NullLoggerFactory>();
@@ -33,6 +37,17 @@ internal static class TestHelper
         services.AddSingleton<IDocumentViewModelFactory, TestDocumentViewModelFactory>();
 
         return services.BuildServiceProvider();
+    }
+
+    /// <summary>
+    /// Initializes PlatformManager.Instance if it has not been set yet.
+    /// </summary>
+    public static void EnsurePlatformManager()
+    {
+        if (PlatformManager.Instance == null)
+        {
+            _ = new PlatformManagerMock();
+        }
     }
 
     /// <summary>
