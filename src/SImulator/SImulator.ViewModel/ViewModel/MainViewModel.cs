@@ -454,7 +454,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsStarting = true;
 
             var presentationListener = new PresentationListener();
-            var presentationController = new WebPresentationController(screen, presentationListener, Settings.Sounds, !Settings.UseSIGameEngine);
+            var presentationController = PlatformManager.Instance.CreatePresentationController(screen, presentationListener, Settings.Sounds, !Settings.UseSIGameEngine);
 
             presentationController.Error += ShowError;
 

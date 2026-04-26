@@ -12,6 +12,13 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
 {
     public override ButtonManagerFactory ButtonManagerFactory { get; } = new TestButtonManagerFactory();
 
+    public override IPresentationController CreatePresentationController(
+        IDisplayDescriptor displayDescriptor,
+        IPresentationListener presentationListener,
+        SoundsSettings soundsSettings,
+        bool sendCommonMessages)
+        => new TestWebPresentationController();
+
     public override string AskSelectColor()
     {
         throw new NotImplementedException();
