@@ -68,10 +68,7 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
         throw new NotImplementedException();
     }
 
-    public override string[] GetFonts()
-    {
-        throw new NotImplementedException();
-    }
+    public override string[] GetFonts() => Array.Empty<string>();
 
     public override int GetKeyNumber(GameKey key)
     {
