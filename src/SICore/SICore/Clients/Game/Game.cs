@@ -1992,7 +1992,7 @@ public sealed class Game : MessageHandler
                     _state.AnswererIndex = i;
                     _state.Players[i].Flag = false;
 
-                    if (_state.HiddenPersons)
+                    if (!_state.HiddenPersons)
                     {
                         _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
                     }
