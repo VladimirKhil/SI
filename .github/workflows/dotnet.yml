@@ -30,14 +30,14 @@ jobs:
     - name: Build SImulator
       run: dotnet build --no-restore SImulator.sln
     - name: Run SIPackages tests
-      run: dotnet test test/Common/SIPackages.Tests/SIPackages.Tests.csproj --no-restore --verbosity normal
+      run: dotnet test test/Common/SIPackages.Tests/SIPackages.Tests.csproj --verbosity normal
     - name: Run SIEngine.Core tests
-      run: dotnet test test/Common/SIEngine.Core.Tests/SIEngine.Core.Tests.csproj --no-restore --verbosity normal
+      run: dotnet test test/Common/SIEngine.Core.Tests/SIEngine.Core.Tests.csproj --verbosity normal
     - name: Run SICore tests
-      run: dotnet test test/SICore/SICore.Tests/SICore.Tests.csproj --no-restore --verbosity normal
+      run: dotnet test test/SICore/SICore.Tests/SICore.Tests.csproj --verbosity normal
     - name: Run SIQuester.ViewModel tests
-      run: dotnet test test/SIQuester/SIQuester.ViewModel.Tests/SIQuester.ViewModel.Tests.csproj --no-restore --verbosity normal
+      run: dotnet test test/SIQuester/SIQuester.ViewModel.Tests/SIQuester.ViewModel.Tests.csproj --verbosity normal
     - name: Run SImulator.ViewModel tests
-      run: dotnet test test/SImulator/SImulator.ViewModel.Tests/SImulator.ViewModel.Tests.csproj --no-restore --verbosity normal
+      run: dotnet test test/SImulator/SImulator.ViewModel.Tests/SImulator.ViewModel.Tests.csproj --verbosity normal
     - name: Run SIGame.ViewModel tests
-      run: dotnet test test/SIGame/SIGame.ViewModel.Tests/SIGame.ViewModel.Tests.csproj --no-restore --verbosity normal
+      run: dotnet test test/SIGame/SIGame.ViewModel.Tests/SIGame.ViewModel.Tests.csproj --verbosity normal

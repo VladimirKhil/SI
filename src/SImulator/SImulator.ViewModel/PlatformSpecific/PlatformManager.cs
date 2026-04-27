@@ -1,4 +1,5 @@
 ﻿using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using Utils.Timers;
@@ -13,6 +14,17 @@ public abstract class PlatformManager
     public static PlatformManager Instance;
 
     public abstract ButtonManagers.ButtonManagerFactory ButtonManagerFactory { get; }
+
+    /// <summary>
+    /// Creates a presentation controller for the given screen.
+    /// Override in tests to return a test implementation that does not require a browser.
+    /// </summary>
+    public virtual IPresentationController CreatePresentationController(
+        IDisplayDescriptor displayDescriptor,
+        IPresentationListener presentationListener,
+        SoundsSettings soundsSettings,
+        bool sendCommonMessages)
+        => new WebPresentationController(displayDescriptor, presentationListener, soundsSettings, sendCommonMessages);
 
     protected PlatformManager()
     {

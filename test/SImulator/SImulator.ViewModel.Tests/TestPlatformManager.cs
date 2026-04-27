@@ -12,6 +12,13 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
 {
     public override ButtonManagerFactory ButtonManagerFactory { get; } = new TestButtonManagerFactory();
 
+    public override IPresentationController CreatePresentationController(
+        IDisplayDescriptor displayDescriptor,
+        IPresentationListener presentationListener,
+        SoundsSettings soundsSettings,
+        bool sendCommonMessages)
+        => new TestWebPresentationController();
+
     public override string AskSelectColor()
     {
         throw new NotImplementedException();
@@ -68,10 +75,7 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
         throw new NotImplementedException();
     }
 
-    public override string[] GetFonts()
-    {
-        throw new NotImplementedException();
-    }
+    public override string[] GetFonts() => Array.Empty<string>();
 
     public override int GetKeyNumber(GameKey key)
     {

@@ -120,12 +120,11 @@ internal sealed class DocumentSavingTests
         var filePath = Path.Combine(_testDirectory, "package_with_image.siq");
         qDocument.Path = filePath;
 
-        // Add an image
+        // Add an image via the ViewModel (write to a temp file first, then add via ViewModel API)
         var imageData = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-        using (var stream = new MemoryStream(imageData))
-        {
-            await document.Images.AddFileAsync("test_image.png", stream);
-        }
+        var tempImagePath = Path.Combine(_testDirectory, "test_image.png");
+        await File.WriteAllBytesAsync(tempImagePath, imageData);
+        qDocument.Images.AddFile(tempImagePath);
 
         // Act
         await qDocument.Save.ExecuteAsync(null);
@@ -145,12 +144,11 @@ internal sealed class DocumentSavingTests
         var filePath = Path.Combine(_testDirectory, "package_with_audio.siq");
         qDocument.Path = filePath;
 
-        // Add audio
+        // Add audio via the ViewModel (write to a temp file first, then add via ViewModel API)
         var audioData = new byte[] { 0x01, 0x02, 0x03, 0x04 };
-        using (var stream = new MemoryStream(audioData))
-        {
-            await document.Audio.AddFileAsync("test_audio.mp3", stream);
-        }
+        var tempAudioPath = Path.Combine(_testDirectory, "test_audio.mp3");
+        await File.WriteAllBytesAsync(tempAudioPath, audioData);
+        qDocument.Audio.AddFile(tempAudioPath);
 
         // Act
         await qDocument.Save.ExecuteAsync(null);

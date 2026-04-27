@@ -1987,7 +1987,14 @@ public sealed class QDocument : WorkspaceViewModel
 
             if (_path.Length > 0)
             {
-                await SaveInternalAsync();
+                if (File.Exists(_path))
+                {
+                    await SaveInternalAsync();
+                }
+                else
+                {
+                    await SaveAsInternalAsync(_path);
+                }
             }
             else
             {

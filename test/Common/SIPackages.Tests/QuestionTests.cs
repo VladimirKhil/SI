@@ -199,7 +199,7 @@ internal sealed class QuestionTests
 
         var text = loaded.GetQuestionReportText(question);
 
-        Assert.That(text, Is.EqualTo($"item text\n{expectedHash}\nitem text 2"));
+        Assert.That(text, Is.EqualTo($"item text\nimage:{expectedHash}\nitem text 2"));
     }
 
     [Test]
