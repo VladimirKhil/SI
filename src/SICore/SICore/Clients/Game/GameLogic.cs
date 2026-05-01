@@ -3215,9 +3215,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         ICollection<string> appellatedAnswers = Array.Empty<string>();
 
-        if (_state.PackageStatistisProvider != null && !_state.ShowMan.IsHuman)
+        if (_state.PackageStatisticsProvider != null && !_state.ShowMan.IsHuman)
         {
-            appellatedAnswers = _state.PackageStatistisProvider.GetAppellatedAnswers(
+            appellatedAnswers = _state.PackageStatisticsProvider.GetAppellatedAnswers(
                 Engine.RoundIndex,
                 _state.ThemeIndex,
                 _state.QuestionIndex);
@@ -3346,9 +3346,9 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
         ICollection<string> appellatedAnswers = Array.Empty<string>();
 
-        if (_state.PackageStatistisProvider != null && !_state.ShowMan.IsHuman)
+        if (_state.PackageStatisticsProvider != null && !_state.ShowMan.IsHuman)
         {
-            appellatedAnswers = _state.PackageStatistisProvider.GetAppellatedAnswers(
+            appellatedAnswers = _state.PackageStatisticsProvider.GetAppellatedAnswers(
                 Engine.RoundIndex,
                 _state.ThemeIndex,
                 _state.QuestionIndex);

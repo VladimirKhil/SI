@@ -198,19 +198,18 @@ public abstract class Node : INode
         if (IsMain)
         {
             // Need to forward this message to other nodes
-            await ConnectionsLock.WithLockAsync(async () =>
-            {
-                foreach (var connection in Connections)
-                {
-                    var send = (connection.UserName != message.Sender)
-                        && ((connection.UserName == message.Receiver) || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
+            var connections = await GetConnectionsSnapshotAsync();
 
-                    if (send)
-                    {
-                        await connection.SendMessageAsync(message);
-                    }
+            foreach (var connection in connections)
+            {
+                var send = (connection.UserName != message.Sender)
+                    && ((connection.UserName == message.Receiver) || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
+
+                if (send)
+                {
+                    await connection.SendMessageAsync(message);
                 }
-            });
+            }
         }
     }
 
@@ -225,35 +224,42 @@ public abstract class Node : INode
             }
         }
 
-        return ConnectionsLock.WithLockAsync(async () =>
+        return SendMessageToConnectionsAsync(message);
+    }
+
+    private async ValueTask SendMessageToConnectionsAsync(Message message)
+    {
+        var connections = await GetConnectionsSnapshotAsync();
+
+        foreach (var connection in connections)
         {
-            foreach (var connection in Connections)
+            bool send;
+
+            if (IsMain)
             {
-                bool send;
-
-                if (IsMain)
+                send = (connection.UserName != message.Sender)
+                    && (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated
+                    || (connection.UserName == message.Receiver));
+            }
+            else
+            {
+                lock (connection.ClientsSync)
                 {
-                    send = (connection.UserName != message.Sender)
-                        && (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated
-                        || (connection.UserName == message.Receiver));
-                }
-                else
-                {
-                    lock (connection.ClientsSync)
-                    {
-                        send = !connection.Clients.Contains(message.Sender) &&
-                            (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated
-                            || connection.Clients.Contains(message.Receiver));
-                    }
-                }
-
-                if (send)
-                {
-                    await connection.SendMessageAsync(message);
+                    send = !connection.Clients.Contains(message.Sender) &&
+                        (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated
+                        || connection.Clients.Contains(message.Receiver));
                 }
             }
-        });
+
+            if (send)
+            {
+                await connection.SendMessageAsync(message);
+            }
+        }
     }
+
+    private ValueTask<IConnection[]> GetConnectionsSnapshotAsync(CancellationToken cancellationToken = default) =>
+        ConnectionsLock.WithLockAsync(() => Connections.ToArray(), cancellationToken);
 
     public bool Contains(string name) => _clients.ContainsKey(name);
 

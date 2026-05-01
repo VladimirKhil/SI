@@ -593,7 +593,18 @@ public sealed class Game : MessageHandler
         bool isMale,
         GameRole role,
         string? password) =>
-        _state.TaskLock.WithLock(() => AuthenticateCore(name, isMale, role, password), 5000);
+        _state.TaskLock.WithLock(() => AuthenticateCore(name, isMale, role, password));
+
+    /// <summary>
+    /// Authenticates person in the game asynchronously.
+    /// </summary>
+    public ValueTask<AuthenticationResult> AuthenticateAsync(
+        string name,
+        bool isMale,
+        GameRole role,
+        string? password,
+        CancellationToken cancellationToken = default) =>
+        _state.TaskLock.WithLockAsync(() => AuthenticateCore(name, isMale, role, password), cancellationToken);
 
     [Obsolete]
     private string GetAuthenticationErrorMessage(AuthenticationResult result) =>
@@ -2074,9 +2085,9 @@ public sealed class Game : MessageHandler
                     }
                 }
 
-                if (restwrong.Count == 0 && _state.PackageStatistisProvider != null)
+                if (restwrong.Count == 0 && _state.PackageStatisticsProvider != null)
                 {
-                    var rejectedAnswers = _state.PackageStatistisProvider.GetRejectedAnswers(Logic.Engine.RoundIndex, _state.ThemeIndex, _state.QuestionIndex);
+                    var rejectedAnswers = _state.PackageStatisticsProvider.GetRejectedAnswers(Logic.Engine.RoundIndex, _state.ThemeIndex, _state.QuestionIndex);
 
                     foreach (var wrong in rejectedAnswers)
                     {

@@ -434,7 +434,7 @@ public sealed class GameActions
 
     internal void AskReview()
     {
-        var packageSource = _state.GameResultInfo.PackageSource?.ToString() ?? (_state.PackageStatistisProvider?.GetPackageSource() ?? "");
+        var packageSource = _state.GameResultInfo.PackageSource?.ToString() ?? (_state.PackageStatisticsProvider?.GetPackageSource() ?? "");
 
         if (!ReviewablePackageSources.Any(allowed => packageSource.StartsWith(allowed, StringComparison.OrdinalIgnoreCase)))
         {

@@ -11,7 +11,8 @@ public interface ISIHostClient
     /// Receives incoming message.
     /// </summary>
     /// <param name="message">Incoming message.</param>
-    Task Receive(Message message);
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task Receive(Message message, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Forces client to disconnect from game (client has been kicked).

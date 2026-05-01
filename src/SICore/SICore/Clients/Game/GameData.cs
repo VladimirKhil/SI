@@ -600,7 +600,7 @@ public sealed class GameData : Data
     /// </summary>
     public ThemesPlayMode ThemesPlayMode { get; internal set; }
 
-    public IPackageStatisticsProvider? PackageStatistisProvider { get; }
+    public IPackageStatisticsProvider? PackageStatisticsProvider { get; }
     
     /// <summary>
     /// Current game stage.
@@ -623,7 +623,7 @@ public sealed class GameData : Data
         GameResultInfo = new GameResult(packageSource);
         TimeSettings = timeSettings;
         Rules = rules;
-        PackageStatistisProvider = packageStatisticsProvider;
+        PackageStatisticsProvider = packageStatisticsProvider;
         InitQuestionTypeSettings();
     }
 
