@@ -11,19 +11,19 @@ namespace SImulator.ViewModel.Services;
 /// </summary>
 internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks>
 {
-    private readonly ViewerActions _viewerActions;
-    private readonly ViewerData _state;
+    private readonly PersonActions _actions;
+    private readonly PersonState _state;
     private readonly Func<string, bool, GameRole, string?, AuthenticationResult> _join;
     private readonly Func<Message, ValueTask> _onMessageReceivedAsync;
     private readonly TaskRunner<Model.Tasks> _taskRunner;
 
     public NewGameActions(
-        ViewerActions viewerActions,
-        ViewerData state,
+        PersonActions viewerActions,
+        PersonState state,
         Func<string, bool, GameRole, string?, AuthenticationResult> join,
         Func<Message, ValueTask> onMessageReceivedAsync)
     {
-        _viewerActions = viewerActions;
+        _actions = viewerActions;
         _state = state;
         _join = join;
         _onMessageReceivedAsync = onMessageReceivedAsync;
@@ -37,27 +37,27 @@ internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks
         switch (taskId)
         {
             case Model.Tasks.MoveNext:
-                _viewerActions.Move();
+                _actions.Move();
                 break;
         }
     }
 
-    public void Init() => _viewerActions.GetInfo();
+    public void Init() => _actions.GetInfo();
 
     public void OnRightAnswer(bool moveToAnswer)
     {
         throw new NotImplementedException();
     }
 
-    public void MoveBack() => _viewerActions.Move(MoveDirections.Back);
+    public void MoveBack() => _actions.Move(MoveDirections.Back);
 
-    public void MoveBackRound() => _viewerActions.Move(MoveDirections.RoundBack);
+    public void MoveBackRound() => _actions.Move(MoveDirections.RoundBack);
 
     public void MoveNext(int delayMs = 100)
     {
         if (_state.Stage == GameStage.Before)
         {
-            _viewerActions.Start();
+            _actions.Start();
         }
 
         _taskRunner.ScheduleExecution(Model.Tasks.MoveNext, delayMs / 100);
@@ -68,17 +68,17 @@ internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks
 
     }
 
-    public void MoveNextRound() => _viewerActions.Move(MoveDirections.RoundNext);
+    public void MoveNextRound() => _actions.Move(MoveDirections.RoundNext);
 
-    public void AddPlayer() => _viewerActions.AddTable();
+    public void AddPlayer() => _actions.AddTable();
 
-    public void RemovePlayerAt(int index) => _viewerActions.RemoveTable(index);
+    public void RemovePlayerAt(int index) => _actions.RemoveTable(index);
 
-    public void IsRightAnswer() => _viewerActions.IsRight(true);
+    public void IsRightAnswer() => _actions.IsRight(true);
 
-    public void IsWrongAnswer() => _viewerActions.IsRight(false);
+    public void IsWrongAnswer() => _actions.IsRight(false);
 
-    public void SelectPlayer(int playerIndex) => _viewerActions.SelectPlayer(playerIndex);
+    public void SelectPlayer(int playerIndex) => _actions.SelectPlayer(playerIndex);
 
     public void ConnectPlayer(PlayerInfo player) => _join(player.Name, false, GameRole.Player, null);
 

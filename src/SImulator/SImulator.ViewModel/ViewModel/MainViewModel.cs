@@ -579,10 +579,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
            null);
 
         var client = new Client("HOST");
-        var actions = new ViewerActions(client);
-        var state = new ViewerData();
+        var actions = new PersonActions(client);
+        var state = new PersonState();
 
-        var gameController = new GameController(actions);
+        var gameController = new Controllers.GameController(actions);
 
         var host = new Showman(client, new Account(), gameController, actions, state);
         var handler = new PresentationHandler(client, presentationController);

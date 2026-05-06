@@ -17,13 +17,13 @@ namespace SImulator.ViewModel.Controllers;
 /// </summary>
 internal sealed class GameController : IPersonController
 {
-    private static bool _fastMoving = true;
+    private static readonly bool _fastMoving = true;
 
     public GameViewModel GameViewModel { get; set; } = null!;
 
-    private readonly ViewerActions _viewerActions;
+    private readonly PersonActions _actions;
 
-    public GameController(ViewerActions actions) => _viewerActions = actions;
+    public GameController(PersonActions actions) => _actions = actions;
 
     public bool CanSwitchType => false;
 
@@ -95,7 +95,7 @@ internal sealed class GameController : IPersonController
         
     }
 
-    public void DeleteTheme() => GameViewModel.PresentationController.DeletionCallback = _viewerActions.DeleteTheme;
+    public void DeleteTheme() => GameViewModel.PresentationController.DeletionCallback = _actions.DeleteTheme;
 
     public void EndThink()
     {
@@ -333,7 +333,7 @@ internal sealed class GameController : IPersonController
     {
         GameViewModel.PresentationController.SelectionCallback = (themeIndex, questionIndex) =>
         {
-            _viewerActions.SelectQuestion(themeIndex, questionIndex);
+            _actions.SelectQuestion(themeIndex, questionIndex);
         };
 
         GameViewModel.PresentationController.SetRoundTable();
@@ -362,7 +362,7 @@ internal sealed class GameController : IPersonController
     {
         if (_fastMoving)
         {
-            _viewerActions.Move();
+            _actions.Move();
         }
     }
 
