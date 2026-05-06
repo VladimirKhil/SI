@@ -4,11 +4,11 @@ using SIData;
 
 namespace SICore;
 
-public sealed class ViewerActions
+public sealed class PersonActions
 {
     public Client Client { get; }
 
-    public ViewerActions(Client client) => Client = client;
+    public PersonActions(Client client) => Client = client;
 
     public void SendMessage(string text) => Client.SendMessage(text, receiver: NetworkConstants.GameName);
 

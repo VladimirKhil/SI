@@ -28,9 +28,15 @@ public abstract class TcpReadConnection : ConnectionBase
         {
             try
             {
-                var address = _tcpClient.Client.RemoteEndPoint.ToString();
+                var address = _tcpClient.Client.RemoteEndPoint?.ToString();
+
+                if (string.IsNullOrEmpty(address))
+                {
+                    return "";
+                }
+
                 var index = address.IndexOf(':');
-                return index > -1 ? address.Substring(0, index) : address;
+                return index > -1 ? address[..index] : address;
             }
             catch (ObjectDisposedException)
             {
@@ -257,7 +263,7 @@ public abstract class TcpReadConnection : ConnectionBase
 
         string connectionIdHeader = "";
 
-        if (!headers.TryGetValue("ConnectionId", out string connectionId))
+        if (!headers.TryGetValue("ConnectionId", out var connectionId))
         {
             connectionId = Guid.NewGuid().ToString();
             connectionIdHeader = $"\nConnectionId: {connectionId}";

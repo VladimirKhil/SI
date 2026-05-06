@@ -275,12 +275,12 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         var humanPlayer = Human;
         var name = humanPlayer.Name;
 
-        var data = new ViewerData()
+        var data = new PersonState()
         {
             IsNetworkGame = true
         };
 
-        var actions = new ViewerActions(_client);
+        var actions = new PersonActions(_client);
 
         var loggerFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ILoggerFactory>();
 

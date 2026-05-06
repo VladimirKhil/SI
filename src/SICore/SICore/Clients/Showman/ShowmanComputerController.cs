@@ -8,13 +8,13 @@ namespace SICore;
 /// </summary>
 internal sealed class ShowmanComputerController
 {
-    private readonly ViewerActions _viewerActions;
-    private readonly ViewerData _state;
+    private readonly PersonActions _actions;
+    private readonly PersonState _state;
     private readonly IShowmanIntelligence _intelligence;
 
-    public ShowmanComputerController(ViewerData state, ViewerActions viewerActions, IShowmanIntelligence intelligence)
+    public ShowmanComputerController(PersonState state, PersonActions actions, IShowmanIntelligence intelligence)
     {
-        _viewerActions = viewerActions;
+        _actions = actions;
         _state = state;
         _intelligence = intelligence;
     }
@@ -25,7 +25,7 @@ internal sealed class ShowmanComputerController
 
         try
         {
-            await _state.TaskLock.WithLockAsync(() => ExecuteTask(task, arg), ViewerData.LockTimeoutMs);
+            await _state.TaskLock.WithLockAsync(() => ExecuteTask(task, arg), PersonState.LockTimeoutMs);
         }
         catch (Exception exc)
         {
@@ -59,24 +59,24 @@ internal sealed class ShowmanComputerController
         }
     }
 
-    private void OnReady() => _viewerActions.SendReady();
+    private void OnReady() => _actions.SendReady();
 
     private void OnSelectPlayer()
     {
         var playerIndex = _state.Players.SelectRandomIndex();
-        _viewerActions.SelectPlayer(playerIndex);
+        _actions.SelectPlayer(playerIndex);
     }
 
     private void OnValidateAnswer(string? answer)
     {
         var isRight = ValidateAnswerCore(answer);
-        _viewerActions.IsRight(isRight);
+        _actions.IsRight(isRight);
     }
 
     private void OnValidateAnswerNew(string answer, bool voteForRight)
     {
         var isRight = ValidateAnswerCore(answer);
-        _viewerActions.ValidateAnswer(answer, isRight);
+        _actions.ValidateAnswer(answer, isRight);
     }
 
     private bool ValidateAnswerCore(string? answer)

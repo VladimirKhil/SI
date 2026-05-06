@@ -13,7 +13,7 @@ public sealed class GameTests
     [Test]
     public void ParsePoint_AppliesAspectRatioToXCoordinate()
     {
-        var parsePoint = typeof(GameLogic).GetMethod("ParsePoint", BindingFlags.NonPublic | BindingFlags.Static);
+        var parsePoint = typeof(GameController).GetMethod("ParsePoint", BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.That(parsePoint, Is.Not.Null);
 
@@ -28,7 +28,7 @@ public sealed class GameTests
     [Test]
     public void ParsePlayerPoint_AppliesReferenceAspectRatioToXCoordinate()
     {
-        var parsePlayerPoint = typeof(GameLogic).GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
+        var parsePlayerPoint = typeof(GameController).GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.That(parsePlayerPoint, Is.Not.Null);
 
@@ -42,7 +42,7 @@ public sealed class GameTests
     [Test]
     public void ParsePlayerPoint_RejectsAspectRatioInPlayerInput()
     {
-        var parsePlayerPoint = typeof(GameLogic).GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
+        var parsePlayerPoint = typeof(GameController).GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.That(parsePlayerPoint, Is.Not.Null);
 

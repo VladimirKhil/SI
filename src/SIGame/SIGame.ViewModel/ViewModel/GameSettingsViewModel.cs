@@ -822,9 +822,9 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             null,
             false);
 
-        var data = new ViewerData();
+        var data = new PersonState();
         var client = new Client(_model.HumanPlayerName);
-        var actions = new ViewerActions(client);
+        var actions = new PersonActions(client);
 
         var gameViewModel = new GameViewModel(data, actions, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
         {

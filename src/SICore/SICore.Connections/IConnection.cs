@@ -9,7 +9,7 @@ public interface IConnection : IAsyncDisposable
 {
     object ClientsSync { get; }
 
-    string ConnectionId { get; }
+    string? ConnectionId { get; }
 
     string Id { get; }
 

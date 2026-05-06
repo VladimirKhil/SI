@@ -9,7 +9,7 @@ public abstract class ConnectionBase : IConnection
 {
     protected bool IsClosed { get; private set; } = false;
 
-    public string ConnectionId { get; protected set; }
+    public string? ConnectionId { get; protected set; }
 
     /// <summary>
     /// Уникальный идентификатор внешнего сервера
@@ -36,22 +36,21 @@ public abstract class ConnectionBase : IConnection
     /// <summary>
     /// Получено сообщение
     /// </summary>
-    public event Action<IConnection, Message> MessageReceived;
+    public event Action<IConnection, Message>? MessageReceived;
 
     /// <summary>
     /// Соединение закрылось
     /// </summary>
-    public event Action<IConnection, bool> ConnectionClose;
+    public event Action<IConnection, bool>? ConnectionClose;
 
     /// <summary>
     /// Ошибка
     /// </summary>
-    public event Action<Exception, bool> Error;
+    public event Action<Exception, bool>? Error;
 
-    public event Action<Message, Exception> SerializationError;
-    public event Action Reconnecting;
-    public event Action Reconnected;
-
+    public event Action<Message, Exception>? SerializationError;
+    public event Action? Reconnecting;
+    public event Action? Reconnected;
     protected void OnReconnecting() => Reconnecting?.Invoke();
     protected void OnReconnected() => Reconnected?.Invoke();
 

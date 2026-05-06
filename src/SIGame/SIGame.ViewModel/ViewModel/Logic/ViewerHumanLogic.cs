@@ -58,7 +58,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     private readonly ILocalFileManager _localFileManager = 
         PlatformManager.Instance.ServiceProvider!.GetRequiredService<ILocalFileManager>();
 
-    private readonly ViewerActions _viewerActions;
+    private readonly PersonActions _actions;
 
     public TableInfoViewModel TInfo { get; }
 
@@ -87,7 +87,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     private readonly UserSettings _userSettings;
     private readonly ILogger<ViewerHumanLogic> _logger;
 
-    private readonly ViewerData _state;
+    private readonly PersonState _state;
 
     private bool _isAnswer;
 
@@ -102,8 +102,8 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public ViewerHumanLogic(
         GameViewModel gameViewModel,
-        ViewerData state,
-        ViewerActions viewerActions,
+        PersonState state,
+        PersonActions actions,
         UserSettings userSettings,
         string serverAddress,
         ILogger<ViewerHumanLogic> logger,
@@ -112,7 +112,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     {
         _gameViewModel = gameViewModel;
         _state = state;
-        _viewerActions = viewerActions;
+        _actions = actions;
         _userSettings = userSettings;
         _logger = logger;
 
@@ -160,7 +160,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 if (TInfo.RoundInfo[i].Questions[j] == question)
                 {
                     found = true;
-                    _viewerActions.SendMessageWithArgs(Messages.Toggle, i, j);
+                    _actions.SendMessageWithArgs(Messages.Toggle, i, j);
                     break;
                 }
             }
@@ -190,7 +190,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 if (TInfo.RoundInfo[i].Questions[j] == question)
                 {
                     found = true;
-                    _viewerActions.SelectQuestion(i, j);
+                    _actions.SelectQuestion(i, j);
                     break;
                 }
             }
@@ -210,7 +210,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         {
             if (TInfo.RoundInfo[i] == theme)
             {
-                _viewerActions.DeleteTheme(i);
+                _actions.DeleteTheme(i);
                 break;
             }
         }
@@ -248,7 +248,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             $"\n{string.Format(Resources.FileLoadError, Path.GetFileName(mediaUri.ToString()))}: {e.Message}\n",
             LogMode.Log);
 
-    private void TInfo_MediaLoad() => _viewerActions.SendMessage(Messages.MediaLoaded);
+    private void TInfo_MediaLoad() => _actions.SendMessage(Messages.MediaLoaded);
 
     private void TInfo_MediaLoadError(MediaLoadException exc)
     {
@@ -372,7 +372,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
             {
                 try
                 {
-                    var stream = CreateLog(_viewerActions.Client.Name, out var path);
+                    var stream = CreateLog(_actions.Client.Name, out var path);
                     _logFilePath = path;
                     _gameLogger = new StreamWriter(stream);
                     _gameLogger.Write(text);
@@ -456,7 +456,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 {
                     try
                     {
-                        var stream = CreateLog(_viewerActions.Client.Name, out string path);
+                        var stream = CreateLog(_actions.Client.Name, out string path);
                         _logFilePath = path;
                         _gameLogger = new StreamWriter(stream);
                         _gameLogger.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + Resources.LogTitle + "</title>");
@@ -646,7 +646,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
         catch (Exception exc)
         {
-            _viewerActions.Client.CurrentNode.OnError(exc, false);
+            _actions.Client.CurrentNode.OnError(exc, false);
         }
     }
 
@@ -1778,7 +1778,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 if (currentProgressRounded > lastReportedProgress)
                 {
                     lastReportedProgress = currentProgressRounded;
-                    _viewerActions.ReportMediaPreloadProgress(currentProgressRounded);
+                    _actions.ReportMediaPreloadProgress(currentProgressRounded);
                 }
             });
         }
@@ -2039,7 +2039,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
     public void OnPlayerOutcome(int playerIndex, bool isRight)
     {
         if (_state.QuestionType != QuestionTypes.Simple
-            && _state.Players[playerIndex].Name == _viewerActions.Client.Name
+            && _state.Players[playerIndex].Name == _actions.Client.Name
             || isRight)
         {
             _gameViewModel.Apellate.CanBeExecuted = _gameViewModel.ApellationCount > 0;
@@ -2107,7 +2107,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void OnHostChanged(string? initiator, string newHost)
     {
-        _gameViewModel.IsHost = _viewerActions.Client.Name == newHost;
+        _gameViewModel.IsHost = _actions.Client.Name == newHost;
         _gameViewModel.UpdateCommands();
 
         if (!string.IsNullOrEmpty(initiator))

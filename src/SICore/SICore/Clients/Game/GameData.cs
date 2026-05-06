@@ -103,11 +103,6 @@ public sealed class GameData : Data
     }
 
     /// <summary>
-    /// Global game state.
-    /// </summary>
-    internal GameState GameState { get; } = new();
-
-    /// <summary>
     /// Question play state. This state is reset before each question.
     /// </summary>
     internal QuestionPlayState QuestionPlay { get; } = new();

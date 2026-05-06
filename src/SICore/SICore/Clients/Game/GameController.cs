@@ -23,9 +23,9 @@ namespace SICore;
 // TODO: split this class into aspect classes
 
 /// <summary>
-/// Executes SIGame logic implemented as a state machine.
+/// Executes SIGame controller implemented as a state machine.
 /// </summary>
-public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
+public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 {
     private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
@@ -81,7 +81,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     public SIEngine.GameEngine Engine { get; } // TODO: remove dependency on GameEngine
 
-    public event Action<GameLogic, GameStages, string, int, int>? StageChanged;
+    public event Action<GameController, GameStages, string, int, int>? StageChanged;
 
     public event Action<string, int, int>? AdShown;
 
@@ -111,7 +111,7 @@ public sealed class GameLogic : ITaskRunHandler<Tasks>, IDisposable
 
     private readonly GameData _state;
 
-    public GameLogic(
+    public GameController(
         GameData state,
         GameActions actions,
         SIEngine.GameEngine engine,

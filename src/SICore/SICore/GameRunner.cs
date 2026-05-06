@@ -58,16 +58,16 @@ public static class GameRunner
             if (!settings.Showman.IsHuman)
             {
                 var showmanClient = new Client(settings.Showman.Name);
-                var data = new ViewerData();
-                var actions = new ViewerActions(showmanClient);
+                var state = new PersonState();
+                var actions = new PersonActions(showmanClient);
 
                 var logic = new PersonComputerController(
-                    data,
+                    state,
                     actions,
                     new Intelligence((ComputerAccount)settings.Showman),
                     GameRole.Showman);
 
-                var showman = new Showman(showmanClient, settings.Showman, logic, actions, data);
+                var showman = new Showman(showmanClient, settings.Showman, logic, actions, state);
                 showmanClient.ConnectTo(node);
 
                 gameData.ShowMan.IsConnected = true;
@@ -82,16 +82,16 @@ public static class GameRunner
                 if (!human)
                 {
                     var playerClient = new Client(settings.Players[i].Name);
-                    var data = new ViewerData();
-                    var actions = new ViewerActions(playerClient);
+                    var state = new PersonState();
+                    var actions = new PersonActions(playerClient);
 
                     var logic = new PersonComputerController(
-                        data,
+                        state,
                         actions,
                         new Intelligence((ComputerAccount)settings.Players[i]),
                         GameRole.Player);
 
-                    var player = new Player(playerClient, settings.Players[i], logic, actions, data);
+                    var player = new Player(playerClient, settings.Players[i], logic, actions, state);
                     playerClient.ConnectTo(node);
 
                     gameData.Players[i].IsConnected = true;
@@ -118,7 +118,7 @@ public static class GameRunner
 
         var gameActions = new GameActions(client, gameData, fileShare);
 
-        var gameLogic = new GameLogic(
+        var gameController = new GameController(
             gameData,
             gameActions,
             /* TODO: This dependency should be removed by using engine callbacks */ engine,
@@ -126,16 +126,16 @@ public static class GameRunner
             fileShare,
             pinHelper);
 
-        questionPlayHandler.GameLogic = gameLogic;
+        questionPlayHandler.Controller = gameController;
         playHandler.GameActions = gameActions;
-        playHandler.GameLogic = gameLogic;
+        playHandler.Controller = gameController;
 
         return new Game(
             client,
             localizer,
             gameData,
             gameActions,
-            gameLogic,
+            gameController,
             defaultPlayers,
             defaultShowmans,
             fileShare,

@@ -43,9 +43,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private readonly ViewerData _data;
+    private readonly PersonState _data;
 
-    public ViewerData Data => _data;
+    public PersonState Data => _data;
 
     public TableInfoViewModel TInfo { get; private set; }
 
@@ -651,11 +651,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    private readonly ViewerActions _viewerActions;
+    private readonly PersonActions _viewerActions;
 
     public GameViewModel(
-        ViewerData viewerData,
-        ViewerActions viewerActions,
+        PersonState viewerData,
+        PersonActions viewerActions,
         Node node,
         UserSettings userSettings,
         SettingsViewModel settings,

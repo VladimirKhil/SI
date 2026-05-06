@@ -16,8 +16,8 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     private const int DefaultThemeQuestionCount = 5;
 
     private readonly IPlayerIntelligence _intelligence;
-    private readonly ViewerActions _viewerActions;
-    private readonly ViewerData _state;
+    private readonly PersonActions _actions;
+    private readonly PersonState _state;
 
     private readonly TimerInfo[] _timersInfo;
 
@@ -34,10 +34,10 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     /// <summary>
     /// Initializes a new instance of the <see cref="PlayerComputerController"/> class.
     /// </summary>
-    public PlayerComputerController(ViewerData state, IPlayerIntelligence intelligence, ViewerActions viewerActions, TimerInfo[] timerInfos)
+    public PlayerComputerController(PersonState state, IPlayerIntelligence intelligence, PersonActions viewerActions, TimerInfo[] timerInfos)
     {
         _intelligence = intelligence;
-        _viewerActions = viewerActions;
+        _actions = viewerActions;
         _state = state;
         _timersInfo = timerInfos;
         _taskRunner = new TaskRunner<PlayerTasks>(this);
@@ -56,7 +56,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     {
         try
         {
-            _state.TaskLock.WithLock(() => ExecuteTaskCore(taskId, _taskArg), ViewerData.LockTimeoutMs);
+            _state.TaskLock.WithLock(() => ExecuteTaskCore(taskId, _taskArg), PersonState.LockTimeoutMs);
         }
         catch (Exception exc)
         {
@@ -113,7 +113,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
     }
 
-    private void OnReady() => _viewerActions.SendReady();
+    private void OnReady() => _actions.SendReady();
 
     private void OnAnswer(bool knows, bool isSure)
     {
@@ -127,7 +127,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         try
         {
             var ans = new MessageBuilder(Messages.Answer, knows ? MessageParams.Answer_Right : MessageParams.Answer_Wrong, isSure ? '+' : '-');
-            _viewerActions.SendMessage(ans.ToString());
+            _actions.SendMessage(ans.ToString());
         }
         catch (Exception exc)
         {
@@ -153,7 +153,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 BestOpponentScore(),
                 GetTimePercentage(0));
 
-            _viewerActions.SelectQuestion(themeIndex, questionIndex);
+            _actions.SelectQuestion(themeIndex, questionIndex);
         }
         catch (Exception exc)
         {
@@ -162,10 +162,10 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     }
 
     // As player is validating only during appellations, computer player always agrees with appellation
-    private void OnValidateAnswer(bool? voteForRight) => _viewerActions.IsRight(voteForRight == true);
+    private void OnValidateAnswer(bool? voteForRight) => _actions.IsRight(voteForRight == true);
 
     // As player is validating only during appellations, computer player always agrees with appellation
-    private void OnValidateAnswerNew(string answer, bool voteForRight) => _viewerActions.ValidateAnswer(answer, voteForRight);
+    private void OnValidateAnswerNew(string answer, bool voteForRight) => _actions.ValidateAnswer(answer, voteForRight);
 
     private void OnSelectPlayer()
     {
@@ -191,7 +191,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 _state.TInfo.RoundInfo,
                 GetTimePercentage(0));
 
-            _viewerActions.SelectPlayer(playerIndex);
+            _actions.SelectPlayer(playerIndex);
         }
         catch (Exception exc)
         {
@@ -204,7 +204,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         try
         {
             var themeIndex = _intelligence.DeleteTheme(_state.TInfo.RoundInfo);
-            _viewerActions.DeleteTheme(themeIndex);
+            _actions.DeleteTheme(themeIndex);
         }
         catch (Exception exc)
         {
@@ -247,7 +247,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
                 msg.Add(stakeSum);
             }
 
-            _viewerActions.SendMessage(msg.ToString());
+            _actions.SendMessage(msg.ToString());
         }
         catch (Exception exc)
         {
@@ -255,7 +255,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
         }
     }
 
-    private void OnPressButton() => _viewerActions.PressButton(_state.TryStartTime);
+    private void OnPressButton() => _actions.PressButton(_state.TryStartTime);
 
     public void CancelTask() => _taskRunner.ScheduleExecution(PlayerTasks.None, 0, runTimer: false);
 
@@ -360,7 +360,7 @@ internal sealed class PlayerComputerController : ITaskRunHandler<PlayerComputerC
     /// <summary>
     /// Returns the maximum opponent score.
     /// </summary>
-    private int BestOpponentScore() => _state.Players.Where(player => player.Name != _viewerActions.Client.Name).Max(player => player.Sum);
+    private int BestOpponentScore() => _state.Players.Where(player => player.Name != _actions.Client.Name).Max(player => player.Sum);
 
     internal void OnPersonStake(int stakerIndex) => _lastStakerIndex = stakerIndex;
 

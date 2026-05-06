@@ -10,7 +10,7 @@ namespace SICore;
 /// </summary>
 internal class PersonComputerController : IPersonController
 {
-    protected readonly ViewerActions _viewerActions;
+    protected readonly PersonActions _actions;
 
     public bool CanSwitchType => false;
 
@@ -21,20 +21,20 @@ internal class PersonComputerController : IPersonController
 
     private readonly GameRole _role;
 
-    private readonly ViewerData _state;
+    private readonly PersonState _state;
 
     internal PersonComputerController(
-        ViewerData state,
-        ViewerActions viewerActions,
+        PersonState state,
+        PersonActions actions,
         IIntelligence intelligence,
         GameRole role)
     {
         _state = state;
-        _viewerActions = viewerActions;
+        _actions = actions;
         _role = role;
 
-        _player = new PlayerComputerController(state,  intelligence, viewerActions, _timersInfo);
-        _showman = new ShowmanComputerController(state, viewerActions, intelligence);
+        _player = new PlayerComputerController(state,  intelligence, actions, _timersInfo);
+        _showman = new ShowmanComputerController(state, actions, intelligence);
     }
 
     public void ClearSelections(bool full = false)

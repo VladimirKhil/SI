@@ -1,5 +1,4 @@
 ﻿using SICore.Models;
-using SICore.Network.Servers;
 using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
@@ -10,9 +9,9 @@ namespace SICore.Clients.Game;
 internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 {
     private readonly GameData _state;
-    private GameLogic _controller = null!;
+    private GameController _controller = null!;
 
-    public GameLogic GameLogic
+    public GameController Controller
     {
         get => _controller;
         set => _controller = value;

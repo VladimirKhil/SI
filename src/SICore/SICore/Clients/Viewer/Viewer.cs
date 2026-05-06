@@ -17,9 +17,9 @@ namespace SICore;
 /// </summary>
 public class Viewer : MessageHandler, IViewerClient
 {
-    protected readonly ViewerActions _actions;
+    protected readonly PersonActions _actions;
 
-    public ViewerActions Actions => _actions;
+    public PersonActions Actions => _actions;
 
     public virtual GameRole Role => GameRole.Viewer;
 
@@ -27,7 +27,7 @@ public class Viewer : MessageHandler, IViewerClient
 
     protected IPersonController Controller => _controller;
 
-    protected ViewerData State { get; }
+    protected PersonState State { get; }
 
     public string? Avatar { get; set; }
 
@@ -38,8 +38,8 @@ public class Viewer : MessageHandler, IViewerClient
         Client client,
         Account personData,
         IPersonController controller,
-        ViewerActions actions,
-        ViewerData state)
+        PersonActions actions,
+        PersonState state)
         : base(client)
     {
         _actions = actions;
@@ -2170,7 +2170,7 @@ public class Viewer : MessageHandler, IViewerClient
 
             await State.TaskLock.WithLockAsync(
                 async () => await OnSystemMessageReceivedAsync(message.Text.Split('\n')),
-                ViewerData.LockTimeoutMs);
+                PersonState.LockTimeoutMs);
         }
         else
         {

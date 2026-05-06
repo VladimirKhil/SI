@@ -69,7 +69,7 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
                             continue;
                         }
 
-                        localizedCache[package.Id.ToString()] = new PackageEntry { Uri = package.DirectContentUri };
+                        localizedCache[package.Id.ToString()] = new PackageEntry(package.DirectContentUri);
                     }
                 }
             }
@@ -171,10 +171,8 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
         }
     }
 
-    private record PackageEntry
+    private record PackageEntry(Uri Uri)
     {
-        public Uri Uri { get; set; }
-
         public string? LocalPath { get; set; }
     }
 }

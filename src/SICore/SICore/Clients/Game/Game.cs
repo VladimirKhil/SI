@@ -41,9 +41,9 @@ public sealed class Game : MessageHandler
     private readonly IFileShare _fileShare;
     private readonly IAvatarHelper _avatarHelper;
 
-    private readonly GameLogic _controller;
+    private readonly GameController _controller;
 
-    public GameLogic Logic => _controller;
+    public GameController Controller => _controller;
 
     private ILocalizer LO { get; }
 
@@ -56,7 +56,7 @@ public sealed class Game : MessageHandler
         ILocalizer localizer,
         GameData state,
         GameActions actions,
-        GameLogic controller,
+        GameController controller,
         ComputerAccount[] defaultPlayers,
         ComputerAccount[] defaultShowmans,
         IFileShare fileShare,
@@ -84,7 +84,7 @@ public sealed class Game : MessageHandler
     protected override void Dispose(bool disposing)
     {
         // Logic must be disposed before TaskLock
-        Logic.Dispose();
+        Controller.Dispose();
         _state.TaskLock.Dispose();
         _state.TableInformStageLock.Dispose();
 
@@ -632,7 +632,7 @@ public sealed class Game : MessageHandler
                 return;
             }
 
-            Logic.AddHistory($"[{message.Text}@{message.Sender}]");
+            Controller.AddHistory($"[{message.Text}@{message.Sender}]");
 
             var args = message.Text.Split(Message.ArgsSeparatorChar);
 
@@ -880,7 +880,7 @@ public sealed class Game : MessageHandler
 
     private void OnPin(string hostName)
     {
-        var pin = Logic.PinHelper?.GeneratePin() ?? 0;
+        var pin = Controller.PinHelper?.GeneratePin() ?? 0;
         _gameActions.SendMessageToWithArgs(hostName, Messages.Pin, pin);
     }
 
@@ -895,7 +895,7 @@ public sealed class Game : MessageHandler
 
             case DecisionType.NextPersonStakeMaking:
                 _state.Order[_state.OrderIndex] = playerIndex;
-                Logic.CheckOrder(_state.OrderIndex);
+                Controller.CheckOrder(_state.OrderIndex);
                 _controller.Stop(StopReason.Decision);
                 break;
 
@@ -963,7 +963,7 @@ public sealed class Game : MessageHandler
             _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
-        if (Logic.CanPlayerAct())
+        if (Controller.CanPlayerAct())
         {
             _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
         }
@@ -999,7 +999,7 @@ public sealed class Game : MessageHandler
                 _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
 
-            if (_state.Chooser != null && Logic.CanPlayerAct())
+            if (_state.Chooser != null && Controller.CanPlayerAct())
             {
                 _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
             }
@@ -1311,7 +1311,7 @@ public sealed class Game : MessageHandler
         {
             if (message.Sender == _state.ShowMan.Name)
             {
-                if (Logic.CanPlayerAct())
+                if (Controller.CanPlayerAct())
                 {
                     _gameActions.SendMessage(Messages.Cancel, stakerName);
                 }
@@ -1515,7 +1515,7 @@ public sealed class Game : MessageHandler
             _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
-        if (Logic.CanPlayerAct())
+        if (Controller.CanPlayerAct())
         {
             _gameActions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
         }
@@ -1959,7 +1959,7 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        if (Logic.HaveMultipleAnswerers())
+        if (Controller.HaveMultipleAnswerers())
         {
             for (var i = 0; i < _state.Players.Count; i++)
             {
@@ -1990,7 +1990,7 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        if (Logic.HaveMultipleAnswerers())
+        if (Controller.HaveMultipleAnswerers())
         {
             _state.AnswererIndex = -1; // TODO: do not use AnswererIndex here - update player answer directly
 
@@ -2087,7 +2087,7 @@ public sealed class Game : MessageHandler
 
                 if (restwrong.Count == 0 && _state.PackageStatisticsProvider != null)
                 {
-                    var rejectedAnswers = _state.PackageStatisticsProvider.GetRejectedAnswers(Logic.Engine.RoundIndex, _state.ThemeIndex, _state.QuestionIndex);
+                    var rejectedAnswers = _state.PackageStatisticsProvider.GetRejectedAnswers(Controller.Engine.RoundIndex, _state.ThemeIndex, _state.QuestionIndex);
 
                     foreach (var wrong in rejectedAnswers)
                     {
@@ -2105,7 +2105,7 @@ public sealed class Game : MessageHandler
 
                 var wrongIndex = Random.Shared.Next(restwrong.Count);
 
-                if (!Logic.HaveMultipleAnswerers())
+                if (!Controller.HaveMultipleAnswerers())
                 {
                     _state.UsedWrongVersions.Add(restwrong[wrongIndex]);
                 }
@@ -2135,7 +2135,7 @@ public sealed class Game : MessageHandler
                         _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
                     }
                 }
-                else if (!Logic.HaveMultipleAnswerers())
+                else if (!Controller.HaveMultipleAnswerers())
                 {
                     _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
                 }
@@ -2235,7 +2235,7 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        var nextTask = Logic.Runner.PendingTask;
+        var nextTask = Controller.Runner.PendingTask;
 
         if (nextTask == Tasks.AskStake
             || _state.Decision == DecisionType.StakeMaking
@@ -2273,7 +2273,7 @@ public sealed class Game : MessageHandler
                             && (nextTask == Tasks.AskStake || _state.Decision == DecisionType.NextPersonStakeMaking))
                         {
                             // We do not interrupt DecisionType.StakeMaking of the current player
-                            Logic.TryDetectStakesWinner(); // returning despite of the call result
+                            Controller.TryDetectStakesWinner(); // returning despite of the call result
                         }
                     }
 
@@ -2519,7 +2519,7 @@ public sealed class Game : MessageHandler
         try
         {
             _state.Players.Add(new GamePlayerAccount(newAccount));
-            Logic.AddHistory($"Player added (total: {_state.Players.Count})");
+            Controller.AddHistory($"Player added (total: {_state.Players.Count})");
         }
         finally
         {
@@ -2560,7 +2560,7 @@ public sealed class Game : MessageHandler
         try
         {
             _state.Players.RemoveAt(index);
-            Logic.AddHistory($"Player removed at {index}; AnswererIndex: {_state.AnswererIndex}");
+            Controller.AddHistory($"Player removed at {index}; AnswererIndex: {_state.AnswererIndex}");
 
             try
             {
@@ -2569,7 +2569,7 @@ public sealed class Game : MessageHandler
             catch (Exception exc)
             {
                 throw new InvalidOperationException(
-                    $"DropPlayerIndex error. Persons history: {_state.PersonsUpdateHistory}; logic history: {Logic.PrintHistory()}; stake history: {_state.OrderHistory}",
+                    $"DropPlayerIndex error. Persons history: {_state.PersonsUpdateHistory}; logic history: {Controller.PrintHistory()}; stake history: {_state.OrderHistory}",
                     exc);
             }
 
@@ -2631,7 +2631,7 @@ public sealed class Game : MessageHandler
         if (_state.AnswererIndex > playerIndex)
         {
             _state.AnswererIndex--;
-            Logic.AddHistory($"AnswererIndex reduced to {_state.AnswererIndex}");
+            Controller.AddHistory($"AnswererIndex reduced to {_state.AnswererIndex}");
         }
         else if (_state.AnswererIndex == playerIndex)
         {
@@ -2647,9 +2647,9 @@ public sealed class Game : MessageHandler
             DropCurrentAppelaer();
         }
 
-        if (Logic.Stakes.HandlePlayerDrop(playerIndex))
+        if (Controller.Stakes.HandlePlayerDrop(playerIndex))
         {
-            Logic.AddHistory($"StakerIndex set to {_state.Stakes.StakerIndex}");
+            Controller.AddHistory($"StakerIndex set to {_state.Stakes.StakerIndex}");
         }
 
         // TODO: move to stakes.HandlePlayerDrop()
@@ -2660,7 +2660,7 @@ public sealed class Game : MessageHandler
             DropPlayerFromStakes(playerIndex);
         }
 
-        if (Logic.HaveMultipleAnswerers())
+        if (Controller.HaveMultipleAnswerers())
         {
             DropPlayerFromAnnouncing(playerIndex);
         }
@@ -2694,9 +2694,9 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        Logic.AddHistory($"ThemeDeleters before remove: {themeDeleters}");
+        Controller.AddHistory($"ThemeDeleters before remove: {themeDeleters}");
         themeDeleters.RemoveAt(playerIndex);
-        Logic.AddHistory($"ThemeDeleters removed: {playerIndex}; result: {themeDeleters}");
+        Controller.AddHistory($"ThemeDeleters removed: {playerIndex}; result: {themeDeleters}");
 
         if (!_state.IsWaiting)
         {
@@ -2825,14 +2825,14 @@ public sealed class Game : MessageHandler
 
         if (!_state.Players.Any(p => p.StakeMaking))
         {
-            Logic.AddHistory("Last staker dropped");
+            Controller.AddHistory("Last staker dropped");
             _state.SkipQuestion?.Invoke();
-            Logic.PlanExecution(Tasks.MoveNext, 20, 1);
+            Controller.PlanExecution(Tasks.MoveNext, 20, 1);
         }
         else if (currentOrderIndex != -1 && _state.OrderIndex == -1
             || currentStaker != -1 && _state.Order[_state.OrderIndex] == -1)
         {
-            Logic.AddHistory("Current staker dropped");
+            Controller.AddHistory("Current staker dropped");
 
             if (_state.Decision == DecisionType.StakeMaking || _state.Decision == DecisionType.NextPersonStakeMaking)
             {
@@ -2863,7 +2863,7 @@ public sealed class Game : MessageHandler
     private void DropCurrentAppelaer()
     {
         _state.AppelaerIndex = -1;
-        Logic.AddHistory($"AppelaerIndex dropped");
+        Controller.AddHistory($"AppelaerIndex dropped");
     }
 
     /// <summary>
@@ -2879,45 +2879,45 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        var nextTask = Logic.Runner.PendingTask;
+        var nextTask = Controller.Runner.PendingTask;
 
-        Logic.AddHistory(
+        Controller.AddHistory(
             $"AnswererIndex dropped; nextTask = {nextTask};" +
             $" ClientData.Decision = {_state.Decision}");
 
         if ((_state.Decision == DecisionType.Answering ||
-            _state.Decision == DecisionType.AnswerValidating) && !Logic.HaveMultipleAnswerers())
+            _state.Decision == DecisionType.AnswerValidating) && !Controller.HaveMultipleAnswerers())
         {
             // Answerer has been dropped. The game should be moved forward
-            Logic.StopWaiting();
+            Controller.StopWaiting();
 
             if (_state.IsOralNow)
             {
                 _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
 
-            Logic.PlanExecution(Tasks.ContinueQuestion, 1);
+            Controller.PlanExecution(Tasks.ContinueQuestion, 1);
         }
         else if (nextTask == Tasks.AskRight || nextTask == Tasks.WaitRight)
         {
             // Player has been removed after giving answer. But the answer has not been validated by showman yet
             if (_state.QuestionPlay.AnswererIndicies.Count == 0)
             {
-                Logic.PlanExecution(Tasks.ContinueQuestion, 1);
+                Controller.PlanExecution(Tasks.ContinueQuestion, 1);
             }
             else
             {
-                Logic.PlanExecution(Tasks.Announce, 15);
+                Controller.PlanExecution(Tasks.Announce, 15);
             }
         }
         else if (_state.QuestionPlay.AnswererIndicies.Count == 0 && !_state.QuestionPlay.UseButtons)
         {
             _state.SkipQuestion?.Invoke();
-            Logic.PlanExecution(Tasks.MoveNext, 20, 1);
+            Controller.PlanExecution(Tasks.MoveNext, 20, 1);
         }
         else if (nextTask == Tasks.AnnounceStake)
         {
-            Logic.PlanExecution(Tasks.Announce, 15);
+            Controller.PlanExecution(Tasks.Announce, 15);
         }
     }
 
@@ -2928,19 +2928,19 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        Logic.AddHistory($"AnnouncedAnswerersEnumerator before update: {_state.AnnouncedAnswerersEnumerator}");
+        Controller.AddHistory($"AnnouncedAnswerersEnumerator before update: {_state.AnnouncedAnswerersEnumerator}");
         _state.AnnouncedAnswerersEnumerator.Update(CustomEnumeratorUpdaters.RemoveByIndex(index));
-        Logic.AddHistory($"AnnouncedAnswerersEnumerator after update: {_state.AnnouncedAnswerersEnumerator}");
+        Controller.AddHistory($"AnnouncedAnswerersEnumerator after update: {_state.AnnouncedAnswerersEnumerator}");
     }
 
     private void ContinueMakingStakes()
     {
-        Logic.AddHistory("ContinueMakingStakes");
+        Controller.AddHistory("ContinueMakingStakes");
 
         var previousDecision = _state.Decision;
-        Logic.StopWaiting(); // Drops ClientData.Decision
+        Controller.StopWaiting(); // Drops ClientData.Decision
 
-        if (Logic.TryDetectStakesWinner())
+        if (Controller.TryDetectStakesWinner())
         {
             if (_state.Stake == -1)
             {
@@ -2952,11 +2952,11 @@ public sealed class Game : MessageHandler
 
         if (_state.OrderIndex > -1 && previousDecision == DecisionType.NextPersonStakeMaking)
         {
-            Logic.AddHistory("Rolling order index back");
+            Controller.AddHistory("Rolling order index back");
             _state.OrderIndex--;
         }
 
-        Logic.PlanExecution(Tasks.AskStake, 20);
+        Controller.PlanExecution(Tasks.AskStake, 20);
     }
 
     private void FreeTable(Message message, string[] args, Account host)
@@ -3185,7 +3185,7 @@ public sealed class Game : MessageHandler
                     IsConnected = account.IsConnected,
                 };
 
-                Logic.SendQuestionAnswersToShowman();
+                Controller.SendQuestionAnswersToShowman();
             }
             else
             {
@@ -3271,7 +3271,7 @@ public sealed class Game : MessageHandler
                     _state.ShowMan.Ready = otherPerson.Ready;
                 }
 
-                Logic.SendQuestionAnswersToShowman();
+                Controller.SendQuestionAnswersToShowman();
             }
 
             InformAvatar(otherAccount);
@@ -3436,10 +3436,10 @@ public sealed class Game : MessageHandler
         _state.Players[index] = newAccount;
 
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        var data = new ViewerData();
-        var actions = new ViewerActions(playerClient);
-        var logic = new PersonComputerController(data, actions, new Intelligence(account), GameRole.Player);
-        _ = new Player(playerClient, account, logic, actions, data);
+        var state = new PersonState();
+        var actions = new PersonActions(playerClient);
+        var logic = new PersonComputerController(state, actions, new Intelligence(account), GameRole.Player);
+        _ = new Player(playerClient, account, logic, actions, state);
 
         OnInfo(newAccount.Name);
 
@@ -3465,19 +3465,19 @@ public sealed class Game : MessageHandler
         _state.ShowMan = newAccount;
 
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        var data = new ViewerData();
-        var actions = new ViewerActions(showmanClient);
+        var state = new PersonState();
+        var actions = new PersonActions(showmanClient);
         
         var logic = new PersonComputerController(
-            data,
+            state,
             actions,
             new Intelligence(account),
             GameRole.Showman);
         
-        var showman = new Showman(showmanClient, account, logic, actions, data);
+        var showman = new Showman(showmanClient, account, logic, actions, state);
 
         OnInfo(newAccount.Name);
-        Logic.SendQuestionAnswersToShowman();
+        Controller.SendQuestionAnswersToShowman();
 
         return newAccount;
     }
@@ -3547,7 +3547,7 @@ public sealed class Game : MessageHandler
 
         if (role == GameRole.Showman)
         {
-            Logic.SendQuestionAnswersToShowman();
+            Controller.SendQuestionAnswersToShowman();
         }
 
         OnPersonsChanged();

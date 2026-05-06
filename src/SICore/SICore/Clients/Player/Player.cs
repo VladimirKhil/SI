@@ -17,15 +17,15 @@ public sealed class Player : Viewer
     /// <param name="client">Player game network client.</param>
     /// <param name="personData">Player account data.</param>
     /// <param name="logic">Player logic.</param>
-    /// <param name="viewerActions">Player actions.</param>
-    /// <param name="data">Player game data.</param>
+    /// <param name="actions">Player actions.</param>
+    /// <param name="state">Player game state.</param>
     public Player(
         Client client,
         Account personData,
         IPersonController logic,
-        ViewerActions viewerActions,
-        ViewerData data)
-        : base(client, personData, logic, viewerActions, data)
+        PersonActions actions,
+        PersonState state)
+        : base(client, personData, logic, actions, state)
     { }
 
     protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)

@@ -12,7 +12,7 @@ namespace SICore;
 /// <summary>
 /// Defines viewer data.
 /// </summary>
-public sealed class ViewerData : Data, INotifyPropertyChanged
+public sealed class PersonState : Data, INotifyPropertyChanged
 {
     internal const int LockTimeoutMs = 5000;
 

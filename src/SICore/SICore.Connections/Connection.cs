@@ -69,7 +69,7 @@ public sealed class Connection : TcpReadConnection
         }
     }
 
-    public async Task<string> UpgradeAsync(string serverAddress, string? connectionId)
+    public async Task<string?> UpgradeAsync(string serverAddress, string? connectionId)
     {
         var connectionIdHeader = connectionId != null ? $"\nConnectionId: {connectionId}" : "";
 
@@ -106,7 +106,7 @@ public sealed class Connection : TcpReadConnection
             })
             .ToDictionary(val => val.Name, val => val.Value);
 
-        if (!headers.TryGetValue("ConnectionId", out string connectionIdFromServer))
+        if (!headers.TryGetValue("ConnectionId", out var connectionIdFromServer))
         {
             connectionIdFromServer = connectionId;
         }
