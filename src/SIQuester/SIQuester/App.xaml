@@ -1424,6 +1424,13 @@
                                                         Content="{StaticResource TextImage}"
                                                         Command="{Binding AddComments}"
                                                         Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        x:Name="showmanComments"
+                                                        ToolTip="{x:Static lp:Resources.ShowmanComments}"
+                                                        Content="{StaticResource ShowmanCommentsImage}"
+                                                        Command="{Binding AddShowmanComments}"
+                                                        Style="{StaticResource MenuButton}" />
                                                 </StackPanel>
                                                 
                                                 <DataTemplate.Triggers>
@@ -1437,6 +1444,7 @@
                                                         <Setter TargetName="authors" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="sources" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="comments" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="showmanComments" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="complexAnswer" Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
@@ -3464,6 +3472,40 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
+            <DataTemplate x:Key="ShowmanComments" DataType="{x:Type vm:ShowmanCommentsViewModel}">
+                <DockPanel x:Name="panel" Background="Transparent">
+                    <TextBlock Text="{x:Static lp:Resources.ShowmanCommentsHeader}" Style="{StaticResource BlockStyleKey}" />
+
+                    <Button
+                        x:Name="remove"
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        lb:ClearTextBehaviour.Target="{Binding ElementName=text}"
+                        Width="20"
+                        Height="20"
+                        Visibility="Hidden"
+                        ToolTip="{x:Static lp:Resources.RemoveComment}">
+                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
+                    </Button>
+
+                    <TextBox
+                        x:Name="text"
+                        Style="{StaticResource LightTextBox}"
+                        siq:ActivateManager.IsWatching="True"
+                        Text="{Binding Text}"
+                        AcceptsReturn="True" />
+                </DockPanel>
+
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter TargetName="remove" Property="Visibility" Value="Visible" />
+                    </Trigger>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="remove" Property="Visibility" Value="Visible" />
+                    </Trigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
             <Style x:Key="AuthorsStyle" TargetType="{x:Type ContentControl}">
                 <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
                 
@@ -3494,11 +3536,22 @@
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="ShowmanCommentsStyle" TargetType="{x:Type ContentControl}">
+                <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding ShowmanComments.HasValue}" Value="true">
+                        <Setter Property="ContentTemplate" Value="{StaticResource ShowmanComments}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <DataTemplate DataType="{x:Type vm:InfoViewModel}">
                 <StackPanel>
                     <ContentControl Style="{StaticResource AuthorsStyle}" Content="{Binding Authors}" KeyboardNavigation.IsTabStop="False" />
                     <ContentControl Style="{StaticResource SourcesStyle}" Content="{Binding Sources}" KeyboardNavigation.IsTabStop="False" />
                     <ContentControl Style="{StaticResource CommentsStyle}" Content="{Binding Comments}" KeyboardNavigation.IsTabStop="False" />
+                    <ContentControl Style="{StaticResource ShowmanCommentsStyle}" Content="{Binding ShowmanComments}" KeyboardNavigation.IsTabStop="False" />
                 </StackPanel>
             </DataTemplate>
 

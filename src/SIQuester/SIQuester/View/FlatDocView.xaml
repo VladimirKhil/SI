@@ -665,6 +665,64 @@
                     TextWrapping="Wrap"
                     Margin="0,1,0,0"
                     Padding="0,1" />
+
+                <TextBlock
+                    Text="{x:Static lp:Resources.ShowmanCommentsHeader}"
+                    Margin="0,5,0,0"
+                    Padding="0,1">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowmanComments.HasValue}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <ContentControl
+                    Content="{Binding ShowmanComments}">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowmanComments.HasValue}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Setter Property="ContentTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <DockPanel Margin="0,1,0,0">
+                                                    <Button
+                                                        DockPanel.Dock="Right"
+                                                        ToolTip="{x:Static lp:Resources.RemoveComment}"
+                                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                        lb:ClearTextBehaviour.Target="{Binding ElementName=showmanCommentText}"
+                                                        Width="25"
+                                                        Height="25"
+                                                        Padding="2">
+                                                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="#555555" Stretch="Fill" Margin="5" />
+                                                    </Button>
+
+                                                    <TextBox
+                                                        x:Name="showmanCommentText"
+                                                        Text="{Binding Text}"
+                                                        AcceptsReturn="True"
+                                                        TextWrapping="Wrap"
+                                                        Padding="0,1" />
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
             </StackPanel>
         </DataTemplate>
 

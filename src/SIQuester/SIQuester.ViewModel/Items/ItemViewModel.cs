@@ -68,7 +68,11 @@ public abstract class ItemViewModel<T> : ModelViewBase, IItemViewModel
 
     public SimpleCommand AddComments { get; private set; }
 
+    public ICommand AddShowmanComments { get; private set; }
+
     public ICommand SetCosts { get; private set; }
+
+    private readonly SimpleCommand _addShowmanComments;
 
     public InfoOwner GetModel() => Model;
 
@@ -86,17 +90,28 @@ public abstract class ItemViewModel<T> : ModelViewBase, IItemViewModel
         AddAuthors = new SimpleCommand(AddAuthors_Executed) { CanBeExecuted = Info.Authors.Count == 0 };
         AddSources = new SimpleCommand(AddSources_Executed) { CanBeExecuted = Info.Sources.Count == 0 };
         AddComments = new SimpleCommand(AddComments_Executed) { CanBeExecuted = Info.Comments.Text.Length == 0 };
+        _addShowmanComments = new SimpleCommand(AddShowmanComments_Executed)
+        {
+            CanBeExecuted = !Info.ShowmanComments.HasValue || Info.ShowmanComments.Text.Length == 0
+        };
+        AddShowmanComments = _addShowmanComments;
 
         SetCosts = new SimpleCommand(SetCosts_Executed);
 
         Info.Authors.CollectionChanged += Authors_CollectionChanged;
         Info.Sources.CollectionChanged += Sources_CollectionChanged;
         Info.Comments.PropertyChanged += Comments_PropertyChanged;
+        Info.ShowmanComments.PropertyChanged += ShowmanComments_PropertyChanged;
     }
 
     private void Comments_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         AddComments.CanBeExecuted = Info.Comments.Text.Length == 0;
+    }
+
+    private void ShowmanComments_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        _addShowmanComments.CanBeExecuted = !Info.ShowmanComments.HasValue || Info.ShowmanComments.Text.Length == 0;
     }
 
     private void Sources_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -125,6 +140,12 @@ public abstract class ItemViewModel<T> : ModelViewBase, IItemViewModel
     {
         QDocument.ActivatedObject = Info.Comments;
         Info.Comments.Text = Resources.Comment;
+    }
+
+    private void AddShowmanComments_Executed(object? arg)
+    {
+        QDocument.ActivatedObject = Info.ShowmanComments;
+        Info.ShowmanComments.Text = Resources.Comment;
     }
 
     private void SetCosts_Executed(object? arg)

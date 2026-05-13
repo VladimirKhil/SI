@@ -962,6 +962,7 @@ public sealed class QDocument : WorkspaceViewModel
         owner.Info.Authors.CollectionChanged += Object_CollectionChanged;
         owner.Info.Sources.CollectionChanged += Object_CollectionChanged;
         owner.Info.Comments.PropertyChanged += Object_PropertyValueChanged;
+        owner.Info.ShowmanComments.PropertyChanged += Object_PropertyValueChanged;
     }
 
     private void StopListen(IItemViewModel owner)
@@ -969,6 +970,7 @@ public sealed class QDocument : WorkspaceViewModel
         owner.Info.Authors.CollectionChanged -= Object_CollectionChanged;
         owner.Info.Sources.CollectionChanged -= Object_CollectionChanged;
         owner.Info.Comments.PropertyChanged -= Object_PropertyValueChanged;
+        owner.Info.ShowmanComments.PropertyChanged -= Object_PropertyValueChanged;
     }
 
     private void Object_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

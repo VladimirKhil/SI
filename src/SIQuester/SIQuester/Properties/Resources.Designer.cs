@@ -1259,15 +1259,6 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You package lacks preview image. It is better to set up preview before uploading to Steam.
-        /// </summary>
-        public static string EmptyPreviewWarning {
-            get {
-                return ResourceManager.GetString("EmptyPreviewWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to (empty).
         /// </summary>
         public static string EmptyQuestion {
@@ -3159,6 +3150,24 @@ namespace SIQuester.Properties {
         public static string ShowHelp {
             get {
                 return ResourceManager.GetString("ShowHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comments for showman.
+        /// </summary>
+        public static string ShowmanComments {
+            get {
+                return ResourceManager.GetString("ShowmanComments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comments for showman:.
+        /// </summary>
+        public static string ShowmanCommentsHeader {
+            get {
+                return ResourceManager.GetString("ShowmanCommentsHeader", resourceCulture);
             }
         }
         

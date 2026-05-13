@@ -24,11 +24,17 @@ public static class ClearTextBehaviour
         {
             button.Click -= (s, e) =>
             {
-                oldTextBox.Clear();
-
-                if (oldTextBox.DataContext is CommentsViewModel commentsViewModel)
+                if (oldTextBox.DataContext is ShowmanCommentsViewModel showmanCommentsViewModel)
                 {
-                    commentsViewModel.Text = "";
+                    showmanCommentsViewModel.Clear();
+                }
+                else if (oldTextBox.DataContext is CommentsViewModel commentsViewModel)
+                {
+                    commentsViewModel.Clear();
+                }
+                else
+                {
+                    oldTextBox.Clear();
                 }
             };
         }
@@ -37,11 +43,17 @@ public static class ClearTextBehaviour
         {
             button.Click += (s, e) =>
             {
-                textBox.Clear();
-
-                if (textBox.DataContext is CommentsViewModel commentsViewModel)
+                if (textBox.DataContext is ShowmanCommentsViewModel showmanCommentsViewModel)
                 {
-                    commentsViewModel.Text = "";
+                    showmanCommentsViewModel.Clear();
+                }
+                else if (textBox.DataContext is CommentsViewModel commentsViewModel)
+                {
+                    commentsViewModel.Clear();
+                }
+                else
+                {
+                    textBox.Clear();
                 }
             };
         }

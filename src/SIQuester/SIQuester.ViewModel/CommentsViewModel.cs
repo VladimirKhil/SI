@@ -2,23 +2,21 @@
 
 namespace SIQuester.ViewModel;
 
-public sealed class CommentsViewModel : ModelViewBase
+public class CommentsViewModel(Comments comments) : ModelViewBase
 {
-    private readonly Comments _comments;
-
     public string Text
     {
-        get => _comments.Text;
+        get => comments.Text;
         set
         {
-            if (_comments.Text != value)
+            if (comments.Text != value)
             {
-                var oldValue = _comments.Text;
-                _comments.Text = value;
-               OnPropertyChanged<string>(oldValue);
+                var oldValue = comments.Text;
+                comments.Text = value;
+                OnPropertyChanged<string>(oldValue);
             }
         }
     }
 
-    public CommentsViewModel(Comments comments) => _comments = comments;
+    public void Clear() => Text = "";
 }

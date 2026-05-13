@@ -84,6 +84,12 @@
         </DrawingImage.Drawing>
     </DrawingImage>
 
+    <DrawingImage x:Key="ShowmanCommentsImage">
+        <DrawingImage.Drawing>
+            <GeometryDrawing Brush="DarkSlateBlue" Geometry="{Binding Source={StaticResource app_at},Path=Data}" />
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
     <DrawingImage x:Key="PasteImage">
         <DrawingImage.Drawing>
             <GeometryDrawing Brush="Gray" Geometry="{Binding Source={StaticResource app_paste},Path=Data}" />

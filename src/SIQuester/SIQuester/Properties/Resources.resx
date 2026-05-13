@@ -535,9 +535,6 @@ By following these steps, you help maintain a responsible and collaborative envi
   <data name="EmptyLineBeforeThemeName" xml:space="preserve">
     <value>Is an empty line needed after the theme name</value>
   </data>
-  <data name="EmptyPreviewWarning" xml:space="preserve">
-    <value>You package lacks preview image. It is better to set up preview before uploading to Steam</value>
-  </data>
   <data name="EmptyQuestion" xml:space="preserve">
     <value>(empty)</value>
   </data>
@@ -1106,6 +1103,12 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="ShowToolTipsInFlatView" xml:space="preserve">
     <value>Show tooltips in tile view</value>
+  </data>
+  <data name="ShowmanComments" xml:space="preserve">
+    <value>Comments for showman</value>
+  </data>
+  <data name="ShowmanCommentsHeader" xml:space="preserve">
+    <value>Comments for showman:</value>
   </data>
   <data name="GamesStartedTooltip" xml:space="preserve">
     <value>Number of games started with this package</value>

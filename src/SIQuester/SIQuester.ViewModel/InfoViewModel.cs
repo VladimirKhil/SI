@@ -5,26 +5,36 @@ namespace SIQuester.ViewModel;
 
 public sealed class InfoViewModel : ModelViewBase
 {
-    private readonly Info _model;
-
     public AuthorsViewModel Authors { get; }
 
     public SourcesViewModel Sources { get; }
 
     public CommentsViewModel Comments { get; }
 
+    public ShowmanCommentsViewModel ShowmanComments { get; }
+
     public IItemViewModel Owner { get; }
 
     public InfoViewModel(Info model, IItemViewModel owner)
     {
-        _model = model;
         Owner = owner;
 
-        Authors = new AuthorsViewModel(_model.Authors, this);
-        Sources = new SourcesViewModel(_model.Sources, this);
-        Comments = new CommentsViewModel(_model.Comments);
+        Authors = new AuthorsViewModel(model.Authors, this);
+        Sources = new SourcesViewModel(model.Sources, this);
+        Comments = new CommentsViewModel(model.Comments);
+        ShowmanComments = new ShowmanCommentsViewModel(model);
 
-        BindHelper.Bind(Authors, _model.Authors);
-        BindHelper.Bind(Sources, _model.Sources);
+        BindHelper.Bind(Authors, model.Authors);
+        BindHelper.Bind(Sources, model.Sources);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            ShowmanComments.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 }
