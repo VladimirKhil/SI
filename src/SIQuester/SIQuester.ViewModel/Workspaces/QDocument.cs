@@ -32,6 +32,7 @@ using System.Xml;
 using System.Xml.Xsl;
 using Utils;
 using Utils.Commands;
+using Lock = Utils.Lock;
 
 namespace SIQuester.ViewModel;
 
@@ -2148,6 +2149,11 @@ public sealed class QDocument : WorkspaceViewModel
         if (!Package.HasQualityControl)
         {
             return Resources.ExportToSteamQualityControlDisabled;
+        }
+
+        if (Package.Model.Logo.Length == 0)
+        {
+            return string.Format(Resources.EmptyPreviewWarning);
         }
 
         var hasQuestions = false;

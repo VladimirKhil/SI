@@ -1034,4 +1034,7 @@ Humor</value>
   <data name="Descending" xml:space="preserve">
     <value>Descending</value>
   </data>
+  <data name="EmptyPreviewWarning" xml:space="preserve">
+    <value>You package lacks preview image</value>
+  </data>
 </root>

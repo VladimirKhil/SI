@@ -69,17 +69,6 @@
                 Padding="15,8" />
 
             <TextBlock Grid.Row="4" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="{x:Static lp:Resources.SteamWarning}" HorizontalAlignment="Right" Foreground="Red" />
-            
-            <TextBlock
-                Grid.Row="5"
-                Grid.ColumnSpan="2"
-                TextWrapping="Wrap"
-                Text="{x:Static lp:Resources.EmptyPreviewWarning}"
-                HorizontalAlignment="Right"
-                Foreground="Goldenrod"
-                Margin="0,10,0,5"
-                Visibility="{Binding ShowMissingPreviewWarning, Converter={StaticResource VisibilityConverter}}" />
-            
             <ProgressBar Grid.Row="6" Grid.ColumnSpan="2" x:Name="UploadProgressBar" Height="20" Margin="0,10" Value="{Binding Progress}" Minimum="0" Maximum="100" />
             <TextBlock Grid.Row="7" Grid.ColumnSpan="2" x:Name="StatusTextBlock" TextWrapping="Wrap" Text="{Binding Status}" />
             <TextBlock Grid.Row="8" Grid.ColumnSpan="2"><Hyperlink lb:HyperlinkBehavior.IsAttached="True" NavigateUri="{Binding ItemLink}"> <TextBlock Text="{Binding ItemLink}" /></Hyperlink></TextBlock>

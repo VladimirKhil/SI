@@ -137,6 +137,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     private readonly string[] _args;
     private readonly AppOptions _appOptions;
     private readonly IClipboardService _clipboardService;
+    private readonly IPlatformService _platformService;
     private readonly IDocumentViewModelFactory _documentViewModelFactory;
     private readonly IServiceProvider _serviceProvider;
 
@@ -147,11 +148,13 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         AppOptions appOptions,
         IClipboardService clipboardService,
         IServiceProvider serviceProvider,
+        IPlatformService platformService,
         IDocumentViewModelFactory documentViewModelFactory,
         ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
         _clipboardService = clipboardService;
+        _platformService = platformService;
         _documentViewModelFactory = documentViewModelFactory;
         _logger = loggerFactory.CreateLogger<MainViewModel>();
         _appOptions = appOptions;
@@ -247,7 +250,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     private void SetSettings_Executed(object? arg) => DocList.Add(new SettingsViewModel());
 
-    private void Help_Executed(object? arg) => PlatformManager.Instance.ShowHelp();
+    private void Help_Executed(object? arg) => _platformService.ShowHelp();
 
     private async Task Close_Executed(object? arg)
     {
@@ -302,7 +305,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-                foreach (WorkspaceViewModel item in e.NewItems)
+                foreach (WorkspaceViewModel item in e.NewItems ?? Array.Empty<WorkspaceViewModel>())
                 {
                     item.Error += ShowError;
                     item.NewItem += Item_NewDoc;
@@ -316,7 +319,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
                 break;
 
             case NotifyCollectionChangedAction.Remove:
-                foreach (WorkspaceViewModel item in e.OldItems)
+                foreach (WorkspaceViewModel item in e.OldItems ?? Array.Empty<WorkspaceViewModel>())
                 {
                     item.Error -= ShowError;
                     item.NewItem -= Item_NewDoc;
@@ -380,16 +383,36 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Открыть недавний файл
+    /// Opens recently opened file.
     /// </summary>
-    /// <param name="arg">Путь к файлу</param>
-    private async void OpenRecent_Executed(object? arg) => await OpenFileAsync(arg.ToString());
+    /// <param name="arg">Path to the file.</param>
+    private async void OpenRecent_Executed(object? arg)
+    {
+        var filePath = arg?.ToString();
+
+        if (filePath == null)
+        {
+            return;
+        }
+
+        await OpenFileAsync(filePath);
+    }
 
     /// <summary>
     /// Removes recent file.
     /// </summary>
     /// <param name="arg">Recent file path.</param>
-    private void RemoveRecent_Executed(object? arg) => AppSettings.Default.History.Remove(arg.ToString());
+    private void RemoveRecent_Executed(object? arg)
+    {
+        var filePath = arg?.ToString();
+
+        if (filePath == null)
+        {
+            return;
+        }
+
+        AppSettings.Default.History.Remove(filePath);
+    }
 
     private static void OpenFolder(string path)
     {

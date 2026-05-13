@@ -1032,4 +1032,7 @@
   <data name="Descending" xml:space="preserve">
     <value>По убыванию</value>
   </data>
+  <data name="EmptyPreviewWarning" xml:space="preserve">
+    <value>У вашего пакета отсутствует превью</value>
+  </data>
 </root>

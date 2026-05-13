@@ -33,12 +33,12 @@ namespace SIQuester.Implementation;
 /// <summary>
 /// Implements SIQuester desktop framework logic.
 /// </summary>
-internal sealed class DesktopManager : PlatformManager, IDisposable
+internal sealed class DesktopManager : PlatformManager, IPlatformService, IDisposable
 {
     internal const string STR_Definition = "{0}: {1}";
     internal const string STR_ExtendedDefinition = "{0}: {1} ({2})";
 
-    private readonly Dictionary<string, string> _mediaFiles = new();
+    private readonly Dictionary<string, string> _mediaFiles = [];
 
     private const int MAX_PATH = 260;
 
@@ -255,9 +255,11 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                 }
             }
 
+            var controls = dialog.Controls ?? throw new InvalidOperationException("Dialog controls are unavailable.");
+
             foreach (var item in richUI)
             {
-                dialog.Controls.Add(item);
+                controls.Add(item);
             }
 
             if (title != null)
@@ -752,7 +754,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
                     var paragraph = new Paragraph();
 
-                    foreach (var line in fileRes.ToString().Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
+                    foreach (var line in fileRes.ToString().Split(["\r\n", "\r", "\n"], StringSplitOptions.None))
                     {
                         if (paragraph.Inlines.Count > 0)
                         {
@@ -1096,7 +1098,19 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
     public void Dispose()
     {
-        
+        var tempDirectory = Path.Combine(Path.GetTempPath(), AppSettings.ProductName);
+
+        try
+        {
+            if (Directory.Exists(tempDirectory))
+            {
+                Directory.Delete(tempDirectory, true);
+            }
+        }
+        catch (Exception exc)
+        {
+            Trace.TraceError(exc.ToString());
+        }
     }
 
     internal sealed class Disposable : IDisposable

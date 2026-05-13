@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using SIQuester.Helpers;
+using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.Services.Host;
 using SIQuester.ViewModel;
@@ -21,7 +22,6 @@ using SIStatisticsService.Client;
 using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -141,8 +141,9 @@ public partial class App : Application
             var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();
             var documentViewModelFactory = _host.Services.GetRequiredService<IDocumentViewModelFactory>();
             var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
+            var platformService = _host.Services.GetRequiredService<IPlatformService>();
 
-            _mainViewModel = new MainViewModel(e.Args, options.Value, clipboardService, _host.Services, documentViewModelFactory, loggerFactory);
+            _mainViewModel = new MainViewModel(e.Args, options.Value, clipboardService, _host.Services, platformService, documentViewModelFactory, loggerFactory);
             DocumentCollectionController.AttachTo(_mainViewModel);
 
             var storageContextViewModel = _host.Services.GetRequiredService<StorageContextViewModel>();
@@ -181,6 +182,7 @@ public partial class App : Application
         services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
 
         services.AddSingleton<IClipboardService, ClipboardService>();
+        services.AddSingleton<IPlatformService, DesktopManager>();
 
         services.AddSIQuester();
     }

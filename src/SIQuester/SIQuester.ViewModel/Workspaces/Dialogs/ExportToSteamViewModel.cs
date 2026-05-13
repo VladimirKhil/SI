@@ -96,7 +96,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
     /// <summary>
     /// Workshop items created by the user.
     /// </summary>
-    public ObservableCollection<WorkshopItemViewModel> UserItems { get; } = new();
+    public ObservableCollection<WorkshopItemViewModel> UserItems { get; } = [];
 
     private WorkshopItemViewModel? _selectedItem;
 
@@ -147,9 +147,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
     private string? _tempFolder;
 
-    private readonly Dictionary<string, object> _metadata = new();
-
-    public bool ShowMissingPreviewWarning => _document.Package.Model.Logo.Length == 0;
+    private readonly Dictionary<string, object> _metadata = [];
 
     public ExportToSteamViewModel(QDocument document)
     {

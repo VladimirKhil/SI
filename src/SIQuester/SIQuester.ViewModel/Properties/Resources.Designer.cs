@@ -473,6 +473,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You package lacks preview image.
+        /// </summary>
+        public static string EmptyPreviewWarning {
+            get {
+                return ResourceManager.GetString("EmptyPreviewWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty.
         /// </summary>
         public static string EmptyValue {
