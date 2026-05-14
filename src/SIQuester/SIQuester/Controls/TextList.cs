@@ -55,6 +55,9 @@ public sealed class TextList : TextBox
 
     private readonly List<ItemInfo> _infos = new();
 
+    private string? _lastCollectionChangeInfo;
+    private string? _lastInternalIssueInfo;
+
     private int _oldSelectionStart = -1, _oldSelectionLength = -1, _oldOffsetStart = -1;
 
     /// <summary>
@@ -129,38 +132,47 @@ public sealed class TextList : TextBox
             return;
         }
 
-        switch (e.Action)
+        _lastCollectionChangeInfo = DescribeCollectionChange(e);
+
+        try
         {
-            case NotifyCollectionChangedAction.Add:
-                OnItemsAdded(e);
-                break;
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    OnItemsAdded(e);
+                    break;
 
-            case NotifyCollectionChangedAction.Move:
-                // Не обрабатывается
-                break;
+                case NotifyCollectionChangedAction.Move:
+                    // Не обрабатывается
+                    break;
 
-            case NotifyCollectionChangedAction.Remove:
-                OnItemsRemoved(e);
+                case NotifyCollectionChangedAction.Remove:
+                    OnItemsRemoved(e);
 
-                if (_infos.Count != ItemsSource.Count)
-                {
-                    throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems?.Count}");
-                }
-                break;
+                    if (_infos.Count != ItemsSource.Count)
+                    {
+                        throw CreateStateException($"_infos.Count != ItemsSource.Count after remove (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems?.Count})");
+                    }
+                    break;
 
-            case NotifyCollectionChangedAction.Replace:
-                OnItemsReplaced(e);
-                break;
+                case NotifyCollectionChangedAction.Replace:
+                    OnItemsReplaced(e);
+                    break;
 
-            case NotifyCollectionChangedAction.Reset:
-                SetText();
-                break;
+                case NotifyCollectionChangedAction.Reset:
+                    SetText();
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
+
+            Check();
         }
-
-        Check();
+        catch (Exception exc)
+        {
+            throw CreateStateException($"TextList collection change processing failed ({_lastCollectionChangeInfo})", exc);
+        }
     }
 
     public object? CurrentItem
@@ -204,7 +216,7 @@ public sealed class TextList : TextBox
 
         if (_infos.Count != ItemsSource.Count)
         {
-            throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems?.Count}");
+            throw CreateStateException($"_infos.Count != ItemsSource.Count after replace (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.OldItems.Count: {e.OldItems?.Count})");
         }
     }
 
@@ -280,6 +292,50 @@ public sealed class TextList : TextBox
         }
     }
 
+    private static string DescribeCollectionChange(NotifyCollectionChangedEventArgs e) =>
+        $"Action={e.Action}, OldStartingIndex={e.OldStartingIndex}, NewStartingIndex={e.NewStartingIndex}, OldItemsCount={e.OldItems?.Count ?? 0}, NewItemsCount={e.NewItems?.Count ?? 0}";
+
+    private string DescribeState() =>
+        $"TextList state: InfosCount={_infos.Count}, InfosLengths={string.Join(";", _infos.Select(info => info._length))}, ItemsSourceCount={ItemsSource?.Count ?? -1}, TextLength={Text?.Length ?? -1}, SelectionStart={SelectionStart}, SelectionLength={SelectionLength}, LastCollectionChange={_lastCollectionChangeInfo ?? "none"}, LastInternalIssue={_lastInternalIssueInfo ?? "none"}, ItemsSourceType={ItemsSource?.GetType().FullName ?? "null"}";
+
+    private void RememberInternalIssue(string issue) => _lastInternalIssueInfo = issue;
+
+    private InvalidOperationException CreateStateException(string message, Exception? innerException = null) =>
+        new($"{message}. {DescribeState()}", innerException);
+
+    private int GetAvailableItemCount()
+    {
+        if (ItemsSource == null)
+        {
+            return 0;
+        }
+
+        if (_infos.Count != ItemsSource.Count)
+        {
+            RememberInternalIssue($"Metadata desync detected before rebuild: InfosCount={_infos.Count}, ItemsSourceCount={ItemsSource.Count}");
+            SetText();
+        }
+
+        return Math.Min(_infos.Count, ItemsSource.Count);
+    }
+
+    private int GetTextLength(int itemCount)
+    {
+        var result = 0;
+
+        for (var i = 0; i < itemCount; i++)
+        {
+            if (i > 0)
+            {
+                result += ItemsSeparator.Length;
+            }
+
+            result += _infos[i]._length;
+        }
+
+        return result;
+    }
+
     private void OnItemsAdded(NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems == null || ItemsSource == null)
@@ -303,14 +359,23 @@ public sealed class TextList : TextBox
                     text.Append(ItemsSeparator);
                 }
 
-                var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeSpecified, out var _);
+                var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeSpecified, out var tail);
                 text.Append(toAdd);
-                _infos.Insert(index++, new ItemInfo(toAdd.Length, isLink ? toAdd.Length : -1, canBeSpecified));
+
+                var length = toAdd.Length;
+
+                if (!string.IsNullOrEmpty(tail))
+                {
+                    text.Append(tail);
+                    length += tail.Length;
+                }
+
+                _infos.Insert(index++, new ItemInfo(length, isLink ? toAdd.Length : -1, canBeSpecified));
             }
 
             if (_infos.Count != ItemsSource.Count)
             {
-                throw new Exception($"_infos.Count != ItemsSource.Count (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.NewItems.Count: {e.NewItems.Count}");
+                throw CreateStateException($"_infos.Count != ItemsSource.Count after add (_infos.Count: {_infos.Count}, ItemsSource.Count: {ItemsSource.Count}, e.NewItems.Count: {e.NewItems.Count})");
             }
 
             if (e.NewStartingIndex == 0 && index < _infos.Count)
@@ -446,7 +511,12 @@ public sealed class TextList : TextBox
     {
         base.OnTextChanged(e);
 
-        if (_blockChanges || _infos.Count == 0)
+        if (_blockChanges || ItemsSource == null)
+        {
+            return;
+        }
+
+        if (GetAvailableItemCount() == 0)
         {
             return;
         }
@@ -495,7 +565,7 @@ public sealed class TextList : TextBox
             }
             catch (Exception exc)
             {
-                throw new Exception(string.Format("origin: {0}, offset: {1}, cOffset: {2}, cAdded: {3}, cRemoved: {4}, text: {5}", origin, offset, change.Offset, change.AddedLength, change.RemovedLength, Text), exc);
+                throw CreateStateException(string.Format("Text change processing failed. origin: {0}, offset: {1}, cOffset: {2}, cAdded: {3}, cRemoved: {4}, text: {5}", origin, offset, change.Offset, change.AddedLength, change.RemovedLength, Text), exc);
             }
             finally
             {
@@ -524,10 +594,27 @@ public sealed class TextList : TextBox
             throw new InvalidOperationException("ItemsSource == null");
         }
 
+        var itemCount = GetAvailableItemCount();
+
+        if (itemCount == 0)
+        {
+            index = 0;
+            return 0;
+        }
+
+        var maxOffset = GetTextLength(itemCount);
+
+        if (offset < 0 || offset > maxOffset)
+        {
+            RememberInternalIssue($"Offset out of range detected: Offset={offset}, MaxOffset={maxOffset}");
+        }
+
+        offset = Math.Clamp(offset, 0, maxOffset);
+
         index = 0;
         var length = 0;
 
-        while (index < _infos.Count)
+        while (index < itemCount)
         {
             var add = _infos[index]._length + ItemsSeparator.Length;
 
@@ -543,21 +630,15 @@ public sealed class TextList : TextBox
             index++;
         }
 
+        if (index >= itemCount)
+        {
+            index = itemCount - 1;
+            return _infos[index]._length;
+        }
+
         var result = offset - length;
 
-        if (index < 0 || index >= _infos.Count)
-        {
-            throw new InvalidOperationException(
-                $"_infos = {string.Join(";", _infos.Select(info => info._length))}, offset = {offset}, index = {index}, result = {result}");
-        }
-
-        if (index < 0 || index >= ItemsSource.Count)
-        {
-            throw new InvalidOperationException(
-                $"_infos = {string.Join(";", _infos.Select(info => info._length))}, ItemsSource.Count = {ItemsSource.Count}, offset = {offset}, index = {index}, result = {result}");
-        }
-
-        return result;
+        return Math.Clamp(result, 0, _infos[index]._length);
     }
 
     /// <summary>
@@ -585,91 +666,105 @@ public sealed class TextList : TextBox
     {
         base.OnSelectionChanged(e);
 
-        // В данной версии просто запретим выделять более 1 элемента
-        if (_blockSelection > 0 || ItemsSource == null || _infos.Count == 0)
+        try
         {
-            return;
-        }
-
-        var offsetStart = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int indexStart);
-        var offsetEnd = ConvertGlobalOffsetToLocalOffset(SelectionStart + SelectionLength, out int indexEnd);
-
-        if (indexStart >= _infos.Count)
-        {
-            return;
-        }
-
-        if (indexStart != indexEnd || ItemsSource != null && ItemsSource.Count > 0 && offsetEnd > _infos[indexStart]._length)
-        {
-            _blockSelection++;
-
-            try
+            // В данной версии просто запретим выделять более 1 элемента
+            if (_blockSelection > 0 || ItemsSource == null || _infos.Count == 0)
             {
-                if (SelectionLength == 0)
+                return;
+            }
+
+            var itemCount = GetAvailableItemCount();
+
+            if (itemCount == 0)
+            {
+                return;
+            }
+
+            var offsetStart = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int indexStart);
+            var offsetEnd = ConvertGlobalOffsetToLocalOffset(SelectionStart + SelectionLength, out int indexEnd);
+
+            if (indexStart >= itemCount)
+            {
+                return;
+            }
+
+            if (indexStart != indexEnd || offsetEnd > _infos[indexStart]._length)
+            {
+                _blockSelection++;
+
+                try
                 {
-                    if (SelectionStart + 1 == _oldSelectionStart)
+                    if (SelectionLength == 0)
                     {
-                        if (SelectionStart > 0)
+                        if (SelectionStart + 1 == _oldSelectionStart)
                         {
-                            SelectionStart--;
+                            if (SelectionStart > 0)
+                            {
+                                SelectionStart--;
+                            }
                         }
+                        else
+                        {
+                            SelectionStart++;
+                        }
+
+                        _oldSelectionStart = SelectionStart;
+                        _oldSelectionLength = SelectionLength;
+                        _oldOffsetStart = ConvertGlobalOffsetToLocalOffset(SelectionStart, out indexStart);
+                    }
+                    else if (SelectionStart < _oldSelectionStart)
+                    {
+                        // Выделение идёт справа налево
+                        SelectionStart = Math.Max(0, _oldSelectionStart - _oldOffsetStart);
+                        SelectionLength = _oldSelectionLength + _oldOffsetStart;
+
+                        _oldSelectionStart = SelectionStart;
+                        _oldSelectionLength = SelectionLength;
+
+                        ConvertGlobalOffsetToLocalOffset(SelectionStart, out indexStart);
+                    }
+                    else if (SelectionStart == _oldSelectionStart)
+                    {
+                        // Выделение идёт слева направо
+                        SelectionLength = Math.Max(0, _infos[indexStart]._length - _oldOffsetStart);
                     }
                     else
                     {
-                        SelectionStart++;
+                        SelectionLength = 0;
+
+                        _oldSelectionStart = SelectionStart;
+                        _oldSelectionLength = SelectionLength;
+                        _oldOffsetStart = offsetStart;
                     }
-
-                    _oldSelectionStart = SelectionStart;
-                    _oldSelectionLength = SelectionLength;
-                    _oldOffsetStart = ConvertGlobalOffsetToLocalOffset(SelectionStart, out indexStart);
                 }
-                else if (SelectionStart < _oldSelectionStart)
+                finally
                 {
-                    // Выделение идёт справа налево
-                    SelectionStart = Math.Max(0, _oldSelectionStart - _oldOffsetStart);
-                    SelectionLength = _oldSelectionLength + _oldOffsetStart;
-
-                    _oldSelectionStart = SelectionStart;
-                    _oldSelectionLength = SelectionLength;
-
-                    ConvertGlobalOffsetToLocalOffset(SelectionStart, out indexStart);
-                }
-                else if (SelectionStart == _oldSelectionStart)
-                {
-                    // Выделение идёт слева направо
-                    SelectionLength = Math.Max(0, _infos[indexStart]._length - _oldOffsetStart);
-                }
-                else
-                {
-                    SelectionLength = 0;
-
-                    _oldSelectionStart = SelectionStart;
-                    _oldSelectionLength = SelectionLength;
-                    _oldOffsetStart = offsetStart;
+                    _blockSelection--;
+                    e.Handled = true;
                 }
             }
-            finally
+            else
             {
-                _blockSelection--;
-                e.Handled = true;
+                _oldSelectionStart = SelectionStart;
+                _oldSelectionLength = SelectionLength;
+                _oldOffsetStart = offsetStart;
+            }
+
+            if (indexStart < ItemsSource.Count)
+            {
+                CurrentItem = ItemsSource[indexStart];
+                CurrentPosition = indexStart;
+            }
+
+            if (IsSynchronizedWithCurrentItem == true && Items != null && indexStart < itemCount)
+            {
+                Items.MoveCurrentToPosition(indexStart);
             }
         }
-        else
+        catch (Exception exc)
         {
-            _oldSelectionStart = SelectionStart;
-            _oldSelectionLength = SelectionLength;
-            _oldOffsetStart = offsetStart;
-        }
-
-        if (ItemsSource != null && indexStart < ItemsSource.Count)
-        {
-            CurrentItem = ItemsSource[indexStart];
-            CurrentPosition = indexStart;
-        }
-
-        if (IsSynchronizedWithCurrentItem == true && Items != null)
-        {
-            Items.MoveCurrentToPosition(indexStart);
+            throw CreateStateException("Selection change processing failed", exc);
         }
     }
 
