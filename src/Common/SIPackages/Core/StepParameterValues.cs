@@ -103,4 +103,9 @@ public static class StepParameterValues
     /// SetAnswerType select type.
     /// </summary>
     public const string SetAnswerTypeType_Select = "select";
+
+    /// <summary>
+    /// SetAnswerType managed by client type.
+    /// </summary>
+    public const string SetAnswerTypeType_ManagedByClient = "client";
 }

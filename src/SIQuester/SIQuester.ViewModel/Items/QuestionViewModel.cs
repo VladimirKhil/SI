@@ -195,6 +195,18 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         }
     }
 
+    /// <summary>
+    /// Gets whether this question answer validation is managed by client.
+    /// </summary>
+    public bool IsManagedByClient
+    {
+        get
+        {
+            return Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
+                && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_ManagedByClient;
+        }
+    }
+
     private int? _triesPercent;
 
     /// <summary>
@@ -304,6 +316,11 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     private void AddWrongAnswers_Executed(object? arg)
     {
+        if (IsManagedByClient)
+        {
+            return;
+        }
+
         QDocument.ActivatedObject = Wrong;
 
         try
@@ -412,9 +429,13 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerDeviation);
 
+                if (Right.Count == 0)
+                {
+                    Right.Add("");
+                }
+
                 innerChange.Commit();
-                OnPropertyChanged(nameof(IsNumericAnswer));
-                OnPropertyChanged(nameof(NumericAnswer));
+                OnAnswerTypeChanged();
                 return;
             }
 
@@ -504,6 +525,13 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                 // Remove deviation parameter for select type
                 Parameters.RemoveParameter(QuestionParameterNames.AnswerDeviation);
             }
+            else if (answerType == StepParameterValues.SetAnswerTypeType_ManagedByClient)
+            {
+                Right.ClearOneByOne();
+                Wrong.ClearOneByOne();
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
+                Parameters.RemoveParameter(QuestionParameterNames.AnswerDeviation);
+            }
             else
             {
                 // For other answer types, remove both options and deviation
@@ -512,15 +540,21 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             }
 
             change.Commit();
-            OnPropertyChanged(nameof(IsNumericAnswer));
-            OnPropertyChanged(nameof(NumericAnswer));
-            OnPropertyChanged(nameof(IsPointAnswer));
-            OnPropertyChanged(nameof(PointAnswer));
+            OnAnswerTypeChanged();
         }
         catch (Exception exc)
         {
             PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
         }
+    }
+
+    private void OnAnswerTypeChanged()
+    {
+        OnPropertyChanged(nameof(IsNumericAnswer));
+        OnPropertyChanged(nameof(NumericAnswer));
+        OnPropertyChanged(nameof(IsPointAnswer));
+        OnPropertyChanged(nameof(PointAnswer));
+        OnPropertyChanged(nameof(IsManagedByClient));
     }
 
     private void SwitchEmpty_Executed(object? arg)
@@ -599,7 +633,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     public bool TryAddRightAnswerFromFileName(string fileName)
     {
         if (Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter)
-            && answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Select)
+            && (answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_Select
+                || answerTypeParameter.Model.SimpleValue == StepParameterValues.SetAnswerTypeType_ManagedByClient))
         {
             return false;
         }

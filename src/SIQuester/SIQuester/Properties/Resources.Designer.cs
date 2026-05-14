@@ -3055,6 +3055,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Minigame (HTML).
+        /// </summary>
+        public static string SetAnswerTypeType_ManagedByClient {
+            get {
+                return ResourceManager.GetString("SetAnswerTypeType_ManagedByClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number.
         /// </summary>
         public static string SetAnswerTypeType_Number {

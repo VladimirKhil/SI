@@ -1401,4 +1401,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="OtherLanguage" xml:space="preserve">
     <value>(other)</value>
   </data>
+  <data name="SetAnswerTypeType_ManagedByClient" xml:space="preserve">
+    <value>Minigame (HTML)</value>
+  </data>
 </root>

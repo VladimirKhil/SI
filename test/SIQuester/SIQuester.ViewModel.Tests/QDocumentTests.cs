@@ -202,6 +202,51 @@ internal sealed class QDocumentTests
     }
 
     [Test]
+    public void SetAnswerTypeToManagedByClient_ShouldClearAndHideAnswerData()
+    {
+        // Arrange
+        var document = TestHelper.CreateSimpleTestPackage();
+        var qDocument = _documentFactory.CreateViewModelFor(document, "Test Package");
+        var question = qDocument.Package.Rounds[0].Themes[0].Questions[0];
+
+        question.Right.Clear();
+        question.Right.Add("Correct answer");
+        question.Wrong.Add("Wrong answer");
+
+        question.Parameters.AddParameter(QuestionParameterNames.Answer, new global::SIQuester.ViewModel.StepParameterViewModel(question, new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue = new List<ContentItem>
+            {
+                new() { Type = ContentTypes.Text, Value = "Complex answer" }
+            }
+        }));
+
+        question.Parameters.AddParameter(QuestionParameterNames.AnswerDeviation, new global::SIQuester.ViewModel.StepParameterViewModel(question, new StepParameter
+        {
+            Type = StepParameterTypes.Simple,
+            SimpleValue = "3"
+        }));
+
+        question.Parameters.AddParameter(QuestionParameterNames.AnswerOptions, new global::SIQuester.ViewModel.StepParameterViewModel(question, new StepParameter
+        {
+            Type = StepParameterTypes.Group,
+            GroupValue = new StepParameters()
+        }));
+
+        // Act
+        question.SetAnswerType.Execute(StepParameterValues.SetAnswerTypeType_ManagedByClient);
+
+        // Assert
+        Assert.That(question.IsManagedByClient, Is.True);
+        Assert.That(question.Right, Is.Empty);
+        Assert.That(question.Wrong, Is.Empty);
+        Assert.That(question.Parameters.Model.ContainsKey(QuestionParameterNames.AnswerDeviation), Is.False);
+        Assert.That(question.Parameters.Model.ContainsKey(QuestionParameterNames.AnswerOptions), Is.False);
+        Assert.That(question.TryAddRightAnswerFromFileName("sample.png"), Is.False);
+    }
+
+    [Test]
     public void DeserializeClipboardQuestionData_ShouldSucceed()
     {
         // Arrange

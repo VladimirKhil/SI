@@ -395,6 +395,7 @@
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Number}" Member="lp:Resources.SetAnswerTypeType_Number" />
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Point}" Member="lp:Resources.SetAnswerTypeType_Point" />
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Select}" Member="lp:Resources.SetAnswerTypeType_Select" />
+                <!--<x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_ManagedByClient}" Member="lp:Resources.SetAnswerTypeType_ManagedByClient" />-->
             </siqcv:StringDictionary>
 
             <SolidColorBrush
@@ -1446,6 +1447,10 @@
                                                         <Setter TargetName="comments" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="showmanComments" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="complexAnswer" Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding IsManagedByClient}" Value="True">
+                                                        <Setter TargetName="wrong" Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2520,6 +2525,10 @@
                     <DataTrigger Binding="{Binding Wrong.Count,Converter={StaticResource GreaterZero}}" Value="true">
                         <Setter Property="ContentTemplate" Value="{StaticResource WrongAnswersTemplateKey}" />
                     </DataTrigger>
+
+                    <DataTrigger Binding="{Binding IsManagedByClient}" Value="True">
+                        <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+                    </DataTrigger>
                 </Style.Triggers>
             </Style>
 
@@ -3235,6 +3244,20 @@
                 <lv:PointAnswerTemplate DataContext="{Binding PointAnswer}" />
             </DataTemplate>
 
+            <DataTemplate x:Key="ManagedByClientAnswerTemplate">
+                <Border
+                    Background="{StaticResource SimpleAnswerBackgroundBrush}"
+                    Padding="3"
+                    Margin="0"
+                    VerticalAlignment="Center">
+                    <Image
+                        Source="{StaticResource ManagedByClientAnswerImage}"
+                        Width="16"
+                        Height="16"
+                        ToolTip="{x:Static lp:Resources.SetAnswerTypeType_ManagedByClient}" />
+                </Border>
+            </DataTemplate>
+
             <ControlTemplate TargetType="ContentControl" x:Key="AnswerDurationTemplate">
                 <StackPanel Background="#DDDDDD" Margin="0,0,5,0" Orientation="Horizontal" ToolTip="{x:Static lp:Resources.AnswerDuration}" VerticalAlignment="Center">
                     <Image Source="{StaticResource AddTimeImage}" Width="10" Margin="4,0,0,0" />
@@ -3263,6 +3286,10 @@
                 <Setter Property="ContentTemplate" Value="{StaticResource SimpleAnswerTemplate}" />
 
                 <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsManagedByClient}" Value="True">
+                        <Setter Property="ContentTemplate" Value="{StaticResource ManagedByClientAnswerTemplate}" />
+                    </DataTrigger>
+
                     <DataTrigger Binding="{Binding Parameters.AnswerType}" Value="number">
                         <Setter Property="ContentTemplate" Value="{StaticResource NumericAnswerTemplate}" />
                     </DataTrigger>
@@ -3363,6 +3390,7 @@
                         Grid.Row="1"
                         Grid.Column="5"
                         Content="{Binding}"
+                        VerticalAlignment="Center"
                         Style="{StaticResource AnswerBlockStyle}" />
                 </Grid>
 
