@@ -56,5 +56,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public bool OnPointAnswerType(double deviation) => false;
 
+    public bool OnClientAnswerType() => false;
+
     public bool OnRightAnswerPoint(string rightAnswer) => false;
 }

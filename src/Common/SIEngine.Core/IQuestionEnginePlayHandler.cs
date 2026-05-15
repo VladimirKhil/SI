@@ -36,6 +36,11 @@ public interface IQuestionEnginePlayHandler
     bool OnPointAnswerType(double deviation);
 
     /// <summary>
+    /// Notifies about client-managed answer type.
+    /// </summary>
+    bool OnClientAnswerType();
+
+    /// <summary>
     /// Shows question content.
     /// </summary>
     /// <param name="content">Question content to display.</param>

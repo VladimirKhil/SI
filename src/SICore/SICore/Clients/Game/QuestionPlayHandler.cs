@@ -41,6 +41,12 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         return false;
     }
 
+    public bool OnClientAnswerType()
+    {
+        _state.QuestionPlay.AnswerType = AnswerType.Client;
+        return false;
+    }
+
     public bool OnAccept()
     {
         _controller.AcceptQuestion();

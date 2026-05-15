@@ -3284,6 +3284,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var waitAnswerTime = useButtons ? _state.TimeSettings.Answering * 10 : (_state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.SoloAnswering) * 10;
 
         var useAnswerOptions = _state.QuestionPlay.AnswerOptions != null;
+        var useClientManagedAnswer = _state.QuestionPlay.AnswerType == AnswerType.Client;
         _state.IsOralNow = _state.IsOral && _state.Answerer.IsHuman;
 
         if (useAnswerOptions || _state.QuestionPlay.AnswerType == AnswerType.Point)
@@ -3304,7 +3305,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            if (_state.IsOralNow)
+            if (useClientManagedAnswer)
+            {
+                _gameActions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
+            }
+            else if (_state.IsOralNow)
             {
                 // Showman accepts answer orally
                 SendAnswersInfoToShowman(null);

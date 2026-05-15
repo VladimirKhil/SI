@@ -2115,7 +2115,12 @@ public sealed class Game : MessageHandler
         }
         else
         {
-            if (args[1].Length > 0)
+            if (_state.QuestionPlay.AnswerType == AnswerType.Client)
+            {
+                _state.Answerer.Answer = args[1] == MessageParams.Answer_Right ? "+" : "-";
+                _state.Answerer.AnswerIsWrong = args[1] != MessageParams.Answer_Right;
+            }
+            else if (args[1].Length > 0)
             {
                 _state.Answerer.Answer = args[1];
                 _state.Answerer.AnswerIsWrong = false;

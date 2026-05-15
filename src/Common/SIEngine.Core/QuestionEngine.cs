@@ -231,7 +231,20 @@ public sealed class QuestionEngine : IQuestionEngine
                         break;
                     }
 
-                    if (answerType != StepParameterValues.SetAnswerTypeType_Select) // Only "select" type is currently supported
+                    if (answerType == StepParameterValues.SetAnswerTypeType_ManagedByClient)
+                    {
+                        var setClientAnswerResult = _playHandler.OnClientAnswerType();
+                        _stepIndex++;
+
+                        if (setClientAnswerResult)
+                        {
+                            return true;
+                        }
+
+                        break;
+                    }
+
+                    if (answerType != StepParameterValues.SetAnswerTypeType_Select)
                     {
                         _stepIndex++;
                         continue;

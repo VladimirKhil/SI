@@ -124,6 +124,21 @@ public sealed class QuestionEngineTests
         Assert.That(handler.LastDeviation, Is.EqualTo(5));
     }
 
+    [Test]
+    public void Question_WithClientManagedAnswerType_ShouldNotifyHandler()
+    {
+        var question = CreateClientManagedAnswerQuestion();
+        var handler = new TestQuestionEnginePlayHandler();
+        var options = CreateDefaultOptions();
+        var engine = new QuestionEngine(question, options, handler);
+
+        while (engine.PlayNext() && !handler.ClientAnswerTypeCalled)
+        {
+        }
+
+        Assert.That(handler.ClientAnswerTypeCalled, Is.True);
+    }
+
     #endregion
 
     #region MoveToAnswer Tests
@@ -455,6 +470,30 @@ public sealed class QuestionEngineTests
         return question;
     }
 
+    private static Question CreateClientManagedAnswerQuestion()
+    {
+        var question = new Question();
+
+        question.Parameters[QuestionParameterNames.Question] = new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue = new List<ContentItem>
+            {
+                new ContentItem { Type = ContentTypes.Text, Value = "Client validates", Placement = ContentPlacements.Screen }
+            }
+        };
+
+        question.Parameters[QuestionParameterNames.AnswerType] = new StepParameter
+        {
+            Type = StepParameterTypes.Simple,
+            SimpleValue = StepParameterValues.SetAnswerTypeType_ManagedByClient
+        };
+
+        question.Right.Add("Answer");
+
+        return question;
+    }
+
     private static Question CreateStakeQuestion()
     {
         var question = new Question { TypeName = QuestionTypes.Stake };
@@ -604,6 +643,7 @@ public sealed class QuestionEngineTests
         public bool SimpleRightAnswerStartCalled { get; set; }
         public bool AnswerOptionsCalled { get; set; }
         public bool NumericAnswerTypeCalled { get; set; }
+        public bool ClientAnswerTypeCalled { get; set; }
         public bool SetThemeCalled { get; set; }
         public bool SetAnswererCalled { get; set; }
         public bool AnnouncePriceCalled { get; set; }
@@ -662,6 +702,12 @@ public sealed class QuestionEngineTests
         {
             NumericAnswerTypeCalled = true;
             LastDeviation = deviation;
+            return false;
+        }
+
+        public bool OnClientAnswerType()
+        {
+            ClientAnswerTypeCalled = true;
             return false;
         }
 

@@ -19,4 +19,9 @@ public enum AnswerType
     /// Point answer.
     /// </summary>
     Point,
+
+    /// <summary>
+    /// Answer result is managed by client.
+    /// </summary>
+    Client,
 }
