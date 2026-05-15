@@ -1593,7 +1593,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
         _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
 
-        if (_state.QuestionPlay.AnswerOptions != null) // TODO: _state.QuestionPlay.ValidateAfterRightAnswer
+        if (_state.QuestionPlay.ValidateAfterRightAnswer)
         {
             var m = new MessageBuilder(Messages.Answers).AddRange(_state.Players.Select(p => p.Answer ?? ""));
             _gameActions.SendMessage(m.ToString());
