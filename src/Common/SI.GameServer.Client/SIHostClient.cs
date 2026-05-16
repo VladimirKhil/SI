@@ -134,6 +134,20 @@ public sealed class SIHostClient : IGameClient
         return response;
     }
 
+    public async Task<JoinGame2Result> JoinGame2Async(
+        JoinGameRequest joinGameRequest,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _connection.InvokeAsync<JoinGame2Result>("JoinGame2", joinGameRequest, cancellationToken);
+
+        if (response == JoinGame2Result.Success)
+        {
+            _joinGameRequest = joinGameRequest;
+        }
+
+        return response;
+    }
+
     public Task SendMessageAsync(Message message, CancellationToken cancellationToken = default) =>
         _connection.SendAsync("SendMessage", message, cancellationToken);
 
