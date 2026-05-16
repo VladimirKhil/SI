@@ -16,6 +16,8 @@ public sealed class SIHostClient : IGameClient
 
     private JoinGameRequest? _joinGameRequest;
 
+    private JoinGameRequest2? _joinGameRequest2;
+
     private bool _reconnect = true;
 
     public event Action<Message>? IncomingMessage;
@@ -129,20 +131,22 @@ public sealed class SIHostClient : IGameClient
         if (response.IsSuccess)
         {
             _joinGameRequest = joinGameRequest;
+            _joinGameRequest2 = null;
         }
 
         return response;
     }
 
     public async Task<JoinGame2Result> JoinGame2Async(
-        JoinGameRequest joinGameRequest,
+        JoinGameRequest2 joinGameRequest,
         CancellationToken cancellationToken = default)
     {
         var response = await _connection.InvokeAsync<JoinGame2Result>("JoinGame2", joinGameRequest, cancellationToken);
 
         if (response == JoinGame2Result.Success)
         {
-            _joinGameRequest = joinGameRequest;
+            _joinGameRequest = null;
+            _joinGameRequest2 = joinGameRequest;
         }
 
         return response;
@@ -169,7 +173,7 @@ public sealed class SIHostClient : IGameClient
 
     private async Task<bool> TryReconnectAsync()
     {
-        if (_joinGameRequest == null)
+        if (_joinGameRequest == null && _joinGameRequest2 == null)
         {
             return false;
         }
@@ -178,7 +182,16 @@ public sealed class SIHostClient : IGameClient
         {
             await Task.Delay(5000);
             await _connection.StartAsync();
-            await JoinGameAsync(_joinGameRequest);
+
+            if (_joinGameRequest2 != null)
+            {
+                await JoinGame2Async(_joinGameRequest2);
+            }
+            else if (_joinGameRequest != null)
+            {
+                await JoinGameAsync(_joinGameRequest);
+            }
+
             return true;
         }
         catch

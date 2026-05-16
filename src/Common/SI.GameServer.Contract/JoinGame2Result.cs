@@ -36,6 +36,26 @@ public enum JoinGame2Result
     CommonJoinError,
 
     /// <summary>
+    /// Authorization mode is not supported.
+    /// </summary>
+    AuthorizationModeNotSupported,
+
+    /// <summary>
+    /// Authorization data is missing.
+    /// </summary>
+    AuthorizationDataMissing,
+
+    /// <summary>
+    /// Authorization failed.
+    /// </summary>
+    AuthorizationFailed,
+
+    /// <summary>
+    /// Authorization service error.
+    /// </summary>
+    AuthorizationServiceError,
+
+    /// <summary>
     /// Role is forbidden.
     /// </summary>
     ForbiddenRole,
