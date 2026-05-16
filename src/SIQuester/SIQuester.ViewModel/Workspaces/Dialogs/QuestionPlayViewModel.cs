@@ -410,4 +410,6 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     public bool OnNumericAnswerType(int deviation) => false;
 
     public bool OnPointAnswerType(double deviation) => false;
+
+    public bool OnClientAnswerType() => false;
 }
