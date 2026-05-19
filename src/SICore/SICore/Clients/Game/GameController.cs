@@ -1843,8 +1843,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                         AnnounceStake();
                         break;
 
-                    case Tasks.AnnouncePostStakeWithAnswerOptions:
-                        AnnouncePostStakeWithAnswerOptions();
+                    case Tasks.AnnouncePlayerStakeWithAutomaticAnswerValidation:
+                        OnAnnouncePlayerStakeWithAutomaticAnswerValidation();
                         break;
 
                     case Tasks.Winner:
@@ -2450,7 +2450,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         OnDecision();
     }
 
-    private void AnnouncePostStakeWithAnswerOptions()
+    private void OnAnnouncePlayerStakeWithAutomaticAnswerValidation()
     {
         if (_state.AnnouncedAnswerersEnumerator == null || !_state.AnnouncedAnswerersEnumerator.MoveNext())
         {
@@ -2462,11 +2462,29 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.AnswererIndex = answererIndex;
 
         var answerer = _state.Players[answererIndex];
-        _state.PlayerIsRight = answerer.Answer == _state.RightOptionLabel;
+        var playerAnswer = answerer.Answer ?? "";
+        _state.PlayerIsRight = ValidateAnswerAutomatically(playerAnswer, answerer.AnswerIsWrong);
+
         RegisterQuestionAnswerStatistics(answerer, _state.PlayerIsRight);
 
         AnnounceStakeCore();
-        ScheduleExecution(Tasks.AnnouncePostStakeWithAnswerOptions, 15);
+        ScheduleExecution(Tasks.AnnouncePlayerStakeWithAutomaticAnswerValidation, 15);
+    }
+
+    private bool ValidateAnswerAutomatically(string playerAnswer, bool answerIsWrongByDefault)
+    {
+        var rightAnswers = _state.QuestionPlay.RightAnswers;
+        var rightAnswer = rightAnswers.FirstOrDefault() ?? "";
+        var deviation = _state.QuestionPlay.AnswerDeviation;
+
+        return _state.QuestionPlay.AnswerType switch
+        {
+            AnswerType.Options => playerAnswer == rightAnswer,
+            AnswerType.Number => AnswerChecker.IsNumberAnswerRight(playerAnswer, rightAnswer, deviation),
+            AnswerType.Point => AnswerChecker.IsPointAnswerRight(playerAnswer, rightAnswer, Math.Max(0.02, deviation)),
+            AnswerType.Client => !answerIsWrongByDefault,
+            _ => AnswerChecker.IsAnswerRight(playerAnswer, rightAnswers),
+        };
     }
 
     private void AnnounceStake()
@@ -2644,7 +2662,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         var canChooseTheme = _state.TInfo.RoundInfo.Select(t => t.Questions.Any(QuestionHelper.IsActive)).ToArray();
-        var numberOfThemes = canChooseTheme.Where(can => can).Count();
+        var numberOfThemes = canChooseTheme.Count(can => can);
 
         if (numberOfThemes == 0)
         {
@@ -3097,20 +3115,21 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new InvalidOperationException("Answerer is null");
         }
 
-        if (_state.QuestionPlay.AnswerOptions != null)
+        if (_state.QuestionPlay.AnswerType == AnswerType.Options)
         {
             _state.IsWaiting = true;
             _state.Decision = DecisionType.AnswerValidating;
 
-            var rightLabel = _state.Question?.Right.FirstOrDefault();
+            var rightAnswer = _state.Question?.Right.FirstOrDefault() ?? "";
+            var playerAnswer = _state.Answerer.Answer ?? "";
 
-            _state.Answerer.AnswerIsRight = _state.Answerer.Answer == rightLabel;
+            _state.Answerer.AnswerIsRight = playerAnswer == rightAnswer;
             _state.Answerer.AnswerValidationFactor = 1.0;
             _state.ShowmanDecision = true;
 
             OnDecision();
         }
-        else if (!_state.Answerer.IsHuman || _state.Answerer.AnswerIsWrong)
+        else if (!_state.Answerer.IsHuman || _state.Answerer.AnswerIsWrong || _state.QuestionPlay.AnswerType == AnswerType.Client)
         {
             _state.IsWaiting = true;
             _state.Decision = DecisionType.AnswerValidating;
@@ -3134,17 +3153,16 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             OnDecision();
         }
-        else if (_state.QuestionPlay.AnswerType == AnswerType.Number &&
-            int.TryParse(_state.Question?.Right.FirstOrDefault() ?? "", out var rightNumber))
+        else if (_state.QuestionPlay.AnswerType == AnswerType.Number)
         {
             _state.IsWaiting = true;
             _state.Decision = DecisionType.AnswerValidating;
 
+            var rightAnswer = _state.Question?.Right.FirstOrDefault() ?? "";
+            var playerAnswer = _state.Answerer.Answer ?? "";
             var deviation = _state.QuestionPlay.AnswerDeviation;
 
-            _state.Answerer.AnswerIsRight = int.TryParse(_state.Answerer.Answer, out var playerNumber) && 
-                Math.Abs(playerNumber - rightNumber) <= deviation;
-            
+            _state.Answerer.AnswerIsRight = AnswerChecker.IsNumberAnswerRight(playerAnswer, rightAnswer, deviation);            
             _state.Answerer.AnswerValidationFactor = 1.0;
             _state.ShowmanDecision = true;
             OnDecision();
@@ -3158,21 +3176,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             var playerAnswer = _state.Answerer.Answer ?? "";
             var deviation = Math.Max(0.02, _state.QuestionPlay.AnswerDeviation);
 
-            var rightPointParsed = ParsePoint(rightAnswer);
-
-            if (rightPointParsed.HasValue)
-            {
-                var (x, y, aspectRatio) = rightPointParsed.Value;
-                var playerPointParsed = ParsePlayerPoint(playerAnswer, aspectRatio);
-
-                _state.Answerer.AnswerIsRight = playerPointParsed.HasValue &&
-                    CalculatePointDistance((x, y), playerPointParsed.Value) <= deviation;
-            }
-            else
-            {
-                _state.Answerer.AnswerIsRight = false;
-            }
-
+            _state.Answerer.AnswerIsRight = AnswerChecker.IsPointAnswerRight(playerAnswer, rightAnswer, deviation);
             _state.Answerer.AnswerValidationFactor = 1.0;
             _state.ShowmanDecision = true;
             OnDecision();
@@ -4195,16 +4199,10 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (!string.IsNullOrWhiteSpace(package.Restriction))
             {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.Restrictions)], LO[nameof(R.OfPackage)], package.Restriction);
-                _gameActions.ShowmanReplic(res.ToString()); // TODO: Remove (replaced by PackageRestrictions Message)
                 _gameActions.SendMessageWithArgs(Messages.PackageRestrictions, package.Restriction);
             }
-            else
-            {
-                stage++;
-            }
+
+            stage++;
         }
 
         if (stage < 4)
@@ -4576,12 +4574,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (_state.QuestionPlay.HiddenStakes)
             {
-                ScheduleExecution(Tasks.AnnouncePostStakeWithAnswerOptions, 1);
+                ScheduleExecution(Tasks.AnnouncePlayerStakeWithAutomaticAnswerValidation, 1);
                 return true;
             }
             else
             {
-                CalculateOutcomesByRightAnswerOption();
+                ValidateAnswersAndCalculateOutcomes();
                 return false;
             }
         }
@@ -4589,7 +4587,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         return null;
     }
 
-    private void CalculateOutcomesByRightAnswerOption()
+    private void ValidateAnswersAndCalculateOutcomes()
     {
         if (_state.AnnouncedAnswerersEnumerator == null)
         {
@@ -4606,7 +4604,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
 
             var answerer = _state.Players[answererIndex];
-            var isRight = answerer.Answer == _state.RightOptionLabel;
+            var playerAnswer = answerer.Answer ?? "";
+            var isRight = ValidateAnswerAutomatically(playerAnswer, answerer.AnswerIsWrong);
 
             RegisterQuestionAnswerStatistics(answerer, isRight);
 
@@ -5133,85 +5132,5 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             _gameActions.SendVisualMessageWithArgs(Messages.ShowmanComments, question.Info.ShowmanComments.Text.EscapeNewLines());
         }
-    }
-
-    /// <summary>
-    /// Parses a point answer in "x,y" or "x,y,aspectRatio" format.
-    /// </summary>
-    /// <param name="pointString">String in "x,y" or "x,y,aspectRatio" format where x and y are doubles.</param>
-    /// <returns>Parsed point as tuple (x, y, aspectRatio), or null if parsing fails.</returns>
-    private static (double X, double Y, double aspectRatio)? ParsePoint(string pointString, double defaultAspectRation = 1.0)
-    {
-        if (string.IsNullOrWhiteSpace(pointString))
-        {
-            return null;
-        }
-
-        var parts = pointString.Split(',');
-
-        if (parts.Length < 2 || parts.Length > 3)
-        {
-            return null;
-        }
-
-        var aspectRatio = parts.Length > 2
-            ? double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var ar)
-                ? ar
-                : defaultAspectRation
-            : defaultAspectRation;
-
-        if (!double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) ||
-            !double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y))
-        {
-            return null;
-        }
-
-        if (aspectRatio > 0.0 && Math.Abs(aspectRatio - 1.0) > double.Epsilon)
-        {
-            x *= aspectRatio;
-        }
-
-        return (x, y, aspectRatio);
-    }
-
-    /// <summary>
-    /// Parses player point answer in "x,y" format and normalizes it with a known aspect ratio.
-    /// </summary>
-    private static (double X, double Y)? ParsePlayerPoint(string pointString, double aspectRatio)
-    {
-        if (string.IsNullOrWhiteSpace(pointString))
-        {
-            return null;
-        }
-
-        var parts = pointString.Split(',');
-
-        if (parts.Length != 2)
-        {
-            return null;
-        }
-
-        if (!double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) ||
-            !double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y))
-        {
-            return null;
-        }
-
-        if (aspectRatio > 0.0 && Math.Abs(aspectRatio - 1.0) > double.Epsilon)
-        {
-            x *= aspectRatio;
-        }
-
-        return (x, y);
-    }
-
-    /// <summary>
-    /// Calculates Euclidean distance between two points.
-    /// </summary>
-    private static double CalculatePointDistance((double X, double Y) point1, (double X, double Y) point2)
-    {
-        var dx = point1.X - point2.X;
-        var dy = point1.Y - point2.Y;
-        return Math.Sqrt(dx * dx + dy * dy);
     }
 }

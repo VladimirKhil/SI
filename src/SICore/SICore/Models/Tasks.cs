@@ -163,7 +163,7 @@ public enum Tasks
     /// <summary>
     /// Announce stake after right answer.
     /// </summary>
-    AnnouncePostStakeWithAnswerOptions,
+    AnnouncePlayerStakeWithAutomaticAnswerValidation,
 
     /// <summary>
     /// Завершение игры

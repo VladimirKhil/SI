@@ -21,6 +21,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {
+        _state.QuestionPlay.AnswerType = AnswerType.Options;
         _state.QuestionPlay.AnswerOptions = answerOptions;
         _state.QuestionPlay.ScreenContentSequence = screenContentSequence;
         return false;
