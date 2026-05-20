@@ -13,7 +13,10 @@ public sealed class GameTests
     [Test]
     public void ParsePoint_AppliesAspectRatioToXCoordinate()
     {
-        var parsePoint = typeof(GameController).GetMethod("ParsePoint", BindingFlags.NonPublic | BindingFlags.Static);
+        var answerCheckerType = typeof(GameController).Assembly.GetType("SICore.AnswerChecker");
+        Assert.That(answerCheckerType, Is.Not.Null);
+
+        var parsePoint = answerCheckerType!.GetMethod("ParsePoint", BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.That(parsePoint, Is.Not.Null);
 
@@ -28,7 +31,10 @@ public sealed class GameTests
     [Test]
     public void ParsePlayerPoint_AppliesReferenceAspectRatioToXCoordinate()
     {
-        var parsePlayerPoint = typeof(GameController).GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
+        var answerCheckerType = typeof(GameController).Assembly.GetType("SICore.AnswerChecker");
+        Assert.That(answerCheckerType, Is.Not.Null);
+
+        var parsePlayerPoint = answerCheckerType!.GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.That(parsePlayerPoint, Is.Not.Null);
 
@@ -42,7 +48,10 @@ public sealed class GameTests
     [Test]
     public void ParsePlayerPoint_RejectsAspectRatioInPlayerInput()
     {
-        var parsePlayerPoint = typeof(GameController).GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
+        var answerCheckerType = typeof(GameController).Assembly.GetType("SICore.AnswerChecker");
+        Assert.That(answerCheckerType, Is.Not.Null);
+
+        var parsePlayerPoint = answerCheckerType!.GetMethod("ParsePlayerPoint", BindingFlags.NonPublic | BindingFlags.Static);
 
         Assert.That(parsePlayerPoint, Is.Not.Null);
 
