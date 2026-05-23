@@ -10,7 +10,7 @@ namespace SI.GameServer.Contract;
 /// <param name="Role">Role to join.</param>
 /// <param name="Sex">User sex.</param>
 /// <param name="AuthorizationMode">Authorization mode.</param>
-/// <param name="SteamAuthTicket">Steam authentication ticket.</param>
+/// <param name="AuthTicket">Authentication ticket.</param>
 /// <param name="Password">Game password.</param>
 /// <param name="Pin">Game PIN.</param>
 public sealed record JoinGameRequest2(
@@ -19,6 +19,6 @@ public sealed record JoinGameRequest2(
     GameRole Role,
     Sex Sex,
     AuthorizationMode AuthorizationMode = AuthorizationMode.None,
-    string? SteamAuthTicket = null,
+    string? AuthTicket = null,
     string? Password = null,
     int? Pin = null);

@@ -56,6 +56,11 @@ public enum JoinGame2Result
     AuthorizationServiceError,
 
     /// <summary>
+    /// Indicates that the authorization failed due to an invalid username.
+    /// </summary>
+    AuthorizationInvalidUserName,
+
+    /// <summary>
     /// Role is forbidden.
     /// </summary>
     ForbiddenRole,
