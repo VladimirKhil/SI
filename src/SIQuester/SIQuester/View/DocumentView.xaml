@@ -414,7 +414,16 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Resources>
-                
+
+                <TextBlock
+                    Text="{Binding QuestionCount}"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Foreground="#FF555555"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0"
+                    ToolTip="{x:Static lp:Resources.DocumentQuestionCount}" />
+
                 <ToggleButton
                     Name="helpToggle"
                     ToolTip="{x:Static lp:Resources.ShowHelp}"

@@ -1124,6 +1124,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Total questions.
+        /// </summary>
+        public static string DocumentQuestionCount {
+            get {
+                return ResourceManager.GetString("DocumentQuestionCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Thank the author….
         /// </summary>
         public static string Donate {

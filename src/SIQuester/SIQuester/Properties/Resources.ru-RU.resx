@@ -1400,4 +1400,7 @@
   <data name="SetAnswerTypeType_ManagedByClient" xml:space="preserve">
     <value>Мини-игра (HTML)</value>
   </data>
+  <data name="DocumentQuestionCount" xml:space="preserve">
+    <value>Всего вопросов</value>
+  </data>
 </root>

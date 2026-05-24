@@ -1004,12 +1004,16 @@ public sealed class QDocument : WorkspaceViewModel
                             if (itemViewModel is RoundViewModel round)
                             {
                                 round.Themes.CollectionChanged += Object_CollectionChanged;
+                                // Update question count when a round is added
+                                QuestionCount += CountQuestionsInRound(round);
                             }
                             else
                             {
                                 if (itemViewModel is ThemeViewModel theme)
                                 {
                                     theme.Questions.CollectionChanged += Object_CollectionChanged;
+                                    // Update question count when a theme is added
+                                    QuestionCount += theme.Questions.Count;
                                 }
                                 else
                                 {
@@ -1024,6 +1028,9 @@ public sealed class QDocument : WorkspaceViewModel
                                     questionViewModel.Wrong.CollectionChanged += Object_CollectionChanged;
 
                                     questionViewModel.TypeNameChanged += Question_TypeNameChanged;
+
+                                    // Update question count when a question is added
+                                    QuestionCount++;
                                 }
                             }
                         }
@@ -1057,12 +1064,16 @@ public sealed class QDocument : WorkspaceViewModel
                             if (itemViewModel is RoundViewModel round)
                             {
                                 round.Themes.CollectionChanged -= Object_CollectionChanged;
+                                // Update question count when a round is removed
+                                QuestionCount -= CountQuestionsInRound(round);
                             }
                             else
                             {
                                 if (itemViewModel is ThemeViewModel theme)
                                 {
                                     theme.Questions.CollectionChanged -= Object_CollectionChanged;
+                                    // Update question count when a theme is removed
+                                    QuestionCount -= theme.Questions.Count;
                                 }
                                 else
                                 {
@@ -1077,6 +1088,9 @@ public sealed class QDocument : WorkspaceViewModel
                                     questionViewModel.Wrong.CollectionChanged -= Object_CollectionChanged;
 
                                     questionViewModel.TypeNameChanged -= Question_TypeNameChanged;
+
+                                    // Update question count when a question is removed
+                                    QuestionCount--;
                                 }
                             }
                         }
@@ -1112,9 +1126,49 @@ public sealed class QDocument : WorkspaceViewModel
                         return;
                     }
                 }
+
+                // For replace, adjust question count by computing delta
+                var oldCount = 0;
+                var newCount = 0;
+
+                foreach (var oldItem in e.OldItems)
+                {
+                    if (oldItem is RoundViewModel oldRound)
+                    {
+                        oldCount += CountQuestionsInRound(oldRound);
+                    }
+                    else if (oldItem is ThemeViewModel oldTheme)
+                    {
+                        oldCount += oldTheme.Questions.Count;
+                    }
+                    else if (oldItem is QuestionViewModel)
+                    {
+                        oldCount++;
+                    }
+                }
+
+                foreach (var newItem in e.NewItems)
+                {
+                    if (newItem is RoundViewModel newRound)
+                    {
+                        newCount += CountQuestionsInRound(newRound);
+                    }
+                    else if (newItem is ThemeViewModel newTheme)
+                    {
+                        newCount += newTheme.Questions.Count;
+                    }
+                    else if (newItem is QuestionViewModel)
+                    {
+                        newCount++;
+                    }
+                }
+
+                QuestionCount += newCount - oldCount;
                 break;
 
             case NotifyCollectionChangedAction.Reset:
+                // On reset, recompute the entire count
+                QuestionCount = CountTotalQuestions();
                 return;
         }
 
@@ -1157,6 +1211,18 @@ public sealed class QDocument : WorkspaceViewModel
             DetachParametersLsteners(parameter.Value.GroupValue);
         }
     }
+
+    /// <summary>
+    /// Counts the total number of questions in the entire package.
+    /// </summary>
+    private int CountTotalQuestions() =>
+        Package.Rounds.Sum(round => CountQuestionsInRound(round));
+
+    /// <summary>
+    /// Counts the total number of questions in a round.
+    /// </summary>
+    private static int CountQuestionsInRound(RoundViewModel round) =>
+        round.Themes.Sum(theme => theme.Questions.Count);
 
     public StorageContextViewModel StorageContext { get; set; }
 
@@ -1285,6 +1351,24 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
+    private int _questionCount;
+
+    /// <summary>
+    /// Gets the total number of questions in the document.
+    /// </summary>
+    public int QuestionCount
+    {
+        get => _questionCount;
+        private set
+        {
+            if (_questionCount != value)
+            {
+                _questionCount = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     internal QDocument(
         SIDocument document,
         StorageContextViewModel storageContextViewModel,
@@ -1379,6 +1463,9 @@ public sealed class QDocument : WorkspaceViewModel
         Html.Error += OnError;
 
         CreatePropertyListeners();
+
+        // Initialize question count after package is loaded and listeners are set up
+        QuestionCount = CountTotalQuestions();
     }
 
     private void OperationsManager_Error(Exception exc) => OnError(exc);

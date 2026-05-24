@@ -1404,4 +1404,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="SetAnswerTypeType_ManagedByClient" xml:space="preserve">
     <value>Minigame (HTML)</value>
   </data>
+  <data name="DocumentQuestionCount" xml:space="preserve">
+    <value>Total questions</value>
+  </data>
 </root>
