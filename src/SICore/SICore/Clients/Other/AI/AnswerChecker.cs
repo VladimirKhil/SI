@@ -39,6 +39,106 @@ internal static class AnswerChecker
         return false;
     }
 
+    internal static bool IsNumberAnswerRight(string playerAnswer, string rightAnswer, double deviation) =>
+        int.TryParse(rightAnswer, out var rightNumber) &&
+        int.TryParse(playerAnswer, out var playerNumber) &&
+        Math.Abs(playerNumber - rightNumber) <= deviation;
+
+    internal static bool IsPointAnswerRight(string playerAnswer, string rightAnswer, double deviation)
+    {
+        var rightPointParsed = ParsePoint(rightAnswer);
+
+        if (!rightPointParsed.HasValue)
+        {
+            return false;
+        }
+
+        var (x, y, aspectRatio) = rightPointParsed.Value;
+        var playerPointParsed = ParsePlayerPoint(playerAnswer, aspectRatio);
+
+        return playerPointParsed.HasValue && CalculatePointDistance((x, y), playerPointParsed.Value) <= deviation;
+    }
+
+    /// <summary>
+    /// Parses a point answer in "x,y" or "x,y,aspectRatio" format.
+    /// </summary>
+    /// <param name="pointString">String in "x,y" or "x,y,aspectRatio" format where x and y are doubles.</param>
+    /// <returns>Parsed point as tuple (x, y, aspectRatio), or null if parsing fails.</returns>
+    private static (double X, double Y, double aspectRatio)? ParsePoint(string pointString, double defaultAspectRation = 1.0)
+    {
+        if (string.IsNullOrWhiteSpace(pointString))
+        {
+            return null;
+        }
+
+        var parts = pointString.Split(',');
+
+        if (parts.Length < 2 || parts.Length > 3)
+        {
+            return null;
+        }
+
+        var aspectRatio = parts.Length > 2
+            ? double.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var ar)
+                ? ar
+                : defaultAspectRation
+            : defaultAspectRation;
+
+        if (!double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) ||
+            !double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y))
+        {
+            return null;
+        }
+
+        if (aspectRatio > 0.0 && Math.Abs(aspectRatio - 1.0) > double.Epsilon)
+        {
+            x *= aspectRatio;
+        }
+
+        return (x, y, aspectRatio);
+    }
+
+    /// <summary>
+    /// Parses player point answer in "x,y" format and normalizes it with a known aspect ratio.
+    /// </summary>
+    private static (double X, double Y)? ParsePlayerPoint(string pointString, double aspectRatio)
+    {
+        if (string.IsNullOrWhiteSpace(pointString))
+        {
+            return null;
+        }
+
+        var parts = pointString.Split(',');
+
+        if (parts.Length != 2)
+        {
+            return null;
+        }
+
+        if (!double.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) ||
+            !double.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y))
+        {
+            return null;
+        }
+
+        if (aspectRatio > 0.0 && Math.Abs(aspectRatio - 1.0) > double.Epsilon)
+        {
+            x *= aspectRatio;
+        }
+
+        return (x, y);
+    }
+
+    /// <summary>
+    /// Calculates Euclidean distance between two points.
+    /// </summary>
+    private static double CalculatePointDistance((double X, double Y) point1, (double X, double Y) point2)
+    {
+        var dx = point1.X - point2.X;
+        var dy = point1.Y - point2.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
     /// <summary>
     /// Separates the input string into two parts: one containing only digits and the other containing non-digit characters.
     /// </summary>

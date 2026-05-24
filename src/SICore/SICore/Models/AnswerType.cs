@@ -11,6 +11,11 @@ public enum AnswerType
     Text,
 
     /// <summary>
+    /// Select from options answer.
+    /// </summary>
+    Options,
+
+    /// <summary>
     /// Numeric answer.
     /// </summary>
     Number,
