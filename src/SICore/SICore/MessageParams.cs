@@ -16,11 +16,6 @@ public static class MessageParams
     public const string Answer_Wrong = "WRONG";
 
     /// <summary>
-    /// Question fragment uri.
-    /// </summary>
-    public const string Atom_Uri = "URI";
-
-    /// <summary>
     /// Добавить стол игрока
     /// </summary>
     public const string Config_AddTable = "ADDTABLE";
@@ -51,11 +46,6 @@ public static class MessageParams
     public const string EndTry_All = "A";
 
     /// <summary>
-    /// Обновление игровой конфигурации
-    /// </summary>
-    public const string Info_Update = "UPDATE";
-
-    /// <summary>
     /// Answer options layout.
     /// </summary>
     public const string Layout_AnswerOptions = "ANSWER_OPTIONS";
@@ -64,11 +54,6 @@ public static class MessageParams
     /// Overlay with points layout.
     /// </summary>
     public const string Layout_OverlayPoints = "OVERLAY_POINTS";
-
-    /// <summary>
-    /// Report log.
-    /// </summary>
-    public const string Report_Log = "LOG";
 
     /// <summary>
     /// Запуск таймера

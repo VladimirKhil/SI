@@ -13,7 +13,7 @@ public static class Quality
         [CollectionNames.ImagesStorageName] = 1,
         [CollectionNames.AudioStorageName] = 5,
         [CollectionNames.VideoStorageName] = 10,
-        [CollectionNames.HtmlStorageName] = 1,
+        [CollectionNames.HtmlStorageName] = 10,
     };
 
     /// <summary>

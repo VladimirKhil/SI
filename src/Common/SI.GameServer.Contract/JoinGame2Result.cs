@@ -16,6 +16,11 @@ public enum JoinGame2Result
     InvalidRole,
 
     /// <summary>
+    /// Invalid user name value.
+    /// </summary>
+    InvalidUserName,
+
+    /// <summary>
     /// Game with provided identifier not found.
     /// </summary>
     GameNotFound,

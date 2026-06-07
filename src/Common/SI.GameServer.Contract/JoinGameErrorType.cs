@@ -11,6 +11,11 @@ public enum JoinGameErrorType
     InvalidRole,
 
     /// <summary>
+    /// Invalid user name value.
+    /// </summary>
+    InvalidUserName,
+
+    /// <summary>
     /// Game with provided identifier not found.
     /// </summary>
     GameNotFound,
