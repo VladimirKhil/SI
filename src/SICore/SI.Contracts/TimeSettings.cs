@@ -9,6 +9,7 @@ public sealed class TimeSettings
     public const int DefaultThemeSelection = 30;
     public const int DefaultPlayerSelection = 30;
     public const int DefaultButtonPressing = 5;
+    public const int DefaultButtonsAccepting = 300; // milliseconds
     public const int DefaultAnswering = 25;
     public const int DefaultSoloAnswering = 25;
     public const int DefaultHiddenAnswering = 45;
@@ -27,6 +28,7 @@ public sealed class TimeSettings
         ThemeSelection = DefaultThemeSelection,
         PlayerSelection = DefaultPlayerSelection,
         ButtonPressing = DefaultButtonPressing,
+        ButtonsAccepting = DefaultButtonsAccepting,
         Answering = DefaultAnswering,
         SoloAnswering = DefaultSoloAnswering,
         HiddenAnswering = DefaultHiddenAnswering,
@@ -59,6 +61,11 @@ public sealed class TimeSettings
     /// Gets or sets the time interval allowed for pressing a button.
     /// </summary>
     public int ButtonPressing { get; set; } = DefaultButtonPressing;
+
+    /// <summary>
+    /// Gets or sets the time interval allowed for accepting additional buttons after first button pressing.
+    /// </summary>
+    public int ButtonsAccepting { get; set; } = DefaultButtonsAccepting;
 
     /// <summary>
     /// Gets or sets the time interval allowed for giving an answer.

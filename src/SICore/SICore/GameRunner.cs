@@ -16,13 +16,13 @@ namespace SICore;
 /// </summary>
 public static class GameRunner
 {
-    private static EngineOptions CreateEngineOptions(AppSettingsCore appSettingsCore) => new()
+    private static EngineOptions CreateEngineOptions(SI.Contracts.RulesSettings rules) => new()
     {
-        IsMultimediaPressMode = appSettingsCore.FalseStart,
-        IsPressMode = appSettingsCore.FalseStart,
+        IsMultimediaPressMode = rules.FalseStart,
+        IsPressMode = rules.FalseStart,
         ShowRight = true,
         PlaySpecials = true,
-        PlayAllQuestionsInFinalRound = appSettingsCore.PlayAllQuestionsInFinalRound,
+        PlayAllQuestionsInFinalRound = rules.PlayAllThemesInThemesRemovalRound,
     };
 
     public static Game CreateGame(
@@ -42,7 +42,7 @@ public static class GameRunner
         IPackageStatisticsProvider? packageStatisticsProvider = null,
         bool hiddenPlayers = false)
     {
-        var gameData = new GameData(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, timeSettings, rules, packageStatisticsProvider)
+        var gameState = new GameData(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, timeSettings, rules, packageStatisticsProvider)
         {
             HostName = settings.IsAutomatic ? null : settings.HumanPlayerName,
             GameName = gameName ?? "",
@@ -51,7 +51,7 @@ public static class GameRunner
 
         var localizer = new Localizer(settings.AppSettings.Culture ?? "en-US");
 
-        gameData.BeginUpdatePersons("Start");
+        gameState.BeginUpdatePersons("Start");
 
         try
         {
@@ -70,12 +70,12 @@ public static class GameRunner
                 var showman = new Showman(showmanClient, settings.Showman, logic, actions, state);
                 showmanClient.ConnectTo(node);
 
-                gameData.ShowMan.IsConnected = true;
+                gameState.ShowMan.IsConnected = true;
             }
 
             for (int i = 0; i < settings.Players.Length; i++)
             {
-                gameData.Players.Add(new GamePlayerAccount(settings.Players[i]));
+                gameState.Players.Add(new GamePlayerAccount(settings.Players[i]));
                 var name = settings.Players[i].Name;
                 var human = settings.Players[i].IsHuman;
 
@@ -94,32 +94,32 @@ public static class GameRunner
                     var player = new Player(playerClient, settings.Players[i], logic, actions, state);
                     playerClient.ConnectTo(node);
 
-                    gameData.Players[i].IsConnected = true;
+                    gameState.Players[i].IsConnected = true;
                 }
             }
         }
         finally
         {
-            gameData.EndUpdatePersons();
+            gameState.EndUpdatePersons();
         }
 
-        var playHandler = new PlayHandler(gameData);
-        var questionPlayHandler = new QuestionPlayHandler(gameData);
-        var gameRules = GetGameRules(gameData.Settings.AppSettings.GameMode);
+        var playHandler = new PlayHandler(gameState);
+        var questionPlayHandler = new QuestionPlayHandler(gameState);
+        var gameRules = GetGameRules(gameState.Rules.GameMode);
 
         var engine = EngineFactory.CreateEngine(
             gameRules,
             document,
-            () => CreateEngineOptions(gameData.Settings.AppSettings),
+            () => CreateEngineOptions(gameState.Rules),
             playHandler,
             questionPlayHandler);
 
         var client = Client.Create(NetworkConstants.GameName, node);
 
-        var gameActions = new GameActions(client, gameData, fileShare);
+        var gameActions = new GameActions(client, gameState, fileShare);
 
         var gameController = new GameController(
-            gameData,
+            gameState,
             gameActions,
             /* TODO: This dependency should be removed by using engine callbacks */ engine,
             localizer,
@@ -133,7 +133,7 @@ public static class GameRunner
         return new Game(
             client,
             localizer,
-            gameData,
+            gameState,
             gameActions,
             gameController,
             defaultPlayers,
@@ -142,12 +142,12 @@ public static class GameRunner
             avatarHelper);
     }
 
-    private static GameRules GetGameRules(GameModes gameMode) => gameMode switch
+    private static GameRules GetGameRules(SI.Contracts.GameMode gameMode) => gameMode switch
     {
-        GameModes.Tv => WellKnownGameRules.Classic,
-        GameModes.Sport => WellKnownGameRules.Simple,
-        GameModes.Quiz => WellKnownGameRules.Quiz,
-        GameModes.TurnTaking => WellKnownGameRules.TurnTaking,
+        SI.Contracts.GameMode.Classic => WellKnownGameRules.Classic,
+        SI.Contracts.GameMode.Sequential => WellKnownGameRules.Simple,
+        SI.Contracts.GameMode.Quiz => WellKnownGameRules.Quiz,
+        SI.Contracts.GameMode.TurnTaking => WellKnownGameRules.TurnTaking,
         _ => throw new NotSupportedException($"Game mode {gameMode} is not supported"),
     };
 }

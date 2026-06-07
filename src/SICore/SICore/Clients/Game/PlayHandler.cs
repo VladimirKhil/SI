@@ -1,5 +1,4 @@
 ﻿using SICore.Models;
-using SICore.Utils;
 using SIEngine;
 using SIEngine.Models;
 using SIEngine.Rules;
@@ -117,7 +116,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
             }
         }
 
-        if (_state.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes && !playRound)
+        if (_state.Rules.AllowEveryoneToPlayHiddenStakes && !playRound)
         {
             // Nobody has positive score, but we allow everybody to play and delete themes
             for (var i = 0; i < _state.Players.Count; i++)

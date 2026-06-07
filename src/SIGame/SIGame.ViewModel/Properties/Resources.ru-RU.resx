@@ -759,4 +759,25 @@
   <data name="ChooseQuest" xml:space="preserve">
     <value>выбирайте вопрос!;прошу вас!;выбирайте!;сделайте выбор!;вы выбираете;вы выбираете следующий вопрос</value>
   </data>
+  <data name="JoinRoleForbidden" xml:space="preserve">
+    <value>Подключение к игре под данной ролью запрещено</value>
+  </data>
+  <data name="WrongPassword" xml:space="preserve">
+    <value>Неверный пароль!</value>
+  </data>
+  <data name="PersonWithSuchNameIsAlreadyInGame" xml:space="preserve">
+    <value>Человек с таким именем уже есть в игре!</value>
+  </data>
+  <data name="PositionNotFoundByIndex" xml:space="preserve">
+    <value>Позиция с данным номером не обнаружена!</value>
+  </data>
+  <data name="PlaceIsOccupied" xml:space="preserve">
+    <value>Место уже занято!</value>
+  </data>
+  <data name="NoFreePlaceForName" xml:space="preserve">
+    <value>Свободного места с таким именем не обнаружено!</value>
+  </data>
+  <data name="InvalidUserName" xml:space="preserve">
+    <value>Некорректное имя пользователя</value>
+  </data>
 </root>

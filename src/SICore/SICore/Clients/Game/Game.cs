@@ -2,6 +2,7 @@
 using SICore.Clients;
 using SICore.Contracts;
 using SICore.Extensions;
+using SICore.Helpers;
 using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -9,7 +10,6 @@ using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
 using SICore.Results;
 using SICore.Services;
-using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
@@ -159,11 +159,11 @@ public sealed class Game : MessageHandler
             switch (optionName)
             {
                 case nameof(AppSettingsCore.Oral):
-                    if (bool.TryParse(optionValue, out var oral) && oral != appSettings.Oral)
+                    if (bool.TryParse(optionValue, out var oral) && oral != rules.Oral)
                     {
                         appSettings.Oral = oral;
                         rules.Oral = oral;
-                        _state.IsOral = appSettings.Oral && _state.ShowMan.IsHuman;
+                        _state.IsOral = rules.Oral && _state.ShowMan.IsHuman;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
                     }
@@ -171,7 +171,7 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.Managed):
-                    if (bool.TryParse(optionValue, out var managed) && managed != appSettings.Managed)
+                    if (bool.TryParse(optionValue, out var managed) && managed != rules.Managed)
                     {
                         appSettings.Managed = managed;
                         rules.Managed = managed;
@@ -182,7 +182,7 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.DisplayAnswerOptionsLabels):
-                    if (bool.TryParse(optionValue, out var displayAnswerOptionsLabels) && displayAnswerOptionsLabels != appSettings.DisplayAnswerOptionsLabels)
+                    if (bool.TryParse(optionValue, out var displayAnswerOptionsLabels) && displayAnswerOptionsLabels != rules.DisplayAnswerOptionsLabels)
                     {
                         appSettings.DisplayAnswerOptionsLabels = displayAnswerOptionsLabels;
                         rules.DisplayAnswerOptionsLabels = displayAnswerOptionsLabels;
@@ -193,7 +193,7 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.FalseStart):
-                    if (bool.TryParse(optionValue, out var falseStart) && falseStart != appSettings.FalseStart)
+                    if (bool.TryParse(optionValue, out var falseStart) && falseStart != rules.FalseStart)
                     {
                         appSettings.FalseStart = falseStart;
                         rules.FalseStart = falseStart;
@@ -204,7 +204,7 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.ReadingSpeed):
-                    if (int.TryParse(optionValue, out var readingSpeed) && readingSpeed != appSettings.ReadingSpeed)
+                    if (int.TryParse(optionValue, out var readingSpeed) && readingSpeed != rules.ReadingSpeed)
                     {
                         appSettings.ReadingSpeed = readingSpeed;
                         rules.ReadingSpeed = readingSpeed;
@@ -215,7 +215,7 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.PartialText):
-                    if (bool.TryParse(optionValue, out var partialText) && partialText != appSettings.PartialText)
+                    if (bool.TryParse(optionValue, out var partialText) && partialText != rules.PartialText)
                     {
                         appSettings.PartialText = partialText;
                         rules.PartialText = partialText;
@@ -226,7 +226,7 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.PartialImages):
-                    if (bool.TryParse(optionValue, out var partialImages) && partialImages != appSettings.PartialImages)
+                    if (bool.TryParse(optionValue, out var partialImages) && partialImages != rules.PartialImages)
                     {
                         appSettings.PartialImages = partialImages;
                         rules.PartialImages = partialImages;
@@ -258,7 +258,7 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.UseApellations):
-                    if (bool.TryParse(optionValue, out var useApellations) && useApellations != appSettings.UseApellations)
+                    if (bool.TryParse(optionValue, out var useApellations) && useApellations != rules.UseAppellations)
                     {
                         appSettings.UseApellations = useApellations;
                         rules.UseAppellations = useApellations;
@@ -1571,7 +1571,7 @@ public sealed class Game : MessageHandler
 
             SelectNewHost();
 
-            if (_state.Settings.AppSettings.Managed && !_controller.Runner.IsRunning)
+            if (_state.Rules.Managed && !_controller.Runner.IsRunning)
             {
                 if (_controller.StopReason == StopReason.Pause || _state.TInfo.Pause)
                 {
@@ -2174,7 +2174,7 @@ public sealed class Game : MessageHandler
 
             if (_state.Answerer != null
                 && _state.IsOralNow
-                && (_state.QuestionPlay.AnswerOptions == null || !_state.Settings.AppSettings.OralPlayersActions))
+                && (_state.QuestionPlay.AnswerOptions == null || !_state.Rules.OralPlayersActions))
             {
                 // Cancelling Oral Answer player mode
                 _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
@@ -2349,19 +2349,19 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        var buttonPressMode = _state.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = _state.Rules.ButtonPressMode;
 
         switch (buttonPressMode)
         {
-            case ButtonPressMode.FirstWins:
+            case SI.Contracts.ButtonPressMode.FirstWins:
                 ProcessAnswerer_FirstWinsServer(answererIndex);
                 break;
 
-            case ButtonPressMode.RandomWithinInterval:
+            case SI.Contracts.ButtonPressMode.RandomWithinInterval:
                 ProcessAnswerer_RandomWithinInterval(answererIndex);
                 break;
 
-            case ButtonPressMode.FirstWinsClient:
+            case SI.Contracts.ButtonPressMode.FirstWinsClient:
                 ProcessAnswerer_FirstWinsClient(answererIndex, pressDurationMs);
                 break;
 
@@ -2389,7 +2389,7 @@ public sealed class Game : MessageHandler
 
         if (!_state.IsDeferringAnswer)
         {            
-            _state.WaitInterval = (int)(_state.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
+            _state.WaitInterval = _state.TimeSettings.ButtonsAccepting / 100;
             _controller.Stop(StopReason.Wait);
         }
     }
@@ -2399,7 +2399,7 @@ public sealed class Game : MessageHandler
         if (_state.PendingAnswererIndex == -1 || pressDurationMs > 0 && pressDurationMs < _state.AnswererPressDuration)
         {
             _state.PendingAnswererIndex = answererIndex;
-            _state.AnswererPressDuration = pressDurationMs > 0 ? pressDurationMs : (int)_state.Host.Options.ButtonsAcceptInterval.TotalMilliseconds;
+            _state.AnswererPressDuration = pressDurationMs > 0 ? pressDurationMs : _state.TimeSettings.ButtonsAccepting;
         }
         else
         {
@@ -2408,7 +2408,7 @@ public sealed class Game : MessageHandler
 
         if (!_state.IsDeferringAnswer)
         {
-            _state.WaitInterval = (int)(_state.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
+            _state.WaitInterval = _state.TimeSettings.ButtonsAccepting / 100;
             _controller.Stop(StopReason.Wait);
         }
     }
@@ -3349,7 +3349,7 @@ public sealed class Game : MessageHandler
 
                 if (!isPlayer)
                 {
-                    _state.IsOral = _state.Settings.AppSettings.Oral && _state.ShowMan.IsHuman;
+                    _state.IsOral = _state.Rules.Oral && _state.ShowMan.IsHuman;
                 }
             }
             else if (isPlayer)
@@ -3407,7 +3407,7 @@ public sealed class Game : MessageHandler
                 newName = newAcc.Name;
                 newIsMale = newAcc.IsMale;
 
-                _state.IsOral = _state.Settings.AppSettings.Oral && _state.ShowMan.IsHuman;
+                _state.IsOral = _state.Rules.Oral && _state.ShowMan.IsHuman;
             }
         }
         finally
@@ -3505,7 +3505,7 @@ public sealed class Game : MessageHandler
         _controller.OnStageChanged(GameStages.Started, "");
         _gameActions.InformStage();
 
-        _state.IsOral = _state.Settings.AppSettings.Oral && _state.ShowMan.IsHuman;
+        _state.IsOral = _state.Rules.Oral && _state.ShowMan.IsHuman;
 
         _controller.ScheduleExecution(Tasks.StartGame, 1, 1);
     }

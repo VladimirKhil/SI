@@ -4,7 +4,6 @@ using SICore.Contracts;
 using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
-using SICore.Utils;
 using SIData;
 using SIEngine.Rules;
 using SIPackages;
@@ -271,7 +270,7 @@ public sealed class GameActions
     /// <param name="person">Person name (everybody by default).</param>
     internal void InformRoundContent(string person = NetworkConstants.Everybody)
     {
-        if (!_state.Settings.AppSettings.PreloadRoundContent)
+        if (!_state.Rules.PreloadRoundContent)
         {
             return;
         }

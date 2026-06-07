@@ -5,9 +5,9 @@ using SICore.Clients.Game.Plugins.Stakes;
 using SICore.Clients.Other;
 using SICore.Contracts;
 using SICore.Extensions;
+using SICore.Helpers;
 using SICore.Models;
 using SICore.Results;
-using SICore.Utils;
 using SIData;
 using SIEngine.Rules;
 using SIPackages;
@@ -27,8 +27,6 @@ namespace SICore;
 /// </summary>
 public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 {
-    private const string OfObjectPropertyFormat = "{0} {1}: {2}";
-
     private const int MaxAnswerLength = 350;
 
     private const int DefaultAudioVideoTime = 1200; // maximum audio/video duration (120 s)
@@ -269,7 +267,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     {
         _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
 
-        _state.QuestionPlay.AppellationState = _state.Settings.AppSettings.UseApellations ? AppellationState.Processing : AppellationState.None;
+        _state.QuestionPlay.AppellationState = _state.Rules.UseAppellations ? AppellationState.Processing : AppellationState.None;
         _state.IsPlayingMedia = false;
 
         _state.InformStages &= ~(InformStages.Question | InformStages.Layout | InformStages.ContentShape);
@@ -491,8 +489,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     /// </summary>
     private bool IsPartial() =>
         _state.QuestionPlay.UseButtons
-            && !_state.Settings.AppSettings.FalseStart
-            && _state.Settings.AppSettings.PartialText
+            && !_state.Rules.FalseStart
+            && _state.Rules.PartialText
             && !_state.QuestionPlay.IsAnswer;
 
     internal void OnContentReplicText(string text, bool waitForFinish, TimeSpan duration)
@@ -674,9 +672,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.IsPartial = false;
         ShareMedia(contentItem);
 
-        var appSettings = _state.Settings.AppSettings;
         // TODO: provide this flag to client as part of the CONTENT message
-        var partialImage = appSettings.PartialImages && !appSettings.FalseStart && _state.QuestionPlay.UseButtons && !_state.QuestionPlay.IsAnswer;
+        var partialImage = _state.Rules.PartialImages && !_state.Rules.FalseStart && _state.QuestionPlay.UseButtons && !_state.QuestionPlay.IsAnswer;
 
         var renderTime = partialImage ? Math.Max(0, _state.TimeSettings.PartialImage * 10) : 0;
 
@@ -755,7 +752,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     }
 
     // Let's add a random offset so it will be difficult to press the button in advance (before the frame appears)
-    internal void AskToPress() => ScheduleExecution(Tasks.AskToTry, 1 + (_state.Settings.AppSettings.Managed ? 0 : Random.Shared.Next(10)), force: true);
+    internal void AskToPress() => ScheduleExecution(Tasks.AskToTry, 1 + (_state.Rules.Managed ? 0 : Random.Shared.Next(10)), force: true);
 
     internal void AskDirectAnswer() => ScheduleExecution(Tasks.AskAnswer, 1, force: true);
 
@@ -1402,12 +1399,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         return true;
     }
 
-    private TurnSwitchingStrategy GetTurnSwitchingStrategy() => _state.Settings.AppSettings.GameMode switch
+    private TurnSwitchingStrategy GetTurnSwitchingStrategy() => _state.Rules.GameMode switch
     {
-        GameModes.Tv => TurnSwitchingStrategy.ByRightAnswerOnButton,
-        GameModes.Sport => TurnSwitchingStrategy.Never,
-        GameModes.Quiz => TurnSwitchingStrategy.Never,
-        GameModes.TurnTaking => TurnSwitchingStrategy.Sequentially,
+        SI.Contracts.GameMode.Classic => TurnSwitchingStrategy.ByRightAnswerOnButton,
+        SI.Contracts.GameMode.Sequential => TurnSwitchingStrategy.Never,
+        SI.Contracts.GameMode.Quiz => TurnSwitchingStrategy.Never,
+        SI.Contracts.GameMode.TurnTaking => TurnSwitchingStrategy.Sequentially,
         _ => TurnSwitchingStrategy.Never,
     };
 
@@ -1471,7 +1468,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _gameActions.SendMessage(Messages.Resume); // To resume the media
 
-        if (_state.Settings.AppSettings.FalseStart || _state.IsQuestionFinished)
+        if (_state.Rules.FalseStart || _state.IsQuestionFinished)
         {
             ScheduleExecution(Tasks.AskToTry, 1, 1, true);
             return;
@@ -1617,7 +1614,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal string PrintHistory() => _tasksHistory.ToString();
 
-    // TODO: currently PlanExecution() is used for interruprions and ScheduleExecution() for normal tasks flow
+    // TODO: currently PlanExecution() is used for interruptions and ScheduleExecution() for normal tasks flow
     // Think about using a universal scheduler which will be able to handle both cases
 
     internal void PlanExecution(Tasks task, double taskTime, int arg = 0)
@@ -1647,7 +1644,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _taskRunner.ScheduleExecution(task, taskTime, arg, force || ShouldRunTimer());
     }
 
-    private bool ShouldRunTimer() => !_state.Settings.AppSettings.Managed || _state.HostName == null || !_state.AllPersons.ContainsKey(_state.HostName);
+    private bool ShouldRunTimer() => !_state.Rules.Managed || _state.HostName == null || !_state.AllPersons.ContainsKey(_state.HostName);
 
     /// <summary>
     /// Executes current task of the game state machine.
@@ -2025,7 +2022,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
                             newTask = Tasks.MoveNext;
                         }
-                        else if (task == Tasks.RoundTheme && !_state.Settings.AppSettings.Managed) // Skip all round themes
+                        else if (task == Tasks.RoundTheme && !_state.Rules.Managed) // Skip all round themes
                         {
                             for (var themeIndex = arg; themeIndex < _state.TInfo.RoundInfo.Count; themeIndex++)
                             {
@@ -2615,7 +2612,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var resumePressing = arg == 1;
 
-        if (_state.Settings.AppSettings.FalseStart || resumePressing)
+        if (_state.Rules.FalseStart || resumePressing)
         {
             _gameActions.SendMessage(Messages.Try);
         }
@@ -2768,7 +2765,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var newTextLength = Math.Min(
             _state.InitialPartialTextLength
-                + (int)(_state.Settings.AppSettings.ReadingSpeed * PartialPrintFrequencyPerSecond * _state.PartialIterationCounter),
+                + (int)(_state.Rules.ReadingSpeed * PartialPrintFrequencyPerSecond * _state.PartialIterationCounter),
             text.Length);
 
         if (newTextLength > _state.TextLength)
@@ -2830,7 +2827,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private int GetReadingDurationForTextLength(int textLength)
     {
-        var readingSpeed = Math.Max(1, _state.Settings.AppSettings.ReadingSpeed);
+        var readingSpeed = Math.Max(1, _state.Rules.ReadingSpeed);
         return Math.Max(1, 10 * textLength / readingSpeed);
     }
 
@@ -2862,9 +2859,9 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal bool PrepareForAskAnswer()
     {
-        var buttonPressMode = _state.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = _state.Rules.ButtonPressMode;
 
-        if (buttonPressMode == ButtonPressMode.RandomWithinInterval)
+        if (buttonPressMode == SI.Contracts.ButtonPressMode.RandomWithinInterval)
         {
             if (_state.PendingAnswererIndicies.Count == 0)
             {
@@ -2885,7 +2882,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.AnswererIndex = _state.PendingAnswererIndex;
         _state.QuestionPlay.SetSingleAnswerer(_state.PendingAnswererIndex);
 
-        if (!_state.Settings.AppSettings.FalseStart)
+        if (!_state.Rules.FalseStart)
         {
             // Stop question reading
             if (!_state.IsQuestionFinished)
@@ -2925,7 +2922,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal void DumpButtonPressError(string reason)
     {
-        var pressMode = _state.Settings.AppSettings.ButtonPressMode;
+        var pressMode = _state.Rules.ButtonPressMode;
         _state.Host.SendError(new Exception($"{reason} {pressMode}"));
     }
 
@@ -2996,7 +2993,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         WaitFor(DecisionType.QuestionSelection, time, _state.ChooserIndex);
     }
 
-    internal bool CanPlayerAct() => !_state.IsOralNow || _state.Settings.AppSettings.OralPlayersActions;
+    internal bool CanPlayerAct() => !_state.IsOralNow || _state.Rules.OralPlayersActions;
 
     private void AskToSelectQuestionAnswerer()
     {
@@ -3329,9 +3326,9 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _state.Answerer.Answer = "";
 
-        var buttonPressMode = _state.Settings.AppSettings.ButtonPressMode;
+        var buttonPressMode = _state.Rules.ButtonPressMode;
 
-        if (buttonPressMode != ButtonPressMode.FirstWins)
+        if (buttonPressMode != SI.Contracts.ButtonPressMode.FirstWins)
         {
             InformWrongTries();
         }
@@ -4288,7 +4285,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
 #if !DEBUG
                     // Advertisement could not be skipped
-                    _state.MoveNextBlocked = !_state.Settings.AppSettings.Managed;
+                    _state.MoveNextBlocked = !_state.Rules.Managed;
 #endif
                     adShown = true;
 
@@ -4778,7 +4775,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         for (var i = 0; i < _state.Players.Count; i++)
         {
             if ((!hasConnectedPlayers || _state.Players[i].IsConnected) &&
-                (_state.Players[i].Sum > 0 || _state.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes))
+                (_state.Players[i].Sum > 0 || _state.Rules.AllowEveryoneToPlayHiddenStakes))
             {
                 answerers.Add(i);
             }
@@ -4809,7 +4806,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             _state.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
         }
 
-        var factor = _state.Settings.AppSettings.QuestionForYourselfFactor;
+        var factor = _state.Rules.QuestionForYourselfFactor;
 
         _state.CurPriceRight *= factor;
         _state.CurPriceWrong *= factor;
@@ -4888,7 +4885,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         int contentDuration = InformAnswerOption(optionIndex);
 
         var nextTask = optionIndex + 1 < _state.QuestionPlay.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
-        ScheduleExecution(nextTask, _state.Settings.AppSettings.DisplayAnswerOptionsOneByOne ? contentDuration : 1, optionIndex + 1);
+        ScheduleExecution(nextTask, _state.Rules.DisplayAnswerOptionsOneByOne ? contentDuration : 1, optionIndex + 1);
     }
 
     internal int InformAnswerOption(int optionIndex)

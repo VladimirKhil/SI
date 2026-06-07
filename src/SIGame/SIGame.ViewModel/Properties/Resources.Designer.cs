@@ -943,6 +943,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid user name.
+        /// </summary>
+        public static string InvalidUserName {
+            get {
+                return ResourceManager.GetString("InvalidUserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is found at least twice.
         /// </summary>
         public static string IsDouble {
@@ -957,6 +966,15 @@ namespace SIGame.ViewModel.Properties {
         public static string JoinForbidden {
             get {
                 return ResourceManager.GetString("JoinForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Join to this game under this role is forbidden.
+        /// </summary>
+        public static string JoinRoleForbidden {
+            get {
+                return ResourceManager.GetString("JoinRoleForbidden", resourceCulture);
             }
         }
         
@@ -1231,6 +1249,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There&apos;s no empty space for user with such name!.
+        /// </summary>
+        public static string NoFreePlaceForName {
+            get {
+                return ResourceManager.GetString("NoFreePlaceForName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Licenses folder not found.
         /// </summary>
         public static string NoLicensesFolder {
@@ -1348,6 +1375,24 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There already is a player with such nickname in the game.
+        /// </summary>
+        public static string PersonWithSuchNameIsAlreadyInGame {
+            get {
+                return ResourceManager.GetString("PersonWithSuchNameIsAlreadyInGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The place is already occupied!.
+        /// </summary>
+        public static string PlaceIsOccupied {
+            get {
+                return ResourceManager.GetString("PlaceIsOccupied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you really want to remove the AI player {0}?.
         /// </summary>
         public static string PlayerDeleteConfirm {
@@ -1389,6 +1434,15 @@ namespace SIGame.ViewModel.Properties {
         public static string PortNumberRequired {
             get {
                 return ResourceManager.GetString("PortNumberRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Position with such number was not found.
+        /// </summary>
+        public static string PositionNotFoundByIndex {
+            get {
+                return ResourceManager.GetString("PositionNotFoundByIndex", resourceCulture);
             }
         }
         
@@ -1965,6 +2019,15 @@ namespace SIGame.ViewModel.Properties {
         public static string WrongAnswers {
             get {
                 return ResourceManager.GetString("WrongAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong password.
+        /// </summary>
+        public static string WrongPassword {
+            get {
+                return ResourceManager.GetString("WrongPassword", resourceCulture);
             }
         }
         

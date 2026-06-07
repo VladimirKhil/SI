@@ -4,7 +4,6 @@ using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
-using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;

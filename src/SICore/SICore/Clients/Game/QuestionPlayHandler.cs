@@ -92,7 +92,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         _controller.AddHistory("Appellation opened");
 
         _state.QuestionPlay.IsAnswer = true;
-        _state.QuestionPlay.AppellationState = _state.Settings.AppSettings.UseApellations ? AppellationState.Collecting : AppellationState.None;
+        _state.QuestionPlay.AppellationState = _state.Rules.UseAppellations ? AppellationState.Collecting : AppellationState.None;
         _state.IsPlayingMedia = false;
     }
 

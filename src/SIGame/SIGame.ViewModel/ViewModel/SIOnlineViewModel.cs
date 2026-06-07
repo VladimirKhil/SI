@@ -1019,26 +1019,33 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                 new SIHostClientOptions { ServiceUri = gameInfo.HostUri, ProxyUri = proxyUri },
                 cancellationToken);
 
-            var result = await siHostClient.JoinGameAsync(
-                new SI.GameServer.Contract.JoinGameRequest(
+            var result = await siHostClient.JoinGame2Async(
+                new SI.GameServer.Contract.JoinGameRequest2(
                     gameInfo.GameID,
                     Human.Name,
                     role,
                     Human.IsMale ? SI.GameServer.Contract.Sex.Male : SI.GameServer.Contract.Sex.Female,
-                    _password),
+                    Password: _password),
                 cancellationToken);
 
-            if (!result.IsSuccess)
+            if (result != SI.GameServer.Contract.JoinGame2Result.Success)
             {
-                Error = result.ErrorType switch
+                Error = result switch
                 {
-                    SI.GameServer.Contract.JoinGameErrorType.GameNotFound => Resources.GameNotFound,
-                    SI.GameServer.Contract.JoinGameErrorType.CommonJoinError => Resources.CommonJoinError,
-                    SI.GameServer.Contract.JoinGameErrorType.InvalidRole => Resources.InvalidRole,
-                    SI.GameServer.Contract.JoinGameErrorType.InternalServerError => Resources.InternalServerError,
-                    SI.GameServer.Contract.JoinGameErrorType.Forbidden => Resources.JoinForbidden,
+                    SI.GameServer.Contract.JoinGame2Result.GameNotFound => Resources.GameNotFound,
+                    SI.GameServer.Contract.JoinGame2Result.CommonJoinError => Resources.CommonJoinError,
+                    SI.GameServer.Contract.JoinGame2Result.InvalidRole => Resources.InvalidRole,
+                    SI.GameServer.Contract.JoinGame2Result.InvalidUserName => Resources.InvalidUserName,
+                    SI.GameServer.Contract.JoinGame2Result.InternalServerError => Resources.InternalServerError,
+                    SI.GameServer.Contract.JoinGame2Result.Forbidden => Resources.JoinForbidden,
+                    SI.GameServer.Contract.JoinGame2Result.ForbiddenRole => Resources.JoinRoleForbidden,
+                    SI.GameServer.Contract.JoinGame2Result.WrongPassword => Resources.WrongPassword,
+                    SI.GameServer.Contract.JoinGame2Result.NameIsOccupied => Resources.PersonWithSuchNameIsAlreadyInGame,
+                    SI.GameServer.Contract.JoinGame2Result.PositionNotFound => Resources.PositionNotFoundByIndex,
+                    SI.GameServer.Contract.JoinGame2Result.PlaceIsOccupied => Resources.PlaceIsOccupied,
+                    SI.GameServer.Contract.JoinGame2Result.FreePlaceNotFound => Resources.NoFreePlaceForName,
                     _ => Resources.UnknownError
-                } + ' ' + result.Message;
+                };
 
                 await siHostClient.DisposeAsync();
 

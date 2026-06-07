@@ -1,7 +1,7 @@
 ﻿using SIPackages;
 using SIUI.Model;
 
-namespace SICore.Utils;
+namespace SICore.Helpers;
 
 internal static class QuestionHelper
 {

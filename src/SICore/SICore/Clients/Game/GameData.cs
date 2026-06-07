@@ -294,7 +294,7 @@ public sealed class GameData : Data
 
     internal InformStages InformStages { get; set; } = InformStages.None;
 
-    internal Lock TableInformStageLock { get; } = new Lock(nameof(TableInformStageLock));
+    internal Utils.Lock TableInformStageLock { get; } = new Utils.Lock(nameof(TableInformStageLock));
 
     /// <summary>
     /// Number of players that are making hidden stakes.
@@ -417,7 +417,7 @@ public sealed class GameData : Data
 
     public int ReportsCount { get; set; }
 
-    internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
+    internal Utils.Lock TaskLock { get; } = new Utils.Lock(nameof(TaskLock));
 
     /// <summary>
     /// Дочитан ли вопрос
@@ -624,20 +624,18 @@ public sealed class GameData : Data
 
     private void InitQuestionTypeSettings()
     {
-        var appSettings = Settings.AppSettings;
-
         QuestionTypeSettings[QuestionTypes.ForYourself] = QuestionTypeSettings[QuestionTypes.NoRisk] =
-            new QuestionTypeRules(appSettings.QuestionForYourselfPenalty == PenaltyType.None
+            new QuestionTypeRules(Rules.QuestionForYourselfPenalty == SI.Contracts.PenaltyType.None
                 ? PenaltyType.None
                 : PenaltyType.SubtractPoints);
 
         QuestionTypeSettings[QuestionTypes.ForAll] =
-            new QuestionTypeRules(appSettings.QuestionForAllPenalty == PenaltyType.None
+            new QuestionTypeRules(Rules.QuestionForAllPenalty == SI.Contracts.PenaltyType.None
                 ? PenaltyType.None
                 : PenaltyType.SubtractPoints);
 
         QuestionTypeSettings[QuestionTypes.WithButton] = QuestionTypeSettings[QuestionTypes.Simple] =
-            new QuestionTypeRules(appSettings.QuestionWithButtonPenalty == PenaltyType.None
+            new QuestionTypeRules(Rules.QuestionWithButtonPenalty == SI.Contracts.PenaltyType.None
                 ? PenaltyType.None
                 : PenaltyType.SubtractPoints);
     }

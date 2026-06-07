@@ -3,7 +3,6 @@ using SIData;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Utils;
 
 namespace SICore;
 
@@ -19,7 +18,7 @@ public sealed class PersonState : Data, INotifyPropertyChanged
     /// <summary>
     /// Allows to separate message handling and logic execution.
     /// </summary>
-    internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
+    internal Utils.Lock TaskLock { get; } = new Utils.Lock(nameof(TaskLock));
 
     // TODO: replace with ButtonsNeeded flag
     /// <summary>

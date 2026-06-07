@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.32014.148
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11822.322 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F806503B-43D4-473F-AAF7-4297E54EBE66}"
 EndProject
@@ -81,8 +81,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SIGame", "SIGame", "{530D4F6C-075B-42BE-7691-6342AE1B255D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIGame.ViewModel.Tests", "test\SIGame\SIGame.ViewModel.Tests\SIGame.ViewModel.Tests.csproj", "{F0B89DA9-9399-40D1-AAFF-66E2143503AE}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SIGame", "SIGame", "{8F9B5DF9-5D90-E54E-1222-77ED6FDE0F8E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -735,7 +733,6 @@ Global
 		{E34E557D-5DB4-46D3-B94A-0393C2FEB210} = {C4457E87-27E4-45E3-ADF9-01BA5E9D5771}
 		{530D4F6C-075B-42BE-7691-6342AE1B255D} = {3E07412F-2F9C-458E-B897-E07E86BF682A}
 		{F0B89DA9-9399-40D1-AAFF-66E2143503AE} = {530D4F6C-075B-42BE-7691-6342AE1B255D}
-		{8F9B5DF9-5D90-E54E-1222-77ED6FDE0F8E} = {F806503B-43D4-473F-AAF7-4297E54EBE66}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD7AA90B-4EDB-45F7-A42F-7DE847C4386A}

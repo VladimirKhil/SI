@@ -762,4 +762,25 @@
   <data name="ChooseQuest" xml:space="preserve">
     <value>Choose the question!;Please!;Choose!;Make a choice!;It's your choice;You're chosing the next question</value>
   </data>
+  <data name="JoinRoleForbidden" xml:space="preserve">
+    <value>Join to this game under this role is forbidden</value>
+  </data>
+  <data name="WrongPassword" xml:space="preserve">
+    <value>Wrong password</value>
+  </data>
+  <data name="PersonWithSuchNameIsAlreadyInGame" xml:space="preserve">
+    <value>There already is a player with such nickname in the game</value>
+  </data>
+  <data name="PositionNotFoundByIndex" xml:space="preserve">
+    <value>Position with such number was not found</value>
+  </data>
+  <data name="PlaceIsOccupied" xml:space="preserve">
+    <value>The place is already occupied!</value>
+  </data>
+  <data name="NoFreePlaceForName" xml:space="preserve">
+    <value>There's no empty space for user with such name!</value>
+  </data>
+  <data name="InvalidUserName" xml:space="preserve">
+    <value>Invalid user name</value>
+  </data>
 </root>

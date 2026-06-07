@@ -1,6 +1,6 @@
 ﻿using SIData;
 
-namespace SICore.Utils;
+namespace SICore;
 
 // TODO: rewrite without boxing (use underlying StringBuilder)
 
