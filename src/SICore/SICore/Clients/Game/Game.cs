@@ -1693,7 +1693,7 @@ public sealed class Game : MessageHandler
                 return;
             }
         }
-        else
+        else // appellation against right answer
         {
             if (_controller.HaveMultipleAnswerers())
             {
@@ -1716,9 +1716,15 @@ public sealed class Game : MessageHandler
                 // Appellation for wrong answer, but player not found
                 return;
             }
+
+            if (!_state.QuestionHistory.Any(result => result.IsRight))
+            {
+                // Appellation for wrong answer, but no right answers found
+                return;
+            }
         }
 
-        if (_state.QuestionPlay.Appellations.Any(a => a.Item1 == appellationSource || !a.Item2))
+        if (_state.QuestionPlay.Appellations.Any(a => a.Item1 == appellationSource || !a.Item2 && !isAppellationForRightAnswer))
         {
             // Appellation already exists for this source or appellation for wrong answer already given
             return;
@@ -3571,7 +3577,7 @@ public sealed class Game : MessageHandler
 
         foreach (var personName in _state.AllPersons.Keys)
         {
-            if (account.Name != personName && personName != NetworkConstants.GameName)
+            if (personName != NetworkConstants.GameName)
             {
                 InformAvatar(account, personName);
             }

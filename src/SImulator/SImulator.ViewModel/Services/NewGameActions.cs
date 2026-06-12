@@ -84,6 +84,8 @@ internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks
 
     public async void PlayerPressed(PlayerInfo player) => await _onMessageReceivedAsync(new Message("I", player.Name));
 
+    public void SetPause(bool isPaused) => _actions.Pause(isPaused);
+
     public void Dispose()
     {
 

@@ -604,6 +604,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             if (_isPaused != value)
             {
+                if (_managed)
+                {
+                    _gameActions.SetPause(value);
+                }
+
                 _isPaused = value;
                 OnPropertyChanged();
                 OnIsPausedChanged();

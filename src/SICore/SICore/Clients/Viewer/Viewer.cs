@@ -1048,15 +1048,23 @@ public class Viewer : MessageHandler, IViewerClient
             return;
         }
 
+        var setActive = mparams.Length > 2 && mparams[2] == "+";
+
         for (int i = 0; i < State.Players.Count; i++)
         {
             State.Players[i].IsChooser = i == index;
 
-            if (mparams.Length > 2 && mparams[2] == "+")
+            if (setActive)
             {
                 State.Players[i].State = i == index ? PlayerState.Answering : PlayerState.Pass;
             }
         }
+
+        var manually = mparams.Length > 3 && mparams[3] == "+";
+        var announce = mparams.Length > 3 && mparams[3] == "ANNOUNCE";
+        var initial = mparams.Length > 3 && mparams[3] == "INITIAL";
+
+        Controller.OnChooserSelected(index, setActive, manually, announce, initial);
     }
 
     private async ValueTask OnConnectedAsync(string[] mparams)

@@ -538,10 +538,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             HumanPlayerName = "HOST",
             AppSettings = new AppSettingsCore
             {
-                Managed = true,
                 Culture = "ru-RU",
-                Oral = true,
-                ButtonPressMode = ButtonPressMode.FirstWins,
             },
             Showman = new Account
             {
@@ -553,7 +550,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         var rules = new SI.Contracts.RulesSettings
         {
-            
+            Managed = true,
+            Oral = true,
+            ButtonPressMode = SI.Contracts.ButtonPressMode.FirstWins,
         };
 
         var gameHost = new GameHost();

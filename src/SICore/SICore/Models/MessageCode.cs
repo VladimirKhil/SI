@@ -39,4 +39,8 @@ public enum MessageCode
     DeleteTheme,
 
     IncomeWithoutAnswering,
+
+    AppellationFor,
+
+    AppellationAgainst,
 }

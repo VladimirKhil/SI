@@ -34,4 +34,6 @@ public interface IGameActions : IDisposable
     void ConnectPlayer(PlayerInfo player) { }
 
     void PlayerPressed(PlayerInfo player) { }
+
+    void SetPause(bool isPaused) { }
 }

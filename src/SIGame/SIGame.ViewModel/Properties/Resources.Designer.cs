@@ -97,6 +97,24 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is considering that the answer of {1} is wrong.
+        /// </summary>
+        public static string AppellationAgainst {
+            get {
+                return ResourceManager.GetString("AppellationAgainst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is appellating his own answer.
+        /// </summary>
+        public static string AppellationFor {
+            get {
+                return ResourceManager.GetString("AppellationFor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your avatar is bigger than 1 MB. Other players will not see it.
         /// </summary>
         public static string AvatarTooBig {
@@ -790,6 +808,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All stakes are submitted. Your attention, please!.
+        /// </summary>
+        public static string HiddenStakesMade {
+            get {
+                return ResourceManager.GetString("HiddenStakesMade", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hint: you can press the answer button at any point of the screen using right mouse button or {0} key.
         /// </summary>
         public static string Hint {
@@ -1465,6 +1492,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Question price is multiplied by {0}.
+        /// </summary>
+        public static string PriceMultiplication {
+            get {
+                return ResourceManager.GetString("PriceMultiplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Question authors.
         /// </summary>
         public static string QuestionAuthors {
@@ -1776,6 +1812,15 @@ namespace SIGame.ViewModel.Properties {
         public static string Tables {
             get {
                 return ResourceManager.GetString("Tables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Theme: {0}.
+        /// </summary>
+        public static string Theme {
+            get {
+                return ResourceManager.GetString("Theme", resourceCulture);
             }
         }
         

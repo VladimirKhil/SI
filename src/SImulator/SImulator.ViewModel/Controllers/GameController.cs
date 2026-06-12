@@ -2,7 +2,6 @@
 using SICore.Models;
 using SIData;
 using SIEngine.Rules;
-using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.Properties;
 using SIPackages;
@@ -57,7 +56,7 @@ internal sealed class GameController : IPersonController
 
     public void OnRoundNames(string[] roundNames) => GameViewModel.OnRoundNames(roundNames);
 
-    public void OnRoundComments(string comments) => MoveWhenFast();
+    public void OnRoundComments(string comments) { }
 
     public void OnThemeComments(string comments) => GameViewModel.PresentationController.OnThemeComments(comments);
 
@@ -74,7 +73,7 @@ internal sealed class GameController : IPersonController
                 var contentItems = content.Select(ci => new ContentItem
                 {
                     Type = ci.Type,
-                    Value = ci.Uri,
+                    Value = ci.Type == ContentTypes.Text ? ci.Uri : "",
                     IsRef = true,
                     Placement = ContentPlacements.Screen
                 }).ToList();
@@ -187,7 +186,6 @@ internal sealed class GameController : IPersonController
     public void OnPackageComments(string comments)
     {
         GameViewModel.ShowmanReplic = $"{Resources.PackageComments}: {comments}";
-        MoveWhenFast();
     }
 
     public void OnPackageRestrictions(string restrictions)
@@ -203,6 +201,11 @@ internal sealed class GameController : IPersonController
         }
 
         GameViewModel.OnQuestionType(typeName, isDefaultType);
+    }
+
+    public void OnQuestionEnd() 
+    {
+        GameViewModel.ContentItems = [];
     }
 
     public void OnRightAnswer(string answer)
@@ -392,5 +395,23 @@ internal sealed class GameController : IPersonController
     {
         GameViewModel.AskAnswerButton();
         GameViewModel.StartQuestionTimer();
+    }
+
+    public void OnQuestionAnswers(string[] right, string[] wrong)
+    {
+        GameViewModel.QuestionAnswers = right;
+    }
+
+    public void OnChooserSelected(int index, bool setActive, bool manually, bool announce, bool initial)
+    {
+        if (initial)
+        {
+            MoveWhenFast();
+        }
+    }
+
+    public void OnToggle(int themeIndex, int questionIndex, int price)
+    {
+        GameViewModel.LocalInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
     }
 }

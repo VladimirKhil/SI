@@ -780,4 +780,19 @@
   <data name="InvalidUserName" xml:space="preserve">
     <value>Некорректное имя пользователя</value>
   </data>
+  <data name="PriceMultiplication" xml:space="preserve">
+    <value>Стоимость вопроса умножается на {0}</value>
+  </data>
+  <data name="HiddenStakesMade" xml:space="preserve">
+    <value>Все ставки сделаны. Внимание, вопрос!</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Тема: {0}</value>
+  </data>
+  <data name="AppellationFor" xml:space="preserve">
+    <value>{0} апеллирует свой ответ</value>
+  </data>
+  <data name="AppellationAgainst" xml:space="preserve">
+    <value>{0} считает, что ответ {1} неверен</value>
+  </data>
 </root>

@@ -2215,7 +2215,8 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         string? text = null;
 
         int? selector = null;
-        string? namePrefix = null;
+        string? argument = null;
+        string? argument2 = null;
 
         if (args != null && args.Length > 0)
         {
@@ -2226,12 +2227,17 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                 if (args.Length > 1)
                 {
-                    namePrefix = args[1];
+                    argument = args[1];
                 }
             }
             else
             {
-                namePrefix = args[0];
+                argument = args[0];
+            }
+
+            if (args.Length > 1)
+            {
+                argument2 = args[1];
             }
         }
 
@@ -2242,7 +2248,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 break;
 
             case Models.MessageCode.SelectQuestion:
-                text = ChooseResourceVariant(Resources.ChooseQuest, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.ChooseQuest, selector, argument);
                 break;
 
             case Models.MessageCode.UnsupportedQuestion:
@@ -2250,19 +2256,31 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 break;
 
             case Models.MessageCode.SelectPlayer:
-                text = ChooseResourceVariant(Resources.GiveCat, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.GiveCat, selector, argument);
+                break;
+
+            case Models.MessageCode.PriceMultiplication:
+                text = string.Format(ChooseResourceVariant(Resources.PriceMultiplication, selector), argument);
                 break;
 
             case Models.MessageCode.MakeStake:
-                text = ChooseResourceVariant(Resources.YourStake, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.YourStake, selector, argument);
+                break;
+
+            case Models.MessageCode.HiddenStakesMade:
+                text = ChooseResourceVariant(Resources.HiddenStakesMade, selector);
+                break;
+
+            case Models.MessageCode.Theme:
+                text = string.Format(ChooseResourceVariant(Resources.Theme, selector), argument);
                 break;
 
             case Models.MessageCode.SelectAnswerOption:
-                text = ChooseResourceVariant(Resources.SelectAnswerOption, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.SelectAnswerOption, selector, argument);
                 break;
 
             case Models.MessageCode.Answer:
-                text = ChooseResourceVariant(Resources.YourAnswer, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.YourAnswer, selector, argument);
                 break;
 
             case Models.MessageCode.RoundSkippedNoPlayers:
@@ -2274,11 +2292,19 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 break;
 
             case Models.MessageCode.DeleteTheme:
-                text = ChooseResourceVariant(Resources.DeleteTheme, selector, namePrefix);
+                text = ChooseResourceVariant(Resources.DeleteTheme, selector, argument);
                 break;
 
             case Models.MessageCode.IncomeWithoutAnswering:
                 text = ChooseResourceVariant(Resources.EasyCat, selector);
+                break;
+
+            case Models.MessageCode.AppellationFor:
+                text = string.Format(ChooseResourceVariant(Resources.AppellationFor, selector), argument);
+                break;
+
+            case Models.MessageCode.AppellationAgainst:
+                text = string.Format(ChooseResourceVariant(Resources.AppellationAgainst, selector), argument, argument2);
                 break;
 
             default:

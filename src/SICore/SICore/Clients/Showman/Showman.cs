@@ -124,6 +124,8 @@ public sealed class Showman : Viewer
 
         State.Right = right.ToArray();
         State.Wrong = wrong.ToArray();
+
+        Controller.OnQuestionAnswers(State.Right, State.Wrong);
     }
 
     private void OnValidation2(string[] mparams)

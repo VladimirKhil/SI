@@ -3244,7 +3244,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             var answerTime = _state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.HiddenAnswering;
 
-            _gameActions.ShowmanReplic(LO[nameof(R.StartThink)]); // TODO: REMOVE: replaced by FINALTHINK message
             _gameActions.SendMessageWithArgs(Messages.FinalThink, answerTime);
 
             for (var i = 0; i < _state.Players.Count; i++)
@@ -3823,6 +3822,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             : string.Format(LO[nameof(R.IsConsideringWrong)], appelaer.Name);
 
         _gameActions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}"); // TODO: REMOVE (replaced by Validation2Message)
+        _gameActions.ShowmanReplicNew(isAppellationForRightAnswer ? MessageCode.AppellationFor : MessageCode.AppellationAgainst, appellationSource, appelaer);
 
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
 

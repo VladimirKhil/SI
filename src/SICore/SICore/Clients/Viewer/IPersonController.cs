@@ -333,4 +333,8 @@ public interface IPersonController
     void OnRoundNames(string[] roundNames) { }
 
     void OnPackageRestrictions(string restrictions) { }
+
+    void OnQuestionAnswers(string[] right, string[] wrong) { }
+
+    void OnChooserSelected(int index, bool setActive, bool manually, bool announce, bool initial) { }
 }

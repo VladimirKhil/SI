@@ -783,4 +783,19 @@
   <data name="InvalidUserName" xml:space="preserve">
     <value>Invalid user name</value>
   </data>
+  <data name="PriceMultiplication" xml:space="preserve">
+    <value>Question price is multiplied by {0}</value>
+  </data>
+  <data name="HiddenStakesMade" xml:space="preserve">
+    <value>All stakes are submitted. Your attention, please!</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Theme: {0}</value>
+  </data>
+  <data name="AppellationFor" xml:space="preserve">
+    <value>{0} is appellating his own answer</value>
+  </data>
+  <data name="AppellationAgainst" xml:space="preserve">
+    <value>{0} is considering that the answer of {1} is wrong</value>
+  </data>
 </root>
