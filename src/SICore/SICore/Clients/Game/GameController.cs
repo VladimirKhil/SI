@@ -69,7 +69,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     public object? UserState { get; set; }
 
-    private readonly GameActions _gameActions;
+    private readonly GameActions _actions;
 
     private readonly ILocalizer LO; // TODO: localization must be removed from SICore
 
@@ -118,7 +118,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         IPinHelper? pinHelper)
     {
         _state = state;
-        _gameActions = actions;
+        _actions = actions;
         Engine = engine;
         LO = localizer;
         _fileShare = fileShare;
@@ -143,13 +143,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             ScheduleExecution(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
             _state.TimerStartTime[2] = DateTime.UtcNow;
 
-            _gameActions.InformTimerGameStart(Constants.AutomaticGameStartDuration);
+            _actions.InformTimerGameStart(Constants.AutomaticGameStartDuration);
         }
     }
 
     internal void OnFinalRoundSkip()
     {
-        _gameActions.ShowmanReplicNew(MessageCode.RoundSkippedNoPlayers);
+        _actions.ShowmanReplicNew(MessageCode.RoundSkippedNoPlayers);
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10), 1);
     }
 
@@ -220,7 +220,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 // If there are 2 or 3 players, there are already 2 positive votes for the answer
                 // from answered player and showman. And only 1 or 2 votes left.
                 // So there is no chance to win a vote against the answer
-                _gameActions.SendMessageToWithArgs(appellationSource, Messages.UserError, ErrorCode.AppellationFailedTooFewPlayers);
+                _actions.SendMessageToWithArgs(appellationSource, Messages.UserError, ErrorCode.AppellationFailedTooFewPlayers);
                 return false;
             }
 
@@ -277,7 +277,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (GetTurnSwitchingStrategy() == TurnSwitchingStrategy.Sequentially)
         {
             _state.ChooserIndex = (_state.ChooserIndex + 1) % _state.Players.Count;
-            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+            _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
         }
 
         if (_state.QuestionPlay.AppellationState != AppellationState.None && _state.QuestionPlay.Appellations.Any())
@@ -294,8 +294,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             .Select((round, index) => new RoundInfo { Index = index, Name = round.Name })
             .ToArray();
 
-        _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID)); // TODO: REMOVE (replaced by PACKAGE_INFO message)
-        _gameActions.InformRoundsNames();
+        _actions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID)); // TODO: REMOVE (replaced by PACKAGE_INFO message)
+        _actions.InformRoundsNames();
 
         _state.InformStages |= InformStages.RoundNames;
 
@@ -305,7 +305,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void OnGameThemes(IEnumerable<string> gameThemes)
     {
         var msg = new MessageBuilder(Messages.GameThemes).AddRange(gameThemes);
-        _gameActions.SendVisualMessage(msg);
+        _actions.SendVisualMessage(msg);
         _ = gameThemes.TryGetNonEnumeratedCount(out var count);
         ScheduleExecution(Tasks.MoveNext, Math.Max(40, 10 + 10 * count));
     }
@@ -366,12 +366,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 ? $"{GetRandomString(LO[nameof(R.RoundThemes)])}. {LO[nameof(R.WeWillPlayAllOfThem)]}"
                 : LO[nameof(R.LetsPlayNextTheme)];
 
-            _gameActions.ShowmanReplic(themesReplic);
+            _actions.ShowmanReplic(themesReplic);
         }
 
         _state.TableInformStageLock.WithLock(() =>
         {
-            _gameActions.InformRoundThemesNames(playMode: playMode);
+            _actions.InformRoundThemesNames(playMode: playMode);
             _state.ThemeComments = themes.Select(theme => theme.Info.Comments.Text).ToArray();
             _state.InformStages |= InformStages.RoundThemesNames;
             _state.ThemesPlayMode = playMode;
@@ -389,8 +389,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     {
         _state.Question = question;
 
-        _gameActions.ShowmanReplic($"{_state.Theme?.Name}, {question.Price}");
-        _gameActions.SendVisualMessageWithArgs(Messages.Question, question.Price);
+        _actions.ShowmanReplic($"{_state.Theme?.Name}, {question.Price}");
+        _actions.SendVisualMessageWithArgs(Messages.Question, question.Price);
 
         InitQuestionState(_state.Question);
         ProceedToThemeAndQuestion();
@@ -403,7 +403,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new InvalidOperationException("_data.Round == null");
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
+        _actions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
         _state.InformStages |= InformStages.Question;
 
         _state.Theme = _state.Round.Themes[themeIndex];
@@ -460,7 +460,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (_state.IsPartial)
         {
             _state.Text = text;
-            _gameActions.SendContentShape();
+            _actions.SendContentShape();
             _state.InformStages |= InformStages.ContentShape;
             _state.InitialPartialTextLength = 0;
             _state.PartialIterationCounter = 0;
@@ -470,12 +470,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         var message = string.Join(Message.ArgsSeparator, Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
-        _gameActions.SendContent(ContentPlacements.Screen, 0, "", ContentTypes.Text, "", text.EscapeNewLines());
+        _actions.SendContent(ContentPlacements.Screen, 0, "", ContentTypes.Text, "", text.EscapeNewLines());
 
         _state.ComplexVisualState ??= new IReadOnlyList<string>[1];
         _state.ComplexVisualState[0] = new string[] { message };
 
-        _gameActions.SendMessage(message);
+        _actions.SendMessage(message);
 
         var nextTime = !waitForFinish ? 1 : contentTime;
 
@@ -498,7 +498,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.IsPartial = false;
         // There is no need to send content for now, as we can send replic directly
         //_gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Replic, 0, ContentTypes.Text, text.EscapeNewLines());
-        _gameActions.ShowmanReplic(text);
+        _actions.ShowmanReplic(text);
 
         var atomTime = !waitForFinish ? 1 : (duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length));
 
@@ -598,9 +598,9 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 var errorText = error ?? string.Format(LO[nameof(R.MediaNotFound)], globalUri);
                 var message = string.Join(Message.ArgsSeparator, Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
-                _gameActions.SendMessage(message);
+                _actions.SendMessage(message);
 
-                _gameActions.SendContent(ContentPlacements.Screen, 0, "", ContentTypes.Text, "", errorText);
+                _actions.SendContent(ContentPlacements.Screen, 0, "", ContentTypes.Text, "", errorText);
 
                 _state.ComplexVisualState ??= new IReadOnlyList<string>[1];
                 _state.ComplexVisualState[0] = new string[] { message };
@@ -608,14 +608,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 return null;
             }
 
-            _gameActions.SendVisualMessageWithArgs(
+            _actions.SendVisualMessageWithArgs(
                 Messages.Content,
                 contentItem.Placement,
                 0,
                 contentItem.Type,
                 globalUri);
 
-            _gameActions.SendContent(
+            _actions.SendContent(
                 contentItem.Placement,
                 0,
                 "",
@@ -654,14 +654,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         // Notify users that the media file is too large and could be downloaded slowly
         var errorMessage = string.Format(LO[nameof(R.OversizedFile)], R.File, fileLocation, maxRecommendedFileLength);
-        _gameActions.SendMessageWithArgs(Messages.UserError, ErrorCode.OversizedFile, contentType, maxRecommendedFileLength);
+        _actions.SendMessageWithArgs(Messages.UserError, ErrorCode.OversizedFile, contentType, maxRecommendedFileLength);
 
         if (_state.OversizedMediaNotificationsCount < MaxMediaNotifications)
         {
             _state.OversizedMediaNotificationsCount++;
 
             // Show message on table
-            _gameActions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
+            _actions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
         }
 
         return (true, null);
@@ -761,8 +761,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.IsQuestionAskPlaying = false;
         _state.IsPlayingMedia = false;
 
-        _gameActions.InformSums();
-        _gameActions.SendMessage(Messages.Stop); // Timers STOP
+        _actions.InformSums();
+        _actions.SendMessage(Messages.Stop); // Timers STOP
 
         _state.IsThinking = false;
 
@@ -867,14 +867,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             RescheduleTask(); // Decision could be ready
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
+        _actions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
     }
 
-    internal void OnRoundEmpty() => _gameActions.SendMessage(Messages.RoundEnd, "empty");
+    internal void OnRoundEmpty() => _actions.SendMessage(Messages.RoundEnd, "empty");
 
-    internal void OnRoundTimeout() => _gameActions.SendMessage(Messages.RoundEnd, "timeout");
+    internal void OnRoundTimeout() => _actions.SendMessage(Messages.RoundEnd, "timeout");
 
-    internal void OnRoundEndedManually() => _gameActions.SendMessage(Messages.RoundEnd, "manual");
+    internal void OnRoundEndedManually() => _actions.SendMessage(Messages.RoundEnd, "manual");
 
     internal void OnThemeDeleted(int themeIndex)
     {
@@ -896,7 +896,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _state.TInfo.RoundInfo[themeIndex].Name = QuestionHelper.InvalidThemeName;
 
-        _gameActions.SendMessageWithArgs(Messages.Out, themeIndex);
+        _actions.SendMessageWithArgs(Messages.Out, themeIndex);
 
         var playerIndex = _state.ThemeDeleters.Current.PlayerIndex;
         var themeName = _state.TInfo.RoundInfo[themeIndex].Name;
@@ -906,8 +906,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal void AnnounceFinalTheme(Question question)
     {
-        _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _state.Theme.Name);
-        _gameActions.SendThemeInfo(overridenQuestionCount: 1);
+        _actions.SendMessageWithArgs(Messages.QuestionCaption, _state.Theme.Name);
+        _actions.SendThemeInfo(overridenQuestionCount: 1);
         
         InitQuestionState(question);
         ProceedToThemeAndQuestion(force: false);
@@ -916,7 +916,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void OnEndGame()
     {
         // Clearing the table
-        _gameActions.SendMessage(Messages.Stop);
+        _actions.SendMessage(Messages.Stop);
 
         FillReport();
         ScheduleExecution(Tasks.Winner, 15 + Random.Shared.Next(10), force: true);
@@ -1060,7 +1060,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var s = _state.ChooserIndex == _state.AnswererIndex ? LO[nameof(R.ToMyself)] : _state.Answerer.Name;
 
         _state.ChooserIndex = _state.AnswererIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
         ScheduleExecution(Tasks.MoveNext, 10);
         return true;
     }
@@ -1076,8 +1076,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _state.CurPriceWrong = _state.CurPriceRight;
 
-        _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
+        _actions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
 
         ScheduleExecution(Tasks.MoveNext, 20);
 
@@ -1099,8 +1099,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void ProceedToHiddenStakesQuestion()
     {
-        _gameActions.ShowmanReplic(LO[nameof(R.ThankYou)]); // TODO: REMOVE (replaced by MessageCode.HiddenStakesMade)
-        _gameActions.ShowmanReplicNew(MessageCode.HiddenStakesMade);
+        _actions.ShowmanReplic(LO[nameof(R.ThankYou)]); // TODO: REMOVE (replaced by MessageCode.HiddenStakesMade)
+        _actions.ShowmanReplicNew(MessageCode.HiddenStakesMade);
         ScheduleExecution(Tasks.MoveNext, 20);
     }
 
@@ -1112,7 +1112,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         StopWaiting();
-        _gameActions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {_state.Players[_state.ThemeDeleters.Current.PlayerIndex].Name}");
+        _actions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {_state.Players[_state.ThemeDeleters.Current.PlayerIndex].Name}");
         _state.ThemeDeleters.MoveBack();
         ScheduleExecution(Tasks.AskToDelete, 1);
         return true;
@@ -1176,7 +1176,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             _state.Players[playerIndex].StakeMaking = false;
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass, playerIndex);
-            _gameActions.SendMessage(passMsg.ToString());
+            _actions.SendMessage(passMsg.ToString());
         }
         else
         {
@@ -1194,7 +1194,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             stakeMessage.Add(_state.Stake);
         }
 
-        _gameActions.SendMessage(stakeMessage.Build());
+        _actions.SendMessage(stakeMessage.Build());
 
         if (_state.StakeType != StakeMode.Pass)
         {
@@ -1205,7 +1205,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 if (i != _state.Stakes.StakerIndex && player.StakeMaking && player.Sum <= _state.Stake)
                 {
                     player.StakeMaking = false;
-                    _gameActions.SendMessageWithArgs(Messages.PersonStake, i, 2);
+                    _actions.SendMessageWithArgs(Messages.PersonStake, i, 2);
                 }
             }
         }
@@ -1273,10 +1273,10 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 var outcome = _state.CurPriceRight;
                 updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
 
-                _gameActions.ShowmanReplicNew(MessageCode.RightAnswer, outcome, _state.Answerer.AnswerValidationFactor);
-                _gameActions.OnPlayerOutcome(_state.AnswererIndex, true, updateSum);
+                _actions.ShowmanReplicNew(MessageCode.RightAnswer, outcome, _state.Answerer.AnswerValidationFactor);
+                _actions.OnPlayerOutcome(_state.AnswererIndex, true, updateSum);
                 AddRightSum(_state.Answerer, updateSum);
-                _gameActions.InformSums();
+                _actions.InformSums();
 
                 if (multipleAnswerers)
                 {
@@ -1289,14 +1289,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                         _state.ChooserIndex != _state.AnswererIndex)
                     {
                         _state.ChooserIndex = _state.AnswererIndex;
-                        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+                        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
                     }
 
                     // TODO: many of these lines are redundand in Special questions
                     _state.IsQuestionAskPlaying = false;
 
                     _state.IsThinking = false;
-                    _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Stop);
+                    _actions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Stop);
 
                     MoveToAnswer(); // Question is answered correctly
                     ScheduleExecution(Tasks.MoveNext, 1, force: true);
@@ -1304,7 +1304,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _gameActions.ShowmanReplicNew(MessageCode.RightAnswer);
+                _actions.ShowmanReplicNew(MessageCode.RightAnswer);
                 _state.PlayerIsRight = true;
                 updateSum = _state.Answerer.PersonalStake;
                 ScheduleExecution(Tasks.AnnounceStake, 15);
@@ -1327,7 +1327,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
                 if (answerIndex > -1)
                 {
-                    _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Wrong);
+                    _actions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Wrong);
                 }
 
                 if (!HaveMultipleAnswerers())
@@ -1343,20 +1343,20 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (!_state.QuestionPlay.HiddenStakes)
             {
                 s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");                
-                _gameActions.ShowmanReplic(s.ToString());
+                _actions.ShowmanReplic(s.ToString());
 
                 if (_state.Answerer.AnswerValidationFactor == 0)
                 {
-                    _gameActions.SendMessageWithArgs(Messages.Pass, _state.AnswererIndex);
+                    _actions.SendMessageWithArgs(Messages.Pass, _state.AnswererIndex);
                     updateSum = -1;
                 }
                 else
                 {
                     updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
-                    _gameActions.OnPlayerOutcome(_state.AnswererIndex, false, updateSum);
-                    _gameActions.ShowmanReplicNew(MessageCode.WrongAnswer, outcome, _state.Answerer.AnswerValidationFactor);
+                    _actions.OnPlayerOutcome(_state.AnswererIndex, false, updateSum);
+                    _actions.ShowmanReplicNew(MessageCode.WrongAnswer, outcome, _state.Answerer.AnswerValidationFactor);
                     SubtractWrongSum(_state.Answerer, updateSum);
-                    _gameActions.InformSums();
+                    _actions.InformSums();
 
                     if (_state.Answerer.IsHuman && _state.Theme != null)
                     {
@@ -1381,8 +1381,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _gameActions.ShowmanReplic(s.ToString());
-                _gameActions.ShowmanReplicNew(MessageCode.WrongAnswer);
+                _actions.ShowmanReplic(s.ToString());
+                _actions.ShowmanReplicNew(MessageCode.WrongAnswer);
                 _state.PlayerIsRight = false;
                 updateSum = _state.Answerer.PersonalStake;
 
@@ -1466,7 +1466,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.AnswererPressDuration = -1;
         _state.PendingAnswererIndicies.Clear();
 
-        _gameActions.SendMessage(Messages.Resume); // To resume the media
+        _actions.SendMessage(Messages.Resume); // To resume the media
 
         if (_state.Rules.FalseStart || _state.IsQuestionFinished)
         {
@@ -1474,7 +1474,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
+        _actions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
         _state.IsPlayingMedia = _state.IsPlayingMediaPaused;
 
         // Resume question playing
@@ -1513,7 +1513,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         StopWaiting();
 
         var s = $"{LO[nameof(R.StakeMakes)]} {_state.Players[playerIndex].Name}";
-        _gameActions.ShowmanReplic(s);
+        _actions.ShowmanReplic(s);
 
         _state.OrderIndex--;
         ScheduleExecution(Tasks.AskStake, 10);
@@ -1528,7 +1528,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         StopWaiting();
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");        
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");        
         ScheduleExecution(Tasks.MoveNext, 20);
 
         return true;
@@ -1537,7 +1537,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     private void RunRoundTimer()
     {
         _state.TimerStartTime[0] = DateTime.UtcNow;
-        _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _state.TimeSettings.Round * 10);
+        _actions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _state.TimeSettings.Round * 10);
     }
 
     private bool OnDecisionAnswering()
@@ -1557,7 +1557,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
                 if (answerIndex > -1)
                 {
-                    _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Active);
+                    _actions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Active);
                 }
 
                 ScheduleExecution(Tasks.AskRight, 15, force: true);
@@ -1565,8 +1565,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _gameActions.PlayerReplic(_state.AnswererIndex, _state.Answerer.Answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
-                _gameActions.OnPlayerAnswer(_state.AnswererIndex, _state.Answerer.Answer);
+                _actions.PlayerReplic(_state.AnswererIndex, _state.Answerer.Answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
+                _actions.OnPlayerAnswer(_state.AnswererIndex, _state.Answerer.Answer);
             }
 
             if (_state.IsOralNow)
@@ -1584,8 +1584,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         StopWaiting();
 
         var s = GetRandomString(LO[nameof(R.LetsSee)]);
-        _gameActions.ShowmanReplic(s);
-        _gameActions.ShowmanReplicNew(MessageCode.PlayerAnswers);
+        _actions.ShowmanReplic(s);
+        _actions.ShowmanReplicNew(MessageCode.PlayerAnswers);
 
         var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
         _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
@@ -1593,7 +1593,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (_state.QuestionPlay.ValidateAfterRightAnswer)
         {
             var m = new MessageBuilder(Messages.Answers).AddRange(_state.Players.Select(p => p.Answer ?? ""));
-            _gameActions.SendMessage(m.ToString());
+            _actions.SendMessage(m.ToString());
             ScheduleExecution(Tasks.MoveNext, 30, 1, true);
             return true;
         }
@@ -1609,7 +1609,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.IsWaiting = false;
         _state.Decision = DecisionType.None;
 
-        _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
+        _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
     }
 
     internal string PrintHistory() => _tasksHistory.ToString();
@@ -1864,7 +1864,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             _state.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
             ScheduleExecution(Tasks.NoTask, 10);
             _state.MoveNextBlocked = true;
-            _gameActions.SendMessageWithArgs(Messages.GameError);
+            _actions.SendMessageWithArgs(Messages.GameError);
         }
     }
 
@@ -1875,7 +1875,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new ArgumentException($"{nameof(themeIndex)} {themeIndex} must be in [0;{_state.TInfo.RoundInfo.Count - 1}]");
         }
 
-        _gameActions.SendThemeInfo(themeIndex, true);
+        _actions.SendThemeInfo(themeIndex, true);
 
         if (themeIndex + 1 < _state.TInfo.RoundInfo.Count)
         {
@@ -1892,7 +1892,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     private void InformTable() => _state.TableInformStageLock.WithLock(
         () =>
         {
-            _gameActions.InformTable();
+            _actions.InformTable();
             _state.InformStages |= InformStages.Table;
         },
         5000);
@@ -1953,7 +1953,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                     times[i] = (int)(_state.PauseStartTime.Subtract(_state.TimerStartTime[i]).TotalMilliseconds / 100);
                 }
 
-                _gameActions.SendMessageWithArgs(Messages.Pause, '+', times[0], times[1], times[2]);
+                _actions.SendMessageWithArgs(Messages.Pause, '+', times[0], times[1], times[2]);
                 break;
 
             case StopReason.Decision:
@@ -2018,7 +2018,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                         {
                             var subText = _state.Text[_state.TextLength..];
 
-                            _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
+                            _actions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
 
                             newTask = Tasks.MoveNext;
                         }
@@ -2026,7 +2026,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                         {
                             for (var themeIndex = arg; themeIndex < _state.TInfo.RoundInfo.Count; themeIndex++)
                             {
-                                _gameActions.SendThemeInfo(themeIndex, true);
+                                _actions.SendThemeInfo(themeIndex, true);
                             }
 
                             InformTable();
@@ -2098,11 +2098,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void GoodLuck()
     {
-        _gameActions.ShowmanReplic(LO[nameof(R.GoodLuck)]); // TODO: REMOVE (replaced by InformStage)
+        _actions.ShowmanReplic(LO[nameof(R.GoodLuck)]); // TODO: REMOVE (replaced by InformStage)
 
         _state.Stage = GameStage.After;
         OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
-        _gameActions.InformStage();
+        _actions.InformStage();
 
         SendStatistics();
         AskForPlayerReviews();
@@ -2117,7 +2117,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             msg.AddRange(name, statistic.RightAnswerCount, statistic.WrongAnswerCount, statistic.RightTotal, statistic.WrongTotal);
         }
 
-        _gameActions.SendVisualMessage(msg.Build());
+        _actions.SendVisualMessage(msg.Build());
     }
 
     private void AskForPlayerReviews()
@@ -2126,13 +2126,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.GameResultInfo.Reviews.Clear();
         _state.GameResultInfo.Completed = true;
 
-        _gameActions.AskReview();
+        _actions.AskReview();
         SendReport();
     }
 
     private void WaitRight()
     {
-        _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+        _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
 
         if (_state.Answerer == null)
         {
@@ -2169,11 +2169,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new ArgumentException($"{nameof(_state.StakeRange)} == null", nameof(_state.StakeRange));
         }
 
-        _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
+        _actions.SendMessage(Messages.Cancel, _state.Answerer.Name);
 
         if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         _state.CurPriceRight = _state.StakeRange.Minimum;
@@ -2194,7 +2194,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (player.Flag)
             {
-                _gameActions.SendMessage(Messages.Cancel, player.Name);
+                _actions.SendMessage(Messages.Cancel, player.Name);
             }
         }
     }
@@ -2235,18 +2235,18 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.CurPriceRight = _state.Stake;
         _state.CurPriceWrong = _state.Stake;
 
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+", "ANNOUNCE");
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+", "ANNOUNCE");
 
         var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_state.Players[stakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_state.Stake)}";
 
-        _gameActions.ShowmanReplic(msg.ToString()); // TODO: REMOVE (replaced by SET_CHOOSER + ANNOUNCE message)
+        _actions.ShowmanReplic(msg.ToString()); // TODO: REMOVE (replaced by SET_CHOOSER + ANNOUNCE message)
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10));
     }
 
     private void WaitNext(bool isSelectingStaker)
     {
-        _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
-        _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
+        _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+        _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
         if (!isSelectingStaker && _state.ThemeDeleters != null && _state.ThemeDeleters.IsEmpty())
         {
@@ -2304,14 +2304,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0; {_state.Players.Count - 1}]: {_state.OrderHistory}");
         }
 
-        _gameActions.SendMessage(Messages.Cancel, _state.Players[playerIndex].Name);
+        _actions.SendMessage(Messages.Cancel, _state.Players[playerIndex].Name);
 
         if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
+        _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
         _state.StakeType = _state.StakeModes.HasFlag(StakeModes.Pass) ? StakeMode.Pass : StakeMode.Nominal;
 
         OnDecision();
@@ -2339,7 +2339,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitFirst()
     {
-        _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+        _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
 
         if (_state.ChooserIndex == -1)
         {
@@ -2364,7 +2364,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 return;
             }
 
-            _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
+            _actions.SendMessage(Messages.Cancel, _state.Answerer.Name);
 
             if (string.IsNullOrEmpty(_state.Answerer.Answer))
             {
@@ -2376,7 +2376,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (_state.QuestionPlay.ActiveValidationCount > 0)
             {
-                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name); // Cancel validation
+                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name); // Cancel validation
             }
 
             for (var i = 0; i < _state.Players.Count; i++)
@@ -2387,7 +2387,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                     _state.Players[i].AnswerIsWrong = true;
                 }
 
-                _gameActions.SendMessage(Messages.Cancel, _state.Players[i].Name);
+                _actions.SendMessage(Messages.Cancel, _state.Players[i].Name);
             }
 
             _state.IsWaiting = true;
@@ -2398,11 +2398,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitQuestionAnswererSelection()
     {
-        _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+        _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
 
         if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         var index = _state.Players.SelectRandomOnIndex(index => index != _state.ChooserIndex);
@@ -2420,7 +2420,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (_state.QuestionPlay.UseButtons)
         {
-            _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All); // Timer 1 STOP
+            _actions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All); // Timer 1 STOP
         }
 
         ScheduleExecution(Tasks.MoveNext, 1, force: true);
@@ -2430,16 +2430,16 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitHiddenStake()
     {
-        _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
+        _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
         for (var i = 0; i < _state.Players.Count; i++)
         {
             if (_state.QuestionPlay.AnswererIndicies.Contains(i) && _state.Players[i].PersonalStake == -1)
             {
-                _gameActions.SendMessage(Messages.Cancel, _state.Players[i].Name);
+                _actions.SendMessage(Messages.Cancel, _state.Players[i].Name);
                 _state.Players[i].PersonalStake = 1;
 
-                _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
+                _actions.SendMessageWithArgs(Messages.PersonFinalStake, i);
             }
         }
 
@@ -2510,16 +2510,16 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             SubtractWrongSum(answerer, stake);
         }
 
-        _gameActions.OnPlayerOutcome(_state.AnswererIndex, _state.PlayerIsRight, stake);
-        _gameActions.InformSums();
+        _actions.OnPlayerOutcome(_state.AnswererIndex, _state.PlayerIsRight, stake);
+        _actions.InformSums();
 
-        _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, stake);
+        _actions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, stake);
     }
 
     private void AskHiddenStakes()
     {
         var s = GetRandomString(LO[nameof(R.MakeStake)]);
-        _gameActions.ShowmanReplic(s);
+        _actions.ShowmanReplic(s);
 
         _state.HiddenStakerCount = 0;
         var stakers = new List<(string, StakeSettings)>();
@@ -2531,7 +2531,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 if (_state.Players[i].Sum <= 1)
                 {
                     _state.Players[i].PersonalStake = 1; // only one choice
-                    _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
+                    _actions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                     continue;
                 }
 
@@ -2559,14 +2559,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitDelete()
     {
-        _gameActions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
+        _actions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
 
         if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
+        _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
         _state.ThemeIndexToDelete = _state.TInfo.RoundInfo.SelectRandom(item => item.Name != null);
 
@@ -2587,16 +2587,16 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                     var s = new StringBuilder(_state.Players[i].Name).Append(", ");
                     s.Append(GetRandomString(LO[nameof(R.YouWin)]));
 
-                    _gameActions.ShowmanReplic(s.ToString());
-                    _gameActions.SendMessageWithArgs(Messages.Winner, i);
+                    _actions.ShowmanReplic(s.ToString());
+                    _actions.SendMessageWithArgs(Messages.Winner, i);
                     break;
                 }
             }
         }
         else
         {
-            _gameActions.ShowmanReplic(LO[nameof(R.NoWinner)]);
-            _gameActions.SendMessageWithArgs(Messages.Winner, -1);
+            _actions.ShowmanReplic(LO[nameof(R.NoWinner)]);
+            _actions.SendMessageWithArgs(Messages.Winner, -1);
         }
 
         ScheduleExecution(Tasks.GoodLuck, 20 + Random.Shared.Next(10));
@@ -2614,7 +2614,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (_state.Rules.FalseStart || resumePressing)
         {
-            _gameActions.SendMessage(Messages.Try);
+            _actions.SendMessage(Messages.Try);
         }
 
         SendTryToPlayers();
@@ -2626,11 +2626,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (resumePressing)
         {
-            _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Resume);
+            _actions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Resume);
         }
         else
         {
-            _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Go, maxTime);
+            _actions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Go, maxTime);
         }
 
         _state.Decision = DecisionType.Pressing;
@@ -2644,18 +2644,18 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (_state.Players[i].CanPress)
             {
-                _gameActions.SendMessage(Messages.YouTry, _state.Players[i].Name);
+                _actions.SendMessage(Messages.YouTry, _state.Players[i].Name);
             }
         }
     }
 
     private void WaitChoose()
     {
-        _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+        _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
 
         if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         var canChooseTheme = _state.TInfo.RoundInfo.Select(t => t.Questions.Any(QuestionHelper.IsActive)).ToArray();
@@ -2694,14 +2694,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (authors.Length > 0)
         {
             var msg = new MessageBuilder(Messages.QuestionAuthors).AddRange(authors);
-            _gameActions.SendMessage(msg.ToString());
+            _actions.SendMessage(msg.ToString());
         }
 
         var themeComments = _state.Theme.Info.Comments.Text;
 
         if (themeComments.Length > 0)
         {
-            _gameActions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines()); // TODO: REMOVE: replaced by THEME message
+            _actions.SendMessageWithArgs(Messages.ThemeComments, themeComments.EscapeNewLines()); // TODO: REMOVE: replaced by THEME message
         }
 
         ScheduleExecution(Tasks.MoveNext, 1, arg + 1, force: true);
@@ -2738,13 +2738,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             _state.CurPriceWrong = 0;
         }
 
-        _gameActions.SendVisualMessageWithArgs(Messages.QType, typeName, isDefault, isNoRisk);
+        _actions.SendVisualMessageWithArgs(Messages.QType, typeName, isDefault, isNoRisk);
         ScheduleExecution(Tasks.MoveNext, isDefault ? 1 : 22, force: true);
     }
 
     private void OnUnsupportedQuestionType(string typeName)
     {
-        _gameActions.ShowmanReplicNew(MessageCode.UnsupportedQuestion);
+        _actions.ShowmanReplicNew(MessageCode.UnsupportedQuestion);
         _state.SkipQuestion?.Invoke();
         ScheduleExecution(Tasks.MoveNext, 150, 1);
     }
@@ -2780,7 +2780,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             var subText = text.Substring(_state.TextLength, printingLength);
 
-            _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
+            _actions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
 
             _state.TextLength += printingLength;
         }
@@ -2803,21 +2803,21 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var textTime = 1;
 
-        _gameActions.SendMessageWithArgs(Messages.QuestionEnd); // Should be here because only here question is fully processed
+        _actions.SendMessageWithArgs(Messages.QuestionEnd); // Should be here because only here question is fully processed
 
         var sources = _state.PackageDoc.ResolveSources(_state.Question.Info.Sources);
 
         if (sources.Count > 0)
         {
             var msg = new MessageBuilder(Messages.QuestionSources).AddRange(sources);
-            _gameActions.SendMessage(msg.Build());
+            _actions.SendMessage(msg.Build());
         }
 
         var comments = _state.Question.Info.Comments.Text;
 
         if (comments.Length > 0)
         {
-            _gameActions.SendVisualMessageWithArgs(Messages.QuestionComments, comments.EscapeNewLines());
+            _actions.SendVisualMessageWithArgs(Messages.QuestionComments, comments.EscapeNewLines());
             textTime = GetReadingDurationForTextLength(comments.Length);
             informed = true;
         }
@@ -2844,8 +2844,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var playerAnswer = _state.Answerer?.Answer;
         var answer = string.IsNullOrEmpty(playerAnswer) ? "-" : playerAnswer;
 
-        _gameActions.PlayerReplic(answererIndex, answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
-        _gameActions.OnPlayerAnswer(answererIndex, playerAnswer ?? "");
+        _actions.PlayerReplic(answererIndex, answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
+        _actions.OnPlayerAnswer(answererIndex, playerAnswer ?? "");
 
         if (_state.QuestionPlay.ValidateAfterRightAnswer)
         {
@@ -2912,7 +2912,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _state.IsThinking = false;
 
-        _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Pause, (int)_state.TimeThinking);
+        _actions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Pause, (int)_state.TimeThinking);
 
         _state.IsPlayingMediaPaused = _state.IsPlayingMedia;
         _state.IsPlayingMedia = false;
@@ -2928,21 +2928,21 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void OnStartGame()
     {
-        _gameActions.ShowmanReplicNew(MessageCode.ShowmanGreeting);
+        _actions.ShowmanReplicNew(MessageCode.ShowmanGreeting);
         ScheduleExecution(Tasks.MoveNext, 20, 0);
     }
 
     private void OnAskToSelectQuestion()
     {
-        _gameActions.InformSums();
-        _gameActions.SendVisualMessage(Messages.ShowTable);
+        _actions.InformSums();
+        _actions.SendVisualMessage(Messages.ShowTable);
 
         if (_state.Chooser == null)
         {
             throw new Exception("_data.Chooser == null");
         }
 
-        if (_gameActions.Client.CurrentNode == null)
+        if (_actions.Client.CurrentNode == null)
         {
             throw new Exception("_actor.Client.CurrentServer == null");
         }
@@ -2954,7 +2954,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new Exception($"activeQuestionsCount == 0 {Engine.Stage}");
         }
 
-        _gameActions.ShowmanReplicNew(MessageCode.SelectQuestion, _state.Chooser.Name);
+        _actions.ShowmanReplicNew(MessageCode.SelectQuestion, _state.Chooser.Name);
 
         _state.ThemeIndex = -1;
         _state.QuestionIndex = -1;
@@ -2972,7 +2972,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (_state.IsOralNow)
             {
-                _gameActions.SendMessage(message, _state.ShowMan.Name);
+                _actions.SendMessage(message, _state.ShowMan.Name);
             }
             else if (!_state.Chooser.IsConnected)
             {
@@ -2981,7 +2981,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (CanPlayerAct())
             {
-                _gameActions.SendMessage(message, _state.Chooser.Name);
+                _actions.SendMessage(message, _state.Chooser.Name);
             }
         }
         else
@@ -3002,7 +3002,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new Exception("_data.Chooser == null");
         }
 
-        _gameActions.ShowmanReplicNew(MessageCode.SelectPlayer, _state.Chooser.Name);
+        _actions.ShowmanReplicNew(MessageCode.SelectPlayer, _state.Chooser.Name);
         _state.AnswererIndex = -1;
 
         var waitTime = _state.TimeSettings.PlayerSelection * 10;
@@ -3076,7 +3076,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            _gameActions.SendVisualMessage(Messages.ShowTable); // Everybody will see the table during showman's decision
+            _actions.SendVisualMessage(Messages.ShowTable); // Everybody will see the table during showman's decision
             _state.ChooserIndex = -1;
 
             AskToSelectPlayer(SelectPlayerReason.Chooser, _state.ShowMan.Name);
@@ -3098,7 +3098,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         foreach (var selector in selectors)
         {
-            _gameActions.SendMessage(msg.ToString(), selector);
+            _actions.SendMessage(msg.ToString(), selector);
         }
 
         _state.DecisionMakers.Clear();
@@ -3202,7 +3202,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
-        _gameActions.SendMessage(
+        _actions.SendMessage(
             BuildValidation2Message(answerer.Name, answer, !_state.QuestionPlay.FlexiblePrice),
             _state.ShowMan.Name);
     }
@@ -3244,7 +3244,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             var answerTime = _state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.HiddenAnswering;
 
-            _gameActions.SendMessageWithArgs(Messages.FinalThink, answerTime);
+            _actions.SendMessageWithArgs(Messages.FinalThink, answerTime);
 
             for (var i = 0; i < _state.Players.Count; i++)
             {
@@ -3252,7 +3252,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 {
                     _state.Players[i].Answer = "";
                     _state.Players[i].Flag = true;
-                    _gameActions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.AnswerType);
+                    _actions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.AnswerType);
                 }
             }
 
@@ -3274,11 +3274,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (useButtons)
         {
-            _gameActions.SendMessageWithArgs(Messages.EndTry, _state.AnswererIndex);
+            _actions.SendMessageWithArgs(Messages.EndTry, _state.AnswererIndex);
         }
         else
         {
-            _gameActions.SendMessageWithArgs(Messages.StopPlay);
+            _actions.SendMessageWithArgs(Messages.StopPlay);
         }
 
         var waitAnswerTime = useButtons ? _state.TimeSettings.Answering * 10 : (_state.QuestionPlay.AnswerDuration ?? _state.TimeSettings.SoloAnswering) * 10;
@@ -3291,37 +3291,37 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (_state.IsOralNow)
             {
-                _gameActions.SendMessage(Messages.Answer, _state.ShowMan.Name);
+                _actions.SendMessage(Messages.Answer, _state.ShowMan.Name);
             }
 
             if (CanPlayerAct())
             {
-                _gameActions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
+                _actions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
             }
             else
             {
-                _gameActions.SendMessage(Messages.OralAnswer, _state.Answerer.Name);
+                _actions.SendMessage(Messages.OralAnswer, _state.Answerer.Name);
             }
         }
         else
         {
             if (useClientManagedAnswer)
             {
-                _gameActions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
+                _actions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
             }
             else if (_state.IsOralNow)
             {
                 // Showman accepts answer orally
                 SendAnswersInfoToShowman(null);
-                _gameActions.SendMessage(Messages.OralAnswer, _state.Answerer.Name);
+                _actions.SendMessage(Messages.OralAnswer, _state.Answerer.Name);
             }
             else // The only place where we do not check CanPlayerAct()
             {
-                _gameActions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
+                _actions.AskAnswer(_state.Answerer.Name, _state.QuestionPlay.AnswerType);
             }
         }
 
-        _gameActions.ShowmanReplicNew(useAnswerOptions ? MessageCode.SelectAnswerOption : MessageCode.Answer, _state.Answerer.Name);
+        _actions.ShowmanReplicNew(useAnswerOptions ? MessageCode.SelectAnswerOption : MessageCode.Answer, _state.Answerer.Name);
 
         _state.Answerer.Answer = "";
 
@@ -3365,7 +3365,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             .AddRange(wrongAnswers)
             .Build();
 
-        _gameActions.SendMessage(message, _state.ShowMan.Name);
+        _actions.SendMessage(message, _state.ShowMan.Name);
     }
 
     private void InformWrongTries()
@@ -3379,7 +3379,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 continue;
             }
 
-            _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, playerIndex);
+            _actions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, playerIndex);
         }
     }
 
@@ -3428,7 +3428,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void RequestForThemeDelete()
     {
-        _gameActions.ShowmanReplicNew(MessageCode.DeleteTheme, _state.ActivePlayer.Name);
+        _actions.ShowmanReplicNew(MessageCode.DeleteTheme, _state.ActivePlayer.Name);
 
         var message = string.Join(Message.ArgsSeparator, Messages.Choose, 2);
         _state.IsOralNow = _state.IsOral && _state.ActivePlayer.IsHuman;
@@ -3437,7 +3437,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(message, _state.ShowMan.Name);
+            _actions.SendMessage(message, _state.ShowMan.Name);
         }
         else if (!_state.ActivePlayer.IsConnected)
         {
@@ -3446,7 +3446,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (CanPlayerAct())
         {
-            _gameActions.SendMessage(message, _state.ActivePlayer.Name);
+            _actions.SendMessage(message, _state.ActivePlayer.Name);
         }
 
         _state.ThemeIndexToDelete = -1;
@@ -3509,7 +3509,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 }
 
                 var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(candidatesAll.Select(i => (object)i));
-                _gameActions.SendMessage(passMsg.ToString());
+                _actions.SendMessage(passMsg.ToString());
 
                 if (TryDetectStakesWinner())
                 {
@@ -3639,7 +3639,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 if (activePlayer.StakeMaking)
                 {
                     activePlayer.StakeMaking = false;
-                    _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
+                    _actions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
                 }
 
                 if (TryDetectStakesWinner())
@@ -3658,7 +3658,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 _state.Stakes.StakerIndex = playerIndex;
                 _state.Stake = cost;
-                _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
+                _actions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
                 ScheduleExecution(Tasks.AskStake, 5, force: true);
                 return;
             }
@@ -3728,7 +3728,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void AskToMakeStake(StakeReason reason, string name, StakeSettings limit)
     {
-        _gameActions.ShowmanReplicNew(MessageCode.MakeStake, name);
+        _actions.ShowmanReplicNew(MessageCode.MakeStake, name);
         AskToMakeStake(reason, new[] { (name, limit) });
     }
 
@@ -3743,13 +3743,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (CanPlayerAct())
             {
-                _gameActions.SendMessage(stakeMessage.Build(), name);
+                _actions.SendMessage(stakeMessage.Build(), name);
             }
 
             if (_state.IsOralNow)
             {
                 stakeMessage.Add(name);
-                _gameActions.SendMessage(stakeMessage.Build(), _state.ShowMan.Name);
+                _actions.SendMessage(stakeMessage.Build(), _state.ShowMan.Name);
             }
 
             _state.DecisionMakers.Add(name);
@@ -3808,7 +3808,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
         
-        _gameActions.SendMessageWithArgs(Messages.Appellation, '+');
+        _actions.SendMessageWithArgs(Messages.Appellation, '+');
 
         var appelaer = _state.Players[_state.AppelaerIndex];
         var isAppellationForRightAnswer = _state.AppellationCallerIndex == -1;
@@ -3821,8 +3821,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             ? LO[nameof(R.IsApellating)]
             : string.Format(LO[nameof(R.IsConsideringWrong)], appelaer.Name);
 
-        _gameActions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}"); // TODO: REMOVE (replaced by Validation2Message)
-        _gameActions.ShowmanReplicNew(isAppellationForRightAnswer ? MessageCode.AppellationFor : MessageCode.AppellationAgainst, appellationSource, appelaer);
+        _actions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}"); // TODO: REMOVE (replaced by Validation2Message)
+        _actions.ShowmanReplicNew(isAppellationForRightAnswer ? MessageCode.AppellationFor : MessageCode.AppellationAgainst, appellationSource, appelaer);
 
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
 
@@ -3852,13 +3852,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 _state.Players[i].AppellationFlag = false;
                 _state.AppellationNegativeVoteCount++;
-                _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
+                _actions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
             }
             else if (_state.Players[i].IsConnected)
             {
                 _state.AppellationAwaitedVoteCount++;
                 _state.Players[i].AppellationFlag = true;
-                _gameActions.SendMessage(validation2Message, _state.Players[i].Name);
+                _actions.SendMessage(validation2Message, _state.Players[i].Name);
             }
         }
 
@@ -3885,13 +3885,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (votingForRight && positiveVoteCount <= negativeVoteCount || !votingForRight && positiveVoteCount >= negativeVoteCount)
             {
-                _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
+                _actions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
                 _tasksHistory.AddLogEntry($"CheckAppellation denied and resumed normally ({_taskRunner.PrintOldTasks()})");
                 return;
             }
 
             // Commit appellation
-            _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
+            _actions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
 
             if (votingForRight)
             {
@@ -3900,7 +3900,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             UpdatePlayersSumsAfterAppellation(votingForRight);
 
-            _gameActions.InformSums();
+            _actions.InformSums();
 
             _tasksHistory.AddLogEntry($"CheckAppellation resumed normally ({_taskRunner.PrintOldTasks()})");
         }
@@ -3908,7 +3908,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (_state.QuestionPlay.AppellationIndex >= _state.QuestionPlay.Appellations.Count || !ProcessNextAppellationRequest(false))
             {
-                _gameActions.SendMessageWithArgs(Messages.Appellation, '-');
+                _actions.SendMessageWithArgs(Messages.Appellation, '-');
                 ResumeExecution(40);
             }
             else
@@ -4018,7 +4018,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                         if (Engine.CanMoveBack) // Not the beginning of a round
                         {
                             _state.ChooserIndex = index;
-                            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+                            _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
                         }
                     }
                 }
@@ -4087,19 +4087,19 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (right.Any())
         {
             var rightMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Right).AddRange(right);
-            _gameActions.SendMessage(rightMsg.ToString());
+            _actions.SendMessage(rightMsg.ToString());
         }
 
         if (wrong.Any())
         {
             var wrongMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Wrong).AddRange(wrong);
-            _gameActions.SendMessage(wrongMsg.ToString());
+            _actions.SendMessage(wrongMsg.ToString());
         }
 
         if (passed.Any())
         {
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passed);
-            _gameActions.SendMessage(passMsg.ToString());
+            _actions.SendMessage(passMsg.ToString());
         }
     }
 
@@ -4110,7 +4110,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.IsWaiting = isWaiting;
         _state.Decision = decision;
 
-        _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, time, person);
+        _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, time, person);
     }
 
     private void OnPackage(Package package, int stage)
@@ -4127,7 +4127,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 informed = true;
                 var msg = new MessageBuilder(Messages.PackageAuthors).AddRange(authors);
-                _gameActions.SendVisualMessage(msg);
+                _actions.SendVisualMessage(msg);
                 baseTime = 40;
             }
             else
@@ -4160,7 +4160,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 }
             }
 
-            _gameActions.SendVisualMessage(messageBuilder);
+            _actions.SendVisualMessage(messageBuilder);
             baseTime = 40;
 
             var sources = _state.PackageDoc.ResolveSources(package.Info.Sources);
@@ -4168,12 +4168,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (sources.Count > 0)
             {
                 var msg = new MessageBuilder(Messages.PackageSources).AddRange(sources);
-                _gameActions.SendMessage(msg.ToString());
+                _actions.SendMessage(msg.ToString());
             }
 
             if (!string.IsNullOrWhiteSpace(package.Date))
             {
-                _gameActions.SendMessageWithArgs(Messages.PackageDate, package.Date);
+                _actions.SendMessageWithArgs(Messages.PackageDate, package.Date);
             }
         }
 
@@ -4182,7 +4182,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (package.Info.Comments.Text.Length > 0 && package.Name != Constants.RandomIndicator)
             {
                 informed = true;
-                _gameActions.SendVisualMessageWithArgs(Messages.PackageComments, package.Info.Comments.Text.EscapeNewLines());
+                _actions.SendVisualMessageWithArgs(Messages.PackageComments, package.Info.Comments.Text.EscapeNewLines());
 
                 baseTime = GetReadingDurationForTextLength(package.Info.Comments.Text.Length);
             }
@@ -4196,7 +4196,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (!string.IsNullOrWhiteSpace(package.Restriction))
             {
-                _gameActions.SendMessageWithArgs(Messages.PackageRestrictions, package.Restriction);
+                _actions.SendMessageWithArgs(Messages.PackageRestrictions, package.Restriction);
             }
 
             stage++;
@@ -4224,7 +4224,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (stage == 1)
         {
             informed = true;
-            _gameActions.InformSums();
+            _actions.InformSums();
 
             var roundIndex = Engine.RoundIndex;
             var roundName = round.Name;
@@ -4232,8 +4232,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             _state.Stage = GameStage.Round;
             OnStageChanged(GameStages.Round, roundName, roundIndex + 1, _state.Rounds.Length);
 
-            _gameActions.InformRound(roundName, roundIndex, _state.RoundStrategy);
-            _gameActions.InformRoundContent();
+            _actions.InformRound(roundName, roundIndex, _state.RoundStrategy);
+            _actions.InformRoundContent();
             _state.InformStages |= InformStages.RoundContent;
 
             var authors = _state.PackageDoc.ResolveAuthors(round.Info.Authors);
@@ -4241,7 +4241,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (authors.Length > 0)
             {
                 var msg = new MessageBuilder(Messages.RoundAuthors).AddRange(authors);
-                _gameActions.SendMessage(msg.ToString());
+                _actions.SendMessage(msg.ToString());
             }
 
             var sources = _state.PackageDoc.ResolveSources(round.Info.Sources);
@@ -4249,7 +4249,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (sources.Count > 0)
             {
                 var msg = new MessageBuilder(Messages.RoundSources).AddRange(sources);
-                _gameActions.SendMessage(msg.ToString());
+                _actions.SendMessage(msg.ToString());
             }
         }
 
@@ -4258,7 +4258,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (round.Info.Comments.Text.Length > 0)
             {
                 informed = true;
-                _gameActions.SendVisualMessageWithArgs(Messages.RoundComments, round.Info.Comments.Text.EscapeNewLines());
+                _actions.SendVisualMessageWithArgs(Messages.RoundComments, round.Info.Comments.Text.EscapeNewLines());
 
                 baseTime = GetReadingDurationForTextLength(round.Info.Comments.Text.Length);
             }
@@ -4281,7 +4281,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 {
                     informed = true;
 
-                    _gameActions.SendMessageWithArgs(Messages.Ads, ad);
+                    _actions.SendMessageWithArgs(Messages.Ads, ad);
 
 #if !DEBUG
                     // Advertisement could not be skipped
@@ -4322,7 +4322,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.AnswererIndex = _state.ChooserIndex;
         _state.QuestionPlay.SetSingleAnswerer(_state.ChooserIndex);
 
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, '+');
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, '+');
 
         ScheduleExecution(Tasks.MoveNext, 5);
     }
@@ -4373,9 +4373,9 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             _state.ChooserIndex = _state.AnswererIndex = playerIndex;
             _state.QuestionPlay.SetSingleAnswerer(playerIndex);
-            _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+            _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
 
-            _gameActions.ShowmanReplic($"{_state.Answerer.Name}, {LO[nameof(R.CatIsYours)]}!");
+            _actions.ShowmanReplic($"{_state.Answerer.Name}, {LO[nameof(R.CatIsYours)]}!");
             ScheduleExecution(Tasks.MoveNext, 10);
         }
         else
@@ -4406,12 +4406,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.QuestionPlay.SetMultipleAnswerers(allConnectedIndicies);
         
         var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(allConnectedIndicies.Select(i => (object)i));
-        _gameActions.SendMessage(msg.ToString());
+        _actions.SendMessage(msg.ToString());
 
         if (allDisconnectedIndicies.Count > 0)
         {
             msg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(allDisconnectedIndicies);
-            _gameActions.SendMessage(msg.ToString());
+            _actions.SendMessage(msg.ToString());
         }
 
         ScheduleExecution(Tasks.MoveNext, 5);
@@ -4420,7 +4420,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void OnButtonPressStart()
     {
         _state.Decision = DecisionType.Pressing;
-        _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
+        _actions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
 
         SendTryToPlayers();
     }
@@ -4432,12 +4432,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             themeName = _state.Theme?.Name ?? "";
         }
 
-        _gameActions.SendMessageWithArgs(Messages.QuestionCaption, themeName);
+        _actions.SendMessageWithArgs(Messages.QuestionCaption, themeName);
 
         var s = new StringBuilder(LO[nameof(R.Theme)]).Append(": ").Append(themeName);
 
-        _gameActions.ShowmanReplic(s.ToString()); // TODO: Remove (replaced by MessageCode.Theme)
-        _gameActions.ShowmanReplicNew(MessageCode.Theme, themeName);
+        _actions.ShowmanReplic(s.ToString()); // TODO: Remove (replaced by MessageCode.Theme)
+        _actions.ShowmanReplicNew(MessageCode.Theme, themeName);
 
         ScheduleExecution(Tasks.MoveNext, 30);
     }
@@ -4446,7 +4446,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void OnSimpleAnswer(string answer)
     {
         var normalizedAnswer = answer.LeaveFirst(MaxAnswerLength);
-        _gameActions.OnRightAnswer(AnswerType.Text, normalizedAnswer);
+        _actions.OnRightAnswer(AnswerType.Text, normalizedAnswer);
 
         var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length)
             + _state.TimeSettings.Reflection * 10;
@@ -4467,17 +4467,17 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (answerIndex > -1)
             {
-                _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Right);
+                _actions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Right);
             }
         }
 
-        _gameActions.SendMessageWithArgs(Messages.RightAnswerStart, ContentTypes.Text, answer);
+        _actions.SendMessageWithArgs(Messages.RightAnswerStart, ContentTypes.Text, answer);
     }
 
     internal void OnRightAnswerOption(string rightOptionLabel)
     {
         OnRightAnswerOptionCore(rightOptionLabel);
-        _gameActions.OnRightAnswer(AnswerType.Text, rightOptionLabel);
+        _actions.OnRightAnswer(AnswerType.Text, rightOptionLabel);
         var answerTime = Math.Max(2, _state.TimeSettings.Reflection) * 10;
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
@@ -4501,7 +4501,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnRightAnswerPoint(string rightAnswer)
     {
-        _gameActions.OnRightAnswer(AnswerType.Point, rightAnswer);
+        _actions.OnRightAnswer(AnswerType.Point, rightAnswer);
         var answerTime = Math.Max(_state.TimeSettings.Image, _state.TimeSettings.Reflection) * 10;
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
@@ -4532,7 +4532,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (_state.Stage == GameStage.Round && roundDuration >= _state.TimeSettings.Round * 10)
         {
             // Round timeout
-            _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
+            _actions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
             return true;
         }
 
@@ -4619,10 +4619,10 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 outcome = _state.CurPriceWrong;
             }
 
-            _gameActions.OnPlayerOutcome(answererIndex, isRight, outcome);
+            _actions.OnPlayerOutcome(answererIndex, isRight, outcome);
         }
 
-        _gameActions.InformSums();
+        _actions.InformSums();
     }
 
     // TODO: OnAnnouncePrice and OnSelectPrice should utilize the same selection strategy
@@ -4634,14 +4634,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (availableRange.Maximum == 0)
         {
             s.Append(LO[nameof(R.MinMaxChoice)]);
-            _gameActions.ShowmanReplic(s.ToString());
-            _gameActions.SendMessageWithArgs(Messages.QuestionPriceRange, 0);
+            _actions.ShowmanReplic(s.ToString());
+            _actions.SendMessageWithArgs(Messages.QuestionPriceRange, 0);
         }
         else if (availableRange.Minimum == availableRange.Maximum)
         {
             s.Append(availableRange.Minimum);
-            _gameActions.ShowmanReplic(s.ToString());
-            _gameActions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum);
+            _actions.ShowmanReplic(s.ToString());
+            _actions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum);
         }
         else
         {
@@ -4651,14 +4651,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                     $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.UpTo)]} {Notion.FormatNumber(availableRange.Maximum)} " +
                     $"{LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(availableRange.Step)} ({LO[nameof(R.YourChoice)]})");
 
-                _gameActions.ShowmanReplic(s.ToString());
-                _gameActions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum, availableRange.Step);
+                _actions.ShowmanReplic(s.ToString());
+                _actions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum, availableRange.Step);
             }
             else
             {
                 s.Append($"{Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.Or)]} {Notion.FormatNumber(availableRange.Maximum)} ({LO[nameof(R.YourChoice)]})");
-                _gameActions.ShowmanReplic(s.ToString());
-                _gameActions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum);
+                _actions.ShowmanReplic(s.ToString());
+                _actions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum);
             }
         }
 
@@ -4673,7 +4673,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 _state.CurPriceRight = _minRoundPrice;
                 _state.CurPriceWrong = _state.CurPriceRight;
-                _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
+                _actions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
                 ScheduleExecution(Tasks.MoveNext, 1);
             }
             else
@@ -4687,7 +4687,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         else if (availableRange.Minimum == availableRange.Maximum)
         {
             _state.CurPriceWrong = _state.CurPriceRight = availableRange.Minimum;
-            _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
+            _actions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight);
             ScheduleExecution(Tasks.MoveNext, 1);
         }
         else
@@ -4731,7 +4731,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (passes.Count > 0)
         {
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passes);
-            _gameActions.SendMessage(passMsg.ToString());
+            _actions.SendMessage(passMsg.ToString());
         }
 
         _state.Stake = -1;
@@ -4786,12 +4786,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(answerers.Select(i => (object)i));
-        _gameActions.SendMessage(msg.ToString());
+        _actions.SendMessage(msg.ToString());
 
         if (passes.Count > 0)
         {
             var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passes);
-            _gameActions.SendMessage(passMsg.ToString());
+            _actions.SendMessage(passMsg.ToString());
         }
 
         _state.QuestionPlay.SetMultipleAnswerers(answerers);
@@ -4819,18 +4819,18 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 Notion.FormatNumber(_state.CurPriceWrong),
                 factor);
 
-            _gameActions.ShowmanReplic($"{_state.Chooser!.Name}, {replic}");
+            _actions.ShowmanReplic($"{_state.Chooser!.Name}, {replic}");
         }
 
         var delay = 20;
 
         if (factor != 1)
         {
-            _gameActions.ShowmanReplicNew(MessageCode.PriceMultiplication, factor);
+            _actions.ShowmanReplicNew(MessageCode.PriceMultiplication, factor);
             delay += 20;
         }
 
-        _gameActions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight, _state.CurPriceWrong);
+        _actions.SendMessageWithArgs(Messages.PersonStake, _state.AnswererIndex, 1, _state.CurPriceRight, _state.CurPriceWrong);
 
         ScheduleExecution(Tasks.MoveNext, delay);
     }
@@ -4842,13 +4842,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new InvalidOperationException("_data.Answerer == null");
         }
 
-        _gameActions.ShowmanReplicNew(MessageCode.IncomeWithoutAnswering);
-        _gameActions.OnPlayerOutcome(_state.AnswererIndex, true, _state.CurPriceRight);
+        _actions.ShowmanReplicNew(MessageCode.IncomeWithoutAnswering);
+        _actions.OnPlayerOutcome(_state.AnswererIndex, true, _state.CurPriceRight);
 
         AddRightSum(_state.Answerer, _state.CurPriceRight);
         _state.ChooserIndex = _state.AnswererIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
-        _gameActions.InformSums();
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+        _actions.InformSums();
 
         _state.SkipQuestion?.Invoke();
         ScheduleExecution(Tasks.MoveNext, 20, 1);
@@ -4856,7 +4856,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnAnswerOptions()
     {
-        _gameActions.InformLayout();
+        _actions.InformLayout();
         _state.InformStages |= InformStages.Layout;
         _state.LastVisualMessage = null;
         _state.ComplexVisualState = new IReadOnlyList<string>[1 + (_state.QuestionPlay.AnswerOptions?.Length ?? 0)];
@@ -4864,7 +4864,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnOverlayLayout()
     {
-        _gameActions.InformLayout();
+        _actions.InformLayout();
         _state.InformStages |= InformStages.Layout;
     }
 
@@ -4932,7 +4932,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             contentDuration = 10;
         }
 
-        _gameActions.SendContent(
+        _actions.SendContent(
             ContentPlacements.Screen,
             optionIndex + 1,
             answerOption.Label,
@@ -4940,7 +4940,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             "",
             contentValue);
 
-        _gameActions.SendMessage(messageBuilder.ToString());
+        _actions.SendMessage(messageBuilder.ToString());
 
         if (_state.ComplexVisualState != null && optionIndex + 1 < _state.ComplexVisualState.Length)
         {
@@ -5020,8 +5020,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
 
             var message = messageBuilder.ToString();
-            _gameActions.SendMessage(message);
-            _gameActions.SendContent(placement, 0, "", content);
+            _actions.SendMessage(message);
+            _actions.SendContent(placement, 0, "", content);
             visualState.Add(message);
 
             contentTime = Math.Max(contentTime, contentListDuration);
@@ -5110,7 +5110,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         return statistic;
     }
 
-    internal void OnNumericAnswer() => _gameActions.InformAnswerDeviation(_state.QuestionPlay.AnswerDeviation);
+    internal void OnNumericAnswer() => _actions.InformAnswerDeviation(_state.QuestionPlay.AnswerDeviation);
 
     internal void OnQuestionStart()
     {
@@ -5118,7 +5118,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (_state.Settings.AppSettings.HintShowman && _state.QuestionPlay.AnswerType != AnswerType.Point)
         {
             // TODO: use SendAnswerInfoToShowman()
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, _state.QuestionPlay.RightAnswers.FirstOrDefault() ?? ""), _state.ShowMan.Name);
+            _actions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, _state.QuestionPlay.RightAnswers.FirstOrDefault() ?? ""), _state.ShowMan.Name);
         }
 
         SendQuestionAnswersToShowman();
@@ -5127,7 +5127,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (question != null && question.Info.ShowmanComments != null && question.Info.ShowmanComments.Text.Length > 0)
         {
-            _gameActions.SendVisualMessageWithArgs(Messages.ShowmanComments, question.Info.ShowmanComments.Text.EscapeNewLines());
+            _actions.SendVisualMessageWithArgs(Messages.ShowmanComments, question.Info.ShowmanComments.Text.EscapeNewLines());
         }
     }
 }

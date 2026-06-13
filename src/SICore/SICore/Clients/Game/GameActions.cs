@@ -492,10 +492,10 @@ public sealed class GameActions
 
     internal void InformMediaPreloadProgress(string sender, int progress) => SendMessageWithArgs(Messages.MediaPreloadProgress, sender, progress);
 
-    internal void InformTimerGameStart(int automaticGameStartDuration)
+    internal void InformTimerGameStart(int automaticGameStartDuration, string person = NetworkConstants.Everybody)
     {
-        SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, automaticGameStartDuration, -2); // deprecaated
-        SendMessageWithArgs(Messages.TimerGameStart, automaticGameStartDuration);
+        SendMessageToWithArgs(person, Messages.Timer, 2, MessageParams.Timer_Go, automaticGameStartDuration, -2); // deprecated
+        SendMessageToWithArgs(person, Messages.TimerGameStart, automaticGameStartDuration);
     }
 
     internal void OnArenaMode() => SendMessage(Messages.ArenaMode);

@@ -31,7 +31,7 @@ public sealed class Game : MessageHandler
     /// Informs the hosting environment that a person with provided name should be disconnected.
     /// </summary>
     public event Action<Game, string>? DisconnectRequested;
-    private readonly GameActions _gameActions;
+    private readonly GameActions _actions;
 
     private IPrimaryNode Master => (IPrimaryNode)_client.Node;
 
@@ -63,7 +63,7 @@ public sealed class Game : MessageHandler
         IAvatarHelper avatarHelper)
         : base(client)
     {
-        _gameActions = actions;
+        _actions = actions;
         _controller = controller;
         LO = localizer;
         _state = state;
@@ -79,7 +79,7 @@ public sealed class Game : MessageHandler
         Master.Unbanned += Master_Unbanned;
     }
 
-    private void Master_Unbanned(string clientId) => _gameActions.SendMessageWithArgs(Messages.Unbanned, clientId);
+    private void Master_Unbanned(string clientId) => _actions.SendMessageWithArgs(Messages.Unbanned, clientId);
 
     protected override void Dispose(bool disposing)
     {
@@ -128,7 +128,7 @@ public sealed class Game : MessageHandler
 
     private void InformGameMetadata(string person)
     {
-        _gameActions.SendMessageToWithArgs(
+        _actions.SendMessageToWithArgs(
             person,
             Messages.GameMetadata,
             _state.GameName,
@@ -136,7 +136,7 @@ public sealed class Game : MessageHandler
             _controller.Engine.ContactUri,
             _state.Settings.NetworkVoiceChat);
 
-        _gameActions.SendMessageToWithArgs(person, Messages.Hostname, _state.HostName ?? "");
+        _actions.SendMessageToWithArgs(person, Messages.Hostname, _state.HostName ?? "");
     }
 
     private void OnSetOptions(Message message, string[] mparams)
@@ -275,13 +275,13 @@ public sealed class Game : MessageHandler
 
         if (changed)
         {
-            _gameActions.SendMessage(msg.Build());
+            _actions.SendMessage(msg.Build());
         }
     }
 
     private void InformSettings(string person)
     {
-        _gameActions.SendMessageToWithArgs(
+        _actions.SendMessageToWithArgs(
             person,
             Messages.ComputerAccounts,
             string.Join(Message.ArgsSeparator, _defaultPlayers.Select(p => p.Name)));
@@ -290,16 +290,16 @@ public sealed class Game : MessageHandler
         var rules = _state.Rules;
 
         var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
-        _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
+        _actions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
 
-        _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, _state.JoinMode);
+        _actions.SendMessageToWithArgs(person, Messages.SetJoinMode, _state.JoinMode);
 
         if (_state.HiddenPersons)
         {
-            _gameActions.OnArenaMode();
+            _actions.OnArenaMode();
         }
 
-        _gameActions.SendMessageToWithArgs(
+        _actions.SendMessageToWithArgs(
             person,
             Messages.Options2,
             "",
@@ -331,7 +331,7 @@ public sealed class Game : MessageHandler
                 messageBuilder.Add(item.Key).Add(item.Value);
             }
 
-            _gameActions.SendMessage(messageBuilder.Build(), person);
+            _actions.SendMessage(messageBuilder.Build(), person);
         }
     }
 
@@ -402,7 +402,7 @@ public sealed class Game : MessageHandler
 
         var msg = info.ToString()[..(info.Length - 1)];
 
-        _gameActions.SendMessage(msg, person);
+        _actions.SendMessage(msg, person);
     }
 
     private static void AppendAccountExt(ViewerAccount account, StringBuilder info)
@@ -670,7 +670,7 @@ public sealed class Game : MessageHandler
                             res.Append(Message.ArgsSeparatorChar).Append('-');
                         }
 
-                        _gameActions.SendMessage(res.ToString(), message.Sender);
+                        _actions.SendMessage(res.ToString(), message.Sender);
 
                         #endregion
                         break;
@@ -841,7 +841,7 @@ public sealed class Game : MessageHandler
         }
 
         _state.JoinMode = joinMode;
-        _gameActions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
+        _actions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
     }
 
     private void OnMark(string[] args)
@@ -881,7 +881,7 @@ public sealed class Game : MessageHandler
     private void OnPin(string hostName)
     {
         var pin = Controller.PinHelper?.GeneratePin() ?? 0;
-        _gameActions.SendMessageToWithArgs(hostName, Messages.Pin, pin);
+        _actions.SendMessageToWithArgs(hostName, Messages.Pin, pin);
     }
 
     private void OnSelectedPlayer(int playerIndex, string messageSender)
@@ -910,7 +910,7 @@ public sealed class Game : MessageHandler
 
                 if (_state.IsOralNow)
                 {
-                    _gameActions.SendMessage(
+                    _actions.SendMessage(
                         Messages.Cancel,
                         messageSender == _state.ShowMan.Name ? _state.Chooser.Name : _state.ShowMan.Name);
                 }
@@ -960,12 +960,12 @@ public sealed class Game : MessageHandler
 
         if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         if (Controller.CanPlayerAct())
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+            _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
         }
 
         _controller.Stop(StopReason.Decision);
@@ -996,17 +996,17 @@ public sealed class Game : MessageHandler
 
             if (_state.IsOralNow)
             {
-                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
 
             if (_state.Chooser != null && Controller.CanPlayerAct())
             {
-                _gameActions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+                _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
             }
         }
 
         _state.ChooserIndex = playerIndex;
-        _gameActions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "+");
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "+");
 
         if (isChoosingNow)
         {
@@ -1014,7 +1014,7 @@ public sealed class Game : MessageHandler
         }
     }
 
-    private void OnMediaLoaded(Message message) => _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.MediaLoaded, message.Sender);
+    private void OnMediaLoaded(Message message) => _actions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.MediaLoaded, message.Sender);
 
     private void OnMediaPreloadProgress(Message message, string[] args)
     {
@@ -1023,7 +1023,7 @@ public sealed class Game : MessageHandler
             return;
         }
         
-        _gameActions.InformMediaPreloadProgress(message.Sender, progress);
+        _actions.InformMediaPreloadProgress(message.Sender, progress);
     }
 
     private void OnToggle(Message message, string[] args)
@@ -1064,7 +1064,7 @@ public sealed class Game : MessageHandler
 
             var oldPrice = question.Price;
             question.Price = Question.InvalidPrice;
-            _gameActions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, Question.InvalidPrice);
+            _actions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, Question.InvalidPrice);
         }
         else
         {
@@ -1091,17 +1091,17 @@ public sealed class Game : MessageHandler
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
+            _actions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
+            _actions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
 
-        _gameActions.SendMessageToWithArgs(clientName, Messages.YouAreKicked);
+        _actions.SendMessageToWithArgs(clientName, Messages.YouAreKicked);
         OnDisconnectRequested(clientName);
 
         var clientId = Master.Kick(clientName);
@@ -1110,11 +1110,11 @@ public sealed class Game : MessageHandler
         {
             if (!_state.HiddenPersons)
             {
-                _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
+                _actions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
             }
             else
             {
-                _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.Banned, clientId, clientName);
+                _actions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.Banned, clientId, clientName);
             }
         }
     }
@@ -1135,17 +1135,17 @@ public sealed class Game : MessageHandler
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
+            _actions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickYourSelf);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
+            _actions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotKickBots);
             return;
         }
 
-        _gameActions.SendMessageToWithArgs(clientName, Messages.YouAreKicked);
+        _actions.SendMessageToWithArgs(clientName, Messages.YouAreKicked);
         OnDisconnectRequested(clientName);
 
         var clientId = Master.Kick(clientName, true);
@@ -1154,11 +1154,11 @@ public sealed class Game : MessageHandler
         {
             if (!_state.HiddenPersons)
             {
-                _gameActions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
+                _actions.SendMessageWithArgs(Messages.Banned, clientId, clientName);
             }
             else
             {
-                _gameActions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.Banned, clientId, clientName);
+                _actions.SendMessageToWithArgs(_state.ShowMan.Name, Messages.Banned, clientId, clientName);
             }
         }
     }
@@ -1179,13 +1179,13 @@ public sealed class Game : MessageHandler
 
         if (person.Name == message.Sender)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToYourself);
+            _actions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToYourself);
             return;
         }
 
         if (!person.IsHuman)
         {
-            _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToBots);
+            _actions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.CannotSetHostToBots);
             return;
         }
 
@@ -1294,7 +1294,7 @@ public sealed class Game : MessageHandler
                         _state.HiddenStakerCount--;
                         _state.StakeLimits.Remove(stakerName);
 
-                        _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
+                        _actions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                         break;
                     }
                 }
@@ -1313,12 +1313,12 @@ public sealed class Game : MessageHandler
             {
                 if (Controller.CanPlayerAct())
                 {
-                    _gameActions.SendMessage(Messages.Cancel, stakerName);
+                    _actions.SendMessage(Messages.Cancel, stakerName);
                 }
             }
             else
             {
-                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
         }
     }
@@ -1335,7 +1335,7 @@ public sealed class Game : MessageHandler
     {
         Inform(person);
         InformReady(person);
-        _gameActions.InformSums(person);
+        _actions.InformSums(person);
         InformGameStage(person);
     }
 
@@ -1350,7 +1350,7 @@ public sealed class Game : MessageHandler
         {
             if (item.Ready)
             {
-                _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", person);
+                _actions.SendMessage($"{Messages.Ready}\n{item.Name}", person);
             }
         }
     }
@@ -1358,11 +1358,11 @@ public sealed class Game : MessageHandler
     private void InformGameStage(string person)
     {
         var roundIndex = _controller.Engine.RoundIndex;
-        _gameActions.InformStageInfo(person, roundIndex);
+        _actions.InformStageInfo(person, roundIndex);
 
         if ((_state.InformStages & InformStages.RoundNames) > 0)
         {
-            _gameActions.InformRoundsNames(person);
+            _actions.InformRoundsNames(person);
         }
 
         // To save traffic, do not send round content info on reconnection
@@ -1373,38 +1373,38 @@ public sealed class Game : MessageHandler
 
         if ((_state.InformStages & InformStages.RoundThemesNames) > 0)
         {
-            _gameActions.InformRoundThemesNames(person, _state.ThemesPlayMode);
+            _actions.InformRoundThemesNames(person, _state.ThemesPlayMode);
         }
 
         if ((_state.InformStages & InformStages.RoundThemesComments) > 0)
         {
-            _gameActions.InformRoundThemesComments(person);
+            _actions.InformRoundThemesComments(person);
         }
 
         if ((_state.InformStages & InformStages.Table) > 0)
         {
-            _gameActions.InformTable(person);
+            _actions.InformTable(person);
         }
 
         if ((_state.InformStages & InformStages.Theme) > 0)
         {
-            _gameActions.InformTheme(person);
+            _actions.InformTheme(person);
         }
 
         if ((_state.InformStages & InformStages.Question) > 0 && _state.Question != null)
         {
-            _gameActions.SendMessageToWithArgs(person, Messages.Choice, _state.ThemeIndex, _state.QuestionIndex, _state.Question.Price);
+            _actions.SendMessageToWithArgs(person, Messages.Choice, _state.ThemeIndex, _state.QuestionIndex, _state.Question.Price);
         }
 
         if ((_state.InformStages & InformStages.Layout) > 0)
         {
-            _gameActions.InformLayout(person);
+            _actions.InformLayout(person);
             // TODO: send already displayed answer options and their state
         }
 
         if ((_state.InformStages & InformStages.ContentShape) > 0)
         {
-            _gameActions.SendContentShape(person);
+            _actions.SendContentShape(person);
             // TODO: send already displayed content part
         }
 
@@ -1414,7 +1414,7 @@ public sealed class Game : MessageHandler
 
             if (leftTimeBeforeStart > 0)
             {
-                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, MessageParams.Timer_Go, leftTimeBeforeStart, -2), person);
+                _actions.InformTimerGameStart(leftTimeBeforeStart, person);
             }
         }
 
@@ -1430,21 +1430,21 @@ public sealed class Game : MessageHandler
 
                 foreach (var visualMessage in visualMessageList)
                 {
-                    _gameActions.SendMessage(visualMessage, person);
+                    _actions.SendMessage(visualMessage, person);
                 }
             }
         }
         else if (!string.IsNullOrEmpty(_state.LastVisualMessage))
         {
-            _gameActions.SendMessage(_state.LastVisualMessage, person);
+            _actions.SendMessage(_state.LastVisualMessage, person);
         }
 
         if (_state.Stage == GameStage.Round) // TODO: keep all timers state on server and send it to client on reconnection
         {
-            _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _state.TimeSettings.Round * 10);
+            _actions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _state.TimeSettings.Round * 10);
         }
 
-        _gameActions.SendMessageToWithArgs(person, Messages.Pause, _state.TInfo.Pause ? '+' : '-', 0, 0, 0); // TODO: fill time values
+        _actions.SendMessageToWithArgs(person, Messages.Pause, _state.TInfo.Pause ? '+' : '-', 0, 0, 0); // TODO: fill time values
 
         if (_state.Decision == DecisionType.Appellation)
         {
@@ -1452,7 +1452,7 @@ public sealed class Game : MessageHandler
 
             if (canProcessAppellation)
             {
-                _gameActions.SendMessageToWithArgs(person, Messages.Appellation, '+');
+                _actions.SendMessageToWithArgs(person, Messages.Appellation, '+');
             }
         }
         else if (_state.Decision == DecisionType.Pressing)
@@ -1461,7 +1461,7 @@ public sealed class Game : MessageHandler
 
             if (personIsPlayerAndCanPress)
             {
-                _gameActions.SendMessageToWithArgs(person, Messages.Try);
+                _actions.SendMessageToWithArgs(person, Messages.Try);
             }
         }
         else if (_state.Decision == DecisionType.AnswerValidating)
@@ -1474,7 +1474,7 @@ public sealed class Game : MessageHandler
                 {
                     var answer = answerer.Answer ?? "";
 
-                    _gameActions.SendMessage(
+                    _actions.SendMessage(
                         _controller.BuildValidation2Message(answerer.Name, answer, !_state.QuestionPlay.FlexiblePrice),
                         _state.ShowMan.Name);
                 }
@@ -1484,7 +1484,7 @@ public sealed class Game : MessageHandler
 
         if (_state.ChooserIndex != -1)
         {
-            _gameActions.SendMessageToWithArgs(person, Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");
+            _actions.SendMessageToWithArgs(person, Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");
         }
     }
 
@@ -1512,12 +1512,12 @@ public sealed class Game : MessageHandler
 
         if (_state.IsOralNow)
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
         }
 
         if (Controller.CanPlayerAct())
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
         }
 
         _controller.Stop(StopReason.Decision);
@@ -1532,7 +1532,7 @@ public sealed class Game : MessageHandler
 
         var withError = args[2] == "+";
 
-        _gameActions.SendMessageWithArgs(Messages.Disconnected, account.Name);
+        _actions.SendMessageWithArgs(Messages.Disconnected, account.Name);
         _state.BeginUpdatePersons($"Disconnected {account.Name}");
 
         try
@@ -1609,12 +1609,12 @@ public sealed class Game : MessageHandler
         if (result != AuthenticationResult.Ok)
         {
             var msg = new MessageBuilder(SystemMessages.Refuse, GetAuthenticationErrorMessage(result)).Build();
-            _gameActions.SendMessage(msg, message.Sender);
+            _actions.SendMessage(msg, message.Sender);
             return;
         }
 
         Master.AuthenticateConnection(message.Sender[1..], name);
-        _gameActions.SendMessage(Messages.Accepted, message.Sender);
+        _actions.SendMessage(Messages.Accepted, message.Sender);
     }
 
     private void SelectNewHost()
@@ -1654,7 +1654,7 @@ public sealed class Game : MessageHandler
     private void UpdateHostName(string? newHostName, string source = "")
     {
         _state.HostName = newHostName;
-        _gameActions.SendMessageWithArgs(Messages.Hostname, newHostName ?? "", source);
+        _actions.SendMessageWithArgs(Messages.Hostname, newHostName ?? "", source);
     }
 
     private void OnAppellation(Message message, string[] args)
@@ -1732,7 +1732,7 @@ public sealed class Game : MessageHandler
 
         _state.QuestionPlay.Appellations.Add((appellationSource, isAppellationForRightAnswer));
 
-        _gameActions.SendMessageWithArgs(Messages.PlayerAppellating, appellationSource);
+        _actions.SendMessageWithArgs(Messages.PlayerAppellating, appellationSource);
 
         if (_state.QuestionPlay.AppellationState == AppellationState.Collecting)
         {
@@ -1762,14 +1762,14 @@ public sealed class Game : MessageHandler
 
         if (!_state.HiddenPersons)
         {
-            _gameActions.SendMessageWithArgs(Messages.PlayerScoreChanged, playerIndex - 1, sum);
+            _actions.SendMessageWithArgs(Messages.PlayerScoreChanged, playerIndex - 1, sum);
         }
         else
         {
-            _gameActions.SendMessageToWithArgs(player.Name, Messages.PlayerScoreChanged, 0, sum);
+            _actions.SendMessageToWithArgs(player.Name, Messages.PlayerScoreChanged, 0, sum);
         }
             
-        _gameActions.InformSums();
+        _actions.InformSums();
 
         _controller.AddHistory($"Sum change: {playerIndex - 1} = {sum}");
     }
@@ -1884,7 +1884,7 @@ public sealed class Game : MessageHandler
 
         if (found && !_state.HiddenPersons)
         {
-            _gameActions.OnReady(message.Sender, toReady);
+            _actions.OnReady(message.Sender, toReady);
         }
 
         if (readyAll)
@@ -2011,7 +2011,7 @@ public sealed class Game : MessageHandler
 
                     if (!_state.HiddenPersons)
                     {
-                        _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
+                        _actions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
                     }
 
                     if (_state.QuestionPlay.AnswerOptions == null
@@ -2027,7 +2027,7 @@ public sealed class Game : MessageHandler
                         }
 
                         _state.QuestionPlay.Validations[answer] = null;
-                        _gameActions.AskValidate(_state.ShowMan.Name, i, answer, !_state.QuestionPlay.FlexiblePrice);
+                        _actions.AskValidate(_state.ShowMan.Name, i, answer, !_state.QuestionPlay.FlexiblePrice);
                     }
 
                     break;
@@ -2143,12 +2143,12 @@ public sealed class Game : MessageHandler
                 {
                     if (_state.Answerer != null)
                     {
-                        _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
+                        _actions.SendMessage(Messages.Cancel, _state.Answerer.Name);
                     }
                 }
                 else if (!Controller.HaveMultipleAnswerers())
                 {
-                    _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                    _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
                 }
             }
         }
@@ -2183,7 +2183,7 @@ public sealed class Game : MessageHandler
                 && (_state.QuestionPlay.AnswerOptions == null || !_state.Rules.OralPlayersActions))
             {
                 // Cancelling Oral Answer player mode
-                _gameActions.SendMessage(Messages.Cancel, _state.Answerer.Name);
+                _actions.SendMessage(Messages.Cancel, _state.Answerer.Name);
             }
 
             _controller.Stop(StopReason.Decision);
@@ -2207,8 +2207,8 @@ public sealed class Game : MessageHandler
 
                     _state.Players[i].AppellationFlag = false;
                     _state.AppellationAwaitedVoteCount--;
-                    _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
-                    _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
+                    _actions.SendMessageWithArgs(Messages.PersonApellated, i);
+                    _actions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
                     break;
                 }
             }
@@ -2234,7 +2234,7 @@ public sealed class Game : MessageHandler
         {
             if (player.AppellationFlag)
             {
-                _gameActions.SendMessage(Messages.Cancel, player.Name);
+                _actions.SendMessage(Messages.Cancel, player.Name);
             }
         }
     }
@@ -2276,8 +2276,8 @@ public sealed class Game : MessageHandler
                             .AppendLine();
                         
                         // TODO: leave only one pass message
-                        _gameActions.SendMessageWithArgs(Messages.Pass, i);
-                        _gameActions.SendMessageWithArgs(Messages.PersonStake, i, 2);
+                        _actions.SendMessageWithArgs(Messages.Pass, i);
+                        _actions.SendMessageWithArgs(Messages.PersonStake, i, 2);
 
                         if (_state.ActivePlayer != null
                             && _state.ActivePlayer.StakeMaking
@@ -2309,7 +2309,7 @@ public sealed class Game : MessageHandler
 
                 if (!_state.HiddenPersons)
                 {
-                    _gameActions.SendMessageWithArgs(Messages.Pass, i);
+                    _actions.SendMessageWithArgs(Messages.Pass, i);
                 }
 
                 canPressChanged = true;
@@ -2458,12 +2458,12 @@ public sealed class Game : MessageHandler
             {
                 if (_state.Answerer != player)
                 {
-                    _gameActions.SendMessageWithArgs(Messages.WrongTry, i);
+                    _actions.SendMessageWithArgs(Messages.WrongTry, i);
                     
                     if (player.CanPress)
                     {
                         player.LastBadTryTime = DateTime.UtcNow;
-                        _gameActions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, i);
+                        _actions.SendMessageWithArgs(Messages.PlayerState, PlayerState.Lost, i);
                     }
                 }
 
@@ -2542,7 +2542,7 @@ public sealed class Game : MessageHandler
 
         AppendAccountExt(newAccount, info);
 
-        _gameActions.SendMessage(info.ToString());
+        _actions.SendMessage(info.ToString());
         OnPersonsChanged();
     }
 
@@ -2607,7 +2607,7 @@ public sealed class Game : MessageHandler
             }
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
+        _actions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
 
         if (_state.Stage == GameStage.Before)
         {
@@ -2689,7 +2689,7 @@ public sealed class Game : MessageHandler
         {
             case DecisionType.StarterChoosing:
                 // Asking again
-                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
                 _controller.StopWaiting();
                 _controller.PlanExecution(Tasks.AskFirst, 20);
                 break;
@@ -2850,7 +2850,7 @@ public sealed class Game : MessageHandler
                 // Staker has been deleted. We need to move game further
                 if (_state.IsOralNow || _state.Decision == DecisionType.NextPersonStakeMaking)
                 {
-                    _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                    _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
                 }
 
                 ContinueMakingStakes();
@@ -2858,7 +2858,7 @@ public sealed class Game : MessageHandler
         }
         else if (_state.Decision == DecisionType.NextPersonStakeMaking)
         {
-            _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             ContinueMakingStakes();
         }
     }
@@ -2904,7 +2904,7 @@ public sealed class Game : MessageHandler
 
             if (_state.IsOralNow)
             {
-                _gameActions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
             }
 
             Controller.PlanExecution(Tasks.ContinueQuestion, 1);
@@ -3038,11 +3038,11 @@ public sealed class Game : MessageHandler
         {
             if (item.Ready)
             {
-                _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
+                _actions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
             }
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
+        _actions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
 
         OnPersonsChanged();
     }
@@ -3101,7 +3101,7 @@ public sealed class Game : MessageHandler
         {
             if (_state.AllPersons.ContainsKey(replacer))
             {
-                _gameActions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.PersonAlreadyExists);
+                _actions.SendMessageToWithArgs(message.Sender, Messages.UserError, ErrorCode.PersonAlreadyExists);
                 return;
             }
 
@@ -3138,7 +3138,7 @@ public sealed class Game : MessageHandler
             newAccount = account;
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
+        _actions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
 
         InformAvatar(newAccount);
         OnPersonsChanged();
@@ -3425,11 +3425,11 @@ public sealed class Game : MessageHandler
         {
             if (item.Ready)
             {
-                _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}");
+                _actions.SendMessage($"{Messages.Ready}\n{item.Name}");
             }
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newIsMale ? '+' : '-');
+        _actions.SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newIsMale ? '+' : '-');
         OnPersonsChanged();
     }
 
@@ -3509,7 +3509,7 @@ public sealed class Game : MessageHandler
         _state.GameResultInfo.StartTime = DateTimeOffset.UtcNow;
 
         _controller.OnStageChanged(GameStages.Started, "");
-        _gameActions.InformStage();
+        _actions.InformStage();
 
         _state.IsOral = _state.Rules.Oral && _state.ShowMan.IsHuman;
 
@@ -3549,7 +3549,7 @@ public sealed class Game : MessageHandler
             _state.EndUpdatePersons();
         }
 
-        _gameActions.SendMessageWithArgs(Messages.Connected, role.ToString().ToLowerInvariant(), index, name, isMale ? 'm' : 'f', "");
+        _actions.SendMessageWithArgs(Messages.Connected, role.ToString().ToLowerInvariant(), index, name, isMale ? 'm' : 'f', "");
 
         if (_state.HostName == null && !_state.Settings.IsAutomatic)
         {
@@ -3592,13 +3592,13 @@ public sealed class Game : MessageHandler
 
             if (link != null)
             {
-                _gameActions.SendMessageToWithArgs(receiver, Messages.Avatar, account.Name, ContentTypes.Image, link);
+                _actions.SendMessageToWithArgs(receiver, Messages.Avatar, account.Name, ContentTypes.Image, link);
             }
         }
 
         if (!string.IsNullOrEmpty(account.AvatarVideoUri))
         {
-            _gameActions.SendMessageToWithArgs(receiver, Messages.Avatar, account.Name, ContentTypes.Video, account.AvatarVideoUri);
+            _actions.SendMessageToWithArgs(receiver, Messages.Avatar, account.Name, ContentTypes.Video, account.AvatarVideoUri);
         }
     }
 
