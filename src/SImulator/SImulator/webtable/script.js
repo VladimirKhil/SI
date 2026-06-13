@@ -21,6 +21,13 @@ try {
                 resolve(true);
             });
         },
+        selectPlayer: function (playerIndex) {
+            window.chrome.webview.postMessage({ type: 'selectPlayer', playerIndex: playerIndex });
+
+            return new Promise(function (resolve) {
+                resolve(true);
+            });
+        },
         mediaLoaded: function () { }
     });
 

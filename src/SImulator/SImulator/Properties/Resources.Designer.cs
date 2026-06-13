@@ -367,6 +367,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select a player to delete theme.
+        /// </summary>
+        public static string ChoosePlayerToDelete {
+            get {
+                return ResourceManager.GetString("ChoosePlayerToDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select a player to start the game.
         /// </summary>
         public static string ChoosePlayerToStart {

@@ -43,4 +43,6 @@ public enum MessageCode
     AppellationFor,
 
     AppellationAgainst,
+
+    ThemeDeletes,
 }

@@ -714,4 +714,7 @@ To play, you need to organize a local network.</value>
   <data name="NextRound" xml:space="preserve">
     <value>Next round</value>
   </data>
+  <data name="ChoosePlayerToDelete" xml:space="preserve">
+    <value>Select a player to delete theme</value>
+  </data>
 </root>

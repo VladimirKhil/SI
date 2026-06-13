@@ -29,4 +29,9 @@ public enum DecisionMode
     /// Making stake.
     /// </summary>
     Stake,
+
+    /// <summary>
+    /// Selecting player to delete theme.
+    /// </summary>
+    SelectDeleter,
 }

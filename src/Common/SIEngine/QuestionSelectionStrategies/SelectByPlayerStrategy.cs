@@ -150,6 +150,11 @@ internal sealed class SelectByPlayerStrategy : ISelectionStrategy, IRoundTableCo
 
     private void SelectQuestion(int themeIndex, int questionIndex)
     {
+        if (themeIndex == -1 && questionIndex == -1 && _forward.Count > 0)
+        {
+            (themeIndex, questionIndex) = _forward.Pop();
+        }
+
         if (!_questionsTable.Remove((themeIndex, questionIndex)))
         {
             return;

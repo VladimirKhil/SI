@@ -35,6 +35,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public Action<int>? DeletionCallback { get; set; }
 
+    public Action<int>? PlayerSelectionCallback { get; set; }
+
     public event Action<string>? SendJsonMessage;
 
     public event Action<Exception>? Error;
@@ -694,6 +696,10 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
                     Type = "askAnswer"
                 });
 
+                break;
+
+            case "selectPlayer":
+                PlayerSelectionCallback?.Invoke(data["playerIndex"].GetInt32());
                 break;
 
             case "keyPressed":

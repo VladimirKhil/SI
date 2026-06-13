@@ -17,6 +17,8 @@ public interface IPresentationController : IDisposable
     
     Action<int>? DeletionCallback { get; set; }
 
+    Action<int>? PlayerSelectionCallback { get; set; }
+
     event Action<Exception>? Error;
 
     bool CanControlMedia { get; }

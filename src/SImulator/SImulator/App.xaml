@@ -87,6 +87,16 @@
                         Padding="10" />
                 </DataTemplate>
 
+                <DataTemplate x:Key="{x:Static m:DecisionMode.SelectDeleter}">
+                    <TextBlock
+                        Text="{x:Static lp:Resources.ChoosePlayerToDelete}"
+                        FontWeight="Bold"
+                        Background="Orange"
+                        VerticalAlignment="Center"
+                        TextAlignment="Center"
+                        Padding="10" />
+                </DataTemplate>
+
                 <DataTemplate x:Key="{x:Static m:DecisionMode.AnswererChoosing}">
                     <TextBlock
                         Text="{x:Static lp:Resources.ChoosePlayerToAnswer}"
@@ -468,6 +478,12 @@
                                     <DataTrigger
                                         Binding="{Binding DataContext.DecisionMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                         Value="{x:Static m:DecisionMode.StarterChoosing}">
+                                        <Setter TargetName="bTurn" Property="Background" Value="Orange" />
+                                    </DataTrigger>
+
+                                    <DataTrigger
+                                        Binding="{Binding DataContext.DecisionMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        Value="{x:Static m:DecisionMode.SelectDeleter}">
                                         <Setter TargetName="bTurn" Property="Background" Value="Orange" />
                                     </DataTrigger>
 

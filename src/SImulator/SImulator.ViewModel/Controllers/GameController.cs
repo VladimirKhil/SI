@@ -158,6 +158,11 @@ internal sealed class GameController : IPersonController
         throw new NotImplementedException();
     }
 
+    public void OnPlayerAnswer(int playerIndex, string answer)
+    {
+        GameViewModel.ShowmanReplic = $"{GameViewModel.Players[playerIndex].Name}: {answer}";
+    }
+
     public void OnReplic(string personCode, string text)
     {
         if (personCode == "s")
@@ -168,7 +173,17 @@ internal sealed class GameController : IPersonController
 
     public void OnShowmanReplic(int messageIndex, MessageCode messageCode, params string[] args)
     {
-        // TODO
+        switch (messageCode)
+        {
+            case MessageCode.ThemeDeletes:
+                MoveWhenFast();
+                break;
+
+            default:
+                break;
+        }
+
+        GameViewModel.ShowmanReplic = messageCode.ToString();
     }
 
     public void OnPackageAuthors(IEnumerable<string> authors)
@@ -236,6 +251,8 @@ internal sealed class GameController : IPersonController
 
     public void OnSelectPlayer(SelectPlayerReason reason)
     {
+        GameViewModel.PresentationController.PlayerSelectionCallback = _actions.SelectPlayer;
+
         switch (reason)
         {
             case SelectPlayerReason.Chooser:
@@ -246,6 +263,7 @@ internal sealed class GameController : IPersonController
                 break;
             
             case SelectPlayerReason.Deleter:
+                GameViewModel.DecisionMode = DecisionMode.SelectDeleter;
                 break;
             
             case SelectPlayerReason.Answerer:
@@ -347,11 +365,6 @@ internal sealed class GameController : IPersonController
     public void OnStage(bool informOnly, GameStage stage, string stageName, int stageIndex, QuestionSelectionStrategyType? questionSelectionStrategyType)
     {
         GameViewModel.ShowmanReplic = "";
-
-        if (stage == GameStage.Begin)
-        {
-            MoveWhenFast();
-        }
 
         if (stage != GameStage.Round || questionSelectionStrategyType == null)
         {

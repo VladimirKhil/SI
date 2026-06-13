@@ -1112,7 +1112,9 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         StopWaiting();
-        _actions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {_state.Players[_state.ThemeDeleters.Current.PlayerIndex].Name}");
+        var deleterName = _state.Players[_state.ThemeDeleters.Current.PlayerIndex].Name;
+        _actions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {deleterName}");
+        _actions.ShowmanReplicNew(MessageCode.ThemeDeletes, deleterName);
         _state.ThemeDeleters.MoveBack();
         ScheduleExecution(Tasks.AskToDelete, 1);
         return true;
