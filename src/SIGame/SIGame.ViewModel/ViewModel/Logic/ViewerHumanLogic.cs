@@ -2307,6 +2307,10 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 text = string.Format(ChooseResourceVariant(Resources.AppellationAgainst, selector), argument, argument2);
                 break;
 
+            case Models.MessageCode.ThemeDeletes:
+                text = string.Format(ChooseResourceVariant(Resources.ThemeDeletes, selector), argument);
+                break;
+
             default:
                 break;
         }

@@ -1,6 +1,5 @@
 ﻿using SICore.Connections;
 using SIData;
-using Utils;
 
 namespace SICore.Network.Contracts;
 
@@ -23,7 +22,7 @@ public interface INode : IAsyncDisposable
     /// <summary>
     /// A lock object to manage <see cref="Connections" /> collection.
     /// </summary>
-    Lock ConnectionsLock { get; }
+    Utils.Lock ConnectionsLock { get; }
 
     /// <summary>
     /// Adds client to node.

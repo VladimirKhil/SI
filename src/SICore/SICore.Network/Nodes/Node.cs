@@ -7,7 +7,6 @@ using SIData;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.WebSockets;
-using Utils;
 
 namespace SICore.Network.Servers;
 
@@ -23,7 +22,7 @@ public abstract class Node : INode
     /// </summary>
     private readonly ConcurrentDictionary<string, IClient> _clients = new();
 
-    public Lock ConnectionsLock { get; } = new Lock(nameof(ConnectionsLock));
+    public Utils.Lock ConnectionsLock { get; } = new Utils.Lock(nameof(ConnectionsLock));
 
     public abstract bool IsMain { get; }
 

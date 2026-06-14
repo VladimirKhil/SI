@@ -37,6 +37,8 @@ internal sealed class TestWebPresentationController : IPresentationController
     public event Action<Exception>? Error { add { } remove { } }
     public bool CanControlMedia => false;
 
+    public Action<int>? PlayerSelectionCallback { get; set; }
+
     private void AddCommand(string command)
     {
         lock (_lock)

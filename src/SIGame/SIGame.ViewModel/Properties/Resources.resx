@@ -798,4 +798,7 @@
   <data name="AppellationAgainst" xml:space="preserve">
     <value>{0} is considering that the answer of {1} is wrong</value>
   </data>
+  <data name="ThemeDeletes" xml:space="preserve">
+    <value>{0} will remove a theme</value>
+  </data>
 </root>

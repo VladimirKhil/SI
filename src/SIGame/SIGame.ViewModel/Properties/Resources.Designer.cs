@@ -1825,6 +1825,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} will remove a theme.
+        /// </summary>
+        public static string ThemeDeletes {
+            get {
+                return ResourceManager.GetString("ThemeDeletes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://vk.com/topic-135725718_34975471.
         /// </summary>
         public static string ThemesLink {

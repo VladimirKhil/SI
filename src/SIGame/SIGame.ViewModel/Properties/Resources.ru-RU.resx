@@ -795,4 +795,7 @@
   <data name="AppellationAgainst" xml:space="preserve">
     <value>{0} считает, что ответ {1} неверен</value>
   </data>
+  <data name="ThemeDeletes" xml:space="preserve">
+    <value>Тему убирает {0}</value>
+  </data>
 </root>
