@@ -8,6 +8,7 @@ using SIData;
 using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
+using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -109,6 +110,20 @@ public sealed class GameActions
 
         SendMessageWithArgs(Messages.Replic, person, text);
     }
+
+    public void InformConnected(string name, GameRole role, int index, bool isMale) =>
+        SendMessageToWithArgs(
+            _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody,
+            Messages.Connected, role.ToString().ToLowerInvariant(),
+            index,
+            name,
+            isMale ? 'm' : 'f',
+            "");
+
+    public void InformDisconnected(string name) => SendMessageToWithArgs(
+        _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody, 
+        Messages.Disconnected,
+        name);
 
     /// <summary>
     /// Выдача информации о счёте
@@ -484,8 +499,15 @@ public sealed class GameActions
         SendMessage(messageBuilder.ToString());
     }
 
-    internal void OnPlayerAnswer(int answererIndex, string answer) =>
+    internal void OnPlayerAnswer(int answererIndex, string answer)
+    {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
         SendMessageWithArgs(Messages.PlayerAnswer, answererIndex, answer);
+    }
 
     internal void OnRightAnswer(AnswerType answerType, string rightAnswer) =>
         SendVisualMessageWithArgs(Messages.RightAnswer, answerType.ToString().ToLowerInvariant(), rightAnswer);
@@ -514,5 +536,24 @@ public sealed class GameActions
         }
 
         SendMessageWithArgs(Messages.Person, isRight ? '+' : '-', playerIndex, scoreUpdate);
+    }
+
+    internal void InformPlayerState(PlayerState state, int playerIndex) => InformPlayerState(state, [playerIndex]);
+
+    internal void InformPlayerState(PlayerState state, IEnumerable<int> playerIndexes)
+    {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
+        var msg = new MessageBuilder(Messages.PlayerState, state);
+
+        foreach (var playerIndex in playerIndexes)
+        {
+            msg.Add(playerIndex);
+        }
+
+        SendMessage(msg.ToString());
     }
 }

@@ -365,12 +365,15 @@ public sealed class Game : MessageHandler
 
     private void InformPersons(string person)
     {
+        var hidePlayers = _state.HiddenPersons && person != _state.HostName;
+
         var isPlayer = _state.Players.Any(p => p.Name == person);
         var hiddenPlayerCount = isPlayer ? 1 : 0;
+        var playerCount = hidePlayers ? hiddenPlayerCount : _state.Players.Count;
 
         var info = new StringBuilder(Messages.Info2)
             .Append(Message.ArgsSeparatorChar)
-            .Append(_state.HiddenPersons ? hiddenPlayerCount : _state.Players.Count)
+            .Append(playerCount)
             .Append(Message.ArgsSeparatorChar);
 
         AppendAccountExt(_state.ShowMan, info);
@@ -379,7 +382,7 @@ public sealed class Game : MessageHandler
 
         foreach (var player in _state.Players)
         {
-            if (_state.HiddenPersons && player.Name != person)
+            if (hidePlayers && player.Name != person)
             {
                 continue;
             }
@@ -391,7 +394,7 @@ public sealed class Game : MessageHandler
 
         foreach (var viewer in _state.Viewers)
         {
-            if (_state.HiddenPersons && viewer.Name != person)
+            if (hidePlayers && viewer.Name != person)
             {
                 continue;
             }
@@ -483,7 +486,8 @@ public sealed class Game : MessageHandler
             return AuthenticationResult.ForbiddenRole;
         }
 
-        if (!string.IsNullOrEmpty(_state.Settings.NetworkGamePassword)
+        if ((!_state.HiddenPersons || name == _state.HostName)
+            && !string.IsNullOrEmpty(_state.Settings.NetworkGamePassword)
             && _state.Settings.NetworkGamePassword != password)
         {
             return AuthenticationResult.WrongPassword;
@@ -1165,6 +1169,11 @@ public sealed class Game : MessageHandler
 
     private void OnSetHost(Message message, string[] args)
     {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
         if (message.Sender != _state.HostName || args.Length <= 1)
         {
             return;
@@ -1532,7 +1541,7 @@ public sealed class Game : MessageHandler
 
         var withError = args[2] == "+";
 
-        _actions.SendMessageWithArgs(Messages.Disconnected, account.Name);
+        _actions.InformDisconnected(account.Name);
         _state.BeginUpdatePersons($"Disconnected {account.Name}");
 
         try
@@ -1564,7 +1573,7 @@ public sealed class Game : MessageHandler
             _state.EndUpdatePersons();
         }
 
-        if (args[1] == _state.HostName)
+        if (args[1] == _state.HostName && !_state.HiddenPersons)
         {
             // A new host must be assigned if possible.
             // The host is assigned randomly
@@ -2009,10 +2018,7 @@ public sealed class Game : MessageHandler
                     _state.AnswererIndex = i;
                     _state.Players[i].Flag = false;
 
-                    if (!_state.HiddenPersons)
-                    {
-                        _actions.SendMessageWithArgs(Messages.PlayerState, PlayerState.HasAnswered, i);
-                    }
+                    _actions.InformPlayerState(PlayerState.HasAnswered, i);
 
                     if (_state.QuestionPlay.AnswerOptions == null
                         && _state.QuestionPlay.AnswerType == AnswerType.Text
@@ -3549,7 +3555,7 @@ public sealed class Game : MessageHandler
             _state.EndUpdatePersons();
         }
 
-        _actions.SendMessageWithArgs(Messages.Connected, role.ToString().ToLowerInvariant(), index, name, isMale ? 'm' : 'f', "");
+        _actions.InformConnected(name, role, index, isMale);
 
         if (_state.HostName == null && !_state.Settings.IsAutomatic)
         {

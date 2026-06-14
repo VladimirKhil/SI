@@ -1275,7 +1275,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 var outcome = _state.CurPriceRight;
                 updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
 
-                _actions.ShowmanReplicNew(MessageCode.RightAnswer, outcome, _state.Answerer.AnswerValidationFactor);
+                if (!_state.HiddenPersons)
+                {
+                    _actions.ShowmanReplicNew(MessageCode.RightAnswer, outcome, _state.Answerer.AnswerValidationFactor);
+                }
+
                 _actions.OnPlayerOutcome(_state.AnswererIndex, true, updateSum);
                 AddRightSum(_state.Answerer, updateSum);
                 _actions.InformSums();
@@ -1306,7 +1310,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _actions.ShowmanReplicNew(MessageCode.RightAnswer);
+                if (_state.HiddenPersons)
+                {
+                    _actions.ShowmanReplicNew(MessageCode.RightAnswer);
+                }
+
                 _state.PlayerIsRight = true;
                 updateSum = _state.Answerer.PersonalStake;
                 ScheduleExecution(Tasks.AnnounceStake, 15);
@@ -1356,7 +1364,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 {
                     updateSum = (int)(outcome * _state.Answerer.AnswerValidationFactor);
                     _actions.OnPlayerOutcome(_state.AnswererIndex, false, updateSum);
-                    _actions.ShowmanReplicNew(MessageCode.WrongAnswer, outcome, _state.Answerer.AnswerValidationFactor);
+
+                    if (!_state.HiddenPersons)
+                    {
+                        _actions.ShowmanReplicNew(MessageCode.WrongAnswer, outcome, _state.Answerer.AnswerValidationFactor);
+                    }
+
                     SubtractWrongSum(_state.Answerer, updateSum);
                     _actions.InformSums();
 
@@ -1383,8 +1396,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _actions.ShowmanReplic(s.ToString());
-                _actions.ShowmanReplicNew(MessageCode.WrongAnswer);
+                if (!_state.HiddenPersons)
+                {
+                    _actions.ShowmanReplic(s.ToString());
+                    _actions.ShowmanReplicNew(MessageCode.WrongAnswer);
+                }
+
                 _state.PlayerIsRight = false;
                 updateSum = _state.Answerer.PersonalStake;
 
@@ -4770,7 +4787,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void SetAnswerersByAllHiddenStakes()
     {
         var answerers = new List<int>();
-        var passes = new List<object>();
+        var passes = new List<int>();
 
         var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
 
@@ -4787,13 +4804,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(answerers.Select(i => (object)i));
-        _actions.SendMessage(msg.ToString());
+        _actions.InformPlayerState(PlayerState.Answering, answerers);
 
         if (passes.Count > 0)
         {
-            var passMsg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(passes);
-            _actions.SendMessage(passMsg.ToString());
+            _actions.InformPlayerState(PlayerState.Pass, passes);
         }
 
         _state.QuestionPlay.SetMultipleAnswerers(answerers);

@@ -44,6 +44,8 @@ public abstract class Node : INode
 
     public object? UserState { get; set; }
 
+    public string? AllowedChatMessageSender { get; set; }
+
     public abstract IEnumerable<IConnection> Connections { get; }
 
     public virtual ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default)
@@ -160,6 +162,11 @@ public abstract class Node : INode
 
             if (!m.IsSystem)
             {
+                if (AllowedChatMessageSender != null && AllowedChatMessageSender != sender)
+                {
+                    return;
+                }
+
                 messageText = messageText.Shorten(_options.MaxChatMessageLength);
             }
 

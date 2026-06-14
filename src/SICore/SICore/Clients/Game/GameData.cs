@@ -336,7 +336,9 @@ public sealed class GameData : Data
     public List<GamePlayerAccount> Players { get; } = new();
 
     /// <summary>
-    /// Defines hidden persons mode (when persons are not shown to each other).
+    /// Defines hidden persons mode (when persons are not shown to each other). Arena mode marker.
+    /// The idea is to hide players from each other, but showman is still visible to all.
+    /// Showman sees all players, but players see only showman and themselves.
     /// </summary>
     public bool HiddenPersons { get; set; }
 
