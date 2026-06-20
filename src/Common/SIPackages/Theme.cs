@@ -19,7 +19,7 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
     public override string ToString() => Name;
 
     /// <inheritdoc />
-    public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
+    public override void ReadXml(XmlReader reader, bool upgrade = false, PackageLimits? limits = null)
     {
         Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
 
@@ -49,7 +49,7 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
                             if (limits == null || Questions.Count < limits.QuestionCount)
                             {
                                 var question = new Question();
-                                question.ReadXml(reader, limits);
+                                question.ReadXml(reader, upgrade, limits);
                                 Questions.Add(question);
                             }
                             else

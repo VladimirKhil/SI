@@ -15,8 +15,6 @@ public abstract class PlatformManager
 {
     public static PlatformManager Instance;
 
-    public IServiceProvider ServiceProvider { get; set; }
-
     /// <summary>
     /// Gets well-known font family names.
     /// </summary>

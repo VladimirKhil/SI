@@ -1369,9 +1369,14 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
+    private readonly IPackageTemplatesRepository _packageTemplatesRepository;
+    private readonly IDocumentViewModelFactory _documentViewModelFactory;
+
     internal QDocument(
         SIDocument document,
         StorageContextViewModel storageContextViewModel,
+        IPackageTemplatesRepository packageTemplatesRepository,
+        IDocumentViewModelFactory documentViewModelFactory,
         IClipboardService clipboardService,
         ILoggerFactory loggerFactory,
         ISIStatisticsServiceClient statisticsClient)
@@ -1381,6 +1386,8 @@ public sealed class QDocument : WorkspaceViewModel
         OperationsManager.Changed += OperationsManager_Changed;
         OperationsManager.Error += OperationsManager_Error;
 
+        _packageTemplatesRepository = packageTemplatesRepository;
+        _documentViewModelFactory = documentViewModelFactory;
         _clipboardService = clipboardService;
         _loggerFactory = loggerFactory;
         _statisticsClient = statisticsClient;
@@ -2109,8 +2116,6 @@ public sealed class QDocument : WorkspaceViewModel
                 return;
             }
 
-            var packageTemplatesRepository = PlatformManager.Instance.ServiceProvider.GetRequiredService<IPackageTemplatesRepository>();
-
             var templateFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppSettings.TemplatesFolderName);
             Directory.CreateDirectory(templateFolder);
 
@@ -2140,7 +2145,7 @@ public sealed class QDocument : WorkspaceViewModel
                 await Html.ApplyToAsync(tempDoc.Html);
             }
 
-            packageTemplatesRepository.AddTemplate(new PackageTemplate
+            _packageTemplatesRepository.AddTemplate(new PackageTemplate
             {
                 Name = templateName,
                 FileName = templateFileName
@@ -3241,9 +3246,7 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void SelectThemes_Executed(object? arg)
     {
-        var selectThemesViewModel = new SelectThemesViewModel(
-            this,
-            PlatformManager.Instance.ServiceProvider.GetRequiredService<IDocumentViewModelFactory>());
+        var selectThemesViewModel = new SelectThemesViewModel(this, _documentViewModelFactory);
 
         selectThemesViewModel.NewItem += OnNewItem;
         Dialog = selectThemesViewModel;

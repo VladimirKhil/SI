@@ -25,7 +25,7 @@ public abstract class InfoOwner : Named
     /// <summary>
     /// Reads data from XML reader.
     /// </summary>
-    public abstract void ReadXml(XmlReader reader, PackageLimits? limits = null);
+    public abstract void ReadXml(XmlReader reader, bool upgrade = false, PackageLimits? limits = null);
 
     /// <summary>
     /// Writes data to XML writer.

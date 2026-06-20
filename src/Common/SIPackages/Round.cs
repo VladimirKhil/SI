@@ -36,7 +36,7 @@ public sealed class Round : InfoOwner, IEquatable<Round>
     public override string ToString() => Name;
 
     /// <inheritdoc/>
-    public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
+    public override void ReadXml(XmlReader reader, bool upgrade = false, PackageLimits? limits = null)
     {
         Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
 
@@ -71,7 +71,7 @@ public sealed class Round : InfoOwner, IEquatable<Round>
                             if (limits == null || Themes.Count < limits.ThemeCount)
                             {
                                 var theme = new Theme();
-                                theme.ReadXml(reader, limits);
+                                theme.ReadXml(reader, upgrade, limits);
                                 Themes.Add(theme);
                             }
                             else

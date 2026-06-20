@@ -221,7 +221,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     public override string ToString() => Name;
 
     /// <inheritdoc />
-    public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
+    public override void ReadXml(XmlReader reader, bool upgrade = false, PackageLimits? limits = null)
     {
         ReadXml(reader, limits, null);
     }
@@ -341,7 +341,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                             if (limits == null || Rounds.Count < limits.RoundCount)
                             {
                                 var round = new Round();
-                                round.ReadXml(reader, limits);
+                                round.ReadXml(reader, Version < 5.0, limits);
                                 Rounds.Add(round);
                             }
                             else
@@ -357,32 +357,10 @@ public sealed class Package : InfoOwner, IEquatable<Package>
             }
         }
 
-        Upgrade();
-    }
-
-    /// <summary>
-    /// Upgrades package to new format.
-    /// </summary>
-    internal bool Upgrade()
-    {
-        if (Version >= 5.0)
+        if (Version < 5.0)
         {
-            return false;
+            Version = 5.0;
         }
-
-        foreach (var round in Rounds)
-        {
-            foreach (var theme in round.Themes)
-            {
-                foreach (var question in theme.Questions)
-                {
-                    question.Upgrade();
-                }
-            }
-        }
-
-        Version = 5;
-        return true;
     }
 
     /// <summary>

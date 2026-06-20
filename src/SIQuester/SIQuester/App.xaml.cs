@@ -100,8 +100,6 @@ public partial class App : Application
 
         await _host.StartAsync();
 
-        _manager.ServiceProvider = _host.Services;
-
         _logger = _host.Services.GetRequiredService<ILogger<App>>();
         _logger.LogInformation("Application started. Version: {version}", Assembly.GetExecutingAssembly().GetName().Version);
     }

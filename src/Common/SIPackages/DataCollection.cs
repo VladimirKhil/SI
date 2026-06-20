@@ -34,6 +34,9 @@ public sealed class DataCollection : IEnumerable<string>
     /// </summary>
     /// <param name="package">Package that owns the collection.</param>
     /// <param name="name">Collection name.</param>
+    /// <param name="fileChanged">File changed handler.</param>
+    /// <param name="fileRemoved">File removed handler.</param>
+    /// <param name="fileRenamed">File renamed handler.</param>
     internal DataCollection(
         ISIPackageContainer package,
         string name,

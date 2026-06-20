@@ -39,13 +39,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     }
 
     /// <summary>
-    /// Question type.
-    /// </summary>
-    [Obsolete("Left for backward compatibility with old format. Use TypeName and Parameters properties")]
-    [DefaultValue(typeof(QuestionType), QuestionTypes.Simple)]
-    internal QuestionType Type { get; } = new();
-
-    /// <summary>
     /// Question type name.
     /// </summary>
     [DefaultValue(QuestionTypes.Default)]
@@ -54,12 +47,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         get => _typeName;
         set { _typeName = value; }
     }
-
-    /// <summary>
-    /// Question scenario.
-    /// </summary>
-    [Obsolete("Left for backward compatibility with old format. Use Parameters property")]
-    internal Scenario Scenario { get; } = new();
 
     /// <summary>
     /// Question script.
@@ -94,7 +81,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public override string Name => "";
 
     /// <inheritdoc />
-    public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
+    public override void ReadXml(XmlReader reader, bool upgrade = false, PackageLimits? limits = null)
     {
         var priceStr = reader.GetAttribute("price");
         _ = int.TryParse(priceStr, out _price);
@@ -107,117 +94,132 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         var right = true;
         var read = true;
 
-        while (!read || reader.Read())
+        QuestionType? type = null;
+        Scenario? scenario = null;
+
+        try
         {
-            read = true;
-
-            switch (reader.NodeType)
+            while (!read || reader.Read())
             {
-                case XmlNodeType.Element:
-                    switch (reader.LocalName)
-                    {
-                        case "info":
-                            Info.ReadXml(reader, limits);
-                            read = false;
-                            break;
+                read = true;
 
-                        case "type":
-                            Type.Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
-                            break;
-
-                        case "param":
-                            if (limits == null || Type.Params.Count < limits.CollectionCount)
-                            {
-                                var param = new QuestionTypeParam
-                                {
-                                    Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength),
-                                    Value = reader.ReadElementContentAsString()
-                                };
-
-                                Type.Params.Add(param);
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch (reader.LocalName)
+                        {
+                            case "info":
+                                Info.ReadXml(reader, limits);
                                 read = false;
-                            }
-                            break;
+                                break;
 
-                        case "script":
-                            Script = new();
-                            Script.ReadXml(reader, limits);
-                            read = false;
-                            break;
+                            case "type":
+                                type ??= new QuestionType();
+                                type.Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
+                                break;
 
-                        case "params":
-                            if (!reader.IsEmptyElement)
-                            {
-                                Parameters.ReadXml(reader, limits);
-                                read = false;
-                            }
-                            break;
-
-                        case "atom":
-                            if (limits == null || Scenario.Count < limits.ContentItemCount)
-                            {
-                                var atom = new Atom();
-
-                                if (reader.MoveToAttribute("time"))
+                            case "param":
+                                if (limits == null || type?.Params.Count < limits.CollectionCount)
                                 {
-                                    if (int.TryParse(reader.Value, out int time))
+                                    var param = new QuestionTypeParam
                                     {
-                                        atom.AtomTime = time;
-                                    }
+                                        Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength),
+                                        Value = reader.ReadElementContentAsString()
+                                    };
+
+                                    type?.Params.Add(param);
+                                    read = false;
                                 }
+                                break;
 
-                                if (reader.MoveToAttribute("type"))
-                                {
-                                    atom.Type = reader.Value.LimitLengthBy(limits?.TextLength);
-                                }
-
-                                reader.MoveToElement();
-                                atom.Text = reader.ReadElementContentAsString().LimitLengthBy(limits?.ContentValueLength);
-
-                                Scenario.Add(atom);
+                            case "script":
+                                Script = new();
+                                Script.ReadXml(reader, limits);
                                 read = false;
-                            }
-                            break;
+                                break;
 
-                        case "right":
-                            right = true;
-                            break;
+                            case "params":
+                                if (!reader.IsEmptyElement)
+                                {
+                                    Parameters.ReadXml(reader, limits);
+                                    read = false;
+                                }
+                                break;
 
-                        case "wrong":
-                            right = false;
-                            break;
+                            case "atom":
+                                if (limits == null || scenario?.Count < limits.ContentItemCount)
+                                {
+                                    var atom = new Atom();
 
-                        case "answer":
-                            var answer = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
+                                    if (reader.MoveToAttribute("time"))
+                                    {
+                                        if (int.TryParse(reader.Value, out int time))
+                                        {
+                                            atom.AtomTime = time;
+                                        }
+                                    }
 
-                            if (right)
-                            {
-                                Right.Add(answer);
-                            }
-                            else
-                            {
-                                Wrong.Add(answer);
-                            }
+                                    if (reader.MoveToAttribute("type"))
+                                    {
+                                        atom.Type = reader.Value.LimitLengthBy(limits?.TextLength);
+                                    }
 
-                            read = false;
-                            break;
-                    }
+                                    reader.MoveToElement();
+                                    atom.Text = reader.ReadElementContentAsString().LimitLengthBy(limits?.ContentValueLength);
 
-                    break;
+                                    scenario ??= new Scenario();
+                                    scenario.Add(atom);
+                                    read = false;
+                                }
+                                break;
 
-                case XmlNodeType.EndElement:
-                    if (reader.LocalName == "question")
-                    {
-                        reader.Read();
-                        return;
-                    }
-                    break;
+                            case "right":
+                                right = true;
+                                break;
+
+                            case "wrong":
+                                right = false;
+                                break;
+
+                            case "answer":
+                                var answer = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
+
+                                if (right)
+                                {
+                                    Right.Add(answer);
+                                }
+                                else
+                                {
+                                    Wrong.Add(answer);
+                                }
+
+                                read = false;
+                                break;
+                        }
+
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.LocalName == "question")
+                        {
+                            reader.Read();
+                            return;
+                        }
+                        break;
+                }
             }
         }
-
-        if (Right.Count == 0)
+        finally
         {
-            Right.Add("");
+            if (Right.Count == 0)
+            {
+                Right.Add("");
+            }
+
+            if (upgrade)
+            {
+                Upgrade(type ?? new QuestionType(), scenario ?? new Scenario());
+            }
         }
     }
 
@@ -300,17 +302,15 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Upgrades the question to new format.
     /// </summary>
-    internal void Upgrade()
+    internal void Upgrade(QuestionType type, Scenario scenario)
     {
         if (Price == InvalidPrice)
         {
-            Scenario.Clear();
-            Type.Params.Clear();
-            TypeName = Type.Name = QuestionTypes.Default;
+            TypeName = QuestionTypes.Default;
             return;
         }
 
-        switch (Type.Name)
+        switch (type.Name)
         {
             case QuestionTypes.Auction:
                 {
@@ -327,15 +327,15 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             case QuestionTypes.BagCat:
             case QuestionTypes.Cat:
                 {
-                    var theme = Type[QuestionTypeParams.Cat_Theme] ?? "";
-                    var price = Type[QuestionTypeParams.Cat_Cost] ?? "";
+                    var theme = type[QuestionTypeParams.Cat_Theme] ?? "";
+                    var price = type[QuestionTypeParams.Cat_Cost] ?? "";
 
-                    var knows = Type.Name == QuestionTypes.BagCat
-                        ? Type[QuestionTypeParams.BagCat_Knows] ?? QuestionTypeParams.BagCat_Knows_Value_After
+                    var knows = type.Name == QuestionTypes.BagCat
+                        ? type[QuestionTypeParams.BagCat_Knows] ?? QuestionTypeParams.BagCat_Knows_Value_After
                         : QuestionTypeParams.BagCat_Knows_Value_After;
 
-                    var canGiveSelf = Type.Name == QuestionTypes.BagCat
-                        ? Type[QuestionTypeParams.BagCat_Self] ?? QuestionTypeParams.BagCat_Self_Value_False
+                    var canGiveSelf = type.Name == QuestionTypes.BagCat
+                        ? type[QuestionTypeParams.BagCat_Self] ?? QuestionTypeParams.BagCat_Self_Value_False
                         : QuestionTypeParams.BagCat_Self_Value_False;
 
                     var selectAnswererMode = canGiveSelf == QuestionTypeParams.BagCat_Self_Value_True
@@ -347,9 +347,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     switch (knows)
                     {
                         case QuestionTypeParams.BagCat_Knows_Value_Never:
-                            Scenario.Clear();
-                            Type.Params.Clear();
-                            Type.Name = QuestionTypes.Simple;
                             TypeName = QuestionTypes.SecretNoQuestion;
 
                             Parameters[QuestionParameterNames.Price] = new StepParameter
@@ -385,15 +382,13 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                 break;
 
             default:
-                TypeName = Type.Name;
-                Type.Name = QuestionTypes.Default;
+                TypeName = type.Name;
 
-                foreach (var item in Type.Params)
+                foreach (var item in type.Params)
                 {
                     Parameters.Add(item.Name, new StepParameter { SimpleValue = item.Value });
                 }
 
-                Type.Params.Clear();
                 break;
         }
 
@@ -404,7 +399,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         var currentContent = content;
         var useMarker = false;
 
-        foreach (var atom in Scenario)
+        foreach (var atom in scenario)
         {
             if (atom.Type == AtomTypes.Marker)
             {
@@ -435,9 +430,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             Parameters[QuestionParameterNames.Answer] = currentContent;
         }
 
-        Scenario.Clear();
-        Type.Params.Clear();
-        Type.Name = QuestionTypes.Simple;
     }
 
     private static string GetContentType(string type) =>
