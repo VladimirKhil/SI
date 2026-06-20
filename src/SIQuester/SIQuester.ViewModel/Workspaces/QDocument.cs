@@ -1372,7 +1372,7 @@ public sealed class QDocument : WorkspaceViewModel
     private readonly IPackageTemplatesRepository _packageTemplatesRepository;
     private readonly IDocumentViewModelFactory _documentViewModelFactory;
 
-    internal QDocument(
+    public QDocument(
         SIDocument document,
         StorageContextViewModel storageContextViewModel,
         IPackageTemplatesRepository packageTemplatesRepository,

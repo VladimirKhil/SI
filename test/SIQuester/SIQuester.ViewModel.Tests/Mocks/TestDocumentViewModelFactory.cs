@@ -13,17 +13,20 @@ namespace SIQuester.ViewModel.Tests.Mocks;
 internal sealed class TestDocumentViewModelFactory : IDocumentViewModelFactory
 {
     private readonly StorageContextViewModel _storageContextViewModel;
+    private readonly IPackageTemplatesRepository _packageTemplatesRepository;
     private readonly IClipboardService _clipboardService;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ISIStatisticsServiceClient _statisticsClient;
 
     public TestDocumentViewModelFactory(
         StorageContextViewModel storageContextViewModel,
+        IPackageTemplatesRepository packageTemplatesRepository,
         IClipboardService clipboardService,
         ILoggerFactory loggerFactory,
         ISIStatisticsServiceClient statisticsClient)
     {
         _storageContextViewModel = storageContextViewModel;
+        _packageTemplatesRepository = packageTemplatesRepository;
         _clipboardService = clipboardService;
         _loggerFactory = loggerFactory;
         _statisticsClient = statisticsClient;
@@ -31,20 +34,7 @@ internal sealed class TestDocumentViewModelFactory : IDocumentViewModelFactory
 
     public QDocument CreateViewModelFor(SIDocument document, string? fileName = null)
     {
-        // Use reflection to create QDocument since the constructor is internal
-        var qDocumentType = typeof(QDocument);
-        var constructor = qDocumentType.GetConstructor(
-            BindingFlags.Instance | BindingFlags.NonPublic,
-            null,
-            new[] { typeof(SIDocument), typeof(StorageContextViewModel), typeof(IClipboardService), typeof(ILoggerFactory), typeof(ISIStatisticsServiceClient) },
-            null);
-
-        if (constructor == null)
-        {
-            throw new InvalidOperationException("Could not find QDocument constructor");
-        }
-
-        var qDocument = (QDocument)constructor.Invoke(new object[] { document, _storageContextViewModel, _clipboardService, _loggerFactory, _statisticsClient });
+        var qDocument = new QDocument(document, _storageContextViewModel, _packageTemplatesRepository, this, _clipboardService, _loggerFactory, _statisticsClient);
         qDocument.FileName = fileName ?? document.Package.Name;
         
         return qDocument;
