@@ -3,7 +3,6 @@ using SIPackages;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
 using SIStatisticsService.Contract;
-using System.Reflection;
 
 namespace SIQuester.ViewModel.Tests.Mocks;
 

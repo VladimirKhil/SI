@@ -3,15 +3,15 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<SignAssembly>True</SignAssembly>
-	<AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-	<Version>$(SIGameVersion)</Version>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <Version>$(SIGameVersion)</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-	<DebugType>none</DebugType>
-	<DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-	<ProjectReference Include="..\SIPackages\SIPackages.csproj" />
+    <ProjectReference Include="..\SIPackages\SIPackages.csproj" />
   </ItemGroup>
 </Project>
