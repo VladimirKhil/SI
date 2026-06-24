@@ -13,6 +13,7 @@ using SICore.Services;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
+using System.Globalization;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -872,7 +873,7 @@ public sealed class Game : MessageHandler
 
         var answer = args[1];
         var validationStatus = args[2] == "+";
-        var validationFactor = args.Length > 3 && double.TryParse(args[3], out var factor) && factor >= 0.0 ? factor : 1.0;
+        var validationFactor = args.Length > 3 && double.TryParse(args[3], CultureInfo.InvariantCulture, out var factor) && factor >= 0.0 ? factor : 1.0;
 
         if (!_state.QuestionPlay.Validations.TryGetValue(answer, out var validation) || validation.HasValue)
         {
@@ -2181,7 +2182,7 @@ public sealed class Game : MessageHandler
         {
             _state.Decision = DecisionType.AnswerValidating;
             _state.Answerer.AnswerIsRight = args[1] == "+";
-            _state.Answerer.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor >= 0.0 ? factor : 1.0;
+            _state.Answerer.AnswerValidationFactor = args.Length > 2 && double.TryParse(args[2], CultureInfo.InvariantCulture, out var factor) && factor >= 0.0 ? factor : 1.0;
             _state.ShowmanDecision = true;
 
             if (_state.Answerer != null

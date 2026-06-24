@@ -135,9 +135,9 @@ public sealed class GameActions
         {
             foreach (var player in _state.Players)
             {
-                if (player.Name == person)
+                if (player.Name == person || person == NetworkConstants.Everybody)
                 {
-                    SendMessageToWithArgs(person, Messages.Sums, player.Sum);
+                    SendMessageToWithArgs(player.Name, Messages.Sums, player.Sum);
                     break;
                 }
             }

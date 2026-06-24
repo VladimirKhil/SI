@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIPackages.Core;
+using System.Globalization;
 
 namespace SIEngine.Core;
 
@@ -216,7 +217,7 @@ public sealed class QuestionEngine : IQuestionEngine
                             out var answerDeviation) &&
                             answerDeviation.SimpleValue != null)
                         {
-                            _ = double.TryParse(answerDeviation.SimpleValue, out deviation);
+                            _ = double.TryParse(answerDeviation.SimpleValue, CultureInfo.InvariantCulture, out deviation);
                         }
 
                         _isAnswerTypePoint = true;

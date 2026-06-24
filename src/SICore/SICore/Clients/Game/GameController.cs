@@ -1611,8 +1611,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (_state.QuestionPlay.ValidateAfterRightAnswer)
         {
-            var m = new MessageBuilder(Messages.Answers).AddRange(_state.Players.Select(p => p.Answer ?? ""));
-            _actions.SendMessage(m.ToString());
+            if (!_state.HiddenPersons)
+            {
+                var m = new MessageBuilder(Messages.Answers).AddRange(_state.Players.Select(p => p.Answer ?? ""));
+                _actions.SendMessage(m.ToString());
+            }
+
             ScheduleExecution(Tasks.MoveNext, 30, 1, true);
             return true;
         }
@@ -2129,6 +2133,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void SendStatistics()
     {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
         var msg = new MessageBuilder(Messages.GameStatistics);
 
         foreach (var (name, statistic) in _state.Statistics)
@@ -2594,28 +2603,31 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void Winner()
     {
-        var winnerScore = _state.Players.Max(player => player.Sum);
-        var winnerCount = _state.Players.Count(player => player.Sum == winnerScore);
-
-        if (winnerCount == 1)
+        if (!_state.HiddenPersons)
         {
-            for (var i = 0; i < _state.Players.Count; i++)
-            {
-                if (_state.Players[i].Sum == winnerScore)
-                {
-                    var s = new StringBuilder(_state.Players[i].Name).Append(", ");
-                    s.Append(GetRandomString(LO[nameof(R.YouWin)]));
+            var winnerScore = _state.Players.Max(player => player.Sum);
+            var winnerCount = _state.Players.Count(player => player.Sum == winnerScore);
 
-                    _actions.ShowmanReplic(s.ToString());
-                    _actions.SendMessageWithArgs(Messages.Winner, i);
-                    break;
+            if (winnerCount == 1)
+            {
+                for (var i = 0; i < _state.Players.Count; i++)
+                {
+                    if (_state.Players[i].Sum == winnerScore)
+                    {
+                        var s = new StringBuilder(_state.Players[i].Name).Append(", ");
+                        s.Append(GetRandomString(LO[nameof(R.YouWin)]));
+
+                        _actions.ShowmanReplic(s.ToString());
+                        _actions.SendMessageWithArgs(Messages.Winner, i);
+                        break;
+                    }
                 }
             }
-        }
-        else
-        {
-            _actions.ShowmanReplic(LO[nameof(R.NoWinner)]);
-            _actions.SendMessageWithArgs(Messages.Winner, -1);
+            else
+            {
+                _actions.ShowmanReplic(LO[nameof(R.NoWinner)]);
+                _actions.SendMessageWithArgs(Messages.Winner, -1);
+            }
         }
 
         ScheduleExecution(Tasks.GoodLuck, 20 + Random.Shared.Next(10));
@@ -4406,7 +4418,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void SetAnswerersAll()
     {
         var allConnectedIndicies = new List<int>();
-        var allDisconnectedIndicies = new List<object>();
+        var allDisconnectedIndicies = new List<int>();
 
         var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
 
@@ -4423,14 +4435,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _state.QuestionPlay.SetMultipleAnswerers(allConnectedIndicies);
-        
-        var msg = new MessageBuilder(Messages.PlayerState, PlayerState.Answering).AddRange(allConnectedIndicies.Select(i => (object)i));
-        _actions.SendMessage(msg.ToString());
+        _actions.InformPlayerState(PlayerState.Answering, allConnectedIndicies);
 
         if (allDisconnectedIndicies.Count > 0)
         {
-            msg = new MessageBuilder(Messages.PlayerState, PlayerState.Pass).AddRange(allDisconnectedIndicies);
-            _actions.SendMessage(msg.ToString());
+            _actions.InformPlayerState(PlayerState.Pass, allDisconnectedIndicies);
         }
 
         ScheduleExecution(Tasks.MoveNext, 5);

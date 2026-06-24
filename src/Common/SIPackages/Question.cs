@@ -147,7 +147,9 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                                 break;
 
                             case "atom":
-                                if (limits == null || scenario?.Count < limits.ContentItemCount)
+                                scenario ??= new Scenario();
+
+                                if (limits == null || scenario.Count < limits.ContentItemCount)
                                 {
                                     var atom = new Atom();
 
@@ -167,7 +169,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                                     reader.MoveToElement();
                                     atom.Text = reader.ReadElementContentAsString().LimitLengthBy(limits?.ContentValueLength);
 
-                                    scenario ??= new Scenario();
                                     scenario.Add(atom);
                                     read = false;
                                 }

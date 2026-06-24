@@ -4,6 +4,7 @@ using SIPackages.Helpers;
 using SIPackages.Models;
 using SIPackages.Serializers;
 using System.ComponentModel;
+using System.Globalization;
 using System.Xml;
 
 namespace SIPackages;
@@ -239,7 +240,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
 
         var versionString = reader.GetAttribute("version");
 
-        if (double.TryParse(versionString, out var version))
+        if (double.TryParse(versionString, CultureInfo.InvariantCulture, out var version))
         {
             if (version > MaximumSupportedVersion)
             {
