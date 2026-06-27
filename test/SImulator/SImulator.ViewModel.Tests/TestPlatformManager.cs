@@ -19,7 +19,7 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
         bool sendCommonMessages)
         => new TestWebPresentationController();
 
-    public override string AskSelectColor()
+    public string AskSelectColor()
     {
         throw new NotImplementedException();
     }
@@ -99,7 +99,7 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
         throw new NotImplementedException();
     }
 
-    public override void NavigateToSite()
+    public void NavigateToSite()
     {
         throw new NotImplementedException();
     }
@@ -109,5 +109,5 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
         
     }
 
-    public override void ShowMessage(string text, bool error = true) => Assert.Fail(text);
+    public void ShowMessage(string text, bool error = true) => Assert.Fail(text);
 }

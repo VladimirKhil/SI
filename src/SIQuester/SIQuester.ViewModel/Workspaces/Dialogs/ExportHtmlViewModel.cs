@@ -58,70 +58,84 @@ public sealed class ExportHtmlViewModel : WorkspaceViewModel
             var manager = new XmlNamespaceManager(template.NameTable);
             manager.AddNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
             manager.AddNamespace("yg", "http://ur-quan1986.narod.ru/ygpackage3.0.xsd");
-            XmlNode node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='/']/html", manager);
-            node["head"]["title"].InnerText = DocHeader;
-            node["body"].Attributes["style"].Value = string.Format("background-color: #FFFFFF; font-family: {0}", DocumentFontFamily);
+            var node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='/']/html", manager) ?? throw new Exception(Resources.ConversionError);
+
+            node["head"]?["title"]?.InnerText = DocHeader;
+            node["body"]?.Attributes["style"]?.Value = string.Format("background-color: #FFFFFF; font-family: {0}", DocumentFontFamily);
+
             if (!ShowMetaTips)
             {
-                XmlNode nodeB = node["body"]["b"];
-                nodeB.RemoveChild(nodeB["center"]);
-                nodeB.RemoveChild(nodeB["center"]);
-                nodeB.RemoveChild(nodeB["br"]);
+                var nodeB = node["body"]?["b"];
+                nodeB?.TryRemoveChild(nodeB["center"]);
+                nodeB?.TryRemoveChild(nodeB["center"]);
+                nodeB?.TryRemoveChild(nodeB["br"]);
             }
 
-            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:package']", manager);
-            node["center"].Attributes["style"].Value = string.Format("font-size: {0}pt", PackageFontSize);
+            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:package']", manager) ?? throw new Exception(Resources.ConversionError);
+            node["center"]?.Attributes["style"]?.Value = string.Format("font-size: {0}pt", PackageFontSize);
 
-            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:round']", manager);
-            node["center"].Attributes["style"].Value = string.Format("font-size: {0}pt", RoundFontSize);
+            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:round']", manager) ?? throw new Exception(Resources.ConversionError);
+            node["center"]?.Attributes["style"]?.Value = string.Format("font-size: {0}pt", RoundFontSize);
 
-            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:theme']", manager);
-            node["span"].Attributes["style"].Value = string.Format("font-size: {0}pt", ThemeFontSize);
+            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:theme']", manager) ?? throw new Exception(Resources.ConversionError);
+            node["span"]?.Attributes["style"]?.Value = string.Format("font-size: {0}pt", ThemeFontSize);
+
             if (ThemeHeader.Length > 0)
             {
                 XmlText text = template.CreateTextNode(ThemeHeader);
-                node["span"].PrependChild(text);
+                node["span"]?.PrependChild(text);
             }
+
             if (ThemeNumbers)
             {
                 XmlText text = template.CreateTextNode(". ");
-                node["span"].PrependChild(text);
+                node["span"]?.PrependChild(text);
                 XmlNode nodeP = template.CreateElement("xsl", "value-of", "http://www.w3.org/1999/XSL/Transform");
                 XmlAttribute attr = template.CreateAttribute("select");
-                nodeP.Attributes.Append(attr);
-                nodeP.Attributes["select"].Value = "position()";
-                node["span"].PrependChild(nodeP);
+                nodeP.Attributes?.Append(attr);
+                nodeP.Attributes?["select"]?.Value = "position()";
+                node["span"]?.PrependChild(nodeP);
             }
-            if (EmptyStringAfterThemeName)
-                node.InsertAfter(template.CreateElement("br"), node["span"]);
 
-            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:question']", manager);
-            node["span"].Attributes["style"].Value = string.Format("font-size: {0}pt", QuestionFontSize);
+            if (EmptyStringAfterThemeName)
+            {
+                node.InsertAfter(template.CreateElement("br"), node["span"]);
+            }
+
+            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:question']", manager) ?? throw new Exception(Resources.ConversionError);
+            node["span"]?.Attributes["style"]?.Value = string.Format("font-size: {0}pt", QuestionFontSize);
+
             if (PriceNearText)
             {
-                XmlNode nodeWhen = node["span"]["xsl:choose"]["xsl:when"];
-                nodeWhen.InsertBefore(template.CreateTextNode(". "), nodeWhen["br"]);
-                nodeWhen.RemoveChild(nodeWhen["br"]);
+                var nodeWhen = node["span"]?["xsl:choose"]?["xsl:when"];
+                nodeWhen?.InsertBefore(template.CreateTextNode(". "), nodeWhen["br"]);
+                if (nodeWhen?["br"] != null)
+                {
+                    nodeWhen.TryRemoveChild(nodeWhen["br"]);
+                }
             }
 
-            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:answer']", manager);
+            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:answer']", manager) ?? throw new Exception(Resources.ConversionError);
+
             if (AnswerOrientation == Orientation.Vertical)
             {
-                node.RemoveChild(node["xsl:choose"]);
+                node.TryRemoveChild(node["xsl:choose"]);
                 node.PrependChild(template.CreateElement("br"));
             }
 
-            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:author']", manager);
+            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:author']", manager) ?? throw new Exception(Resources.ConversionError);
+
             if (AuthorsOrientation == Orientation.Vertical)
             {
-                node.RemoveChild(node["xsl:choose"]);
+                node.TryRemoveChild(node["xsl:choose"]);
                 node.PrependChild(template.CreateElement("br"));
             }
 
-            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:source']", manager);
+            node = template.SelectSingleNode(@"/xsl:stylesheet/xsl:template[@match='yg:source']", manager) ?? throw new Exception(Resources.ConversionError);
+
             if (SourcesOrientation == Orientation.Vertical)
             {
-                node.RemoveChild(node["xsl:choose"]);
+                node.TryRemoveChild(node["xsl:choose"]);
                 node.PrependChild(template.CreateElement("br"));
             }
 
@@ -144,6 +158,17 @@ public sealed class ExportHtmlViewModel : WorkspaceViewModel
         finally
         {
             OnClosed();
+        }
+    }
+}
+
+internal static class XmlNodeExtensions
+{
+    public static void TryRemoveChild(this XmlNode node, XmlNode? child)
+    {
+        if (child != null)
+        {
+            node.RemoveChild(child);
         }
     }
 }

@@ -656,6 +656,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private readonly bool _managed;
 
     private readonly PresentationHandler? _presentationHandler;
+    private readonly IPlatformService _platformService;
 
     public GameViewModel(
         AppSettingsViewModel settings,
@@ -664,6 +665,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         IPresentationController presentationController,
         IGameLogger gameLogger,
         PresentationHandler? presentationHandler,
+        IPlatformService platformService,
         bool managed)
     {
         Settings = settings;
@@ -672,6 +674,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _gameLogger = gameLogger;
         PresentationController = presentationController;
         _presentationHandler = presentationHandler;
+        _platformService = platformService;
         _managed = managed;
 
         LocalInfo = new TableInfoViewModel();
@@ -784,7 +787,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
+            _platformService.ShowMessage($"{Resources.Error}: {exc.Message}");
         }
     }
 
@@ -838,7 +841,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
+            _platformService.ShowMessage($"{Resources.Error}: {exc.Message}");
         }
     }
 
@@ -1371,7 +1374,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal async Task StartAsync()
     {
-        _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings.Model, this);
+        _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings.Model, this, _platformService);
 
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
         {
@@ -1467,7 +1470,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
+            _platformService.ShowMessage($"{Resources.Error}: {exc.Message}");
         }
     }
 
@@ -1902,7 +1905,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameEndingError, exc.Message));
+            _platformService.ShowMessage(string.Format(Resources.GameEndingError, exc.Message));
         }
 
         _isDisposed = true;
@@ -2034,7 +2037,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameEndingError, exc.Message));
+            _platformService.ShowMessage(string.Format(Resources.GameEndingError, exc.Message));
         }
     }
 

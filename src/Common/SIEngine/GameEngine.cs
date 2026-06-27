@@ -333,6 +333,11 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
             return;
         }
 
+        if (Stage == GameStage.Question)
+        {
+            _playHandler.OnQuestionAborted();
+        }
+
         SelectionStrategy.MoveBack();
         Stage = GameStage.SelectingQuestion;
 

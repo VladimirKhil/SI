@@ -11,6 +11,8 @@ public interface IPlatformService
 
     string? AskSelectLogsFolder();
 
+    string? AskSelectColor();
+
     Task<IPackageSource?> AskSelectPackageAsync(string arg);
 
     IGameLogger CreateGameLogger(string? folder);
@@ -18,4 +20,6 @@ public interface IPlatformService
     IDisplayDescriptor[] GetScreens();
 
     void ShowMessage(string text, bool error = true);
+
+    void NavigateToSite();
 }

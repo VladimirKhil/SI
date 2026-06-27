@@ -39,7 +39,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     #endregion
 
-    public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
+    public string[] Languages { get; } = ["ru-RU", "en-US"];
 
     private bool _lockPlayerButtonSync = false;
 
@@ -295,7 +295,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private void NavigateToSite_Executed(object? arg) => PlatformManager.Instance.NavigateToSite();
+    private void NavigateToSite_Executed(object? arg) => _platformService.NavigateToSite();
 
     private void SelectColor_Executed(object? arg)
     {
@@ -304,7 +304,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        var color = PlatformManager.Instance.AskSelectColor();
+        var color = _platformService.AskSelectColor();
 
         if (color == null)
         {
@@ -617,6 +617,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             presentationController,
             gameLogger,
             handler,
+            _platformService,
             true);
 
         gameController.GameViewModel = gameViewModel;
@@ -676,6 +677,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             presentationController,
             gameLogger,
             null,
+            _platformService,
             false)
         {
             RoundTimeMax = Settings.RoundTime
@@ -825,7 +827,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com)
             {
-                _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings, this);
+                _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings, this, _platformService);
 
                 if (_buttonManager == null)
                 {

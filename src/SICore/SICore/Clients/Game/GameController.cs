@@ -2348,6 +2348,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     private void AskToSelectQuestionPrice()
     {
         var answerer = _state.Answerer ?? throw new InvalidOperationException("Answerer not defined");
+        var stakeRange = _state.StakeRange ?? throw new InvalidOperationException("Stake range not defined");
 
         var waitTime = _state.TimeSettings.StakeMaking * 10;
 
@@ -2359,7 +2360,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _state.StakeModes = StakeModes.Stake;
-        AskToMakeStake(StakeReason.Simple, answerer.Name, _state.StakeRange);
+        AskToMakeStake(StakeReason.Simple, answerer.Name, stakeRange);
 
         ScheduleExecution(Tasks.WaitSelectQuestionPrice, waitTime);
         WaitFor(DecisionType.QuestionPriceSelection, waitTime, _state.AnswererIndex);
@@ -4591,6 +4592,16 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         return timeout;
     }
 
+    internal void OnQuestionAborted()
+    {
+        _state.IsPlayingMedia = false;
+        _state.InformStages &= ~(InformStages.Question | InformStages.Layout | InformStages.ContentShape);
+
+        _actions.SendMessageWithArgs(Messages.QuestionEnd);
+        _continuation = null;
+        ScheduleExecution(Tasks.MoveNext, 1, force: true);
+    }
+
     private bool? ValidatePlayersAnswers()
     {
         if (_state.AnnouncedAnswerersEnumerator != null)
@@ -4894,7 +4905,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.InformStages |= InformStages.Layout;
     }
 
-    internal void ShowAnswerOptions(Action? continuation)
+    internal void ShowAnswerOptions(Action? continuation, bool force)
     {
         if (_state.QuestionPlay.AnswerOptions == null)
         {
@@ -4902,7 +4913,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         var nextTask = _state.QuestionPlay.AnswerOptions.Length > 0 ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
-        ScheduleExecution(nextTask, 1, 0);
+        ScheduleExecution(nextTask, 1, 0, force);
         _continuation = continuation;
     }
 

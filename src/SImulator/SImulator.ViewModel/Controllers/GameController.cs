@@ -175,21 +175,23 @@ internal sealed class GameController : IPersonController
     {
         switch (messageCode)
         {
+            case MessageCode.SelectQuestion:
+                GameViewModel.ShowmanReplic = $"{(args.Length > 0 ? args[0] + ": " : "")}{Resources.ChooseQuest}";
+                break;
+
             case MessageCode.ThemeDeletes:
                 MoveWhenFast();
                 break;
 
             default:
+                GameViewModel.ShowmanReplic = messageCode.ToString();
                 break;
         }
-
-        GameViewModel.ShowmanReplic = messageCode.ToString();
     }
 
     public void OnPackageAuthors(IEnumerable<string> authors)
     {
         GameViewModel.ShowmanReplic = $"{Resources.PackageAuthors}: {string.Join(", ", authors)}";
-        MoveWhenFast();
     }
 
     public void OnPackage(string packageName, string? logoUri)

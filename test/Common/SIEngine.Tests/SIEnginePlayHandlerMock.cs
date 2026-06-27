@@ -43,6 +43,11 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
+    public void OnQuestionAborted()
+    {
+
+    }
+
     public bool OnQuestionEnd(string comments) => false;
 
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)

@@ -756,4 +756,9 @@ internal class TrackingGameHandler : ISIEnginePlayHandler
         CallOrder.Add("OnQuestionEnd");
         return false; // Don't timeout
     }
+
+    public void OnQuestionAborted()
+    {
+        CallOrder.Add("OnQuestionAborted");
+    }
 }

@@ -195,19 +195,33 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-                for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems?.Count; i++)
+                if (e.NewItems != null)
                 {
-                    var item = this[i];
-                    Model[item.Key] = item.Value.Model;
+                    for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
+                    {
+                        var item = this[i];
+                        Model[item.Key] = item.Value.Model;
+                    }
                 }
 
                 break;
 
             case NotifyCollectionChangedAction.Replace:
-                for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems?.Count; i++)
+                if (e.OldItems != null)
                 {
-                    var item = this[i];
-                    Model[item.Key] = item.Value.Model;
+                    foreach (var item in e.OldItems.Cast<StepParameterRecord>())
+                    {
+                        Model.Remove(item.Key);
+                    }
+                }
+
+                if (e.NewItems != null)
+                {
+                    for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
+                    {
+                        var item = this[i];
+                        Model[item.Key] = item.Value.Model;
+                    }
                 }
 
                 break;
@@ -220,6 +234,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
                         Model.Remove(item.Key);
                     }
                 }
+
                 break;
 
             case NotifyCollectionChangedAction.Reset:

@@ -53,17 +53,11 @@ public abstract class PlatformManager
 
     public abstract Task<IPackageSource?> AskSelectPackageAsync(string arg);
 
-    public abstract string? AskSelectColor();
-
     public abstract Task<string?> AskSelectFileAsync(string header);
 
     public abstract string? AskSelectLogsFolder();
 
     public abstract Task<bool> AskStopGameAsync();
-
-    public abstract void ShowMessage(string text, bool error = true);
-
-    public abstract void NavigateToSite();
 
     public abstract void PlaySound(string name, Action? onFinish = null);
 

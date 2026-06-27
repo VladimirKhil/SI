@@ -788,7 +788,15 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
             () => SendJsonMessage?.Invoke(JsonSerializer.Serialize(message, SerializerOptions)),
             OnError);
 
-    private void OnError(Exception exc) => Error?.Invoke(exc);
+    private void OnError(Exception exc)
+    {
+        if (exc is InvalidOperationException invalidOperationException && invalidOperationException.HResult == -2146233079)
+        {
+            return; // Ignore exception when the web view is closed
+        }
+
+        Error?.Invoke(exc);
+    }
 
     /// <summary>
     /// Defines content info.

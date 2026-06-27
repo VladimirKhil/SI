@@ -1,4 +1,5 @@
-﻿using SIEngine;
+﻿using SICore.Network.Servers;
+using SIEngine;
 using SIEngine.Core;
 using SIEngine.Models;
 using SIEngine.Rules;
@@ -125,6 +126,13 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public bool OnButtonPressStart()
     {
+        if (_optionsShown.HasValue && !_optionsShown.Value)
+        {
+            PresentationController.ShowAnswerOptions();
+            _optionsShown = true;
+            return true;
+        }
+
         GameViewModel.AskAnswerButton();
         return false;
     }
@@ -488,6 +496,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     public void OnQuestionType(string typeName, bool isDefault) => GameViewModel.OnQuestionType(typeName, isDefault);
 
     public bool OnQuestionEnd(string comments) => GameViewModel.OnQuestionEnd(comments);
+
+    public void OnQuestionAborted() { }
 
     public void OnPackage(Package package)
     {

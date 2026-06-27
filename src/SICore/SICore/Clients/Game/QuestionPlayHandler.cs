@@ -60,7 +60,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
         if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
         {
-            _controller.ShowAnswerOptions(() => OnAskAnswer(mode, duration));
+            _controller.ShowAnswerOptions(() => OnAskAnswer(mode, duration), true);
             _state.QuestionPlay.AnswerOptionsShown = true;
             return;
         }
@@ -103,7 +103,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
         if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
         {
-            _controller.ShowAnswerOptions(null);
+            _controller.ShowAnswerOptions(null, false);
             _state.QuestionPlay.AnswerOptionsShown = true;
             return true;
         }

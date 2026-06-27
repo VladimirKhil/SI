@@ -5,13 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
-using SImulator.ViewModel.PlatformSpecific;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Utils;
 
 namespace SImulator.Implementation.ButtonManagers.WebNew;
@@ -22,7 +17,7 @@ namespace SImulator.Implementation.ButtonManagers.WebNew;
 public sealed class WebManagerNew(WebApplication webApplication, IGameRepository gameRepository, IButtonManagerListener buttonManagerListener)
     : ButtonManagerBase(buttonManagerListener), ICommandExecutor
 {
-    internal static async Task<WebManagerNew> CreateAsync(int port, IButtonManagerListener buttonManagerListener)
+    internal static async Task<WebManagerNew> CreateAsync(int port, IButtonManagerListener buttonManagerListener, IPlatformService platformService)
     {
         var builder = WebApplication.CreateBuilder();
 
@@ -33,7 +28,7 @@ public sealed class WebManagerNew(WebApplication webApplication, IGameRepository
             .AddSignalR(options => options.HandshakeTimeout = TimeSpan.FromMinutes(1))
             .AddMessagePackProtocol();
 
-        var gameRepository = new GameRepository(buttonManagerListener);
+        var gameRepository = new GameRepository(buttonManagerListener, platformService);
 
         builder.Services.AddSingleton<IGameRepository>(gameRepository);
 
@@ -132,7 +127,7 @@ public sealed class WebManagerNew(WebApplication webApplication, IGameRepository
     }
 }
 
-internal sealed class GameRepository(IButtonManagerListener listener) : IGameRepository
+internal sealed class GameRepository(IButtonManagerListener listener, IPlatformService platformService) : IGameRepository
 {
     public ConnectionPersonData[] Players => [.. listener.GamePlayers.Select(p => new ConnectionPersonData
         {
@@ -156,25 +151,25 @@ internal sealed class GameRepository(IButtonManagerListener listener) : IGameRep
 
     public Task<bool> TryAddPlayerAsync(string id, string playerName) => UI.ExecuteAsync(
         () => listener.TryConnectPlayer(playerName, id),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+        exc => platformService.ShowMessage(exc.Message));
 
     public Task<bool> TryRemovePlayerAsync(string playerName) => UI.ExecuteAsync(
         () => listener.TryDisconnectPlayer(playerName),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+        exc => platformService.ShowMessage(exc.Message));
 
     public void OnPlayerPress(string playerName) => UI.Execute(
         () => listener.OnPlayerPressed(playerName),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+        exc => platformService.ShowMessage(exc.Message));
 
     public void OnPlayerAnswer(string playerName, string answer, bool isPreliminary) => UI.Execute(
         () => listener.OnPlayerAnswered(playerName, answer, isPreliminary),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+        exc => platformService.ShowMessage(exc.Message));
 
     public void OnPlayerPass(string playerName) => UI.Execute(
         () => listener.OnPlayerPassed(playerName),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+        exc => platformService.ShowMessage(exc.Message));
 
     public void OnPlayerStake(string playerName, int stake) => UI.Execute(
         () => listener.OnPlayerStake(playerName, stake),
-        exc => PlatformManager.Instance.ShowMessage(exc.Message));
+        exc => platformService.ShowMessage(exc.Message));
 }

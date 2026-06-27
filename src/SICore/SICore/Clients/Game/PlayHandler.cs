@@ -219,6 +219,8 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public bool OnQuestionEnd(string comments) => Controller.OnQuestionEnd();
 
+    public void OnQuestionAborted() => Controller.OnQuestionAborted();
+
     public void OnPackage(Package package) => Controller.OnPackage(package);
 
     public void OnGameThemes(IEnumerable<string> themes) => Controller.OnGameThemes(themes);

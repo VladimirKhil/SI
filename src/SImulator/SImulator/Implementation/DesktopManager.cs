@@ -239,7 +239,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         return null;
     }
 
-    public override string? AskSelectColor()
+    public string? AskSelectColor()
     {
         if (Win32.TryChooseColor(out var color))
         {
@@ -283,10 +283,10 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
             MessageBoxButton.YesNo,
             MessageBoxImage.Question) == MessageBoxResult.Yes);
 
-    public override void ShowMessage(string text, bool error = true) =>
+    public void ShowMessage(string text, bool error = true) =>
         MessageBox.Show(text, MainViewModel.ProductName, MessageBoxButton.OK, error ? MessageBoxImage.Error : MessageBoxImage.Exclamation);
 
-    public override void NavigateToSite()
+    public void NavigateToSite()
     {
         try
         {

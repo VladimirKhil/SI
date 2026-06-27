@@ -1,5 +1,6 @@
-﻿using SImulator.ViewModel.Model;
+﻿using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Model;
 
 namespace SImulator.ViewModel.ButtonManagers;
 
@@ -12,8 +13,10 @@ public class ButtonManagerFactory
     /// Creates an instance of <see cref="IButtonManager" />.
     /// </summary>
     /// <param name="settings">Button manager settings.</param>
+    /// <param name="buttonManagerListener">Button manager listener.</param>
+    /// <param name="platformService">Platform service.</param>
     /// <returns>Created button manager.</returns>
-    public virtual Task<IButtonManager?> CreateAsync(AppSettings settings, IButtonManagerListener buttonManagerListener) =>
+    public virtual Task<IButtonManager?> CreateAsync(AppSettings settings, IButtonManagerListener buttonManagerListener, IPlatformService platformService) =>
         Task.FromResult<IButtonManager?>(settings.UsePlayersKeys switch
         {
             PlayerKeysModes.External => new EmptyButtonManager(buttonManagerListener),

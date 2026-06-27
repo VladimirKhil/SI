@@ -123,6 +123,9 @@
   <data name="ButtonPressed" xml:space="preserve">
     <value>Нажатие на кнопку</value>
   </data>
+  <data name="ChooseQuest" xml:space="preserve">
+    <value>Выбирайте вопрос</value>
+  </data>
   <data name="ConnectionError" xml:space="preserve">
     <value>Ошибка связи: {0}</value>
   </data>
