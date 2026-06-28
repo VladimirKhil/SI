@@ -109,10 +109,10 @@
                 Grid.Row="1"
                 Height="200"
                 Margin="4"
+                BorderThickness="1"
+                BorderBrush="{StaticResource MahApps.Brushes.TextBox.Border}"
                 ItemsSource="{Binding Templates}"
-                SelectedItem="{Binding CurrentTemplate}"
-                Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
-                Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
+                SelectedItem="{Binding CurrentTemplate}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}" />

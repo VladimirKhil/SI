@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <Style x:Key="SelectPointButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
             <Setter Property="Foreground" Value="#555555" />
+
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
@@ -18,18 +19,21 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
+
     <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
         <TextBox
             Text="{Binding Answer, UpdateSourceTrigger=PropertyChanged}"
             Width="80"
             Margin="0,0,5,0"
-                        Padding="3"
+            Padding="3"
             Style="{StaticResource CommonTextBox}"
-            Background="Honeydew"
+            Background="{StaticResource SimpleAnswerBackgroundBrush}"
             HorizontalContentAlignment="Center"
             VerticalAlignment="Center"
             IsReadOnly="True" />
+
         <TextBlock Text="&#x00B1;" VerticalAlignment="Center" Margin="0,0,2,0" Foreground="Black" />
+
         <TextBox
             Text="{Binding Deviation, UpdateSourceTrigger=PropertyChanged}"
             Width="40"
@@ -40,6 +44,7 @@
             VerticalAlignment="Center"
             IsReadOnly="True"
             Background="#F3F3F3" />
+
         <Button
             Command="{Binding SelectPoint}"
             VerticalAlignment="Center"

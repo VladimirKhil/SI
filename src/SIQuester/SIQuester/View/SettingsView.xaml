@@ -52,10 +52,11 @@
 
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.BasicSettings}" />
             
-            <!--<StackPanel Orientation="Vertical" Margin="0,7,0,0">
+            <StackPanel Orientation="Vertical" Margin="0,7,0,0">
                 <TextBlock VerticalAlignment="Center" Text="{x:Static lp:Resources.Theme}" />
 
                 <ComboBox
+                    IsEnabled="False"
                     Margin="0,5"
                     Width="120"
                     HorizontalAlignment="Left"
@@ -67,7 +68,7 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-            </StackPanel>-->
+            </StackPanel>
 
             <CheckBox
                 Content="{x:Static lp:Resources.InstallUpdates}"

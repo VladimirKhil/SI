@@ -5,12 +5,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance lvm:SearchFolderViewModel}"
-    FocusManager.FocusedElement="{Binding ElementName=query}">
+    FocusManager.FocusedElement="{Binding ElementName=query}"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -56,11 +59,14 @@
             Grid.ColumnSpan="2"
             Margin="0,5,0,0"
             ItemsSource="{Binding SearchResults}"
+            BorderThickness="1"
+            BorderBrush="{StaticResource MahApps.Brushes.TextBox.Border}"
             MouseDoubleClick="ListBox_MouseDoubleClick">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{Binding FileName}" FontSize="15" />
+
                         <TextBlock TextWrapping="Wrap">
                             <Run Text="{Binding Fragment.Begin, Mode=OneTime}" />
                             <Run Text="{Binding Fragment.Match, Mode=OneTime}" Foreground="Red" />

@@ -26,8 +26,10 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+                <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Blue.xaml" />-->
                 <ResourceDictionary Source="/Icons.xaml" />
                 <ResourceDictionary Source="View/Dictionaries/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -720,6 +722,8 @@
             </Style>
 
             <Style x:Key="CommandRoutedItem" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                <Setter Property="Padding" Value="0,5" />
+
                 <Style.Triggers>
                     <Trigger Property="Command" Value="{x:Null}">
                         <Setter Property="IsEnabled" Value="False" />
@@ -2033,7 +2037,6 @@
                     
                     <ComboBox
                         siq:ActivateManager.IsWatching="True"
-                        Style="{StaticResource ComboBoxCommon}"
                         MinWidth="90"
                         ItemsSource="{Binding DataContext.StorageContext.Publishers, RelativeSource={RelativeSource AncestorType=TreeView}}"
                         Text="{Binding Model.Publisher}"
@@ -2056,7 +2059,6 @@
 
                     <ComboBox
                         siq:ActivateManager.IsWatching="True"
-                        Style="{StaticResource ComboBoxCommon}"
                         MinWidth="90"
                         ItemsSource="{Binding DataContext.StorageContext.Languages, RelativeSource={RelativeSource AncestorType=TreeView}}"
                         SelectedItem="{Binding Model.Language}">
@@ -2343,19 +2345,16 @@
                         Grid.ColumnSpan="2"
                         Text="{Binding Model.Name}"
                         Padding="0,2" />
-                    
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="(" VerticalAlignment="Center" Style="{StaticResource BlockStyleKey}" />
-                    
+
                     <ComboBox
-                        Style="{StaticResource ComboBoxCommon}"
                         Grid.Row="0"
                         Grid.Column="3"
                         IsEditable="True"
+                        Margin="5,0,0,0"
                         ItemsSource="{Binding Source={StaticResource RTypes}, Path=Values, Mode=OneTime}"
                         Text="{Binding Path=Model.Type, Converter={StaticResource RoundTypeConverter}}"
                         VerticalAlignment="Center" />
-                    
-                    <TextBlock Grid.Row="0" Grid.Column="4" Text=")" VerticalAlignment="Center" Style="{StaticResource BlockStyleKey}" />
+
                     <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
                 </Grid>
 
@@ -2460,7 +2459,6 @@
 
             <DataTemplate x:Key="SelectionModeTemplate" DataType="vm:StepParameterViewModel">
                 <ComboBox
-                    Style="{StaticResource ComboBoxCommon}"
                     Padding="5,2,2,2"
                     Width="200"
                     Height="Auto"
@@ -2472,7 +2470,6 @@
             <DataTemplate x:Key="QuestionTypeTemplateNew" DataType="vm:QuestionViewModel">
                 <StackPanel Orientation="Horizontal">
                     <ComboBox
-                        Style="{StaticResource ComboBoxCommon}"
                         IsSynchronizedWithCurrentItem="False"
                         HorizontalAlignment="Left"
                         MinWidth="50"
@@ -2692,7 +2689,7 @@
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
 
-                                <Rectangle Fill="Lavender" />
+                                <Rectangle Fill="#44000000" />
 
                                 <MediaElement
                                     Name="mediaElement1"
@@ -2963,7 +2960,6 @@
                         DockPanel.Dock="Left"
                         MinWidth="25"
                         FontWeight="Bold"
-                        Foreground="Black"
                         VerticalAlignment="Center"
                         TextAlignment="Left"
                         Margin="5,2,3,2" />
@@ -3209,7 +3205,7 @@
                     <ItemsControl
                         ItemsSource="{Binding GroupValue}"
                         ItemTemplate="{StaticResource GroupItemTemplate}"
-                        Background="Honeydew"
+                        Background="{StaticResource SimpleAnswerBackgroundBrush}"
                         MaxWidth="800" />
                 </StackPanel>
             </DataTemplate>
@@ -3221,7 +3217,7 @@
                         Style="{StaticResource LightTextBox}"
                         MinWidth="75"
                         Padding="3"
-                        Background="Honeydew" />
+                        Background="{StaticResource SimpleAnswerBackgroundBrush}" />
 
                     <TextBlock
                         Text="{x:Static lp:Resources.Deviation}"

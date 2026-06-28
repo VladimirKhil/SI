@@ -7,11 +7,14 @@
     xmlns:l="clr-namespace:SIQuester"
     xmlns:lp="clr-namespace:SIQuester.Properties"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     mc:Ignorable="d"
     FontSize="14"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    d:DataContext="{d:DesignInstance vm:SelectThemesViewModel}">
+    d:DataContext="{d:DesignInstance vm:SelectThemesViewModel}"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="10,10,0,0">
             <GroupBox Header="{x:Static lp:Resources.Range}">

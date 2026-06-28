@@ -12,7 +12,6 @@
     d:DesignHeight="80"
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance vm:NumericAnswerViewModel}">
-    
     <UserControl.Resources>
         <Style TargetType="{x:Type c:NumericTextBox}">
             <Setter Property="Minimum" Value="-999999" />

@@ -1403,4 +1403,7 @@
   <data name="DocumentQuestionCount" xml:space="preserve">
     <value>Всего вопросов</value>
   </data>
+  <data name="Format" xml:space="preserve">
+    <value>Формат</value>
+  </data>
 </root>

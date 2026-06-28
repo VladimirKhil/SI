@@ -30,7 +30,7 @@
                 <TextBlock Text="{x:Static lp:Resources.OpenCloseBracketsIncosistency}" />
             </CheckBox>
 
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Vertical">
                 <Button
                     Content="{x:Static lp:Resources.Refresh}"
                     Command="{Binding Create}"
@@ -42,7 +42,7 @@
                     Content="{x:Static lp:Resources.RemoveUnusedFiles}"
                     Command="{Binding RemoveUnusedFiles}"
                     HorizontalAlignment="Left"
-                    Margin="5,5,0,0"
+                    Margin="0,5,0,0"
                     Padding="8,2" />
             </StackPanel>
         </StackPanel>
@@ -71,7 +71,6 @@
                 </ItemsControl>
 
                 <TextBox
-                    Background="#EEEEEE"
                     Padding="3,3,0,0"
                     Margin="0,5,0,0"
                     Text="{Binding Result}"

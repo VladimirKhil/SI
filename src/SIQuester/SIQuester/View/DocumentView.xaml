@@ -79,7 +79,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         
-        <DockPanel Grid.ColumnSpan="3" Height="30" Name="statusBar1" HorizontalAlignment="Stretch" Background="#FFD7EAFF">
+        <DockPanel Grid.ColumnSpan="3" Height="30" Name="statusBar1" HorizontalAlignment="Stretch">
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
                 <StackPanel.Resources>
                     <Style x:Key="{x:Type Image}" TargetType="{x:Type Image}">
@@ -166,8 +166,8 @@
 
                             <Separator />
 
-                            <MenuItem Header="{x:Static lp:Resources.TableFormat}" Command="{Binding ExportTable}" />
-                            <MenuItem Header="YAML" Command="{Binding ExportYaml}" />
+                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="{x:Static lp:Resources.TableFormat}" Command="{Binding ExportTable}" />
+                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="YAML" Command="{Binding ExportYaml}" />
 
                             <Separator />
                             
@@ -208,9 +208,9 @@
                     
                     <siq:DropDownButton.DropDown>
                         <ContextMenu>
-                            <MenuItem Header="{x:Static lp:Resources.Cut}" Command="ApplicationCommands.Cut" />
-                            <MenuItem Header="{x:Static lp:Resources.Copy}" Command="ApplicationCommands.Copy" />
-                            <MenuItem Header="{x:Static lp:Resources.Paste}" Command="ApplicationCommands.Paste" />
+                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="{x:Static lp:Resources.Cut}" Command="ApplicationCommands.Cut" />
+                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="{x:Static lp:Resources.Copy}" Command="ApplicationCommands.Copy" />
+                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="{x:Static lp:Resources.Paste}" Command="ApplicationCommands.Paste" />
                             <Separator />
                             
                             <MenuItem
@@ -285,7 +285,6 @@
                     VerticalAlignment="Stretch"
                     Margin="2,0"
                     ToolTip="{x:Static lp:Resources.View}"
-                    Style="{StaticResource ComboBoxCommon}"
                     ItemsSource="{Binding Source={StaticResource ViewModes}}"
                     SelectedItem="{Binding View, Source={x:Static m:AppSettings.Default}}"
                     VerticalContentAlignment="Center">
@@ -510,32 +509,33 @@
                     
                     <Menu.Resources>
                         <DataTemplate x:Key="CommonTemplate">
-                            <TextBlock Text="{Binding Model.Name}" />
+                            <TextBlock Text="{Binding Model.Name}" Foreground="Black" />
                         </DataTemplate>
 
                         <DataTemplate x:Key="QuestionTemplate">
-                            <TextBlock Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}" />
+                            <TextBlock Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}" Foreground="Black" />
                         </DataTemplate>
 
                         <siqsel:DictionaryTemplateSelector x:Key="NavigateSelector">
                             <siqsel:DictionaryTemplateSelector.Templates>
                                 <HierarchicalDataTemplate x:Key="{x:Type vm:PackageViewModel}" ItemsSource="{Binding Rounds}" ItemTemplate="{StaticResource CommonTemplate}">
-                                    <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" />
+                                    <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" FontSize="14" FontWeight="Normal" />
                                 </HierarchicalDataTemplate>
                                 
                                 <HierarchicalDataTemplate x:Key="{x:Type vm:RoundViewModel}" ItemsSource="{Binding Themes}" ItemTemplate="{StaticResource CommonTemplate}">
-                                    <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" />
+                                    <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" FontSize="14" FontWeight="Normal" />
                                 </HierarchicalDataTemplate>
                                 
                                 <HierarchicalDataTemplate x:Key="{x:Type vm:ThemeViewModel}" ItemsSource="{Binding Questions}" ItemTemplate="{StaticResource QuestionTemplate}">
-                                    <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" />
+                                    <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" FontSize="14" FontWeight="Normal" />
                                 </HierarchicalDataTemplate>
                                 
-                                <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">                                    
+                                <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
                                     <TextBlock 
                                         Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}"
                                         TextTrimming="CharacterEllipsis"
-                                        lb:SmartTipBehavior.IsAttached="True" />                                    
+                                        lb:SmartTipBehavior.IsAttached="True"
+                                        FontSize="14" />
                                 </DataTemplate>
                             </siqsel:DictionaryTemplateSelector.Templates>
                         </siqsel:DictionaryTemplateSelector>
@@ -548,13 +548,14 @@
                             <Setter Property="MenuItem.HeaderTemplateSelector" Value="{StaticResource NavigateSelector}" />
                             <Setter Property="FocusManager.IsFocusScope" Value="False" />
                             <Setter Property="Focusable" Value="False" />
-                            
+
                             <Setter Property="MenuItem.ItemContainerStyle">
                                 <Setter.Value>
-                                    <Style TargetType="{x:Type MenuItem}">
+                                    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
                                         <Setter Property="Command" Value="{Binding ElementName=main,Path=DataContext.ActiveDocument.Navigate}" />
                                         <Setter Property="CommandParameter" Value="{Binding}" />
                                         <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+                                        <Setter Property="Padding" Value="5" />
                                     </Style>
                                 </Setter.Value>
                             </Setter>
@@ -949,7 +950,7 @@
         <Grid
             Grid.ColumnSpan="3"
             Grid.RowSpan="2"
-            Background="{StaticResource MainBack}"
+            Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
             DataContext="{Binding Dialog}"
             Visibility="{Binding Converter={StaticResource NotNullToVisibilityConverter}}">
             
@@ -967,7 +968,7 @@
                     Padding="5"
                     Command="{Binding Close}"
                     Visibility="{Binding Close, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <Path Data="M0,1L1,0M0,1L1,2M-0.1,1L2,1" Stretch="Uniform" Stroke="Black" StrokeThickness="2" />
+                    <Path Data="M0,1L1,0M0,1L1,2M-0.1,1L2,1" Stretch="Uniform" Stroke="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}" StrokeThickness="2" />
                 </Button>
                 
                 <TextBlock FontSize="16" FontWeight="Bold" Margin="3,3,0,0" Text="{Binding Header}"></TextBlock>

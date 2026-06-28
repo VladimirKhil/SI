@@ -15,8 +15,8 @@
         </ObjectDataProvider>
         
         <my:EnumConverter x:Key="EnumConverter1" EnumType="{x:Type m:ExportFormats}" />
-        
-        <Style TargetType="ComboBox">
+
+        <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Source={StaticResource Formats}, Path=Count}" Value="1">
                     <Setter Property="IsEnabled" Value="False" />
@@ -27,9 +27,9 @@
     
     <DockPanel Margin="5,2">
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <TextBlock Name="textBlock1" Text="Формат:" VerticalAlignment="Center" Margin="5,2" />
+            <TextBlock Name="textBlock1" Text="{x:Static lp:Resources.Format}" VerticalAlignment="Center" Margin="5,2" />
             
-            <ComboBox Name="comboBox1" Width="150" Margin="5,2" ItemsSource="{Binding Source={StaticResource Formats}}" SelectedItem="{Binding Format}" IsSynchronizedWithCurrentItem="True">
+            <ComboBox Width="150" Margin="5,2" ItemsSource="{Binding Source={StaticResource Formats}}" SelectedItem="{Binding Format}" IsSynchronizedWithCurrentItem="True">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Converter={StaticResource EnumConverter1}}" Margin="2,1,0,0" />
@@ -37,7 +37,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <Button Margin="0,2,5,2" Width="100" Height="25" Command="{Binding Save}" CommandParameter="{Binding ElementName=root}" Content="{x:Static lp:Resources.Save}" />
+            <Button Margin="0,2,5,2" Width="100" Command="{Binding Save}" CommandParameter="{Binding ElementName=root}" Content="{x:Static lp:Resources.Save}" />
             <Button Margin="0,2,5,2" Width="100" Command="{Binding Print}" CommandParameter="{Binding ElementName=root}" Content="{x:Static lp:Resources.Print}" />
         </StackPanel>
         

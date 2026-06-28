@@ -114,9 +114,7 @@
                 Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"
                 FontSize="14"
                 Margin="10,0,0,0"
-                Padding="4"
-                Background="Lavender"
-                BorderThickness="0" />
+                Padding="4" />
         </DockPanel>
 
         <!-- Sorting Controls -->
@@ -149,7 +147,7 @@
             </ComboBox>
         </DockPanel>
 
-        <StackPanel Orientation="Horizontal" Background="Lavender" DockPanel.Dock="Top">
+        <StackPanel Orientation="Horizontal" Background="#22000000" DockPanel.Dock="Top">
             <Button
                 Height="25"
                 HorizontalAlignment="Left"
@@ -177,11 +175,11 @@
             </ListBox.ItemsPanel>
             
             <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">                    
+                <Style TargetType="{x:Type ListBoxItem}">
                     <Setter Property="Template">
                         <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">                                
-                                <Border Name="bd" BorderThickness="1" Padding="8" Margin="5,5,0,0" Background="#FFD2DCFF">
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border Name="bd" BorderThickness="1" Padding="8" Margin="5,5,0,0" Background="#22000000">
                                     <ContentPresenter />
                                 </Border>
 

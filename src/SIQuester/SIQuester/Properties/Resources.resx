@@ -1407,4 +1407,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="DocumentQuestionCount" xml:space="preserve">
     <value>Total questions</value>
   </data>
+  <data name="Format" xml:space="preserve">
+    <value>Format</value>
+  </data>
 </root>

@@ -360,6 +360,7 @@
                                 <Setter Property="HeaderedItemsControl.Header" Value="{Binding}" />
                                 <Setter Property="MenuItem.Command" Value="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=DataContext.OpenRecent}" />
                                 <Setter Property="MenuItem.CommandParameter" Value="{Binding}" />
+                                <Setter Property="Padding" Value="0,5" />
                             </Style>
                         </ContextMenu.ItemContainerStyle>
                     </ContextMenu>
@@ -371,25 +372,31 @@
                 
                 <siq:DropDownButton.DropDown>
                     <ContextMenu>
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                <Setter Property="Padding" Value="0,5" />
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+
                         <MenuItem
                             Header="{x:Static lp:Resources.ImportText}"
                             ToolTip="{x:Static lp:Resources.ImportTextTip}"
                             Command="{Binding ImportTxt}">
                             <MenuItem.Icon>
-                                <Path Stretch="Uniform" Fill="Gray" Margin="3,0,0,0" Data="{Binding Source={StaticResource app_text},Path=Data}" />
+                                <Path Stretch="Uniform" Fill="Gray" Margin="3,0,0,0" Data="{Binding Source={StaticResource app_text},Path=Data}" Height="20" />
                             </MenuItem.Icon>
                         </MenuItem>
 
                         <MenuItem Header="{x:Static lp:Resources.ImportXml}" Command="{Binding ImportXml}" />
                         <MenuItem Header="YAML…" Command="{Binding ImportYaml}" />
-                        
-                        <MenuItem Header="{x:Static lp:Resources.ImportDB}" Command="{Binding ImportBase}">
+
+                        <MenuItem Header="{x:Static lp:Resources.ImportDB}" Command="{Binding ImportBase}" Height="30">
                             <MenuItem.Style>
-                                <Style TargetType="MenuItem">
+                                <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
                                     <Setter Property="HeaderTemplate">
                                         <Setter.Value>
                                             <DataTemplate>
-                                                <TextBlock Text="{Binding}" Margin="4,0,0,0" />
+                                                <TextBlock Text="{Binding}" Margin="4,0,0,0" Height="20" />
                                             </DataTemplate>
                                         </Setter.Value>
                                     </Setter>
@@ -470,6 +477,12 @@
                 
                 <siq:DropDownButton.DropDown>
                     <ContextMenu>
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                <Setter Property="Padding" Value="0,5" />
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+
                         <MenuItem
                             Header="{x:Static lp:Resources.ContactAuthor}"
                             ToolTip="{x:Static lp:Resources.ContactAuthorToolTip}"
