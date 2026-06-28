@@ -19,7 +19,7 @@ namespace SICore.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -57,24 +57,6 @@ namespace SICore.Properties {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to All the questions are taken; So, we are done with all the question.
-        /// </summary>
-        public static string AllQuestions {
-            get {
-                return ResourceManager.GetString("AllQuestions", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The time of the round has run out.
-        /// </summary>
-        public static string AllTime {
-            get {
-                return ResourceManager.GetString("AllTime", resourceCulture);
             }
         }
         
@@ -151,15 +133,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cost.
-        /// </summary>
-        public static string Cost2 {
-            get {
-                return ResourceManager.GetString("Cost2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Question contains external link which is forbidden and will not be loaded.
         /// </summary>
         public static string ExternalLinksForbidden {
@@ -178,29 +151,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to From.
-        /// </summary>
-        public static string From {
-            get {
-                return ResourceManager.GetString("From", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Start of the game.
         /// </summary>
         public static string GameBeginning {
             get {
                 return ResourceManager.GetString("GameBeginning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Game rules.
-        /// </summary>
-        public static string GameRules {
-            get {
-                return ResourceManager.GetString("GameRules", resourceCulture);
             }
         }
         
@@ -223,15 +178,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thank you for your attention. We wish you good luck, see you soon, good bye!.
-        /// </summary>
-        public static string GoodLuck {
-            get {
-                return ResourceManager.GetString("GoodLuck", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to he gave.
         /// </summary>
         public static string HeGave {
@@ -246,15 +192,6 @@ namespace SICore.Properties {
         public static string Human {
             get {
                 return ResourceManager.GetString("Human", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} will start the game; {0} is starting the game.
-        /// </summary>
-        public static string InformChooser {
-            get {
-                return ResourceManager.GetString("InformChooser", resourceCulture);
             }
         }
         
@@ -349,15 +286,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The minimum and the maximum in the round (your choice).
-        /// </summary>
-        public static string MinMaxChoice {
-            get {
-                return ResourceManager.GetString("MinMaxChoice", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No answer.
         /// </summary>
         public static string NoAnswer {
@@ -376,47 +304,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nominal.
-        /// </summary>
-        public static string Nominal {
-            get {
-                return ResourceManager.GetString("Nominal", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to We have no winner today.
         /// </summary>
         public static string NoWinner {
             get {
                 return ResourceManager.GetString("NoWinner", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to So, the player is.
-        /// </summary>
-        public static string NowPlays {
-            get {
-                return ResourceManager.GetString("NowPlays", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to of the pack.
-        /// </summary>
-        public static string OfPackage {
-            get {
-                return ResourceManager.GetString("OfPackage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to or.
-        /// </summary>
-        public static string Or {
-            get {
-                return ResourceManager.GetString("Or", resourceCulture);
             }
         }
         
@@ -520,29 +412,11 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This question is only for you. Question price is multiplied by {2}. If you answer correctly, you&apos;ll earn {0} points, otherwise you loose {1}.
-        /// </summary>
-        public static string QuestionForYourselfInfo {
-            get {
-                return ResourceManager.GetString("QuestionForYourselfInfo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Random themes.
         /// </summary>
         public static string RandomPackageName {
             get {
                 return ResourceManager.GetString("RandomPackageName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Restrictions.
-        /// </summary>
-        public static string Restrictions {
-            get {
-                return ResourceManager.GetString("Restrictions", resourceCulture);
             }
         }
         
@@ -628,33 +502,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Think!.
-        /// </summary>
-        public static string StartThink {
-            get {
-                return ResourceManager.GetString("StartThink", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Thank you! Pay attention to the board!.
-        /// </summary>
-        public static string ThankYou {
-            get {
-                return ResourceManager.GetString("ThankYou", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Theme.
-        /// </summary>
-        public static string Theme {
-            get {
-                return ResourceManager.GetString("Theme", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Removes a theme.
         /// </summary>
         public static string ThemeDeletes {
@@ -700,24 +547,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to with.
-        /// </summary>
-        public static string With {
-            get {
-                return ResourceManager.GetString("With", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to with step.
-        /// </summary>
-        public static string WithStepOf {
-            get {
-                return ResourceManager.GetString("WithStepOf", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to None of a kind!;Incorrect!;I&apos;m sorry, but that&apos;s not correct;Unfortunately that&apos;s not right;You have given an incorrect answer!;That&apos;s not right!;No;No, you&apos;re mistaken!;No, you&apos;re not right! Your answer is not correct.
         /// </summary>
         public static string Wrong {
@@ -741,24 +570,6 @@ namespace SICore.Properties {
         public static string WrongPassword {
             get {
                 return ResourceManager.GetString("WrongPassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to on the choice.
-        /// </summary>
-        public static string YourChoice {
-            get {
-                return ResourceManager.GetString("YourChoice", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Congratulations, you&apos;re the winner!; My congratulations!; Congratulations on the victory!.
-        /// </summary>
-        public static string YouWin {
-            get {
-                return ResourceManager.GetString("YouWin", resourceCulture);
             }
         }
     }

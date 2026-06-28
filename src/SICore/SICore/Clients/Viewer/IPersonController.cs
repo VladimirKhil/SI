@@ -248,12 +248,6 @@ public interface IPersonController
     void Answer() { }
 
     /// <summary>
-    /// Handles game hint.
-    /// </summary>
-    /// <param name="hint">Game hint.</param>
-    void OnHint(string hint) { }
-
-    /// <summary>
     /// Handles start of thinking.
     /// </summary>
     void StartThink() { }

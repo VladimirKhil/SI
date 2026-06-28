@@ -47,15 +47,6 @@ public sealed class Showman : Viewer
                     OnValidation2(mparams);
                     break;
 
-                case Messages.Hint:
-                    if (mparams.Length < 2)
-                    {
-                        break;
-                    }
-
-                    Controller.OnHint(mparams[1]);
-                    break;
-
                 case Messages.QuestionAnswers:
                     OnQuestionAnswers(mparams);
                     break;

@@ -1033,6 +1033,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to So, let&apos;s look at the players&apos; answers;It&apos;s time to look at our players&apos; answers.
+        /// </summary>
+        public static string LetsSee {
+            get {
+                return ResourceManager.GetString("LetsSee", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occured while trying to follow the link. Please, make sure you have a default browser.
         /// </summary>
         public static string LinkError {
@@ -2055,6 +2064,15 @@ namespace SIGame.ViewModel.Properties {
         public static string VoiceChatLink {
             get {
                 return ResourceManager.GetString("VoiceChatLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None of a kind!;Incorrect!;I&apos;m sorry, but that&apos;s not correct;Unfortunately that&apos;s not right;You have given an incorrect answer!;That&apos;s not right!;No;No, you&apos;re mistaken!;No, you&apos;re not right! Your answer is not correct.
+        /// </summary>
+        public static string Wrong {
+            get {
+                return ResourceManager.GetString("Wrong", resourceCulture);
             }
         }
         

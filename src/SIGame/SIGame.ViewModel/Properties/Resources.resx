@@ -801,4 +801,10 @@
   <data name="ThemeDeletes" xml:space="preserve">
     <value>{0} will remove a theme</value>
   </data>
+  <data name="Wrong" xml:space="preserve">
+    <value>None of a kind!;Incorrect!;I'm sorry, but that's not correct;Unfortunately that's not right;You have given an incorrect answer!;That's not right!;No;No, you're mistaken!;No, you're not right! Your answer is not correct</value>
+  </data>
+  <data name="LetsSee" xml:space="preserve">
+    <value>So, let's look at the players' answers;It's time to look at our players' answers</value>
+  </data>
 </root>

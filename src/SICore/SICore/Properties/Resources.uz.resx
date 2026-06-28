@@ -117,77 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="GameRules" xml:space="preserve">
-    <value>O‘yin qoidalari</value>
-  </data>
-  <data name="GoodLuck" xml:space="preserve">
-    <value>Barchaga e’tibor uchun rahmat. Xayr, ko‘rishguncha, sog‘ bo‘ling!</value>
-  </data>
-  <data name="InformChooser" xml:space="preserve">
-    <value>O‘yin {0} dan keyin boshlanadi;O‘yin boshlanishiga qoldi: {0}</value>
-  </data>
   <data name="LetsSee" xml:space="preserve">
     <value>Xo‘sh, keling, o‘yinchilarning javoblari bilan tanishib chiqamiz;O‘yinchilar nima deb javob berganini bilish vaqti keldi</value>
   </data>
   <data name="MakeStake" xml:space="preserve">
     <value>Hurmatli o‘yinchilar, iltimos, o‘z badallaringizni tiking;Janoblar, marhamat, badal tiking</value>
   </data>
-  <data name="Nominal" xml:space="preserve">
-    <value>Nominal</value>
-  </data>
-  <data name="NowPlays" xml:space="preserve">
-    <value>Shunday qilib, quyidagilar o‘ynamoqda</value>
-  </data>
-  <data name="OfPackage" xml:space="preserve">
-    <value>paketning</value>
-  </data>
-  <data name="Restrictions" xml:space="preserve">
-    <value>Cheklovlar</value>
-  </data>
-  <data name="QuestionForYourselfInfo" xml:space="preserve">
-    <value>savol faqat siz uchun yangraydi. Savolning qiymati {2} ga ko‘paytiriladi. To‘g‘ri javob bersangiz, {0} olasiz, noto‘g‘ri bo‘lsa, {1} yo‘qotasiz</value>
-  </data>
   <data name="Stake" xml:space="preserve">
     <value>Badal</value>
   </data>
-  <data name="StartThink" xml:space="preserve">
-    <value>O‘ylang!</value>
-  </data>
-  <data name="ThankYou" xml:space="preserve">
-    <value>Rahmat sizga! Diqqat, savol!</value>
-  </data>
-  <data name="Theme" xml:space="preserve">
-    <value>Mavzu</value>
-  </data>
-  <data name="TypeManaged" xml:space="preserve">
-    <value>boshqariladigan</value>
-  </data>
-  <data name="TypeNoFalseStart" xml:space="preserve">
-    <value>falstartsiz</value>
-  </data>
-  <data name="TypeOral" xml:space="preserve">
-    <value>og‘zaki</value>
-  </data>
-  <data name="TypeSport" xml:space="preserve">
-    <value>soddalashtirilgan</value>
-  </data>
-  <data name="With" xml:space="preserve">
-    <value>uchun</value>
-  </data>
   <data name="Wrong" xml:space="preserve">
     <value>Yo‘g‘-e!;Noto‘g‘ri!;Afsuski, unday emas!;Yo‘q, noto‘g‘ri;Afsuski, adashdingiz;Siz noto‘g‘ri javob berdingiz!;Unday emas;Yo‘q;Yo‘q, siz adashdingiz;Yo‘g‘-e, nimalar deyapsiz;Yo‘q-yo‘q!;Javobingiz noto‘g‘ri</value>
-  </data>
-  <data name="YouCanSayOnly" xml:space="preserve">
-    <value>siz faqat quyidagini ayta olasiz</value>
-  </data>
-  <data name="YourStake" xml:space="preserve">
-    <value>sizning badalingiz?</value>
-  </data>
-  <data name="YouWin" xml:space="preserve">
-    <value>tabriklayman, siz g‘alaba qozondingiz!;tabriklarimni qabul qiling!;g‘alaba muborak!</value>
-  </data>
-  <data name="TypeClassic" xml:space="preserve">
-    <value>klassik</value>
   </data>
   <data name="RandomPackageName" xml:space="preserve">
     <value>Tasodifiy mavzular to‘plami</value>

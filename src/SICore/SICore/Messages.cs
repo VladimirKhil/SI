@@ -260,6 +260,7 @@ public static class Messages
     /// <summary>
     /// Подсказка ведущему
     /// </summary>
+    [Obsolete]
     public const string Hint = "HINT";
 
     /// <summary>

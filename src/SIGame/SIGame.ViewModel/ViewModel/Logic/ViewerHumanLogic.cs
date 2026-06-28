@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Notions;
+using SI.Contracts;
 using SICore.Clients.Viewer;
 using SIData;
 using SIEngine.Rules;
@@ -689,7 +690,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
             switch (optionName)
             {
-                case nameof(AppSettingsCore.DisplayAnswerOptionsLabels):
+                case nameof(RulesSettings.DisplayAnswerOptionsLabels):
                     if (bool.TryParse(optionValue, out var flag))
                     {
                         TInfo.Settings.Model.DisplayAnswerOptionsLabels = flag;
@@ -697,7 +698,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                     break;
 
-                case nameof(AppSettingsCore.FalseStart):
+                case nameof(RulesSettings.FalseStart):
                     if (bool.TryParse(optionValue, out var falseStart))
                     {
                         _appSettings.FalseStart = falseStart;
@@ -705,7 +706,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                     break;
 
-                case nameof(AppSettingsCore.PartialText):
+                case nameof(RulesSettings.PartialText):
                     if (bool.TryParse(optionValue, out var partialText))
                     {
                         _appSettings.PartialText = partialText;
@@ -713,7 +714,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                     break;
 
-                case nameof(AppSettingsCore.PartialImages):
+                case nameof(RulesSettings.PartialImages):
                     if (bool.TryParse(optionValue, out var partialImages))
                     {
                         _appSettings.PartialImages = partialImages;
@@ -721,7 +722,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                     break;
 
-                case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
+                case nameof(SI.Contracts.TimeSettings.PartialImage):
                     if (int.TryParse(optionValue, out var value))
                     {
                         _appSettings.TimeSettings.PartialImageTime = value;
@@ -729,7 +730,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                     break;
 
-                case nameof(AppSettingsCore.ReadingSpeed):
+                case nameof(RulesSettings.ReadingSpeed):
                     if (int.TryParse(optionValue, out var readingSpeed))
                     {
                         _appSettings.ReadingSpeed = readingSpeed;
@@ -745,7 +746,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     }
                     break;
 
-                case nameof(AppSettingsCore.TimeSettings.TimeForBlockingButton):
+                case nameof(SI.Contracts.TimeSettings.ButtonBlocking):
                     if (int.TryParse(optionValue, out var timeForBlockingButton))
                     {
                         // TODO _appSettings.TimeSettings.TimeForBlockingButton = timeForBlockingButton;
@@ -754,7 +755,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
                     break;
 
-                case nameof(AppSettingsCore.UseApellations):
+                case nameof(RulesSettings.UseAppellations):
                     if (bool.TryParse(optionValue, out var useApellations))
                     {
                         _appSettings.UseApellations = useApellations;
@@ -2046,7 +2047,13 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         }
     }
 
-    public void OnHint(string hint) => _gameViewModel.Hint = $"{Resources.RightAnswer.ToUpperInvariant()} : {hint}";
+    public void OnQuestionAnswers(string[] right, string[] wrong)
+    {
+        if (right.Length > 0)
+        {
+            _gameViewModel.Hint = $"{Resources.RightAnswer.ToUpperInvariant()} : {right[0]}";
+        }
+    }
 
     public void EndThink()
     {
@@ -2291,6 +2298,10 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                 text = ChooseResourceVariant(Resources.Right, selector);
                 break;
 
+            case Models.MessageCode.WrongAnswer:
+                text = ChooseResourceVariant(Resources.Wrong, selector);
+                break;
+
             case Models.MessageCode.DeleteTheme:
                 text = ChooseResourceVariant(Resources.DeleteTheme, selector, argument);
                 break;
@@ -2309,6 +2320,10 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
             case Models.MessageCode.ThemeDeletes:
                 text = string.Format(ChooseResourceVariant(Resources.ThemeDeletes, selector), argument);
+                break;
+
+            case Models.MessageCode.PlayerAnswers:
+                text = ChooseResourceVariant(Resources.LetsSee, selector);
                 break;
 
             default:

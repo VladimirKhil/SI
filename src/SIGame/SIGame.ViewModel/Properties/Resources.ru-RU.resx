@@ -798,4 +798,10 @@
   <data name="ThemeDeletes" xml:space="preserve">
     <value>Тему убирает {0}</value>
   </data>
+  <data name="Wrong" xml:space="preserve">
+    <value>Да что вы!;Неправильно!;Увы, это не так!;Нет, вы не правы;К сожалению, вы ошиблись;Вы дали неверный ответ!;Неверно;Нет;Нет, вы ошиблись;Нет, вы не правы;Да нет!;Ваш ответ неверен</value>
+  </data>
+  <data name="LetsSee" xml:space="preserve">
+    <value>Итак, давайте ознакомимся с ответами наших игроков;Пришло время узнать, что же ответили игроки</value>
+  </data>
 </root>

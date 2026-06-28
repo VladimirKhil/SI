@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AllQuestions" xml:space="preserve">
-    <value>All the questions are taken; So, we are done with all the question</value>
-  </data>
-  <data name="AllTime" xml:space="preserve">
-    <value>The time of the round has run out</value>
-  </data>
   <data name="And" xml:space="preserve">
     <value>And</value>
   </data>
@@ -144,29 +138,17 @@
   <data name="Computer" xml:space="preserve">
     <value>Computer</value>
   </data>
-  <data name="From" xml:space="preserve">
-    <value>From</value>
-  </data>
   <data name="GameBeginning" xml:space="preserve">
     <value>Start of the game</value>
   </data>
-  <data name="GameRules" xml:space="preserve">
-    <value>Game rules</value>
-  </data>
   <data name="GameThemes" xml:space="preserve">
     <value>Here are the themes of today's game; I offer these themes of today's game for your attention</value>
-  </data>
-  <data name="GoodLuck" xml:space="preserve">
-    <value>Thank you for your attention. We wish you good luck, see you soon, good bye!</value>
   </data>
   <data name="HeGave" xml:space="preserve">
     <value>he gave</value>
   </data>
   <data name="Human" xml:space="preserve">
     <value>A human</value>
-  </data>
-  <data name="InformChooser" xml:space="preserve">
-    <value>{0} will start the game; {0} is starting the game</value>
   </data>
   <data name="IsApellating" xml:space="preserve">
     <value>is apellating his own answer</value>
@@ -183,29 +165,14 @@
   <data name="MakeStake" xml:space="preserve">
     <value>Dear players, make your stakes, please;Ladies and gentlemen, make your stakes, please</value>
   </data>
-  <data name="MinMaxChoice" xml:space="preserve">
-    <value>The minimum and the maximum in the round (your choice)</value>
-  </data>
   <data name="NoAnswer" xml:space="preserve">
     <value>No answer</value>
   </data>
   <data name="NoFreePlaceForName" xml:space="preserve">
     <value>There's no empty space for user with such name!</value>
   </data>
-  <data name="Nominal" xml:space="preserve">
-    <value>Nominal</value>
-  </data>
   <data name="NoWinner" xml:space="preserve">
     <value>We have no winner today</value>
-  </data>
-  <data name="NowPlays" xml:space="preserve">
-    <value>So, the player is</value>
-  </data>
-  <data name="OfPackage" xml:space="preserve">
-    <value>of the pack</value>
-  </data>
-  <data name="Or" xml:space="preserve">
-    <value>or</value>
   </data>
   <data name="Pass" xml:space="preserve">
     <value>Pass</value>
@@ -225,9 +192,6 @@
   <data name="Private" xml:space="preserve">
     <value>privately</value>
   </data>
-  <data name="Restrictions" xml:space="preserve">
-    <value>Restrictions</value>
-  </data>
   <data name="RightAnswer" xml:space="preserve">
     <value>The right answer</value>
   </data>
@@ -240,9 +204,6 @@
   <data name="SheGave" xml:space="preserve">
     <value>She gave</value>
   </data>
-  <data name="QuestionForYourselfInfo" xml:space="preserve">
-    <value>This question is only for you. Question price is multiplied by {2}. If you answer correctly, you'll earn {0} points, otherwise you loose {1}</value>
-  </data>
   <data name="StageFinished" xml:space="preserve">
     <value>The game is over</value>
   </data>
@@ -251,15 +212,6 @@
   </data>
   <data name="StakeMakes" xml:space="preserve">
     <value>Makes a stake</value>
-  </data>
-  <data name="StartThink" xml:space="preserve">
-    <value>Think!</value>
-  </data>
-  <data name="ThankYou" xml:space="preserve">
-    <value>Thank you! Pay attention to the board!</value>
-  </data>
-  <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
   </data>
   <data name="ThemeDeletes" xml:space="preserve">
     <value>Removes a theme</value>
@@ -270,12 +222,6 @@
   <data name="ToMyself" xml:space="preserve">
     <value>To myself</value>
   </data>
-  <data name="With" xml:space="preserve">
-    <value>with</value>
-  </data>
-  <data name="WithStepOf" xml:space="preserve">
-    <value>with step</value>
-  </data>
   <data name="Wrong" xml:space="preserve">
     <value>None of a kind!;Incorrect!;I'm sorry, but that's not correct;Unfortunately that's not right;You have given an incorrect answer!;That's not right!;No;No, you're mistaken!;No, you're not right! Your answer is not correct</value>
   </data>
@@ -284,12 +230,6 @@
   </data>
   <data name="WrongPassword" xml:space="preserve">
     <value>Wrong password</value>
-  </data>
-  <data name="YourChoice" xml:space="preserve">
-    <value>on the choice</value>
-  </data>
-  <data name="YouWin" xml:space="preserve">
-    <value>Congratulations, you're the winner!; My congratulations!; Congratulations on the victory!</value>
   </data>
   <data name="ApellatedAnswers" xml:space="preserve">
     <value>Apellated answers</value>
@@ -308,9 +248,6 @@
   </data>
   <data name="PersonAlreadyExists" xml:space="preserve">
     <value>Person {0} already exists in the game!</value>
-  </data>
-  <data name="Cost2" xml:space="preserve">
-    <value>Cost</value>
   </data>
   <data name="LetsPlayNextTheme" xml:space="preserve">
     <value>Let's play next theme</value>

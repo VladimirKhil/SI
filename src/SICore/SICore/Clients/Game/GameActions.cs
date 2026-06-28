@@ -99,9 +99,6 @@ public sealed class GameActions
                 .Concat(args ?? Array.Empty<object>())
                 .ToArray());
 
-    [Obsolete]
-    internal void PlayerReplic(int playerIndex, string text) => UserMessage(text, GameRole.Player, playerIndex);
-
     internal void UserMessage(string text, GameRole? personRole = null, int? personIndex = null)
     {
         var person = personRole == GameRole.Player && personIndex.HasValue

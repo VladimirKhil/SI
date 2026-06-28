@@ -1099,7 +1099,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void ProceedToHiddenStakesQuestion()
     {
-        _actions.ShowmanReplic(LO[nameof(R.ThankYou)]); // TODO: REMOVE (replaced by MessageCode.HiddenStakesMade)
         _actions.ShowmanReplicNew(MessageCode.HiddenStakesMade);
         ScheduleExecution(Tasks.MoveNext, 20);
     }
@@ -1113,7 +1112,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         StopWaiting();
         var deleterName = _state.Players[_state.ThemeDeleters.Current.PlayerIndex].Name;
-        _actions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {deleterName}");
+        _actions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {deleterName}"); // TODO: REMOVE (replaced by ShowmanReplicNew)
         _actions.ShowmanReplicNew(MessageCode.ThemeDeletes, deleterName);
         _state.ThemeDeleters.MoveBack();
         ScheduleExecution(Tasks.AskToDelete, 1);
@@ -1353,7 +1352,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (!_state.QuestionPlay.HiddenStakes)
             {
                 s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");                
-                _actions.ShowmanReplic(s.ToString());
+                _actions.ShowmanReplic(s.ToString()); // TODO: remove this line (replaced by ShowmanReplicNew)
 
                 if (_state.Answerer.AnswerValidationFactor == 0)
                 {
@@ -1398,7 +1397,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 if (!_state.HiddenPersons)
                 {
-                    _actions.ShowmanReplic(s.ToString());
+                    _actions.ShowmanReplic(s.ToString()); // TODO: remove this line (replaced by ShowmanReplicNew)
                     _actions.ShowmanReplicNew(MessageCode.WrongAnswer);
                 }
 
@@ -1584,7 +1583,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _actions.PlayerReplic(_state.AnswererIndex, _state.Answerer.Answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
                 _actions.OnPlayerAnswer(_state.AnswererIndex, _state.Answerer.Answer);
             }
 
@@ -1603,7 +1601,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         StopWaiting();
 
         var s = GetRandomString(LO[nameof(R.LetsSee)]);
-        _actions.ShowmanReplic(s);
+        _actions.ShowmanReplic(s); // TODO: remove this line (replaced by ShowmanReplicNew)
         _actions.ShowmanReplicNew(MessageCode.PlayerAnswers);
 
         var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
@@ -2121,8 +2119,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void GoodLuck()
     {
-        _actions.ShowmanReplic(LO[nameof(R.GoodLuck)]); // TODO: REMOVE (replaced by InformStage)
-
         _state.Stage = GameStage.After;
         OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
         _actions.InformStage();
@@ -2264,10 +2260,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.CurPriceWrong = _state.Stake;
 
         _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+", "ANNOUNCE");
-
-        var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_state.Players[stakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_state.Stake)}";
-
-        _actions.ShowmanReplic(msg.ToString()); // TODO: REMOVE (replaced by SET_CHOOSER + ANNOUNCE message)
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10));
     }
 
@@ -2615,10 +2607,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 {
                     if (_state.Players[i].Sum == winnerScore)
                     {
-                        var s = new StringBuilder(_state.Players[i].Name).Append(", ");
-                        s.Append(GetRandomString(LO[nameof(R.YouWin)]));
-
-                        _actions.ShowmanReplic(s.ToString());
                         _actions.SendMessageWithArgs(Messages.Winner, i);
                         break;
                     }
@@ -2626,7 +2614,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                _actions.ShowmanReplic(LO[nameof(R.NoWinner)]);
                 _actions.SendMessageWithArgs(Messages.Winner, -1);
             }
         }
@@ -2874,9 +2861,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var answererIndex = _state.AnnouncedAnswerersEnumerator.Current;
         _state.AnswererIndex = answererIndex;
         var playerAnswer = _state.Answerer?.Answer;
-        var answer = string.IsNullOrEmpty(playerAnswer) ? "-" : playerAnswer;
 
-        _actions.PlayerReplic(answererIndex, answer); // TODO: REMOVE: replaced by PLAYER_ANSWER message
         _actions.OnPlayerAnswer(answererIndex, playerAnswer ?? "");
 
         if (_state.QuestionPlay.ValidateAfterRightAnswer)
@@ -3846,14 +3831,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var isAppellationForRightAnswer = _state.AppellationCallerIndex == -1;
         var appellationSource = isAppellationForRightAnswer ? appelaer : _state.Players[_state.AppellationCallerIndex];
 
-        var given = LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
-        var apellationReplic = string.Format(LO[nameof(R.PleaseCheckApellation)], given);
-
-        string origin = isAppellationForRightAnswer
-            ? LO[nameof(R.IsApellating)]
-            : string.Format(LO[nameof(R.IsConsideringWrong)], appelaer.Name);
-
-        _actions.ShowmanReplic($"{appellationSource} {origin}. {apellationReplic}"); // TODO: REMOVE (replaced by Validation2Message)
         _actions.ShowmanReplicNew(isAppellationForRightAnswer ? MessageCode.AppellationFor : MessageCode.AppellationAgainst, appellationSource, appelaer);
 
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer ?? "", false, isAppellationForRightAnswer);
@@ -4462,10 +4439,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _actions.SendMessageWithArgs(Messages.QuestionCaption, themeName);
-
-        var s = new StringBuilder(LO[nameof(R.Theme)]).Append(": ").Append(themeName);
-
-        _actions.ShowmanReplic(s.ToString()); // TODO: Remove (replaced by MessageCode.Theme)
         _actions.ShowmanReplicNew(MessageCode.Theme, themeName);
 
         ScheduleExecution(Tasks.MoveNext, 30);
@@ -4667,38 +4640,21 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     // TODO: OnAnnouncePrice and OnSelectPrice should utilize the same selection strategy
     internal void OnAnnouncePrice(NumberSet availableRange)
     {
-        // TODO: REMOVE (replaced by QUESTION_PRICE_RANGE)
-        var s = new StringBuilder(LO[nameof(R.Cost2)]).Append(": ");
-
         if (availableRange.Maximum == 0)
         {
-            s.Append(LO[nameof(R.MinMaxChoice)]);
-            _actions.ShowmanReplic(s.ToString());
             _actions.SendMessageWithArgs(Messages.QuestionPriceRange, 0);
         }
         else if (availableRange.Minimum == availableRange.Maximum)
         {
-            s.Append(availableRange.Minimum);
-            _actions.ShowmanReplic(s.ToString());
             _actions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum);
+        }
+        else if (availableRange.Step > 0)
+        {
+            _actions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum, availableRange.Step);
         }
         else
         {
-            if (availableRange.Step > 0)
-            {
-                s.Append(
-                    $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.UpTo)]} {Notion.FormatNumber(availableRange.Maximum)} " +
-                    $"{LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(availableRange.Step)} ({LO[nameof(R.YourChoice)]})");
-
-                _actions.ShowmanReplic(s.ToString());
-                _actions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum, availableRange.Step);
-            }
-            else
-            {
-                s.Append($"{Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.Or)]} {Notion.FormatNumber(availableRange.Maximum)} ({LO[nameof(R.YourChoice)]})");
-                _actions.ShowmanReplic(s.ToString());
-                _actions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum);
-            }
+            _actions.SendMessageWithArgs(Messages.QuestionPriceRange, availableRange.Minimum, availableRange.Maximum);
         }
 
         ScheduleExecution(Tasks.MoveNext, 20);
@@ -4845,24 +4801,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var factor = _state.Rules.QuestionForYourselfFactor;
 
-        _state.CurPriceRight *= factor;
-        _state.CurPriceWrong *= factor;
-
-        if (factor != 1 || _state.CurPriceRight != _state.CurPriceWrong)
-        {
-            var replic = string.Format(
-                LO[nameof(R.QuestionForYourselfInfo)],
-                Notion.FormatNumber(_state.CurPriceRight),
-                Notion.FormatNumber(_state.CurPriceWrong),
-                factor);
-
-            _actions.ShowmanReplic($"{_state.Chooser!.Name}, {replic}");
-        }
-
         var delay = 20;
 
         if (factor != 1)
         {
+            _state.CurPriceRight *= factor;
+            _state.CurPriceWrong *= factor;
+
             _actions.ShowmanReplicNew(MessageCode.PriceMultiplication, factor);
             delay += 20;
         }

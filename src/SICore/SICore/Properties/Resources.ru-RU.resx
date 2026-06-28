@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AllQuestions" xml:space="preserve">
-    <value>Разыграны все вопросы;Итак, мы разыграли все вопросы</value>
-  </data>
-  <data name="AllTime" xml:space="preserve">
-    <value>Время раунда вышло;Время истекло</value>
-  </data>
   <data name="And" xml:space="preserve">
     <value>И</value>
   </data>
@@ -144,29 +138,17 @@
   <data name="Computer" xml:space="preserve">
     <value>Компьютер</value>
   </data>
-  <data name="From" xml:space="preserve">
-    <value>От</value>
-  </data>
   <data name="GameBeginning" xml:space="preserve">
     <value>Начало игры</value>
   </data>
-  <data name="GameRules" xml:space="preserve">
-    <value>Правила игры</value>
-  </data>
   <data name="GameThemes" xml:space="preserve">
     <value>А вот и темы сегодняшней игры;Предлагаю вашему вниманию темы сегодняшней игры</value>
-  </data>
-  <data name="GoodLuck" xml:space="preserve">
-    <value>Всем спасибо за внимание. Всего доброго, увидимся, пока!</value>
   </data>
   <data name="HeGave" xml:space="preserve">
     <value>он дал</value>
   </data>
   <data name="Human" xml:space="preserve">
     <value>Человек</value>
-  </data>
-  <data name="InformChooser" xml:space="preserve">
-    <value>Игру начнёт {0};Игру будет начинать {0}</value>
   </data>
   <data name="IsApellating" xml:space="preserve">
     <value>апеллирует свой ответ</value>
@@ -183,29 +165,14 @@
   <data name="MakeStake" xml:space="preserve">
     <value>Уважаемые игроки, делайте, пожалуйста, ваши ставки;Господа, делайте, пожалуйста, ваши ставки</value>
   </data>
-  <data name="MinMaxChoice" xml:space="preserve">
-    <value>Минимум или максимум в раунде (на выбор)</value>
-  </data>
   <data name="NoAnswer" xml:space="preserve">
     <value>Нет ответа</value>
   </data>
   <data name="NoFreePlaceForName" xml:space="preserve">
     <value>Свободного места с таким именем не обнаружено!</value>
   </data>
-  <data name="Nominal" xml:space="preserve">
-    <value>Номинал</value>
-  </data>
   <data name="NoWinner" xml:space="preserve">
     <value>Сегодня у нас нет победителя</value>
-  </data>
-  <data name="NowPlays" xml:space="preserve">
-    <value>Итак, играет</value>
-  </data>
-  <data name="OfPackage" xml:space="preserve">
-    <value>пакета</value>
-  </data>
-  <data name="Or" xml:space="preserve">
-    <value>или</value>
   </data>
   <data name="Pass" xml:space="preserve">
     <value>Пас</value>
@@ -225,9 +192,6 @@
   <data name="Private" xml:space="preserve">
     <value>лично</value>
   </data>
-  <data name="Restrictions" xml:space="preserve">
-    <value>Ограничения</value>
-  </data>
   <data name="RightAnswer" xml:space="preserve">
     <value>Правильный ответ</value>
   </data>
@@ -240,9 +204,6 @@
   <data name="SheGave" xml:space="preserve">
     <value>она дала</value>
   </data>
-  <data name="QuestionForYourselfInfo" xml:space="preserve">
-    <value>вопрос звучит только для вас. Стоимость вопроса умножается на {2}. В случае верного ответа вы получите {0}, в случае неверного вы потеряете {1}</value>
-  </data>
   <data name="StageFinished" xml:space="preserve">
     <value>Игра окончена</value>
   </data>
@@ -251,15 +212,6 @@
   </data>
   <data name="StakeMakes" xml:space="preserve">
     <value>Ставку делает</value>
-  </data>
-  <data name="StartThink" xml:space="preserve">
-    <value>Думайте!</value>
-  </data>
-  <data name="ThankYou" xml:space="preserve">
-    <value>Благодарю вас! Внимание, вопрос!</value>
-  </data>
-  <data name="Theme" xml:space="preserve">
-    <value>Тема</value>
   </data>
   <data name="ThemeDeletes" xml:space="preserve">
     <value>Тему убирает</value>
@@ -270,12 +222,6 @@
   <data name="ToMyself" xml:space="preserve">
     <value>Себе</value>
   </data>
-  <data name="With" xml:space="preserve">
-    <value>за</value>
-  </data>
-  <data name="WithStepOf" xml:space="preserve">
-    <value>с шагом в</value>
-  </data>
   <data name="Wrong" xml:space="preserve">
     <value>Да что вы!;Неправильно!;Увы, это не так!;Нет, вы не правы;К сожалению, вы ошиблись;Вы дали неверный ответ!;Неверно;Нет;Нет, вы ошиблись;Нет, вы не правы;Да нет!;Ваш ответ неверен</value>
   </data>
@@ -284,12 +230,6 @@
   </data>
   <data name="WrongPassword" xml:space="preserve">
     <value>Неверный пароль!</value>
-  </data>
-  <data name="YourChoice" xml:space="preserve">
-    <value>на выбор</value>
-  </data>
-  <data name="YouWin" xml:space="preserve">
-    <value>поздравляю вас, вы победили!;примите мои поздравления!;с победой вас!</value>
   </data>
   <data name="ApellatedAnswers" xml:space="preserve">
     <value>Апеллированные ответы</value>
@@ -308,9 +248,6 @@
   </data>
   <data name="PersonAlreadyExists" xml:space="preserve">
     <value>Участник {0} уже есть в игре!</value>
-  </data>
-  <data name="Cost2" xml:space="preserve">
-    <value>Стоимость</value>
   </data>
   <data name="LetsPlayNextTheme" xml:space="preserve">
     <value>Давайте сыграем остальные темы</value>

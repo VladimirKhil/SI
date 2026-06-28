@@ -210,6 +210,8 @@ public sealed class TimeSettings
     /// </summary>
     public int TimeForBlockingButton { get; } = 3;
 
+    public int ButtonsAccepting { get; set; } = 300;
+
     public TimeSettings()
     {
         All[TimeSettingsTypes.ChoosingQuestion] = 30;
