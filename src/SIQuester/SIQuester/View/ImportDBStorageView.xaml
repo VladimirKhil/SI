@@ -7,10 +7,13 @@
     xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lvmm="clr-namespace:SIQuester.ViewModel.Model;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300"
-    d:DataContext="{d:DesignInstance lvm:ImportDBStorageViewModel}">    
+    d:DataContext="{d:DesignInstance lvm:ImportDBStorageViewModel}"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">    
     <UserControl.Resources>
         <HierarchicalDataTemplate DataType="{x:Type lvmm:DBNode}" ItemsSource="{Binding Children}">
             <TextBlock Text="{Binding Name}" Padding="5,3" />

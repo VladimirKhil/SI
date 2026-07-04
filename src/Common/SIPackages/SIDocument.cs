@@ -375,12 +375,20 @@ public sealed class SIDocument : IDisposable
             using var writer = XmlWriter.Create(stream);
             _authors.WriteXml(writer);
         }
+        else
+        {
+            packageContainer.DeleteStream(CollectionNames.TextsStorageName, AuthorsFileName);
+        }
 
         if (_sources.Any())
         {
             using var stream = CreateIfNotExists(packageContainer, CollectionNames.TextsStorageName, SourcesFileName).Stream;
             using var writer = XmlWriter.Create(stream);
             _sources.WriteXml(writer);
+        }
+        else
+        {
+            packageContainer.DeleteStream(CollectionNames.TextsStorageName, SourcesFileName);
         }
 
         var qualityStreamLength = packageContainer.GetStreamLength(QualityMarkerName);

@@ -24,6 +24,7 @@ using SIStorage.Service.Contract;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -67,12 +68,16 @@ public partial class App : Application
 
     private ILogger<App>? _logger;
 
+    private const string MahAppsThemePathPrefix = "pack://application:,,,/MahApps.Metro;component/Styles/Themes/";
+    private static readonly Uri LightBlueThemeUri = new($"{MahAppsThemePathPrefix}Light.Blue.xaml", UriKind.Absolute);
+    private static readonly Uri DarkBlueThemeUri = new($"{MahAppsThemePathPrefix}Dark.Blue.xaml", UriKind.Absolute);
 
     private DispatcherTimer? _autoSaveTimer;
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
         AppSettings.Default = _settings;
+        AppSettings.Default.PropertyChanged += Default_PropertyChanged;
 
         if (!IsWindows8_1OrLater)
         {
@@ -129,6 +134,8 @@ public partial class App : Application
             SendDelayedReports();
 #endif
 
+            UpdateTheme();
+
             if (_host == null)
             {
                 throw new InvalidOperationException("Host is not initialized");
@@ -168,6 +175,45 @@ public partial class App : Application
     }
 
     private void AutoSave(object? sender, EventArgs args) => _mainViewModel?.AutoSave();
+
+    private void Default_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.PropertyName) && e.PropertyName != nameof(AppSettings.Theme))
+        {
+            return;
+        }
+
+        if (Dispatcher.CheckAccess())
+        {
+            UpdateTheme();
+        }
+        else
+        {
+            Dispatcher.Invoke(UpdateTheme);
+        }
+    }
+
+    private void UpdateTheme()
+    {
+        var themeUri = _settings.Theme == ThemeOption.Dark ? DarkBlueThemeUri : LightBlueThemeUri;
+        var dictionaries = Resources.MergedDictionaries;
+
+        var themeDictionary = dictionaries.FirstOrDefault(
+            dictionary =>
+                dictionary.Source is not null
+                && dictionary.Source.OriginalString.StartsWith(MahAppsThemePathPrefix, StringComparison.OrdinalIgnoreCase));
+
+        if (themeDictionary is null)
+        {
+            dictionaries.Insert(0, new ResourceDictionary { Source = themeUri });
+            return;
+        }
+
+        if (themeDictionary.Source != themeUri)
+        {
+            themeDictionary.Source = themeUri;
+        }
+    }
 
     private void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
     {
@@ -487,6 +533,7 @@ public partial class App : Application
         try
         {
             _logger?.LogInformation("OnExit");
+            AppSettings.Default.PropertyChanged -= Default_PropertyChanged;
 
             if (_settings != null && _settings.HasChanges)
             {

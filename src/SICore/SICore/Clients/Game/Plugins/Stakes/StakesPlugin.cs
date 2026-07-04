@@ -2,10 +2,10 @@
 
 internal sealed class StakesPlugin
 {
-    private readonly GameData _gameData;
+    private readonly GameState _gameData;
     private readonly StakesState _state;
 
-    public StakesPlugin(GameData gameData)
+    public StakesPlugin(GameState gameData)
     {
         _gameData = gameData;
         _state = gameData.Stakes;

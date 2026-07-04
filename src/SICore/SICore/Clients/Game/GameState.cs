@@ -14,9 +14,9 @@ using System.Text;
 namespace SICore;
 
 /// <summary>
-/// Defines a game data.
+/// Defines a game state.
 /// </summary>
-public sealed class GameData : Data
+public sealed class GameState : Data
 {
     /// <summary>
     /// Game host.
@@ -27,6 +27,11 @@ public sealed class GameData : Data
     /// Настройки игры
     /// </summary>
     public IGameSettingsCore<AppSettingsCore> Settings { get; }
+
+    /// <summary>
+    /// Gets game room settings.
+    /// </summary>
+    public SI.Contracts.RoomSettings RoomSettings { get; }
 
     /// <summary>
     /// Gets game time settings.
@@ -603,11 +608,12 @@ public sealed class GameData : Data
     /// </summary>
     public SIData.GameStage Stage { get; internal set; }
 
-    public GameData(
+    public GameState(
         IGameHost gameHost,
         GamePersonAccount showman,
         Uri? packageSource,
         IGameSettingsCore<AppSettingsCore> settings,
+        SI.Contracts.RoomSettings roomSettings,
         SI.Contracts.TimeSettings timeSettings,
         SI.Contracts.RulesSettings rules,
         IPackageStatisticsProvider? packageStatisticsProvider)
@@ -617,6 +623,7 @@ public sealed class GameData : Data
         Stakes = new StakesState(Players);
         Settings = settings;
         GameResultInfo = new GameResult(packageSource);
+        RoomSettings = roomSettings;
         TimeSettings = timeSettings;
         Rules = rules;
         PackageStatisticsProvider = packageStatisticsProvider;

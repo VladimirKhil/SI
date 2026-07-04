@@ -8,10 +8,13 @@
     xmlns:lp="clr-namespace:SIQuester.Properties"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:uwc="clr-namespace:Utils.Wpf.Converters;assembly=Utils.Wpf"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     mc:Ignorable="d"
     d:DesignWidth="564"
     d:DesignHeight="708.29"
-    d:DataContext="{d:DesignInstance vm:ImportSIStorageViewModel}">
+    d:DataContext="{d:DesignInstance vm:ImportSIStorageViewModel}"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <UserControl.Resources>
         <uwc:StringJoinConverter x:Key="StringJoinConverter" />
         

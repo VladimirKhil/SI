@@ -68,6 +68,7 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
+            new SI.Contracts.RoomSettings(),
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             document,
@@ -234,6 +235,7 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
+            new SI.Contracts.RoomSettings(),
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             document,
@@ -333,6 +335,7 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
+            new SI.Contracts.RoomSettings(),
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             document,
@@ -434,6 +437,7 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
+            new SI.Contracts.RoomSettings(),
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             document,

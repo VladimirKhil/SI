@@ -8,7 +8,7 @@ namespace SICore.Clients.Game;
 /// <inheritdoc cref="IQuestionEnginePlayHandler" />
 internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 {
-    private readonly GameData _state;
+    private readonly GameState _state;
     private GameController _controller = null!;
 
     public GameController Controller
@@ -17,7 +17,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         set => _controller = value;
     }
 
-    public QuestionPlayHandler(GameData state) => _state = state;
+    public QuestionPlayHandler(GameState state) => _state = state;
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions, IReadOnlyList<ContentItem[]> screenContentSequence)
     {

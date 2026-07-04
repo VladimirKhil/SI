@@ -26,13 +26,13 @@ public sealed class GameActions
 
     private static readonly string[] ReviewablePackageSources = new string[] { "https://steamcommunity.com" };
 
-    private readonly GameData _state;
+    private readonly GameState _state;
 
     public Client Client { get; }
 
     private readonly IFileShare _fileShare;
 
-    public GameActions(Client client, GameData state, IFileShare fileShare)
+    public GameActions(Client client, GameState state, IFileShare fileShare)
     {
         Client = client;
         _state = state;

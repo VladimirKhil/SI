@@ -107,10 +107,10 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal StakesPlugin Stakes { get; }
 
-    private readonly GameData _state;
+    private readonly GameState _state;
 
     public GameController(
-        GameData state,
+        GameState state,
         GameActions actions,
         SIEngine.GameEngine engine,
         ILocalizer localizer,
@@ -137,7 +137,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.GameResultInfo.PackageAuthors = Engine.Document.Package.Info.Authors.ToArray();
         _state.GameResultInfo.PackageAuthorsContacts = Engine.Document.Package.ContactUri;
 
-        if (_state.Settings.IsAutomatic)
+        if (_state.RoomSettings.IsAutomatic)
         {
             // The game should be started automatically
             ScheduleExecution(Tasks.AutoGame, Constants.AutomaticGameStartDuration);

@@ -56,7 +56,6 @@
                 <TextBlock VerticalAlignment="Center" Text="{x:Static lp:Resources.Theme}" />
 
                 <ComboBox
-                    IsEnabled="False"
                     Margin="0,5"
                     Width="120"
                     HorizontalAlignment="Left"

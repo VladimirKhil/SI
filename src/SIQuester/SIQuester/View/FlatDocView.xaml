@@ -796,7 +796,6 @@
                             Padding="0,2,0,0" />
 
                         <ComboBox
-                            Style="{StaticResource ComboBoxCommon}"
                             MinWidth="90"
                             Margin="0,1,0,0"
                             Padding="0,1"
@@ -838,7 +837,6 @@
                             Padding="0,2,0,0" />
 
                         <ComboBox
-                            Style="{StaticResource ComboBoxCommon}"
                             MinWidth="90"
                             Padding="0,1"
                             ItemsSource="{Binding DataContext.StorageContext.Languages, RelativeSource={RelativeSource AncestorType=Grid}}"
@@ -944,7 +942,6 @@
                             Padding="0,2,0,0" />
 
                         <ComboBox
-                            Style="{StaticResource ComboBoxCommon}"
                             Grid.Row="0"
                             Grid.Column="3"
                             IsEditable="True"
@@ -1382,7 +1379,7 @@
         <Border
             Width="400"
             Grid.Column="1"
-            Background="#FFF1F1F1"
+            Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
             Visibility="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ContentControl Content="{Binding ActiveNode}" ContentTemplateSelector="{StaticResource CardSelector}" />

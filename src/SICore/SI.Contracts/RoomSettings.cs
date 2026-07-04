@@ -10,7 +10,7 @@ public sealed class RoomSettings
     /// <summary>
     /// Game host name.
     /// </summary>
-    public required string HostName { get; set; }
+    public string HostName { get; set; } = "";
 
     /// <summary>
     /// Showman account.

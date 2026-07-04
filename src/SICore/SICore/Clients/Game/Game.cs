@@ -48,14 +48,14 @@ public sealed class Game : MessageHandler
 
     private ILocalizer LO { get; }
 
-    private readonly GameData _state;
+    private readonly GameState _state;
 
-    public GameData ClientData => _state;
+    public GameState ClientData => _state;
 
     public Game(
         Client client,
         ILocalizer localizer,
-        GameData state,
+        GameState state,
         GameActions actions,
         GameController controller,
         ComputerAccount[] defaultPlayers,
@@ -135,7 +135,7 @@ public sealed class Game : MessageHandler
             _state.GameName,
             _controller.Engine.PackageName,
             _controller.Engine.ContactUri,
-            _state.Settings.NetworkVoiceChat);
+            _state.RoomSettings.VoiceChatUri);
 
         _actions.SendMessageToWithArgs(person, Messages.Hostname, _state.HostName ?? "");
     }
@@ -238,7 +238,7 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
-                case nameof(GameData.TimeSettings.PartialImage):
+                case nameof(GameState.TimeSettings.PartialImage):
                     if (int.TryParse(optionValue, out var partialImageTime) && partialImageTime != _state.TimeSettings.PartialImage)
                     {
                         _state.TimeSettings.PartialImage = partialImageTime;
@@ -248,7 +248,7 @@ public sealed class Game : MessageHandler
 
                     break;
 
-                case nameof(GameData.TimeSettings.ButtonBlocking):
+                case nameof(GameState.TimeSettings.ButtonBlocking):
                     if (int.TryParse(optionValue, out var buttonBlockingTime) && buttonBlockingTime != _state.TimeSettings.ButtonBlocking)
                     {
                         _state.TimeSettings.ButtonBlocking = buttonBlockingTime;
@@ -488,8 +488,8 @@ public sealed class Game : MessageHandler
         }
 
         if ((!_state.HiddenPersons || name == _state.HostName)
-            && !string.IsNullOrEmpty(_state.Settings.NetworkGamePassword)
-            && _state.Settings.NetworkGamePassword != password)
+            && !string.IsNullOrEmpty(_state.RoomSettings.Password)
+            && _state.RoomSettings.Password != password)
         {
             return AuthenticationResult.WrongPassword;
         }
@@ -653,7 +653,7 @@ public sealed class Game : MessageHandler
                         var res = new StringBuilder();
                         
                         res.Append(Messages.GameInfo);
-                        res.Append(Message.ArgsSeparatorChar).Append(_state.Settings.NetworkGameName);
+                        res.Append(Message.ArgsSeparatorChar).Append(_state.RoomSettings.Name);
                         res.Append(Message.ArgsSeparatorChar).Append(_state.HostName);
                         res.Append(Message.ArgsSeparatorChar).Append(_state.Players.Count);
 
@@ -1418,7 +1418,7 @@ public sealed class Game : MessageHandler
             // TODO: send already displayed content part
         }
 
-        if (_state.Stage == GameStage.Before && _state.Settings.IsAutomatic)
+        if (_state.Stage == GameStage.Before && _state.RoomSettings.IsAutomatic)
         {
             var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - _state.TimerStartTime[2]).TotalSeconds * 10;
 
@@ -1901,7 +1901,7 @@ public sealed class Game : MessageHandler
         {
             StartGame();
         }
-        else if (_state.Settings.IsAutomatic)
+        else if (_state.RoomSettings.IsAutomatic)
         {
             if (_state.Players.All(player => player.IsConnected))
             {
@@ -3558,7 +3558,7 @@ public sealed class Game : MessageHandler
 
         _actions.InformConnected(name, role, index, isMale);
 
-        if (_state.HostName == null && !_state.Settings.IsAutomatic)
+        if (_state.HostName == null && !_state.RoomSettings.IsAutomatic)
         {
             UpdateHostName(name);
         }

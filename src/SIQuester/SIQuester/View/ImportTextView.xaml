@@ -13,7 +13,10 @@
     xmlns:lp="clr-namespace:SIQuester.Properties"
     xmlns:lc="clr-namespace:SIQuester.Converters"
     xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
-    d:DataContext="{d:DesignInstance lvm:ImportTextViewModel}">
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
+    d:DataContext="{d:DesignInstance lvm:ImportTextViewModel}"
+    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <UserControl.Resources>
         <Style x:Key="Editor" TargetType="RichTextBox">
             <Style.Triggers>

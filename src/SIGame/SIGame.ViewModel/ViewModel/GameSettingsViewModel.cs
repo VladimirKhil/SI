@@ -752,25 +752,26 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         var avatarHelper = new AvatarHelper(Path.Combine(documentPath, "avatars"));
 
         var appSettings = _model.AppSettings;
-        var timeSettings = appSettings.TimeSettings;
+        var timeSettingsOld = appSettings.TimeSettings;
 
-        var timeSettingsNew = new SI.Contracts.TimeSettings
+        var timeSettings = new SI.Contracts.TimeSettings
         {
-            QuestionSelection = timeSettings.TimeForChoosingQuestion,
-            ThemeSelection = timeSettings.TimeForChoosingFinalTheme,
-            PlayerSelection = timeSettings.TimeForGivingACat,
-            ButtonPressing = timeSettings.TimeForThinkingOnQuestion,
-            Answering = timeSettings.TimeForPrintingAnswer,
-            SoloAnswering = timeSettings.TimeForThinkingOnSpecial,
-            HiddenAnswering = timeSettings.TimeForFinalThinking,
-            StakeMaking = timeSettings.TimeForMakingStake,
-            ShowmanDecision = timeSettings.TimeForShowmanDecisions,
-            Appellation = timeSettings.TimeForShowmanDecisions, // Backward compatibility
-            Round = timeSettings.TimeOfRound,
-            ButtonBlocking = timeSettings.TimeForBlockingButton,
-            Reflection = timeSettings.TimeForRightAnswer, // Backward compatibility
-            Image = timeSettings.ImageTime,
-            PartialImage = timeSettings.PartialImageTime,
+            QuestionSelection = timeSettingsOld.TimeForChoosingQuestion,
+            ThemeSelection = timeSettingsOld.TimeForChoosingFinalTheme,
+            PlayerSelection = timeSettingsOld.TimeForGivingACat,
+            ButtonPressing = timeSettingsOld.TimeForThinkingOnQuestion,
+            ButtonsAccepting = timeSettingsOld.ButtonsAccepting,
+            Answering = timeSettingsOld.TimeForPrintingAnswer,
+            SoloAnswering = timeSettingsOld.TimeForThinkingOnSpecial,
+            HiddenAnswering = timeSettingsOld.TimeForFinalThinking,
+            StakeMaking = timeSettingsOld.TimeForMakingStake,
+            ShowmanDecision = timeSettingsOld.TimeForShowmanDecisions,
+            Appellation = timeSettingsOld.TimeForShowmanDecisions, // Backward compatibility
+            Round = timeSettingsOld.TimeOfRound,
+            ButtonBlocking = timeSettingsOld.TimeForBlockingButton,
+            Reflection = timeSettingsOld.TimeForRightAnswer, // Backward compatibility
+            Image = timeSettingsOld.ImageTime,
+            PartialImage = timeSettingsOld.PartialImageTime,
         };
 
         var rulesSettings = new SI.Contracts.RulesSettings
@@ -805,10 +806,24 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             AppendRightAnswerTextToComplexAnswer = SI.Contracts.RulesSettings.DefaultAppendRightAnswerTextToComplexAnswer,
         };
 
+        var roomSettings = new SI.Contracts.RoomSettings
+        {
+            HostName = _model.HumanPlayerName,
+            Showman = ToContractAccount(_model.Showman),
+            Players = [.. _model.Players.Select(ToContractAccount)],
+            Viewers = [.. _model.Viewers.Select(ToContractAccount)],
+            Name = _model.NetworkGameName,
+            Password = _model.NetworkGamePassword,
+            VoiceChatUri = _model.NetworkVoiceChat,
+            IsPrivate = _model.IsPrivate,
+            IsAutomatic = _model.IsAutomatic,
+        };
+
         var game = GameRunner.CreateGame(
             node,
             _model,
-            timeSettingsNew,
+            roomSettings,
+            timeSettings,
             rulesSettings,
             document,
             _gameHost,
@@ -887,6 +902,14 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         MoveToGame(gameViewModel);
     }
+
+    private static SI.Contracts.Models.Account ToContractAccount(Account account) => new()
+    {
+        Name = account.Name,
+        Type = account.IsHuman ? SI.Contracts.Models.AccountType.Human : SI.Contracts.Models.AccountType.Bot,
+        Gender = account.IsMale ? SI.Contracts.Models.Gender.Male : SI.Contracts.Models.Gender.Female,
+        AvatarUri = account.Picture,
+    };
 
     private void MoveToGame(GameViewModel gameViewModel)
     {

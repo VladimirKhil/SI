@@ -9,13 +9,13 @@ namespace SICore.Clients.Game;
 
 internal sealed class PlayHandler : ISIEnginePlayHandler
 {
-    private readonly GameData _state;
+    private readonly GameState _state;
 
     public GameController Controller { get; internal set; } = null!;
 
     public GameActions GameActions { get; internal set; } = null!;
 
-    public PlayHandler(GameData state) => _state = state;
+    public PlayHandler(GameState state) => _state = state;
 
     public void OnRound(Round round, QuestionSelectionStrategyType strategyType)
     {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="siq" targetNamespace="https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd" elementFormDefault="qualified" xmlns="https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd" xmlns:mstns="https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xs:element name="package">
 		<xs:annotation>
@@ -13,6 +13,32 @@
 								<xs:annotation>
 									<xs:documentation>Package tag</xs:documentation>
 								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="files" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Package file hashes</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Package file hash entry</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="name" type="xs:string" use="required">
+										<xs:annotation>
+											<xs:documentation>Qualified package file name</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="hash" type="xs:string" use="required">
+										<xs:annotation>
+											<xs:documentation>File content hash</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
 					</xs:complexType>

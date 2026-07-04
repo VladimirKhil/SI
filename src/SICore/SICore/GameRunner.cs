@@ -28,6 +28,7 @@ public static class GameRunner
     public static Game CreateGame(
         Node node,
         IGameSettingsCore<AppSettingsCore> settings,
+        SI.Contracts.RoomSettings roomSettings,
         SI.Contracts.TimeSettings timeSettings,
         SI.Contracts.RulesSettings rules,
         SIDocument document,
@@ -42,9 +43,9 @@ public static class GameRunner
         IPackageStatisticsProvider? packageStatisticsProvider = null,
         bool hiddenPlayers = false)
     {
-        var gameState = new GameData(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, timeSettings, rules, packageStatisticsProvider)
+        var gameState = new GameState(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, roomSettings, timeSettings, rules, packageStatisticsProvider)
         {
-            HostName = settings.IsAutomatic ? null : settings.HumanPlayerName,
+            HostName = roomSettings.IsAutomatic ? null : roomSettings.HostName,
             GameName = gameName ?? "",
             HiddenPersons = hiddenPlayers,
         };
