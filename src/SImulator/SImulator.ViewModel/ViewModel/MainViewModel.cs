@@ -555,6 +555,21 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             ButtonPressMode = SI.Contracts.ButtonPressMode.FirstWins,
         };
 
+        var roomSettings = new SI.Contracts.RoomSettings
+        {
+            HostName = "HOST",
+            Showman = new SI.Contracts.Models.Account
+            {
+                Name = "HOST",
+                Type = SI.Contracts.Models.AccountType.Human,
+            },
+            Players = [.. players.Select(p => new SI.Contracts.Models.Account
+            {
+                Name = p.Name,
+                Type = SI.Contracts.Models.AccountType.Human,
+            })],
+        };
+
         var gameHost = new GameHost();
         var fileShare = new Services.FileShare(tempDir);
 
@@ -566,6 +581,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         var game = GameRunner.CreateGame(
            node,
            gameSettings,
+           roomSettings,
            new SI.Contracts.TimeSettings(),
            rules,
            document,
