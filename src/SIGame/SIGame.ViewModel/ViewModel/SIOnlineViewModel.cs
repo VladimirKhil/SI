@@ -578,7 +578,9 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                 Count = 6
             };
 
-            var packagesStatistics = (await _siStatisticsServiceClient.GetLatestTopPackagesAsync(filter, token)
+            var topPackagesRequest = new SIStatisticsService.Contract.Models.TopPackagesRequest(filter);
+
+            var packagesStatistics = (await _siStatisticsServiceClient.GetLatestTopPackagesAsync(topPackagesRequest, token)
                 ?? new SIStatisticsService.Contract.Models.PackagesStatistic())
                 .Packages.Where(p => p.Package?.Name != RandomIndicator).ToArray();
 

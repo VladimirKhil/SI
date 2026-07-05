@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="VKhil.SIContentService.Client" Version="1.1.2" />
-    <PackageReference Include="VKhil.SIStatisticsService.Client" Version="1.1.1" />
+    <PackageReference Include="VKhil.SIStatisticsService.Client" Version="1.7.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
