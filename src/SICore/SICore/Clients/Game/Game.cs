@@ -830,6 +830,10 @@ public sealed class Game : MessageHandler
                     case Messages.Validate:
                         OnValidate(message, args);
                         break;
+
+                    case Messages.Leaderboard:
+                        OnLeaderboard(message);
+                        break;
                 }
             }
             catch (Exception exc)
@@ -837,6 +841,16 @@ public sealed class Game : MessageHandler
                 _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
+
+    private void OnLeaderboard(Message message)
+    {
+        if (message.Sender != _state.HostName)
+        {
+            return;
+        }
+
+        _actions.ShowLeaderboard();
+    }
 
     private void OnSetJoinMode(Message message, string[] args)
     {

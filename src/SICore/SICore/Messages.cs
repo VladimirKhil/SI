@@ -302,6 +302,11 @@ public static class Messages
     public const string Layout = "LAYOUT";
 
     /// <summary>
+    /// Game leaderboard.
+    /// </summary>
+    public const string Leaderboard = "LEADERBOARD";
+
+    /// <summary>
     /// Пометить вопрос
     /// </summary>
     public const string Mark = "MARK";

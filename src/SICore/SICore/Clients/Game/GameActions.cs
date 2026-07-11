@@ -132,10 +132,9 @@ public sealed class GameActions
         {
             foreach (var player in _state.Players)
             {
-                if (player.Name == person || person == NetworkConstants.Everybody)
+                if (player.Name == person || person == NetworkConstants.Everybody || person == _state.HostName)
                 {
                     SendMessageToWithArgs(player.Name, Messages.Sums, player.Sum);
-                    break;
                 }
             }
 
@@ -150,6 +149,18 @@ public sealed class GameActions
         }
 
         SendMessage(message.ToString(), person);
+    }
+
+    public void ShowLeaderboard()
+    {
+        var message = new MessageBuilder(Messages.Leaderboard);
+
+        foreach (var player in _state.Players.OrderByDescending(player => player.Sum).Take(10))
+        {
+            message.Add(player.Name).Add(player.Sum);
+        }
+
+        SendMessage(message.ToString());
     }
 
     /// <summary>

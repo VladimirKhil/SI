@@ -74,28 +74,38 @@ public static class GameRunner
                 gameState.ShowMan.IsConnected = true;
             }
 
-            for (int i = 0; i < settings.Players.Length; i++)
+            if (hiddenPlayers)
             {
-                gameState.Players.Add(new GamePlayerAccount(settings.Players[i]));
-                var name = settings.Players[i].Name;
-                var human = settings.Players[i].IsHuman;
-
-                if (!human)
+                for (int i = 0; i < 24; i++)
                 {
-                    var playerClient = new Client(settings.Players[i].Name);
-                    var state = new PersonState();
-                    var actions = new PersonActions(playerClient);
+                    gameState.Players.Add(new GamePlayerAccount(new Account { IsHuman = true }));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < settings.Players.Length; i++)
+                {
+                    gameState.Players.Add(new GamePlayerAccount(settings.Players[i]));
+                    var name = settings.Players[i].Name;
+                    var human = settings.Players[i].IsHuman;
 
-                    var logic = new PersonComputerController(
-                        state,
-                        actions,
-                        new Intelligence((ComputerAccount)settings.Players[i]),
-                        GameRole.Player);
+                    if (!human)
+                    {
+                        var playerClient = new Client(settings.Players[i].Name);
+                        var state = new PersonState();
+                        var actions = new PersonActions(playerClient);
 
-                    var player = new Player(playerClient, settings.Players[i], logic, actions, state);
-                    playerClient.ConnectTo(node);
+                        var logic = new PersonComputerController(
+                            state,
+                            actions,
+                            new Intelligence((ComputerAccount)settings.Players[i]),
+                            GameRole.Player);
 
-                    gameState.Players[i].IsConnected = true;
+                        var player = new Player(playerClient, settings.Players[i], logic, actions, state);
+                        playerClient.ConnectTo(node);
+
+                        gameState.Players[i].IsConnected = true;
+                    }
                 }
             }
         }

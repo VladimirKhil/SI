@@ -1285,7 +1285,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
                 if (multipleAnswerers)
                 {
-                    ScheduleExecution(Tasks.Announce, 15);
+                    ScheduleExecution(Tasks.Announce, _state.HiddenPersons ? 1 : 15);
                 }
                 else
                 {
@@ -1309,7 +1309,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
             else
             {
-                if (_state.HiddenPersons)
+                if (!_state.HiddenPersons)
                 {
                     _actions.ShowmanReplicNew(MessageCode.RightAnswer);
                 }
@@ -1351,8 +1351,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (!_state.QuestionPlay.HiddenStakes)
             {
-                s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");                
-                _actions.ShowmanReplic(s.ToString()); // TODO: remove this line (replaced by ShowmanReplicNew)
+                if (!_state.HiddenPersons)
+                {
+                    s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");
+                    _actions.ShowmanReplic(s.ToString()); // TODO: remove this line (replaced by ShowmanReplicNew)
+                }
 
                 if (_state.Answerer.AnswerValidationFactor == 0)
                 {
@@ -1600,9 +1603,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         StopWaiting();
 
-        var s = GetRandomString(LO[nameof(R.LetsSee)]);
-        _actions.ShowmanReplic(s); // TODO: remove this line (replaced by ShowmanReplicNew)
-        _actions.ShowmanReplicNew(MessageCode.PlayerAnswers);
+        if (!_state.HiddenPersons)
+        {
+            var s = GetRandomString(LO[nameof(R.LetsSee)]);
+            _actions.ShowmanReplic(s); // TODO: remove this line (replaced by ShowmanReplicNew)
+            _actions.ShowmanReplicNew(MessageCode.PlayerAnswers);
+        }
 
         var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
         _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
@@ -1619,7 +1625,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             return true;
         }
 
-        ScheduleExecution(Tasks.Announce, 15);
+        ScheduleExecution(Tasks.Announce, _state.HiddenPersons ? 1 : 15);
         return true;
     }
 
@@ -2870,7 +2876,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            ScheduleExecution(Tasks.AskRight, 35, force: true);
+            ScheduleExecution(Tasks.AskRight, _state.HiddenPersons ? 1 : 35, force: true);
         }
     }
 
