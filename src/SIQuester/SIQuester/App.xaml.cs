@@ -195,7 +195,7 @@ public partial class App : Application
 
     private void UpdateTheme()
     {
-        var themeUri = _settings.Theme == ThemeOption.Dark ? DarkBlueThemeUri : LightBlueThemeUri;
+        var themeUri = _settings.Theme == ThemeOption.Light ? LightBlueThemeUri : DarkBlueThemeUri;
         var dictionaries = Resources.MergedDictionaries;
 
         var themeDictionary = dictionaries.FirstOrDefault(

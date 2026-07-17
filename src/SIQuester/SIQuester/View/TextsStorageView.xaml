@@ -13,7 +13,8 @@
     <UserControl.Resources>
         <Style x:Key="LightTextBox" TargetType="{x:Type TextBox}">
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Background" Value="White" />
+            <Setter Property="Background" Value="{StaticResource WhiteBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Height" Value="Auto" />
             <Setter Property="Margin" Value="0,2,0,0" />
@@ -87,7 +88,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
-        <StackPanel Orientation="Horizontal" Background="Lavender">
+        <StackPanel Orientation="Horizontal" Background="{StaticResource LavenderBrush}">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                     <Style.Triggers>
@@ -133,7 +134,7 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
-                                <Border Name="bd" BorderThickness="1" Padding="8" Margin="5,5,0,0" Background="#FFD2DCFF">
+                                <Border Name="bd" BorderThickness="1" Padding="8" Margin="5,5,0,0" Background="{StaticResource SectionHeaderBrush}">
                                     <DockPanel>
                                         <Button
                                             Name="bDelete"

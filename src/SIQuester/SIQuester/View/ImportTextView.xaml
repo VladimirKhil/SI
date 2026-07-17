@@ -182,7 +182,7 @@
                         <TextBox
                             TextWrapping="Wrap"
                             IsReadOnly="True"
-                            Background="LightGray"
+                            Background="{StaticResource LightGrayBrush}"
                             Padding="10"
                             Text="{Binding ImportText}"
                             ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -222,7 +222,7 @@
                             ScrollViewer.VerticalScrollBarVisibility="Auto"
                             IsReadOnly="True"
                             FontSize="14"
-                            Background="LightGray"
+                            Background="{StaticResource LightGrayBrush}"
                             Margin="10,10,10,0"
                             Padding="5"
                             lb:ScrollableBehavior.IsAttached="True">
@@ -250,7 +250,7 @@
                             </FlowDocument>
                         </RichTextBox>
 
-                        <TextBlock Grid.Column="1" Grid.Row="2" FontSize="16" TextWrapping="Wrap" Margin="15" Foreground="DarkRed">
+                        <TextBlock Grid.Column="1" Grid.Row="2" FontSize="16" TextWrapping="Wrap" Margin="15" Foreground="{StaticResource DarkRedTextBrush}">
                             <Run Text="{Binding Info}" /><Run Text=": " /><Run Text="{Binding Problem}" />
                         </TextBlock>
                         
@@ -342,7 +342,7 @@
                                                     <TextBlock
                                                         Text="{Binding}"
                                                         TextWrapping="Wrap"
-                                                        Background="#FFEEEEEE"
+                                                        Background="{StaticResource WhiteBrush}"
                                                         Padding="7"
                                                         HorizontalAlignment="Stretch" />
                                                 </DataTemplate>
@@ -417,7 +417,7 @@
                                 Padding="4"
                                 IsReadOnly="True"
                                 VerticalScrollBarVisibility="Auto"
-                                Background="LightPink" />
+                                Background="{StaticResource WrongAnswerBackgroundBrush}" />
 
                             <CheckBox
                                 Grid.Row="2"

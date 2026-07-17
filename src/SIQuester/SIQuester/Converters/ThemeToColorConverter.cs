@@ -11,11 +11,18 @@ public sealed class ThemeToColorConverter : IValueConverter
     public Color LightColor { get; set; }
     public Color DarkColor { get; set; }
 
+    public Color? DarkGrayColor { get; set; }
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is ThemeOption theme)
         {
-            return theme == ThemeOption.Dark ? DarkColor : LightColor;
+            return theme switch
+            {
+                ThemeOption.Dark => DarkColor,
+                ThemeOption.DarkGray => DarkGrayColor ?? DarkColor,
+                _ => LightColor,
+            };
         }
 
         return LightColor;

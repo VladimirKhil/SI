@@ -33,9 +33,9 @@
                 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="0,5,5,0" Background="Lavender" Padding="5,3,3,3">
+                        <Border Margin="0,5,5,0" Background="{StaticResource LavenderBrush}" Padding="5,3,3,3">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding}" FontSize="18" Margin="0,0,0,5" />
+                                <TextBlock Text="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" FontSize="18" Margin="0,0,0,5" />
 
                                 <Button
                                     Command="{Binding DataContext.RemoveItem, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
@@ -67,7 +67,7 @@
                     Padding="2,4,2,2"
                     FontSize="18"
                     BorderThickness="0"
-                    Background="Lavender" />
+                    Background="{StaticResource LavenderBrush}" />
 
                 <Button
                     Command="{Binding AddItem}"
@@ -134,7 +134,27 @@
                                             Cursor="Hand">
                                             <Button.Style>
                                                 <Style TargetType="Button">
+                                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                                                    <Setter Property="Background" Value="{StaticResource SectionHeaderBrush}" />
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border
+                                                                    Background="{TemplateBinding Background}"
+                                                                    Padding="{TemplateBinding Padding}"
+                                                                    CornerRadius="7"
+                                                                    SnapsToDevicePixels="True"
+                                                                    TextBlock.Foreground="{TemplateBinding Foreground}">
+                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                </Border>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
                                                     <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="{StaticResource ActiveBrush}" />
+                                                        </Trigger>
+
                                                         <DataTrigger Value="True">
                                                             <DataTrigger.Binding>
                                                                 <MultiBinding Converter="{StaticResource ContainsConverter}">
@@ -143,7 +163,7 @@
                                                                 </MultiBinding>
                                                             </DataTrigger.Binding>
 
-                                                            <Setter Property="Background" Value="Lavender" />
+                                                            <Setter Property="Background" Value="{StaticResource LightBlueBrush}" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>

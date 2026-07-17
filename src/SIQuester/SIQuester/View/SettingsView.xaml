@@ -216,7 +216,7 @@
                     Margin="0,5,0,0"
                     Height="200"
                     IsReadOnly="True"
-                    Background="LightGray"
+                    Background="{StaticResource LightGrayBrush}"
                     TextWrapping="Wrap"
                     VerticalScrollBarVisibility="Auto" />
 

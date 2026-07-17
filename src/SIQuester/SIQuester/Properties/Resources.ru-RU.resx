@@ -1217,6 +1217,9 @@
   <data name="ThemeOptionDark" xml:space="preserve">
     <value>Тёмная</value>
   </data>
+  <data name="ThemeOptionDarkGray" xml:space="preserve">
+    <value>Тёмно-серая</value>
+  </data>
   <data name="ThemeOptionLight" xml:space="preserve">
     <value>Светлая</value>
   </data>

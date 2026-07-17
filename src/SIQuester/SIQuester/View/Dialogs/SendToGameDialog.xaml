@@ -24,6 +24,6 @@
             HorizontalAlignment="Left" />
         
         <Button Command="{Binding Send}" Margin="0,5,0,0" HorizontalAlignment="Left" Padding="10,5">Отправить</Button>
-        <TextBlock Foreground="DarkRed" Text="{Binding ErrorMessage}" Margin="0,5,0,0" />
+        <TextBlock Foreground="{StaticResource DarkRedTextBrush}" Text="{Binding ErrorMessage}" Margin="0,5,0,0" />
     </StackPanel>
 </UserControl>

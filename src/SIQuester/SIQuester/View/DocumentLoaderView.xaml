@@ -19,7 +19,7 @@
                         <DataTemplate>
                             <TextBlock
                                 Text="{Binding ErrorMessage, Mode=OneWay}"
-                                Foreground="DarkRed"
+                                Foreground="{StaticResource DarkRedTextBrush}"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Center" />
                         </DataTemplate>

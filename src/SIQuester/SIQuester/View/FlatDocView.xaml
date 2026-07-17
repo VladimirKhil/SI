@@ -69,7 +69,7 @@
         <DataTemplate x:Key="CompactQuestionView">
             <Border
                 Name="bd"
-                Background="#FFD5DDFF"
+                Background="{StaticResource SectionHeaderBrush}"
                 Margin="3"
                 Padding="4"
                 BorderThickness="0"
@@ -265,7 +265,7 @@
         <DataTemplate x:Key="QuestionView">
             <Border
                 Name="bd"
-                Background="#FFD5DDFF"
+                Background="{StaticResource SectionHeaderBrush}"
                 Margin="0,5,5,5"
                 Padding="6"
                 BorderThickness="0"
@@ -285,14 +285,14 @@
                                         Text="{Binding Key, Converter={StaticResource QuestionParameterNamesConverter}}"
                                         DockPanel.Dock="Left"
                                         FontWeight="Bold"
-                                        Foreground="Black"
+                                        Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                         Margin="0,2,10,2"
                                         TextWrapping="Wrap" />
 
                                     <ContentControl
                                         x:Name="value"
                                         Margin="0,2,0,0"
-                                        TextBlock.Foreground="Black"
+                                        TextBlock.Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                         Content="{Binding Value}"
                                         ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource FlatParameterSelector}}" />
                                 </DockPanel>
@@ -354,7 +354,7 @@
         <DataTemplate x:Key="CompactThemeView">
             <Border
                 Name="bd"
-                Background="#FFD5DDFF"
+                Background="{StaticResource SectionHeaderBrush}"
                 Margin="3"
                 Padding="4"
                 BorderThickness="0"
@@ -417,7 +417,7 @@
         </Style>
 
         <DataTemplate x:Key="ThemeView">
-            <StackPanel Name="panel" Margin="0,6,6,0" Background="#FFA1C2DE" Width="240">
+            <StackPanel Name="panel" Margin="0,6,6,0" Background="{StaticResource SectionHeaderBrush}" Width="240">
                 <Border Name="border">
                     <TextBlock
                         Name="name"
@@ -507,7 +507,7 @@
 
         <DataTemplate x:Key="RoundView">
             <Border>
-                <StackPanel x:Name="bd" Margin="6" Background="#FFA1C2DE">
+                <StackPanel x:Name="bd" Margin="6" Background="{StaticResource SectionHeaderBrush}">
                     <TextBlock
                         Text="{Binding Model.Name}"
                         ToolTip="{Binding Model.Name}"
@@ -733,7 +733,7 @@
                     <TextBlock
                         Text="{Binding}"
                         FontWeight="Bold"
-                        Foreground="Black" />
+                        Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
                 </DataTemplate>
             </lc:TemplateConverter.DefaultTemplate>
 
@@ -744,7 +744,7 @@
                             DockPanel.Dock="Left"
                             Text="{Binding}"
                             FontWeight="Bold"
-                            Foreground="Black"
+                            Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                             Margin="0,3,0,0" />
 
                         <Button
@@ -1066,7 +1066,7 @@
                             <StackPanel x:Name="answerDurationSection" Orientation="Vertical" Margin="0,5,0,0" Visibility="Collapsed">
                                 <TextBlock
                                     Text="{x:Static lp:Resources.AnswerDuration}"
-                                    Foreground="Black"
+                                    Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                     VerticalAlignment="Center" />
                                 
                                 <l:NumericTextBox
@@ -1074,8 +1074,8 @@
                                     Minimum="1"
                                     Maximum="120"
                                     Padding="2"
-                                    Background="White"
-                                    BorderBrush="Gray"
+                                    Background="{StaticResource WhiteBrush}"
+                                    BorderBrush="{StaticResource LightGrayBrush}"
                                     BorderThickness="1"
                                     Margin="0,5,0,0"
                                     HorizontalAlignment="Stretch" />
@@ -1396,7 +1396,7 @@
             VerticalOffset="-2"
             HorizontalOffset="20"
             util:PopupManager.Owner="{Binding Source={x:Static l:App.Current},Path=MainWindow}">
-            <Border Background="#FFF1F1F1" BorderBrush="Gray" BorderThickness="1" Opacity="0.8">
+            <Border Background="{StaticResource WhiteBrush}" BorderBrush="Gray" BorderThickness="1" Opacity="0.8">
                 <Border.Triggers>
                     <EventTrigger RoutedEvent="Border.MouseEnter">
                         <BeginStoryboard>
