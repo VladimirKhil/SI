@@ -1410,6 +1410,12 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="DocumentQuestionCount" xml:space="preserve">
     <value>Total questions</value>
   </data>
+  <data name="DocumentFilledQuestionCount" xml:space="preserve">
+    <value>Filled questions / total questions</value>
+  </data>
+  <data name="DocumentFilledLabel" xml:space="preserve">
+    <value>Filled:</value>
+  </data>
   <data name="Format" xml:space="preserve">
     <value>Format</value>
   </data>

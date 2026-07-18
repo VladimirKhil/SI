@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Workspaces.Sidebar;
 using System.Text;
@@ -186,11 +187,9 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                     
                     var emptyQuestion = !emptyNormal
                         && (questionText == "" || questionText == Resources.Question)
-                        && !question.Model.HasMediaContent();
+                        && !question.Model.HasQuestionMedia();
 
-                    var noAnswer = !emptyNormal
-                        && (question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]))
-                        && !question.IsManagedByClient;
+                    var noAnswer = !emptyNormal && !question.Model.HasAnswer();
 
                     var emptySources = question.Info.Sources.Count == 0 && _checkEmptySources;
 

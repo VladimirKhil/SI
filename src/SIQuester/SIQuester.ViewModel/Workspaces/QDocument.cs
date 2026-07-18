@@ -63,6 +63,11 @@ public sealed class QDocument : WorkspaceViewModel
     private const string ChangesFileName = "changes.json";
 
     /// <summary>
+    /// Delay before the filled question count is recalculated.
+    /// </summary>
+    private static readonly TimeSpan FilledQuestionCountUpdateDelay = TimeSpan.FromMilliseconds(500);
+
+    /// <summary>
     /// Созданный объект
     /// </summary>
     public static object? ActivatedObject { get; set; }
@@ -1224,6 +1229,12 @@ public sealed class QDocument : WorkspaceViewModel
     private static int CountQuestionsInRound(RoundViewModel round) =>
         round.Themes.Sum(theme => theme.Questions.Count);
 
+    /// <summary>
+    /// Counts the questions that have both content and a right answer filled in.
+    /// </summary>
+    private int CountFilledQuestions() =>
+        Package.Rounds.Sum(round => round.Themes.Sum(theme => theme.Questions.Count(question => question.Model.IsFilled())));
+
     public StorageContextViewModel StorageContext { get; set; }
 
     private bool _isLinksClearingBlocked;
@@ -1365,9 +1376,34 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 _questionCount = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(AllQuestionsFilled));
             }
         }
     }
+
+    private int _filledQuestionCount;
+
+    /// <summary>
+    /// Gets the number of questions that have both content and a right answer filled in.
+    /// </summary>
+    public int FilledQuestionCount
+    {
+        get => _filledQuestionCount;
+        private set
+        {
+            if (_filledQuestionCount != value)
+            {
+                _filledQuestionCount = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(AllQuestionsFilled));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets whether every question in the document is filled.
+    /// </summary>
+    public bool AllQuestionsFilled => QuestionCount > 0 && FilledQuestionCount == QuestionCount;
 
     private readonly IPackageTemplatesRepository _packageTemplatesRepository;
     private readonly IDocumentViewModelFactory _documentViewModelFactory;
@@ -1473,11 +1509,49 @@ public sealed class QDocument : WorkspaceViewModel
 
         // Initialize question count after package is loaded and listeners are set up
         QuestionCount = CountTotalQuestions();
+        FilledQuestionCount = CountFilledQuestions();
     }
 
     private void OperationsManager_Error(Exception exc) => OnError(exc);
 
-    private void OperationsManager_Changed() => Changed = true; // TODO: delegate all change logic to OperationsManager
+    private void OperationsManager_Changed()
+    {
+        Changed = true; // TODO: delegate all change logic to OperationsManager
+        ScheduleFilledQuestionCountUpdate();
+    }
+
+    private bool _filledQuestionCountUpdateScheduled;
+
+    /// <summary>
+    /// Updates the filled question count after a delay merging the changes that happen during it.
+    /// </summary>
+    /// <remarks>
+    /// Recounting the whole package on each change would be too slow,
+    /// so the recount is delayed and performed only once for a series of changes.
+    /// </remarks>
+    private async void ScheduleFilledQuestionCountUpdate()
+    {
+        if (_filledQuestionCountUpdateScheduled)
+        {
+            return;
+        }
+
+        _filledQuestionCountUpdateScheduled = true;
+
+        try
+        {
+            await Task.Delay(FilledQuestionCountUpdateDelay);
+            FilledQuestionCount = CountFilledQuestions();
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
+        finally
+        {
+            _filledQuestionCountUpdateScheduled = false;
+        }
+    }
 
     private ICollection<string> FillFiles(MediaStorageViewModel mediaStorage, int maxFileSize, List<WarningViewModel> warnings)
     {
@@ -2281,14 +2355,14 @@ public sealed class QDocument : WorkspaceViewModel
 
                     var emptyQuestion = !emptyNormal
                         && (questionText == "" || questionText == Resources.Question)
-                        && !question.Model.HasMediaContent();
+                        && !question.Model.HasQuestionMedia();
 
                     if (emptyQuestion)
                     {
                         return $"{Resources.Round} {round.Model.Name}: {theme.Model.Name}, {question.Model.Price}: {Resources.ExportToSteamEmptyQuestion}";
                     }
 
-                    var noAnswer = !emptyNormal && (question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]));
+                    var noAnswer = !emptyNormal && !question.Model.HasAnswer();
 
                     if (noAnswer)
                     {

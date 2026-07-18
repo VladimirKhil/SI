@@ -416,13 +416,31 @@
                 </StackPanel.Resources>
 
                 <TextBlock
-                    Text="{Binding QuestionCount}"
                     FontSize="14"
                     FontWeight="SemiBold"
                     Foreground="#FF555555"
                     VerticalAlignment="Center"
                     Margin="0,0,10,0"
-                    ToolTip="{x:Static lp:Resources.DocumentQuestionCount}" />
+                    ToolTip="{x:Static lp:Resources.DocumentFilledQuestionCount}">
+                    <Run Text="{x:Static lp:Resources.DocumentFilledLabel}" />
+                    <Run Text="{Binding FilledQuestionCount, Mode=OneWay}">
+                        <Run.Style>
+                            <Style TargetType="Run">
+                                <Setter Property="Foreground" Value="#FF4A90D9" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AllQuestionsFilled}" Value="True">
+                                        <Setter Property="Foreground" Value="#FF3E9C42" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Run.Style>
+                    </Run>
+                    <Run Text=" / " />
+                    <Run
+                        Text="{Binding QuestionCount, Mode=OneWay}"
+                        Foreground="#FF3E9C42"
+                        ToolTip="{x:Static lp:Resources.DocumentQuestionCount}" />
+                </TextBlock>
 
                 <ToggleButton
                     Name="helpToggle"
