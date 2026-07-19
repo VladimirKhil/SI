@@ -825,6 +825,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             roomSettings,
             timeSettings,
             rulesSettings,
+            _model.AppSettings.Culture ?? "en-US",
             document,
             _gameHost,
             fileShare,

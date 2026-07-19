@@ -5,7 +5,7 @@ namespace SICore.Results;
 /// <summary>
 /// Defines a game result report.
 /// </summary>
-public sealed class GameResult
+public sealed class GameResult(Uri? packageSource = null, string? language = null)
 {
     /// <summary>
     /// Game name.
@@ -15,7 +15,7 @@ public sealed class GameResult
     /// <summary>
     /// Game language.
     /// </summary>
-    public string? Language { get; set; }
+    public string? Language { get; set; } = language;
 
     /// <summary>
     /// Game start time.
@@ -35,7 +35,7 @@ public sealed class GameResult
     /// <summary>
     /// Package source URI.
     /// </summary>
-    public Uri? PackageSource { get; }
+    public Uri? PackageSource { get; } = packageSource;
 
     /// <summary>
     /// Game package authors.
@@ -86,11 +86,6 @@ public sealed class GameResult
     /// Defines statistics for questions.
     /// </summary>
     public Dictionary<string, QuestionStats> QuestionsStats { get; } = new();
-
-    public GameResult(Uri? packageSource = null)
-    {
-        PackageSource = packageSource;
-    }
 
     internal void IncrementQuestionSeenCount(string questionKey, int humanPlayerCount)
     {

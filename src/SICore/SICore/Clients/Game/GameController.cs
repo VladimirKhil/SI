@@ -132,7 +132,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.PackageDoc = Engine.Document;
 
         _state.GameResultInfo.Name = _state.GameName;
-        _state.GameResultInfo.Language = _state.Settings.AppSettings.Culture;
         _state.GameResultInfo.PackageName = Engine.PackageName;
         _state.GameResultInfo.PackageAuthors = Engine.Document.Package.Info.Authors.ToArray();
         _state.GameResultInfo.PackageAuthorsContacts = Engine.Document.Package.ContactUri;
@@ -5102,13 +5101,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnQuestionStart()
     {
-        // TODO: remove
-        if (_state.Settings.AppSettings.HintShowman && _state.QuestionPlay.AnswerType != AnswerType.Point)
-        {
-            // TODO: use SendAnswerInfoToShowman()
-            _actions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, _state.QuestionPlay.RightAnswers.FirstOrDefault() ?? ""), _state.ShowMan.Name);
-        }
-
         SendQuestionAnswersToShowman();
 
         var question = _state.Question;

@@ -1,4 +1,5 @@
 ﻿using Notions;
+using SI.Contracts;
 using SICore.Clients;
 using SICore.Contracts;
 using SICore.Extensions;
@@ -147,7 +148,6 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        var appSettings = _state.Settings.AppSettings;
         var rules = _state.Rules;
         var msg = new MessageBuilder(Messages.Options2, _state.HostName);
         var changed = false;
@@ -159,10 +159,9 @@ public sealed class Game : MessageHandler
 
             switch (optionName)
             {
-                case nameof(AppSettingsCore.Oral):
+                case nameof(RulesSettings.Oral):
                     if (bool.TryParse(optionValue, out var oral) && oral != rules.Oral)
                     {
-                        appSettings.Oral = oral;
                         rules.Oral = oral;
                         _state.IsOral = rules.Oral && _state.ShowMan.IsHuman;
                         msg.Add(optionName).Add(optionValue);
@@ -171,10 +170,9 @@ public sealed class Game : MessageHandler
 
                     break;
 
-                case nameof(AppSettingsCore.Managed):
+                case nameof(RulesSettings.Managed):
                     if (bool.TryParse(optionValue, out var managed) && managed != rules.Managed)
                     {
-                        appSettings.Managed = managed;
                         rules.Managed = managed;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
@@ -182,10 +180,9 @@ public sealed class Game : MessageHandler
 
                     break;
 
-                case nameof(AppSettingsCore.DisplayAnswerOptionsLabels):
+                case nameof(RulesSettings.DisplayAnswerOptionsLabels):
                     if (bool.TryParse(optionValue, out var displayAnswerOptionsLabels) && displayAnswerOptionsLabels != rules.DisplayAnswerOptionsLabels)
                     {
-                        appSettings.DisplayAnswerOptionsLabels = displayAnswerOptionsLabels;
                         rules.DisplayAnswerOptionsLabels = displayAnswerOptionsLabels;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
@@ -193,10 +190,9 @@ public sealed class Game : MessageHandler
 
                     break;
 
-                case nameof(AppSettingsCore.FalseStart):
+                case nameof(RulesSettings.FalseStart):
                     if (bool.TryParse(optionValue, out var falseStart) && falseStart != rules.FalseStart)
                     {
-                        appSettings.FalseStart = falseStart;
                         rules.FalseStart = falseStart;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
@@ -204,10 +200,9 @@ public sealed class Game : MessageHandler
 
                     break;
 
-                case nameof(AppSettingsCore.ReadingSpeed):
+                case nameof(RulesSettings.ReadingSpeed):
                     if (int.TryParse(optionValue, out var readingSpeed) && readingSpeed != rules.ReadingSpeed)
                     {
-                        appSettings.ReadingSpeed = readingSpeed;
                         rules.ReadingSpeed = readingSpeed;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
@@ -215,10 +210,9 @@ public sealed class Game : MessageHandler
                     
                     break;
 
-                case nameof(AppSettingsCore.PartialText):
+                case nameof(RulesSettings.PartialText):
                     if (bool.TryParse(optionValue, out var partialText) && partialText != rules.PartialText)
                     {
-                        appSettings.PartialText = partialText;
                         rules.PartialText = partialText;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
@@ -226,10 +220,9 @@ public sealed class Game : MessageHandler
 
                     break;
 
-                case nameof(AppSettingsCore.PartialImages):
+                case nameof(RulesSettings.PartialImages):
                     if (bool.TryParse(optionValue, out var partialImages) && partialImages != rules.PartialImages)
                     {
-                        appSettings.PartialImages = partialImages;
                         rules.PartialImages = partialImages;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
@@ -259,9 +252,9 @@ public sealed class Game : MessageHandler
                     break;
 
                 case nameof(AppSettingsCore.UseApellations):
+                case nameof(RulesSettings.UseAppellations):
                     if (bool.TryParse(optionValue, out var useApellations) && useApellations != rules.UseAppellations)
                     {
-                        appSettings.UseApellations = useApellations;
                         rules.UseAppellations = useApellations;
                         msg.Add(optionName).Add(optionValue);
                         changed = true;
@@ -287,7 +280,6 @@ public sealed class Game : MessageHandler
             Messages.ComputerAccounts,
             string.Join(Message.ArgsSeparator, _defaultPlayers.Select(p => p.Name)));
 
-        var appSettings = _state.Settings.AppSettings;
         var rules = _state.Rules;
 
         var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
@@ -311,10 +303,7 @@ public sealed class Game : MessageHandler
             nameof(rules.ReadingSpeed), rules.Managed ? 0 : rules.ReadingSpeed,
             nameof(rules.PartialText), rules.PartialText,
             nameof(rules.PartialImages), rules.PartialImages,
-            nameof(appSettings.UseApellations), rules.UseAppellations, // legacy
             nameof(rules.UseAppellations), rules.UseAppellations,
-            nameof(appSettings.TimeSettings.PartialImageTime), _state.TimeSettings.PartialImage, // legacy
-            nameof(appSettings.TimeSettings.TimeForBlockingButton), _state.TimeSettings.ButtonBlocking, // legacy
             nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
             nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
     }

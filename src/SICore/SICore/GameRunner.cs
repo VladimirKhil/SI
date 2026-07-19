@@ -31,6 +31,7 @@ public static class GameRunner
         SI.Contracts.RoomSettings roomSettings,
         SI.Contracts.TimeSettings timeSettings,
         SI.Contracts.RulesSettings rules,
+        string language,
         SIDocument document,
         IGameHost gameHost,
         IFileShare fileShare,
@@ -43,14 +44,23 @@ public static class GameRunner
         IPackageStatisticsProvider? packageStatisticsProvider = null,
         bool hiddenPlayers = false)
     {
-        var gameState = new GameState(gameHost, new GamePersonAccount(settings.Showman), packageSource, settings, roomSettings, timeSettings, rules, packageStatisticsProvider)
+        var gameState = new GameState(
+            gameHost,
+            new GamePersonAccount(settings.Showman),
+            packageSource,
+            language,
+            settings,
+            roomSettings,
+            timeSettings,
+            rules,
+            packageStatisticsProvider)
         {
             HostName = roomSettings.IsAutomatic ? null : roomSettings.HostName,
             GameName = gameName ?? "",
             HiddenPersons = hiddenPlayers,
         };
 
-        var localizer = new Localizer(settings.AppSettings.Culture ?? "en-US");
+        var localizer = new Localizer(language);
 
         gameState.BeginUpdatePersons("Start");
 

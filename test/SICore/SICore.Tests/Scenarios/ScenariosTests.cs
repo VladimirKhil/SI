@@ -36,7 +36,6 @@ public sealed class ScenariosTests
                 new Account { IsHuman = true, Name = Constants.FreePlace },
                 new Account { IsHuman = true, Name = Constants.FreePlace }
             ],
-            HumanPlayerName = "Showman"
         };
 
         var document = SIDocument.Create("Test Package", "Test Author");
@@ -68,9 +67,10 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings(),
+            new SI.Contracts.RoomSettings { HostName = "Showman" },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
+            "en-US",
             document,
             gameHost,
             fileShare,
@@ -207,7 +207,6 @@ public sealed class ScenariosTests
             {
                 new Account { IsHuman = true, Name = Constants.FreePlace }
             },
-            HumanPlayerName = "Showman"
         };
 
         var document = SIDocument.Create("Test Package", "Test Author");
@@ -235,9 +234,18 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings(),
+            new SI.Contracts.RoomSettings
+            {
+                Showman = new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace },
+                Players =
+                [
+                    new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace }
+                ],
+                HostName = "Showman"
+            },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
+            "en-US",
             document,
             gameHost,
             fileShare,
@@ -298,7 +306,6 @@ public sealed class ScenariosTests
             {
                 new Account { IsHuman = true, Name = Constants.FreePlace }
             },
-            HumanPlayerName = "Showman"
         };
 
         var document = SIDocument.Create("Package", "Author");
@@ -335,9 +342,10 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings(),
+            new SI.Contracts.RoomSettings { HostName = "Showman" },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
+            "en-US",
             document,
             gameHost,
             fileShare,
@@ -408,7 +416,6 @@ public sealed class ScenariosTests
                 new Account { IsHuman = true, Name = Constants.FreePlace },
                 new Account { IsHuman = true, Name = Constants.FreePlace }
             },
-            HumanPlayerName = "Showman"
         };
 
         var document = SIDocument.Create("Package", "Author");
@@ -437,9 +444,10 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings(),
+            new SI.Contracts.RoomSettings { HostName = "Showman" },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
+            "en-US",
             document,
             gameHost,
             fileShare,
@@ -581,11 +589,14 @@ public sealed class ScenariosTests
 
         public async Task<string[]> AssertNextMessageAsync(string expectedMessageType, CancellationToken cancellationToken = default)
         {
-            while (await _messageChannel.Reader.WaitToReadAsync(cancellationToken))
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(120)); // 10 second timeout to prevent infinite hang
+
+            while (await _messageChannel.Reader.WaitToReadAsync(cts.Token))
             {
                 while (_messageChannel.Reader.TryRead(out var message))
                 {
-                    var messageArgs = message.Text.Split(Message.ArgsSeparator, StringSplitOptions.RemoveEmptyEntries);
+                    var messageArgs = message.Text.Split(Message.ArgsSeparatorChar, StringSplitOptions.RemoveEmptyEntries);
                     var actualMessageType = messageArgs[0];
 
                     if (_messagesToSkip.Contains(actualMessageType))
@@ -598,17 +609,20 @@ public sealed class ScenariosTests
                 }
             }
 
-            throw new InvalidOperationException();
+            throw new InvalidOperationException($"Timeout waiting for message: {expectedMessageType}");
         }
 
         public async Task<string[]> WaitForMessageAsync(string messageType, CancellationToken cancellationToken = default)
         {
-            while (await _messageChannel.Reader.WaitToReadAsync(cancellationToken))
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(120)); // 10 second timeout to prevent infinite hang
+
+            while (await _messageChannel.Reader.WaitToReadAsync(cts.Token))
             {
                 while (_messageChannel.Reader.TryRead(out var message))
                 {
                     var messageArgs = message.Text.Split(Message.ArgsSeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-                    
+
                     if (messageArgs[0] == messageType)
                     {
                         return messageArgs;
@@ -616,7 +630,7 @@ public sealed class ScenariosTests
                 }
             }
 
-            throw new InvalidOperationException();
+            throw new InvalidOperationException($"Timeout waiting for message: {messageType}");
         }
 
         private System.Threading.Tasks.ValueTask Client_MessageReceived(Message arg) => _messageChannel.Writer.WriteAsync(arg);

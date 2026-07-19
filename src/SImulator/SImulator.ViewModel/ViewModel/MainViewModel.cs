@@ -587,6 +587,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
            roomSettings,
            new SI.Contracts.TimeSettings(),
            rules,
+           Settings.Language ?? "en-US",
            document,
            gameHost,
            fileShare,

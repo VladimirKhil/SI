@@ -612,6 +612,7 @@ public sealed class GameState : Data
         IGameHost gameHost,
         GamePersonAccount showman,
         Uri? packageSource,
+        string language,
         IGameSettingsCore<AppSettingsCore> settings,
         SI.Contracts.RoomSettings roomSettings,
         SI.Contracts.TimeSettings timeSettings,
@@ -622,7 +623,7 @@ public sealed class GameState : Data
         ShowMan = showman;
         Stakes = new StakesState(Players);
         Settings = settings;
-        GameResultInfo = new GameResult(packageSource);
+        GameResultInfo = new GameResult(packageSource, language);
         RoomSettings = roomSettings;
         TimeSettings = timeSettings;
         Rules = rules;
