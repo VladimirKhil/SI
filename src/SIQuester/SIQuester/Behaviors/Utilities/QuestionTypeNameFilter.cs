@@ -6,6 +6,7 @@ public sealed class QuestionTypeNameFilter : ICollectionFilter
 {
     public void Filter(object sender, FilterEventArgs e)
     {
-        e.Accepted = (e.Item as string).Length > 0;
+        var value = e.Item as string;
+        e.Accepted = !string.IsNullOrEmpty(value);
     }
 }

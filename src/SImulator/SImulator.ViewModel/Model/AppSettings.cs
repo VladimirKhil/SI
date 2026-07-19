@@ -754,6 +754,25 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _partialText = false;
+
+    /// <summary>
+    /// Partial question text (when false start are disabled).
+    /// </summary>
+    [DefaultValue(false)]
+    public bool PartialText
+    {
+        get => _partialText;
+        set
+        {
+            if (_partialText != value)
+            {
+                _partialText = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     #endregion
 
     public void Save(Stream stream, XmlSerializer? serializer = null)

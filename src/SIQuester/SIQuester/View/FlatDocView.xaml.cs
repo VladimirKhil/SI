@@ -561,6 +561,13 @@ public partial class FlatDocView : UserControl
                 else
                 {
                     var value = e.Data.GetData(DataFormats.Serializable).ToString();
+
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        e.Effects = DragDropEffects.None;
+                        return;
+                    }
+
                     using var stringReader = new StringReader(value);
                     using var reader = XmlReader.Create(stringReader);
 
@@ -586,7 +593,11 @@ public partial class FlatDocView : UserControl
                     themeViewModel.ResetPrices(currentPrices);
                 }
 
-                document.ApplyData(dragData);
+                if (dragData != null)
+                {
+                    document.ApplyData(dragData);
+                }
+
                 document.Navigate.Execute(questionViewModelNew);
             }
             else

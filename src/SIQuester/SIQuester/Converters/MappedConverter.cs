@@ -5,7 +5,7 @@ namespace SIQuester.Converters;
 
 public sealed class MappedConverter : IValueConverter
 {
-    private StringDictionary? _map = null;
+    private StringDictionary _map = [];
 
     public object Map
     {
@@ -20,7 +20,7 @@ public sealed class MappedConverter : IValueConverter
 
             if (value is CollectionViewSource collection)
             {
-                _map = new StringDictionary();
+                _map = [];
 
                 foreach (KeyValuePair<string, string> item in collection.View)
                 {
@@ -37,7 +37,7 @@ public sealed class MappedConverter : IValueConverter
             return "";
         }
 
-        if (_map.TryGetValue(value.ToString(), out string result))
+        if (_map.TryGetValue(value.ToString() ?? "", out var result))
         {
             return result;
         }
@@ -45,7 +45,7 @@ public sealed class MappedConverter : IValueConverter
         return value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null)
         {

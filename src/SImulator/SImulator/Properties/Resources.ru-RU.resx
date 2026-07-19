@@ -718,4 +718,7 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="ChoosePlayerToDelete" xml:space="preserve">
     <value>Выберите игрока, удаляющего тему</value>
   </data>
+  <data name="PartialText" xml:space="preserve">
+    <value>Частичный текст вопросов</value>
+  </data>
 </root>

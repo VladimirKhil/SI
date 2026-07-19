@@ -83,7 +83,7 @@ public sealed class ExportViewModel : WorkspaceViewModel
     {
         try
         {
-            string filename = _source.FileName.Replace(".", "-");
+            string? filename = _source.FileName.Replace(".", "-");
 
             var filter = new Dictionary<string, string>
             {
@@ -122,10 +122,15 @@ public sealed class ExportViewModel : WorkspaceViewModel
 
     internal async Task ExportAsync(string filename, int index, Encoding encoding)
     {
+        if (_documentWrapper == null)
+        {
+            throw new InvalidOperationException("Document wrapper is not initialized");
+        }
+
         switch (index)
         {
             case 2:
-                ExportHtml(filename);
+                ExportHtml(_documentWrapper, filename);
                 break;
 
             case 3:
@@ -133,7 +138,7 @@ public sealed class ExportViewModel : WorkspaceViewModel
                 break;
 
             case 4:
-                ExportRtf(filename);
+                ExportRtf(_documentWrapper, filename);
                 break;
 
             case 5:
@@ -141,7 +146,7 @@ public sealed class ExportViewModel : WorkspaceViewModel
                 break;
 
             default:
-                ExportTxt(filename, encoding);
+                ExportTxt(_documentWrapper, filename, encoding);
                 break;
         }
 
@@ -178,36 +183,38 @@ public sealed class ExportViewModel : WorkspaceViewModel
             }
         }
 
-        if (extMediaNew.Any())
+        if (extMediaNew.Count == 0)
         {
-            var name = Path.GetFileNameWithoutExtension(filename);
-            var folder = Path.Combine(Path.GetDirectoryName(filename), name + "_Media");
-            Directory.CreateDirectory(folder);
+            return;
+        }
 
-            foreach (var (media, fileName) in extMediaNew)
+        var name = Path.GetFileNameWithoutExtension(filename);
+        var folder = Path.Combine(Path.GetDirectoryName(filename) ?? "", name + "_Media");
+        Directory.CreateDirectory(folder);
+
+        foreach (var (media, fileName) in extMediaNew)
+        {
+            var stream = media.Stream;
+
+            if (stream == null)
             {
-                var stream = media.Stream;
+                continue;
+            }
 
-                if (stream == null)
-                {
-                    continue;
-                }
-
-                using (stream)
-                {
-                    var file = Path.Combine(folder, fileName);
-                    using var fs = File.Open(file, FileMode.Create, FileAccess.Write);
-                    await stream.CopyToAsync(fs);
-                }
+            using (stream)
+            {
+                var file = Path.Combine(folder, fileName);
+                using var fs = File.Open(file, FileMode.Create, FileAccess.Write);
+                await stream.CopyToAsync(fs);
             }
         }
     }
 
-    private void ExportTxt(string filename, Encoding encoding) =>
-        _documentWrapper.WalkAndSave(filename, encoding, sr => sr.WriteLine(), (sr, text) => sr.Write(text));
+    private void ExportTxt(IFlowDocumentWrapper documentWrapper, string filename, Encoding encoding) =>
+        documentWrapper.WalkAndSave(filename, encoding, sr => sr.WriteLine(), (sr, text) => sr.Write(text));
 
-    private void ExportHtml(string filename) =>
-        _documentWrapper.WalkAndSave(
+    private void ExportHtml(IFlowDocumentWrapper documentWrapper, string filename) =>
+        documentWrapper.WalkAndSave(
             filename,
             Encoding.UTF8,
             sr => sr.Write("<br>"),
@@ -217,9 +224,9 @@ public sealed class ExportViewModel : WorkspaceViewModel
                 _source.Document.Package.Name)),
             sr => sr.Write("</body></html>"));
 
-    private void ExportRtf(string filename) =>
+    private void ExportRtf(IFlowDocumentWrapper documentWrapper, string filename) =>
         // RTF does not support Unicode!
-        _documentWrapper.WalkAndSave(
+        documentWrapper.WalkAndSave(
             filename,
             Encoding.GetEncoding(1251),
             sr => sr.Write(@"\par "),
@@ -234,6 +241,11 @@ public sealed class ExportViewModel : WorkspaceViewModel
 
     private void Print_Executed(object? arg)
     {
+        if (_documentWrapper == null)
+        {
+            throw new InvalidOperationException("Document wrapper is not initialized");
+        }
+
         if (_documentWrapper.Print())
         {
             OnClosed();

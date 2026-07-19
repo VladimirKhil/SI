@@ -265,9 +265,9 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     private readonly QConverter _converter = new();
 
     private SIDocument? _existing = null;
-    private bool _automaticTextImport = false;
+    private readonly bool _automaticTextImport = false;
 
-    private SIPart[][]? _parts = null;
+    private SIPart[][] _parts = [];
     private SITemplate? _template = null;
 
     private readonly object _sync = new();
@@ -563,7 +563,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     {
         if (task.IsFaulted)
         {
-            OnError(task.Exception.InnerException);
+            OnError(task.Exception.InnerException ?? task.Exception);
         }
         else
         {
@@ -584,6 +584,11 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private Tuple<bool, int> Analyze()
     {
+        if (_template == null)
+        {
+            throw new InvalidOperationException("Template is not defined");
+        }
+
         var result = _converter.ReadFile(
             _parts,
             _template,
@@ -602,6 +607,11 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         switch (_stage)
         {
             case Stage.Begin:
+                if (_template == null)
+                {
+                    throw new InvalidOperationException("Template is not defined");
+                }
+
                 GoText = Resources.Futher;
                 CanGo = false;
                 CanChangeStandart = false;
@@ -939,7 +949,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
         if (expression is End close)
         {
-            return "Всё распознано, но остался лишний текст";
+            return "All recognized but some text remains";
         }
 
         return string.Empty;
@@ -947,6 +957,11 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private void PrepareUIForRead()
     {
+        if (_template == null)
+        {
+            throw new InvalidOperationException("Template is not defined");
+        }
+
         _free = true;
         SkipToolTip = _readError.Index.Item1 == 0 ? Resources.SkipTitle : Resources.SkipPart;
 
@@ -1082,10 +1097,10 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     {
         try
         {
-            _parts = _converter.ExtractQuestions(_text);
+            var parts = _converter.ExtractQuestions(_text);
             Progress = 0;
             
-            if (_parts == null || _parts.Length == 1)
+            if (parts == null || parts.Length == 1)
             {
                 if (!_tokenSource.IsCancellationRequested)
                 {
@@ -1095,6 +1110,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                 return;
             }
 
+            _parts = parts;
             Free = true;
 
             GoText = Resources.Start;

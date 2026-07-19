@@ -717,4 +717,7 @@ To play, you need to organize a local network.</value>
   <data name="ChoosePlayerToDelete" xml:space="preserve">
     <value>Select a player to delete theme</value>
   </data>
+  <data name="PartialText" xml:space="preserve">
+    <value>Partial question text</value>
+  </data>
 </root>

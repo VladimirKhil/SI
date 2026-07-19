@@ -553,6 +553,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             Managed = true,
             Oral = true,
             ButtonPressMode = SI.Contracts.ButtonPressMode.FirstWins,
+            FalseStart = Settings.FalseStart,
+            PartialText = Settings.PartialText,
+            ReadingSpeed = Settings.QuestionReadingSpeed,
         };
 
         var roomSettings = new SI.Contracts.RoomSettings

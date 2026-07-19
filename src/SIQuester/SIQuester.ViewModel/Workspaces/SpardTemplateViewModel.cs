@@ -11,7 +11,7 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class SpardTemplateViewModel : ModelViewBase
 {
-    private static string UnicodeDataFormat = "UnicodeText";
+    private static readonly string UnicodeDataFormat = "UnicodeText";
 
     public string Name { get; private set; }
 
@@ -50,7 +50,7 @@ public sealed class SpardTemplateViewModel : ModelViewBase
         set { if (_canChange != value) { _canChange = value; OnPropertyChanged(); } }
     }
 
-    private ObservableCollection<string> _variants;
+    private ObservableCollection<string> _variants = [];
 
     public ObservableCollection<string> Variants
     {
@@ -77,7 +77,7 @@ public sealed class SpardTemplateViewModel : ModelViewBase
     public SpardTemplateViewModel(string name, IClipboardService clipboardService)
     {
         Name = name;
-        Aliases = new Dictionary<string, EditAlias>();
+        Aliases = [];
 
         Cut = new SimpleCommand(
             arg =>
@@ -101,13 +101,13 @@ public sealed class SpardTemplateViewModel : ModelViewBase
         Paste = new SimpleCommand(
             arg =>
             {
-                Transform = (string)clipboardService.GetData(UnicodeDataFormat);
+                Transform = (string?)clipboardService.GetData(UnicodeDataFormat) ?? "";
             });
 
         InsertAlias = new SimpleCommand(
             arg =>
             {
-                AliasInserted?.Invoke(arg.ToString());
+                AliasInserted?.Invoke(arg?.ToString() ?? "");
             });
 
         InsertOptional = new SimpleCommand(
@@ -119,7 +119,7 @@ public sealed class SpardTemplateViewModel : ModelViewBase
         ChangeTemplate = new SimpleCommand(
             template =>
             {
-                Transform = template.ToString();
+                Transform = template?.ToString() ?? "";
             });
     }
 }

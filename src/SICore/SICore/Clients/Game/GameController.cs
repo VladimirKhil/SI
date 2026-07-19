@@ -465,7 +465,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             _state.InitialPartialTextLength = 0;
             _state.PartialIterationCounter = 0;
             _state.TextLength = 0;
-            ScheduleExecution(Tasks.PrintPartial, 1);
+            ScheduleExecution(Tasks.PrintPartial, 1, force: true);
             return;
         }
 
@@ -2818,7 +2818,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         else
         {
             _state.TimeThinking = 0.0;
-            ScheduleExecution(Tasks.MoveNext, Math.Max(_state.AtomTime, 10), force: true);
+            ScheduleExecution(Tasks.MoveNext, Math.Max(_state.AtomTime, 10));
         }
     }
 

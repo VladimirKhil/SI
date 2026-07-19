@@ -23,20 +23,23 @@ public sealed class TagsViewModel : ItemsViewModel<string>
 
     private void AddTag_Executed(object? arg)
     {
-        if (arg == null)
+        ArgumentNullException.ThrowIfNull(arg);
+        var value = arg.ToString();
+
+        if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentNullException(nameof(arg));
+            return;
         }
 
         var index = CurrentPosition;
 
         if (string.IsNullOrWhiteSpace(this[index]))
         {
-            this[index] = arg.ToString();
+            this[index] = value;
         }
         else
         {
-            Add(arg.ToString());
+            Add(value);
         }
     }
 }

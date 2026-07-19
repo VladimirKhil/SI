@@ -14,7 +14,7 @@ public sealed class SimpleSpardEditor : RichTextBox
     private bool _updateFlag = false;
 
     private SpardTemplateViewModel? _spardViewModel = null;
-    private readonly Paragraph? _paragraph = null;
+    private readonly Paragraph _paragraph = new();
 
     private readonly object _sync = new();
 
@@ -84,7 +84,6 @@ public sealed class SimpleSpardEditor : RichTextBox
     {
         DataContextChanged += SimpleSpardEditor_DataContextChanged;
         Document = new FlowDocument();
-        _paragraph = new Paragraph();
         Document.Blocks.Add(_paragraph);
         _paragraph.Inlines.Add(new Run());
 
@@ -449,16 +448,15 @@ public sealed class SimpleSpardEditor : RichTextBox
 
     private Expression GetExpression(Inline inline)
     {
-        if (inline == null)
+        if (!_indexTable.TryGetValue(inline, out var result))
         {
-            return null;
+            throw new InvalidOperationException("Expression not found for the given inline");
         }
 
-        _indexTable.TryGetValue(inline, out Expression result);
         return result;
     }
 
-    private Inline GetSelectedInline(out int leftIndex) => GetSelectedInline(Selection.Start, out leftIndex);
+    private Inline? GetSelectedInline(out int leftIndex) => GetSelectedInline(Selection.Start, out leftIndex);
 
     /// <summary>
     /// Получить выделенный элемент
@@ -472,7 +470,7 @@ public sealed class SimpleSpardEditor : RichTextBox
     /// <param name="pointer"></param>
     /// <param name="leftIndex"></param>
     /// <returns></returns>
-    private Inline GetSelectedInline(TextPointer pointer, out int leftIndex)
+    private Inline? GetSelectedInline(TextPointer pointer, out int leftIndex)
     {
         if (pointer.Parent is not Run active)
         {
@@ -566,7 +564,7 @@ public sealed class SimpleSpardEditor : RichTextBox
         return result.ToArray();
     }
 
-    private bool FillChain(Expression parent, Expression expression, List<Expression> chain)
+    private static bool FillChain(Expression parent, Expression expression, List<Expression> chain)
     {
         foreach (var child in parent.Operands())
         {
@@ -584,7 +582,7 @@ public sealed class SimpleSpardEditor : RichTextBox
     {
         if (before == null)
         {
-            _rootExpression.SetOperands(new Expression[] { expr });
+            _rootExpression.SetOperands([expr]);
             _paragraph.Inlines.Clear();
             _indexTable.Clear();
         }
@@ -593,30 +591,36 @@ public sealed class SimpleSpardEditor : RichTextBox
             InsertPureExpression(before, expr, root);
         }
 
-        var split = before != null && pointer.CompareTo(inline.ContentStart) > 0 && pointer.CompareTo(inline.ContentEnd) < 0;
-
         if (!InsertExpressionAtPoint(pointer, expr, out Inline toInsert))
         {
             return;
         }
 
-        if (split)
+        if (before == null || pointer.CompareTo(inline.ContentStart) <= 0 || pointer.CompareTo(inline.ContentEnd) >= 0)
         {
-            ((StringValue)((Instruction)before).Argument).Value = ((Run)inline).Text;
-            
-            Inline inl = toInsert;
-            Run newRun;
-            do
-            {
-                inl = inl.NextInline;
-                newRun = inl as Run;
-            } while (inl != null && newRun == null);
-
-            var newText = CreateInstruction(newRun.Text);
-            InsertPureExpression(expr, newText, root);
-
-            _indexTable[newRun] = newText;
+            return;
         }
+
+        ((StringValue)((Instruction)before).Argument).Value = ((Run)inline).Text;
+
+        Inline inl = toInsert;
+        Run? newRun;
+
+        do
+        {
+            inl = inl.NextInline;
+            newRun = inl as Run;
+        } while (inl != null && newRun == null);
+
+        if (newRun == null)
+        {
+            return;
+        }
+
+        var newText = CreateInstruction(newRun.Text);
+        InsertPureExpression(expr, newText, root);
+
+        _indexTable[newRun] = newText;
     }
 
     private void InsertExpressionAtTheBeginning(Expression expr, Sequence root)
@@ -920,7 +924,7 @@ public sealed class SimpleSpardEditor : RichTextBox
     {
         if (expression is StringValue stringValue)
         {
-            if (parent is not Instruction) // Мало ли
+            if (parent is not Instruction)
             {
                 var instruct = new Instruction(new StringValue("ignoresp"), stringValue);
 
@@ -942,8 +946,7 @@ public sealed class SimpleSpardEditor : RichTextBox
             GetSetDisplayData(set, out string text, out SolidColorBrush color, out bool isReadOnly);
 
             var run = AppendTextToEnd(isReadOnly ? parent : expression, text, true);
-            if (run != null)
-                run.Background = color;
+            run?.Background = color;
 
             return;
         }
@@ -951,13 +954,16 @@ public sealed class SimpleSpardEditor : RichTextBox
         if (expression is Optional opt)
         {
             var run = AppendTextToEnd(expression, "(", true);
-            run.Background = new SolidColorBrush(Colors.Chartreuse);
+
+            run?.Background = new SolidColorBrush(Colors.Chartreuse);
 
             if (opt.Operand != null)
+            {
                 Init(opt.Operand, expression);
+            }
 
             run = AppendTextToEnd(expression, ")?", true);
-            run.Background = new SolidColorBrush(Colors.Chartreuse);
+            run?.Background = new SolidColorBrush(Colors.Chartreuse);
             return;
         }
 
@@ -980,13 +986,19 @@ public sealed class SimpleSpardEditor : RichTextBox
     private void GetSetDisplayData(Set set, out string text, out SolidColorBrush color, out bool isReadOnly)
     {
         var name = ((StringValue)set.Operand.Operands().First()).Value;
-        _spardViewModel.Aliases.TryGetValue(name, out var alias);
+        Model.EditAlias? alias = null;
+
+        if (_spardViewModel != null)
+        {
+            _spardViewModel.Aliases.TryGetValue(name, out alias);
+        }
+
         text = alias == null ? (name == "Line" ? "\n" : name) : alias.VisibleName;
         color = new SolidColorBrush(alias == null ? Colors.MediumSlateBlue : (Color)ColorConverter.ConvertFromString(alias.Color));
         isReadOnly = name != "Line" && name != "Some";
     }
 
-    private Run AppendTextToEnd(Expression expression, string text, bool readOnly = false)
+    private Run? AppendTextToEnd(Expression expression, string text, bool readOnly = false)
     {
         if (text == "\n")
         {

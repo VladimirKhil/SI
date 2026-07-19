@@ -952,6 +952,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Partial question text.
+        /// </summary>
+        public static string PartialText {
+            get {
+                return ResourceManager.GetString("PartialText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pass.
         /// </summary>
         public static string Pass {

@@ -9,7 +9,7 @@ namespace SIQuester.Converters;
 [ValueConversion(typeof(string), typeof(ImageSource))]
 public sealed class ImageConverter : IValueConverter
 {
-    private BitmapImage _defaultImage;
+    private BitmapImage? _defaultImage;
 
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -36,7 +36,7 @@ public sealed class ImageConverter : IValueConverter
             return null;
         }
 
-        if (!Uri.TryCreate(path, UriKind.RelativeOrAbsolute, out Uri uri))
+        if (!Uri.TryCreate(path, UriKind.RelativeOrAbsolute, out var uri))
         {
             return null;
         }

@@ -5,7 +5,7 @@ namespace SIQuester.Controls;
 
 public sealed class BreadcrumbBar : StackPanel
 {
-    private double[] _newWidths = null;
+    private double[] _newWidths = [];
 
     protected override Size MeasureOverride(Size constraint)
     {
