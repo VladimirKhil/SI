@@ -32,7 +32,7 @@
             VerticalAlignment="Center"
             IsReadOnly="True" />
 
-        <TextBlock Text="&#x00B1;" VerticalAlignment="Center" Margin="0,0,2,0" Foreground="Black" />
+        <TextBlock Text="&#x00B1;" VerticalAlignment="Center" Margin="0,0,2,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
 
         <TextBox
             Text="{Binding Deviation, UpdateSourceTrigger=PropertyChanged}"
@@ -43,7 +43,7 @@
             HorizontalContentAlignment="Center"
             VerticalAlignment="Center"
             IsReadOnly="True"
-            Background="#F3F3F3" />
+            Background="{StaticResource WhiteBrush}" />
 
         <Button
             Command="{Binding SelectPoint}"

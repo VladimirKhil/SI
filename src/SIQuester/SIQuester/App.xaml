@@ -42,7 +42,8 @@
             <siqcv:ThemeToBrushConverter
                 x:Key="ThemeBackgroundConverter"
                 LightBrush="#FFFBFBFF"
-                DarkBrush="Black" />
+                DarkBrush="Black"
+                DarkGrayBrush="#FF1E1E1E" />
             <siqcv:ThemeToBrushConverter
                 x:Key="ThemeForegroundConverter"
                 LightBrush="Black"
@@ -59,6 +60,11 @@
                 x:Key="ToolBarHoverBorderColorConverter"
                 LightColor="#990000FF"
                 DarkColor="#FF6A6A6A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="ToolBarCheckedColorConverter"
+                LightColor="#E6F0FA"
+                DarkColor="#FF4A4A4A"
+                DarkGrayColor="#FF2E4550" />
             <siqcv:ThemeToColorConverter
                 x:Key="ItemOverColorConverter"
                 LightColor="#FFE9E9FF"
@@ -78,7 +84,78 @@
             <siqcv:ThemeToColorConverter
                 x:Key="SimpleAnswerBackgroundConverter"
                 LightColor="Honeydew"
+                DarkColor="#FF2A2A2A"
+                DarkGrayColor="#FF253325" />
+            <siqcv:ThemeToColorConverter
+                x:Key="MainBackColorConverter"
+                LightColor="#FFFBFBFF"
+                DarkColor="Black"
+                DarkGrayColor="#FF1E1E1E" />
+            <siqcv:ThemeToColorConverter
+                x:Key="LavenderColorConverter"
+                LightColor="Lavender"
+                DarkColor="#FF262626"
+                DarkGrayColor="#FF2A2D3A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="SidePanelColorConverter"
+                LightColor="Lavender"
+                DarkColor="Black"
+                DarkGrayColor="#FF1E1E1E" />
+            <siqcv:ThemeToColorConverter
+                x:Key="LightBlueColorConverter"
+                LightColor="LightBlue"
+                DarkColor="#FF2D2D2D"
+                DarkGrayColor="#FF1F3640" />
+            <siqcv:ThemeToColorConverter
+                x:Key="LightGrayColorConverter"
+                LightColor="LightGray"
                 DarkColor="#FF2A2A2A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="WhiteColorConverter"
+                LightColor="White"
+                DarkColor="#FF252525" />
+            <siqcv:ThemeToColorConverter
+                x:Key="SectionHeaderColorConverter"
+                LightColor="#FFD2DCFF"
+                DarkColor="#FF2D2D2D"
+                DarkGrayColor="#FF2D3548" />
+            <siqcv:ThemeToColorConverter
+                x:Key="DarkRedTextColorConverter"
+                LightColor="DarkRed"
+                DarkColor="#FFFF8080" />
+            <siqcv:ThemeToColorConverter
+                x:Key="DarkBlueTextColorConverter"
+                LightColor="DarkBlue"
+                DarkColor="#FF8AB4FF" />
+            <siqcv:ThemeToColorConverter
+                x:Key="DarkGreenTextColorConverter"
+                LightColor="DarkGreen"
+                DarkColor="#FF7FD27F" />
+            <siqcv:ThemeToColorConverter
+                x:Key="DarkCyanTextColorConverter"
+                LightColor="DarkCyan"
+                DarkColor="#FF80DADA" />
+            <siqcv:ThemeToColorConverter
+                x:Key="TextBoxBorderColorConverter"
+                LightColor="#FFABAdB3"
+                DarkColor="#FF5A5A5A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="TextBoxBackgroundColorConverter"
+                LightColor="#00FFFFFF"
+                DarkColor="#FF2A2A2A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="WrongAnswerBackgroundColorConverter"
+                LightColor="#FFFFE1E6"
+                DarkColor="#FF2D2024" />
+            <siqcv:ThemeToColorConverter
+                x:Key="DurationBadgeColorConverter"
+                LightColor="#DDDDDD"
+                DarkColor="#FF3A3A3A" />
+            <siqcv:ThemeToColorConverter
+                x:Key="ActiveBrushColorConverter"
+                LightColor="#FFC5EFF3"
+                DarkColor="#FF3A3A3A"
+                DarkGrayColor="#FF2E4550" />
 
             <SolidColorBrush
                 x:Key="{x:Static SystemColors.ControlTextBrushKey}"
@@ -127,7 +204,48 @@
                 <x:Static Member="vmp:Resources.Link" />
             </util:StringList>
 
-            <SolidColorBrush x:Key="MainBack" Color="#FFFBFBFF" />
+            <SolidColorBrush
+                x:Key="MainBack"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource MainBackColorConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}" />
+            <SolidColorBrush
+                x:Key="LavenderBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource LavenderColorConverter}, FallbackValue=Lavender, TargetNullValue=Lavender}" />
+            <SolidColorBrush
+                x:Key="SidePanelBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource SidePanelColorConverter}, FallbackValue=Lavender, TargetNullValue=Lavender}" />
+            <SolidColorBrush
+                x:Key="LightBlueBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource LightBlueColorConverter}, FallbackValue=LightBlue, TargetNullValue=LightBlue}" />
+            <SolidColorBrush
+                x:Key="LightGrayBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource LightGrayColorConverter}, FallbackValue=LightGray, TargetNullValue=LightGray}" />
+            <SolidColorBrush
+                x:Key="WhiteBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource WhiteColorConverter}, FallbackValue=White, TargetNullValue=White}" />
+            <SolidColorBrush
+                x:Key="SectionHeaderBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource SectionHeaderColorConverter}, FallbackValue=#FFD2DCFF, TargetNullValue=#FFD2DCFF}" />
+            <SolidColorBrush
+                x:Key="DarkRedTextBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource DarkRedTextColorConverter}, FallbackValue=DarkRed, TargetNullValue=DarkRed}" />
+            <SolidColorBrush
+                x:Key="DarkBlueTextBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource DarkBlueTextColorConverter}, FallbackValue=DarkBlue, TargetNullValue=DarkBlue}" />
+            <SolidColorBrush
+                x:Key="DarkGreenTextBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource DarkGreenTextColorConverter}, FallbackValue=DarkGreen, TargetNullValue=DarkGreen}" />
+            <SolidColorBrush
+                x:Key="DarkCyanTextBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource DarkCyanTextColorConverter}, FallbackValue=DarkCyan, TargetNullValue=DarkCyan}" />
+            <SolidColorBrush
+                x:Key="WrongAnswerBackgroundBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource WrongAnswerBackgroundColorConverter}, FallbackValue=#FFFFE1E6, TargetNullValue=#FFFFE1E6}" />
+            <SolidColorBrush
+                x:Key="DurationBadgeBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource DurationBadgeColorConverter}, FallbackValue=#DDDDDD, TargetNullValue=#DDDDDD}" />
+            <SolidColorBrush
+                x:Key="ActiveBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ActiveBrushColorConverter}, FallbackValue=#FFC5EFF3, TargetNullValue=#FFC5EFF3}" />
 
             <m:QuestionTypesNamesNew x:Key="QTypesNew" />
 
@@ -144,13 +262,18 @@
                     Grid.Row="0" />
             </ControlTemplate>
 
-            <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+            <SolidColorBrush
+                x:Key="TextBox.Static.Border"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource TextBoxBorderColorConverter}, FallbackValue=#FFABAdB3, TargetNullValue=#FFABAdB3}" />
             <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
             <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
+            <SolidColorBrush
+                x:Key="TextBoxBackgroundBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource TextBoxBackgroundColorConverter}, FallbackValue=#00FFFFFF, TargetNullValue=#00FFFFFF}" />
 
             <Style x:Key="CommonTextBox" TargetType="{x:Type TextBox}">
                 <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Background" Value="{StaticResource TextBoxBackgroundBrush}" />
                 <Setter Property="TextWrapping" Value="Wrap" />
                 <Setter Property="Height" Value="Auto" />
                 <Setter Property="SpellCheck.IsEnabled" Value="{Binding SpellChecking, Source={x:Static m:AppSettings.Default}}" />
@@ -590,7 +713,9 @@
                 Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ToolBarHoverColorConverter}, FallbackValue=#330000FF, TargetNullValue=#330000FF}" />
             <SolidColorBrush x:Key="ToolBarButtonPressedBorder" Color="#FF0000FF"/>
             <SolidColorBrush x:Key="ToolBarButtonPressed" Color="#770000FF"/>
-            <SolidColorBrush x:Key="ToolBarButtonChecked" Color="#E6F0FA"/>
+            <SolidColorBrush
+                x:Key="ToolBarButtonChecked"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ToolBarCheckedColorConverter}, FallbackValue=#E6F0FA, TargetNullValue=#E6F0FA}" />
 
             <Style x:Key="{x:Static ToolBar.ToggleButtonStyleKey}" TargetType="{x:Type ToggleButton}">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
@@ -1109,24 +1234,88 @@
                                                 </Setter>
                                             </Style>
 
-                                            <Style x:Key="SubMenuItemQuestionType" TargetType="MenuItem">
+                                            <Style x:Key="SubMenuTypeItem" TargetType="MenuItem">
+                                                <Setter Property="Padding" Value="5" />
+                                                <!-- Render this menu with the light look in every theme (MahApps dark menus hurt readability here). -->
+                                                <Setter Property="Background" Value="#FFF5F5F5" />
+                                                <Setter Property="Foreground" Value="#FF1E1E1E" />
+
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="MenuItem">
+                                                            <Border x:Name="Bd" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="20" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <Rectangle
+                                                                        x:Name="HoverBg"
+                                                                        Grid.ColumnSpan="2"
+                                                                        Fill="{StaticResource MenuItemSelectionFill}"
+                                                                        Visibility="Collapsed" />
+
+                                                                    <Path
+                                                                        x:Name="Check"
+                                                                        Grid.Column="0"
+                                                                        Width="11"
+                                                                        Height="11"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Stretch="Uniform"
+                                                                        Visibility="Collapsed"
+                                                                        Stroke="{TemplateBinding Foreground}"
+                                                                        StrokeThickness="1.5"
+                                                                        StrokeStartLineCap="Round"
+                                                                        StrokeEndLineCap="Round"
+                                                                        StrokeLineJoin="Round"
+                                                                        Data="M1,5 L4,8 L9,1" />
+
+                                                                    <ContentPresenter
+                                                                        Grid.Column="1"
+                                                                        Margin="{TemplateBinding Padding}"
+                                                                        ContentSource="Header"
+                                                                        VerticalAlignment="Center"
+                                                                        RecognizesAccessKey="True"
+                                                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                                </Grid>
+                                                            </Border>
+
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsHighlighted" Value="True">
+                                                                    <Setter TargetName="HoverBg" Property="Visibility" Value="Visible" />
+                                                                </Trigger>
+
+                                                                <Trigger Property="IsChecked" Value="True">
+                                                                    <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                                                                </Trigger>
+
+                                                                <Trigger Property="IsEnabled" Value="False">
+                                                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+
+                                            <Style x:Key="SubMenuItemQuestionType" TargetType="MenuItem" BasedOn="{StaticResource SubMenuTypeItem}">
                                                 <Setter
                                                     Property="Command"
                                                     Value="{Binding DataContext.SetQuestionType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
 
                                                 <Setter Property="CommandParameter" Value="{Binding Key}" />
                                                 <Setter Property="Header" Value="{Binding Value}" />
-                                                <Setter Property="Padding" Value="5" />
                                             </Style>
 
-                                            <Style x:Key="SubMenuItemAnswerType" TargetType="MenuItem">
+                                            <Style x:Key="SubMenuItemAnswerType" TargetType="MenuItem" BasedOn="{StaticResource SubMenuTypeItem}">
                                                 <Setter
                                                     Property="Command"
                                                     Value="{Binding DataContext.SetAnswerType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
 
                                                 <Setter Property="CommandParameter" Value="{Binding Key}" />
                                                 <Setter Property="Header" Value="{Binding Value}" />
-                                                <Setter Property="Padding" Value="5" />
 
                                                 <Style.Triggers>
                                                     <DataTrigger Value="True">
@@ -2519,7 +2708,7 @@
                     Style="{StaticResource LightTextBox}"
                     CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
                     ItemsSource="{Binding}"
-                    Background="#FFFFE1E6"
+                    Background="{StaticResource WrongAnswerBackgroundBrush}"
                     siq:SmartMenuManager.SecondMenu="True"
                     siq:ActivateManager.IsWatching="True"
                     Padding="4" />
@@ -2542,7 +2731,7 @@
             <siqcv:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
             <ControlTemplate TargetType="ContentControl" x:Key="ContentItemDurationTemplate">
-                <StackPanel Background="#DDDDDD" Margin="0,0,2,0" Orientation="Horizontal" ToolTip="{x:Static lp:Resources.Duration}">
+                <StackPanel Background="{StaticResource DurationBadgeBrush}" Margin="0,0,2,0" Orientation="Horizontal" ToolTip="{x:Static lp:Resources.Duration}">
                     <Image Source="{StaticResource AddTimeImage}" Width="10" Margin="4,0,0,0" />
                     
                     <siq:NumericTextBox
@@ -2627,7 +2816,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource CommonTextBox}"
-                                            Foreground="DarkRed"
+                                            Foreground="{StaticResource DarkRedTextBrush}"
                                             TextWrapping="Wrap"
                                             Height="Auto"
                                             MinWidth="50"
@@ -2674,7 +2863,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource CommonTextBox}"
-                                            Foreground="DarkBlue"
+                                            Foreground="{StaticResource DarkBlueTextBrush}"
                                             TextWrapping="Wrap"
                                             Height="Auto"
                                             MinWidth="50"
@@ -2732,7 +2921,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource CommonTextBox}"
-                                            Foreground="DarkGreen"
+                                            Foreground="{StaticResource DarkGreenTextBrush}"
                                             TextWrapping="Wrap"
                                             Height="Auto"
                                             MinWidth="50"
@@ -2757,7 +2946,7 @@
                                 <TextBox
                                     IsReadOnly="True"
                                     Style="{StaticResource CommonTextBox}"
-                                    Foreground="DarkCyan"
+                                    Foreground="{StaticResource DarkCyanTextBrush}"
                                     TextWrapping="Wrap"
                                     Height="Auto"
                                     MinWidth="50"
@@ -2975,13 +3164,13 @@
                         Margin="5,2,3,2" />
 
                     <Border
-                        Background="LightBlue"
+                        Background="{StaticResource LightBlueBrush}"
                         MinWidth="25"
                         Margin="1">
                         <ContentControl
                             x:Name="value"
                             Margin="0,2,0,0"
-                            TextBlock.Foreground="Black"
+                            TextBlock.Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                             Content="{Binding Value}"
                             ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource GroupParameterSelector}}"
                             KeyboardNavigation.IsTabStop="False" />
@@ -3066,7 +3255,7 @@
                         <TextBlock
                             Text="{Binding}"
                             FontWeight="Bold"
-                            Foreground="Black" />
+                            Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
                     </DataTemplate>
                 </siqcv:TemplateConverter.DefaultTemplate>
 
@@ -3077,7 +3266,7 @@
                                 DockPanel.Dock="Left"
                                 Text="{Binding}"
                                 FontWeight="Bold"
-                                Foreground="Black"
+                                Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                 Margin="0,3,0,0" />
                             
                             <Button
@@ -3116,7 +3305,7 @@
                                 <ContentControl
                                     x:Name="value"
                                     Margin="0,2,0,0"
-                                    TextBlock.Foreground="Black"
+                                    TextBlock.Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                     Content="{Binding Value}"
                                     ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource ParameterSelector}}"
                                     KeyboardNavigation.IsTabStop="False" />
@@ -3231,7 +3420,7 @@
 
                     <TextBlock
                         Text="{x:Static lp:Resources.Deviation}"
-                        Foreground="Black"
+                        Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                         FontSize="18"
                         Margin="8,1,3,0" />
 
@@ -3241,7 +3430,7 @@
                         MinWidth="75"
                         Padding="3"
                         Margin="5,0,0,0"
-                        Background="#F3F3F3"
+                        Background="{StaticResource SimpleAnswerBackgroundBrush}"
                         ToolTip="{x:Static lp:Resources.AnswerDeviation}" />
                 </StackPanel>
             </DataTemplate>
@@ -3265,7 +3454,7 @@
             </DataTemplate>
 
             <ControlTemplate TargetType="ContentControl" x:Key="AnswerDurationTemplate">
-                <StackPanel Background="#DDDDDD" Margin="0,0,5,0" Orientation="Horizontal" ToolTip="{x:Static lp:Resources.AnswerDuration}" VerticalAlignment="Center">
+                <StackPanel Background="{StaticResource DurationBadgeBrush}" Margin="0,0,5,0" Orientation="Horizontal" ToolTip="{x:Static lp:Resources.AnswerDuration}" VerticalAlignment="Center">
                     <Image Source="{StaticResource AddTimeImage}" Width="10" Margin="4,0,0,0" />
 
                     <siq:NumericTextBox

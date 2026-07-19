@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -16,17 +17,20 @@
         </Style>
     </UserControl.Resources>
     
-    <DockPanel Margin="5">
+    <DockPanel
+        Margin="5"
+        Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+        TextElement.Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
         <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
-            <CheckBox IsChecked="{Binding CheckEmptyAuthors}">
+            <CheckBox IsChecked="{Binding CheckEmptyAuthors}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
                 <TextBlock Text="{x:Static lp:Resources.AuthorsAbsence}" />
             </CheckBox>
             
-            <CheckBox IsChecked="{Binding CheckEmptySources}" Margin="0,2,0,0">
+            <CheckBox IsChecked="{Binding CheckEmptySources}" Margin="0,2,0,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
                 <TextBlock Text="{x:Static lp:Resources.SourcesAbsense}" />
             </CheckBox>
             
-            <CheckBox IsChecked="{Binding CheckBrackets}" Margin="0,2,0,0">
+            <CheckBox IsChecked="{Binding CheckBrackets}" Margin="0,2,0,0" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
                 <TextBlock Text="{x:Static lp:Resources.OpenCloseBracketsIncosistency}" />
             </CheckBox>
 
@@ -52,7 +56,7 @@
                 <ItemsControl ItemsSource="{Binding Warnings}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <DockPanel Margin="0,5" Background="#EEEEEE">
+                            <DockPanel Margin="0,5" Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}">
                                 <Button
                                     Command="{Binding NavigateToSource}"
                                     Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
@@ -64,13 +68,19 @@
                                     <Image Source="{StaticResource RightImageKey}" />
                                 </Button>
 
-                                <TextBlock Text="{Binding Title}" TextWrapping="Wrap" Margin="5" />
+                                <TextBlock
+                                    Text="{Binding Title}"
+                                    Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                    TextWrapping="Wrap"
+                                    Margin="5" />
                             </DockPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
                 <TextBox
+                    Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+                    Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                     Padding="3,3,0,0"
                     Margin="0,5,0,0"
                     Text="{Binding Result}"

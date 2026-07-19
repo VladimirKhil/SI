@@ -10,7 +10,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <Grid Name="ReferenceGrid" Background="LightGray" SizeChanged="ReferenceGrid_SizeChanged" ClipToBounds="True">
+        <Grid Name="ReferenceGrid" Background="{StaticResource LightGrayBrush}" SizeChanged="ReferenceGrid_SizeChanged" ClipToBounds="True">
             <Image Name="TargetImage" Stretch="Uniform" Opacity="0.6" />
             <Canvas Name="OverlayCanvas" IsHitTestVisible="False">
                 <Grid Name="SelectionMarker" Width="18" Height="18" Visibility="Hidden">

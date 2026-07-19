@@ -88,5 +88,7 @@ public enum ThemeOption
     [Description("ThemeOptionLight")]
     Light,
     [Description("ThemeOptionDark")]
-    Dark
+    Dark,
+    [Description("ThemeOptionDarkGray")]
+    DarkGray
 }

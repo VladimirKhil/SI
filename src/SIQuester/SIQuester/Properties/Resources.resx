@@ -1221,6 +1221,9 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeOptionDark" xml:space="preserve">
     <value>Dark</value>
   </data>
+  <data name="ThemeOptionDarkGray" xml:space="preserve">
+    <value>Dark gray</value>
+  </data>
   <data name="ThemeOptionLight" xml:space="preserve">
     <value>Light</value>
   </data>

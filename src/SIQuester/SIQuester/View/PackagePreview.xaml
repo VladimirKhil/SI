@@ -12,7 +12,8 @@
     d:DesignHeight="450"
     d:DesignWidth="1200"
     d:DataContext="{d:DesignInstance vm:PreviewViewModel}"
-    Background="White">
+    Background="{StaticResource WhiteBrush}"
+    Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
     <UserControl.Resources>
         <lc:ContentTypeConverter x:Key="ContentTypeConverter" />
     </UserControl.Resources>
@@ -32,7 +33,7 @@
             
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Margin="2" Background="Lavender" Padding="5,3">
+                    <TextBlock Margin="2" Background="{StaticResource LavenderBrush}" Padding="5,3">
                         <Run Text="{Binding Key, Mode=OneWay, Converter={StaticResource ContentTypeConverter}}" /><Run Text=" (" /><Run Text="{Binding Value, Mode=OneWay}" /><Run Text=")" />
                     </TextBlock>
                 </DataTemplate>
@@ -48,7 +49,7 @@
             
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding}" Margin="2" Background="#DDDDDD" Padding="5,3" />
+                    <TextBlock Text="{Binding}" Margin="2" Background="{StaticResource LightGrayBrush}" Padding="5,3" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
@@ -62,7 +63,7 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="p:Round">
-                    <StackPanel Margin="0,5,5,0" Background="LightBlue">
+                    <StackPanel Margin="0,5,5,0" Background="{StaticResource LightBlueBrush}">
                         <TextBlock Text="{Binding Name}" FontSize="25" FontWeight="Bold" Margin="10,6" />
 
                         <ItemsControl ItemsSource="{Binding Themes}" Margin="10,4" Width="400">
