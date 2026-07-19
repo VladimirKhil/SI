@@ -273,7 +273,7 @@
 
             <Style x:Key="CommonTextBox" TargetType="{x:Type TextBox}">
                 <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Background" Value="{StaticResource TextBoxBackgroundBrush}" />
+                <Setter Property="Background" Value="Transparent" />
                 <Setter Property="TextWrapping" Value="Wrap" />
                 <Setter Property="Height" Value="Auto" />
                 <Setter Property="SpellCheck.IsEnabled" Value="{Binding SpellChecking, Source={x:Static m:AppSettings.Default}}" />

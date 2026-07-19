@@ -2252,45 +2252,47 @@ public sealed class QDocument : WorkspaceViewModel
 
         var hasQuestions = false;
 
-        foreach (var round in Package.Model.Rounds)
+        foreach (var round in Package.Rounds)
         {
-            if (round.Name.Length == 0)
+            if (round.Model.Name.Length == 0)
             {
                 return $"{Resources.ExportToSteamEmptyRound}";
             }
 
             foreach (var theme in round.Themes)
             {
-                if (theme.Name.Length == 0)
+                if (theme.Model.Name.Length == 0)
                 {
-                    return $"{Resources.Round} {round.Name}: {Resources.ExportToSteamEmptyTheme}";
+                    return $"{Resources.Round} {round.Model.Name}: {Resources.ExportToSteamEmptyTheme}";
                 }
 
                 foreach (var question in theme.Questions)
                 {
-                    if (question.Price != Question.InvalidPrice)
+                    if (question.Model.Price != Question.InvalidPrice)
                     {
                         hasQuestions = true;
                     }
 
-                    var questionText = question.GetText();
+                    var questionText = question.Model.GetText();
 
-                    var emptyNormal = question.Price == Question.InvalidPrice || question.TypeName == QuestionTypes.SecretNoQuestion;
+                    var emptyNormal = question.Model.Price == Question.InvalidPrice
+                        || question.TypeName == QuestionTypes.SecretNoQuestion
+                        || question.IsManagedByClient;
 
                     var emptyQuestion = !emptyNormal
                         && (questionText == "" || questionText == Resources.Question)
-                        && !question.HasMediaContent();
+                        && !question.Model.HasMediaContent();
 
                     if (emptyQuestion)
                     {
-                        return $"{Resources.Round} {round.Name}: {theme.Name}, {question.Price}: {Resources.ExportToSteamEmptyQuestion}";
+                        return $"{Resources.Round} {round.Model.Name}: {theme.Model.Name}, {question.Model.Price}: {Resources.ExportToSteamEmptyQuestion}";
                     }
 
                     var noAnswer = !emptyNormal && (question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]));
 
                     if (noAnswer)
                     {
-                        return $"{Resources.Round} {round.Name}: {theme.Name}, {question.Price}: {Resources.ExportToSteamNoAnswer}";
+                        return $"{Resources.Round} {round.Model.Name}: {theme.Model.Name}, {question.Model.Price}: {Resources.ExportToSteamNoAnswer}";
                     }
                 }
             }

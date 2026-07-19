@@ -373,11 +373,12 @@
                             <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
                         </DataTemplate>
                     </MenuItem.HeaderTemplate>
-                    
+
                     <MenuItem.Resources>
                         <Style x:Key="MenuSelect" TargetType="{x:Type MenuItem}">
                             <Setter Property="IsCheckable" Value="True" />
-                            
+                            <Setter Property="Padding" Value="5" />
+
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter Property="IsCheckable" Value="False" />
@@ -385,7 +386,7 @@
                             </Style.Triggers>
                         </Style>
                     </MenuItem.Resources>
-                    
+
                     <MenuItem
                         Style="{StaticResource MenuSelect}"
                         Header="{x:Static lp:Resources.EditMode_ReadOnly}"

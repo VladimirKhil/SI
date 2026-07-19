@@ -25,6 +25,9 @@
         <lc:QTypeToColorConverter
             x:Key="QTypeToColorConverter"
             CommonBrush="Black"
+            CommonBrushLight="Black"
+            CommonBrushDark="White"
+            CommonBrushDarkGray="White"
             StakeBrush="#FFFF3A00"
             SecretBrush="#FFB900FF"
             NoRiskBrush="#FF00B900"
@@ -34,6 +37,9 @@
         <lc:RoundTypeToColorConverter
             x:Key="RoundTypeToColorConverter"
             CommonBrush="Black"
+            CommonBrushLight="Black"
+            CommonBrushDark="White"
+            CommonBrushDarkGray="White"
             FinalBrush="Firebrick" />
 
         <lc:EqualsToVisibilityConverter x:Key="Equals" />
@@ -41,11 +47,25 @@
         <lc:NotNullConverter x:Key="NotNullConverter" />
 
         <Style x:Key="QHeaderStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{Binding TypeName, Converter={StaticResource QTypeToColorConverter}}" />
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource QTypeToColorConverter}">
+                        <Binding Path="TypeName" />
+                        <Binding Path="Theme" Source="{x:Static m:AppSettings.Default}" />
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="RoundHeaderStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{Binding Model.Type, Converter={StaticResource RoundTypeToColorConverter}}" />
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource RoundTypeToColorConverter}">
+                        <Binding Path="Model.Type" />
+                        <Binding Path="Theme" Source="{x:Static m:AppSettings.Default}" />
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="MenuButton" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
@@ -105,7 +125,7 @@
                 </DataTrigger>
                 
                 <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
-                    <Setter TargetName="bd" Property="Margin" Value="2,2,1,2" />
+                    <Setter TargetName="bd" Property="Margin" Value="2,0,1,0" />
                 </DataTrigger>
 
                 <DataTrigger Binding="{Binding IsDragged}" Value="True">
@@ -417,8 +437,8 @@
         </Style>
 
         <DataTemplate x:Key="ThemeView">
-            <StackPanel Name="panel" Margin="0,6,6,0" Background="{StaticResource SectionHeaderBrush}" Width="240">
-                <Border Name="border">
+            <StackPanel Name="panel" Margin="0,6,6,0" Width="240">
+                <Border Name="border" Background="{StaticResource SectionHeaderBrush}">
                     <TextBlock
                         Name="name"
                         Text="{Binding Model.Name}"
@@ -1258,7 +1278,6 @@
                         x:Name="editor"
                         BorderThickness="0"
                         Visibility="Collapsed"
-                        Foreground="{Binding Type.Model.Name, Converter={StaticResource QTypeToColorConverter}}"
                         Width="40"
                         Height="23"
                         MaxLines="1"
@@ -1266,7 +1285,14 @@
                         HorizontalAlignment="Left"
                         VerticalContentAlignment="Center"
                         Text="{Binding Model.Price,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                        HorizontalContentAlignment="Center" />
+                        HorizontalContentAlignment="Center">
+                        <l:NumericTextBox.Foreground>
+                            <MultiBinding Converter="{StaticResource QTypeToColorConverter}">
+                                <Binding Path="Type.Model.Name" />
+                                <Binding Path="Theme" Source="{x:Static m:AppSettings.Default}" />
+                            </MultiBinding>
+                        </l:NumericTextBox.Foreground>
+                    </l:NumericTextBox>
 
                     <DataTemplate.Triggers>
                         <DataTrigger
@@ -1379,7 +1405,7 @@
         <Border
             Width="400"
             Grid.Column="1"
-            Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+            Background="#22777777"
             Visibility="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ContentControl Content="{Binding ActiveNode}" ContentTemplateSelector="{StaticResource CardSelector}" />

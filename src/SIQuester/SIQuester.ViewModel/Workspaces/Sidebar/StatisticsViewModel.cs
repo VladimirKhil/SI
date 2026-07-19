@@ -145,9 +145,9 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
     private void CheckText(StringBuilder stats, List<WarningViewModel> warnings)
     {
-        foreach (var round in _document.Document.Package.Rounds)
+        foreach (var round in _document.Package.Rounds)
         {
-            stats.AppendLine(string.Format("{0}: {1}", Resources.Round, round.Name));
+            stats.AppendLine(string.Format("{0}: {1}", Resources.Round, round.Model.Name));
             stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfThemes, round.Themes.Count));
 
             foreach (var theme in round.Themes)
@@ -157,14 +157,14 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
                 var unrecognizedText = theme.Info.Comments.Text.Contains(Resources.Undefined);
                 var noAuthors = theme.Info.Authors.Count == 0 && _checkEmptyAuthors;
-                var invalidBrackets = !Utils.ValidateTextBrackets(theme.Name) || !Utils.ValidateTextBrackets(theme.Info.Comments.Text);
+                var invalidBrackets = !Utils.ValidateTextBrackets(theme.Model.Name) || !Utils.ValidateTextBrackets(theme.Info.Comments.Text);
 
                 if (unrecognizedText || noAuthors || invalidBrackets)
                 {
                     if (!here)
                     {
                         here = true;
-                        themeData.AppendLine(string.Format("{0}: {1}", Resources.Theme, theme.Name));
+                        themeData.AppendLine(string.Format("{0}: {1}", Resources.Theme, theme.Model.Name));
                     }
 
                     if (unrecognizedText)
@@ -180,15 +180,18 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
                 foreach (var question in theme.Questions)
                 {
-                    var questionText = question.GetText();
+                    var questionText = question.Model.GetText();
 
-                    var emptyNormal = question.Price == Question.InvalidPrice || question.TypeName == QuestionTypes.SecretNoQuestion;
+                    var emptyNormal = question.Model.Price == Question.InvalidPrice || question.TypeName == QuestionTypes.SecretNoQuestion;
                     
                     var emptyQuestion = !emptyNormal
                         && (questionText == "" || questionText == Resources.Question)
-                        && !question.HasMediaContent();
+                        && !question.Model.HasMediaContent();
 
-                    var noAnswer = !emptyNormal && (question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]));
+                    var noAnswer = !emptyNormal
+                        && (question.Right.Count == 0 || question.Right.Count == 1 && string.IsNullOrWhiteSpace(question.Right[0]))
+                        && !question.IsManagedByClient;
+
                     var emptySources = question.Info.Sources.Count == 0 && _checkEmptySources;
 
                     var bracketsData = new StringBuilder();
@@ -203,7 +206,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                             switch (i)
                             {
                                 case 0:
-                                    text = question.GetText();
+                                    text = question.Model.GetText();
                                     comment = Resources.QText;
                                     break;
 
@@ -231,7 +234,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
                             if (!Utils.ValidateTextBrackets(text))
                             {
-                                bracketsData.Append(question.Price);
+                                bracketsData.Append(question.Model.Price);
                                 bracketsData.Append(": ");
                                 bracketsData.Append(Resources.WrongBrackets);
                                 bracketsData.AppendFormat(" ({0})", comment);
@@ -248,23 +251,23 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                         if (!here)
                         {
                             here = true;
-                            stats.AppendLine(string.Format("{0}: {1}", Resources.Theme, theme.Name));
+                            stats.AppendLine(string.Format("{0}: {1}", Resources.Theme, theme.Model.Name));
                         }
                     }
 
                     if (emptyQuestion)
                     {
-                        themeData.AppendLine(string.Format("{0}: {1}", question.Price, Resources.NoQuestion));
+                        themeData.AppendLine(string.Format("{0}: {1}", question.Model.Price, Resources.NoQuestion));
                     }
 
                     if (noAnswer)
                     {
-                        themeData.AppendLine(string.Format("{0}: {1}", question.Price, Resources.NoAnswer));
+                        themeData.AppendLine(string.Format("{0}: {1}", question.Model.Price, Resources.NoAnswer));
                     }
 
                     if (emptySources)
                     {
-                        themeData.AppendLine(string.Format("{0}: {1}", question.Price, Resources.NoSource));
+                        themeData.AppendLine(string.Format("{0}: {1}", question.Model.Price, Resources.NoSource));
                     }
 
                     if (hasBracketsIssues)
@@ -274,9 +277,9 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
                     foreach (var content in question.GetContent())
                     {
-                        if (content.Type == ContentTypes.Audio && content.Placement != ContentPlacements.Background)
+                        if (content.Type == ContentTypes.Audio && content.Model.Placement != ContentPlacements.Background)
                         {
-                            themeData.AppendLine($"{question.Price}: {string.Format(Resources.AudioIsNotOnBackground, content.Value)}");
+                            themeData.AppendLine($"{question.Model.Price}: {string.Format(Resources.AudioIsNotOnBackground, content.Model.Value)}");
                         }
                     }
                 }
