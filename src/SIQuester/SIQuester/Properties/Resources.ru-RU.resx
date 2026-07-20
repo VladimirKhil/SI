@@ -1406,6 +1406,12 @@
   <data name="DocumentQuestionCount" xml:space="preserve">
     <value>Всего вопросов</value>
   </data>
+  <data name="DocumentFilledQuestionCount" xml:space="preserve">
+    <value>Заполнено вопросов / всего вопросов</value>
+  </data>
+  <data name="DocumentFilledLabel" xml:space="preserve">
+    <value>Заполнено:</value>
+  </data>
   <data name="Format" xml:space="preserve">
     <value>Формат</value>
   </data>

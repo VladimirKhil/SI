@@ -1115,6 +1115,24 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filled:.
+        /// </summary>
+        public static string DocumentFilledLabel {
+            get {
+                return ResourceManager.GetString("DocumentFilledLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filled questions / total questions.
+        /// </summary>
+        public static string DocumentFilledQuestionCount {
+            get {
+                return ResourceManager.GetString("DocumentFilledQuestionCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Document font.
         /// </summary>
         public static string DocumentFont {
