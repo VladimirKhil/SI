@@ -2326,7 +2326,15 @@ public sealed class Game : MessageHandler
             }
         }
 
+        // The answerer has already been detected (the button has been pressed) but has not been asked for the answer yet.
+        // Moving to answer here would override the pending Tasks.AskAnswer/Tasks.AskAnswerDeferred task
+        // and the answerer would lose their answer.
+        // These indicies are reset in InitQuestionState() and ContinueQuestion(),
+        // so the question is still finished by ContinueQuestion() when nobody can press anymore
+        var answererIsPending = _state.PendingAnswererIndex != -1 || _state.PendingAnswererIndicies.Count > 0;
+
         if (canPressChanged
+            && !answererIsPending
             && _state.Players.All(p => !p.CanPress || !p.IsConnected)
             && (_state.Decision == DecisionType.None || _state.Decision == DecisionType.Pressing) // TODO: Can this state be described in a more clear way?
             && !_state.TInfo.Pause
