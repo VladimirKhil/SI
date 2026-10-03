@@ -593,17 +593,18 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
            fileShare,
            computerPlayers,
            computerShowmans,
+           [],
            avatarHelper,
            null,
            null);
 
         var client = new Client("HOST");
         var actions = new PersonActions(client);
-        var state = new PersonState();
+        var state = new PersonState("");
 
         var gameController = new Controllers.GameController(actions);
 
-        var host = new Showman(client, new Account(), gameController, actions, state);
+        var host = new Showman(client, gameController, actions, state);
         var handler = new PresentationHandler(client, presentationController);
 
         client.ConnectTo(node);

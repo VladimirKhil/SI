@@ -6,13 +6,10 @@ namespace SICore;
 /// <summary>
 /// Defines a showman message processor.
 /// </summary>
-public sealed class Showman : Viewer
+public sealed class Showman(Client client, IPersonController controller, PersonActions actions, PersonState state)
+    : Viewer(client, controller, actions, state)
 {
     public override GameRole Role => GameRole.Showman;
-
-    public Showman(Client client, Account personData, IPersonController controller, PersonActions actions, PersonState state)
-        : base(client, personData, controller, actions, state)
-    { }
 
     /// <inheritdoc />
     protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)

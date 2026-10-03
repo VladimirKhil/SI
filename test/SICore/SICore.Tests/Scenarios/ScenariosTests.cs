@@ -67,13 +67,21 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings { HostName = "Showman" },
+            new SI.Contracts.RoomSettings {
+                HostName = "Showman",
+                Showman = new SI.Contracts.Models.Account
+                {
+                    Type = SI.Contracts.Models.AccountType.Human,
+                    Name = Constants.FreePlace
+                }
+            },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             "en-US",
             document,
             gameHost,
             fileShare,
+            Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             avatarHelper,
@@ -251,6 +259,7 @@ public sealed class ScenariosTests
             fileShare,
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
+            Array.Empty<ComputerAccount>(),
             avatarHelper,
             null,
             null);
@@ -342,13 +351,22 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings { HostName = "Showman" },
+            new SI.Contracts.RoomSettings
+            {
+                HostName = "Showman",
+                Showman = new SI.Contracts.Models.Account
+                {
+                    Type = SI.Contracts.Models.AccountType.Human,
+                    Name = Constants.FreePlace
+                }
+            },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             "en-US",
             document,
             gameHost,
             fileShare,
+            Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             avatarHelper,
@@ -444,13 +462,22 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings { HostName = "Showman" },
+            new SI.Contracts.RoomSettings
+            {
+                HostName = "Showman",
+                Showman = new SI.Contracts.Models.Account
+                {
+                    Type = SI.Contracts.Models.AccountType.Human,
+                    Name = Constants.FreePlace
+                }
+            },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             "en-US",
             document,
             gameHost,
             fileShare,
+            Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             avatarHelper,

@@ -23,10 +23,7 @@ public sealed class GameState : Data
     /// </summary>
     public IGameHost Host { get; }
 
-    /// <summary>
-    /// Настройки игры
-    /// </summary>
-    public IGameSettingsCore<AppSettingsCore> Settings { get; }
+    public string Culture { get; }
 
     /// <summary>
     /// Gets game room settings.
@@ -613,7 +610,6 @@ public sealed class GameState : Data
         GamePersonAccount showman,
         Uri? packageSource,
         string language,
-        IGameSettingsCore<AppSettingsCore> settings,
         SI.Contracts.RoomSettings roomSettings,
         SI.Contracts.TimeSettings timeSettings,
         SI.Contracts.RulesSettings rules,
@@ -622,7 +618,7 @@ public sealed class GameState : Data
         Host = gameHost;
         ShowMan = showman;
         Stakes = new StakesState(Players);
-        Settings = settings;
+        Culture = language;
         GameResultInfo = new GameResult(packageSource, language);
         RoomSettings = roomSettings;
         TimeSettings = timeSettings;

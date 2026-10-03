@@ -15,17 +15,12 @@ public sealed class RoomSettings
     /// <summary>
     /// Showman account.
     /// </summary>
-    public Account? Showman { get; set; }
+    public required Account Showman { get; set; }
 
     /// <summary>
     /// Player accounts.
     /// </summary>
     public Account[] Players { get; set; } = [];
-
-    /// <summary>
-    /// Viewer accounts.
-    /// </summary>
-    public Account[] Viewers { get; set; } = [];
 
     /// <summary>
     /// Room name.

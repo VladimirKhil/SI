@@ -366,6 +366,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 : LO[nameof(R.LetsPlayNextTheme)];
 
             _actions.ShowmanReplic(themesReplic);
+            _actions.ShowmanReplicNew(isFirstPlay ? MessageCode.AllThemesWillBePlayed : MessageCode.PlayingNextTheme);
         }
 
         _state.TableInformStageLock.WithLock(() =>
@@ -387,8 +388,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void OnQuestion(Question question)
     {
         _state.Question = question;
-
-        _actions.ShowmanReplic($"{_state.Theme?.Name}, {question.Price}");
         _actions.SendVisualMessageWithArgs(Messages.Question, question.Price);
 
         InitQuestionState(_state.Question);
@@ -1056,8 +1055,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         StopWaiting();
 
-        var s = _state.ChooserIndex == _state.AnswererIndex ? LO[nameof(R.ToMyself)] : _state.Answerer.Name;
-
         _state.ChooserIndex = _state.AnswererIndex;
         _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
         ScheduleExecution(Tasks.MoveNext, 10);
@@ -1111,7 +1108,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         StopWaiting();
         var deleterName = _state.Players[_state.ThemeDeleters.Current.PlayerIndex].Name;
-        _actions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {deleterName}"); // TODO: REMOVE (replaced by ShowmanReplicNew)
         _actions.ShowmanReplicNew(MessageCode.ThemeDeletes, deleterName);
         _state.ThemeDeleters.MoveBack();
         ScheduleExecution(Tasks.AskToDelete, 1);
@@ -1350,12 +1346,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (!_state.QuestionPlay.HiddenStakes)
             {
-                if (!_state.HiddenPersons)
-                {
-                    s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");
-                    _actions.ShowmanReplic(s.ToString()); // TODO: remove this line (replaced by ShowmanReplicNew)
-                }
-
                 if (_state.Answerer.AnswerValidationFactor == 0)
                 {
                     _actions.SendMessageWithArgs(Messages.Pass, _state.AnswererIndex);
@@ -1399,7 +1389,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 if (!_state.HiddenPersons)
                 {
-                    _actions.ShowmanReplic(s.ToString()); // TODO: remove this line (replaced by ShowmanReplicNew)
                     _actions.ShowmanReplicNew(MessageCode.WrongAnswer);
                 }
 
@@ -1534,6 +1523,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var s = $"{LO[nameof(R.StakeMakes)]} {_state.Players[playerIndex].Name}";
         _actions.ShowmanReplic(s);
+        _actions.ShowmanReplicNew(MessageCode.StakeMakes, _state.Players[playerIndex].Name);
 
         _state.OrderIndex--;
         ScheduleExecution(Tasks.AskStake, 10);
@@ -1604,8 +1594,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (!_state.HiddenPersons)
         {
-            var s = GetRandomString(LO[nameof(R.LetsSee)]);
-            _actions.ShowmanReplic(s); // TODO: remove this line (replaced by ShowmanReplicNew)
             _actions.ShowmanReplicNew(MessageCode.PlayerAnswers);
         }
 
@@ -3900,12 +3888,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (votingForRight && positiveVoteCount <= negativeVoteCount || !votingForRight && positiveVoteCount >= negativeVoteCount)
             {
                 _actions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
+                _actions.ShowmanReplicNew(MessageCode.AppellationRejected);
                 _tasksHistory.AddLogEntry($"CheckAppellation denied and resumed normally ({_taskRunner.PrintOldTasks()})");
                 return;
             }
 
             // Commit appellation
             _actions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
+            _actions.ShowmanReplicNew(MessageCode.AppellationAccepted);
 
             if (votingForRight)
             {

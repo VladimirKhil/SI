@@ -27,16 +27,17 @@ public static class GameRunner
 
     public static Game CreateGame(
         Node node,
-        IGameSettingsCore<AppSettingsCore> settings,
+        /* TODO: remove */ IGameSettingsCore<AppSettingsCore> settings,
         SI.Contracts.RoomSettings roomSettings,
         SI.Contracts.TimeSettings timeSettings,
         SI.Contracts.RulesSettings rules,
-        string language,
+        /* TODO: remove */ string language,
         SIDocument document,
         IGameHost gameHost,
         IFileShare fileShare,
         ComputerAccount[] defaultPlayers,
         ComputerAccount[] defaultShowmans,
+        ComputerAccount[] customAccounts,
         IAvatarHelper avatarHelper,
         IPinHelper? pinHelper,
         Uri? packageSource,
@@ -49,7 +50,6 @@ public static class GameRunner
             new GamePersonAccount(settings.Showman),
             packageSource,
             language,
-            settings,
             roomSettings,
             timeSettings,
             rules,
@@ -66,19 +66,21 @@ public static class GameRunner
 
         try
         {
-            if (!settings.Showman.IsHuman)
+            var showmanSettings = roomSettings.Showman;
+
+            if (showmanSettings.Type == SI.Contracts.Models.AccountType.Bot)
             {
-                var showmanClient = new Client(settings.Showman.Name);
-                var state = new PersonState();
+                var showmanClient = new Client(showmanSettings.Name);
+                var state = new PersonState(showmanSettings.AvatarUri);
                 var actions = new PersonActions(showmanClient);
 
-                var logic = new PersonComputerController(
+                var controller = new PersonComputerController(
                     state,
                     actions,
-                    new Intelligence((ComputerAccount)settings.Showman),
+                    new Intelligence(GetComputerAccount(showmanSettings, defaultShowmans, customAccounts)),
                     GameRole.Showman);
 
-                var showman = new Showman(showmanClient, settings.Showman, logic, actions, state);
+                var showman = new Showman(showmanClient, controller, actions, state);
                 showmanClient.ConnectTo(node);
 
                 gameState.ShowMan.IsConnected = true;
@@ -93,25 +95,24 @@ public static class GameRunner
             }
             else
             {
-                for (int i = 0; i < settings.Players.Length; i++)
+                for (int i = 0; i < roomSettings.Players.Length; i++)
                 {
+                    var playerSettings = roomSettings.Players[i];
                     gameState.Players.Add(new GamePlayerAccount(settings.Players[i]));
-                    var name = settings.Players[i].Name;
-                    var human = settings.Players[i].IsHuman;
 
-                    if (!human)
+                    if (playerSettings.Type == SI.Contracts.Models.AccountType.Bot)
                     {
-                        var playerClient = new Client(settings.Players[i].Name);
-                        var state = new PersonState();
+                        var playerClient = new Client(playerSettings.Name);
+                        var state = new PersonState(playerSettings.AvatarUri);
                         var actions = new PersonActions(playerClient);
 
-                        var logic = new PersonComputerController(
+                        var controller = new PersonComputerController(
                             state,
                             actions,
-                            new Intelligence((ComputerAccount)settings.Players[i]),
+                            new Intelligence(GetComputerAccount(playerSettings, defaultPlayers, customAccounts)),
                             GameRole.Player);
 
-                        var player = new Player(playerClient, settings.Players[i], logic, actions, state);
+                        var player = new Player(playerClient, controller, actions, state);
                         playerClient.ConnectTo(node);
 
                         gameState.Players[i].IsConnected = true;
@@ -143,7 +144,7 @@ public static class GameRunner
             gameState,
             gameActions,
             /* TODO: This dependency should be removed by using engine callbacks */ engine,
-            localizer,
+            /* TODO: remove */ localizer,
             fileShare,
             pinHelper);
 
@@ -153,7 +154,7 @@ public static class GameRunner
 
         return new Game(
             client,
-            localizer,
+            /* TODO: remove */ localizer,
             gameState,
             gameActions,
             gameController,
@@ -161,6 +162,32 @@ public static class GameRunner
             defaultShowmans,
             fileShare,
             avatarHelper);
+    }
+
+    private static ComputerAccount GetComputerAccount(
+        SI.Contracts.Models.Account account,
+        ComputerAccount[] defaultAccounts,
+        ComputerAccount[] customAccounts)
+    {
+        var name = account.Name;
+        var computerAccount = defaultAccounts.FirstOrDefault(a => a.Name == name);
+
+        if (computerAccount != null)
+        {
+            return computerAccount;
+        }
+
+        computerAccount = customAccounts.FirstOrDefault(a => a.Name == name);
+
+        if (computerAccount != null)
+        {
+            return computerAccount;
+        }
+
+        computerAccount = new ComputerAccount(account.Name, account.Gender == SI.Contracts.Models.Gender.Male) { Picture = account.AvatarUri };
+        computerAccount.Randomize();
+
+        return computerAccount;
     }
 
     private static GameRules GetGameRules(SI.Contracts.GameMode gameMode) => gameMode switch

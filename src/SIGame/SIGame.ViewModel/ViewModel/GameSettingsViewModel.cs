@@ -22,7 +22,6 @@ using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
 using SIStorageService.ViewModel;
 using SIUI.ViewModel;
-using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -811,7 +810,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             HostName = _model.HumanPlayerName,
             Showman = ToContractAccount(_model.Showman),
             Players = [.. _model.Players.Select(ToContractAccount)],
-            Viewers = [.. _model.Viewers.Select(ToContractAccount)],
             Name = _model.NetworkGameName,
             Password = _model.NetworkGamePassword,
             VoiceChatUri = _model.NetworkVoiceChat,
@@ -831,6 +829,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             fileShare,
             _computerPlayers.ToArray(),
             _computerShowmans.ToArray(),
+            [],
             avatarHelper,
             null,
             null,
@@ -838,11 +837,16 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             null,
             false);
 
-        var data = new PersonState();
+        var me = _model.HumanPlayerName == _model.Showman.Name
+            ? game.ClientData.ShowMan
+            : game.ClientData.Players.FirstOrDefault(p => p.Name == _model.HumanPlayerName)
+                ?? game.ClientData.Viewers.FirstOrDefault(v => v.Name == _model.HumanPlayerName);
+
+        var state = new PersonState(me?.Picture ?? "");
         var client = new Client(_model.HumanPlayerName);
         var actions = new PersonActions(client);
 
-        var gameViewModel = new GameViewModel(data, actions, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
+        var gameViewModel = new GameViewModel(state, actions, node, _userSettings, _settingsViewModel, fileShare, _loggerFactory.CreateLogger<GameViewModel>())
         {
             NetworkGame = NetworkGame,
             NetworkGamePort = NetworkPort,
@@ -851,7 +855,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             TempDocFolder = documentPath
         };
 
-        var logic = new ViewerHumanLogic(gameViewModel, data, actions, _userSettings, LocalAddress, _loggerFactory.CreateLogger<ViewerHumanLogic>());
+        var logic = new ViewerHumanLogic(gameViewModel, state, actions, _userSettings, LocalAddress, _loggerFactory.CreateLogger<ViewerHumanLogic>());
 
         IViewerClient? host = null;
 
@@ -862,7 +866,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         {
             if (_model.HumanPlayerName == _model.Showman.Name)
             {
-                host = new Showman(client, _model.Showman, logic, actions, data);
+                host = new Showman(client, logic, actions, state);
                 game.ClientData.ShowMan.IsConnected = true;
             }
             else
@@ -871,7 +875,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                 {
                     if (_model.Players[i].Name == _model.HumanPlayerName)
                     {
-                        host = new Player(client, _model.Players[i], logic, actions, data);
+                        host = new Player(client, logic, actions, state);
                         game.ClientData.Players[i].IsConnected = true;
                         break;
                     }
@@ -879,7 +883,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
                 if (host == null)
                 {
-                    host = new Viewer(client, _model.Viewers[0], logic, actions, data);
+                    host = new Viewer(client, logic, actions, state);
                     game.ClientData.Viewers.Add(new ViewerAccount(_model.Viewers[0]) { IsConnected = true });
                 }
             }

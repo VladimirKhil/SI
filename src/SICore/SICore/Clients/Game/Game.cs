@@ -3487,10 +3487,10 @@ public sealed class Game : MessageHandler
         _state.Players[index] = newAccount;
 
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        var state = new PersonState();
+        var state = new PersonState(account.Picture);
         var actions = new PersonActions(playerClient);
-        var logic = new PersonComputerController(state, actions, new Intelligence(account), GameRole.Player);
-        _ = new Player(playerClient, account, logic, actions, state);
+        var controller = new PersonComputerController(state, actions, new Intelligence(account), GameRole.Player);
+        _ = new Player(playerClient, controller, actions, state);
 
         OnInfo(newAccount.Name);
 
@@ -3516,16 +3516,16 @@ public sealed class Game : MessageHandler
         _state.ShowMan = newAccount;
 
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        var state = new PersonState();
+        var state = new PersonState(account.Picture);
         var actions = new PersonActions(showmanClient);
         
-        var logic = new PersonComputerController(
+        var controller = new PersonComputerController(
             state,
             actions,
             new Intelligence(account),
             GameRole.Showman);
         
-        var showman = new Showman(showmanClient, account, logic, actions, state);
+        var showman = new Showman(showmanClient, controller, actions, state);
 
         OnInfo(newAccount.Name);
         Controller.SendQuestionAnswersToShowman();

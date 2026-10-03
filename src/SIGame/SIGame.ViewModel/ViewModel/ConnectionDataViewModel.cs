@@ -275,7 +275,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         var humanPlayer = Human;
         var name = humanPlayer.Name;
 
-        var data = new PersonState()
+        var state = new PersonState(humanPlayer.Picture)
         {
             IsNetworkGame = true
         };
@@ -284,7 +284,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         var loggerFactory = PlatformManager.Instance.ServiceProvider!.GetRequiredService<ILoggerFactory>();
 
-        var gameViewModel = new GameViewModel(data, actions, _node, _userSettings, _settingsViewModel, null, loggerFactory.CreateLogger<GameViewModel>())
+        var gameViewModel = new GameViewModel(state, actions, _node, _userSettings, _settingsViewModel, null, loggerFactory.CreateLogger<GameViewModel>())
         {
             IsOnline = IsOnline,
             IsHost = isHost,
@@ -292,7 +292,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
         var logic = new ViewerHumanLogic(
             gameViewModel,
-            data,
+            state,
             actions,
             _userSettings,
             ServerAddress,
@@ -304,9 +304,9 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         {
             _host = role switch
             {
-                GameRole.Showman => new Showman(_client, humanPlayer, logic, actions, data),
-                GameRole.Player => new Player(_client, humanPlayer, logic, actions, data),
-                _ => new Viewer(_client, humanPlayer, logic, actions, data),
+                GameRole.Showman => new Showman(_client, logic, actions, state),
+                GameRole.Player => new Player(_client, logic, actions, state),
+                _ => new Viewer(_client, logic, actions, state),
             };
 
             gameViewModel.Host = _host;
