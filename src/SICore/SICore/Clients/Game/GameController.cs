@@ -1,4 +1,4 @@
-﻿using Notions;
+using Notions;
 using SICore.Clients;
 using SICore.Clients.Game;
 using SICore.Clients.Game.Plugins.Stakes;
@@ -161,7 +161,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (globalUri != null)
         {
-            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanMainPersonNames);
             _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
@@ -704,7 +704,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (globalUri != null)
         {
-            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanMainPersonNames);
             _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
@@ -731,7 +731,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (globalUri != null)
         {
-            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanMainPersonNames);
             _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
@@ -1002,7 +1002,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         return true;
     }
 
-    internal void RescheduleTask(int taskTime = 10)
+    internal void RescheduleTask(int taskTime = 1)
     {
         _tasksHistory.AddLogEntry(nameof(RescheduleTask));
         _taskRunner.RescheduleTask(taskTime);
@@ -4982,7 +4982,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                             _state.IsPlayingMedia = true;
                             _state.IsPlayingMediaPaused = false;
 
-                            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+                            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanMainPersonNames);
                             _state.QuestionPlay.CollectMediaCompletions = contentItem.Duration <= TimeSpan.Zero;
                             _completion = ClearMediaContent;
                         }

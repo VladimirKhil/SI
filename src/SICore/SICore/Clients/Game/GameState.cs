@@ -405,9 +405,11 @@ public sealed class GameState : Data
         get => _allPersons; private set => _allPersons = value;
     }
 
-    internal int ActiveHumanCount => Viewers.Count
-        + Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
-        + (ShowMan.IsHuman && ShowMan.IsConnected ? 1 : 0);
+    /// <summary>
+    /// Names of connected human showman and players.
+    /// </summary>
+    internal IEnumerable<string> ActiveHumanMainPersonNames =>
+        MainPersons.Where(p => p.IsHuman && p.IsConnected).Select(p => p.Name);
 
     public void BeginUpdatePersons(string reason) =>
         PersonsUpdateHistory.AppendLine("===").Append($"Before ({reason}): ").Append(PrintPersons());

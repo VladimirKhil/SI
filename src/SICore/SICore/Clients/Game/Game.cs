@@ -26,6 +26,7 @@ namespace SICore;
 public sealed class Game : MessageHandler
 {
     private const string VideoAvatarUri = "https://vdo.ninja/";
+    private const int MediaFinalizationTime = 30;
 
     public event Action<Game, bool, bool>? PersonsChanged;
 
@@ -755,7 +756,7 @@ public sealed class Game : MessageHandler
 
                     case Messages.Atom:
                     case Messages.MediaCompleted:
-                        OnMediaCompleted(args);
+                        OnMediaCompleted(message.Sender, args);
                         break;
 
                     case Messages.MediaPreloadProgress:
@@ -1934,7 +1935,7 @@ public sealed class Game : MessageHandler
         _controller.OnPauseCore(args[1] == "+");
     }
 
-    private void OnMediaCompleted(string[] args)
+    private void OnMediaCompleted(string sender, string[] args)
     {
         if (!_state.QuestionPlay.CollectMediaCompletions)
         {
@@ -1963,22 +1964,26 @@ public sealed class Game : MessageHandler
             completion = completions.Values.First();
         }
 
-        completion.Current++;
+        // Only human showman and players are tracked; repeated completions are ignored
+        if (!completion.TryComplete(sender))
+        {
+            return;
+        }
 
         if (!_state.IsPlayingMedia || _state.TInfo.Pause)
         {
             return;
         }
 
-        if (completion.Current == completion.Total)
+        if (completion.IsComplete)
         {
             _state.IsPlayingMedia = false;
             _controller.RescheduleTask();
         }
-        else
+        else if (completion.Current * 2 >= completion.Total)
         {
-            // Sometimes someone drops out, and the process gets delayed by 120 seconds. This is unacceptable. We'll give 3 seconds
-            _controller.RescheduleTask(30);
+            // 50% reached: start or rewind the finalization timer on each new completion
+            _controller.RescheduleTask(MediaFinalizationTime);
         }
     }
 
