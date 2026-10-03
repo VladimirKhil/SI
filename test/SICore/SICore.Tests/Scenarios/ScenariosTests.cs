@@ -73,7 +73,12 @@ public sealed class ScenariosTests
                 {
                     Type = SI.Contracts.Models.AccountType.Human,
                     Name = Constants.FreePlace
-                }
+                },
+                Players =
+                [
+                    new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace },
+                    new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace }
+                ]
             },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
