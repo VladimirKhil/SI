@@ -396,6 +396,11 @@ public sealed class Game : MessageHandler
         var msg = info.ToString()[..(info.Length - 1)];
 
         _actions.SendMessage(msg, person);
+
+        if (_state.HiddenPersons)
+        {
+            _actions.InformPlayerCount(person);
+        }
     }
 
     private static void AppendAccountExt(ViewerAccount account, StringBuilder info)
@@ -1546,6 +1551,12 @@ public sealed class Game : MessageHandler
         var withError = args[2] == "+";
 
         _actions.InformDisconnected(account.Name);
+
+        if (_state.HiddenPersons && _state.Players.Contains(account))
+        {
+            _actions.InformPlayerCount();
+        }
+
         _state.BeginUpdatePersons($"Disconnected {account.Name}");
 
         try
@@ -2277,23 +2288,37 @@ public sealed class Game : MessageHandler
                     if (player.StakeMaking && i != _state.Stakes.StakerIndex) // Current stakes winner cannot pass
                     {
                         player.StakeMaking = false;
-                        
+
                         _state.OrderHistory.Append("Player passed on stakes making: ")
                             .Append(i)
                             .Append(' ')
                             .Append(_state.ActivePlayer?.StakeMaking)
                             .AppendLine();
-                        
+
                         // TODO: leave only one pass message
                         _actions.SendMessageWithArgs(Messages.Pass, i);
                         _actions.SendMessageWithArgs(Messages.PersonStake, i, 2);
 
-                        if (_state.ActivePlayer != null
-                            && _state.ActivePlayer.StakeMaking
-                            && (nextTask == Tasks.AskStake || _state.Decision == DecisionType.NextPersonStakeMaking))
+                        if (nextTask == Tasks.AskStake
+                            && _state.ActivePlayer != null
+                            && _state.ActivePlayer.StakeMaking)
                         {
                             // We do not interrupt DecisionType.StakeMaking of the current player
-                            Controller.TryDetectStakesWinner(); // returning despite of the call result
+                            Controller.TryDetectStakesWinner();
+                        }
+                        else if (_state.Decision == DecisionType.NextPersonStakeMaking)
+                        {
+                            player.Flag = false;
+                            var possibleStakers = _state.Players.Where(p => p.Flag).ToList();
+
+                            if (possibleStakers.Count == 1)
+                            {
+                                var stakerIndex = _state.Players.IndexOf(possibleStakers[0]);
+                                _state.Order[_state.OrderIndex] = stakerIndex;
+                                Controller.CheckOrder(_state.OrderIndex);
+                                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                                _controller.Stop(StopReason.Decision);
+                            }
                         }
                     }
 
@@ -3565,6 +3590,11 @@ public sealed class Game : MessageHandler
         }
 
         _actions.InformConnected(name, role, index, isMale);
+
+        if (_state.HiddenPersons && role == GameRole.Player)
+        {
+            _actions.InformPlayerCount();
+        }
 
         if (_state.HostName == null && !_state.RoomSettings.IsAutomatic)
         {

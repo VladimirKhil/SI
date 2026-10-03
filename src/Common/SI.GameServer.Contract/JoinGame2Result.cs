@@ -56,6 +56,11 @@ public enum JoinGame2Result
     AuthorizationFailed,
 
     /// <summary>
+    /// Authorization failed due to expired token.
+    /// </summary>
+    AuthorizationFailedTokenExpired,
+
+    /// <summary>
     /// Authorization service error.
     /// </summary>
     AuthorizationServiceError,

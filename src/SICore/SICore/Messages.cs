@@ -435,6 +435,11 @@ public static class Messages
     public const string PlayerAppellating = "PLAYER_APPELLATING";
 
     /// <summary>
+    /// Notifies about player count.
+    /// </summary>
+    public const string PlayerCount = "PLAYER_COUNT";
+
+    /// <summary>
     /// Notifies about player score change.
     /// </summary>
     public const string PlayerScoreChanged = "PLAYER_SCORE_CHANGED";

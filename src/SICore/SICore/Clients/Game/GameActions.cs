@@ -108,19 +108,21 @@ public sealed class GameActions
         SendMessageWithArgs(Messages.Replic, person, text);
     }
 
-    public void InformConnected(string name, GameRole role, int index, bool isMale) =>
-        SendMessageToWithArgs(
-            _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody,
-            Messages.Connected, role.ToString().ToLowerInvariant(),
-            index,
-            name,
-            isMale ? 'm' : 'f',
-            "");
+    public void InformConnected(string name, GameRole role, int index, bool isMale) => SendMessageToWithArgs(
+        _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody,
+        Messages.Connected, role.ToString().ToLowerInvariant(),
+        index,
+        name,
+        isMale ? 'm' : 'f',
+        "");
 
     public void InformDisconnected(string name) => SendMessageToWithArgs(
         _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody, 
         Messages.Disconnected,
         name);
+
+    public void InformPlayerCount(string receiver = NetworkConstants.Everybody) =>
+        SendMessageToWithArgs(receiver, Messages.PlayerCount, _state.Players.Count(p => p.IsConnected));
 
     /// <summary>
     /// Выдача информации о счёте
