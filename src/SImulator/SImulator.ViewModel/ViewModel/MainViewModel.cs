@@ -246,11 +246,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         var screensLength = Screens.Length;
 
 #if DEBUG
-        Settings.ScreenNumber = Math.Max(0, screensLength - 2);
+        Settings.ScreenNumber = GetDefaultScreenIndex();
 #else
         if (Settings.ScreenNumber == -1 || Settings.ScreenNumber >= screensLength)
         {
-            Settings.ScreenNumber = screensLength - 2;
+            Settings.ScreenNumber = GetDefaultScreenIndex();
         }
 #endif
 
@@ -958,6 +958,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         UpdateStartCommand();
         UpdatePlayersView();
     }
+
+    /// <summary>
+    /// Gets the default screen index: the last full screen display (or the first screen if there are none).
+    /// </summary>
+    private int GetDefaultScreenIndex() => Math.Max(0, Array.FindLastIndex(Screens, screen => screen.IsFullScreen));
 
     private void UpdatePlayersView()
     {

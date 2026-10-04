@@ -69,6 +69,13 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     public override Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen)
     {
+        if (screen is BrowserDisplayDescriptor)
+        {
+            _window = new RemoteBoardWindow { DataContext = dataContext };
+            _window.Show();
+            return Task.CompletedTask;
+        }
+
         _window = new WebWindow(screen.IsFullScreen)
         {
             DataContext = dataContext
@@ -118,6 +125,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
     [
         .. Win32.GetDisplays().Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen)),
         WebDisplayDescriptor.Instance,
+        BrowserDisplayDescriptor.Instance,
     ];
 
     public override string[] GetFonts() => [.. Fonts.SystemFontFamilies.Select(ff => ff.ToString())];

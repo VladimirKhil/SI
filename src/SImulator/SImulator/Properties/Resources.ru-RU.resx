@@ -721,4 +721,22 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="PartialText" xml:space="preserve">
     <value>Частичный текст вопросов</value>
   </data>
+  <data name="BrowserScreen" xml:space="preserve">
+    <value>Браузер</value>
+  </data>
+  <data name="BrowserBoardStarting" xml:space="preserve">
+    <value>Запуск табло...</value>
+  </data>
+  <data name="BrowserBoardOpen" xml:space="preserve">
+    <value>Открыть табло в браузере</value>
+  </data>
+  <data name="BrowserBoardOpened" xml:space="preserve">
+    <value>Табло открыто в браузере:
+{0}
+
+Esc — остановить игру.</value>
+  </data>
+  <data name="BrowserBoardError" xml:space="preserve">
+    <value>Не удалось запустить табло: {0}</value>
+  </data>
 </root>
