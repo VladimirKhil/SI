@@ -93,6 +93,12 @@ public interface IQuestionEnginePlayHandler
     bool OnAccept();
 
     /// <summary>
+    /// Handles the start of a complex right answer (before its content is played).
+    /// </summary>
+    /// <returns>Should the engine pause here until the next move.</returns>
+    bool OnRightAnswer();
+
+    /// <summary>
     /// Handles content start.
     /// </summary>
     /// <param name="contentItems">Content items that would be played.</param>

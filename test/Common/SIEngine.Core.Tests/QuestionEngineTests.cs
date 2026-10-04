@@ -664,6 +664,8 @@ public sealed class QuestionEngineTests
             QuestionStartCalled = true;
         }
 
+        public bool OnRightAnswer() => false;
+
         public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
         {
             ContentStartCalled = true;

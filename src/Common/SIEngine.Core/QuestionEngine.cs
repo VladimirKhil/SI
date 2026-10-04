@@ -18,7 +18,15 @@ public sealed class QuestionEngine : IQuestionEngine
     private bool _started = false;
 
     private int? _enableButtonsStepIndex = null;
-    private bool _isAskingAnswer = false;
+    private enum AnswerPhase
+    {
+        None,
+        Asking,
+        Answer,
+        RightAnswerShown
+    }
+
+    private AnswerPhase _answerPhase = AnswerPhase.None;
 
     private bool _isAnswerTypeSelect = false;
     private bool _isAnswerTypePoint = false;
@@ -63,10 +71,10 @@ public sealed class QuestionEngine : IQuestionEngine
             _started = true;
         }
 
-        if (_isAskingAnswer)
+        if (_answerPhase == AnswerPhase.Asking)
         {
             _playHandler.OnAnswerStart();
-            _isAskingAnswer = false;
+            _answerPhase = AnswerPhase.Answer;
         }
 
         while (CanNext)
@@ -358,6 +366,7 @@ public sealed class QuestionEngine : IQuestionEngine
                                 if (fallbackRefId == StepParameterValues.FallbackStepIdRef_Right)
                                 {
                                     var rightAnswer = _question.Right.FirstOrDefault() ?? "";
+                                    _answerPhase = AnswerPhase.RightAnswerShown;
 
                                     if (_isAnswerTypeSelect && rightAnswer.Length > 0)
                                     {
@@ -428,6 +437,16 @@ public sealed class QuestionEngine : IQuestionEngine
                     {
                         if (_contentIndex == 0)
                         {
+                            if (_answerPhase == AnswerPhase.Answer)
+                            {
+                                _answerPhase = AnswerPhase.RightAnswerShown;
+
+                                if (_playHandler.OnRightAnswer())
+                                {
+                                    return true;
+                                }
+                            }
+
                             var currentStepIndex = _stepIndex;
 
                             _playHandler.OnContentStart(
@@ -488,7 +507,7 @@ public sealed class QuestionEngine : IQuestionEngine
                         }
 
                         _playHandler.OnAskAnswer(mode, duration);
-                        _isAskingAnswer = true;
+                        _answerPhase = AnswerPhase.Asking;
                         _stepIndex++;
                     }
 
@@ -607,7 +626,7 @@ public sealed class QuestionEngine : IQuestionEngine
 
         _stepIndex = nextStepIndex;
         _contentIndex = 0;
-        _isAskingAnswer = false;
+        _answerPhase = askAnswerFound ? AnswerPhase.Answer : AnswerPhase.None;
 
         if (askAnswerFound)
         {

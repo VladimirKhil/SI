@@ -113,15 +113,22 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         return false;
     }
 
+    public bool OnRightAnswer()
+    {
+        if (!_state.QuestionPlay.IsAnswer || _state.QuestionPlay.IsAnswerSimple || _state.QuestionPlay.IsAnswerAnnounced)
+        {
+            return false;
+        }
+
+        _controller.OnComplexAnswer();
+        _state.QuestionPlay.IsAnswerAnnounced = true;
+
+        return _controller.WaitForPointRightAnswer();
+    }
+
     public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
         _controller.OnLayout();
-
-        if (_state.QuestionPlay.IsAnswer && !_state.QuestionPlay.IsAnswerSimple && !_state.QuestionPlay.IsAnswerAnnounced)
-        {
-            _controller.OnComplexAnswer();
-            _state.QuestionPlay.IsAnswerAnnounced = true;
-        }
     }
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)

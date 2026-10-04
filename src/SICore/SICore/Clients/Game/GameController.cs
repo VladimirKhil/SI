@@ -688,6 +688,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.UseBackgroundAudio = !contentItem.WaitForFinish;
     }
 
+    private int GetPointRightAnswerTime() => Math.Max(_state.TimeSettings.Image, _state.TimeSettings.Reflection) * 10;
+
     private static (int, bool) GetContentItemDuration(ContentItem contentItem, int defaultValue) =>
         contentItem.WaitForFinish
             ? (contentItem.Duration > TimeSpan.Zero ? ((int)(contentItem.Duration.TotalMilliseconds / 100), false) : (defaultValue, true))
@@ -4471,6 +4473,17 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _actions.SendMessageWithArgs(Messages.RightAnswerStart, ContentTypes.Text, answer);
     }
 
+    internal bool WaitForPointRightAnswer()
+    {
+        if (_state.QuestionPlay.AnswerType != AnswerType.Point)
+        {
+            return false;
+        }
+
+        ScheduleExecution(Tasks.MoveNext, GetPointRightAnswerTime());
+        return true;
+    }
+
     internal void OnRightAnswerOption(string rightOptionLabel)
     {
         OnRightAnswerOptionCore(rightOptionLabel);
@@ -4499,8 +4512,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void OnRightAnswerPoint(string rightAnswer)
     {
         _actions.OnRightAnswer(AnswerType.Point, rightAnswer);
-        var answerTime = Math.Max(_state.TimeSettings.Image, _state.TimeSettings.Reflection) * 10;
-        ScheduleExecution(Tasks.MoveNext, answerTime);
+        ScheduleExecution(Tasks.MoveNext, GetPointRightAnswerTime());
     }
 
     internal void OnLayout()
