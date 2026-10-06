@@ -19,6 +19,20 @@ internal static class MessageDialog
 
     private static async Task<bool> ShowCoreAsync(Window? owner, string text, (string Text, bool Result)[] buttons)
     {
+        try
+        {
+            return await ShowDialogCoreAsync(owner, text, buttons);
+        }
+        catch (Exception exc)
+        {
+            System.Diagnostics.Trace.TraceError($"Dialog error: {exc}");
+            return false;
+        }
+    }
+
+    private static async Task<bool> ShowDialogCoreAsync(Window? owner, string text, (string Text, bool Result)[] buttons)
+    {
+        System.Diagnostics.Trace.TraceInformation($"Dialog: {text}");
         var result = false;
         var dialog = new Window
         {
@@ -36,6 +50,7 @@ internal static class MessageDialog
             var button = new Button { Content = buttonText, MinWidth = 80, HorizontalContentAlignment = HorizontalAlignment.Center };
             button.Click += (_, _) =>
             {
+                System.Diagnostics.Trace.TraceInformation($"Dialog button: {buttonText}");
                 result = buttonResult;
                 dialog.Close();
             };
@@ -54,17 +69,24 @@ internal static class MessageDialog
             },
         };
 
+        // A modal ShowDialog does not receive input on macOS while a board (WebKit) window is active,
+        // so the dialog is a regular topmost window and the caller awaits its closing
+        dialog.Topmost = true;
+        dialog.AddHandler(Avalonia.Input.InputElement.PointerPressedEvent, (_, e) => System.Diagnostics.Trace.TraceInformation($"Dialog pointer {e.GetPosition(dialog)}"), Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
+
         if (owner != null && owner.IsVisible)
         {
-            await dialog.ShowDialog(owner);
+            dialog.Position = new PixelPoint(
+                owner.Position.X + (int)((owner.Bounds.Width - 300) / 2 * owner.RenderScaling),
+                owner.Position.Y + (int)(owner.Bounds.Height / 3 * owner.RenderScaling));
+            dialog.WindowStartupLocation = WindowStartupLocation.Manual;
         }
-        else
-        {
-            var closed = new TaskCompletionSource();
-            dialog.Closed += (_, _) => closed.TrySetResult();
-            dialog.Show();
-            await closed.Task;
-        }
+
+        var closed = new TaskCompletionSource();
+        dialog.Closed += (_, _) => closed.TrySetResult();
+        dialog.Show();
+        dialog.Activate();
+        await closed.Task;
 
         return result;
     }

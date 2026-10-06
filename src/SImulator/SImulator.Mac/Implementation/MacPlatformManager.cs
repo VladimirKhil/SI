@@ -167,7 +167,11 @@ internal sealed class MacPlatformManager : PlatformManager, IPlatformService
 
     public override Task<bool> AskStopGameAsync() => MessageDialog.AskAsync(MainWindow, Resources.FinishGameQuestion);
 
-    public void ShowMessage(string text, bool error = true) => _ = MessageDialog.ShowAsync(MainWindow, text, error);
+    public void ShowMessage(string text, bool error = true)
+    {
+        Trace.TraceInformation(text);
+        _ = MessageDialog.ShowAsync(MainWindow, text, error);
+    }
 
     public void NavigateToSite() => OpenUrl(GameSiteUri);
 

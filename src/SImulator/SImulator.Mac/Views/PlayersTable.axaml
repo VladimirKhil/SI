@@ -17,7 +17,7 @@
             <TextBlock VerticalAlignment="Center" Margin="12,0,0,0" FontWeight="SemiBold" Text="{Binding DecisionMode, Converter={x:Static v:PlayersTable.DecisionHint}}" />
         </StackPanel>
 
-        <Grid DockPanel.Dock="Top" ColumnDefinitions="32,2*,90,32,32,70,70,2*,32" Margin="0,0,0,2">
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="32,2*,90,32,32,80,90,2*,32" Margin="0,0,0,2">
             <TextBlock Grid.Column="1" Text="{x:Static p:Resources.Name}" Foreground="Gray" />
             <TextBlock Grid.Column="2" Text="{x:Static p:Resources.Sum}" Foreground="Gray" />
             <TextBlock Grid.Column="5" Text="{x:Static p:Resources.RightAnswers}" Foreground="Gray" />
@@ -29,7 +29,7 @@
             <ItemsControl x:Name="players" ItemsSource="{Binding Players}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="m:PlayerInfo">
-                        <Grid ColumnDefinitions="32,2*,90,32,32,70,70,2*,32" Margin="0,1">
+                        <Grid ColumnDefinitions="32,2*,90,32,32,80,90,2*,32" Margin="0,1">
                             <Button
                                 Content="●"
                                 ToolTip.Tip="{x:Static p:Resources.GiveTurn}"

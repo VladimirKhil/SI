@@ -19,7 +19,11 @@ internal sealed class App : Application
 
     internal ViewModel.Model.AppSettings Settings { get; } = SettingsStorage.Load();
 
-    public override void Initialize() => Styles.Add(new FluentTheme());
+    public override void Initialize()
+    {
+        Name = MainViewModel.ProductName;
+        Styles.Add(new FluentTheme());
+    }
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -36,8 +40,18 @@ internal sealed class App : Application
             CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(Settings.Language);
         }
 
+        // Ports below 1024 require root on macOS
+        if (Settings.WebPort < 1024)
+        {
+            Settings.WebPort = 8080;
+        }
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // The window must exist before the view model: screens are enumerated through it
+            var window = new MainWindow();
+            _manager.MainWindow = window;
+
             var main = new MainViewModel(Settings, _manager);
 
             if (desktop.Args is { Length: > 0 } args)
@@ -45,8 +59,7 @@ internal sealed class App : Application
                 main.PackageSource = new FilePackageSource(args[0]);
             }
 
-            var window = new MainWindow { DataContext = main };
-            _manager.MainWindow = window;
+            window.DataContext = main;
             desktop.MainWindow = window;
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
 

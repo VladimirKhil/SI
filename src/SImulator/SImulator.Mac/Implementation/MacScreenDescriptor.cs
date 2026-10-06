@@ -19,19 +19,25 @@ internal sealed class MacScreenDescriptor : IDisplayDescriptor
     public bool IsCustomizable => false;
 
     /// <summary>
-    /// Screen bounds in pixels (for full screen boards).
+    /// Screen working area in pixels (without the menu bar and the Dock), for full screen boards.
     /// </summary>
     internal PixelRect? Bounds { get; }
 
-    private MacScreenDescriptor(string name, bool isFullScreen, PixelRect? bounds)
+    /// <summary>
+    /// Screen scaling (physical pixels per logical point).
+    /// </summary>
+    internal double Scaling { get; }
+
+    private MacScreenDescriptor(string name, bool isFullScreen, PixelRect? bounds, double scaling = 1.0)
     {
         Name = name;
         IsFullScreen = isFullScreen;
         Bounds = bounds;
+        Scaling = scaling;
     }
 
     public MacScreenDescriptor(Screen screen)
-        : this(screen.IsPrimary ? Resources.MainScreen : Resources.SecondaryScreen, true, screen.Bounds)
+        : this(screen.IsPrimary ? Resources.MainScreen : Resources.SecondaryScreen, true, screen.WorkingArea, screen.Scaling)
     {
     }
 }

@@ -83,8 +83,12 @@
                 </StackPanel>
 
                 <DockPanel Grid.Row="1" Margin="0,8">
-                    <Button DockPanel.Dock="Left" Content="◀" ToolTip.Tip="{x:Static p:Resources.Back}" Command="{Binding Back}" VerticalAlignment="Stretch" Width="44" />
-                    <Button DockPanel.Dock="Right" Content="▶" ToolTip.Tip="{x:Static p:Resources.Next}" Command="{Binding Next}" VerticalAlignment="Stretch" Width="44" />
+                    <Button DockPanel.Dock="Left" ToolTip.Tip="{x:Static p:Resources.Back}" Command="{Binding Back}" VerticalAlignment="Stretch" Width="44" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                        <Path Data="M5,0 L0,5 L5,10" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="3" Stretch="Uniform" Width="12" />
+                    </Button>
+                    <Button DockPanel.Dock="Right" ToolTip.Tip="{x:Static p:Resources.Next}" Command="{Binding Next}" VerticalAlignment="Stretch" Width="44" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                        <Path Data="M0,0 L5,5 L0,10" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="3" Stretch="Uniform" Width="12" />
+                    </Button>
                     <DockPanel Margin="8,0">
                         <TextBlock DockPanel.Dock="Top" Text="{Binding ShowmanReplic}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4" IsVisible="{Binding ShowmanReplic, Converter={x:Static v:Converters.NotEmpty}}" />
                         <v:StageView />
@@ -117,7 +121,7 @@
         </TabItem>
 
         <!-- Buttons -->
-        <TabItem Header="{x:Static p:Resources.Buttons}" IsEnabled="{Binding Mode, Converter={x:Static v:Converters.IsStartMode}}">
+        <TabItem Header="{x:Static p:Resources.Buttons}" IsVisible="{Binding Mode, Converter={x:Static v:Converters.IsStartMode}}">
             <StackPanel Spacing="8">
                 <TextBlock Text="{x:Static p:Resources.Buttons}" FontSize="18" FontWeight="SemiBold" />
                 <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesNone}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.None}}" />

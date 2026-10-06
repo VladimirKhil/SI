@@ -22,6 +22,7 @@ internal sealed class BoardWindow : Window
     private readonly MacScreenDescriptor? _screen;
     private RemoteBoardServer? _server;
     private bool _canClose;
+    private PixelRect? _fullScreenBounds;
 
     public BoardWindow(MacScreenDescriptor? screen)
     {
@@ -35,8 +36,13 @@ internal sealed class BoardWindow : Window
 
         if (screen?.Bounds is { } bounds)
         {
+            // Borderless window covering the screen (not the macOS full screen mode with a separate Space),
+            // so the control window and dialogs stay available on the same display
             WindowStartupLocation = WindowStartupLocation.Manual;
+            WindowDecorations = WindowDecorations.None;
+            CanResize = false;
             Position = bounds.TopLeft;
+            _fullScreenBounds = bounds;
         }
         else
         {
@@ -52,14 +58,17 @@ internal sealed class BoardWindow : Window
     /// </summary>
     public async Task StartAsync(IWebInterop interop)
     {
-        _server = await RemoteBoardServer.StartAsync(interop, Port);
+        _server = await RemoteBoardServer.StartAsync(new BoardKeysInterop(interop, OnBoardKeyPressed), Port);
         _webView.Source = new Uri(_server.Url);
 
         Show();
 
-        if (_screen?.IsFullScreen == true)
+        if (_fullScreenBounds is { } bounds)
         {
-            WindowState = WindowState.FullScreen;
+            Position = bounds.TopLeft;
+            var scaling = _screen?.Scaling ?? 1.0;
+            Width = bounds.Width / scaling;
+            Height = bounds.Height / scaling;
         }
     }
 
@@ -75,6 +84,59 @@ internal sealed class BoardWindow : Window
         {
             await _server.DisposeAsync();
             _server = null;
+        }
+    }
+
+    /// <summary>
+    /// Processes a key pressed inside the board page (WebKit consumes keyboard events of the window).
+    /// </summary>
+    private void OnBoardKeyPressed(string key)
+    {
+        if (key == "Escape")
+        {
+            if (DataContext is WebPresentationController controller && controller.Stop.CanExecute(null))
+            {
+                controller.Stop.Execute(null);
+            }
+
+            return;
+        }
+
+        if (key.Length == 1 && char.IsAsciiDigit(key[0]) && key[0] != '0')
+        {
+            KeyboardHub.OnKeyPressed(Key.D1 + (key[0] - '1'));
+        }
+    }
+
+    /// <summary>
+    /// Passes board messages to the presentation controller and reports pressed keys.
+    /// </summary>
+    private sealed class BoardKeysInterop(IWebInterop inner, Action<string> onKeyPressed) : IWebInterop
+    {
+        public event Action<string>? SendJsonMessage
+        {
+            add => inner.SendJsonMessage += value;
+            remove => inner.SendJsonMessage -= value;
+        }
+
+        public void OnMessage(string webMessageAsJson)
+        {
+            inner.OnMessage(webMessageAsJson);
+
+            try
+            {
+                using var document = System.Text.Json.JsonDocument.Parse(webMessageAsJson);
+                var root = document.RootElement;
+
+                if (root.TryGetProperty("type", out var type) && type.GetString() == "keyPressed"
+                    && root.TryGetProperty("key", out var key) && key.GetString() is { } keyName)
+                {
+                    onKeyPressed(keyName);
+                }
+            }
+            catch (System.Text.Json.JsonException)
+            {
+            }
         }
     }
 
