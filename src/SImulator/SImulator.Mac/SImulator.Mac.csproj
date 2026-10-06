@@ -7,7 +7,7 @@
     <AssemblyTitle>SImulator</AssemblyTitle>
     <Product>SImulator</Product>
     <Description>SIGame emulator for macOS</Description>
-    <Version>$(SImulatorVersion)</Version>
+    <Version>$(SImulatorMacVersion)</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <SatelliteResourceLanguages>ru-RU</SatelliteResourceLanguages>

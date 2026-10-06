@@ -10,7 +10,7 @@ OUT="$REPO/bin/macos/$RID"
 APP="$OUT/SImulator.app"
 DOTNET="${DOTNET:-dotnet}"
 
-VERSION="$(sed -n 's:.*<SImulatorVersion>\(.*\)</SImulatorVersion>.*:\1:p' "$REPO/Directory.Build.props")"
+VERSION="$(sed -n 's:.*<SImulatorMacVersion>\(.*\)</SImulatorMacVersion>.*:\1:p' "$REPO/Directory.Build.props")"
 
 rm -rf "$OUT"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"

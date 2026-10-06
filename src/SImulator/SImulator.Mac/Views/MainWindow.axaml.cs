@@ -17,6 +17,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        var version = typeof(MainWindow).Assembly.GetName().Version;
+        Title = $"SImulator {version?.ToString(3)} (macOS preview)";
         AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
         Closing += OnClosing;
     }
