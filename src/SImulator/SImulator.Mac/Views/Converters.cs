@@ -26,6 +26,18 @@ internal static class Converters
         _ => true,
     });
 
+    /// <summary>
+    /// Timer command glyph: pause for a stop command, play for a run command.
+    /// </summary>
+    public static readonly IValueConverter TimerCommandGlyph = new FuncValueConverter<object?, string>(command =>
+        command is ViewModel.SimpleUICommand { Name: var name } && name == ViewModel.Properties.Resources.Pause ? "⏸" : "▶");
+
+    /// <summary>
+    /// Timer command tooltip.
+    /// </summary>
+    public static readonly IValueConverter TimerCommandName = new FuncValueConverter<object?, string>(command =>
+        command is ViewModel.SimpleUICommand { Name: var name } ? name : "");
+
     public static readonly IValueConverter JoinLines = new FuncValueConverter<IEnumerable<string>?, string>(values => values != null ? string.Join(Environment.NewLine, values) : "");
 
     private sealed class EqualityConverter : IValueConverter
