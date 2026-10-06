@@ -364,8 +364,12 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
             text = uri.LocalPath;
         }
 
-        // Local drive paths only (C:\... or C:/...); network (UNC) paths are not allowed
-        if (text.Length <= 3 || !char.IsAsciiLetter(text[0]) || text[1] != ':' || (text[2] != '\\' && text[2] != '/'))
+        // Local paths only: drive paths on Windows (C:\... or C:/...), absolute paths of existing files on Unix;
+        // network (UNC) paths are not allowed
+        var isWindowsPath = text.Length > 3 && char.IsAsciiLetter(text[0]) && text[1] == ':' && (text[2] == '\\' || text[2] == '/');
+        var isUnixPath = !OperatingSystem.IsWindows() && text.Length > 1 && text[0] == '/' && text[1] != '/' && File.Exists(text);
+
+        if (!isWindowsPath && !isUnixPath)
         {
             return false;
         }
