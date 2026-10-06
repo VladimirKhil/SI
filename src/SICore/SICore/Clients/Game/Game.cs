@@ -2442,7 +2442,7 @@ public sealed class Game : MessageHandler
 
         if (!_state.IsDeferringAnswer)
         {            
-            _state.WaitInterval = _state.TimeSettings.ButtonsAccepting / 100;
+            _state.WaitInterval = Math.Max(1, Math.Min(30, _state.TimeSettings.ButtonsAccepting / 100));
             _controller.Stop(StopReason.Wait);
         }
     }

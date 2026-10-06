@@ -71,13 +71,14 @@ public static class GameRunner
             if (showmanSettings.Type == SI.Contracts.Models.AccountType.Bot)
             {
                 var showmanClient = new Client(showmanSettings.Name);
-                var state = new PersonState(showmanSettings.AvatarUri);
+                var showmanAccount = GetComputerAccount(showmanSettings, defaultShowmans, customAccounts);
+                var state = new PersonState(string.IsNullOrEmpty(showmanSettings.AvatarUri) ? showmanAccount.Picture : showmanSettings.AvatarUri);
                 var actions = new PersonActions(showmanClient);
 
                 var controller = new PersonComputerController(
                     state,
                     actions,
-                    new Intelligence(GetComputerAccount(showmanSettings, defaultShowmans, customAccounts)),
+                    new Intelligence(showmanAccount),
                     GameRole.Showman);
 
                 var showman = new Showman(showmanClient, controller, actions, state);
@@ -103,13 +104,14 @@ public static class GameRunner
                     if (playerSettings.Type == SI.Contracts.Models.AccountType.Bot)
                     {
                         var playerClient = new Client(playerSettings.Name);
-                        var state = new PersonState(playerSettings.AvatarUri);
+                        var playerAccount = GetComputerAccount(playerSettings, defaultPlayers, customAccounts);
+                        var state = new PersonState(string.IsNullOrEmpty(playerSettings.AvatarUri) ? playerAccount.Picture : playerSettings.AvatarUri);
                         var actions = new PersonActions(playerClient);
 
                         var controller = new PersonComputerController(
                             state,
                             actions,
-                            new Intelligence(GetComputerAccount(playerSettings, defaultPlayers, customAccounts)),
+                            new Intelligence(playerAccount),
                             GameRole.Player);
 
                         var player = new Player(playerClient, controller, actions, state);
