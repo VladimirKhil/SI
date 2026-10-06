@@ -144,4 +144,16 @@
   <data name="OpenBoard" xml:space="preserve">
     <value>Открыть табло</value>
   </data>
+  <data name="Media" xml:space="preserve">
+    <value>Медиа:</value>
+  </data>
+  <data name="MediaPause" xml:space="preserve">
+    <value>Пауза видео/аудио</value>
+  </data>
+  <data name="MediaResume" xml:space="preserve">
+    <value>Продолжить видео/аудио</value>
+  </data>
+  <data name="MediaRestart" xml:space="preserve">
+    <value>Запустить видео/аудио заново</value>
+  </data>
 </root>

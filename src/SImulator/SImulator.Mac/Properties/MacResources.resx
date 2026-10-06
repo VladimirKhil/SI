@@ -144,4 +144,16 @@
   <data name="OpenBoard" xml:space="preserve">
     <value>Open board</value>
   </data>
+  <data name="Media" xml:space="preserve">
+    <value>Media:</value>
+  </data>
+  <data name="MediaPause" xml:space="preserve">
+    <value>Pause video/audio</value>
+  </data>
+  <data name="MediaResume" xml:space="preserve">
+    <value>Continue video/audio</value>
+  </data>
+  <data name="MediaRestart" xml:space="preserve">
+    <value>Play video/audio again from the start</value>
+  </data>
 </root>

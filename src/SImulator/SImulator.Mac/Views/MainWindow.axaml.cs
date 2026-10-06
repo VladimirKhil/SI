@@ -21,6 +21,14 @@ public partial class MainWindow : Window
         Closing += OnClosing;
     }
 
+    private void MediaControl_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string action } && Avalonia.Application.Current is App app)
+        {
+            app.PlatformManager.ControlMedia(action);
+        }
+    }
+
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (DataContext is MainViewModel main && main.OnKeyboardPressed((GameKey)e.Key))

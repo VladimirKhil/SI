@@ -21,6 +21,11 @@ internal sealed class BoardWindow : Window
     private readonly NativeWebView _webView = new();
     private readonly MacScreenDescriptor? _screen;
     private RemoteBoardServer? _server;
+
+    /// <summary>
+    /// Board server.
+    /// </summary>
+    internal RemoteBoardServer? Server => _server;
     private bool _canClose;
     private PixelRect? _fullScreenBounds;
 

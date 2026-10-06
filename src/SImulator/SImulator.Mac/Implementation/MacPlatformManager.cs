@@ -33,6 +33,13 @@ internal sealed class MacPlatformManager : PlatformManager, IPlatformService
 
     internal Window? MainWindow { get; set; }
 
+    /// <summary>
+    /// Controls package media on the active board.
+    /// </summary>
+    /// <param name="action">pause, resume or restart.</param>
+    internal void ControlMedia(string action) =>
+        (_boardWindow?.Server ?? RemoteBoardHost.Instance.Server)?.ControlMedia(action);
+
     public override ButtonManagerFactory ButtonManagerFactory => _buttonManagerFactory;
 
     public override void CreatePlayersView(object dataContext)

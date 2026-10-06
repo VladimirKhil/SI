@@ -17,6 +17,8 @@ internal sealed class App : Application
 {
     private readonly MacPlatformManager _manager = new();
 
+    internal MacPlatformManager PlatformManager => _manager;
+
     internal ViewModel.Model.AppSettings Settings { get; } = SettingsStorage.Load();
 
     public override void Initialize()

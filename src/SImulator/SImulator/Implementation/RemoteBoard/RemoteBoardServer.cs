@@ -55,8 +55,27 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
                 document.body.appendChild(overlay);
             }
             ws.onopen = function () { while (queue.length) { ws.send(queue.shift()); } };
+            // Package media (served from /media/) created by the board, for media control from SImulator
+            var packageMedia = new Set();
+            var originalPlay = HTMLMediaElement.prototype.play;
+            HTMLMediaElement.prototype.play = function () {
+                if ((this.currentSrc || this.src || '').indexOf('/media/') >= 0) { packageMedia.add(this); }
+                return originalPlay.apply(this, arguments);
+            };
+            function forEachMedia(action) {
+                document.querySelectorAll('video, audio').forEach(function (m) {
+                    if ((m.currentSrc || m.src || '').indexOf('/media/') >= 0) { packageMedia.add(m); }
+                });
+                packageMedia.forEach(function (m) { try { action(m); } catch (e) { } });
+            }
+            function controlMedia(action) {
+                if (action === 'pause') { forEachMedia(function (m) { m.pause(); }); }
+                else if (action === 'resume') { forEachMedia(function (m) { if (m.isConnected || !m.ended) { m.play(); } }); }
+                else if (action === 'restart') { forEachMedia(function (m) { if (m.isConnected) { m.currentTime = 0; m.play(); } }); }
+            }
             ws.onmessage = function (e) {
                 var data = JSON.parse(e.data);
+                if (data && data.type === '__siMediaControl') { controlMedia(data.action); return; }
                 listeners.slice().forEach(function (l) { l({ data: data }); });
             };
             ws.onclose = function (e) { showMessage(e.code === __BUSY__ ? texts.alreadyOpened : texts.disconnected); };
@@ -247,6 +266,20 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
         }
         catch (Exception exc) when (exc is WebSocketException or OperationCanceledException)
         {
+        }
+    }
+
+    /// <summary>
+    /// Controls package media (video and audio) on the board.
+    /// </summary>
+    /// <param name="action">pause, resume or restart.</param>
+    public void ControlMedia(string action)
+    {
+        var client = _client;
+
+        if (client != null)
+        {
+            _ = SendAsync(client, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { type = "__siMediaControl", action })));
         }
     }
 
