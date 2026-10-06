@@ -259,6 +259,42 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The game board is already opened in another browser window..
+        /// </summary>
+        public static string BrowserBoardAlreadyOpened {
+            get {
+                return ResourceManager.GetString("BrowserBoardAlreadyOpened", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection to SImulator is lost. Open the board again from SImulator..
+        /// </summary>
+        public static string BrowserBoardDisconnected {
+            get {
+                return ResourceManager.GetString("BrowserBoardDisconnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open board.
+        /// </summary>
+        public static string BrowserBoardOpen {
+            get {
+                return ResourceManager.GetString("BrowserBoardOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browser.
+        /// </summary>
+        public static string BrowserScreen {
+            get {
+                return ResourceManager.GetString("BrowserScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Button lock time (s).
         /// </summary>
         public static string ButtonBlockingTime {

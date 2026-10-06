@@ -721,4 +721,16 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="PartialText" xml:space="preserve">
     <value>Частичный текст вопросов</value>
   </data>
+  <data name="BrowserScreen" xml:space="preserve">
+    <value>Браузер</value>
+  </data>
+  <data name="BrowserBoardOpen" xml:space="preserve">
+    <value>Открыть табло</value>
+  </data>
+  <data name="BrowserBoardAlreadyOpened" xml:space="preserve">
+    <value>Табло уже открыто в другом окне браузера.</value>
+  </data>
+  <data name="BrowserBoardDisconnected" xml:space="preserve">
+    <value>Соединение с SImulator потеряно. Откройте табло заново из SImulator.</value>
+  </data>
 </root>
