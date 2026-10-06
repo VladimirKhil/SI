@@ -1,0 +1,135 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:p="clr-namespace:SImulator.Properties"
+    xmlns:v="clr-namespace:SImulator.Views"
+    xmlns:rb="clr-namespace:SImulator.Implementation.RemoteBoard"
+    xmlns:core="clr-namespace:SImulator.ViewModel.Core;assembly=SImulator.ViewModel"
+    x:Class="SImulator.Views.MainWindow"
+    Title="SImulator"
+    Width="900"
+    Height="680"
+    MinWidth="760"
+    MinHeight="520">
+    <TabControl TabStripPlacement="Left" SelectedIndex="{Binding SelectedIndex}" Padding="12,8">
+        <!-- Start -->
+        <TabItem Header="{x:Static p:Resources.Start}" IsVisible="{Binding Mode, Converter={x:Static v:Converters.IsStartMode}}">
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                    <Button
+                        DockPanel.Dock="Right"
+                        Content="{x:Static p:Resources.StartGame}"
+                        Command="{Binding Start}"
+                        FontSize="16"
+                        Padding="24,8"
+                        Classes="accent" />
+                    <ProgressBar IsIndeterminate="True" Height="8" Margin="0,0,20,0" IsVisible="{Binding IsStarting}" VerticalAlignment="Center" />
+                </DockPanel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="{x:Static p:Resources.GamePackage}" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding PackageSource.Name, FallbackValue={x:Static p:Resources.NotSelected}, TargetNullValue={x:Static p:Resources.NotSelected}}" TextTrimming="CharacterEllipsis" FontSize="14" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Button Content="{x:Static p:Resources.SelectFile}" Command="{Binding SelectPackage}" CommandParameter="0" />
+                        <Button Content="{x:Static p:Resources.SelectLibrary}" Command="{Binding SelectPackage}" CommandParameter="1" />
+                        <DropDownButton Content="{x:Static p:Resources.RecentFiles}" IsEnabled="{Binding Settings.Recent.Count}">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout ItemsSource="{Binding Settings.Recent}">
+                                    <MenuFlyout.ItemContainerTheme>
+                                        <ControlTheme TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                            <Setter Property="Header" Value="{Binding}" />
+                                            <Setter Property="Command" Value="{Binding $parent[Window].DataContext.SelectPackage}" />
+                                            <Setter Property="CommandParameter" Value="{Binding}" />
+                                        </ControlTheme>
+                                    </MenuFlyout.ItemContainerTheme>
+                                </MenuFlyout>
+                            </DropDownButton.Flyout>
+                        </DropDownButton>
+                    </StackPanel>
+
+                    <TextBlock Text="{x:Static p:Resources.Screen}" FontSize="18" FontWeight="SemiBold" Margin="0,14,0,0" />
+                    <ComboBox Width="280" ItemsSource="{Binding Screens}" SelectedIndex="{Binding Settings.ScreenNumber}" IsEnabled="{Binding CanSelectScreens}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Text="{x:Static p:Resources.Players}" FontSize="18" FontWeight="SemiBold" Margin="0,14,0,0" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Slider Width="240" Minimum="0" Maximum="20" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Settings.PlayerCount}" />
+                        <TextBlock Text="{Binding Settings.PlayerCount}" FontSize="16" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <CheckBox Content="{x:Static p:Resources.ShowPlayersList}" IsChecked="{Binding Settings.ShowPlayers}" Margin="0,8,0,0" />
+                </StackPanel>
+            </DockPanel>
+        </TabItem>
+
+        <!-- Game -->
+        <TabItem Header="{x:Static p:Resources.Game}" IsVisible="{Binding Mode, Converter={x:Static v:Converters.IsModeratorMode}}">
+            <Grid DataContext="{Binding Game}" RowDefinitions="Auto,*,Auto,Auto,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="{x:Static p:Resources.Game}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <ToggleButton Content="⏸" ToolTip.Tip="{x:Static p:Resources.Pause}" IsChecked="{Binding IsPaused}" />
+                    <Button
+                        DataContext="{x:Static rb:RemoteBoardHost.Instance}"
+                        Content="{x:Static p:MacResources.OpenBoard}"
+                        ToolTip.Tip="{Binding Url}"
+                        Command="{Binding Open}"
+                        IsVisible="{Binding IsRunning}" />
+                </StackPanel>
+
+                <DockPanel Grid.Row="1" Margin="0,8">
+                    <Button DockPanel.Dock="Left" Content="◀" ToolTip.Tip="{x:Static p:Resources.Back}" Command="{Binding Back}" VerticalAlignment="Stretch" Width="44" />
+                    <Button DockPanel.Dock="Right" Content="▶" ToolTip.Tip="{x:Static p:Resources.Next}" Command="{Binding Next}" VerticalAlignment="Stretch" Width="44" />
+                    <DockPanel Margin="8,0">
+                        <TextBlock DockPanel.Dock="Top" Text="{Binding ShowmanReplic}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4" IsVisible="{Binding ShowmanReplic, Converter={x:Static v:Converters.NotEmpty}}" />
+                        <v:StageView />
+                    </DockPanel>
+                </DockPanel>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{x:Static p:Resources.Players}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <RadioButton GroupName="playersView" Content="—" ToolTip.Tip="Hidden" IsChecked="{Binding Settings.Model.PlayersView, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayersViewMode.Hidden}}" />
+                    <RadioButton GroupName="playersView" Content="▦" ToolTip.Tip="Visible" IsChecked="{Binding Settings.Model.PlayersView, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayersViewMode.Visible}}" />
+                    <RadioButton GroupName="playersView" Content="↗" ToolTip.Tip="Separate" IsChecked="{Binding Settings.Model.PlayersView, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayersViewMode.Separate}}" />
+                </StackPanel>
+
+                <v:PlayersTable
+                    Grid.Row="3"
+                    MaxHeight="220"
+                    Margin="0,4"
+                    IsVisible="{Binding Settings.Model.PlayersView, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayersViewMode.Visible}}" />
+
+                <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,6,0,0">
+                    <TextBlock Text="{x:Static p:Resources.Round}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <ProgressBar Grid.Column="1" Maximum="{Binding Settings.Model.RoundTime}" Value="{Binding RoundTime}" Height="10" />
+                    <TextBlock Grid.Row="1" Text="{x:Static p:Resources.Question}" VerticalAlignment="Center" Margin="0,4,10,0" />
+                    <ProgressBar Grid.Row="1" Grid.Column="1" Maximum="{Binding QuestionTimeMax}" Value="{Binding QuestionTime}" Height="10" Margin="0,4,0,0" />
+                    <TextBlock Grid.Row="2" Text="{x:Static p:Resources.Thinking}" VerticalAlignment="Center" Margin="0,4,10,0" />
+                    <ProgressBar Grid.Row="2" Grid.Column="1" Maximum="{Binding ThinkingTimeMax}" Value="{Binding ThinkingTime}" Height="10" Margin="0,4,0,0" />
+                    <Button Grid.Column="2" Grid.RowSpan="3" Content="■" ToolTip.Tip="{x:Static p:Resources.StopGame}" Command="{Binding Stop}" Margin="10,0,0,0" Width="40" Height="40" Foreground="DarkRed" />
+                </Grid>
+            </Grid>
+        </TabItem>
+
+        <!-- Buttons -->
+        <TabItem Header="{x:Static p:Resources.Buttons}" IsEnabled="{Binding Mode, Converter={x:Static v:Converters.IsStartMode}}">
+            <StackPanel Spacing="8">
+                <TextBlock Text="{x:Static p:Resources.Buttons}" FontSize="18" FontWeight="SemiBold" />
+                <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesNone}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.None}}" />
+                <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesExternal}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.External}}" />
+                <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesKeyboard}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.Keyboard}}" />
+                <TextBlock Text="{x:Static p:MacResources.KeyboardButtonsHint}" Foreground="Gray" Margin="28,0,0,0" TextWrapping="Wrap" />
+                <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesWeb}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.WebNew}}" />
+                <StackPanel Orientation="Horizontal" Spacing="6" Margin="28,0,0,0">
+                    <TextBlock Text="Port" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding Settings.WebPort}" Width="80" />
+                </StackPanel>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</Window>

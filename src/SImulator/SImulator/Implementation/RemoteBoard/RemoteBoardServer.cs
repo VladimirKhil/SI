@@ -1,17 +1,18 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using SImulator.Properties;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Windows;
+using Utils;
 using Utils.Web;
 
 namespace SImulator.Implementation.RemoteBoard;
@@ -235,7 +236,13 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
                 message.SetLength(0);
 
                 // WebView2 raises WebMessageReceived on the UI thread; keep the same contract
-                await Application.Current.Dispatcher.InvokeAsync(() => _interop.OnMessage(text));
+                await UI.ExecuteAsync(
+                    () =>
+                    {
+                        _interop.OnMessage(text);
+                        return true;
+                    },
+                    exc => Trace.TraceError(exc.ToString()));
             }
         }
         catch (Exception exc) when (exc is WebSocketException or OperationCanceledException)
