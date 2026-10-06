@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using SImulator.Implementation.ButtonManagers;
+using SImulator.Implementation.RemoteBoard;
 using SImulator.Implementation.WinAPI;
 using SImulator.Properties;
 using SImulator.ViewModel;
@@ -19,6 +20,7 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using Utils;
 using Utils.Timers;
+using Utils.Web;
 using Utils.Wpf;
 
 namespace SImulator.Implementation;
@@ -71,9 +73,8 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
     {
         if (screen is BrowserDisplayDescriptor)
         {
-            _window = new RemoteBoardWindow { DataContext = dataContext };
-            _window.Show();
-            return Task.CompletedTask;
+            return RemoteBoardHost.Instance.StartAsync(
+                dataContext as IWebInterop ?? throw new ArgumentException("Board data context must implement IWebInterop", nameof(dataContext)));
         }
 
         _window = new WebWindow(screen.IsFullScreen)
@@ -101,8 +102,10 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     public static bool CanCloseMainView { get; set; }
 
-    public override Task CloseMainViewAsync()
+    public override async Task CloseMainViewAsync()
     {
+        await RemoteBoardHost.Instance.StopAsync();
+
         if (_window != null)
         {
             CanCloseMainView = true;
@@ -117,8 +120,6 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
                 CanCloseMainView = false;
             }
         }
-
-        return Task.CompletedTask;
     }
 
     public override IDisplayDescriptor[] GetScreens() =>

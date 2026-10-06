@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
-using Utils.Web;
+using SImulator.Properties;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net.WebSockets;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
+using Utils.Web;
 
 namespace SImulator.Implementation.RemoteBoard;
 
@@ -19,49 +22,78 @@ namespace SImulator.Implementation.RemoteBoard;
 /// <remarks>
 /// Replaces the embedded WebView2 where it cannot be rendered (e.g. under Wine/CrossOver on macOS).
 /// The page gets a <c>window.chrome.webview</c> shim backed by WebSocket, so the board scripts stay unchanged.
+/// Security:
+/// <list type="bullet">
+/// <item>the server listens on the loopback interface only;</item>
+/// <item>the WebSocket requires the random session token from the board URL and the board origin,
+/// so other pages opened in the browser cannot control the game;</item>
+/// <item>only one board client is allowed at a time;</item>
+/// <item>only the board files, the sounds folder and the media files sent to the board by the game are served.</item>
+/// </list>
 /// </remarks>
 internal sealed class RemoteBoardServer : IAsyncDisposable
 {
-    private const string Shim = """
+    /// <summary>
+    /// WebSocket close status sent to a second board client.
+    /// </summary>
+    private const int BoardAlreadyOpenedCloseStatus = 4001;
+
+    private const string ShimTemplate = """
         <script>
         (function () {
+            var texts = __TEXTS__;
+            var token = new URLSearchParams(location.hash.substring(1)).get('token') || '';
             var listeners = [];
             var queue = [];
-            var ws = null;
-            function connect() {
-                ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
-                ws.onopen = function () { while (queue.length) { ws.send(queue.shift()); } };
-                ws.onmessage = function (e) {
-                    var data = JSON.parse(e.data);
-                    listeners.slice().forEach(function (l) { l({ data: data }); });
-                };
-                ws.onclose = function () { setTimeout(function () { location.reload(); }, 1000); };
+            var ws = new WebSocket('ws://' + location.host + '/ws?token=' + encodeURIComponent(token));
+            function showMessage(text) {
+                var overlay = document.createElement('div');
+                overlay.textContent = text;
+                overlay.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;' +
+                    'padding:2em;text-align:center;font:2em sans-serif;color:#fff;background:rgba(0,0,40,.92)';
+                document.body.appendChild(overlay);
             }
+            ws.onopen = function () { while (queue.length) { ws.send(queue.shift()); } };
+            ws.onmessage = function (e) {
+                var data = JSON.parse(e.data);
+                listeners.slice().forEach(function (l) { l({ data: data }); });
+            };
+            ws.onclose = function (e) { showMessage(e.code === __BUSY__ ? texts.alreadyOpened : texts.disconnected); };
             window.chrome = window.chrome || {};
             window.chrome.webview = {
                 postMessage: function (msg) {
                     var text = JSON.stringify(msg, function (k, v) { return v instanceof Error ? String(v) : v; });
-                    if (ws && ws.readyState === 1) { ws.send(text); } else { queue.push(text); }
+                    if (ws.readyState === 1) { ws.send(text); } else if (ws.readyState === 0) { queue.push(text); }
                 },
                 addEventListener: function (type, l) { if (type === 'message') { listeners.push(l); } },
                 removeEventListener: function (type, l) { listeners = listeners.filter(function (x) { return x !== l; }); }
             };
-            connect();
         })();
         </script>
         """;
 
     private readonly WebApplication _app;
     private readonly IWebInterop _interop;
-    private readonly ConcurrentDictionary<WebSocket, SemaphoreSlim> _clients = new();
+    private readonly byte[] _token;
+    private readonly string _origin;
+    private readonly object _clientLock = new();
+    private readonly SemaphoreSlim _sendLock = new(1, 1);
+    private readonly ConcurrentDictionary<string, string> _mediaIdsByPath = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, string> _mediaPathsById = new();
+    private WebSocket? _client;
 
+    /// <summary>
+    /// Board URL. Contains the session token in the fragment, so it is not sent in HTTP requests.
+    /// </summary>
     public string Url { get; }
 
-    private RemoteBoardServer(WebApplication app, IWebInterop interop, string url)
+    private RemoteBoardServer(WebApplication app, IWebInterop interop, int port, string token)
     {
         _app = app;
         _interop = interop;
-        Url = url;
+        _token = Encoding.ASCII.GetBytes(token);
+        _origin = $"http://127.0.0.1:{port}";
+        Url = $"{_origin}/webtable/index.html#token={token}";
 
         _interop.SendJsonMessage += OnSendJsonMessage;
     }
@@ -73,64 +105,111 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
         builder.WebHost.UseUrls($"http://127.0.0.1:{port}/");
 
         var app = builder.Build();
-        var url = $"http://127.0.0.1:{port}/webtable/index.html";
-        RemoteBoardServer? server = null;
+        var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
+        var server = new RemoteBoardServer(app, interop, port, token);
+
+        var shim = ShimTemplate
+            .Replace("__TEXTS__", JsonSerializer.Serialize(new
+            {
+                alreadyOpened = Resources.BrowserBoardAlreadyOpened,
+                disconnected = Resources.BrowserBoardDisconnected,
+            }))
+            .Replace("__BUSY__", BoardAlreadyOpenedCloseStatus.ToString());
 
         app.UseWebSockets();
-
-        app.MapGet("/", () => Results.Redirect("/webtable/index.html"));
 
         app.MapGet("/webtable/index.html", async () =>
         {
             var html = await File.ReadAllTextAsync(Path.Combine(baseDir, "webtable", "index.html"));
-            return Results.Content(html.Replace("<head>", "<head>" + Shim), "text/html; charset=utf-8");
+            return Results.Content(html.Replace("<head>", "<head>" + shim), "text/html; charset=utf-8");
         });
 
         var contentTypes = new FileExtensionContentTypeProvider();
 
-        app.MapGet("/fs", (string p) =>
+        app.MapGet("/media/{id}", (string id) =>
         {
-            if (!File.Exists(p))
+            if (!server._mediaPathsById.TryGetValue(id, out var path) || !File.Exists(path))
             {
                 return Results.NotFound();
             }
 
-            if (!contentTypes.TryGetContentType(p, out var contentType))
+            if (!contentTypes.TryGetContentType(path, out var contentType))
             {
                 contentType = "application/octet-stream";
             }
 
-            return Results.File(p, contentType, enableRangeProcessing: true);
+            return Results.File(path, contentType, enableRangeProcessing: true);
         });
 
-        app.Map("/ws", async context =>
+        app.Map("/ws", server.HandleWebSocketAsync);
+
+        foreach (var folder in new[] { "webtable", "sounds" })
         {
-            if (!context.WebSockets.IsWebSocketRequest || server == null)
+            var folderPath = Path.Combine(baseDir, folder);
+
+            if (Directory.Exists(folderPath))
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                return;
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(folderPath),
+                    RequestPath = "/" + folder,
+                    ServeUnknownFileTypes = true,
+                });
             }
+        }
 
-            using var socket = await context.WebSockets.AcceptWebSocketAsync();
-            await server.ServeClientAsync(socket, context.RequestAborted);
-        });
-
-        app.UseStaticFiles(new StaticFileOptions
-        {
-            FileProvider = new PhysicalFileProvider(baseDir),
-            ServeUnknownFileTypes = true,
-        });
-
-        server = new RemoteBoardServer(app, interop, url);
         await app.StartAsync();
 
         return server;
     }
 
-    private async Task ServeClientAsync(WebSocket socket, CancellationToken cancellationToken)
+    private async Task HandleWebSocketAsync(HttpContext context)
     {
-        _clients[socket] = new SemaphoreSlim(1, 1);
+        if (!context.WebSockets.IsWebSocketRequest)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
 
+        var token = Encoding.ASCII.GetBytes(context.Request.Query["token"].ToString());
+
+        if (context.Request.Headers.Origin != _origin || !CryptographicOperations.FixedTimeEquals(token, _token))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return;
+        }
+
+        using var socket = await context.WebSockets.AcceptWebSocketAsync();
+
+        lock (_clientLock)
+        {
+            if (_client == null)
+            {
+                _client = socket;
+            }
+        }
+
+        if (_client != socket)
+        {
+            await socket.CloseAsync((WebSocketCloseStatus)BoardAlreadyOpenedCloseStatus, "Board is already opened", context.RequestAborted);
+            return;
+        }
+
+        try
+        {
+            await ReceiveMessagesAsync(socket, context.RequestAborted);
+        }
+        finally
+        {
+            lock (_clientLock)
+            {
+                _client = null;
+            }
+        }
+    }
+
+    private async Task ReceiveMessagesAsync(WebSocket socket, CancellationToken cancellationToken)
+    {
         try
         {
             var buffer = new byte[64 * 1024];
@@ -156,31 +235,29 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
                 message.SetLength(0);
 
                 // WebView2 raises WebMessageReceived on the UI thread; keep the same contract
-                Application.Current.Dispatcher.Invoke(() => _interop.OnMessage(text));
+                await Application.Current.Dispatcher.InvokeAsync(() => _interop.OnMessage(text));
             }
         }
         catch (Exception exc) when (exc is WebSocketException or OperationCanceledException)
         {
         }
-        finally
-        {
-            _clients.TryRemove(socket, out _);
-        }
     }
 
     private void OnSendJsonMessage(string json)
     {
-        var payload = Encoding.UTF8.GetBytes(RewriteLocalPaths(json));
+        var client = _client;
 
-        foreach (var (socket, sendLock) in _clients)
+        if (client == null)
         {
-            _ = SendAsync(socket, sendLock, payload);
+            return;
         }
+
+        _ = SendAsync(client, Encoding.UTF8.GetBytes(RewriteLocalPaths(json)));
     }
 
-    private static async Task SendAsync(WebSocket socket, SemaphoreSlim sendLock, byte[] payload)
+    private async Task SendAsync(WebSocket socket, byte[] payload)
     {
-        await sendLock.WaitAsync();
+        await _sendLock.WaitAsync();
 
         try
         {
@@ -194,14 +271,17 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
         }
         finally
         {
-            sendLock.Release();
+            _sendLock.Release();
         }
     }
 
     /// <summary>
-    /// Replaces local file paths and file:// URIs with URLs served by this server, so the external browser can load package media.
+    /// Replaces local file paths and file:// URIs with media URLs served by this server, so the external browser can load package media.
     /// </summary>
-    private static string RewriteLocalPaths(string json)
+    /// <remarks>
+    /// Only the files referenced in the board messages become available to the browser.
+    /// </remarks>
+    private string RewriteLocalPaths(string json)
     {
         var node = JsonNode.Parse(json);
 
@@ -214,7 +294,7 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
         return node.ToJsonString();
     }
 
-    private static void Rewrite(JsonNode node)
+    private void Rewrite(JsonNode node)
     {
         switch (node)
         {
@@ -250,41 +330,56 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
         }
     }
 
-    private static JsonNode? TryRewriteValue(JsonNode node) =>
-        node is JsonValue value && value.TryGetValue<string>(out var text) && TryGetLocalPath(text, out var path)
-            ? JsonValue.Create("/fs?p=" + Uri.EscapeDataString(path))
-            : null;
+    private JsonNode? TryRewriteValue(JsonNode node)
+    {
+        if (node is not JsonValue value || !value.TryGetValue<string>(out var text) || !TryGetLocalPath(text, out var path))
+        {
+            return null;
+        }
+
+        var id = _mediaIdsByPath.GetOrAdd(path, _ => Convert.ToHexString(RandomNumberGenerator.GetBytes(16)));
+        _mediaPathsById[id] = path;
+
+        return JsonValue.Create($"/media/{id}");
+    }
 
     private static bool TryGetLocalPath(string text, out string path)
     {
         path = "";
 
-        if (text.StartsWith("file:", StringComparison.OrdinalIgnoreCase)
-            && Uri.TryCreate(text, UriKind.Absolute, out var uri)
-            && uri.IsFile)
+        if (text.StartsWith("file:", StringComparison.OrdinalIgnoreCase))
         {
-            path = uri.LocalPath;
-            return true;
+            if (!Uri.TryCreate(text, UriKind.Absolute, out var uri) || !uri.IsFile || uri.IsUnc)
+            {
+                return false;
+            }
+
+            text = uri.LocalPath;
         }
 
-        if (text.Length > 3 && char.IsLetter(text[0]) && text[1] == ':' && (text[2] == '\\' || text[2] == '/'))
+        // Local drive paths only (C:\... or C:/...); network (UNC) paths are not allowed
+        if (text.Length <= 3 || !char.IsAsciiLetter(text[0]) || text[1] != ':' || (text[2] != '\\' && text[2] != '/'))
         {
-            path = text;
-            return true;
+            return false;
         }
 
-        return false;
+        try
+        {
+            path = Path.GetFullPath(text);
+            return true;
+        }
+        catch (Exception exc) when (exc is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return false;
+        }
     }
 
     public async ValueTask DisposeAsync()
     {
         _interop.SendJsonMessage -= OnSendJsonMessage;
+        _client?.Abort();
 
-        foreach (var socket in _clients.Keys)
-        {
-            socket.Abort();
-        }
-
+        await _app.StopAsync();
         await _app.DisposeAsync();
     }
 }

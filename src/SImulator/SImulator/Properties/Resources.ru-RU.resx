@@ -724,19 +724,13 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="BrowserScreen" xml:space="preserve">
     <value>Браузер</value>
   </data>
-  <data name="BrowserBoardStarting" xml:space="preserve">
-    <value>Запуск табло...</value>
-  </data>
   <data name="BrowserBoardOpen" xml:space="preserve">
-    <value>Открыть табло в браузере</value>
+    <value>Открыть табло</value>
   </data>
-  <data name="BrowserBoardOpened" xml:space="preserve">
-    <value>Табло открыто в браузере:
-{0}
-
-Esc — остановить игру.</value>
+  <data name="BrowserBoardAlreadyOpened" xml:space="preserve">
+    <value>Табло уже открыто в другом окне браузера.</value>
   </data>
-  <data name="BrowserBoardError" xml:space="preserve">
-    <value>Не удалось запустить табло: {0}</value>
+  <data name="BrowserBoardDisconnected" xml:space="preserve">
+    <value>Соединение с SImulator потеряно. Откройте табло заново из SImulator.</value>
   </data>
 </root>

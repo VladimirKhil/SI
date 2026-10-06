@@ -259,6 +259,42 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The game board is already opened in another browser window..
+        /// </summary>
+        public static string BrowserBoardAlreadyOpened {
+            get {
+                return ResourceManager.GetString("BrowserBoardAlreadyOpened", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection to SImulator is lost. Open the board again from SImulator..
+        /// </summary>
+        public static string BrowserBoardDisconnected {
+            get {
+                return ResourceManager.GetString("BrowserBoardDisconnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open board.
+        /// </summary>
+        public static string BrowserBoardOpen {
+            get {
+                return ResourceManager.GetString("BrowserBoardOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browser.
+        /// </summary>
+        public static string BrowserScreen {
+            get {
+                return ResourceManager.GetString("BrowserScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Button lock time (s).
         /// </summary>
         public static string ButtonBlockingTime {
@@ -1816,54 +1852,6 @@ namespace SImulator.Properties {
         public static string WebView {
             get {
                 return ResourceManager.GetString("WebView", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Browser.
-        /// </summary>
-        public static string BrowserScreen {
-            get {
-                return ResourceManager.GetString("BrowserScreen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Starting the game board....
-        /// </summary>
-        public static string BrowserBoardStarting {
-            get {
-                return ResourceManager.GetString("BrowserBoardStarting", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open the board in browser.
-        /// </summary>
-        public static string BrowserBoardOpen {
-            get {
-                return ResourceManager.GetString("BrowserBoardOpen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The game board is opened in browser:
-        ///{0}
-        ///
-        ///Esc — stop the game..
-        /// </summary>
-        public static string BrowserBoardOpened {
-            get {
-                return ResourceManager.GetString("BrowserBoardOpened", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to start the game board: {0}.
-        /// </summary>
-        public static string BrowserBoardError {
-            get {
-                return ResourceManager.GetString("BrowserBoardError", resourceCulture);
             }
         }
         

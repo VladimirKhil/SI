@@ -18,6 +18,7 @@
     xmlns:my="clr-namespace:SImulator.Converters"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:lb="clr-namespace:SImulator.Behaviors"
+    xmlns:rb="clr-namespace:SImulator.Implementation.RemoteBoard"
     xmlns:lc="clr-namespace:SImulator.Converters"
     xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SImulator.ViewModel"
     SnapsToDevicePixels="True"
@@ -660,6 +661,28 @@
                                 </Style>
                             </ToggleButton.Style>
                         </ToggleButton>
+
+                        <Button
+                            DataContext="{Binding Source={x:Static rb:RemoteBoardHost.Instance}}"
+                            Command="{Binding Open}"
+                            ToolTip="{Binding Url}"
+                            Content="{x:Static lp:Resources.BrowserBoardOpen}"
+                            VerticalAlignment="Center"
+                            Margin="10,2,0,0"
+                            Padding="8,0"
+                            Height="23">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
 
                     <Separator Grid.Row="1" Width="250" />

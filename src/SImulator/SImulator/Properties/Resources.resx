@@ -723,19 +723,13 @@ To play, you need to organize a local network.</value>
   <data name="BrowserScreen" xml:space="preserve">
     <value>Browser</value>
   </data>
-  <data name="BrowserBoardStarting" xml:space="preserve">
-    <value>Starting the game board...</value>
-  </data>
   <data name="BrowserBoardOpen" xml:space="preserve">
-    <value>Open the board in browser</value>
+    <value>Open board</value>
   </data>
-  <data name="BrowserBoardOpened" xml:space="preserve">
-    <value>The game board is opened in browser:
-{0}
-
-Esc — stop the game.</value>
+  <data name="BrowserBoardAlreadyOpened" xml:space="preserve">
+    <value>The game board is already opened in another browser window.</value>
   </data>
-  <data name="BrowserBoardError" xml:space="preserve">
-    <value>Failed to start the game board: {0}</value>
+  <data name="BrowserBoardDisconnected" xml:space="preserve">
+    <value>Connection to SImulator is lost. Open the board again from SImulator.</value>
   </data>
 </root>
