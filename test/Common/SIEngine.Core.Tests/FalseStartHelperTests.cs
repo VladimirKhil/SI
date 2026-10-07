@@ -36,55 +36,66 @@ public sealed class FalseStartHelperTests
         Assert.That(index, Is.EqualTo(1));
     }
 
+    [Test]
+    public void FalseStart_ImageOnlyWithTextContentOnly_ShouldAllowPressBeforeImage()
+    {
+        var script = CreateScript(
+            new ContentItem { Type = ContentTypes.Image, Value = "picture.png" });
+
+        var index = FalseStartHelper.GetAskAnswerStartIndex(script, [], FalseStartMode.TextContentOnly);
+
+        Assert.That(index, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void FalseStart_MixedContentWithDelays_ShouldAllowPressBeforeMultimedia()
+    {
+        var script = CreateScript(
+            new ContentItem { Type = ContentTypes.Text, Value = "question text", WaitForFinish = true },
+            new ContentItem { Type = ContentTypes.Audio, Value = "audio.mp3", WaitForFinish = false });
+
+        var index = FalseStartHelper.GetAskAnswerStartIndex(script, [], FalseStartMode.TextContentOnly);
+
+        Assert.That(index, Is.EqualTo(0));
+    }
+
     private static Script CreateScript()
     {
-        var contentStep = new Step { Type = StepTypes.ShowContent };
-
-        contentStep.Parameters.Add(
-            StepParameterNames.Content,
-            new StepParameter
-            {
-                Type = StepParameterTypes.Content,
-                ContentValue = new List<ContentItem>
-                {
-                    new ContentItem { Type = ContentTypes.Text, Value = "question text" }
-                }
-            });
-
-        var content2Step = new Step { Type = StepTypes.ShowContent };
-
-        content2Step.Parameters.Add(
-            StepParameterNames.Content,
-            new StepParameter
-            {
-                Type = StepParameterTypes.Content,
-                ContentValue = new List<ContentItem>
-                {
-                    new ContentItem { Type = ContentTypes.Audio, Value = "http://fake-audio-link" }
-                }
-            });
-
-        var askAnswerStep = new Step { Type = StepTypes.AskAnswer };
-        askAnswerStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.AskAnswerMode_Button);
-
-        var answerStep = new Step { Type = StepTypes.ShowContent };
-
-        answerStep.Parameters.Add(
-            StepParameterNames.Content,
-            new StepParameter
-            {
-                Type = StepParameterTypes.Content,
-                ContentValue = new List<ContentItem>
-                {
-                    new ContentItem { Type = ContentTypes.Text, Value = "question answer" }
-                }
-            });
-
         var script = new Script();
-        script.Steps.Add(contentStep);
-        script.Steps.Add(content2Step);
-        script.Steps.Add(askAnswerStep);
-        script.Steps.Add(answerStep);
+        script.Steps.Add(CreateContentStep(new ContentItem { Type = ContentTypes.Text, Value = "question text" }));
+        script.Steps.Add(CreateContentStep(new ContentItem { Type = ContentTypes.Audio, Value = "audio.mp3" }));
+        script.Steps.Add(CreateAskAnswerStep());
+        script.Steps.Add(CreateAnswerStep());
         return script;
     }
+
+    private static Script CreateScript(params ContentItem[] contentItems)
+    {
+        var script = new Script();
+        script.Steps.Add(CreateContentStep(contentItems));
+        script.Steps.Add(CreateAskAnswerStep());
+        script.Steps.Add(CreateAnswerStep());
+        return script;
+    }
+
+    private static Step CreateContentStep(params ContentItem[] contentItems)
+    {
+        var step = new Step { Type = StepTypes.ShowContent };
+        step.Parameters.Add(StepParameterNames.Content, new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue = [.. contentItems]
+        });
+        return step;
+    }
+
+    private static Step CreateAskAnswerStep()
+    {
+        var step = new Step { Type = StepTypes.AskAnswer };
+        step.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.AskAnswerMode_Button);
+        return step;
+    }
+
+    private static Step CreateAnswerStep() => CreateContentStep(
+        new ContentItem { Type = ContentTypes.Text, Value = "question answer" });
 }

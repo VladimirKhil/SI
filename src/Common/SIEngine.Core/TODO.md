@@ -70,8 +70,8 @@ False start handling (`FalseStartHelper.GetAskAnswerStartIndex`) may not handle 
 
 **Tests Needed:**
 - ✅ Text-only with TextContentOnly mode
-- ⚠️ Image-only with TextContentOnly mode
-- ⚠️ Mixed content with delays
+- ✅ Image-only with TextContentOnly mode
+- ✅ Mixed content with delays
 - ⚠️ Content added via script parameters
 
 ### 4. Parameter Reference Resolution
