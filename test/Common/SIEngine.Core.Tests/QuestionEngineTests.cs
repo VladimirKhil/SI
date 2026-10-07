@@ -29,22 +29,13 @@ public sealed class QuestionEngineTests
             "ContentStart:text",
             "QuestionContent:text:4:screen:True:True"
         }));
-    }
-
-    [Test]
-    public void WithButtonType_ShouldPlaySameFlowAsSimpleAlias()
-    {
-        var simpleHandler = new TestQuestionEnginePlayHandler();
         var buttonHandler = new TestQuestionEnginePlayHandler();
-        var simpleQuestion = CreateQuestion("Question", "Answer");
-        simpleQuestion.TypeName = QuestionTypes.Simple;
-        var buttonQuestion = CreateQuestion("Question", "Answer");
+        var buttonQuestion = CreateQuestion("What is 2+2?", "4");
         buttonQuestion.TypeName = QuestionTypes.WithButton;
 
-        PlayToEnd(new QuestionEngine(simpleQuestion, CreateDefaultOptions(), simpleHandler));
-        PlayToEnd(new QuestionEngine(buttonQuestion, CreateDefaultOptions(), buttonHandler));
+        PlayToEnd(new QuestionEngine(buttonQuestion, options, buttonHandler));
 
-        Assert.That(buttonHandler.Events, Is.EqualTo(simpleHandler.Events));
+        Assert.That(buttonHandler.Events, Is.EqualTo(handler.Events));
     }
 
     [Test]
