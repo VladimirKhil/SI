@@ -42,7 +42,7 @@ public class ContentItem
     string Value;          // Content value or filename
     bool IsRef;            // True if Value is a file reference
     string Placement;      // screen, background, etc.
-    TimeSpan? Duration;    // Playback duration (for media)
+    TimeSpan Duration;     // Playback duration (for media)
     bool WaitForFinish;    // Wait before showing next content
 }
 ```
@@ -64,26 +64,28 @@ Setting up the question context:
 - **Set Answerer** (`OnSetAnswerer`) - Choose who can answer (single player, all, etc.)
 - **Announce Price** (`OnAnnouncePrice`) - Announce available price ranges
 - **Set Price** (`OnSetPrice`) - Set question price/stake
-- **Set Answer Type** (`OnAnswerOptions`, `OnNumericAnswerType`) - Define answer format
+- **Set Answer Type** (`OnAnswerOptions`, `OnNumericAnswerType`, `OnPointAnswerType`, `OnClientAnswerType`) - Define answer format
 
 ### Stage 2: Displaying Question
 Showing the question content:
-- **Show Content** (`OnQuestionContent`) - Display text, images, audio, video
-- **Content Start** (`OnContentStart`) - Notifies about upcoming content sequence
+- **Content Start** (`OnContentStart(contentItems, moveToContentCallback)`) - Notifies about upcoming content sequence
+- **Show Content** (`OnQuestionContent(content, isLast)`) - Display a content batch and indicate whether it is the last batch
 - Multiple content items may be shown sequentially
 - Content can have different placements (screen, background)
 
 ### Stage 3: Asking Answer(s)
 Accepting player responses:
-- **Button Press Start** (`OnButtonPressStart`) - Enable answer buttons
 - **Ask Answer** (`OnAskAnswer`) - Request answer from player(s)
 - **Answer Start** (`OnAnswerStart`) - Marks the beginning of answer processing
+- **Button Press Start** (`OnButtonPressStart`) - Enable the answer button when the script/false-start mode reaches that step
 
 ### Stage 4: Displaying Right Answer
 Showing the correct answer:
+- **Right Answer** (`OnRightAnswer`) - Called before complex answer content is played
 - **Show Content** (answer) - Display answer content
-- **Right Answer Option** (`OnRightAnswerOption`) - Show correct option for select-type questions
-- **Simple Right Answer Start** (`OnSimpleRightAnswerStart`) - Notify about simple text answer
+- **Right Answer Option** (`OnRightAnswerOption`) - Show the correct option for select-type questions
+- **Right Answer Point** (`OnRightAnswerPoint`) - Show the correct coordinates for point-type questions
+- **Simple Right Answer Start** (`OnSimpleRightAnswerStart`) - Notify about fallback simple answer content when enabled
 
 ## Implementing a Custom Handler
 
@@ -99,7 +101,7 @@ public class MyQuestionHandler : IQuestionEnginePlayHandler
         // Store skip callback for later use
     }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
     {
         // Display content items on screen
         foreach (var item in content)
@@ -117,13 +119,18 @@ public class MyQuestionHandler : IQuestionEnginePlayHandler
         }
     }
 
-    public void OnAskAnswer(string mode)
+    public void OnAskAnswer(string mode, int duration)
     {
         // Enable answer input based on mode
         if (mode == StepParameterValues.AskAnswerMode_Button)
         {
             EnableAnswerButton();
         }
+    }
+
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
+    {
+        // Store the callback to move to a specific item in the current content sequence.
     }
 
     public bool OnButtonPressStart()
@@ -140,7 +147,7 @@ public class MyQuestionHandler : IQuestionEnginePlayHandler
 
 ### Handler Return Values
 
-Methods return `bool` to control state machine flow:
+Methods that return `bool` control state machine flow:
 - **`true`** - Pause the engine (waiting for user action, content playback, etc.)
 - **`false`** - Continue immediately to next step
 
@@ -257,10 +264,12 @@ Questions are defined by scripts with these step types:
 | `AnnouncePrice` | Announce price options | `OnAnnouncePrice` |
 | `SetPrice` | Set question price | `OnSetPrice` |
 | `SetTheme` | Set theme name | `OnSetTheme` |
-| `SetAnswerType` | Define answer format | `OnAnswerOptions`, `OnNumericAnswerType` |
-| `ShowContent` | Display content | `OnQuestionContent` |
-| `AskAnswer` | Request answer | `OnAskAnswer` |
+| `SetAnswerType` | Define answer format | `OnAnswerOptions`, `OnNumericAnswerType`, `OnPointAnswerType`, `OnClientAnswerType` |
+| `ShowContent` | Display content | `OnContentStart`, `OnQuestionContent` |
+| `AskAnswer` | Request answer | `OnAskAnswer`, `OnAnswerStart` |
 | `Accept` | Auto-accept answer | `OnAccept` |
+
+Answer-display callbacks depend on the answer content and answer type: `OnRightAnswer` precedes complex answer content, while a select or point answer can instead call `OnRightAnswerOption` or `OnRightAnswerPoint`. `OnSimpleRightAnswerStart` is used for the fallback simple answer when `ShowSimpleRightAnswers` is enabled.
 
 ## Answer Types
 
@@ -289,6 +298,21 @@ bool OnNumericAnswerType(int deviation)
 {
     // Configure numeric input
     // Accept answers within ±deviation of correct value
+}
+```
+
+### Point Answer
+Point answer with an acceptable coordinate deviation. When the answer is revealed, the handler receives the first right-answer value through `OnRightAnswerPoint`.
+
+```csharp
+bool OnPointAnswerType(double deviation)
+{
+    // Configure point input using the allowed deviation.
+}
+
+bool OnRightAnswerPoint(string rightAnswer)
+{
+    // Display the right point coordinates.
 }
 ```
 
@@ -374,7 +398,7 @@ However, handlers should:
 
 ## Testing
 
-See `test/Common/SIEngine.Core.Tests/QuestionEngineTests.cs` for comprehensive examples.
+`test/Common/SIEngine.Core.Tests/QuestionEngineTests.cs` covers the four-stage simple flow, all library question types, content kinds and placements, answer types, answer-content behavior, parameter references, callback ordering, and pause behavior. `test/Common/SIEngine.Core.Tests/FalseStartHelperTests.cs` covers the false-start modes and text, image-only, and mixed content.
 
 ## Reference
 
