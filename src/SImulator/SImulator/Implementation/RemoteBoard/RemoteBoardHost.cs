@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -33,6 +33,11 @@ public sealed class RemoteBoardHost : INotifyPropertyChanged
     /// Opens the board in the default browser.
     /// </summary>
     public ICommand Open { get; }
+
+    /// <summary>
+    /// Running board server.
+    /// </summary>
+    internal RemoteBoardServer? Server => _server;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
