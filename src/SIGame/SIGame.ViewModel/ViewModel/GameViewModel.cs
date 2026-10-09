@@ -250,14 +250,45 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public void AddValidation(string name, string answer)
     {
         ValidationQueue.Enqueue(new ValidationInfo(name, answer));
-        ValidationInfo = ValidationQueue.Peek();
+        UpdateValidationInfo();
     }
 
     public ValidationInfo PopValidation()
     {
         var info = ValidationQueue.Dequeue();
-        ValidationInfo = ValidationQueue.Count > 0 ? ValidationQueue.Peek() : null;
+
+        // Identical answers are validated by the server at once, so they are removed from the queue together
+        var otherAnswers = ValidationQueue.Where(item => item.Answer != info.Answer).ToArray();
+        ValidationQueue.Clear();
+
+        foreach (var item in otherAnswers)
+        {
+            ValidationQueue.Enqueue(item);
+        }
+
+        UpdateValidationInfo();
         return info;
+    }
+
+    /// <summary>
+    /// Displays the first answer in the queue joining the names of all the players that have provided it.
+    /// </summary>
+    private void UpdateValidationInfo()
+    {
+        if (ValidationQueue.Count == 0)
+        {
+            ValidationInfo = null;
+            return;
+        }
+
+        var first = ValidationQueue.Peek();
+
+        var names = ValidationQueue
+            .Where(item => item.Answer == first.Answer)
+            .Select(item => item.Name)
+            .Distinct();
+
+        ValidationInfo = new ValidationInfo(string.Join(", ", names), first.Answer);
     }
 
     public void ClearValidation()

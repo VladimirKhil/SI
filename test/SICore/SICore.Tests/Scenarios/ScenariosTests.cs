@@ -205,6 +205,117 @@ public sealed class ScenariosTests
     }
 
     /// <summary>
+    /// Tests that the showman is asked to validate the answer of every player
+    /// even when several players have provided the same answer.
+    /// The validation verdict is still applied to all of them at once.
+    /// </summary>
+    [Test]
+    public async Task ForAllQuestionEqualAnswersTest()
+    {
+        var node = new PrimaryNode(new Network.Configuration.NodeConfiguration());
+
+        var gameSettings = new GameSettingsCore<AppSettingsCore>
+        {
+            Showman = new Account { IsHuman = true, Name = Constants.FreePlace },
+            Players =
+            [
+                new Account { IsHuman = true, Name = Constants.FreePlace },
+                new Account { IsHuman = true, Name = Constants.FreePlace }
+            ],
+        };
+
+        var document = SIDocument.Create("Test Package", "Test Author");
+
+        var round = new Round { Name = "Round 1", Type = RoundTypes.Standart };
+        document.Package.Rounds.Add(round);
+
+        var theme = new Theme { Name = "Test Theme" };
+        round.Themes.Add(theme);
+
+        var question = new Question { Price = 10, TypeName = QuestionTypes.ForAll };
+        theme.Questions.Add(question);
+
+        question.Parameters[QuestionParameterNames.Question] = new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue =
+            [
+                new() { Value = "Test question text", Type = ContentTypes.Text }
+            ]
+        };
+
+        question.Right.Add("right");
+
+        var gameHost = Substitute.For<IGameHost>();
+        var fileShare = Substitute.For<IFileShare>();
+        var avatarHelper = Substitute.For<IAvatarHelper>();
+
+        var game = GameRunner.CreateGame(
+            node,
+            gameSettings,
+            new SI.Contracts.RoomSettings { HostName = "Showman" },
+            new SI.Contracts.TimeSettings(),
+            new SI.Contracts.RulesSettings(),
+            "en-US",
+            document,
+            gameHost,
+            fileShare,
+            Array.Empty<ComputerAccount>(),
+            Array.Empty<ComputerAccount>(),
+            avatarHelper,
+            null,
+            null);
+
+        game.Run();
+
+        var showmanClient = new Client("Showman");
+        using var showmanListener = new MessageListener(showmanClient);
+        showmanClient.ConnectTo(node);
+        game.Authenticate(showmanClient.Name, false, GameRole.Showman, null);
+
+        var playerAClient = new Client("A");
+        using var playerAListener = new MessageListener(playerAClient);
+        playerAClient.ConnectTo(node);
+        game.Authenticate(playerAClient.Name, false, GameRole.Player, null);
+
+        var playerBClient = new Client("B");
+        playerBClient.ConnectTo(node);
+        game.Authenticate(playerBClient.Name, false, GameRole.Player, null);
+
+        showmanClient.SendMessage(Messages.Start);
+
+        await showmanListener.WaitForMessageAsync(Messages.AskSelectPlayer);
+        showmanClient.SendMessage(new MessageBuilder(Messages.SelectPlayer, 0).ToString(), receiver: NetworkConstants.GameName);
+
+        await playerAListener.WaitForMessageAsync(Messages.Answer);
+
+        // Both players provide the same answer
+        playerAClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
+        playerBClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
+
+        var firstAskValidate = await showmanListener.WaitForMessageAsync(Messages.AskValidate);
+        Assert.That(firstAskValidate[1], Is.EqualTo("0"), "First validation should be asked for player A");
+        Assert.That(firstAskValidate[2], Is.EqualTo("myAnswer"), "Answer text should match");
+
+        var secondAskValidate = await showmanListener.WaitForMessageAsync(Messages.AskValidate);
+        Assert.That(secondAskValidate[1], Is.EqualTo("1"), "Second validation should be asked for player B");
+        Assert.That(secondAskValidate[2], Is.EqualTo("myAnswer"), "Answer text should match");
+
+        // A single verdict is applied to both players
+        showmanClient.SendMessage(
+            new MessageBuilder(Messages.Validate, "myAnswer", "+", 1).ToString(),
+            receiver: NetworkConstants.GameName);
+
+        var firstPerson = await showmanListener.WaitForMessageAsync(Messages.Person);
+        Assert.That(firstPerson[1], Is.EqualTo("+"), "Player A answer should be marked correct");
+        Assert.That(firstPerson[2], Is.EqualTo("0"), "Player index should be 0");
+
+        var secondPerson = await showmanListener.WaitForMessageAsync(Messages.Person);
+        Assert.That(secondPerson[1], Is.EqualTo("+"), "Player B answer should be marked correct too");
+        Assert.That(secondPerson[2], Is.EqualTo("1"), "Player index should be 1");
+    }
+
+    /// <summary>
     /// Tests game initialization sequence.
     /// Validates that initialization messages are sent in the correct order as documented.
     /// </summary>
