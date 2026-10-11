@@ -456,6 +456,18 @@ public sealed class GameActions
             Messages.Answer,
             answerType.ToString().ToLowerInvariant());
 
+    internal void SendAppellationCancellationsToActivePlayers()
+    {
+        foreach (var player in _state.Players)
+        {
+            if (player.AppellationFlag)
+            {
+                player.AppellationFlag = false;
+                SendMessage(Messages.Cancel, player.Name);
+            }
+        }
+    }
+
     internal void AskReview()
     {
         var packageSource = _state.GameResultInfo.PackageSource?.ToString() ?? (_state.PackageStatisticsProvider?.GetPackageSource() ?? "");

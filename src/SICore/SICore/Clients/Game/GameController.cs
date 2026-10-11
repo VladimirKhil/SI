@@ -2203,19 +2203,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitAppellationDecision()
     {
-        SendCancellationsToActivePlayers();
+        _actions.SendAppellationCancellationsToActivePlayers();
         OnDecision();
-    }
-
-    private void SendCancellationsToActivePlayers()
-    {
-        foreach (var player in _state.Players)
-        {
-            if (player.Flag)
-            {
-                _actions.SendMessage(Messages.Cancel, player.Name);
-            }
-        }
     }
 
     private void MoveNext()

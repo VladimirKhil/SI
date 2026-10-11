@@ -2247,19 +2247,8 @@ public sealed class Game : MessageHandler
 
             if (_state.AppellationPositiveVoteCount > halfVoteCount || _state.AppellationNegativeVoteCount > halfVoteCount)
             {
-                SendAppellationCancellationsToActivePlayers();
+                _actions.SendAppellationCancellationsToActivePlayers();
                 _controller.Stop(StopReason.Decision);
-            }
-        }
-    }
-
-    private void SendAppellationCancellationsToActivePlayers()
-    {
-        foreach (var player in _state.Players)
-        {
-            if (player.AppellationFlag)
-            {
-                _actions.SendMessage(Messages.Cancel, player.Name);
             }
         }
     }
@@ -2920,6 +2909,12 @@ public sealed class Game : MessageHandler
     {
         _state.AppelaerIndex = -1;
         Controller.AddHistory($"AppelaerIndex dropped");
+
+        if (_state.Decision == DecisionType.Appellation)
+        {
+            _actions.SendAppellationCancellationsToActivePlayers();
+            _controller.Stop(StopReason.Decision);
+        }
     }
 
     /// <summary>
@@ -2947,15 +2942,14 @@ public sealed class Game : MessageHandler
             // Answerer has been dropped. The game should be moved forward
             Controller.StopWaiting();
 
-            if (_state.IsOralNow)
-            {
-                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
-            }
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
 
             Controller.PlanExecution(Tasks.ContinueQuestion, 1);
         }
         else if (nextTask == Tasks.AskRight || nextTask == Tasks.WaitRight)
         {
+            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+
             // Player has been removed after giving answer. But the answer has not been validated by showman yet
             if (_state.QuestionPlay.AnswererIndicies.Count == 0)
             {
