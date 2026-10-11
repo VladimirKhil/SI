@@ -2047,12 +2047,20 @@ public sealed class Game : MessageHandler
                     {
                         var answer = args[1];
 
-                        if (_state.QuestionPlay.Validations.ContainsKey(answer))
+                        if (_state.QuestionPlay.Validations.TryGetValue(answer, out var validation))
                         {
-                            break;
+                            if (validation.HasValue)
+                            {
+                                break; // The answer has already been validated; the existing verdict is applied automatically
+                            }
+                        }
+                        else
+                        {
+                            _state.QuestionPlay.Validations[answer] = null;
                         }
 
-                        _state.QuestionPlay.Validations[answer] = null;
+                        // Ask for each answer even if the same answer is already pending validation
+                        // so that the showman sees every answering player
                         _actions.AskValidate(_state.ShowMan.Name, i, answer, !_state.QuestionPlay.FlexiblePrice);
                     }
 
