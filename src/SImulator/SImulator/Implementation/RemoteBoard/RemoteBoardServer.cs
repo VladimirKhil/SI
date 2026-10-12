@@ -1,17 +1,18 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using SImulator.Properties;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Windows;
+using Utils;
 using Utils.Web;
 
 namespace SImulator.Implementation.RemoteBoard;
@@ -54,8 +55,27 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
                 document.body.appendChild(overlay);
             }
             ws.onopen = function () { while (queue.length) { ws.send(queue.shift()); } };
+            // Package media (served from /media/) created by the board, for media control from SImulator
+            var packageMedia = new Set();
+            var originalPlay = HTMLMediaElement.prototype.play;
+            HTMLMediaElement.prototype.play = function () {
+                if ((this.currentSrc || this.src || '').indexOf('/media/') >= 0) { packageMedia.add(this); }
+                return originalPlay.apply(this, arguments);
+            };
+            function forEachMedia(action) {
+                document.querySelectorAll('video, audio').forEach(function (m) {
+                    if ((m.currentSrc || m.src || '').indexOf('/media/') >= 0) { packageMedia.add(m); }
+                });
+                packageMedia.forEach(function (m) { try { action(m); } catch (e) { } });
+            }
+            function controlMedia(action) {
+                if (action === 'pause') { forEachMedia(function (m) { m.pause(); }); }
+                else if (action === 'resume') { forEachMedia(function (m) { if (m.isConnected || !m.ended) { m.play(); } }); }
+                else if (action === 'restart') { forEachMedia(function (m) { if (m.isConnected) { m.currentTime = 0; m.play(); } }); }
+            }
             ws.onmessage = function (e) {
                 var data = JSON.parse(e.data);
+                if (data && data.type === '__siMediaControl') { controlMedia(data.action); return; }
                 listeners.slice().forEach(function (l) { l({ data: data }); });
             };
             ws.onclose = function (e) { showMessage(e.code === __BUSY__ ? texts.alreadyOpened : texts.disconnected); };
@@ -235,11 +255,31 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
                 message.SetLength(0);
 
                 // WebView2 raises WebMessageReceived on the UI thread; keep the same contract
-                await Application.Current.Dispatcher.InvokeAsync(() => _interop.OnMessage(text));
+                await UI.ExecuteAsync(
+                    () =>
+                    {
+                        _interop.OnMessage(text);
+                        return true;
+                    },
+                    exc => Trace.TraceError(exc.ToString()));
             }
         }
         catch (Exception exc) when (exc is WebSocketException or OperationCanceledException)
         {
+        }
+    }
+
+    /// <summary>
+    /// Controls package media (video and audio) on the board.
+    /// </summary>
+    /// <param name="action">pause, resume or restart.</param>
+    public void ControlMedia(string action)
+    {
+        var client = _client;
+
+        if (client != null)
+        {
+            _ = SendAsync(client, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { type = "__siMediaControl", action })));
         }
     }
 
@@ -357,8 +397,12 @@ internal sealed class RemoteBoardServer : IAsyncDisposable
             text = uri.LocalPath;
         }
 
-        // Local drive paths only (C:\... or C:/...); network (UNC) paths are not allowed
-        if (text.Length <= 3 || !char.IsAsciiLetter(text[0]) || text[1] != ':' || (text[2] != '\\' && text[2] != '/'))
+        // Local paths only: drive paths on Windows (C:\... or C:/...), absolute paths of existing files on Unix;
+        // network (UNC) paths are not allowed
+        var isWindowsPath = text.Length > 3 && char.IsAsciiLetter(text[0]) && text[1] == ':' && (text[2] == '\\' || text[2] == '/');
+        var isUnixPath = !OperatingSystem.IsWindows() && text.Length > 1 && text[0] == '/' && text[1] != '/' && File.Exists(text);
+
+        if (!isWindowsPath && !isUnixPath)
         {
             return false;
         }

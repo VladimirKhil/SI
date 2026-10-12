@@ -6,6 +6,7 @@
 		<SIGameVersion>7.13.12</SIGameVersion>
 		<SIQuesterVersion>6.9.1</SIQuesterVersion>
 		<SImulatorVersion>3.4.3</SImulatorVersion>
+		<SImulatorMacVersion>0.1.0</SImulatorMacVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup>
