@@ -3037,12 +3037,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     /// </summary>
     private void GiveMoveToPlayerWithMinimumScore()
     {
-        var min = _state.Players.Min(player => player.Sum);
+        var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
+        var min = _state.Players.Where(player => player.IsConnected || !hasConnectedPlayers).Min(player => player.Sum);
         var total = 0;
 
         for (var i = 0; i < _state.Players.Count; i++)
         {
-            if (_state.Players[i].Sum == min)
+            if (_state.Players[i].Sum == min && (_state.Players[i].IsConnected || !hasConnectedPlayers))
             {
                 _state.Players[i].Flag = true;
                 total++;
@@ -4752,8 +4753,9 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private int DetectPlayerIndexWithLowestSum()
     {
-        var minSum = _state.Players.Min(p => p.Sum);
-        return _state.Players.TakeWhile(p => p.Sum != minSum).Count();
+        var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
+        var minSum = _state.Players.Where(p => p.IsConnected || !hasConnectedPlayers).Min(p => p.Sum);
+        return _state.Players.FindIndex(p => p.Sum == minSum && (p.IsConnected || !hasConnectedPlayers));
     }
 
     internal void SetAnswerersByAllHiddenStakes()
