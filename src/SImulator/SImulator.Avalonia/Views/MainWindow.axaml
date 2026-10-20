@@ -75,14 +75,14 @@
                     <TextBlock Text="{x:Static p:Resources.Game}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
                     <ToggleButton Content="⏸" ToolTip.Tip="{x:Static p:Resources.Pause}" IsChecked="{Binding IsPaused}" />
                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="12,0,0,0">
-                        <TextBlock Text="{x:Static p:MacResources.Media}" VerticalAlignment="Center" Margin="0,0,4,0" />
-                        <Button Content="⏸" Tag="pause" Click="MediaControl_Click" ToolTip.Tip="{x:Static p:MacResources.MediaPause}" Width="36" HorizontalContentAlignment="Center" />
-                        <Button Content="▶" Tag="resume" Click="MediaControl_Click" ToolTip.Tip="{x:Static p:MacResources.MediaResume}" Width="36" HorizontalContentAlignment="Center" />
-                        <Button Content="⟲" Tag="restart" Click="MediaControl_Click" ToolTip.Tip="{x:Static p:MacResources.MediaRestart}" Width="36" HorizontalContentAlignment="Center" />
+                        <TextBlock Text="{x:Static p:AvaloniaResources.Media}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                        <Button Content="⏸" Tag="pause" Click="MediaControl_Click" ToolTip.Tip="{x:Static p:AvaloniaResources.MediaPause}" Width="36" HorizontalContentAlignment="Center" />
+                        <Button Content="▶" Tag="resume" Click="MediaControl_Click" ToolTip.Tip="{x:Static p:AvaloniaResources.MediaResume}" Width="36" HorizontalContentAlignment="Center" />
+                        <Button Content="⟲" Tag="restart" Click="MediaControl_Click" ToolTip.Tip="{x:Static p:AvaloniaResources.MediaRestart}" Width="36" HorizontalContentAlignment="Center" />
                     </StackPanel>
                     <Button
                         DataContext="{x:Static rb:RemoteBoardHost.Instance}"
-                        Content="{x:Static p:MacResources.OpenBoard}"
+                        Content="{x:Static p:AvaloniaResources.OpenBoard}"
                         ToolTip.Tip="{Binding Url}"
                         Command="{Binding Open}"
                         IsVisible="{Binding IsRunning}" />
@@ -152,7 +152,7 @@
                 <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesNone}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.None}}" />
                 <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesExternal}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.External}}" />
                 <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesKeyboard}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.Keyboard}}" />
-                <TextBlock Text="{x:Static p:MacResources.KeyboardButtonsHint}" Foreground="Gray" Margin="28,0,0,0" TextWrapping="Wrap" />
+                <TextBlock Text="{x:Static p:AvaloniaResources.KeyboardButtonsHint}" Foreground="Gray" Margin="28,0,0,0" TextWrapping="Wrap" />
                 <RadioButton GroupName="keys" Content="{x:Static p:Resources.ButtonTypesWeb}" IsChecked="{Binding Settings.UsePlayersKeys, Converter={x:Static v:Converters.Equality}, ConverterParameter={x:Static core:PlayerKeysModes.WebNew}}" />
                 <StackPanel Orientation="Horizontal" Spacing="6" Margin="28,0,0,0">
                     <TextBlock Text="Port" VerticalAlignment="Center" />

@@ -8,9 +8,9 @@ namespace SImulator.Implementation;
 /// <summary>
 /// Describes a display (full screen board) or a windowed board.
 /// </summary>
-internal sealed class MacScreenDescriptor : IDisplayDescriptor
+internal sealed class AvaloniaScreenDescriptor : IDisplayDescriptor
 {
-    internal static readonly MacScreenDescriptor WindowScreen = new(Resources.WebView, false, null);
+    internal static readonly AvaloniaScreenDescriptor WindowScreen = new(Resources.WebView, false, null);
 
     public string Name { get; }
 
@@ -28,7 +28,7 @@ internal sealed class MacScreenDescriptor : IDisplayDescriptor
     /// </summary>
     internal double Scaling { get; }
 
-    private MacScreenDescriptor(string name, bool isFullScreen, PixelRect? bounds, double scaling = 1.0)
+    private AvaloniaScreenDescriptor(string name, bool isFullScreen, PixelRect? bounds, double scaling = 1.0)
     {
         Name = name;
         IsFullScreen = isFullScreen;
@@ -36,7 +36,7 @@ internal sealed class MacScreenDescriptor : IDisplayDescriptor
         Scaling = scaling;
     }
 
-    public MacScreenDescriptor(Screen screen)
+    public AvaloniaScreenDescriptor(Screen screen)
         : this(screen.IsPrimary ? Resources.MainScreen : Resources.SecondaryScreen, true, screen.WorkingArea, screen.Scaling)
     {
     }

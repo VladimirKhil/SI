@@ -6,8 +6,8 @@
     <AssemblyName>SImulator</AssemblyName>
     <AssemblyTitle>SImulator</AssemblyTitle>
     <Product>SImulator</Product>
-    <Description>SIGame emulator for macOS</Description>
-    <Version>$(SImulatorMacVersion)</Version>
+    <Description>SIGame emulator (Avalonia)</Description>
+    <Version>$(SImulatorAvaloniaVersion)</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <SatelliteResourceLanguages>ru-RU</SatelliteResourceLanguages>
@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\MacResources.resx" StronglyTypedLanguage="C#" StronglyTypedNamespace="SImulator.Properties" StronglyTypedClassName="MacResources" PublicClass="true" StronglyTypedFileName="$(IntermediateOutputPath)MacResources.Designer.cs" />
+    <EmbeddedResource Update="Properties\AvaloniaResources.resx" StronglyTypedLanguage="C#" StronglyTypedNamespace="SImulator.Properties" StronglyTypedClassName="AvaloniaResources" PublicClass="true" StronglyTypedFileName="$(IntermediateOutputPath)AvaloniaResources.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

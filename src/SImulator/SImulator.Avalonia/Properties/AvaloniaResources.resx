@@ -127,10 +127,10 @@
     <value>No</value>
   </data>
   <data name="LibraryIsNotSupported" xml:space="preserve">
-    <value>The package library is not supported in the macOS version yet. Please select a package file.</value>
+    <value>The package library is not supported in the Avalonia version yet. Please select a package file.</value>
   </data>
   <data name="LogsFolderSelectionIsNotSupported" xml:space="preserve">
-    <value>Logs folder selection is not supported in the macOS version yet.</value>
+    <value>Logs folder selection is not supported in the Avalonia version yet.</value>
   </data>
   <data name="KeyboardButtonsHint" xml:space="preserve">
     <value>On macOS player keys work while a SImulator window is active.</value>

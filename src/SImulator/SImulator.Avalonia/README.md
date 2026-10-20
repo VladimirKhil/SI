@@ -1,14 +1,14 @@
-# SImulator for macOS (preview)
+# SImulator.Avalonia (preview)
 
-Native macOS version of SImulator built with [Avalonia](https://avaloniaui.net/).
+Cross-platform version of SImulator built with [Avalonia](https://avaloniaui.net/). Currently developed and tested on macOS; Windows support (sounds, WebView2 board) is planned.
 Version 0.1 is a preview: the main game flow works, some features of the Windows version are not ported yet.
 
 ## Architecture
 
-- Game logic is shared with the Windows version: `SImulator.ViewModel` and platform-independent files of `SImulator` (linked in `SImulator.Mac.csproj`).
+- Game logic is shared with the Windows version: `SImulator.ViewModel` and platform-independent files of `SImulator` (linked in `SImulator.Avalonia.csproj`).
 - The control window (`Views/MainWindow.axaml`) is an Avalonia port of the WPF `CommandWindow` (start, game, players, buttons).
 - The game board is the same `webtable` web board as in the Windows version. It is shown in a native window with the system WebKit (`Avalonia.Controls.WebView`) and connected through `RemoteBoardServer` (loopback HTTP + WebSocket bridge, session token). The "Browser" screen opens the same board in an external browser.
-- Platform services (screens, file dialogs, sounds via `afplay`, timers, keyboard) are in `Implementation/MacPlatformManager.cs`.
+- Platform services (screens, file dialogs, sounds via `afplay`, timers, keyboard) are in `Implementation/AvaloniaPlatformManager.cs`.
 
 ## What works
 
@@ -32,15 +32,15 @@ Version 0.1 is a preview: the main game flow works, some features of the Windows
 Requires .NET 10 SDK.
 
 ```bash
-dotnet build src/SImulator/SImulator.Mac/SImulator.Mac.csproj
-dotnet run --project src/SImulator/SImulator.Mac/SImulator.Mac.csproj -- path/to/package.siq
+dotnet build src/SImulator/SImulator.Avalonia/SImulator.Avalonia.csproj
+dotnet run --project src/SImulator/SImulator.Avalonia/SImulator.Avalonia.csproj -- path/to/package.siq
 ```
 
 To build `SImulator.app` and a `.dmg` (ad-hoc signed, Apple Silicon by default):
 
 ```bash
-src/SImulator/SImulator.Mac/build-dmg.sh            # osx-arm64
-src/SImulator/SImulator.Mac/build-dmg.sh osx-x64    # Intel
+src/SImulator/SImulator.Avalonia/build-dmg.sh            # osx-arm64
+src/SImulator/SImulator.Avalonia/build-dmg.sh osx-x64    # Intel
 ```
 
 The result is placed into `bin/macos/`. As the app is not signed with an Apple Developer certificate,

@@ -10,12 +10,12 @@ OUT="$REPO/bin/macos/$RID"
 APP="$OUT/SImulator.app"
 DOTNET="${DOTNET:-dotnet}"
 
-VERSION="$(sed -n 's:.*<SImulatorMacVersion>\(.*\)</SImulatorMacVersion>.*:\1:p' "$REPO/Directory.Build.props")"
+VERSION="$(sed -n 's:.*<SImulatorAvaloniaVersion>\(.*\)</SImulatorAvaloniaVersion>.*:\1:p' "$REPO/Directory.Build.props")"
 
 rm -rf "$OUT"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-"$DOTNET" publish "$HERE/SImulator.Mac.csproj" -c Release -r "$RID" --self-contained true \
+"$DOTNET" publish "$HERE/SImulator.Avalonia.csproj" -c Release -r "$RID" --self-contained true \
     -p:PublishSingleFile=false -p:UseAppHost=true -o "$APP/Contents/MacOS"
 
 # Icon

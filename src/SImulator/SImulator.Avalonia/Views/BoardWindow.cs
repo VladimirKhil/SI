@@ -19,7 +19,7 @@ internal sealed class BoardWindow : Window
     private const int Port = 8090;
 
     private readonly NativeWebView _webView = new();
-    private readonly MacScreenDescriptor? _screen;
+    private readonly AvaloniaScreenDescriptor? _screen;
     private RemoteBoardServer? _server;
 
     /// <summary>
@@ -29,7 +29,7 @@ internal sealed class BoardWindow : Window
     private bool _canClose;
     private PixelRect? _fullScreenBounds;
 
-    public BoardWindow(MacScreenDescriptor? screen)
+    public BoardWindow(AvaloniaScreenDescriptor? screen)
     {
         _screen = screen;
 

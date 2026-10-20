@@ -40,13 +40,13 @@
                             <Button
                                 Grid.Column="3"
                                 Content="−"
-                                ToolTip.Tip="{x:Static p:MacResources.WrongAnswer}"
+                                ToolTip.Tip="{x:Static p:AvaloniaResources.WrongAnswer}"
                                 Command="{Binding #players.DataContext.SubtractStake}"
                                 CommandParameter="{Binding}" />
                             <Button
                                 Grid.Column="4"
                                 Content="+"
-                                ToolTip.Tip="{x:Static p:MacResources.RightAnswer}"
+                                ToolTip.Tip="{x:Static p:AvaloniaResources.RightAnswer}"
                                 Command="{Binding #players.DataContext.AddStake}"
                                 CommandParameter="{Binding}" />
                             <TextBlock Grid.Column="5" Text="{Binding Right}" VerticalAlignment="Center" HorizontalAlignment="Center" />

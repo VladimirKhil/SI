@@ -127,10 +127,10 @@
     <value>Нет</value>
   </data>
   <data name="LibraryIsNotSupported" xml:space="preserve">
-    <value>Библиотека пакетов пока не поддерживается в версии для macOS. Выберите файл пакета.</value>
+    <value>Библиотека пакетов пока не поддерживается в версии на Avalonia. Выберите файл пакета.</value>
   </data>
   <data name="LogsFolderSelectionIsNotSupported" xml:space="preserve">
-    <value>Выбор папки для логов пока не поддерживается в версии для macOS.</value>
+    <value>Выбор папки для логов пока не поддерживается в версии на Avalonia.</value>
   </data>
   <data name="KeyboardButtonsHint" xml:space="preserve">
     <value>В macOS клавиши игроков работают, пока активно окно SImulator.</value>

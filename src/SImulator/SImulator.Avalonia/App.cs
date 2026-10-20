@@ -11,13 +11,13 @@ using Utils;
 namespace SImulator;
 
 /// <summary>
-/// macOS (Avalonia) SImulator application.
+/// Avalonia SImulator application.
 /// </summary>
 internal sealed class App : Application
 {
-    private readonly MacPlatformManager _manager = new();
+    private readonly AvaloniaPlatformManager _manager = new();
 
-    internal MacPlatformManager PlatformManager => _manager;
+    internal AvaloniaPlatformManager PlatformManager => _manager;
 
     internal ViewModel.Model.AppSettings Settings { get; } = SettingsStorage.Load();
 

@@ -12,10 +12,10 @@ namespace SImulator.Views;
 internal static class MessageDialog
 {
     public static Task ShowAsync(Window? owner, string text, bool error) =>
-        ShowCoreAsync(owner, text, [(MacResources.OK, true)]);
+        ShowCoreAsync(owner, text, [(AvaloniaResources.OK, true)]);
 
     public static Task<bool> AskAsync(Window? owner, string question) =>
-        ShowCoreAsync(owner, question, [(MacResources.Yes, true), (MacResources.No, false)]);
+        ShowCoreAsync(owner, question, [(AvaloniaResources.Yes, true), (AvaloniaResources.No, false)]);
 
     private static async Task<bool> ShowCoreAsync(Window? owner, string text, (string Text, bool Result)[] buttons)
     {

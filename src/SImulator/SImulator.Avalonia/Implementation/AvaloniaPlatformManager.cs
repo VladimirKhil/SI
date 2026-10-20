@@ -19,13 +19,13 @@ using Utils.Web;
 namespace SImulator.Implementation;
 
 /// <summary>
-/// Provides macOS (Avalonia) platform services.
+/// Provides Avalonia platform services.
 /// </summary>
-internal sealed class MacPlatformManager : PlatformManager, IPlatformService
+internal sealed class AvaloniaPlatformManager : PlatformManager, IPlatformService
 {
     private const string GameSiteUri = "https://vladimirkhil.com/si/game";
 
-    private readonly MacButtonManagerFactory _buttonManagerFactory = new();
+    private readonly AvaloniaButtonManagerFactory _buttonManagerFactory = new();
 
     private BoardWindow? _boardWindow;
     private PlayersWindow? _playersWindow;
@@ -75,7 +75,7 @@ internal sealed class MacPlatformManager : PlatformManager, IPlatformService
             return;
         }
 
-        _boardWindow = new BoardWindow(screen as MacScreenDescriptor) { DataContext = dataContext };
+        _boardWindow = new BoardWindow(screen as AvaloniaScreenDescriptor) { DataContext = dataContext };
         await _boardWindow.StartAsync(interop);
     }
 
@@ -97,8 +97,8 @@ internal sealed class MacPlatformManager : PlatformManager, IPlatformService
 
         return
         [
-            .. screens.OrderByDescending(screen => screen.IsPrimary).Select(screen => (IDisplayDescriptor)new MacScreenDescriptor(screen)),
-            MacScreenDescriptor.WindowScreen,
+            .. screens.OrderByDescending(screen => screen.IsPrimary).Select(screen => (IDisplayDescriptor)new AvaloniaScreenDescriptor(screen)),
+            AvaloniaScreenDescriptor.WindowScreen,
             BrowserDisplayDescriptor.Instance,
         ];
     }
@@ -138,7 +138,7 @@ internal sealed class MacPlatformManager : PlatformManager, IPlatformService
 
         if (arg == "1")
         {
-            ShowMessage(MacResources.LibraryIsNotSupported, false);
+            ShowMessage(AvaloniaResources.LibraryIsNotSupported, false);
             return null;
         }
 
@@ -166,7 +166,7 @@ internal sealed class MacPlatformManager : PlatformManager, IPlatformService
 
     public override string? AskSelectLogsFolder()
     {
-        ShowMessage(MacResources.LogsFolderSelectionIsNotSupported, false);
+        ShowMessage(AvaloniaResources.LogsFolderSelectionIsNotSupported, false);
         return null;
     }
 

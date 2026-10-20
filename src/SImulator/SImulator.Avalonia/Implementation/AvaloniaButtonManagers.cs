@@ -42,7 +42,7 @@ internal sealed class KeyboardButtonManager(IButtonManagerListener buttonManager
 }
 
 /// <inheritdoc cref="ButtonManagerFactory" />
-internal sealed class MacButtonManagerFactory : ButtonManagerFactory
+internal sealed class AvaloniaButtonManagerFactory : ButtonManagerFactory
 {
     public override async Task<IButtonManager?> CreateAsync(AppSettings settings, IButtonManagerListener buttonManagerListener, IPlatformService platformService) =>
         settings.UsePlayersKeys switch
