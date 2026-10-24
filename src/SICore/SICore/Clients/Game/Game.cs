@@ -470,7 +470,9 @@ public sealed class Game : MessageHandler
         string name,
         bool isMale,
         GameRole role,
-        string? password)
+        string? password,
+        string? authProvider = null,
+        string? externalUserId = null)
     {
         if (_state.JoinMode == JoinMode.Forbidden)
         {
@@ -540,7 +542,7 @@ public sealed class Game : MessageHandler
         {
             var accounts = accountsToSearch.ToArray();
 
-            var result = TryAuthenticateAccount(role, name, isMale, index, accounts[index]);
+            var result = TryAuthenticateAccount(role, name, isMale, index, accounts[index], authProvider, externalUserId);
 
             if (result.HasValue)
             {
@@ -560,7 +562,7 @@ public sealed class Game : MessageHandler
             {
                 index++;
 
-                var result = TryAuthenticateAccount(role, name, isMale, index, account);
+                var result = TryAuthenticateAccount(role, name, isMale, index, account, authProvider, externalUserId);
 
                 if (result.HasValue)
                 {
@@ -603,8 +605,12 @@ public sealed class Game : MessageHandler
         bool isMale,
         GameRole role,
         string? password,
-        CancellationToken cancellationToken = default) =>
-        _state.TaskLock.WithLockAsync(() => AuthenticateCore(name, isMale, role, password), cancellationToken);
+        CancellationToken cancellationToken = default,
+        string? authProvider = null,
+        string? externalUserId = null) =>
+        _state.TaskLock.WithLockAsync(
+            () => AuthenticateCore(name, isMale, role, password, authProvider, externalUserId),
+            cancellationToken);
 
     [Obsolete]
     private string GetAuthenticationErrorMessage(AuthenticationResult result) =>
@@ -1552,6 +1558,7 @@ public sealed class Game : MessageHandler
         var withError = args[2] == "+";
 
         _actions.InformDisconnected(account.Name);
+        _state.Identities.Remove(account.Name);
 
         if (_state.HiddenPersons && _state.Players.Contains(account))
         {
@@ -3556,12 +3563,36 @@ public sealed class Game : MessageHandler
         _controller.ScheduleExecution(Tasks.StartGame, 1, 1);
     }
 
+    private void ShareIdentities(string name, string? authProvider, string? externalUserId)
+    {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
+        foreach (var (personName, identity) in _state.Identities.Where(i => _state.AllPersons.ContainsKey(i.Key)))
+        {
+            _actions.InformUserIdentity(personName, identity.Provider, identity.UserId, name);
+        }
+
+        if (string.IsNullOrEmpty(authProvider) || string.IsNullOrEmpty(externalUserId))
+        {
+            _state.Identities.Remove(name);
+            return;
+        }
+
+        _state.Identities[name] = (authProvider, externalUserId);
+        _actions.InformUserIdentity(name, authProvider, externalUserId, NetworkConstants.Everybody);
+    }
+
     private bool? TryAuthenticateAccount(
         GameRole role,
         string name,
         bool isMale,
         int index,
-        ViewerAccount account)
+        ViewerAccount account,
+        string? authProvider = null,
+        string? externalUserId = null)
     {
         if (account.IsConnected)
         {
@@ -3590,6 +3621,7 @@ public sealed class Game : MessageHandler
         }
 
         _actions.InformConnected(name, role, index, isMale);
+        ShareIdentities(name, authProvider, externalUserId);
 
         if (_state.HiddenPersons && role == GameRole.Player)
         {

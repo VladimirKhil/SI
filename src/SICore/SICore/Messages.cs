@@ -738,6 +738,11 @@ public static class Messages
     public const string UserError = "USER_ERROR";
 
     /// <summary>
+    /// Known external identity of a person: name, auth provider, external user id.
+    /// </summary>
+    public const string UserIdentity = "USER_IDENTITY";
+
+    /// <summary>
     /// Answer validation decision.
     /// </summary>
     public const string Validate = "VALIDATE";
