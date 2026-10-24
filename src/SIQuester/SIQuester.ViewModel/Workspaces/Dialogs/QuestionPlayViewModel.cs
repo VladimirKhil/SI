@@ -174,7 +174,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         Close.ExecuteAsync(arg);
     }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast, int contentIndex)
     {
         var screenContent = new List<ContentInfo>();
 

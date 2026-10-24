@@ -177,6 +177,11 @@ public static class Messages
     public const string ContentAppend = "CONTENT_APPEND";
 
     /// <summary>
+    /// Informs the showman about the index of the just played content unit. Sent to the showman only, after the content messages.
+    /// </summary>
+    public const string ContentIndex = "CONTENT_INDEX";
+
+    /// <summary>
     /// Defines content shape without providing real content.
     /// </summary>
     public const string ContentShape = "CONTENT_SHAPE";
@@ -510,6 +515,12 @@ public static class Messages
     /// Готовность к игре
     /// </summary>
     public const string Ready = "READY";
+
+    /// <summary>
+    /// Requests replay of a content unit of the current question step. Argument is an absolute content index
+    /// (received in <see cref="ContentIndex"/>).
+    /// </summary>
+    public const string Replay = "REPLAY";
 
     /// <summary>
     /// Реплика игры/участника

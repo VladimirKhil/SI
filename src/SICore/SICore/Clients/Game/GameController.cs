@@ -697,6 +697,44 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void ClearMediaContent() => _state.QuestionPlay.MediaContentCompletions.Clear();
 
+    /// <summary>
+    /// Registers the played content unit and informs the showman about its index.
+    /// </summary>
+    internal void OnContentUnitPlayed(int contentIndex)
+    {
+        _state.QuestionPlay.LastContentIndex = contentIndex;
+        _actions.SendContentIndex(contentIndex);
+    }
+
+    private void ReplayContent()
+    {
+        var questionPlay = _state.QuestionPlay;
+        var contentIndex = questionPlay.PendingReplayIndex;
+        var moveToContent = questionPlay.MoveToContent;
+        questionPlay.PendingReplayIndex = null;
+
+        if (contentIndex == null || moveToContent == null)
+        {
+            return;
+        }
+
+        if (_completion != null)
+        {
+            _completion();
+            _completion = null;
+        }
+
+        _continuation = null;
+        _state.IsPartial = false;
+        _state.IsPlayingMedia = false;
+        _state.IsPlayingMediaPaused = false;
+        _state.MoveNextBlocked = false;
+
+        moveToContent(contentIndex.Value);
+
+        _tasksHistory.AddLogEntry($"Replayed content: {contentIndex}");
+    }
+
     internal void OnContentBackgroundAudio(ContentItem contentItem)
     {
         _state.IsPartial = false;
@@ -2098,8 +2136,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
                 break;
 
+            case StopReason.Replay:
+                ReplayContent();
+                break;
+
             case StopReason.Wait:
-                // TODO: if someone overrides Task after that (skipping AskAnswerDeferred execution), nobody could press the button during this question
+                // TODO: if someone overrides Task after that
                 // That's very fragile logic. Think about alternatives
                 // The order of calls is important here!
                 ScheduleExecution(Tasks.AskAnswerDeferred, _state.WaitInterval, force: true);
@@ -4522,6 +4564,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal bool OnQuestionEnd()
     {
+        _state.QuestionPlay.ClearContentStep();
         var timeout = DetectRoundTimeout();
         var nextTaskTime = 1;
 

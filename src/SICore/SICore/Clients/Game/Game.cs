@@ -812,6 +812,10 @@ public sealed class Game : MessageHandler
                         OnMove(message, args);
                         break;
 
+                    case Messages.Replay:
+                        OnReplay(message, args);
+                        break;
+
                     case Messages.Kick:
                         OnKick(message, args);
                         break;
@@ -1519,6 +1523,11 @@ public sealed class Game : MessageHandler
             _actions.SendMessage(_state.LastVisualMessage, person);
         }
 
+        if (person == _state.ShowMan.Name && _state.QuestionPlay.LastContentIndex.HasValue)
+        {
+            _actions.SendContentIndex(_state.QuestionPlay.LastContentIndex.Value, person);
+        }
+
         if (_state.Stage == GameStage.Round) // TODO: keep all timers state on server and send it to client on reconnection
         {
             _actions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _state.TimeSettings.Round * 10);
@@ -1859,6 +1868,33 @@ public sealed class Game : MessageHandler
         _actions.InformSums();
 
         _controller.AddHistory($"Sum change: {playerIndex - 1} = {sum}");
+    }
+
+    private void OnReplay(Message message, string[] args)
+    {
+        if (message.Sender != _state.ShowMan.Name
+            || args.Length <= 1
+            || !int.TryParse(args[1], out var contentIndex)
+            || _state.QuestionPlay.MoveToContent == null
+            || contentIndex < 0
+            || contentIndex >= (_state.QuestionPlay.ContentItems?.Count ?? 0))
+        {
+            return;
+        }
+
+        if (_state.TInfo.Pause)
+        {
+            _controller.OnPauseCore(false);
+        }
+
+        _controller.AddHistory($"Replay started: {contentIndex}");
+
+        _state.QuestionPlay.PendingReplayIndex = contentIndex;
+
+        if (!_controller.Stop(StopReason.Replay))
+        {
+            _state.QuestionPlay.PendingReplayIndex = null;
+        }
     }
 
     private void OnMove(Message message, string[] args)
