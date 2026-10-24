@@ -2962,10 +2962,7 @@ public sealed class Game : MessageHandler
     private void DropCurrentChooser()
     {
         // Give turn to player with least score
-        // TODO: MinBy in .NET 7
-        var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
-        var minSum = _state.Players.Where(p => p.IsConnected || !hasConnectedPlayers).Min(p => p.Sum);
-        _state.ChooserIndex = _state.Players.FindIndex(p => p.Sum == minSum && (p.IsConnected || !hasConnectedPlayers));
+        _state.ChooserIndex = _controller.DetectPlayerIndexWithLowestSum();
     }
 
     private void DropCurrentAppelaer()

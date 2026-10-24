@@ -3037,47 +3037,29 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     /// </summary>
     private void GiveMoveToPlayerWithMinimumScore()
     {
-        var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
-        var min = _state.Players.Where(player => player.IsConnected || !hasConnectedPlayers).Min(player => player.Sum);
-        var total = 0;
+        var candidates = GetLowestSumPlayerIndices();
 
-        for (var i = 0; i < _state.Players.Count; i++)
+        if (candidates.Count == 1)
         {
-            if (_state.Players[i].Sum == min && (_state.Players[i].IsConnected || !hasConnectedPlayers))
-            {
-                _state.Players[i].Flag = true;
-                total++;
-            }
-            else
-            {
-                _state.Players[i].Flag = false;
-            }
-        }
-
-        if (total == 1)
-        {
-            for (var i = 0; i < _state.Players.Count; i++)
-            {
-                if (_state.Players[i].Flag)
-                {
-                    _state.ChooserIndex = i;
-                    break;
-                }
-            }
-
+            _state.ChooserIndex = candidates[0];
             _state.IsWaiting = true;
             _state.Decision = DecisionType.StarterChoosing;
             OnDecision();
         }
         else if (!_state.ShowMan.IsConnected || _state.HiddenPersons)
         {
-            _state.ChooserIndex = _state.Players.SelectRandomOnIndex(i => _state.Players[i].Flag);
+            _state.ChooserIndex = candidates[Random.Shared.Next(candidates.Count)];
             _state.IsWaiting = true;
             _state.Decision = DecisionType.StarterChoosing;
             OnDecision();
         }
         else
         {
+            for (var i = 0; i < _state.Players.Count; i++)
+            {
+                _state.Players[i].Flag = candidates.Contains(i);
+            }
+
             _actions.SendVisualMessage(Messages.ShowTable); // Everybody will see the table during showman's decision
             _state.ChooserIndex = -1;
 
@@ -4751,11 +4733,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.AskStake, 10);
     }
 
-    private int DetectPlayerIndexWithLowestSum()
+    internal int DetectPlayerIndexWithLowestSum() => GetLowestSumPlayerIndices()[0];
+
+    private List<int> GetLowestSumPlayerIndices()
     {
         var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
         var minSum = _state.Players.Where(p => p.IsConnected || !hasConnectedPlayers).Min(p => p.Sum);
-        return _state.Players.FindIndex(p => p.Sum == minSum && (p.IsConnected || !hasConnectedPlayers));
+
+        return [.. Enumerable.Range(0, _state.Players.Count).Where(i => _state.Players[i].Sum == minSum && (_state.Players[i].IsConnected || !hasConnectedPlayers))];
     }
 
     internal void SetAnswerersByAllHiddenStakes()
