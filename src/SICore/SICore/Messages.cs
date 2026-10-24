@@ -583,6 +583,11 @@ public static class Messages
     public const string RoundThemesComments = "ROUND_THEMES_COMMENTS";
 
     /// <summary>
+    /// Viewer takes showman or player seat.
+    /// </summary>
+    public const string Seat = "SEAT";
+
+    /// <summary>
     /// Select player.
     /// </summary>
     public const string SelectPlayer = "SELECT_PLAYER";

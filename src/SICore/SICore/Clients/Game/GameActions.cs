@@ -156,6 +156,9 @@ public sealed class GameActions
         SendMessage(message.ToString(), person);
     }
 
+    public void ConfigSet(string personType, string index, string name, bool isMale) =>
+        SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, personType, index, name, isMale ? '+' : '-');
+
     public void ShowLeaderboard()
     {
         var message = new MessageBuilder(Messages.Leaderboard);

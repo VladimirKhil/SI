@@ -709,6 +709,10 @@ public sealed class Game : MessageHandler
                         OnSetJoinMode(message, args);
                         break;
 
+                    case Messages.Seat:
+                        OnSeat(message, args);
+                        break;
+
                     case Messages.Pause:
                         OnPause(message, args);
                         break;
@@ -862,6 +866,57 @@ public sealed class Game : MessageHandler
 
         _state.JoinMode = joinMode;
         _actions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
+    }
+
+    private void OnSeat(Message message, string[] args)
+    {
+        if (_state.JoinMode == JoinMode.OnlyViewer || args.Length <= 1)
+        {
+            return;
+        }
+
+        var viewer = _state.Viewers.FirstOrDefault(v => v.Name == message.Sender);
+
+        if (viewer == null)
+        {
+            return;
+        }
+
+        var isPlayer = args[1] == Constants.Player;
+        var index = 0;
+
+        GamePersonAccount account;
+
+        if (isPlayer)
+        {
+            if (args.Length <= 2 || !int.TryParse(args[2], out index) || index < 0 || index >= _state.Players.Count)
+            {
+                return;
+            }
+
+            account = _state.Players[index];
+        }
+        else if (args[1] == Constants.Showman)
+        {
+            account = _state.ShowMan;
+        }
+        else
+        {
+            return;
+        }
+
+        if (!account.IsHuman || account.IsConnected)
+        {
+            return;
+        }
+
+        if (!SetHumanPerson(isPlayer, account, viewer.Name, index))
+        {
+            return;
+        }
+
+        _actions.ConfigSet(args[1], index.ToString(), viewer.Name, viewer.IsMale);
+        OnPersonsChanged();
     }
 
     private void OnMark(string[] args)
@@ -3185,7 +3240,7 @@ public sealed class Game : MessageHandler
             newAccount = account;
         }
 
-        _actions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
+        _actions.ConfigSet(args[2], args[3], args[4], account.IsMale);
 
         InformAvatar(newAccount);
         OnPersonsChanged();
