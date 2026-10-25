@@ -1,4 +1,5 @@
-﻿using SImulator.ViewModel.PlatformSpecific;
+﻿using SImulator.ViewModel.Model;
+using SImulator.ViewModel.PlatformSpecific;
 
 namespace SImulator.ViewModel.Contracts;
 
@@ -7,6 +8,8 @@ namespace SImulator.ViewModel.Contracts;
 /// </summary>
 public interface IPlatformService
 {
+    ButtonManagers.ButtonManagerFactory ButtonManagerFactory { get; }
+
     Task<string?> AskSelectFileAsync(string header);
 
     string? AskSelectLogsFolder();
@@ -22,4 +25,20 @@ public interface IPlatformService
     void ShowMessage(string text, bool error = true);
 
     void NavigateToSite();
+
+    void InitSettings(AppSettings defaultSettings);
+
+    void PlaySound(string name, Action? onFinish = null);
+
+    void ClearMedia();
+
+    string[] GetComPorts();
+
+    string[] GetFonts();
+
+    IPresentationController CreatePresentationController(
+        IDisplayDescriptor displayDescriptor,
+        IPresentationListener presentationListener,
+        SoundsSettings soundsSettings,
+        bool sendCommonMessages);
 }

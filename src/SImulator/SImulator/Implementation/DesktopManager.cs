@@ -44,7 +44,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     internal static XmlSerializer SettingsSerializer { get; } = new(typeof(AppSettings));
 
-    public override ViewModel.ButtonManagers.ButtonManagerFactory ButtonManagerFactory => _buttonManager;
+    public ViewModel.ButtonManagers.ButtonManagerFactory ButtonManagerFactory => _buttonManager;
 
     public override void CreatePlayersView(object dataContext)
     {
@@ -129,7 +129,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         BrowserDisplayDescriptor.Instance,
     ];
 
-    public override string[] GetFonts() => [.. Fonts.SystemFontFamilies.Select(ff => ff.ToString())];
+    public string[] GetFonts() => [.. Fonts.SystemFontFamilies.Select(ff => ff.ToString())];
 
     public override string[] GetLocalComputers()
     {
@@ -160,7 +160,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         return [.. list];
     }
 
-    public override string[] GetComPorts() => SerialPort.GetPortNames();
+    public string[] GetComPorts() => SerialPort.GetPortNames();
 
     public override bool IsEscapeKey(GameKey key) => (Key)key == Key.Escape;
 
@@ -307,7 +307,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         }
     }
 
-    public override void PlaySound(string name, Action? onFinish = null)
+    public void PlaySound(string name, Action? onFinish = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -370,7 +370,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         return GameLogger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
     }
 
-    public override void ClearMedia()
+    public void ClearMedia()
     {
         if (_mediaClock == null)
         {
@@ -387,7 +387,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         _player = null;
     }
 
-    public override void InitSettings(AppSettings defaultSettings)
+    public void InitSettings(AppSettings defaultSettings)
     {
         
     }

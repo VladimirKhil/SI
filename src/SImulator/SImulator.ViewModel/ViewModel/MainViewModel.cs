@@ -121,7 +121,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private string[] LoadComPorts()
     {
-        var ports = PlatformManager.Instance.GetComPorts();
+        var ports = _platformService.GetComPorts();
 
         if (Settings.ComPort == null || _comPorts != null && ports.Length > 0)
         {
@@ -198,13 +198,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public ICommand NavigateTo => _navigateTo;
 
-    public static string[] FontFamilies { get; private set; }
+    public string[] FontFamilies { get; private set; }
 
     public static double[] LineSpaces { get; private set; }
 
     static MainViewModel()
     {
-        FontFamilies = [SIUI.ViewModel.Core.Settings.DefaultTableFontFamily, .. PlatformManager.Instance.GetFonts().OrderBy(s => s)];
         LineSpaces = [1.0, SIUI.ViewModel.Core.Settings.DefaultQuestionLineSpacing];
     }
 
@@ -214,7 +213,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         Settings = settings;
         _platformService = platformService;
-        SettingsViewModel = new AppSettingsViewModel(Settings);
+
+        FontFamilies = [SIUI.ViewModel.Core.Settings.DefaultTableFontFamily, .. _platformService.GetFonts().OrderBy(s => s)];
+        SettingsViewModel = new AppSettingsViewModel(Settings, platformService);
 
         _start = new AsyncCommand(Start_Executed);
 
@@ -454,7 +455,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsStarting = true;
 
             var presentationListener = new PresentationListener();
-            var presentationController = PlatformManager.Instance.CreatePresentationController(screen, presentationListener, Settings.Sounds, !Settings.UseSIGameEngine);
+            var presentationController = _platformService.CreatePresentationController(screen, presentationListener, Settings.Sounds, !Settings.UseSIGameEngine);
 
             presentationController.Error += ShowError;
 
@@ -848,7 +849,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com)
             {
-                _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings, this, _platformService);
+                _buttonManager = await _platformService.ButtonManagerFactory.CreateAsync(Settings, this, _platformService);
 
                 if (_buttonManager == null)
                 {

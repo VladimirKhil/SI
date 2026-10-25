@@ -10,7 +10,7 @@ namespace SImulator.ViewModel.Tests;
 
 internal sealed class TestPlatformManager : PlatformManager, IPlatformService
 {
-    public override ButtonManagerFactory ButtonManagerFactory { get; } = new TestButtonManagerFactory();
+    public ButtonManagerFactory ButtonManagerFactory { get; } = new TestButtonManagerFactory();
 
     public override IPresentationController CreatePresentationController(
         IDisplayDescriptor displayDescriptor,
@@ -44,7 +44,7 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
         throw new NotImplementedException();
     }
 
-    public override void ClearMedia()
+    public void ClearMedia()
     {
         throw new NotImplementedException();
     }
@@ -70,12 +70,12 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
         throw new NotImplementedException();
     }
 
-    public override string[] GetComPorts()
+    public string[] GetComPorts()
     {
         throw new NotImplementedException();
     }
 
-    public override string[] GetFonts() => Array.Empty<string>();
+    public string[] GetFonts() => Array.Empty<string>();
 
     public override int GetKeyNumber(GameKey key)
     {
@@ -89,7 +89,7 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
 
     public override IDisplayDescriptor[] GetScreens() => new IDisplayDescriptor[] { new TestScreen() };
 
-    public override void InitSettings(AppSettings defaultSettings)
+    public void InitSettings(AppSettings defaultSettings)
     {
         throw new NotImplementedException();
     }
@@ -104,7 +104,7 @@ internal sealed class TestPlatformManager : PlatformManager, IPlatformService
         throw new NotImplementedException();
     }
 
-    public override void PlaySound(string name, Action? onFinish)
+    public void PlaySound(string name, Action? onFinish)
     {
         
     }

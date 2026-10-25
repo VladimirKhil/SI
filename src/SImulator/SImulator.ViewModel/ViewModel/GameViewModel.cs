@@ -111,6 +111,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private readonly List<PlayerInfo> _selectedPlayers = new();
 
+    private string _language = Thread.CurrentThread.CurrentUICulture.Name;
+
     #endregion
 
     #region Commands
@@ -1076,7 +1078,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        UI.Execute(() => PlatformManager.Instance.PlaySound(soundName), exc => OnError(exc.ToString()));
+        UI.Execute(() => _platformService.PlaySound(soundName), exc => OnError(exc.ToString()));
     }
 
     private void RoundTimer_Elapsed(object? state) => UI.Execute(
@@ -1374,12 +1376,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal async Task StartAsync()
     {
-        _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings.Model, this, _platformService);
+        _buttonManager = await _platformService.ButtonManagerFactory.CreateAsync(Settings.Model, this, _platformService);
 
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
         {
             ManagedMode = true;
         }
+
+        _language = Thread.CurrentThread.CurrentUICulture.Name;
 
         await PresentationController.StartAsync(InitPresentation);
 
@@ -1404,7 +1408,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             PresentationController.AddPlayer(Players[i].Name);
         }
 
-        PresentationController.SetLanguage(Thread.CurrentThread.CurrentUICulture.Name);
+        PresentationController.SetLanguage(_language);
         PresentationController.SetReadingSpeed(Settings.Model.QuestionReadingSpeed);
         PresentationController.SetAttachContentToTable(Settings.Model.AttachContentToTable);
         PresentationController.SetAppSound(Settings.Model.PlaySounds);
@@ -1412,6 +1416,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.UpdateShowPlayers(Settings.Model.ShowPlayers);
         PresentationController.ClearPlayersState();
         PresentationController.SetTimerMaxTime(QuestionTimeMax * 10);
+
+        if (LocalInfo.RoundInfo.Count > 0)
+        {
+            PresentationController.SetTable([.. LocalInfo.RoundInfo]);
+        }
     }
 
     internal void OnQuestion(int price)
@@ -1502,10 +1511,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 break;
 
             case QuestionTypes.NoRisk:
+            case QuestionTypes.ForYourself:
                 PrintQuestionType(typeName, Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias, -1);
                 break;
 
             case QuestionTypes.Simple:
+            case QuestionTypes.WithButton:
                 if (!isDefault)
                 {
                     PrintQuestionType(typeName, Resources.QuestionTypeSimple.ToUpper(), "", -1);
@@ -1901,7 +1912,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             _presentationHandler?.Dispose();
 
-            PlatformManager.Instance.ClearMedia();
+            _platformService.ClearMedia();
         }
         catch (Exception exc)
         {

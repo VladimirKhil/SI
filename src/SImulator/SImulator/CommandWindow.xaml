@@ -1318,7 +1318,7 @@
                         <ComboBox
                             HorizontalAlignment="Stretch"
                             Width="Auto"
-                            ItemsSource="{Binding Source={x:Static vm:MainViewModel.FontFamilies}}"
+                            ItemsSource="{Binding FontFamilies}"
                             SelectedItem="{Binding SettingsViewModel.SIUISettings.TableFontFamily}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type sys:String}">

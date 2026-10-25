@@ -13,8 +13,6 @@ public abstract class PlatformManager
 {
     public static PlatformManager Instance;
 
-    public abstract ButtonManagers.ButtonManagerFactory ButtonManagerFactory { get; }
-
     /// <summary>
     /// Creates a presentation controller for the given screen.
     /// Override in tests to return a test implementation that does not require a browser.
@@ -41,11 +39,7 @@ public abstract class PlatformManager
 
     public abstract IDisplayDescriptor[] GetScreens();
 
-    public abstract string[] GetFonts();
-
     public abstract string[] GetLocalComputers();
-
-    public abstract string[] GetComPorts();
 
     public abstract bool IsEscapeKey(GameKey key);
 
@@ -59,13 +53,7 @@ public abstract class PlatformManager
 
     public abstract Task<bool> AskStopGameAsync();
 
-    public abstract void PlaySound(string name, Action? onFinish = null);
-
     public abstract IGameLogger CreateGameLogger(string? folder);
-
-    public abstract void ClearMedia();
-
-    public abstract void InitSettings(AppSettings defaultSettings);
 
     public abstract IAnimatableTimer CreateAnimatableTimer();
 }
