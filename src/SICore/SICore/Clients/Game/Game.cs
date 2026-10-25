@@ -470,7 +470,9 @@ public sealed class Game : MessageHandler
         string name,
         bool isMale,
         GameRole role,
-        string? password)
+        string? password,
+        string? authProvider = null,
+        string? externalUserId = null)
     {
         if (_state.JoinMode == JoinMode.Forbidden)
         {
@@ -540,7 +542,7 @@ public sealed class Game : MessageHandler
         {
             var accounts = accountsToSearch.ToArray();
 
-            var result = TryAuthenticateAccount(role, name, isMale, index, accounts[index]);
+            var result = TryAuthenticateAccount(role, name, isMale, index, accounts[index], authProvider, externalUserId);
 
             if (result.HasValue)
             {
@@ -560,7 +562,7 @@ public sealed class Game : MessageHandler
             {
                 index++;
 
-                var result = TryAuthenticateAccount(role, name, isMale, index, account);
+                var result = TryAuthenticateAccount(role, name, isMale, index, account, authProvider, externalUserId);
 
                 if (result.HasValue)
                 {
@@ -603,8 +605,12 @@ public sealed class Game : MessageHandler
         bool isMale,
         GameRole role,
         string? password,
-        CancellationToken cancellationToken = default) =>
-        _state.TaskLock.WithLockAsync(() => AuthenticateCore(name, isMale, role, password), cancellationToken);
+        CancellationToken cancellationToken = default,
+        string? authProvider = null,
+        string? externalUserId = null) =>
+        _state.TaskLock.WithLockAsync(
+            () => AuthenticateCore(name, isMale, role, password, authProvider, externalUserId),
+            cancellationToken);
 
     [Obsolete]
     private string GetAuthenticationErrorMessage(AuthenticationResult result) =>
@@ -701,6 +707,10 @@ public sealed class Game : MessageHandler
 
                     case Messages.SetJoinMode:
                         OnSetJoinMode(message, args);
+                        break;
+
+                    case Messages.Seat:
+                        OnSeat(message, args);
                         break;
 
                     case Messages.Pause:
@@ -802,6 +812,10 @@ public sealed class Game : MessageHandler
                         OnMove(message, args);
                         break;
 
+                    case Messages.Replay:
+                        OnReplay(message, args);
+                        break;
+
                     case Messages.Kick:
                         OnKick(message, args);
                         break;
@@ -856,6 +870,57 @@ public sealed class Game : MessageHandler
 
         _state.JoinMode = joinMode;
         _actions.SendMessageWithArgs(Messages.SetJoinMode, args[1], "+");
+    }
+
+    private void OnSeat(Message message, string[] args)
+    {
+        if (_state.JoinMode == JoinMode.OnlyViewer || args.Length <= 1)
+        {
+            return;
+        }
+
+        var viewer = _state.Viewers.FirstOrDefault(v => v.Name == message.Sender);
+
+        if (viewer == null)
+        {
+            return;
+        }
+
+        var isPlayer = args[1] == Constants.Player;
+        var index = 0;
+
+        GamePersonAccount account;
+
+        if (isPlayer)
+        {
+            if (args.Length <= 2 || !int.TryParse(args[2], out index) || index < 0 || index >= _state.Players.Count)
+            {
+                return;
+            }
+
+            account = _state.Players[index];
+        }
+        else if (args[1] == Constants.Showman)
+        {
+            account = _state.ShowMan;
+        }
+        else
+        {
+            return;
+        }
+
+        if (!account.IsHuman || account.IsConnected)
+        {
+            return;
+        }
+
+        if (!SetHumanPerson(isPlayer, account, viewer.Name, index))
+        {
+            return;
+        }
+
+        _actions.ConfigSet(args[1], index.ToString(), viewer.Name, viewer.IsMale);
+        OnPersonsChanged();
     }
 
     private void OnMark(string[] args)
@@ -1458,6 +1523,11 @@ public sealed class Game : MessageHandler
             _actions.SendMessage(_state.LastVisualMessage, person);
         }
 
+        if (person == _state.ShowMan.Name && _state.QuestionPlay.LastContentIndex.HasValue)
+        {
+            _actions.SendContentIndex(_state.QuestionPlay.LastContentIndex.Value, person);
+        }
+
         if (_state.Stage == GameStage.Round) // TODO: keep all timers state on server and send it to client on reconnection
         {
             _actions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _state.TimeSettings.Round * 10);
@@ -1552,6 +1622,7 @@ public sealed class Game : MessageHandler
         var withError = args[2] == "+";
 
         _actions.InformDisconnected(account.Name);
+        _state.Identities.Remove(account.Name);
 
         if (_state.HiddenPersons && _state.Players.Contains(account))
         {
@@ -1797,6 +1868,33 @@ public sealed class Game : MessageHandler
         _actions.InformSums();
 
         _controller.AddHistory($"Sum change: {playerIndex - 1} = {sum}");
+    }
+
+    private void OnReplay(Message message, string[] args)
+    {
+        if (message.Sender != _state.ShowMan.Name
+            || args.Length <= 1
+            || !int.TryParse(args[1], out var contentIndex)
+            || _state.QuestionPlay.MoveToContent == null
+            || contentIndex < 0
+            || contentIndex >= (_state.QuestionPlay.ContentItems?.Count ?? 0))
+        {
+            return;
+        }
+
+        if (_state.TInfo.Pause)
+        {
+            _controller.OnPauseCore(false);
+        }
+
+        _controller.AddHistory($"Replay started: {contentIndex}");
+
+        _state.QuestionPlay.PendingReplayIndex = contentIndex;
+
+        if (!_controller.Stop(StopReason.Replay))
+        {
+            _state.QuestionPlay.PendingReplayIndex = null;
+        }
     }
 
     private void OnMove(Message message, string[] args)
@@ -2900,10 +2998,7 @@ public sealed class Game : MessageHandler
     private void DropCurrentChooser()
     {
         // Give turn to player with least score
-        // TODO: MinBy in .NET 7
-        var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
-        var minSum = _state.Players.Where(p => p.IsConnected || !hasConnectedPlayers).Min(p => p.Sum);
-        _state.ChooserIndex = _state.Players.FindIndex(p => p.Sum == minSum && (p.IsConnected || !hasConnectedPlayers));
+        _state.ChooserIndex = _controller.DetectPlayerIndexWithLowestSum();
     }
 
     private void DropCurrentAppelaer()
@@ -3178,7 +3273,7 @@ public sealed class Game : MessageHandler
             newAccount = account;
         }
 
-        _actions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
+        _actions.ConfigSet(args[2], args[3], args[4], account.IsMale);
 
         InformAvatar(newAccount);
         OnPersonsChanged();
@@ -3556,12 +3651,36 @@ public sealed class Game : MessageHandler
         _controller.ScheduleExecution(Tasks.StartGame, 1, 1);
     }
 
+    private void ShareIdentities(string name, string? authProvider, string? externalUserId)
+    {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
+        foreach (var (personName, identity) in _state.Identities.Where(i => _state.AllPersons.ContainsKey(i.Key)))
+        {
+            _actions.InformUserIdentity(personName, identity.Provider, identity.UserId, name);
+        }
+
+        if (string.IsNullOrEmpty(authProvider) || string.IsNullOrEmpty(externalUserId))
+        {
+            _state.Identities.Remove(name);
+            return;
+        }
+
+        _state.Identities[name] = (authProvider, externalUserId);
+        _actions.InformUserIdentity(name, authProvider, externalUserId, NetworkConstants.Everybody);
+    }
+
     private bool? TryAuthenticateAccount(
         GameRole role,
         string name,
         bool isMale,
         int index,
-        ViewerAccount account)
+        ViewerAccount account,
+        string? authProvider = null,
+        string? externalUserId = null)
     {
         if (account.IsConnected)
         {
@@ -3590,6 +3709,7 @@ public sealed class Game : MessageHandler
         }
 
         _actions.InformConnected(name, role, index, isMale);
+        ShareIdentities(name, authProvider, externalUserId);
 
         if (_state.HiddenPersons && role == GameRole.Player)
         {

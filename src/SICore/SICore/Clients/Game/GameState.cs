@@ -345,6 +345,11 @@ public sealed class GameState : Data
     public bool HiddenPersons { get; set; }
 
     /// <summary>
+    /// Known external identities of persons by person name.
+    /// </summary>
+    public Dictionary<string, (string Provider, string UserId)> Identities { get; } = [];
+
+    /// <summary>
     /// Defines players statistics.
     /// </summary>
     internal Dictionary<string, PlayerStatistic> Statistics { get; } = new();

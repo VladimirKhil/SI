@@ -116,6 +116,9 @@ public sealed class GameActions
         isMale ? 'm' : 'f',
         "");
 
+    public void InformUserIdentity(string name, string authProvider, string externalUserId, string receiver) =>
+        SendMessageToWithArgs(receiver, Messages.UserIdentity, name, authProvider, externalUserId);
+
     public void InformDisconnected(string name) => SendMessageToWithArgs(
         _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody, 
         Messages.Disconnected,
@@ -152,6 +155,9 @@ public sealed class GameActions
 
         SendMessage(message.ToString(), person);
     }
+
+    public void ConfigSet(string personType, string index, string name, bool isMale) =>
+        SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, personType, index, name, isMale ? '+' : '-');
 
     public void ShowLeaderboard()
     {
@@ -520,6 +526,12 @@ public sealed class GameActions
 
         SendMessage(messageBuilder.ToString());
     }
+
+    /// <summary>
+    /// Informs the showman about the index of the content unit that has just been sent.
+    /// </summary>
+    internal void SendContentIndex(int contentIndex, string? person = null) =>
+        SendMessageToWithArgs(person ?? _state.ShowMan.Name, Messages.ContentIndex, contentIndex);
 
     internal void OnPlayerAnswer(int answererIndex, string answer)
     {

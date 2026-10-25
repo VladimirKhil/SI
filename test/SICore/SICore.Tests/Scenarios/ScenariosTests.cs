@@ -151,6 +151,7 @@ public sealed class ScenariosTests
         Assert.That(complexValidationMessage, Is.Not.Null, "Should receive answer options");
         
         await showmanListener.AssertNextMessageAsync(Messages.Content2);
+        await showmanListener.AssertNextMessageAsync(Messages.ContentIndex);
 
         // Players receive answer request
         var answerMessage = await playerAListener.WaitForMessageAsync(Messages.Answer);
@@ -185,6 +186,7 @@ public sealed class ScenariosTests
 
         // Right Answer Display
         await showmanListener.AssertNextMessageAsync(Messages.RightAnswer);
+        await showmanListener.AssertNextMessageAsync(Messages.ContentIndex);
 
         // Question End Phase
         await showmanListener.AssertNextMessageAsync(Messages.QuestionEnd);

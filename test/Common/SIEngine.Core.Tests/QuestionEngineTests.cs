@@ -646,7 +646,7 @@ public sealed class QuestionEngineTests
             return false;
         }
 
-        public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
+        public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast, int contentIndex)
         {
             var items = content.ToArray();
             QuestionContents.Add(items);

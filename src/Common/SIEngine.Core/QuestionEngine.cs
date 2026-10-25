@@ -432,6 +432,7 @@ public sealed class QuestionEngine : IQuestionEngine
                     }
 
                     var contentItems = new List<ContentItem>();
+                    var contentStartIndex = _contentIndex;
 
                     while (_contentIndex < content.ContentValue.Count)
                     {
@@ -467,7 +468,7 @@ public sealed class QuestionEngine : IQuestionEngine
                         {
                             if (contentItems.Any())
                             {
-                                _playHandler.OnQuestionContent(contentItems, _contentIndex == content.ContentValue.Count);
+                                _playHandler.OnQuestionContent(contentItems, _contentIndex == content.ContentValue.Count, contentStartIndex);
                             }
 
                             if (_contentIndex == content.ContentValue.Count)
@@ -482,7 +483,7 @@ public sealed class QuestionEngine : IQuestionEngine
 
                     if (contentItems.Any())
                     {
-                        _playHandler.OnQuestionContent(contentItems, true);
+                        _playHandler.OnQuestionContent(contentItems, true, contentStartIndex);
                     }
 
                     _stepIndex++;

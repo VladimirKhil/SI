@@ -28,7 +28,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback) { }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast, int contentIndex)
     {
         
     }

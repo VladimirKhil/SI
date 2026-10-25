@@ -139,8 +139,45 @@ internal sealed class QuestionPlayState
     /// </summary>
     public bool CollectMediaCompletions { get; internal set; }
 
+    /// <summary>
+    /// Content items of the currently playing content step.
+    /// </summary>
+    internal IReadOnlyList<ContentItem>? ContentItems { get; private set; }
+
+    /// <summary>
+    /// Moves engine play to the content item with the specified index within the current content step.
+    /// </summary>
+    internal Action<int>? MoveToContent { get; private set; }
+
+    /// <summary>
+    /// Content index of the last played content unit.
+    /// </summary>
+    internal int? LastContentIndex { get; set; }
+
+    /// <summary>
+    /// Content index to replay.
+    /// </summary>
+    internal int? PendingReplayIndex { get; set; }
+
+    internal void StartContentStep(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContent)
+    {
+        ContentItems = contentItems;
+        MoveToContent = moveToContent;
+        LastContentIndex = null;
+        PendingReplayIndex = null;
+    }
+
+    internal void ClearContentStep()
+    {
+        ContentItems = null;
+        MoveToContent = null;
+        LastContentIndex = null;
+        PendingReplayIndex = null;
+    }
+
     internal void Clear()
     {
+        ClearContentStep();
         AnswererIndicies.Clear();
         AreMultipleAnswerers = false;
         AnswerOptions = null;
