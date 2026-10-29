@@ -1,5 +1,4 @@
 ﻿using SICore.Connections;
-using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using SIData;

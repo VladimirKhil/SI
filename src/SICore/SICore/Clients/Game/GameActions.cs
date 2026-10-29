@@ -108,19 +108,24 @@ public sealed class GameActions
         SendMessageWithArgs(Messages.Replic, person, text);
     }
 
-    public void InformConnected(string name, GameRole role, int index, bool isMale) =>
-        SendMessageToWithArgs(
-            _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody,
-            Messages.Connected, role.ToString().ToLowerInvariant(),
-            index,
-            name,
-            isMale ? 'm' : 'f',
-            "");
+    public void InformConnected(string name, GameRole role, int index, bool isMale) => SendMessageToWithArgs(
+        _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody,
+        Messages.Connected, role.ToString().ToLowerInvariant(),
+        index,
+        name,
+        isMale ? 'm' : 'f',
+        "");
+
+    public void InformUserIdentity(string name, string authProvider, string externalUserId, string receiver) =>
+        SendMessageToWithArgs(receiver, Messages.UserIdentity, name, authProvider, externalUserId);
 
     public void InformDisconnected(string name) => SendMessageToWithArgs(
         _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody, 
         Messages.Disconnected,
         name);
+
+    public void InformPlayerCount(string receiver = NetworkConstants.Everybody) =>
+        SendMessageToWithArgs(receiver, Messages.PlayerCount, _state.Players.Count(p => p.IsConnected));
 
     /// <summary>
     /// Выдача информации о счёте
@@ -150,6 +155,9 @@ public sealed class GameActions
 
         SendMessage(message.ToString(), person);
     }
+
+    public void ConfigSet(string personType, string index, string name, bool isMale) =>
+        SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, personType, index, name, isMale ? '+' : '-');
 
     public void ShowLeaderboard()
     {
@@ -454,6 +462,18 @@ public sealed class GameActions
             Messages.Answer,
             answerType.ToString().ToLowerInvariant());
 
+    internal void SendAppellationCancellationsToActivePlayers()
+    {
+        foreach (var player in _state.Players)
+        {
+            if (player.AppellationFlag)
+            {
+                player.AppellationFlag = false;
+                SendMessage(Messages.Cancel, player.Name);
+            }
+        }
+    }
+
     internal void AskReview()
     {
         var packageSource = _state.GameResultInfo.PackageSource?.ToString() ?? (_state.PackageStatisticsProvider?.GetPackageSource() ?? "");
@@ -506,6 +526,12 @@ public sealed class GameActions
 
         SendMessage(messageBuilder.ToString());
     }
+
+    /// <summary>
+    /// Informs the showman about the index of the content unit that has just been sent.
+    /// </summary>
+    internal void SendContentIndex(int contentIndex, string? person = null) =>
+        SendMessageToWithArgs(person ?? _state.ShowMan.Name, Messages.ContentIndex, contentIndex);
 
     internal void OnPlayerAnswer(int answererIndex, string answer)
     {

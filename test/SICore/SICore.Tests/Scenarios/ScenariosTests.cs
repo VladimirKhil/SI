@@ -67,13 +67,26 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings { HostName = "Showman" },
+            new SI.Contracts.RoomSettings {
+                HostName = "Showman",
+                Showman = new SI.Contracts.Models.Account
+                {
+                    Type = SI.Contracts.Models.AccountType.Human,
+                    Name = Constants.FreePlace
+                },
+                Players =
+                [
+                    new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace },
+                    new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace }
+                ]
+            },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             "en-US",
             document,
             gameHost,
             fileShare,
+            Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             avatarHelper,
@@ -138,6 +151,7 @@ public sealed class ScenariosTests
         Assert.That(complexValidationMessage, Is.Not.Null, "Should receive answer options");
         
         await showmanListener.AssertNextMessageAsync(Messages.Content2);
+        await showmanListener.AssertNextMessageAsync(Messages.ContentIndex);
 
         // Players receive answer request
         var answerMessage = await playerAListener.WaitForMessageAsync(Messages.Answer);
@@ -172,6 +186,7 @@ public sealed class ScenariosTests
 
         // Right Answer Display
         await showmanListener.AssertNextMessageAsync(Messages.RightAnswer);
+        await showmanListener.AssertNextMessageAsync(Messages.ContentIndex);
 
         // Question End Phase
         await showmanListener.AssertNextMessageAsync(Messages.QuestionEnd);
@@ -362,6 +377,7 @@ public sealed class ScenariosTests
             fileShare,
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
+            Array.Empty<ComputerAccount>(),
             avatarHelper,
             null,
             null);
@@ -453,13 +469,22 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings { HostName = "Showman" },
+            new SI.Contracts.RoomSettings
+            {
+                HostName = "Showman",
+                Showman = new SI.Contracts.Models.Account
+                {
+                    Type = SI.Contracts.Models.AccountType.Human,
+                    Name = Constants.FreePlace
+                }
+            },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             "en-US",
             document,
             gameHost,
             fileShare,
+            Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             avatarHelper,
@@ -555,13 +580,22 @@ public sealed class ScenariosTests
         var game = GameRunner.CreateGame(
             node,
             gameSettings,
-            new SI.Contracts.RoomSettings { HostName = "Showman" },
+            new SI.Contracts.RoomSettings
+            {
+                HostName = "Showman",
+                Showman = new SI.Contracts.Models.Account
+                {
+                    Type = SI.Contracts.Models.AccountType.Human,
+                    Name = Constants.FreePlace
+                }
+            },
             new SI.Contracts.TimeSettings(),
             new SI.Contracts.RulesSettings(),
             "en-US",
             document,
             gameHost,
             fileShare,
+            Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             Array.Empty<ComputerAccount>(),
             avatarHelper,

@@ -11,7 +11,7 @@ namespace SICore;
 /// <summary>
 /// Defines viewer data.
 /// </summary>
-public sealed class PersonState : Data, INotifyPropertyChanged
+public sealed class PersonState(string avatarUri) : Data, INotifyPropertyChanged
 {
     internal const int LockTimeoutMs = 5000;
 
@@ -26,7 +26,7 @@ public sealed class PersonState : Data, INotifyPropertyChanged
     /// </summary>
     public string? QuestionType { get; set; }
 
-    public string Name { get; internal set; }
+    public string Name { get; internal set; } = "";
 
     public ViewerAccount? Me
     {
@@ -43,7 +43,7 @@ public sealed class PersonState : Data, INotifyPropertyChanged
     /// <summary>
     /// Адрес изображения участника
     /// </summary>
-    internal string? Picture { get; set; }
+    internal string? Picture { get; } = avatarUri;
 
     /// <summary>
     /// Defines time stamp when game buttons have been activated.

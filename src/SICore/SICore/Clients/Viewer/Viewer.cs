@@ -36,7 +36,6 @@ public class Viewer : MessageHandler, IViewerClient
     /// </summary>
     public Viewer(
         Client client,
-        Account personData,
         IPersonController controller,
         PersonActions actions,
         PersonState state)
@@ -46,7 +45,6 @@ public class Viewer : MessageHandler, IViewerClient
         _controller = controller;
         State = state;
         State.Name = client.Name;
-        State.Picture = personData.Picture;
     }
 
     // TODO: get rid of async and await here
@@ -1927,21 +1925,18 @@ public class Viewer : MessageHandler, IViewerClient
     /// <param name="role">Целевой тип</param>
     private void SwitchToNewType(GameRole role, ViewerAccount newAccount)
     {
-        if (newAccount == null)
-        {
-            throw new ArgumentNullException(nameof(newAccount));
-        }
+        ArgumentNullException.ThrowIfNull(newAccount);
 
         if (!_controller.CanSwitchType)
         {
             throw new InvalidOperationException($"Trying to switch type of computer account:\n{State.Name}");
         }
 
-        IViewerClient viewer = role switch
+        var viewer = role switch
         {
-            GameRole.Viewer => new Viewer(_client, newAccount, _controller, _actions, State),
-            GameRole.Player => new Player(_client, newAccount, _controller, _actions, State),
-            _ => new Showman(_client, newAccount, _controller, _actions, State),
+            GameRole.Viewer => new Viewer(_client, _controller, _actions, State),
+            GameRole.Player => new Player(_client, _controller, _actions, State),
+            _ => new Showman(_client, _controller, _actions, State),
         };
 
         viewer.Avatar = Avatar;

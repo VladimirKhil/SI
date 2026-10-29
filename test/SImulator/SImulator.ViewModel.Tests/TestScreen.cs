@@ -6,5 +6,5 @@ internal sealed class TestScreen : IDisplayDescriptor
 {
     public string Name => throw new NotImplementedException();
 
-    public bool IsFullScreen => throw new NotImplementedException();
+    public bool IsFullScreen => true;
 }

@@ -73,12 +73,12 @@ public sealed class TaskRunner<T> : IDisposable where T : struct
     /// This method should always be run separately from _taskRunHandler.ExecuteTask (with the help of locks)
     /// to prevent collisions.
     /// </remarks>
-    public void RescheduleTask(int taskTime = 10) =>
+    public void RescheduleTask(int taskTime = 1) =>
         _taskTimerLock.WithLock(() =>
         {
             if (!_disposed && (!IsRunning || (FinishingTime - DateTime.UtcNow) > _minimumRescheduleTime))
             {
-                _taskTimer.Change(taskTime, Timeout.Infinite);
+                _taskTimer.Change(taskTime * 100, Timeout.Infinite);
                 FinishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
             }
         });

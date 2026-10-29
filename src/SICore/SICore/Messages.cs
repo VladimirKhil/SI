@@ -177,6 +177,11 @@ public static class Messages
     public const string ContentAppend = "CONTENT_APPEND";
 
     /// <summary>
+    /// Informs the showman about the index of the just played content unit. Sent to the showman only, after the content messages.
+    /// </summary>
+    public const string ContentIndex = "CONTENT_INDEX";
+
+    /// <summary>
     /// Defines content shape without providing real content.
     /// </summary>
     public const string ContentShape = "CONTENT_SHAPE";
@@ -435,6 +440,11 @@ public static class Messages
     public const string PlayerAppellating = "PLAYER_APPELLATING";
 
     /// <summary>
+    /// Notifies about player count.
+    /// </summary>
+    public const string PlayerCount = "PLAYER_COUNT";
+
+    /// <summary>
     /// Notifies about player score change.
     /// </summary>
     public const string PlayerScoreChanged = "PLAYER_SCORE_CHANGED";
@@ -507,6 +517,12 @@ public static class Messages
     public const string Ready = "READY";
 
     /// <summary>
+    /// Requests replay of a content unit of the current question step. Argument is an absolute content index
+    /// (received in <see cref="ContentIndex"/>).
+    /// </summary>
+    public const string Replay = "REPLAY";
+
+    /// <summary>
     /// Реплика игры/участника
     /// </summary>
     public const string Replic = "REPLIC";
@@ -576,6 +592,11 @@ public static class Messages
     /// </summary>
     [IdempotencyRequired]
     public const string RoundThemesComments = "ROUND_THEMES_COMMENTS";
+
+    /// <summary>
+    /// Viewer takes showman or player seat.
+    /// </summary>
+    public const string Seat = "SEAT";
 
     /// <summary>
     /// Select player.
@@ -731,6 +752,11 @@ public static class Messages
     /// Defines a user-level error.
     /// </summary>
     public const string UserError = "USER_ERROR";
+
+    /// <summary>
+    /// Known external identity of a person: name, auth provider, external user id.
+    /// </summary>
+    public const string UserIdentity = "USER_IDENTITY";
 
     /// <summary>
     /// Answer validation decision.

@@ -168,6 +168,10 @@ public enum StopReason
     /// </summary>
     Move,
     /// <summary>
+    /// Content unit replay was requested.
+    /// </summary>
+    Replay,
+    /// <summary>
     /// Throttling on button hit was started.
     /// </summary>
     Wait

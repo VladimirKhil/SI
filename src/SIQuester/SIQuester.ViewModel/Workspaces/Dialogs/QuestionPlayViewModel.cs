@@ -174,7 +174,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         Close.ExecuteAsync(arg);
     }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast, int contentIndex)
     {
         var screenContent = new List<ContentInfo>();
 
@@ -301,7 +301,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         });
     }
 
-    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
+    public bool OnRightAnswer()
     {
         if (_isAnswer && !_isAnswerSimple)
         {
@@ -313,6 +313,12 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
             _isAnswer = false;
         }
+
+        return false;
+    }
+
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
+    {
     }
 
     public void OnSimpleRightAnswerStart() 

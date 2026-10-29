@@ -1,4 +1,4 @@
-﻿using Notions;
+using Notions;
 using SICore.Clients;
 using SICore.Clients.Game;
 using SICore.Clients.Game.Plugins.Stakes;
@@ -161,7 +161,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (globalUri != null)
         {
-            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanMainPersonNames);
             _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
@@ -366,6 +366,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 : LO[nameof(R.LetsPlayNextTheme)];
 
             _actions.ShowmanReplic(themesReplic);
+            _actions.ShowmanReplicNew(isFirstPlay ? MessageCode.AllThemesWillBePlayed : MessageCode.PlayingNextTheme);
         }
 
         _state.TableInformStageLock.WithLock(() =>
@@ -387,8 +388,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void OnQuestion(Question question)
     {
         _state.Question = question;
-
-        _actions.ShowmanReplic($"{_state.Theme?.Name}, {question.Price}");
         _actions.SendVisualMessageWithArgs(Messages.Question, question.Price);
 
         InitQuestionState(_state.Question);
@@ -689,12 +688,52 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.UseBackgroundAudio = !contentItem.WaitForFinish;
     }
 
+    private int GetPointRightAnswerTime() => Math.Max(_state.TimeSettings.Image, _state.TimeSettings.Reflection) * 10;
+
     private static (int, bool) GetContentItemDuration(ContentItem contentItem, int defaultValue) =>
         contentItem.WaitForFinish
             ? (contentItem.Duration > TimeSpan.Zero ? ((int)(contentItem.Duration.TotalMilliseconds / 100), false) : (defaultValue, true))
             : (1, false);
 
     private void ClearMediaContent() => _state.QuestionPlay.MediaContentCompletions.Clear();
+
+    /// <summary>
+    /// Registers the played content unit and informs the showman about its index.
+    /// </summary>
+    internal void OnContentUnitPlayed(int contentIndex)
+    {
+        _state.QuestionPlay.LastContentIndex = contentIndex;
+        _actions.SendContentIndex(contentIndex);
+    }
+
+    private void ReplayContent()
+    {
+        var questionPlay = _state.QuestionPlay;
+        var contentIndex = questionPlay.PendingReplayIndex;
+        var moveToContent = questionPlay.MoveToContent;
+        questionPlay.PendingReplayIndex = null;
+
+        if (contentIndex == null || moveToContent == null)
+        {
+            return;
+        }
+
+        if (_completion != null)
+        {
+            _completion();
+            _completion = null;
+        }
+
+        _continuation = null;
+        _state.IsPartial = false;
+        _state.IsPlayingMedia = false;
+        _state.IsPlayingMediaPaused = false;
+        _state.MoveNextBlocked = false;
+
+        moveToContent(contentIndex.Value);
+
+        _tasksHistory.AddLogEntry($"Replayed content: {contentIndex}");
+    }
 
     internal void OnContentBackgroundAudio(ContentItem contentItem)
     {
@@ -705,7 +744,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (globalUri != null)
         {
-            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanMainPersonNames);
             _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
@@ -732,7 +771,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (globalUri != null)
         {
-            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanMainPersonNames);
             _completion = ClearMediaContent;
             defaultTime = DefaultAudioVideoTime;
         }
@@ -1003,7 +1042,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         return true;
     }
 
-    internal void RescheduleTask(int taskTime = 10)
+    internal void RescheduleTask(int taskTime = 1)
     {
         _tasksHistory.AddLogEntry(nameof(RescheduleTask));
         _taskRunner.RescheduleTask(taskTime);
@@ -1055,8 +1094,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         StopWaiting();
-
-        var s = _state.ChooserIndex == _state.AnswererIndex ? LO[nameof(R.ToMyself)] : _state.Answerer.Name;
 
         _state.ChooserIndex = _state.AnswererIndex;
         _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "+");
@@ -1111,7 +1148,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         StopWaiting();
         var deleterName = _state.Players[_state.ThemeDeleters.Current.PlayerIndex].Name;
-        _actions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {deleterName}"); // TODO: REMOVE (replaced by ShowmanReplicNew)
         _actions.ShowmanReplicNew(MessageCode.ThemeDeletes, deleterName);
         _state.ThemeDeleters.MoveBack();
         ScheduleExecution(Tasks.AskToDelete, 1);
@@ -1350,12 +1386,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             if (!_state.QuestionPlay.HiddenStakes)
             {
-                if (!_state.HiddenPersons)
-                {
-                    s.AppendFormat($"(-{outcome.ToString().FormatNumber()}{PrintRightFactor(_state.Answerer.AnswerValidationFactor)})");
-                    _actions.ShowmanReplic(s.ToString()); // TODO: remove this line (replaced by ShowmanReplicNew)
-                }
-
                 if (_state.Answerer.AnswerValidationFactor == 0)
                 {
                     _actions.SendMessageWithArgs(Messages.Pass, _state.AnswererIndex);
@@ -1399,7 +1429,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 if (!_state.HiddenPersons)
                 {
-                    _actions.ShowmanReplic(s.ToString()); // TODO: remove this line (replaced by ShowmanReplicNew)
                     _actions.ShowmanReplicNew(MessageCode.WrongAnswer);
                 }
 
@@ -1534,6 +1563,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var s = $"{LO[nameof(R.StakeMakes)]} {_state.Players[playerIndex].Name}";
         _actions.ShowmanReplic(s);
+        _actions.ShowmanReplicNew(MessageCode.StakeMakes, _state.Players[playerIndex].Name);
 
         _state.OrderIndex--;
         ScheduleExecution(Tasks.AskStake, 10);
@@ -1604,8 +1634,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (!_state.HiddenPersons)
         {
-            var s = GetRandomString(LO[nameof(R.LetsSee)]);
-            _actions.ShowmanReplic(s); // TODO: remove this line (replaced by ShowmanReplicNew)
             _actions.ShowmanReplicNew(MessageCode.PlayerAnswers);
         }
 
@@ -2108,8 +2136,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
                 break;
 
+            case StopReason.Replay:
+                ReplayContent();
+                break;
+
             case StopReason.Wait:
-                // TODO: if someone overrides Task after that (skipping AskAnswerDeferred execution), nobody could press the button during this question
+                // TODO: if someone overrides Task after that
                 // That's very fragile logic. Think about alternatives
                 // The order of calls is important here!
                 ScheduleExecution(Tasks.AskAnswerDeferred, _state.WaitInterval, force: true);
@@ -2213,19 +2245,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitAppellationDecision()
     {
-        SendCancellationsToActivePlayers();
+        _actions.SendAppellationCancellationsToActivePlayers();
         OnDecision();
-    }
-
-    private void SendCancellationsToActivePlayers()
-    {
-        foreach (var player in _state.Players)
-        {
-            if (player.Flag)
-            {
-                _actions.SendMessage(Messages.Cancel, player.Name);
-            }
-        }
     }
 
     private void MoveNext()
@@ -3058,46 +3079,29 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     /// </summary>
     private void GiveMoveToPlayerWithMinimumScore()
     {
-        var min = _state.Players.Min(player => player.Sum);
-        var total = 0;
+        var candidates = GetLowestSumPlayerIndices();
 
-        for (var i = 0; i < _state.Players.Count; i++)
+        if (candidates.Count == 1)
         {
-            if (_state.Players[i].Sum == min)
-            {
-                _state.Players[i].Flag = true;
-                total++;
-            }
-            else
-            {
-                _state.Players[i].Flag = false;
-            }
-        }
-
-        if (total == 1)
-        {
-            for (var i = 0; i < _state.Players.Count; i++)
-            {
-                if (_state.Players[i].Flag)
-                {
-                    _state.ChooserIndex = i;
-                    break;
-                }
-            }
-
+            _state.ChooserIndex = candidates[0];
             _state.IsWaiting = true;
             _state.Decision = DecisionType.StarterChoosing;
             OnDecision();
         }
         else if (!_state.ShowMan.IsConnected || _state.HiddenPersons)
         {
-            _state.ChooserIndex = _state.Players.SelectRandomOnIndex(i => _state.Players[i].Flag);
+            _state.ChooserIndex = candidates[Random.Shared.Next(candidates.Count)];
             _state.IsWaiting = true;
             _state.Decision = DecisionType.StarterChoosing;
             OnDecision();
         }
         else
         {
+            for (var i = 0; i < _state.Players.Count; i++)
+            {
+                _state.Players[i].Flag = candidates.Contains(i);
+            }
+
             _actions.SendVisualMessage(Messages.ShowTable); // Everybody will see the table during showman's decision
             _state.ChooserIndex = -1;
 
@@ -3900,12 +3904,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             if (votingForRight && positiveVoteCount <= negativeVoteCount || !votingForRight && positiveVoteCount >= negativeVoteCount)
             {
                 _actions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
+                _actions.ShowmanReplicNew(MessageCode.AppellationRejected);
                 _tasksHistory.AddLogEntry($"CheckAppellation denied and resumed normally ({_taskRunner.PrintOldTasks()})");
                 return;
             }
 
             // Commit appellation
             _actions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
+            _actions.ShowmanReplicNew(MessageCode.AppellationAccepted);
 
             if (votingForRight)
             {
@@ -4481,6 +4487,17 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _actions.SendMessageWithArgs(Messages.RightAnswerStart, ContentTypes.Text, answer);
     }
 
+    internal bool WaitForPointRightAnswer()
+    {
+        if (_state.QuestionPlay.AnswerType != AnswerType.Point)
+        {
+            return false;
+        }
+
+        ScheduleExecution(Tasks.MoveNext, GetPointRightAnswerTime());
+        return true;
+    }
+
     internal void OnRightAnswerOption(string rightOptionLabel)
     {
         OnRightAnswerOptionCore(rightOptionLabel);
@@ -4509,8 +4526,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     internal void OnRightAnswerPoint(string rightAnswer)
     {
         _actions.OnRightAnswer(AnswerType.Point, rightAnswer);
-        var answerTime = Math.Max(_state.TimeSettings.Image, _state.TimeSettings.Reflection) * 10;
-        ScheduleExecution(Tasks.MoveNext, answerTime);
+        ScheduleExecution(Tasks.MoveNext, GetPointRightAnswerTime());
     }
 
     internal void OnLayout()
@@ -4548,6 +4564,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal bool OnQuestionEnd()
     {
+        _state.QuestionPlay.ClearContentStep();
         var timeout = DetectRoundTimeout();
         var nextTaskTime = 1;
 
@@ -4759,10 +4776,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.AskStake, 10);
     }
 
-    private int DetectPlayerIndexWithLowestSum()
+    internal int DetectPlayerIndexWithLowestSum() => GetLowestSumPlayerIndices()[0];
+
+    private List<int> GetLowestSumPlayerIndices()
     {
-        var minSum = _state.Players.Min(p => p.Sum);
-        return _state.Players.TakeWhile(p => p.Sum != minSum).Count();
+        var hasConnectedPlayers = _state.Players.Any(p => p.IsConnected);
+        var minSum = _state.Players.Where(p => p.IsConnected || !hasConnectedPlayers).Min(p => p.Sum);
+
+        return [.. Enumerable.Range(0, _state.Players.Count).Where(i => _state.Players[i].Sum == minSum && (_state.Players[i].IsConnected || !hasConnectedPlayers))];
     }
 
     internal void SetAnswerersByAllHiddenStakes()
@@ -4992,7 +5013,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                             _state.IsPlayingMedia = true;
                             _state.IsPlayingMediaPaused = false;
 
-                            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanCount);
+                            _state.QuestionPlay.MediaContentCompletions[(contentItem.Type, globalUri)] = new Completion(_state.ActiveHumanMainPersonNames);
                             _state.QuestionPlay.CollectMediaCompletions = contentItem.Duration <= TimeSpan.Zero;
                             _completion = ClearMediaContent;
                         }

@@ -137,7 +137,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return false;
     }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast, int contentIndex)
     {
         var textToShow =
             GameViewModel.Settings.Model.FalseStart
@@ -343,16 +343,21 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         PresentationController.OnAnswerStart();
     }
 
-    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
+    public bool OnRightAnswer()
     {
-        GameViewModel.OnContentStart();
-        PresentationController.OnContentStart();
-
         if (_isAnswer && !_isAnswerSimple)
         {
             PresentationController.OnComplexRightAnswer(_rightAnswer);
             _isAnswer = false;
         }
+
+        return false;
+    }
+
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
+    {
+        GameViewModel.OnContentStart();
+        PresentationController.OnContentStart();
 
         GameViewModel.ContentItems = contentItems;
         GameViewModel.ActiveMediaCommand = null;

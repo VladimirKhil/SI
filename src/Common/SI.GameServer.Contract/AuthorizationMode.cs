@@ -14,4 +14,9 @@ public enum AuthorizationMode
     /// Steam authorization is used.
     /// </summary>
     Steam,
+
+    /// <summary>
+    /// AccountService authorization is used.
+    /// </summary>
+    Account,
 }

@@ -27,6 +27,6 @@ public abstract class Data
 
     public StringBuilder PersonsUpdateHistory { get; } = new();
 
-    protected static string PrintAccount(ViewerAccount viewerAccount) =>
+    internal static string PrintAccount(ViewerAccount viewerAccount) =>
         $"{viewerAccount?.Name}@{viewerAccount?.IsHuman}:{viewerAccount?.IsConnected}";
 }

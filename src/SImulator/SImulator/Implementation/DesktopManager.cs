@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using SImulator.Implementation.ButtonManagers;
+using SImulator.Implementation.RemoteBoard;
 using SImulator.Implementation.WinAPI;
 using SImulator.Properties;
 using SImulator.ViewModel;
@@ -19,6 +20,7 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using Utils;
 using Utils.Timers;
+using Utils.Web;
 using Utils.Wpf;
 
 namespace SImulator.Implementation;
@@ -42,7 +44,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     internal static XmlSerializer SettingsSerializer { get; } = new(typeof(AppSettings));
 
-    public override ViewModel.ButtonManagers.ButtonManagerFactory ButtonManagerFactory => _buttonManager;
+    public ViewModel.ButtonManagers.ButtonManagerFactory ButtonManagerFactory => _buttonManager;
 
     public override void CreatePlayersView(object dataContext)
     {
@@ -69,6 +71,12 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     public override Task CreateMainViewAsync(object dataContext, IDisplayDescriptor screen)
     {
+        if (screen is BrowserDisplayDescriptor)
+        {
+            return RemoteBoardHost.Instance.StartAsync(
+                dataContext as IWebInterop ?? throw new ArgumentException("Board data context must implement IWebInterop", nameof(dataContext)));
+        }
+
         _window = new WebWindow(screen.IsFullScreen)
         {
             DataContext = dataContext
@@ -94,8 +102,10 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     public static bool CanCloseMainView { get; set; }
 
-    public override Task CloseMainViewAsync()
+    public override async Task CloseMainViewAsync()
     {
+        await RemoteBoardHost.Instance.StopAsync();
+
         if (_window != null)
         {
             CanCloseMainView = true;
@@ -110,17 +120,16 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
                 CanCloseMainView = false;
             }
         }
-
-        return Task.CompletedTask;
     }
 
     public override IDisplayDescriptor[] GetScreens() =>
     [
         .. Win32.GetDisplays().Select(screen => (IDisplayDescriptor)new WebScreenDisplayDescriptor(screen)),
         WebDisplayDescriptor.Instance,
+        BrowserDisplayDescriptor.Instance,
     ];
 
-    public override string[] GetFonts() => [.. Fonts.SystemFontFamilies.Select(ff => ff.ToString())];
+    public string[] GetFonts() => [.. Fonts.SystemFontFamilies.Select(ff => ff.ToString())];
 
     public override string[] GetLocalComputers()
     {
@@ -151,7 +160,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         return [.. list];
     }
 
-    public override string[] GetComPorts() => SerialPort.GetPortNames();
+    public string[] GetComPorts() => SerialPort.GetPortNames();
 
     public override bool IsEscapeKey(GameKey key) => (Key)key == Key.Escape;
 
@@ -298,7 +307,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         }
     }
 
-    public override void PlaySound(string name, Action? onFinish = null)
+    public void PlaySound(string name, Action? onFinish = null)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -361,7 +370,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         return GameLogger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
     }
 
-    public override void ClearMedia()
+    public void ClearMedia()
     {
         if (_mediaClock == null)
         {
@@ -378,7 +387,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
         _player = null;
     }
 
-    public override void InitSettings(AppSettings defaultSettings)
+    public void InitSettings(AppSettings defaultSettings)
     {
         
     }

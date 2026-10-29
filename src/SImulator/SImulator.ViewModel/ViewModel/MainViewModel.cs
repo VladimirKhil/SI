@@ -121,7 +121,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private string[] LoadComPorts()
     {
-        var ports = PlatformManager.Instance.GetComPorts();
+        var ports = _platformService.GetComPorts();
 
         if (Settings.ComPort == null || _comPorts != null && ports.Length > 0)
         {
@@ -198,13 +198,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public ICommand NavigateTo => _navigateTo;
 
-    public static string[] FontFamilies { get; private set; }
+    public string[] FontFamilies { get; private set; }
 
     public static double[] LineSpaces { get; private set; }
 
     static MainViewModel()
     {
-        FontFamilies = [SIUI.ViewModel.Core.Settings.DefaultTableFontFamily, .. PlatformManager.Instance.GetFonts().OrderBy(s => s)];
         LineSpaces = [1.0, SIUI.ViewModel.Core.Settings.DefaultQuestionLineSpacing];
     }
 
@@ -214,7 +213,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         Settings = settings;
         _platformService = platformService;
-        SettingsViewModel = new AppSettingsViewModel(Settings);
+
+        FontFamilies = [SIUI.ViewModel.Core.Settings.DefaultTableFontFamily, .. _platformService.GetFonts().OrderBy(s => s)];
+        SettingsViewModel = new AppSettingsViewModel(Settings, platformService);
 
         _start = new AsyncCommand(Start_Executed);
 
@@ -246,11 +247,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         var screensLength = Screens.Length;
 
 #if DEBUG
-        Settings.ScreenNumber = Math.Max(0, screensLength - 2);
+        Settings.ScreenNumber = GetDefaultScreenIndex();
 #else
         if (Settings.ScreenNumber == -1 || Settings.ScreenNumber >= screensLength)
         {
-            Settings.ScreenNumber = screensLength - 2;
+            Settings.ScreenNumber = GetDefaultScreenIndex();
         }
 #endif
 
@@ -454,7 +455,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsStarting = true;
 
             var presentationListener = new PresentationListener();
-            var presentationController = PlatformManager.Instance.CreatePresentationController(screen, presentationListener, Settings.Sounds, !Settings.UseSIGameEngine);
+            var presentationController = _platformService.CreatePresentationController(screen, presentationListener, Settings.Sounds, !Settings.UseSIGameEngine);
 
             presentationController.Error += ShowError;
 
@@ -593,17 +594,18 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
            fileShare,
            computerPlayers,
            computerShowmans,
+           [],
            avatarHelper,
            null,
            null);
 
         var client = new Client("HOST");
         var actions = new PersonActions(client);
-        var state = new PersonState();
+        var state = new PersonState("");
 
         var gameController = new Controllers.GameController(actions);
 
-        var host = new Showman(client, new Account(), gameController, actions, state);
+        var host = new Showman(client, gameController, actions, state);
         var handler = new PresentationHandler(client, presentationController);
 
         client.ConnectTo(node);
@@ -847,7 +849,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com)
             {
-                _buttonManager = await PlatformManager.Instance.ButtonManagerFactory.CreateAsync(Settings, this, _platformService);
+                _buttonManager = await _platformService.ButtonManagerFactory.CreateAsync(Settings, this, _platformService);
 
                 if (_buttonManager == null)
                 {
@@ -957,6 +959,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         UpdateStartCommand();
         UpdatePlayersView();
     }
+
+    /// <summary>
+    /// Gets the default screen index: the last full screen display (or the first screen if there are none).
+    /// </summary>
+    private int GetDefaultScreenIndex() => Math.Max(0, Array.FindLastIndex(Screens, screen => screen.IsFullScreen));
 
     private void UpdatePlayersView()
     {

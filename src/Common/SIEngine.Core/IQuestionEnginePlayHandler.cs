@@ -45,7 +45,8 @@ public interface IQuestionEnginePlayHandler
     /// </summary>
     /// <param name="content">Question content to display.</param>
     /// <param name="isLast">Whether this is the last content part in this set.</param>
-    void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast);
+    /// <param name="contentIndex">Index of the first content item of this part in the content set passed to <see cref="OnContentStart"/>.</param>
+    void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast, int contentIndex);
 
     /// <summary>
     /// Asks for the answer.
@@ -91,6 +92,12 @@ public interface IQuestionEnginePlayHandler
     /// Accepts the question as answered right even if no answer has been provided.
     /// </summary>
     bool OnAccept();
+
+    /// <summary>
+    /// Handles the start of a complex right answer (before its content is played).
+    /// </summary>
+    /// <returns>Should the engine pause here until the next move.</returns>
+    bool OnRightAnswer();
 
     /// <summary>
     /// Handles content start.

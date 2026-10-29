@@ -7,26 +7,13 @@ namespace SICore;
 /// <summary>
 /// Represents a game player.
 /// </summary>
-public sealed class Player : Viewer
+public sealed class Player(
+    Client client,
+    IPersonController logic,
+    PersonActions actions,
+    PersonState state) : Viewer(client, logic, actions, state)
 {
     public override GameRole Role => GameRole.Player;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="Player" /> class.
-    /// </summary>
-    /// <param name="client">Player game network client.</param>
-    /// <param name="personData">Player account data.</param>
-    /// <param name="logic">Player logic.</param>
-    /// <param name="actions">Player actions.</param>
-    /// <param name="state">Player game state.</param>
-    public Player(
-        Client client,
-        Account personData,
-        IPersonController logic,
-        PersonActions actions,
-        PersonState state)
-        : base(client, personData, logic, actions, state)
-    { }
 
     protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)
     {

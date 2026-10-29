@@ -24,12 +24,11 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public bool OnButtonPressStart() => false;
 
-    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
-    {
-        
-    }
+    public bool OnRightAnswer() => false;
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
+    public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback) { }
+
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast, int contentIndex)
     {
         
     }

@@ -212,12 +212,12 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
-    private bool _showPlayers = false;
+    private bool _showPlayers = true;
 
     /// <summary>
     /// Show players and scores.
     /// </summary>
-    [DefaultValue(false)]
+    [DefaultValue(true)]
     public bool ShowPlayers
     {
         get => _showPlayers;

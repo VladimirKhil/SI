@@ -23,10 +23,7 @@ public sealed class GameState : Data
     /// </summary>
     public IGameHost Host { get; }
 
-    /// <summary>
-    /// Настройки игры
-    /// </summary>
-    public IGameSettingsCore<AppSettingsCore> Settings { get; }
+    public string Culture { get; }
 
     /// <summary>
     /// Gets game room settings.
@@ -348,6 +345,11 @@ public sealed class GameState : Data
     public bool HiddenPersons { get; set; }
 
     /// <summary>
+    /// Known external identities of persons by person name.
+    /// </summary>
+    public Dictionary<string, (string Provider, string UserId)> Identities { get; } = [];
+
+    /// <summary>
     /// Defines players statistics.
     /// </summary>
     internal Dictionary<string, PlayerStatistic> Statistics { get; } = new();
@@ -408,9 +410,11 @@ public sealed class GameState : Data
         get => _allPersons; private set => _allPersons = value;
     }
 
-    internal int ActiveHumanCount => Viewers.Count
-        + Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
-        + (ShowMan.IsHuman && ShowMan.IsConnected ? 1 : 0);
+    /// <summary>
+    /// Names of connected human showman and players.
+    /// </summary>
+    internal IEnumerable<string> ActiveHumanMainPersonNames =>
+        MainPersons.Where(p => p.IsHuman && p.IsConnected).Select(p => p.Name);
 
     public void BeginUpdatePersons(string reason) =>
         PersonsUpdateHistory.AppendLine("===").Append($"Before ({reason}): ").Append(PrintPersons());
@@ -613,7 +617,6 @@ public sealed class GameState : Data
         GamePersonAccount showman,
         Uri? packageSource,
         string language,
-        IGameSettingsCore<AppSettingsCore> settings,
         SI.Contracts.RoomSettings roomSettings,
         SI.Contracts.TimeSettings timeSettings,
         SI.Contracts.RulesSettings rules,
@@ -622,7 +625,7 @@ public sealed class GameState : Data
         Host = gameHost;
         ShowMan = showman;
         Stakes = new StakesState(Players);
-        Settings = settings;
+        Culture = language;
         GameResultInfo = new GameResult(packageSource, language);
         RoomSettings = roomSettings;
         TimeSettings = timeSettings;

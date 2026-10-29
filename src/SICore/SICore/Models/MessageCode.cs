@@ -45,4 +45,14 @@ public enum MessageCode
     AppellationAgainst,
 
     ThemeDeletes,
+
+    AllThemesWillBePlayed,
+
+    PlayingNextTheme,
+
+    StakeMakes,
+
+    AppellationAccepted,
+
+    AppellationRejected,
 }

@@ -1,5 +1,5 @@
-﻿using SImulator.ViewModel.Model;
-using SImulator.ViewModel.PlatformSpecific;
+﻿using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.Model;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Windows.Input;
@@ -10,6 +10,8 @@ namespace SImulator.ViewModel;
 
 public sealed class AppSettingsViewModel
 {
+    private readonly IPlatformService _platformService;
+
     public AppSettings Model { get; private set; }
 
     public SettingsViewModel SIUISettings { get; private set; }
@@ -21,8 +23,9 @@ public sealed class AppSettingsViewModel
     [XmlIgnore]
     public ICommand Reset { get; private set; }
 
-    public AppSettingsViewModel(AppSettings settings)
+    public AppSettingsViewModel(AppSettings settings, IPlatformService platformService)
     {
+        _platformService = platformService;
         Model = settings;
         SIUISettings = new SettingsViewModel(settings.SIUISettings);
         Sounds = new SoundSettingsViewModel(settings.Sounds);
@@ -33,7 +36,7 @@ public sealed class AppSettingsViewModel
     internal void Reset_Executed(object? arg)
     {
         var defaultSettings = new AppSettings();
-        PlatformManager.Instance.InitSettings(defaultSettings);
+        _platformService.InitSettings(defaultSettings);
 
         var defaultUISettings = new Settings();
         var currentSettings = SIUISettings;
