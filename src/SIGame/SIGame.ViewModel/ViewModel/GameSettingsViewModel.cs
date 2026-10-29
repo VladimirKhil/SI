@@ -787,6 +787,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             QuestionWithButtonPenalty = (SI.Contracts.PenaltyType)appSettings.QuestionWithButtonPenalty,
             QuestionForYourselfPenalty = (SI.Contracts.PenaltyType)appSettings.QuestionForYourselfPenalty,
             QuestionForAllPenalty = (SI.Contracts.PenaltyType)appSettings.QuestionForAllPenalty,
+            ValidateEqualAnswersSeparately = appSettings.ValidateEqualAnswersSeparately,
             QuestionForYourselfFactor = appSettings.QuestionForYourselfFactor,
             ButtonPressMode = (SI.Contracts.ButtonPressMode)appSettings.ButtonPressMode,
             PreloadRoundContent = appSettings.PreloadRoundContent,
