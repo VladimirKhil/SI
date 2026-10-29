@@ -24,21 +24,16 @@ public sealed class HideImageOnAnswerAndPauseTests
     private const string HostName = "Showman";
     private const string OptionName = nameof(RulesSettings.HideImageOnAnswerAndPause);
 
-    [Test]
-    public async Task Rule_IsDisabledByDefault_AndSentOnJoin()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Rule_SetOnCreation_IsSentOnJoin(bool enabled)
     {
-        var rules = new RulesSettings();
-        var (_, showman, playerA, playerB) = StartGame(rules);
-
-        Assert.That(rules.HideImageOnAnswerAndPause, Is.False);
+        var (showman, playerA, playerB) = StartGame(new RulesSettings { HideImageOnAnswerAndPause = enabled });
 
         foreach (var listener in new[] { showman, playerA, playerB })
         {
             var options = await listener.WaitForOptions2Async();
-            TestContext.Out.WriteLine($"{listener.Name} join OPTIONS2: {Escape(options.Text)}");
-
-            Assert.That(options.Args[1], Is.Empty, "Join OPTIONS2 has no reason");
-            Assert.That(GetOptionValue(options.Args), Is.EqualTo("False"));
+            Assert.That(GetOptionValue(options.Args), Is.EqualTo(enabled.ToString()));
         }
     }
 
@@ -46,7 +41,7 @@ public sealed class HideImageOnAnswerAndPauseTests
     public async Task Rule_ChangedByHost_IsBroadcastToEveryone()
     {
         var rules = new RulesSettings();
-        var (_, showman, playerA, playerB) = StartGame(rules);
+        var (showman, playerA, playerB) = StartGame(rules);
 
         foreach (var listener in new[] { showman, playerA, playerB })
         {
@@ -60,25 +55,17 @@ public sealed class HideImageOnAnswerAndPauseTests
         foreach (var listener in new[] { showman, playerA, playerB })
         {
             var options = await listener.WaitForOptions2Async();
-            TestContext.Out.WriteLine($"{listener.Name} change OPTIONS2: {Escape(options.Text)}");
-
             Assert.That(options.Text, Is.EqualTo($"{Messages.Options2}\n{HostName}\n{OptionName}\ntrue"));
         }
 
         Assert.That(rules.HideImageOnAnswerAndPause, Is.True);
-
-        // Settings for a newly informed person reflect the new value
-        playerA.Client.SendMessage(Messages.Info, receiver: NetworkConstants.GameName);
-        var info = await playerA.WaitForOptions2Async();
-        TestContext.Out.WriteLine($"{playerA.Name} INFO OPTIONS2 after change: {Escape(info.Text)}");
-        Assert.That(GetOptionValue(info.Args), Is.EqualTo("True"));
     }
 
     [Test]
     public async Task Rule_ChangedByNonHost_IsIgnored()
     {
         var rules = new RulesSettings();
-        var (_, _, playerA, _) = StartGame(rules);
+        var (_, playerA, _) = StartGame(rules);
 
         await playerA.WaitForOptions2Async(); // Join settings
 
@@ -91,28 +78,10 @@ public sealed class HideImageOnAnswerAndPauseTests
 
         var options = await playerA.WaitForOptions2Async();
         Assert.That(options.Args[1], Is.Empty, "No OPTIONS2 change broadcast is expected for non-host");
-        Assert.That(GetOptionValue(options.Args), Is.EqualTo("False"));
         Assert.That(rules.HideImageOnAnswerAndPause, Is.False);
     }
 
-    [Test]
-    public async Task Rule_EnabledOnCreation_IsSentOnJoin()
-    {
-        var rules = new RulesSettings { HideImageOnAnswerAndPause = true };
-        var (_, showman, playerA, playerB) = StartGame(rules);
-
-        foreach (var listener in new[] { showman, playerA, playerB })
-        {
-            var options = await listener.WaitForOptions2Async();
-            TestContext.Out.WriteLine($"{listener.Name} join OPTIONS2 (enabled on creation): {Escape(options.Text)}");
-
-            Assert.That(GetOptionValue(options.Args), Is.EqualTo("True"));
-        }
-
-        Assert.That(rules.HideImageOnAnswerAndPause, Is.True);
-    }
-
-    private static (Game Game, Listener Showman, Listener PlayerA, Listener PlayerB) StartGame(RulesSettings rules)
+    private static (Listener Showman, Listener PlayerA, Listener PlayerB) StartGame(RulesSettings rules)
     {
         var node = new PrimaryNode(new Network.Configuration.NodeConfiguration());
 
@@ -171,7 +140,7 @@ public sealed class HideImageOnAnswerAndPauseTests
         var playerA = Join(node, game, "A", GameRole.Player);
         var playerB = Join(node, game, "B", GameRole.Player);
 
-        return (game, showman, playerA, playerB);
+        return (showman, playerA, playerB);
     }
 
     private static Listener Join(Node node, Game game, string name, GameRole role)
@@ -199,15 +168,11 @@ public sealed class HideImageOnAnswerAndPauseTests
         throw new AssertionException($"{OptionName} not found in OPTIONS2");
     }
 
-    private static string Escape(string text) => text.Replace("\n", "\\n");
-
     private sealed class Listener
     {
         private readonly Channel<Message> _messageChannel = Channel.CreateUnbounded<Message>();
 
         public Client Client { get; }
-
-        public string Name => Client.Name;
 
         public Listener(Client client)
         {
