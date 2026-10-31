@@ -955,6 +955,11 @@ public sealed class Game : MessageHandler
         }
 
         _state.QuestionPlay.Validations[answer] = (validationStatus, validationFactor);
+
+        if (_state.Decision == DecisionType.AnswerValidating && !_state.QuestionPlay.Validations.Any(v => !v.Value.HasValue))
+        {
+            _controller.Stop(StopReason.Decision);
+        }
     }
 
     private void OnPin(string hostName)

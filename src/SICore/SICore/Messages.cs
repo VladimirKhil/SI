@@ -505,13 +505,6 @@ public static class Messages
     public const string QuestionSources = "QUESTION_SOURCES";
 
     /// <summary>
-    /// Скорость чтения вопроса
-    /// </summary>
-    [IdempotencyRequired]
-    [Obsolete("Use Options")]
-    public const string ReadingSpeed = "READINGSPEED";
-
-    /// <summary>
     /// Готовность к игре
     /// </summary>
     public const string Ready = "READY";

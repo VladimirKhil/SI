@@ -83,6 +83,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     public event Action<string, int, int>? AdShown;
 
+    private bool ValidateAfterRightAnswer => _state.QuestionPlay.ValidateAfterRightAnswer || _state.Rules.GameMode == SI.Contracts.GameMode.Quiz;
+
     internal void OnStageChanged(
         GameStages stage,
         string stageName,
@@ -1640,12 +1642,21 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
         _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
 
-        if (_state.QuestionPlay.ValidateAfterRightAnswer)
+        if (ValidateAfterRightAnswer)
         {
             if (!_state.HiddenPersons)
             {
                 var m = new MessageBuilder(Messages.Answers).AddRange(_state.Players.Select(p => p.Answer ?? ""));
                 _actions.SendMessage(m.ToString());
+            }
+
+            if (!_state.QuestionPlay.ValidateAfterRightAnswer && _state.QuestionPlay.Validations.Any(v => !v.Value.HasValue))
+            {
+                // We need to wait for showman decision on the several answers validity
+                var waitTime = _state.TimeSettings.ShowmanDecision * 10;
+                ScheduleExecution(Tasks.MoveNext, waitTime); // Not WaitRight
+                WaitFor(DecisionType.AnswerValidating, waitTime, -1);
+                return true;
             }
 
             ScheduleExecution(Tasks.MoveNext, 30, 1, true);
@@ -2527,7 +2538,10 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             AnswerType.Number => AnswerChecker.IsNumberAnswerRight(playerAnswer, rightAnswer, deviation),
             AnswerType.Point => AnswerChecker.IsPointAnswerRight(playerAnswer, rightAnswer, Math.Max(0.02, deviation)),
             AnswerType.Client => !answerIsWrongByDefault,
-            _ => AnswerChecker.IsAnswerRight(playerAnswer, rightAnswers),
+            // Text
+            _ => _state.QuestionPlay.Validations.TryGetValue(playerAnswer, out var validation) && validation.HasValue
+                ? validation.Value.Item1
+                : AnswerChecker.IsAnswerRight(playerAnswer, rightAnswers),
         };
     }
 
@@ -2890,7 +2904,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _actions.OnPlayerAnswer(answererIndex, playerAnswer ?? "");
 
-        if (_state.QuestionPlay.ValidateAfterRightAnswer)
+        if (ValidateAfterRightAnswer)
         {
             ScheduleExecution(Tasks.Announce, 25, force: true);
         }
@@ -4568,7 +4582,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var timeout = DetectRoundTimeout();
         var nextTaskTime = 1;
 
-        if (HaveMultipleAnswerers() && _state.QuestionPlay.ValidateAfterRightAnswer)
+        if (HaveMultipleAnswerers() && ValidateAfterRightAnswer)
         {
             var validationResult = ValidatePlayersAnswers();
 
