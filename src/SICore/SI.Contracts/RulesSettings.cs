@@ -17,6 +17,7 @@ public sealed class RulesSettings
     public const PenaltyType DefaultQuestionWithButtonPenalty = PenaltyType.SubtractPoints;
     public const PenaltyType DefaultQuestionForYourselfPenalty = PenaltyType.None;
     public const PenaltyType DefaultQuestionForAllPenalty = PenaltyType.SubtractPoints;
+    public const bool DefaultValidateEqualAnswersSeparately = false;
     public const int DefaultQuestionForYourselfFactor = 2;
     public const ButtonPressMode DefaultButtonPressMode = ButtonPressMode.RandomWithinInterval;
     public const int DefaultButtonsAcceptInterval = 300;
@@ -42,6 +43,7 @@ public sealed class RulesSettings
         QuestionWithButtonPenalty = DefaultQuestionWithButtonPenalty,
         QuestionForYourselfPenalty = DefaultQuestionForYourselfPenalty,
         QuestionForAllPenalty = DefaultQuestionForAllPenalty,
+        ValidateEqualAnswersSeparately = DefaultValidateEqualAnswersSeparately,
         QuestionForYourselfFactor = DefaultQuestionForYourselfFactor,
         ButtonPressMode = DefaultButtonPressMode,
         ButtonsAcceptInterval = DefaultButtonsAcceptInterval,
@@ -113,6 +115,12 @@ public sealed class RulesSettings
     /// Gets or sets the penalty for questions for all.
     /// </summary>
     public PenaltyType QuestionForAllPenalty { get; set; } = DefaultQuestionForAllPenalty;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether equal answers of different players in questions for all are validated separately.
+    /// When disabled, the verdict for an answer is applied to all the equal answers automatically.
+    /// </summary>
+    public bool ValidateEqualAnswersSeparately { get; set; } = DefaultValidateEqualAnswersSeparately;
 
     /// <summary>
     /// Gets or sets the factor for questions for yourself.

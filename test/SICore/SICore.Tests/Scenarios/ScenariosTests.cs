@@ -207,6 +207,201 @@ public sealed class ScenariosTests
     }
 
     /// <summary>
+    /// Tests that by default the showman validates equal answers once and the verdict is applied to all of them.
+    /// </summary>
+    [Test]
+    public async Task ForAllQuestionEqualAnswersValidatedOnceTest()
+    {
+        var (showmanClient, showmanListener, playerAClient, playerBClient) = await StartForAllQuestionAsync(validateEqualAnswersSeparately: false);
+        using var _ = showmanListener;
+
+        playerAClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
+        playerBClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
+
+        var askValidate = await showmanListener.WaitForMessageAsync(Messages.AskValidate);
+        Assert.That(askValidate[1], Is.EqualTo("0"), "Validation should be asked for player A");
+        Assert.That(askValidate[2], Is.EqualTo("myAnswer"), "Answer text should match");
+
+        showmanClient.SendMessage(new MessageBuilder(Messages.Validate, "myAnswer", "+", 1).ToString(), receiver: NetworkConstants.GameName);
+
+        var firstPerson = await showmanListener.WaitForMessageAsync(Messages.AskValidate, Messages.Person);
+        Assert.That(firstPerson[0], Is.EqualTo(Messages.Person), "Equal answer of player B should not be asked for validation");
+        Assert.That(firstPerson[1], Is.EqualTo("+"), "Player A answer should be marked correct");
+        Assert.That(firstPerson[2], Is.EqualTo("0"), "Player index should be 0");
+
+        var secondPerson = await showmanListener.WaitForMessageAsync(Messages.Person);
+        Assert.That(secondPerson[1], Is.EqualTo("+"), "Player B answer should be marked correct too");
+        Assert.That(secondPerson[2], Is.EqualTo("1"), "Player index should be 1");
+    }
+
+    /// <summary>
+    /// Tests that equal answers of different players are validated separately when the corresponding rule is enabled
+    /// and could get different verdicts (for example, depending on the time they have been provided).
+    /// </summary>
+    [Test]
+    public async Task ForAllQuestionEqualAnswersTest()
+    {
+        var (showmanClient, showmanListener, playerAClient, playerBClient) = await StartForAllQuestionAsync(validateEqualAnswersSeparately: true);
+        using var _ = showmanListener;
+
+        // Both players provide the same answer
+        playerAClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
+        playerBClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
+
+        var firstAskValidate = await showmanListener.WaitForMessageAsync(Messages.AskValidate);
+        Assert.That(firstAskValidate[1], Is.EqualTo("0"), "First validation should be asked for player A");
+        Assert.That(firstAskValidate[2], Is.EqualTo("myAnswer"), "Answer text should match");
+
+        var secondAskValidate = await showmanListener.WaitForMessageAsync(Messages.AskValidate);
+        Assert.That(secondAskValidate[1], Is.EqualTo("1"), "Second validation should be asked for player B");
+        Assert.That(secondAskValidate[2], Is.EqualTo("myAnswer"), "Answer text should match");
+
+        // The verdicts are given in the order the validations have been asked
+        showmanClient.SendMessage(new MessageBuilder(Messages.Validate, "myAnswer", "+", 1).ToString(), receiver: NetworkConstants.GameName);
+        showmanClient.SendMessage(new MessageBuilder(Messages.Validate, "myAnswer", "-", 1).ToString(), receiver: NetworkConstants.GameName);
+
+        var firstPerson = await showmanListener.WaitForMessageAsync(Messages.Person);
+        Assert.That(firstPerson[1], Is.EqualTo("+"), "Player A answer should be marked correct");
+        Assert.That(firstPerson[2], Is.EqualTo("0"), "Player index should be 0");
+
+        var secondPerson = await showmanListener.WaitForMessageAsync(Messages.Person);
+        Assert.That(secondPerson[1], Is.EqualTo("-"), "Player B answer should be marked wrong");
+        Assert.That(secondPerson[2], Is.EqualTo("1"), "Player index should be 1");
+    }
+
+    /// <summary>
+    /// Tests that the showman is asked to validate an answer equal to the already validated one
+    /// instead of applying the existing verdict silently when the corresponding rule is enabled.
+    /// </summary>
+    [Test]
+    public async Task ForAllQuestionEqualAnswerAfterVerdictTest()
+    {
+        var (showmanClient, showmanListener, playerAClient, playerBClient) = await StartForAllQuestionAsync(validateEqualAnswersSeparately: true);
+        using var _ = showmanListener;
+
+        playerAClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
+
+        var firstAskValidate = await showmanListener.WaitForMessageAsync(Messages.AskValidate);
+        Assert.That(firstAskValidate[1], Is.EqualTo("0"), "First validation should be asked for player A");
+
+        showmanClient.SendMessage(new MessageBuilder(Messages.Validate, "myAnswer", "+", 1).ToString(), receiver: NetworkConstants.GameName);
+
+        // Player B provides the same answer after player A answer has been validated
+        playerBClient.SendMessage(new MessageBuilder(Messages.Answer, "myAnswer").ToString(), receiver: NetworkConstants.GameName);
+
+        var secondAskValidate = await showmanListener.WaitForMessageAsync(Messages.AskValidate);
+        Assert.That(secondAskValidate[1], Is.EqualTo("1"), "Second validation should be asked for player B");
+        Assert.That(secondAskValidate[2], Is.EqualTo("myAnswer"), "Answer text should match");
+
+        showmanClient.SendMessage(new MessageBuilder(Messages.Validate, "myAnswer", "+", "0.5").ToString(), receiver: NetworkConstants.GameName);
+
+        var firstPerson = await showmanListener.WaitForMessageAsync(Messages.Person);
+        Assert.That(firstPerson[1], Is.EqualTo("+"), "Player A answer should be marked correct");
+        Assert.That(firstPerson[2], Is.EqualTo("0"), "Player index should be 0");
+        Assert.That(firstPerson[3], Is.EqualTo("10"), "Player A should get the full price");
+
+        var secondPerson = await showmanListener.WaitForMessageAsync(Messages.Person);
+        Assert.That(secondPerson[1], Is.EqualTo("+"), "Player B answer should be marked correct");
+        Assert.That(secondPerson[2], Is.EqualTo("1"), "Player index should be 1");
+        Assert.That(secondPerson[3], Is.EqualTo("5"), "Player B should get a half of the price");
+    }
+
+    /// <summary>
+    /// Starts a game with a showman and two players and plays a question for all up to the answering stage.
+    /// </summary>
+    private static async Task<(Client Showman, MessageListener ShowmanListener, Client PlayerA, Client PlayerB)> StartForAllQuestionAsync(
+        bool validateEqualAnswersSeparately)
+    {
+        var node = new PrimaryNode(new Network.Configuration.NodeConfiguration());
+
+        var gameSettings = new GameSettingsCore<AppSettingsCore>
+        {
+            Showman = new Account { IsHuman = true, Name = Constants.FreePlace },
+            Players =
+            [
+                new Account { IsHuman = true, Name = Constants.FreePlace },
+                new Account { IsHuman = true, Name = Constants.FreePlace }
+            ],
+        };
+
+        var document = SIDocument.Create("Test Package", "Test Author");
+
+        var round = new Round { Name = "Round 1", Type = RoundTypes.Standart };
+        document.Package.Rounds.Add(round);
+
+        var theme = new Theme { Name = "Test Theme" };
+        round.Themes.Add(theme);
+
+        var question = new Question { Price = 10, TypeName = QuestionTypes.ForAll };
+        theme.Questions.Add(question);
+
+        question.Parameters[QuestionParameterNames.Question] = new StepParameter
+        {
+            Type = StepParameterTypes.Content,
+            ContentValue =
+            [
+                new() { Value = "Test question text", Type = ContentTypes.Text }
+            ]
+        };
+
+        question.Right.Add("right");
+
+        var game = GameRunner.CreateGame(
+            node,
+            gameSettings,
+            new SI.Contracts.RoomSettings
+            {
+                HostName = "Showman",
+                Showman = new SI.Contracts.Models.Account
+                {
+                    Type = SI.Contracts.Models.AccountType.Human,
+                    Name = Constants.FreePlace
+                },
+                Players =
+                [
+                    new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace },
+                    new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace }
+                ]
+            },
+            new SI.Contracts.TimeSettings(),
+            new SI.Contracts.RulesSettings { ValidateEqualAnswersSeparately = validateEqualAnswersSeparately },
+            "en-US",
+            document,
+            Substitute.For<IGameHost>(),
+            Substitute.For<IFileShare>(),
+            Array.Empty<ComputerAccount>(),
+            Array.Empty<ComputerAccount>(),
+            Array.Empty<ComputerAccount>(),
+            Substitute.For<IAvatarHelper>(),
+            null,
+            null);
+
+        game.Run();
+
+        var showmanClient = new Client("Showman");
+        var showmanListener = new MessageListener(showmanClient);
+        showmanClient.ConnectTo(node);
+        game.Authenticate(showmanClient.Name, false, GameRole.Showman, null);
+
+        var playerAClient = new Client("A");
+        using var playerAListener = new MessageListener(playerAClient);
+        playerAClient.ConnectTo(node);
+        game.Authenticate(playerAClient.Name, false, GameRole.Player, null);
+
+        var playerBClient = new Client("B");
+        playerBClient.ConnectTo(node);
+        game.Authenticate(playerBClient.Name, false, GameRole.Player, null);
+
+        showmanClient.SendMessage(Messages.Start);
+
+        await showmanListener.WaitForMessageAsync(Messages.AskSelectPlayer);
+        showmanClient.SendMessage(new MessageBuilder(Messages.SelectPlayer, 0).ToString(), receiver: NetworkConstants.GameName);
+
+        await playerAListener.WaitForMessageAsync(Messages.Answer);
+
+        return (showmanClient, showmanListener, playerAClient, playerBClient);
+    }
+    /// <summary>
     /// Tests game initialization sequence.
     /// Validates that initialization messages are sent in the correct order as documented.
     /// </summary>
@@ -646,7 +841,15 @@ public sealed class ScenariosTests
             throw new InvalidOperationException($"Timeout waiting for message: {expectedMessageType}");
         }
 
-        public async Task<string[]> WaitForMessageAsync(string messageType, CancellationToken cancellationToken = default)
+        public Task<string[]> WaitForMessageAsync(string messageType, CancellationToken cancellationToken = default) =>
+            WaitForMessageAsync([messageType], cancellationToken);
+
+        /// <summary>
+        /// Waits for the first message of any of the provided types.
+        /// </summary>
+        public Task<string[]> WaitForMessageAsync(params string[] messageTypes) => WaitForMessageAsync(messageTypes, default);
+
+        private async Task<string[]> WaitForMessageAsync(string[] messageTypes, CancellationToken cancellationToken)
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(120)); // 10 second timeout to prevent infinite hang
@@ -657,14 +860,14 @@ public sealed class ScenariosTests
                 {
                     var messageArgs = message.Text.Split(Message.ArgsSeparatorChar, StringSplitOptions.RemoveEmptyEntries);
 
-                    if (messageArgs[0] == messageType)
+                    if (Array.IndexOf(messageTypes, messageArgs[0]) >= 0)
                     {
                         return messageArgs;
                     }
                 }
             }
 
-            throw new InvalidOperationException($"Timeout waiting for message: {messageType}");
+            throw new InvalidOperationException($"Timeout waiting for message: {string.Join(", ", messageTypes)}");
         }
 
         private System.Threading.Tasks.ValueTask Client_MessageReceived(Message arg) => _messageChannel.Writer.WriteAsync(arg);

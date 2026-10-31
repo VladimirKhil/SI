@@ -22,6 +22,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const PenaltyType DefaultQuestionWithButtonPenalty = PenaltyType.SubtractPoints;
     public const PenaltyType DefaultQuestionForYourselfPenalty = PenaltyType.None;
     public const PenaltyType DefaultQuestionForAllPenalty = PenaltyType.SubtractPoints;
+    public const bool DefaultValidateEqualAnswersSeparately = false;
     public const int DefaultQuestionForYourselfFactor = 2;
     public const ButtonPressMode DefaultButtonPressMode = ButtonPressMode.RandomWithinInterval;
     public const bool DefaultPreloadRoundContent = true;
@@ -260,6 +261,20 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         }
     }
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _validateEqualAnswersSeparately = DefaultValidateEqualAnswersSeparately;
+
+    /// <summary>
+    /// Validate equal answers of different players in questions for all separately.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultValidateEqualAnswersSeparately)]
+    public bool ValidateEqualAnswersSeparately
+    {
+        get => _validateEqualAnswersSeparately;
+        set { _validateEqualAnswersSeparately = value; OnPropertyChanged(); }
+    }
+
     private int _questionForYourselfFactor = DefaultQuestionForYourselfFactor;
 
     /// <summary>
@@ -440,6 +455,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         QuestionWithButtonPenalty = settings.QuestionWithButtonPenalty;
         QuestionForYourselfPenalty = settings.QuestionForYourselfPenalty;
         QuestionForAllPenalty = settings.QuestionForAllPenalty;
+        ValidateEqualAnswersSeparately = settings.ValidateEqualAnswersSeparately;
         QuestionForYourselfFactor = settings.QuestionForYourselfFactor;
         ButtonPressMode = settings.ButtonPressMode;
         _preloadRoundContent = settings.PreloadRoundContent;

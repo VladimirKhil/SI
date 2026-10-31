@@ -3131,6 +3131,26 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.DecisionMakers.AddRange(selectors);
     }
 
+    /// <summary>
+    /// Finds the verdict the showman has already given to the current answerer answer.
+    /// </summary>
+    private (bool IsRight, double Factor)? FindAnswerVerdict()
+    {
+        var answer = _state.Answerer?.Answer;
+
+        if (answer == null)
+        {
+            return null;
+        }
+
+        var validation = _state.Rules.ValidateEqualAnswersSeparately
+            ? _state.QuestionPlay.Validations.FirstOrDefault(
+                validation => validation.PlayerIndex == _state.AnswererIndex && validation.Answer == answer)
+            : _state.QuestionPlay.Validations.FirstOrDefault(validation => validation.Answer == answer);
+
+        return validation?.Verdict;
+    }
+
     private void AskRight()
     {
         if (_state.Answerer == null)
@@ -3163,15 +3183,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             OnDecision();
         }
-        else if (_state.Answerer.Answer != null
-            && _state.QuestionPlay.Validations.TryGetValue(_state.Answerer.Answer, out var validation)
-            && validation.HasValue)
+        else if (FindAnswerVerdict() is (bool, double) verdict)
         {
             _state.IsWaiting = true;
             _state.Decision = DecisionType.AnswerValidating;
 
-            _state.Answerer.AnswerIsRight = validation.Value.Item1;
-            _state.Answerer.AnswerValidationFactor = validation.Value.Item2;
+            _state.Answerer.AnswerIsRight = verdict.IsRight;
+            _state.Answerer.AnswerValidationFactor = verdict.Factor;
             _state.ShowmanDecision = true;
 
             OnDecision();

@@ -55,14 +55,19 @@ internal sealed class QuestionPlayState
     internal Dictionary<(string ContentType, string ContentValue), Completion> MediaContentCompletions { get; } = new();
 
     /// <summary>
-    /// Answer validations status.
+    /// Answer validations in the order they have been requested from the showman.
     /// </summary>
-    internal Dictionary<string, (bool, double)?> Validations { get; } = new();
+    /// <remarks>
+    /// When <see cref="SI.Contracts.RulesSettings.ValidateEqualAnswersSeparately" /> is enabled, validations are kept per player:
+    /// equal answers could deserve different verdicts (for example, depending on the time they have been provided).
+    /// Otherwise there is a single validation for each distinct answer.
+    /// </remarks>
+    internal List<AnswerValidation> Validations { get; } = new();
 
     /// <summary>
     /// Number of active validations.
     /// </summary>
-    internal int ActiveValidationCount => Validations.Count(pair => pair.Value == null);
+    internal int ActiveValidationCount => Validations.Count(validation => validation.Verdict == null);
 
     /// <summary>
     /// Should the player answers be validated after right answer.
@@ -206,6 +211,16 @@ internal sealed class QuestionPlayState
 
     internal void RemovePlayer(int playerIndex)
     {
+        Validations.RemoveAll(validation => validation.PlayerIndex == playerIndex);
+
+        foreach (var validation in Validations)
+        {
+            if (validation.PlayerIndex > playerIndex)
+            {
+                validation.PlayerIndex--;
+            }
+        }
+
         if (!AnswererIndicies.Any(index => index >= playerIndex))
         {
             return;
