@@ -710,7 +710,7 @@ Escape (правая кнопка мыши) - завершить игру</value
     <value>Цена вопроса</value>
   </data>
   <data name="UseSIGameEngine" xml:space="preserve">
-    <value>Использовать движок SIGame</value>
+    <value>Использовать движок SIGame (экспериментальная функция)</value>
   </data>
   <data name="NextRound" xml:space="preserve">
     <value>Следующий раунд</value>

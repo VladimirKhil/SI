@@ -1783,7 +1783,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use SIGame engine.
+        ///   Looks up a localized string similar to Use SIGame engine (experimental feature).
         /// </summary>
         public static string UseSIGameEngine {
             get {

@@ -57,7 +57,6 @@
     <None Remove="Images\sigame_logo.jpg" />
     <None Remove="Images\siquester_logo.jpg" />
     <None Remove="Images\vk_logo.png" />
-    <None Remove="Images\yoomoney_logo.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\active_player.png" />
@@ -67,7 +66,6 @@
     <Resource Include="Images\sigame_logo.jpg" />
     <Resource Include="Images\siquester_logo.jpg" />
     <Resource Include="Images\vk_logo.png" />
-    <Resource Include="Images\yoomoney_logo.png" />
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -197,6 +195,9 @@
     <None Update="webtable\d26e8e629f57716e90a0.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="webtable\d660f85b3fc88581c86b.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="webtable\e30b805477ba6904b1b0.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -225,6 +226,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="wwwroot2\c367c21f39a95abeddff.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="wwwroot2\d660f85b3fc88581c86b.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="wwwroot2\e30b805477ba6904b1b0.ttf">

@@ -86,6 +86,8 @@ internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks
 
     public void SetPause(bool isPaused) => _actions.Pause(isPaused);
 
+    public void PressButton() => _actions.PressButton(null);
+
     public void Dispose()
     {
 

@@ -266,7 +266,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (Thread.CurrentThread.CurrentUICulture.Name == "ru-RU")
         {
             links.Add(new(new Uri("https://vk.com/si_game"), "VK", "/SImulator;component/Images/vk_logo.png"));
-            links.Add(new(new Uri("https://yoomoney.ru/to/410012283941753"), "Yoomoney", "/SImulator;component/Images/yoomoney_logo.png"));
             links.Add(new(new Uri("https://boosty.to/vladimirkhil"), "Boosty", "/SImulator;component/Images/boosty_logo.png"));
         }
 

@@ -53,6 +53,7 @@ public sealed class WebManagerNew(WebApplication webApplication, IGameRepository
         {
             ContentInfos = new[] { new { } },
             StorageInfos = Array.Empty<object>(),
+            SiHosts = new object(),
         });
 
         await webApplication.StartAsync();
