@@ -41,6 +41,16 @@ public enum Tasks
     WaitFirst,
 
     /// <summary>
+    /// Ask to select theme on game table.
+    /// </summary>
+    AskToSelectTheme,
+
+    /// <summary>
+    /// Waiting for theme selection.
+    /// </summary>
+    WaitSelectTheme,
+
+    /// <summary>
     /// Ask to select question on game table.
     /// </summary>
     AskToSelectQuestion,

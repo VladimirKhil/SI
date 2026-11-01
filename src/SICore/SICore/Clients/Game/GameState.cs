@@ -204,11 +204,6 @@ public sealed class GameState : Data
     }
 
     /// <summary>
-    /// Отвеченные неверные версии
-    /// </summary>
-    internal List<string> UsedWrongVersions = new();
-
-    /// <summary>
     /// Is any decision being awaited now.
     /// </summary>
     internal bool IsWaiting { get; set; }
@@ -507,6 +502,11 @@ public sealed class GameState : Data
     public bool IsPlayingMediaPaused { get; set; }
 
     public int ThemeIndexToDelete { get; set; } = -1;
+
+    /// <summary>
+    /// Indicies of themes that could be selected by the chooser.
+    /// </summary>
+    public IReadOnlyCollection<int> ThemeSelectionOptions { get; set; } = [];
 
     /// <summary>
     /// Round index to move to.

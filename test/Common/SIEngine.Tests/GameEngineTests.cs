@@ -714,6 +714,11 @@ internal class TrackingGameHandler : ISIEnginePlayHandler
         CallOrder.Add("OnQuestionSelected");
     }
 
+    public void AskForThemeSelection(IReadOnlyCollection<int> options, Action<int> selectCallback)
+    {
+        CallOrder.Add("AskForThemeSelection");
+    }
+
     public void AskForThemeDelete(Action<int> deleteCallback)
     {
         CallOrder.Add("AskForThemeDelete");

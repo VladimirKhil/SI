@@ -70,6 +70,11 @@ public static class Messages
     public const string AskSelectPlayer = "ASK_SELECT_PLAYER";
 
     /// <summary>
+    /// Asks to select a theme.
+    /// </summary>
+    public const string AskSelectTheme = "ASK_SELECT_THEME";
+
+    /// <summary>
     /// Asks to make a stake.
     /// </summary>
     public const string AskStake = "ASK_STAKE";
@@ -590,6 +595,11 @@ public static class Messages
     /// Viewer takes showman or player seat.
     /// </summary>
     public const string Seat = "SEAT";
+
+    /// <summary>
+    /// Select theme by index.
+    /// </summary>
+    public const string SelectTheme = "SELECT_THEME";
 
     /// <summary>
     /// Select player.

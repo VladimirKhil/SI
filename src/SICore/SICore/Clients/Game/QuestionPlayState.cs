@@ -159,6 +159,11 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal int? PendingReplayIndex { get; set; }
 
+    /// <summary>
+    /// Already used wrong versions of the question. Used to avoid repeating the same wrong version.
+    /// </summary>
+    internal List<string> UsedWrongVersions { get; } = [];
+
     internal void StartContentStep(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContent)
     {
         ContentItems = contentItems;
@@ -202,6 +207,11 @@ internal sealed class QuestionPlayState
         FlexiblePrice = false;
         QuestionKey = "";
         CollectMediaCompletions = false;
+        ContentItems = null;
+        MoveToContent = null;
+        LastContentIndex = null;
+        PendingReplayIndex = null;
+        UsedWrongVersions.Clear();
     }
 
     internal void RemovePlayer(int playerIndex)

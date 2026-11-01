@@ -13,6 +13,10 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         SelectQuestion = selectCallback;
     }
 
+    public void AskForThemeSelection(IReadOnlyCollection<int> options, Action<int> selectCallback)
+    {
+    }
+
     public void AskForThemeDelete(Action<int> deleteCallback)
     {
         

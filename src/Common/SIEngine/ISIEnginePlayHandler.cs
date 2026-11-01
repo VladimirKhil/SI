@@ -74,6 +74,13 @@ public interface ISIEnginePlayHandler
     void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback);
 
     /// <summary>
+    /// Handles theme selection request.
+    /// </summary>
+    /// <param name="options">Indicies of themes that could be selected.</param>
+    /// <param name="selectCallback">Selection callback.</param>
+    void AskForThemeSelection(IReadOnlyCollection<int> options, Action<int> selectCallback);
+
+    /// <summary>
     /// Handles question selection.
     /// </summary>
     /// <remarks>

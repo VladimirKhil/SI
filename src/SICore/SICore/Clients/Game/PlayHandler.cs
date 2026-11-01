@@ -136,6 +136,14 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
         Controller.ScheduleExecution(Tasks.AskToSelectQuestion, 1, force: true); // TODO: why not calling AskToSelectQuestion directly?
     }
 
+    public void AskForThemeSelection(IReadOnlyCollection<int> options, Action<int> selectCallback)
+    {
+        _state.ThemeSelectionOptions = [.. options];
+        _state.ThemeIndex = -1;
+        Controller.SetContinuation(() => selectCallback(_state.ThemeIndex));
+        Controller.ScheduleExecution(Tasks.AskToSelectTheme, 1, force: true);
+    }
+
     public void OnQuestionSelected(int themeIndex, int questionIndex) => Controller.OnQuestionSelected(themeIndex, questionIndex);
 
     public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)

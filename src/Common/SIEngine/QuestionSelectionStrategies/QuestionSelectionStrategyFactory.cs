@@ -17,6 +17,7 @@ internal static class QuestionSelectionStrategyFactory
             QuestionSelectionStrategyType.SelectByPlayer => new SelectByPlayerStrategy(round, playHandler, selectionCallback, endRoundCallback),
             QuestionSelectionStrategyType.Sequential => new SequentialStrategy(round, playHandler, selectionCallback),
             QuestionSelectionStrategyType.RemoveOtherThemes => new RemoveOtherThemesStrategy(round, engineOptions, playHandler, selectionCallback),
+            QuestionSelectionStrategyType.SelectThemeByPlayer => new SelectThemeByPlayerStrategy(round, playHandler, selectionCallback),
             _ => throw new InvalidOperationException($"Invalid stategy type {questionSelectionStrategyType}")
         };
 }
