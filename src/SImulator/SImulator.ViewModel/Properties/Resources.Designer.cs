@@ -538,6 +538,15 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select player.
+        /// </summary>
+        public static string SelectPlayer {
+            get {
+                return ResourceManager.GetString("SelectPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stake question.
         /// </summary>
         public static string StakeQuestion {

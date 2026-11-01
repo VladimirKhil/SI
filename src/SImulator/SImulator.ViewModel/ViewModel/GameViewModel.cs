@@ -2139,6 +2139,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private bool ProcessPlayerPress(int index, PlayerInfo player)
     {
+        if (_managed)
+        {
+            _gameActions.PressButton();
+            return true;
+        }
+
         // The player has pressed already
         if (_selectedPlayers.Contains(player) || IsPaused)
         {

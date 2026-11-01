@@ -437,6 +437,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         GameViewModel.LocalInfo.TStage = TableStage.RoundTable;
     }
 
+    public void AskForThemeSelection(IReadOnlyCollection<int> options, Action<int> selectCallback) => selectCallback(options.Min());
+
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel.OnQuestionSelected(themeIndex, questionIndex);
 
     public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)

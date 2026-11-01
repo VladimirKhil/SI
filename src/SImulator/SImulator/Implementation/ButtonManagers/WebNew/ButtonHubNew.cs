@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Threading.Tasks;
 
 namespace SImulator.Implementation.ButtonManagers.WebNew;
 
@@ -17,28 +15,28 @@ public sealed class ButtonHubNew(IGameRepository gameRepository) : Hub<IButtonCl
         return gameRepository.TryGetGameById(gameId);
     }
 
-    public async Task<JoinGameResponse> JoinGame(JoinGameRequest request)
+    public async Task<JoinGame2Result> JoinGame2(JoinGameRequest2 request)
     {
         if (request.Role != GameRole.Player)
         {
-            return new JoinGameResponse { ErrorType = JoinGameErrorType.InvalidRole };
+            return JoinGame2Result.InvalidRole;
         }
 
         var info = gameRepository.TryGetGameById(request.GameId);
 
         if (info == null)
         {
-            return new JoinGameResponse { ErrorType = JoinGameErrorType.GameNotFound };
+            return JoinGame2Result.GameNotFound;
         }
 
         if (gameRepository.BannedNames.Contains(request.UserName))
         {
-            return new JoinGameResponse { ErrorType = JoinGameErrorType.Forbidden };
+            return JoinGame2Result.Forbidden;
         }
 
         if (!(await gameRepository.TryAddPlayerAsync(Context.ConnectionId, request.UserName)))
         {
-            return new JoinGameResponse { ErrorType = JoinGameErrorType.InvalidRole };
+            return JoinGame2Result.InvalidRole;
         }
 
         await Groups.AddToGroupAsync(Context.ConnectionId, request.GameId.ToString(), Context.ConnectionAborted);
@@ -48,7 +46,7 @@ public sealed class ButtonHubNew(IGameRepository gameRepository) : Hub<IButtonCl
         // Add connection
         Context.Items["userName"] = request.UserName;
 
-        return JoinGameResponse.Success;
+        return JoinGame2Result.Success;
     }
 
     public void SendMessage(Message m)

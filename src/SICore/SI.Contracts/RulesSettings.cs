@@ -9,6 +9,7 @@ public sealed class RulesSettings
     public const bool DefaultFalseStart = true;
     public const bool DefaultPartialText = false;
     public const bool DefaultPartialImages = false;
+    public const bool DefaultHideImageOnAnswerAndPause = false;
     public const bool DefaultPlayAllThemesInThemesRemovalRound = false;
     public const bool DefaultAllowEveryoneToPlayHiddenStakes = true;
     public const bool DefaultOral = false;
@@ -35,6 +36,7 @@ public sealed class RulesSettings
         FalseStart = DefaultFalseStart,
         PartialText = DefaultPartialText,
         PartialImages = DefaultPartialImages,
+        HideImageOnAnswerAndPause = DefaultHideImageOnAnswerAndPause,
         PlayAllThemesInThemesRemovalRound = DefaultPlayAllThemesInThemesRemovalRound,
         AllowEveryoneToPlayHiddenStakes = DefaultAllowEveryoneToPlayHiddenStakes,
         Oral = DefaultOral,
@@ -75,6 +77,11 @@ public sealed class RulesSettings
     /// Gets or sets a value indicating whether partial images are enabled.
     /// </summary>
     public bool PartialImages { get; set; } = DefaultPartialImages;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether question image is hidden from players and viewers while a player is answering and while the game is paused.
+    /// </summary>
+    public bool HideImageOnAnswerAndPause { get; set; } = DefaultHideImageOnAnswerAndPause;
 
     /// <summary>
     /// Gets or sets a value indicating whether all themes are played in the themes removal round.

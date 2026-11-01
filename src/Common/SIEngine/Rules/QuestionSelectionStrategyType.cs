@@ -18,5 +18,10 @@ public enum QuestionSelectionStrategyType
     /// <summary>
     /// Remove other themes and play the first question in last theme. Only one question in round is played.
     /// </summary>
-    RemoveOtherThemes
+    RemoveOtherThemes,
+
+    /// <summary>
+    /// Next theme is selected by moving player. Questions in the theme are played sequentially.
+    /// </summary>
+    SelectThemeByPlayer,
 }

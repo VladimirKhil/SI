@@ -231,6 +231,16 @@ public sealed class Game : MessageHandler
 
                     break;
 
+                case nameof(RulesSettings.HideImageOnAnswerAndPause):
+                    if (bool.TryParse(optionValue, out var hideImageOnAnswerAndPause) && hideImageOnAnswerAndPause != rules.HideImageOnAnswerAndPause)
+                    {
+                        rules.HideImageOnAnswerAndPause = hideImageOnAnswerAndPause;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
                 case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
                 case nameof(GameState.TimeSettings.PartialImage):
                     if (int.TryParse(optionValue, out var partialImageTime) && partialImageTime != _state.TimeSettings.PartialImage)
@@ -315,6 +325,7 @@ public sealed class Game : MessageHandler
             nameof(rules.ReadingSpeed), rules.Managed ? 0 : rules.ReadingSpeed,
             nameof(rules.PartialText), rules.PartialText,
             nameof(rules.PartialImages), rules.PartialImages,
+            nameof(rules.HideImageOnAnswerAndPause), rules.HideImageOnAnswerAndPause,
             nameof(rules.UseAppellations), rules.UseAppellations,
             nameof(rules.ValidateEqualAnswersSeparately), rules.ValidateEqualAnswersSeparately,
             nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
@@ -752,6 +763,10 @@ public sealed class Game : MessageHandler
                         OnChoice(message, args);
                         break;
 
+                    case Messages.SelectTheme:
+                        OnSelectTheme(message, args);
+                        break;
+
                     case Messages.Toggle:
                         OnToggle(message, args);
                         break;
@@ -972,6 +987,11 @@ public sealed class Game : MessageHandler
         }
 
         validation.Verdict = (validationStatus, validationFactor);
+
+        if (_state.Decision == DecisionType.AnswerValidating && _state.QuestionPlay.Validations.All(v => v.Verdict.HasValue))
+        {
+            _controller.Stop(StopReason.Decision);
+        }
     }
 
     private void OnPin(string hostName)
@@ -1062,6 +1082,38 @@ public sealed class Game : MessageHandler
         if (Controller.CanPlayerAct())
         {
             _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+        }
+
+        _controller.Stop(StopReason.Decision);
+    }
+
+    private void OnSelectTheme(Message message, string[] args)
+    {
+        if (!_state.IsWaiting
+            || _state.Decision != DecisionType.ThemeSelection
+            || args.Length != 2
+            || _state.Chooser == null
+            || message.Sender != _state.Chooser.Name
+                && (!_state.IsOralNow || message.Sender != _state.ShowMan.Name))
+        {
+            return;
+        }
+
+        if (!int.TryParse(args[1], out var themeIndex) || !_state.ThemeSelectionOptions.Contains(themeIndex))
+        {
+            return;
+        }
+
+        _state.ThemeIndex = themeIndex;
+
+        if (_state.IsOralNow)
+        {
+            _actions.Cancel(_state.ShowMan.Name);
+        }
+
+        if (Controller.CanPlayerAct())
+        {
+            _actions.Cancel(_state.Chooser.Name);
         }
 
         _controller.Stop(StopReason.Decision);
@@ -2227,7 +2279,7 @@ public sealed class Game : MessageHandler
 
                 foreach (var wrong in _state.Question.Wrong)
                 {
-                    if (!_state.UsedWrongVersions.Contains(wrong))
+                    if (!_state.QuestionPlay.UsedWrongVersions.Contains(wrong))
                     {
                         restwrong.Add(wrong);
                     }
@@ -2239,7 +2291,7 @@ public sealed class Game : MessageHandler
 
                     foreach (var wrong in rejectedAnswers)
                     {
-                        if (!_state.UsedWrongVersions.Contains(wrong))
+                        if (!_state.QuestionPlay.UsedWrongVersions.Contains(wrong))
                         {
                             restwrong.Add(wrong);
                         }
@@ -2255,7 +2307,7 @@ public sealed class Game : MessageHandler
 
                 if (!Controller.HaveMultipleAnswerers())
                 {
-                    _state.UsedWrongVersions.Add(restwrong[wrongIndex]);
+                    _state.QuestionPlay.UsedWrongVersions.Add(restwrong[wrongIndex]);
                 }
 
                 _state.Answerer.Answer = restwrong[wrongIndex].GrowFirstLetter();

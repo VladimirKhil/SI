@@ -16,6 +16,11 @@ public enum DecisionType
     QuestionSelection,
 
     /// <summary>
+    /// Theme selection.
+    /// </summary>
+    ThemeSelection,
+
+    /// <summary>
     /// Player button pressing.
     /// </summary>
     PlayerButtonPressing,

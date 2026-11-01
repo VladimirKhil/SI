@@ -55,4 +55,6 @@ public enum MessageCode
     AppellationAccepted,
 
     AppellationRejected,
+
+    SelectTheme,
 }

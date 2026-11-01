@@ -83,6 +83,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     public event Action<string, int, int>? AdShown;
 
+    private bool ValidateAfterRightAnswer => _state.QuestionPlay.ValidateAfterRightAnswer || _state.Rules.GameMode == SI.Contracts.GameMode.Quiz;
+
     internal void OnStageChanged(
         GameStages stage,
         string stageName,
@@ -1057,6 +1059,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     {
         DecisionType.StarterChoosing => OnDecisionStarterChoosing(),
         DecisionType.QuestionSelection => OnDecisionQuestionSelection(),
+        DecisionType.ThemeSelection => OnDecisionThemeSelection(),
         DecisionType.Answering => OnDecisionAnswering(),
         DecisionType.AnswerValidating => OnDecisionAnswerValidating(),
         DecisionType.QuestionAnswererSelection => OnDecisionQuestionAnswererSelection(),
@@ -1077,6 +1080,18 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             || _state.QuestionIndex == -1
             || _state.QuestionIndex >= _state.TInfo.RoundInfo[_state.ThemeIndex].Questions.Count
             || !_state.TInfo.RoundInfo[_state.ThemeIndex].Questions[_state.QuestionIndex].IsActive())
+        {
+            return false;
+        }
+
+        StopWaiting();
+        ScheduleExecution(Tasks.MoveNext, 1, force: true);
+        return true;
+    }
+
+    private bool OnDecisionThemeSelection()
+    {
+        if (!_state.ThemeSelectionOptions.Contains(_state.ThemeIndex))
         {
             return false;
         }
@@ -1640,12 +1655,21 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
         _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
 
-        if (_state.QuestionPlay.ValidateAfterRightAnswer)
+        if (ValidateAfterRightAnswer)
         {
             if (!_state.HiddenPersons)
             {
                 var m = new MessageBuilder(Messages.Answers).AddRange(_state.Players.Select(p => p.Answer ?? ""));
                 _actions.SendMessage(m.ToString());
+            }
+
+            if (!_state.QuestionPlay.ValidateAfterRightAnswer && _state.QuestionPlay.Validations.Any(v => !v.Verdict.HasValue))
+            {
+                // We need to wait for showman decision on the several answers validity
+                var waitTime = _state.TimeSettings.ShowmanDecision * 10;
+                ScheduleExecution(Tasks.MoveNext, waitTime); // Not WaitRight
+                WaitFor(DecisionType.AnswerValidating, waitTime, -1);
+                return true;
             }
 
             ScheduleExecution(Tasks.MoveNext, 30, 1, true);
@@ -1772,6 +1796,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
                     case Tasks.WaitFirst:
                         WaitFirst();
+                        break;
+
+                    case Tasks.AskToSelectTheme:
+                        OnAskToSelectTheme();
+                        break;
+
+                    case Tasks.WaitSelectTheme:
+                        OnWaitSelectTheme();
                         break;
 
                     case Tasks.AskToSelectQuestion:
@@ -2024,7 +2056,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 break;
 
             case StopReason.Appellation:
-                var savedTask = task == Tasks.WaitChoose ? Tasks.AskToSelectQuestion : (task == Tasks.WaitDelete ? Tasks.AskToDelete : task);
+                var savedTask = task switch
+                {
+                    Tasks.WaitChoose => Tasks.AskToSelectQuestion,
+                    Tasks.WaitSelectTheme => Tasks.AskToSelectTheme,
+                    Tasks.WaitDelete => Tasks.AskToDelete,
+                    _ => task
+                };
 
                 _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({_taskRunner.PrintOldTasks()})");
 
@@ -2507,7 +2545,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var answerer = _state.Players[answererIndex];
         var playerAnswer = answerer.Answer ?? "";
-        _state.PlayerIsRight = ValidateAnswerAutomatically(playerAnswer, answerer.AnswerIsWrong);
+        _state.PlayerIsRight = ValidateAnswerAutomatically(answererIndex, playerAnswer, answerer.AnswerIsWrong);
 
         RegisterQuestionAnswerStatistics(answerer, _state.PlayerIsRight);
 
@@ -2515,7 +2553,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.AnnouncePlayerStakeWithAutomaticAnswerValidation, 15);
     }
 
-    private bool ValidateAnswerAutomatically(string playerAnswer, bool answerIsWrongByDefault)
+    private bool ValidateAnswerAutomatically(int playerIndex, string playerAnswer, bool answerIsWrongByDefault)
     {
         var rightAnswers = _state.QuestionPlay.RightAnswers;
         var rightAnswer = rightAnswers.FirstOrDefault() ?? "";
@@ -2527,7 +2565,10 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             AnswerType.Number => AnswerChecker.IsNumberAnswerRight(playerAnswer, rightAnswer, deviation),
             AnswerType.Point => AnswerChecker.IsPointAnswerRight(playerAnswer, rightAnswer, Math.Max(0.02, deviation)),
             AnswerType.Client => !answerIsWrongByDefault,
-            _ => AnswerChecker.IsAnswerRight(playerAnswer, rightAnswers),
+            // Text
+            _ => FindAnswerVerdict(playerIndex, playerAnswer) is (bool, double) verdict
+                ? verdict.IsRight
+                : AnswerChecker.IsAnswerRight(playerAnswer, rightAnswers),
         };
     }
 
@@ -2890,7 +2931,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _actions.OnPlayerAnswer(answererIndex, playerAnswer ?? "");
 
-        if (_state.QuestionPlay.ValidateAfterRightAnswer)
+        if (ValidateAfterRightAnswer)
         {
             ScheduleExecution(Tasks.Announce, 25, force: true);
         }
@@ -2975,6 +3016,55 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.MoveNext, 20, 0);
     }
 
+    private void OnAskToSelectTheme()
+    {
+        if (_state.Chooser == null)
+        {
+            throw new Exception("_data.Chooser == null");
+        }
+
+        _actions.ShowmanReplicNew(MessageCode.SelectTheme, _state.Chooser.Name);
+
+        _state.ThemeIndex = -1;
+
+        var time = _state.TimeSettings.ThemeSelection * 10;
+        var message = new MessageBuilder(Messages.AskSelectTheme).AddRange(_state.ThemeSelectionOptions.Cast<object>()).ToString();
+        _state.IsOralNow = _state.IsOral && _state.Chooser.IsHuman;
+
+        if (_state.IsOralNow)
+        {
+            _actions.SendMessage(message, _state.ShowMan.Name);
+        }
+        else if (!_state.Chooser.IsConnected)
+        {
+            time = 20;
+        }
+
+        if (CanPlayerAct())
+        {
+            _actions.SendMessage(message, _state.Chooser.Name);
+        }
+
+        ScheduleExecution(Tasks.WaitSelectTheme, time);
+        WaitFor(DecisionType.ThemeSelection, time, _state.ChooserIndex);
+    }
+
+    private void OnWaitSelectTheme()
+    {
+        if (_state.Chooser != null)
+        {
+            _actions.Cancel(_state.Chooser.Name);
+        }
+
+        if (_state.IsOralNow)
+        {
+            _actions.Cancel(_state.ShowMan.Name);
+        }
+
+        _state.ThemeIndex = _state.ThemeSelectionOptions.ElementAt(Random.Shared.Next(_state.ThemeSelectionOptions.Count));
+        OnDecision();
+    }
+
     private void OnAskToSelectQuestion()
     {
         _actions.InformSums();
@@ -3001,8 +3091,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _state.ThemeIndex = -1;
         _state.QuestionIndex = -1;
-
-        _state.UsedWrongVersions.Clear();
 
         int time;
 
@@ -3143,9 +3231,19 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             return null;
         }
 
+        return FindAnswerVerdict(_state.AnswererIndex, answer);
+    }
+
+    /// <summary>
+    /// Finds the verdict the showman has already given to the player answer.
+    /// </summary>
+    /// <param name="playerIndex">Index of the player that has provided the answer.</param>
+    /// <param name="answer">Player answer.</param>
+    private (bool IsRight, double Factor)? FindAnswerVerdict(int playerIndex, string answer)
+    {
         var validation = _state.Rules.ValidateEqualAnswersSeparately
             ? _state.QuestionPlay.Validations.FirstOrDefault(
-                validation => validation.PlayerIndex == _state.AnswererIndex && validation.Answer == answer)
+                validation => validation.PlayerIndex == playerIndex && validation.Answer == answer)
             : _state.QuestionPlay.Validations.FirstOrDefault(validation => validation.Answer == answer);
 
         return validation?.Verdict;
@@ -4586,7 +4684,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var timeout = DetectRoundTimeout();
         var nextTaskTime = 1;
 
-        if (HaveMultipleAnswerers() && _state.QuestionPlay.ValidateAfterRightAnswer)
+        if (HaveMultipleAnswerers() && ValidateAfterRightAnswer)
         {
             var validationResult = ValidatePlayersAnswers();
 
@@ -4654,7 +4752,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             var answerer = _state.Players[answererIndex];
             var playerAnswer = answerer.Answer ?? "";
-            var isRight = ValidateAnswerAutomatically(playerAnswer, answerer.AnswerIsWrong);
+            var isRight = ValidateAnswerAutomatically(answererIndex, playerAnswer, answerer.AnswerIsWrong);
 
             RegisterQuestionAnswerStatistics(answerer, isRight);
 

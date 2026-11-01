@@ -70,6 +70,11 @@ public static class Messages
     public const string AskSelectPlayer = "ASK_SELECT_PLAYER";
 
     /// <summary>
+    /// Asks to select a theme.
+    /// </summary>
+    public const string AskSelectTheme = "ASK_SELECT_THEME";
+
+    /// <summary>
     /// Asks to make a stake.
     /// </summary>
     public const string AskStake = "ASK_STAKE";
@@ -505,13 +510,6 @@ public static class Messages
     public const string QuestionSources = "QUESTION_SOURCES";
 
     /// <summary>
-    /// Скорость чтения вопроса
-    /// </summary>
-    [IdempotencyRequired]
-    [Obsolete("Use Options")]
-    public const string ReadingSpeed = "READINGSPEED";
-
-    /// <summary>
     /// Готовность к игре
     /// </summary>
     public const string Ready = "READY";
@@ -597,6 +595,11 @@ public static class Messages
     /// Viewer takes showman or player seat.
     /// </summary>
     public const string Seat = "SEAT";
+
+    /// <summary>
+    /// Select theme by index.
+    /// </summary>
+    public const string SelectTheme = "SELECT_THEME";
 
     /// <summary>
     /// Select player.

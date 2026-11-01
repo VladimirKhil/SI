@@ -179,6 +179,14 @@ internal sealed class GameController : IPersonController
                 GameViewModel.ShowmanReplic = $"{(args.Length > 0 ? args[0] + ": " : "")}{Resources.ChooseQuest}";
                 break;
 
+            case MessageCode.SelectPlayer:
+                GameViewModel.ShowmanReplic = $"{(args.Length > 0 ? args[0] + ": " : "")}{Resources.SelectPlayer}";
+                break;
+
+            case MessageCode.Theme:
+                GameViewModel.ShowmanReplic = $"{Resources.Theme}: {(args.Length > 0 ? args[0] : "")}";
+                break;
+
             case MessageCode.ThemeDeletes:
                 MoveWhenFast();
                 break;
@@ -212,6 +220,8 @@ internal sealed class GameController : IPersonController
 
     public void OnQuestionStart(string typeName, bool isDefaultType)
     {
+        GameViewModel.StartButtons(); // Buttons are activated in advance for false starts to work
+
         if (isDefaultType)
         {
             return;

@@ -276,6 +276,9 @@
   <data name="SelectLogoImage" xml:space="preserve">
     <value>Выберите изображение-заставку</value>
   </data>
+  <data name="SelectPlayer" xml:space="preserve">
+    <value>Выберите игрока</value>
+  </data>
   <data name="StakeQuestion" xml:space="preserve">
     <value>Вопрос со ставкой</value>
   </data>
