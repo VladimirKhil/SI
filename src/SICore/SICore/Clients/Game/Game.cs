@@ -231,6 +231,16 @@ public sealed class Game : MessageHandler
 
                     break;
 
+                case nameof(RulesSettings.HideImageOnAnswerAndPause):
+                    if (bool.TryParse(optionValue, out var hideImageOnAnswerAndPause) && hideImageOnAnswerAndPause != rules.HideImageOnAnswerAndPause)
+                    {
+                        rules.HideImageOnAnswerAndPause = hideImageOnAnswerAndPause;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
                 case nameof(AppSettingsCore.TimeSettings.PartialImageTime):
                 case nameof(GameState.TimeSettings.PartialImage):
                     if (int.TryParse(optionValue, out var partialImageTime) && partialImageTime != _state.TimeSettings.PartialImage)
@@ -304,6 +314,7 @@ public sealed class Game : MessageHandler
             nameof(rules.ReadingSpeed), rules.Managed ? 0 : rules.ReadingSpeed,
             nameof(rules.PartialText), rules.PartialText,
             nameof(rules.PartialImages), rules.PartialImages,
+            nameof(rules.HideImageOnAnswerAndPause), rules.HideImageOnAnswerAndPause,
             nameof(rules.UseAppellations), rules.UseAppellations,
             nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
             nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);

@@ -14,6 +14,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultHintShowman = false;
     public const bool DefaultPartialText = false;
     public const bool DefaultPartialImages = false;
+    public const bool DefaultHideImageOnAnswerAndPause = false;
     public const bool DefaultPlayAllQuestionsInFinalRound = false;
     public const bool DefaultAllowEveryoneToPlayHiddenStakes = true;
     public const bool DefaultOral = false;
@@ -128,6 +129,20 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     {
         get => _partialImages;
         set { _partialImages = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _hideImageOnAnswerAndPause = DefaultHideImageOnAnswerAndPause;
+
+    /// <summary>
+    /// Hide question image from players and viewers while a player is answering and while the game is paused.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultHideImageOnAnswerAndPause)]
+    public bool HideImageOnAnswerAndPause
+    {
+        get => _hideImageOnAnswerAndPause;
+        set { _hideImageOnAnswerAndPause = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -431,6 +446,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         FalseStart = settings._falseStart;
         PartialText = settings.PartialText;
         PartialImages = settings.PartialImages;
+        HideImageOnAnswerAndPause = settings.HideImageOnAnswerAndPause;
         Managed = settings.Managed;
         HintShowman = settings._hintShowman;
         PlayAllQuestionsInFinalRound = settings.PlayAllQuestionsInFinalRound;

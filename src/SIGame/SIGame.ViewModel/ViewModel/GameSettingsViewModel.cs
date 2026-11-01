@@ -779,6 +779,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             FalseStart = appSettings.FalseStart,
             PartialText = appSettings.PartialText,
             PartialImages = appSettings.PartialImages,
+            HideImageOnAnswerAndPause = appSettings.HideImageOnAnswerAndPause,
             PlayAllThemesInThemesRemovalRound = appSettings.PlayAllQuestionsInFinalRound,
             AllowEveryoneToPlayHiddenStakes = appSettings.AllowEveryoneToPlayHiddenStakes,
             Oral = appSettings.Oral,
