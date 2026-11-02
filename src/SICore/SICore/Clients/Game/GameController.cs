@@ -1663,7 +1663,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 _actions.SendMessage(m.ToString());
             }
 
-            if (!_state.QuestionPlay.ValidateAfterRightAnswer && _state.QuestionPlay.Validations.Any(v => !v.Value.HasValue))
+            if (!_state.QuestionPlay.ValidateAfterRightAnswer && _state.QuestionPlay.Validations.Any(v => !v.Verdict.HasValue))
             {
                 // We need to wait for showman decision on the several answers validity
                 var waitTime = _state.TimeSettings.ShowmanDecision * 10;
@@ -2545,7 +2545,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var answerer = _state.Players[answererIndex];
         var playerAnswer = answerer.Answer ?? "";
-        _state.PlayerIsRight = ValidateAnswerAutomatically(playerAnswer, answerer.AnswerIsWrong);
+        _state.PlayerIsRight = ValidateAnswerAutomatically(answererIndex, playerAnswer, answerer.AnswerIsWrong);
 
         RegisterQuestionAnswerStatistics(answerer, _state.PlayerIsRight);
 
@@ -2553,7 +2553,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.AnnouncePlayerStakeWithAutomaticAnswerValidation, 15);
     }
 
-    private bool ValidateAnswerAutomatically(string playerAnswer, bool answerIsWrongByDefault)
+    private bool ValidateAnswerAutomatically(int playerIndex, string playerAnswer, bool answerIsWrongByDefault)
     {
         var rightAnswers = _state.QuestionPlay.RightAnswers;
         var rightAnswer = rightAnswers.FirstOrDefault() ?? "";
@@ -2566,8 +2566,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             AnswerType.Point => AnswerChecker.IsPointAnswerRight(playerAnswer, rightAnswer, Math.Max(0.02, deviation)),
             AnswerType.Client => !answerIsWrongByDefault,
             // Text
-            _ => _state.QuestionPlay.Validations.TryGetValue(playerAnswer, out var validation) && validation.HasValue
-                ? validation.Value.Item1
+            _ => FindAnswerVerdict(playerIndex, playerAnswer) is (bool, double) verdict
+                ? verdict.IsRight
                 : AnswerChecker.IsAnswerRight(playerAnswer, rightAnswers),
         };
     }
@@ -3219,6 +3219,36 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.DecisionMakers.AddRange(selectors);
     }
 
+    /// <summary>
+    /// Finds the verdict the showman has already given to the current answerer answer.
+    /// </summary>
+    private (bool IsRight, double Factor)? FindAnswerVerdict()
+    {
+        var answer = _state.Answerer?.Answer;
+
+        if (answer == null)
+        {
+            return null;
+        }
+
+        return FindAnswerVerdict(_state.AnswererIndex, answer);
+    }
+
+    /// <summary>
+    /// Finds the verdict the showman has already given to the player answer.
+    /// </summary>
+    /// <param name="playerIndex">Index of the player that has provided the answer.</param>
+    /// <param name="answer">Player answer.</param>
+    private (bool IsRight, double Factor)? FindAnswerVerdict(int playerIndex, string answer)
+    {
+        var validation = _state.Rules.ValidateEqualAnswersSeparately
+            ? _state.QuestionPlay.Validations.FirstOrDefault(
+                validation => validation.PlayerIndex == playerIndex && validation.Answer == answer)
+            : _state.QuestionPlay.Validations.FirstOrDefault(validation => validation.Answer == answer);
+
+        return validation?.Verdict;
+    }
+
     private void AskRight()
     {
         if (_state.Answerer == null)
@@ -3251,15 +3281,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             OnDecision();
         }
-        else if (_state.Answerer.Answer != null
-            && _state.QuestionPlay.Validations.TryGetValue(_state.Answerer.Answer, out var validation)
-            && validation.HasValue)
+        else if (FindAnswerVerdict() is (bool, double) verdict)
         {
             _state.IsWaiting = true;
             _state.Decision = DecisionType.AnswerValidating;
 
-            _state.Answerer.AnswerIsRight = validation.Value.Item1;
-            _state.Answerer.AnswerValidationFactor = validation.Value.Item2;
+            _state.Answerer.AnswerIsRight = verdict.IsRight;
+            _state.Answerer.AnswerValidationFactor = verdict.Factor;
             _state.ShowmanDecision = true;
 
             OnDecision();
@@ -4724,7 +4752,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             var answerer = _state.Players[answererIndex];
             var playerAnswer = answerer.Answer ?? "";
-            var isRight = ValidateAnswerAutomatically(playerAnswer, answerer.AnswerIsWrong);
+            var isRight = ValidateAnswerAutomatically(answererIndex, playerAnswer, answerer.AnswerIsWrong);
 
             RegisterQuestionAnswerStatistics(answerer, isRight);
 

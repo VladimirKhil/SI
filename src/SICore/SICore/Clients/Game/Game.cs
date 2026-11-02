@@ -273,6 +273,17 @@ public sealed class Game : MessageHandler
                     
                     break;
 
+                case nameof(RulesSettings.ValidateEqualAnswersSeparately):
+                    if (bool.TryParse(optionValue, out var validateEqualAnswersSeparately)
+                        && validateEqualAnswersSeparately != rules.ValidateEqualAnswersSeparately)
+                    {
+                        rules.ValidateEqualAnswersSeparately = validateEqualAnswersSeparately;
+                        msg.Add(optionName).Add(optionValue);
+                        changed = true;
+                    }
+
+                    break;
+
                 default:
                     break;
             }
@@ -316,6 +327,7 @@ public sealed class Game : MessageHandler
             nameof(rules.PartialImages), rules.PartialImages,
             nameof(rules.HideImageOnAnswerAndPause), rules.HideImageOnAnswerAndPause,
             nameof(rules.UseAppellations), rules.UseAppellations,
+            nameof(rules.ValidateEqualAnswersSeparately), rules.ValidateEqualAnswersSeparately,
             nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
             nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
     }
@@ -964,14 +976,19 @@ public sealed class Game : MessageHandler
         var validationStatus = args[2] == "+";
         var validationFactor = args.Length > 3 && double.TryParse(args[3], CultureInfo.InvariantCulture, out var factor) && factor >= 0.0 ? factor : 1.0;
 
-        if (!_state.QuestionPlay.Validations.TryGetValue(answer, out var validation) || validation.HasValue)
+        // The showman validates answers in the order they have been asked,
+        // so the verdict belongs to the earliest pending validation of this answer
+        var validation = _state.QuestionPlay.Validations.FirstOrDefault(
+            validation => validation.Answer == answer && !validation.Verdict.HasValue);
+
+        if (validation == null)
         {
             return;
         }
 
-        _state.QuestionPlay.Validations[answer] = (validationStatus, validationFactor);
+        validation.Verdict = (validationStatus, validationFactor);
 
-        if (_state.Decision == DecisionType.AnswerValidating && !_state.QuestionPlay.Validations.Any(v => !v.Value.HasValue))
+        if (_state.Decision == DecisionType.AnswerValidating && _state.QuestionPlay.Validations.All(v => v.Verdict.HasValue))
         {
             _controller.Stop(StopReason.Decision);
         }
@@ -2197,12 +2214,13 @@ public sealed class Game : MessageHandler
                     {
                         var answer = args[1];
 
-                        if (_state.QuestionPlay.Validations.ContainsKey(answer))
+                        if (!_state.Rules.ValidateEqualAnswersSeparately
+                            && _state.QuestionPlay.Validations.Any(validation => validation.Answer == answer))
                         {
-                            break;
+                            break; // The verdict for the equal answer is applied automatically
                         }
 
-                        _state.QuestionPlay.Validations[answer] = null;
+                        _state.QuestionPlay.Validations.Add(new AnswerValidation(i, answer));
                         _actions.AskValidate(_state.ShowMan.Name, i, answer, !_state.QuestionPlay.FlexiblePrice);
                     }
 
