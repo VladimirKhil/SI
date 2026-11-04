@@ -438,6 +438,9 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
                 PreviewRemove(item);
                 PreviewAdd(newItem, newUri, currentIndex);
+
+                // CreateItem started loading before the file was registered: load again so size and preview are known
+                newItem.ReloadMedia();
                 HasPendingChanges = IsChanged();
 
                 if (returnToCurrent)
@@ -657,6 +660,9 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
         var item = CreateItem(uniqueName);
         PreviewAdd(item, file);
+
+        // CreateItem started loading before the file was registered: load again so size and preview are known
+        item.ReloadMedia();
 
         OnChanged(new CustomChange(
             () =>
