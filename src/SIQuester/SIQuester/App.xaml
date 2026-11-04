@@ -3375,6 +3375,7 @@
                         x:Name="right"
                         Style="{StaticResource LightTextBox}"
                         siq:SmartMenuManager.SecondMenu="True"
+                        lb:PasteBehavior.IsAttached="True"
                         CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
                         DataContext="{Binding Right}"
                         ItemsSource="{Binding}"
