@@ -3047,6 +3047,8 @@
             </Style>
 
             <Style x:Key="ContentListStyle" TargetType="ListBox">
+                <!-- Frame around items joined to play together -->
+                <Setter Property="lb:JoinFrames.IsEnabled" Value="True" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="ItemContainerStyle" Value="{StaticResource ContentListItemStyle}" />
