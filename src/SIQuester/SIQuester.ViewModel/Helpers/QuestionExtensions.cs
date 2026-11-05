@@ -54,7 +54,7 @@ internal static class QuestionExtensions
         && body.ContentValue.Any(item => item.Type != ContentTypes.Text);
 
     // Only the question parameter counts as content (text or media); the complex answer parameter is ignored
-    private static bool HasContent(Question question) =>
+    internal static bool HasContent(Question question) =>
         question.Parameters.TryGetValue(QuestionParameterNames.Question, out var body)
         && body.ContentValue != null
         && body.ContentValue.Any(item => !string.IsNullOrWhiteSpace(item.Value));
