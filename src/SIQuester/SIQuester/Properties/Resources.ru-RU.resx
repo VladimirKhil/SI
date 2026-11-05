@@ -1415,4 +1415,7 @@
   <data name="Format" xml:space="preserve">
     <value>Формат</value>
   </data>
+  <data name="AutoCompressMedia" xml:space="preserve">
+    <value>Автоматически сжимать картинки больше лимита SIGame (1 МБ) при добавлении</value>
+  </data>
 </root>
