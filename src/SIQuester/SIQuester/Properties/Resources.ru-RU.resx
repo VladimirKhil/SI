@@ -1415,4 +1415,13 @@
   <data name="Format" xml:space="preserve">
     <value>Формат</value>
   </data>
+  <data name="ThemeFillQuestions" xml:space="preserve">
+    <value>вопросы</value>
+  </data>
+  <data name="ThemeFillAnswers" xml:space="preserve">
+    <value>ответы</value>
+  </data>
+  <data name="ThemeFillToolTip" xml:space="preserve">
+    <value>Заполнено вопросов / вопросов с правильным ответом</value>
+  </data>
 </root>

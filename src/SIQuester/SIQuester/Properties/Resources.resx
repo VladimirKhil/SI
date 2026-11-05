@@ -1419,4 +1419,13 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="Format" xml:space="preserve">
     <value>Format</value>
   </data>
+  <data name="ThemeFillQuestions" xml:space="preserve">
+    <value>questions</value>
+  </data>
+  <data name="ThemeFillAnswers" xml:space="preserve">
+    <value>answers</value>
+  </data>
+  <data name="ThemeFillToolTip" xml:space="preserve">
+    <value>Questions with text / questions with a right answer</value>
+  </data>
 </root>

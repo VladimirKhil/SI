@@ -73,6 +73,11 @@
                 x:Key="ItemSelectedColorConverter"
                 LightColor="#FFD5D5FF"
                 DarkColor="#FF3A3A3A" />
+            <!-- Theme fill badge: amber while questions are missing, green when the theme is complete -->
+            <siqcv:ThemeToColorConverter x:Key="ThemeFillTodoColorConverter" LightColor="#FFFFF4CE" DarkColor="#FF4A3B12" />
+            <siqcv:ThemeToColorConverter x:Key="ThemeFillTodoTextColorConverter" LightColor="#FF8A5A00" DarkColor="#FFF7C55A" />
+            <siqcv:ThemeToColorConverter x:Key="ThemeFillDoneColorConverter" LightColor="#FFDFF6DD" DarkColor="#FF1E3B1E" />
+            <siqcv:ThemeToColorConverter x:Key="ThemeFillDoneTextColorConverter" LightColor="#FF107C10" DarkColor="#FF8FD88F" />
             <siqcv:ThemeToColorConverter
                 x:Key="TreeItemOverColorConverter"
                 LightColor="#FFF3F3F3"
@@ -531,6 +536,18 @@
             <SolidColorBrush
                 x:Key="TreeItemOverBrush"
                 Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource TreeItemOverColorConverter}, FallbackValue=#FFF3F3F3, TargetNullValue=#FFF3F3F3}" />
+            <SolidColorBrush
+                x:Key="ThemeFillTodoBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeFillTodoColorConverter}, FallbackValue=#FFFFF4CE, TargetNullValue=#FFFFF4CE}" />
+            <SolidColorBrush
+                x:Key="ThemeFillTodoTextBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeFillTodoTextColorConverter}, FallbackValue=#FF8A5A00, TargetNullValue=#FF8A5A00}" />
+            <SolidColorBrush
+                x:Key="ThemeFillDoneBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeFillDoneColorConverter}, FallbackValue=#FFDFF6DD, TargetNullValue=#FFDFF6DD}" />
+            <SolidColorBrush
+                x:Key="ThemeFillDoneTextBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeFillDoneTextColorConverter}, FallbackValue=#FF107C10, TargetNullValue=#FF107C10}" />
 
             <Style x:Key="QTreeViewItem" TargetType="{x:Type TreeViewItem}" >
                 <Setter Property="AllowDrop" Value="True" />
@@ -2632,19 +2649,73 @@
                 ItemsSource="{Binding Questions}"
                 ItemContainerStyle="{StaticResource QuestionStyle}">
                 <StackPanel>
-                    <TextBox
-                        Name="default"
-                        FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.267}"
-                        siq:ActivateManager.IsWatching="True"
-                        Style="{StaticResource LightTextBox}"
-                        MinWidth="90"
-                        Padding="0,2"
-                        Text="{Binding Model.Name, UpdateSourceTrigger=PropertyChanged}" />
-                    
-                    <ContentControl Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox
+                            Name="default"
+                            FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.267}"
+                            siq:ActivateManager.IsWatching="True"
+                            Style="{StaticResource LightTextBox}"
+                            MinWidth="90"
+                            Padding="0,2"
+                            Text="{Binding Model.Name, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <!-- Theme fill: questions with text and with a right answer out of all questions -->
+                        <Border
+                            x:Name="fill"
+                            VerticalAlignment="Center"
+                            Margin="10,0,0,0"
+                            Padding="8,2"
+                            CornerRadius="10"
+                            Background="{StaticResource ThemeFillTodoBrush}"
+                            ToolTip="{x:Static lp:Resources.ThemeFillToolTip}">
+                            <Grid>
+                                <TextBlock x:Name="fillText" FontSize="11" Foreground="{StaticResource ThemeFillTodoTextBrush}">
+                                    <Run Text="{x:Static lp:Resources.ThemeFillQuestions}" /> <Run Text="{Binding QuestionsWithTextCount, Mode=OneWay}" FontWeight="SemiBold" /><Run Text="/" /><Run Text="{Binding Questions.Count, Mode=OneWay}" />
+                                    <Run Text="  ·  " /><Run Text="{x:Static lp:Resources.ThemeFillAnswers}" /> <Run Text="{Binding QuestionsWithAnswerCount, Mode=OneWay}" FontWeight="SemiBold" /><Run Text="/" /><Run Text="{Binding Questions.Count, Mode=OneWay}" />
+                                </TextBlock>
+
+                                <!-- Compact form when the theme is complete -->
+                                <TextBlock x:Name="fillDone" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ThemeFillDoneTextBrush}" Visibility="Collapsed">
+                                    <Run Text="✓" /> <Run Text="{Binding Questions.Count, Mode=OneWay}" />
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <ContentControl Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
                 </StackPanel>
 
                 <HierarchicalDataTemplate.Triggers>
+                    <!-- Every question has text and a right answer: compact green badge -->
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Value="True">
+                                <Condition.Binding>
+                                    <MultiBinding Converter="{StaticResource EqualsMultiConverter}">
+                                        <Binding Path="QuestionsWithAnswerCount" />
+                                        <Binding Path="Questions.Count" />
+                                    </MultiBinding>
+                                </Condition.Binding>
+                            </Condition>
+                            <Condition Value="True">
+                                <Condition.Binding>
+                                    <MultiBinding Converter="{StaticResource EqualsMultiConverter}">
+                                        <Binding Path="QuestionsWithTextCount" />
+                                        <Binding Path="Questions.Count" />
+                                    </MultiBinding>
+                                </Condition.Binding>
+                            </Condition>
+                        </MultiDataTrigger.Conditions>
+                        <Setter TargetName="fill" Property="Background" Value="{StaticResource ThemeFillDoneBrush}" />
+                        <Setter TargetName="fillText" Property="Visibility" Value="Collapsed" />
+                        <Setter TargetName="fillDone" Property="Visibility" Value="Visible" />
+                    </MultiDataTrigger>
+
+                    <!-- Empty theme: nothing to count -->
+                    <DataTrigger Binding="{Binding Questions.Count}" Value="0">
+                        <Setter TargetName="fill" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+
                     <DataTrigger Binding="{Binding IsDragged}" Value="True">
                         <Setter Property="Opacity" Value="0.2" />
                     </DataTrigger>

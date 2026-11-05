@@ -1231,8 +1231,19 @@ public sealed class QDocument : WorkspaceViewModel
     /// <summary>
     /// Counts the questions that have both content and a right answer filled in.
     /// </summary>
-    private int CountFilledQuestions() =>
-        Package.Rounds.Sum(round => round.Themes.Sum(theme => theme.Questions.Count(question => question.Model.IsFilled())));
+    private int CountFilledQuestions()
+    {
+        // Theme counters are refreshed together with the package counter (same delayed pass)
+        foreach (var round in Package.Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                theme.UpdateStats();
+            }
+        }
+
+        return Package.Rounds.Sum(round => round.Themes.Sum(theme => theme.Questions.Count(question => question.Model.IsFilled())));
+    }
 
     public StorageContextViewModel StorageContext { get; set; }
 
