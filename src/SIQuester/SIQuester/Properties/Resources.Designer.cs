@@ -3550,6 +3550,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dark gray.
+        /// </summary>
+        public static string ThemeOptionDarkGray {
+            get {
+                return ResourceManager.GetString("ThemeOptionDarkGray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Light.
         /// </summary>
         public static string ThemeOptionLight {
@@ -3582,6 +3591,24 @@ namespace SIQuester.Properties {
         public static string To {
             get {
                 return ResourceManager.GetString("To", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Today.
+        /// </summary>
+        public static string Today {
+            get {
+                return ResourceManager.GetString("Today", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set today&apos;s date.
+        /// </summary>
+        public static string TodayTip {
+            get {
+                return ResourceManager.GetString("TodayTip", resourceCulture);
             }
         }
         

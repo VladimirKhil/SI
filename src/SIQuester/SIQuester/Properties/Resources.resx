@@ -1419,4 +1419,10 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="Format" xml:space="preserve">
     <value>Format</value>
   </data>
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="TodayTip" xml:space="preserve">
+    <value>Set today&apos;s date</value>
+  </data>
 </root>

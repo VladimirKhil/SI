@@ -2486,6 +2486,15 @@
                             Height="25"
                             Padding="0,2,0,0" />
 
+                        <Button
+                            DockPanel.Dock="Right"
+                            Margin="5,0,0,0"
+                            Padding="8,0"
+                            VerticalAlignment="Center"
+                            Content="{x:Static lp:Resources.Today}"
+                            ToolTip="{x:Static lp:Resources.TodayTip}"
+                            Command="{Binding SetDateToday}" />
+
                         <TextBox
                             siq:ActivateManager.IsWatching="True"
                             Style="{StaticResource LightTextBox}"
