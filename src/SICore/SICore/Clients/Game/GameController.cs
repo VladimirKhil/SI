@@ -44,6 +44,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     private const double PartialPrintFrequencyPerSecond = 0.5;
 
     /// <summary>
+    /// Selects the answering player among button pressers
+    /// </summary>
+    private readonly AnswererRandomizer _answererRandomizer;
+
+    /// <summary>
     /// Execution completion;
     /// </summary>
     private Action? _completion;
@@ -127,6 +132,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _taskRunner = new(this);
         PinHelper = pinHelper;
         Stakes = new StakesPlugin(state);
+        _answererRandomizer = new AnswererRandomizer(Math.Max(1, state.Players.Count));
     }
 
     internal void Run()
@@ -257,7 +263,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 _state.QuestionPlay.AppellationState = AppellationState.Collecting; // To query other appellations
                 Stop(StopReason.Appellation);
             }
-            
+
             return true;
         }
 
@@ -547,7 +553,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 return (false, null, null, string.Format(LO[nameof(R.InvalidFileExtension)], contentItem.Value, fileExtension));
             }
         }
-        
+
         var contentType = contentItem.Type;
         var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
         var media = _state.PackageDoc.TryGetMedia(contentItem);
@@ -563,7 +569,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         if (fileLength.HasValue)
         {
             var (success, error) = CheckFileLength(contentType, fileLength.Value);
-            
+
             if (!success)
             {
                 return (false, null, null, error);
@@ -809,11 +815,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.IsWaiting = false;
         _state.Decision = DecisionType.None;
 
-        _state.InformStages &= ~(InformStages.RoundContent | 
-            InformStages.RoundThemesNames | 
-            InformStages.RoundThemesComments | 
-            InformStages.Table | 
-            InformStages.Theme | 
+        _state.InformStages &= ~(InformStages.RoundContent |
+            InformStages.RoundThemesNames |
+            InformStages.RoundThemesComments |
+            InformStages.Table |
+            InformStages.Theme |
             InformStages.Question |
             InformStages.Layout |
             InformStages.ContentShape);
@@ -948,7 +954,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     {
         _actions.SendMessageWithArgs(Messages.QuestionCaption, _state.Theme.Name);
         _actions.SendThemeInfo(overridenQuestionCount: 1);
-        
+
         InitQuestionState(question);
         ProceedToThemeAndQuestion(force: false);
     }
@@ -1593,7 +1599,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         StopWaiting();
-        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");        
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex, "-", "INITIAL");
         ScheduleExecution(Tasks.MoveNext, 20);
 
         return true;
@@ -2132,7 +2138,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                         if (Engine.CanMoveNextRound)
                         {
                             stop = Engine.MoveNextRound();
-                            
+
                             if (!stop)
                             {
                                 _stopReason = StopReason.None;
@@ -2409,7 +2415,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         var waitTime = _state.TimeSettings.StakeMaking * 10;
 
         _state.IsOralNow = _state.IsOral && answerer.IsHuman;
-        
+
         if (CanPlayerAct() && !answerer.IsConnected)
         {
             waitTime = 20;
@@ -2816,7 +2822,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         _state.QuestionTypeSettings.TryGetValue(typeName, out var questionTypeRules);
-        
+
         var isNoRisk = questionTypeRules?.PenaltyType == PenaltyType.None;
 
         if (isNoRisk)
@@ -2947,14 +2953,31 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         if (buttonPressMode == SI.Contracts.ButtonPressMode.RandomWithinInterval)
         {
+            // Filter out disconnected players and vacant seats
+            _state.PendingAnswererIndicies.RemoveAll(i =>
+                i < 0 || i >= _state.Players.Count ||
+                !_state.Players[i].IsConnected ||
+                _state.Players[i].Name == Constants.FreePlace);
+
+            // If all pressing players have disconnected, continue the question
             if (_state.PendingAnswererIndicies.Count == 0)
             {
                 DumpButtonPressError("_data.PendingAnswererIndicies.Count == 0");
                 return false;
             }
 
-            var index = _state.PendingAnswererIndicies.Count == 1 ? 0 : Random.Shared.Next(_state.PendingAnswererIndicies.Count);
-            _state.PendingAnswererIndex = _state.PendingAnswererIndicies[index];
+            _answererRandomizer.SetPlayersCount(_state.Players.Count(player => player.IsConnected));
+
+            var candidates = _state.PendingAnswererIndicies
+                .Select(i => _state.Players[i].Name)
+                .ToList();
+
+            // IMPORTANT: The randomizer must be called even with a single candidate
+            // so that they are recorded as the previous winner.
+            var winnerName = _answererRandomizer.ChooseAnswerer(candidates);
+
+            _state.PendingAnswererIndex = _state.PendingAnswererIndicies
+                .First(i => _state.Players[i].Name == winnerName);
         }
 
         if (_state.PendingAnswererIndex < 0 || _state.PendingAnswererIndex >= _state.Players.Count)
@@ -3301,7 +3324,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             var playerAnswer = _state.Answerer.Answer ?? "";
             var deviation = _state.QuestionPlay.AnswerDeviation;
 
-            _state.Answerer.AnswerIsRight = AnswerChecker.IsNumberAnswerRight(playerAnswer, rightAnswer, deviation);            
+            _state.Answerer.AnswerIsRight = AnswerChecker.IsNumberAnswerRight(playerAnswer, rightAnswer, deviation);
             _state.Answerer.AnswerValidationFactor = 1.0;
             _state.ShowmanDecision = true;
             OnDecision();
@@ -3760,7 +3783,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             var playerIndex = _state.Order[_state.OrderIndex];
 
             var others = _state.Players.Where((p, index) => index != playerIndex); // Other players
-            
+
             if (others.All(p => !p.StakeMaking) && _state.Stake > -1) // Others cannot make stakes
             {
                 // Staker cannot raise anymore
@@ -3817,7 +3840,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             var minimumStakeNew = _state.Stake != -1 ? _state.Stake + _state.StakeStep : cost;
             var minimumStakeAlignedNew = (int)Math.Ceiling((double)minimumStakeNew / _state.StakeStep) * _state.StakeStep;
-            
+
             _state.StakeModes = StakeModes.AllIn;
 
             if (_state.Stake != -1)
@@ -3949,7 +3972,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             ResumeExecution(40);
             return;
         }
-        
+
         _actions.SendMessageWithArgs(Messages.Appellation, '+');
 
         var appelaer = _state.Players[_state.AppelaerIndex];
@@ -4115,7 +4138,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 if (historyItem.IsRight)
                 {
                     UndoRightSum(player, historyItem.Sum);
-                    
+
                     // Clear all negative appellations when positive outcome is being reverted
                     _state.QuestionPlay.Appellations.RemoveAll(appellation => !appellation.Item2);
                 }
@@ -4144,7 +4167,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                     {
                         // Positive appellation: changing wrong to right
                         appelaerHistoryIndex = i;
-                        
+
                         UndoWrongSum(player, historyItem.Sum);
                         AddRightSum(player, _state.CurPriceRight);
 
@@ -4200,13 +4223,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             _state.QuestionPlay.Appellations.RemoveAll(appellation =>
             {
                 var (appellationSource, isAppellationForRightAnswer) = appellation;
-                
+
                 if (!isAppellationForRightAnswer)
                 {
                     // Negative appellations were already cleared if positive outcome was reverted
                     return false;
                 }
-                
+
                 // Remove positive appellations for removed players
                 for (var i = 0; i < _state.Players.Count; i++)
                 {
@@ -4579,7 +4602,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length)
             + _state.TimeSettings.Reflection * 10;
-        
+
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
