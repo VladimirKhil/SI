@@ -47,7 +47,7 @@
                                     Cursor="Hand">
                                     <Path
                                         Stretch="Uniform"
-                                        Stroke="#FF555555"
+                                        Stroke="{StaticResource IconBrush}"
                                         StrokeThickness="2"
                                         Margin="4"
                                         Data="{Binding Source={StaticResource app_delete},Path=Data}" />

@@ -10,7 +10,7 @@
     d:DataContext="{d:DesignInstance vm:PointAnswerViewModel}">
     <UserControl.Resources>
         <Style x:Key="SelectPointButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-            <Setter Property="Foreground" Value="#555555" />
+            <Setter Property="Foreground" Value="{StaticResource IconBrush}" />
 
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">

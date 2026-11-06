@@ -162,7 +162,7 @@
                 Command="{Binding AddItem}"
                 ToolTip="{x:Static lp:Resources.Add}">
 
-                <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_add}, Path=Data}" />
+                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_add}, Path=Data}" />
             </Button>
         </StackPanel>
         
@@ -243,7 +243,7 @@
                                 ToolTip="{x:Static lp:Resources.Delete}">
                                 <Path
                                     Stretch="Uniform"
-                                    Stroke="#FF555555"
+                                    Stroke="{StaticResource IconBrush}"
                                     StrokeThickness="2"
                                     Margin="3"
                                     Data="{Binding Source={StaticResource app_delete},Path=Data}" />
@@ -259,7 +259,7 @@
                                 ToolTip="{x:Static lp:Resources.Compress}">
                                 <Path
                                     Stretch="Uniform"
-                                    Stroke="#FF555555"
+                                    Stroke="{StaticResource IconBrush}"
                                     StrokeThickness="2"
                                     Margin="3"
                                     Data="{Binding Source={StaticResource app_lightning},Path=Data}" />
@@ -284,7 +284,7 @@
                                 ToolTip="{x:Static lp:Resources.NavigateToUsage}">
                                 <Path
                                     Stretch="Uniform"
-                                    Stroke="#FF555555"
+                                    Stroke="{StaticResource IconBrush}"
                                     StrokeThickness="2"
                                     Margin="3"
                                     Data="{Binding Source={StaticResource app_right},Path=Data}" />
@@ -300,7 +300,7 @@
                             Margin="5,0,0,0"
                             Width="25"
                             ToolTip="{x:Static lp:Resources.Edit}">                            
-                            <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_edit}, Path=Data}" />                        
+                            <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_edit}, Path=Data}" />                        
                         </ToggleButton>
 
                         <DockPanel Grid.Row="1">
