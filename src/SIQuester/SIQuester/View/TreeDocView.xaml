@@ -26,6 +26,7 @@
             Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
             Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}"
             TextElement.Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}" />
-        <Separator Name="_insertionMark" Height="3" Background="Black" Visibility="Hidden" VerticalAlignment="Top" />
+        <!-- Where a dragged item will be dropped: accent color, visible in light and dark themes (was black) -->
+        <Border Name="_insertionMark" Height="3" CornerRadius="1.5" Background="{DynamicResource MahApps.Brushes.Accent}" IsHitTestVisible="False" Visibility="Hidden" VerticalAlignment="Top" />
     </Grid>
 </UserControl>
