@@ -158,6 +158,29 @@ public sealed class GameActions
 
     public void Cancel(string person = NetworkConstants.Everybody) => SendMessage(Messages.Cancel, person);
 
+    public void InformOptions(string person = NetworkConstants.Everybody)
+    {
+        var rules = _state.Rules;
+
+        SendMessageToWithArgs(
+            person,
+            Messages.Options2,
+            "",
+            nameof(rules.Oral), rules.Oral,
+            nameof(rules.Managed), rules.Managed,
+            nameof(rules.DisplayAnswerOptionsLabels), rules.DisplayAnswerOptionsLabels,
+            nameof(rules.FalseStart), rules.FalseStart,
+            nameof(rules.ReadingSpeed), rules.Managed ? 0 : rules.ReadingSpeed,
+            "ReadingSpeed2", rules.ReadingSpeed,
+            nameof(rules.PartialText), rules.PartialText,
+            nameof(rules.PartialImages), rules.PartialImages,
+            nameof(rules.HideImageOnAnswerAndPause), rules.HideImageOnAnswerAndPause,
+            nameof(rules.UseAppellations), rules.UseAppellations,
+            nameof(rules.ValidateEqualAnswersSeparately), rules.ValidateEqualAnswersSeparately,
+            nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
+            nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
+    }
+
     public void ConfigSet(string personType, string index, string name, bool isMale) =>
         SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, personType, index, name, isMale ? '+' : '-');
 

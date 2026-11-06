@@ -302,8 +302,6 @@ public sealed class Game : MessageHandler
             Messages.ComputerAccounts,
             string.Join(Message.ArgsSeparator, _defaultPlayers.Select(p => p.Name)));
 
-        var rules = _state.Rules;
-
         var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
         _actions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
 
@@ -314,22 +312,7 @@ public sealed class Game : MessageHandler
             _actions.OnArenaMode();
         }
 
-        _actions.SendMessageToWithArgs(
-            person,
-            Messages.Options2,
-            "",
-            nameof(rules.Oral), rules.Oral,
-            nameof(rules.Managed), rules.Managed,
-            nameof(rules.DisplayAnswerOptionsLabels), rules.DisplayAnswerOptionsLabels,
-            nameof(rules.FalseStart), rules.FalseStart,
-            nameof(rules.ReadingSpeed), rules.Managed ? 0 : rules.ReadingSpeed,
-            nameof(rules.PartialText), rules.PartialText,
-            nameof(rules.PartialImages), rules.PartialImages,
-            nameof(rules.HideImageOnAnswerAndPause), rules.HideImageOnAnswerAndPause,
-            nameof(rules.UseAppellations), rules.UseAppellations,
-            nameof(rules.ValidateEqualAnswersSeparately), rules.ValidateEqualAnswersSeparately,
-            nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
-            nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
+        _actions.InformOptions();
     }
 
     private void InformBanned(string person)

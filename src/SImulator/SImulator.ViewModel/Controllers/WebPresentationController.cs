@@ -264,7 +264,7 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
     public void SetTable(ThemeInfoViewModel[] table) => SendMessage(new
     {
         Type = "table",
-        Table = table.Select(t => new { t.Name, Questions = t.Questions.Select(q => q.Price).ToArray() }).ToArray()
+        Table = table.Select(t => t.Questions.Select(q => q.Price).ToArray()).ToArray()
     });
 
     public void SetRoundTable() => SendMessage(new
@@ -442,9 +442,9 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     private static string ConvertWpfToHtmlColor(string wpfColor)
     {
-        if (wpfColor.Length == 9 && wpfColor.StartsWith("#"))
+        if (wpfColor.Length == 9 && wpfColor.StartsWith('#'))
         {
-            return $"#{wpfColor.Substring(3)}{wpfColor.Substring(1, 2)}";
+            return $"#{wpfColor[3..]}{wpfColor.Substring(1, 2)}";
         }
 
         return wpfColor; // Return as-is if not in expected format

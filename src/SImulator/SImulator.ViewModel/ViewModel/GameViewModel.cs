@@ -1639,6 +1639,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private bool AfterRoundThemes()
     {
         Continuation = null;
+        _gameActions.InformSkippedThemes();
         PresentationController.SetTable(LocalInfo.RoundInfo.ToArray());
         PresentationController.SetRoundTable();
         _gameActions.MoveNext();
@@ -2245,6 +2246,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 if (Settings.Model.ShowQuestionBorder)
                 {
                     PresentationController.BeginPressButton();
+                    _buttonManager?.TryGetCommandExecutor()?.AskPressButton();
                 }
                 break;
 

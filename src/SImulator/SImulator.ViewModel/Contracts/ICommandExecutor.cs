@@ -11,4 +11,6 @@ public interface ICommandExecutor
     void AskOralAnswer(string connectionId);
 
     void Cancel();
+
+    void AskPressButton();
 }

@@ -2765,7 +2765,6 @@
                 </StackPanel>
             </DataTemplate>
 
-            <siqcv:NotSimpleConverter x:Key="NotSimpleConverter" />
             <siqcv:NotDefaultTypeConverter x:Key="NotDefaultTypeConverter" />
 
             <Style x:Key="QuestionTypeStyle" TargetType="{x:Type ContentControl}">

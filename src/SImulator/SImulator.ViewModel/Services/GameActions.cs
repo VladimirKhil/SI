@@ -12,6 +12,7 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
     private readonly TaskRunner<Tasks> _taskRunner;
 
     private string[] _themeNames = Array.Empty<string>();
+    private int _nextThemeIndex;
 
     public GameViewModel GameViewModel { get; internal set; } = null!;
 
@@ -39,8 +40,17 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
                 }
 
                 _presentationController.SetTheme(_themeNames[arg], true);
+                _nextThemeIndex = arg + 1;
                 _taskRunner.ScheduleExecution(Tasks.ShowTheme, 20, arg + 1);
                 break;
+        }
+    }
+
+    public void InformSkippedThemes() 
+    {
+        for (; _nextThemeIndex < _themeNames.Length; _nextThemeIndex++)
+        {
+            _presentationController.SetTheme(_themeNames[_nextThemeIndex], true);
         }
     }
 
@@ -49,6 +59,7 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
     public void ShowThemes(string[] themeNames)
     {
         _themeNames = themeNames;
+        _nextThemeIndex = 0;
         _taskRunner.ScheduleExecution(Tasks.ShowTheme, 1, 0);
     }
 

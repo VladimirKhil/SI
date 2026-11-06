@@ -126,6 +126,8 @@ public sealed class WebManagerNew(WebApplication webApplication, IGameRepository
         context.Clients.Client(id).Disconnect();
         gameRepository.BannedNames.Add(name);
     }
+
+    public void AskPressButton() => SendMessage("TRY");
 }
 
 internal sealed class GameRepository(IButtonManagerListener listener, IPlatformService platformService) : IGameRepository
