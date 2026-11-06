@@ -1428,4 +1428,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="TextItemHint" xml:space="preserve">
+    <value>Type the text…</value>
+  </data>
 </root>

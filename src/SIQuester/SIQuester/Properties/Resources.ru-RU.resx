@@ -1424,4 +1424,7 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="TextItemHint" xml:space="preserve">
+    <value>Введите текст…</value>
+  </data>
 </root>

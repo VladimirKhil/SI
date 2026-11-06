@@ -286,7 +286,8 @@
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                 <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <!-- Stretch keeps the text at the top as before; Center centers it in a taller field (question text item) -->
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 <Setter Property="AllowDrop" Value="true"/>
                 <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
@@ -304,9 +305,10 @@
                                 <ScrollViewer
                                     Template="{StaticResource QTextBoxScrollViewerTemplate}"
                                     x:Name="PART_ContentHost"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                     Focusable="false"
                                     HorizontalScrollBarVisibility="Disabled"
-                                    VerticalScrollBarVisibility="Hidden" />                                
+                                    VerticalScrollBarVisibility="Hidden" />
                             </Border>
                             
                             <ControlTemplate.Triggers>
@@ -3046,18 +3048,39 @@
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <!-- pc:ContentTypes.Text -->
                     <DataTemplate DataType="vm:ContentItemViewModel">
-                        <TextBox
-                            lb:PasteBehavior.IsAttached="True"
-                            siq:ActivateManager.IsWatching="True"
-                            TextWrapping="Wrap"
-                            AcceptsReturn="True"
-                            Height="Auto"
-                            MinWidth="250"
-                            Text="{Binding Model.Value, UpdateSourceTrigger=PropertyChanged}"
-                            Style="{StaticResource CommonTextBox}"
-                            TabIndex="2"
-                            Padding="0,2"
-                            VerticalAlignment="Center" />
+                        <Grid>
+                            <!-- Fills the whole row height (e.g. next to a picture): a click anywhere in the item puts the caret -->
+                            <TextBox
+                                x:Name="text"
+                                lb:PasteBehavior.IsAttached="True"
+                                siq:ActivateManager.IsWatching="True"
+                                TextWrapping="Wrap"
+                                AcceptsReturn="True"
+                                Height="Auto"
+                                MinWidth="250"
+                                Text="{Binding Model.Value, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource CommonTextBox}"
+                                TabIndex="2"
+                                Padding="0,2"
+                                VerticalAlignment="Stretch"
+                                VerticalContentAlignment="Center" />
+
+                            <!-- An empty text field has no border and can't be seen: show a hint in it -->
+                            <TextBlock
+                                x:Name="hint"
+                                Text="{x:Static lp:Resources.TextItemHint}"
+                                Margin="2,0,0,0"
+                                VerticalAlignment="Center"
+                                Opacity="0.5"
+                                IsHitTestVisible="False"
+                                Visibility="Collapsed" />
+                        </Grid>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=text}" Value="">
+                                <Setter TargetName="hint" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </siqcv:TemplateConverter.DefaultTemplate>
 
