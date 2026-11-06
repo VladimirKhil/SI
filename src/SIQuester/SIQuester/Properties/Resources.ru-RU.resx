@@ -1424,4 +1424,13 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="FontSmaller" xml:space="preserve">
+    <value>Уменьшить текст (Ctrl+−, Ctrl+колесо мыши)</value>
+  </data>
+  <data name="FontBigger" xml:space="preserve">
+    <value>Увеличить текст (Ctrl++, Ctrl+колесо мыши)</value>
+  </data>
+  <data name="FontReset" xml:space="preserve">
+    <value>Размер текста. Щелчок — вернуть размер по умолчанию (Ctrl+0)</value>
+  </data>
 </root>

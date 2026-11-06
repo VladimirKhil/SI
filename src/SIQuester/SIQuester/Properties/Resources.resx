@@ -1428,4 +1428,13 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="FontSmaller" xml:space="preserve">
+    <value>Smaller text (Ctrl+−, Ctrl+mouse wheel)</value>
+  </data>
+  <data name="FontBigger" xml:space="preserve">
+    <value>Larger text (Ctrl++, Ctrl+mouse wheel)</value>
+  </data>
+  <data name="FontReset" xml:space="preserve">
+    <value>Text size. Click to restore the default (Ctrl+0)</value>
+  </data>
 </root>

@@ -26,6 +26,7 @@
     SnapsToDevicePixels="True"
     TextOptions.TextFormattingMode="Display"
     PreviewKeyDown="Main_PreviewKeyDown"
+    PreviewMouseWheel="Main_PreviewMouseWheel"
     Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
     Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <Window.Resources>
