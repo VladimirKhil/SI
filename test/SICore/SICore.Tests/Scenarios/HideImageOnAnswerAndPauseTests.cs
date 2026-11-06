@@ -54,7 +54,7 @@ public sealed class HideImageOnAnswerAndPauseTests
 
         foreach (var listener in new[] { showman, playerA, playerB })
         {
-            var options = await listener.WaitForOptions2Async();
+            var options = await listener.WaitForOptions2Async(changesOnly: true);
             Assert.That(options.Text, Is.EqualTo($"{Messages.Options2}\n{HostName}\n{OptionName}\ntrue"));
         }
 
@@ -180,7 +180,7 @@ public sealed class HideImageOnAnswerAndPauseTests
             Client.MessageReceived += message => _messageChannel.Writer.WriteAsync(message);
         }
 
-        public async Task<(string Text, string[] Args)> WaitForOptions2Async()
+        public async Task<(string Text, string[] Args)> WaitForOptions2Async(bool changesOnly = false)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 
@@ -190,7 +190,7 @@ public sealed class HideImageOnAnswerAndPauseTests
                 {
                     var args = message.Text.Split(Message.ArgsSeparatorChar);
 
-                    if (args[0] == Messages.Options2)
+                    if (args[0] == Messages.Options2 && (!changesOnly || args[1].Length > 0))
                     {
                         return (message.Text, args);
                     }
