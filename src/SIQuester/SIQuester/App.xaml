@@ -119,6 +119,16 @@
                 x:Key="WhiteColorConverter"
                 LightColor="White"
                 DarkColor="#FF252525" />
+            <!-- Gray icons and captions: the former #555555 in the light theme, light gray in the dark ones -->
+            <siqcv:ThemeToColorConverter
+                x:Key="IconColorConverter"
+                LightColor="#FF555555"
+                DarkColor="#FFB4B4B4" />
+            <!-- Help panel headers -->
+            <siqcv:ThemeToColorConverter
+                x:Key="HeaderTextColorConverter"
+                LightColor="#FF2060A0"
+                DarkColor="#FF8AB4FF" />
             <siqcv:ThemeToColorConverter
                 x:Key="SectionHeaderColorConverter"
                 LightColor="#FFD2DCFF"
@@ -227,6 +237,12 @@
             <SolidColorBrush
                 x:Key="WhiteBrush"
                 Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource WhiteColorConverter}, FallbackValue=White, TargetNullValue=White}" />
+            <SolidColorBrush
+                x:Key="IconBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource IconColorConverter}, FallbackValue=#FF555555, TargetNullValue=#FF555555}" />
+            <SolidColorBrush
+                x:Key="HeaderTextBrush"
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource HeaderTextColorConverter}, FallbackValue=#FF2060A0, TargetNullValue=#FF2060A0}" />
             <SolidColorBrush
                 x:Key="SectionHeaderBrush"
                 Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource SectionHeaderColorConverter}, FallbackValue=#FFD2DCFF, TargetNullValue=#FFD2DCFF}" />
@@ -1057,7 +1073,7 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Path Data="M0,0L11.6,6.7L0,13.4z" Fill="#555555" />
+                            <Path Data="M0,0L11.6,6.7L0,13.4z" Fill="{StaticResource IconBrush}" />
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -1068,7 +1084,7 @@
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <Path Data="M0,0L3,0L3,12L0,12zM6,0L9,0L9,12L6,12z" Fill="#555555" />
+                                    <Path Data="M0,0L3,0L3,12L0,12zM6,0L9,0L9,12L6,12z" Fill="{StaticResource IconBrush}" />
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
@@ -1394,7 +1410,7 @@
                                                                     Width="20"
                                                                     Height="20"
                                                                     Stretch="Uniform"
-                                                                    Fill="Black"
+                                                                    Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                                                     Data="{Binding Source={StaticResource app_language},Path=Data}" />
                                                             </DataTemplate>
                                                         </Button.ContentTemplate>
@@ -2177,7 +2193,7 @@
                                     Cursor="Hand"
                                     HorizontalAlignment="Left"
                                     Padding="2">
-                                    <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                                    <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
                                 </Button>
 
                                 <TextBox

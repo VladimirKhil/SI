@@ -133,7 +133,7 @@
                 </Button>
 
                 <Button ToolTip="{x:Static lp:Resources.ExportAndPrint}" Command="{Binding ExportDinabank}" Padding="4,3">
-                    <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_export},Path=Data}" />
+                    <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_export},Path=Data}" />
                 </Button>
 
                 <Button ToolTip="{x:Static lp:Resources.Preview}" Command="{Binding ExportPreview}" VerticalAlignment="Stretch">
@@ -149,7 +149,7 @@
                     IsEnabled="{Binding ElementName=bExpand,Path=IsEnabled}"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch">
-                    <Path Data="M0,0L8,0L4,4z" Fill="#FF555555" />
+                    <Path Data="M0,0L8,0L4,4z" Fill="{StaticResource IconBrush}" />
                     
                     <siq:DropDownButton.DropDown>
                         <ContextMenu>
@@ -182,11 +182,11 @@
                 <Separator />
 
                 <Button Style="{StaticResource blured}" ToolTip="{x:Static lp:Resources.Undo}" Command="{Binding OperationsManager.Undo}">
-                    <Path Stretch="Uniform" Fill="#FF555555" Margin="4" Data="{Binding Source={StaticResource app_undo},Path=Data}" />
+                    <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="4" Data="{Binding Source={StaticResource app_undo},Path=Data}" />
                 </Button>
 
                 <Button Style="{StaticResource blured}" ToolTip="{x:Static lp:Resources.Redo}" Command="{Binding OperationsManager.Redo}">
-                    <Path Stretch="Uniform" Fill="#FF555555" Margin="4" Data="{Binding Source={StaticResource app_redo},Path=Data}" />
+                    <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="4" Data="{Binding Source={StaticResource app_redo},Path=Data}" />
                 </Button>
                 
                 <Separator />
@@ -196,7 +196,7 @@
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch">
                     <Border Padding="5">
-                        <Path Data="M0,0L10,0M0,3L10,3M0,6L10,6" Stroke="#FF555555" StrokeThickness="2" Stretch="UniformToFill" />
+                        <Path Data="M0,0L10,0M0,3L10,3M0,6L10,6" Stroke="{StaticResource IconBrush}" StrokeThickness="2" Stretch="UniformToFill" />
                     </Border>
                     
                     <siq:DropDownButton.Resources>
@@ -370,7 +370,7 @@
                 <MenuItem ToolTip="{x:Static lp:Resources.EditMode}">
                     <MenuItem.HeaderTemplate>
                         <DataTemplate>
-                            <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                            <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
                         </DataTemplate>
                     </MenuItem.HeaderTemplate>
 
@@ -418,7 +418,7 @@
                 <TextBlock
                     FontSize="14"
                     FontWeight="SemiBold"
-                    Foreground="#FF555555"
+                    Foreground="{StaticResource IconBrush}"
                     VerticalAlignment="Center"
                     Margin="0,0,10,0"
                     ToolTip="{x:Static lp:Resources.DocumentFilledQuestionCount}">
@@ -456,7 +456,7 @@
                         Text="?"
                         FontWeight="Bold"
                         FontSize="14"
-                        Foreground="#FF555555"
+                        Foreground="{StaticResource IconBrush}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center" />
                 </ToggleButton>
@@ -487,7 +487,7 @@
                     Width="22"
                     Margin="0,-1,0,0"
                     VerticalAlignment="Center">
-                    <Path Data="M0,0L10,10M0,10L10,0" Stroke="Black" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    <Path Data="M0,0L10,10M0,10L10,0" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" />
                 </Button>
 
                 <Button
@@ -496,7 +496,7 @@
                     Padding="5"
                     Margin="0,-1,0,0"
                     VerticalAlignment="Center">
-                    <Path Data="M0,5L10,0L10,10" Fill="Black" />
+                    <Path Data="M0,5L10,0L10,10" Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
                 </Button>
 
                 <Button
@@ -505,7 +505,7 @@
                     Padding="5"
                     Margin="0,-1,0,0"
                     VerticalAlignment="Center">
-                    <Path Data="M10,5L0,0L0,10" Fill="Black" />
+                    <Path Data="M10,5L0,0L0,10" Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
                 </Button>
             </StackPanel>
             
@@ -674,7 +674,7 @@
                                                         <TabItem.Header>
                                                             <Path
                                                                 Stretch="Uniform"
-                                                                Fill="#FF555555"
+                                                                Fill="{StaticResource IconBrush}"
                                                                 Margin="5,3"
                                                                 Data="{Binding Source={StaticResource app_author},Path=Data}" />
                                                         </TabItem.Header>
@@ -684,7 +684,7 @@
                                                         <TabItem.Header>
                                                             <Path
                                                                 Stretch="Uniform"
-                                                                Fill="#FF555555"
+                                                                Fill="{StaticResource IconBrush}"
                                                                 Margin="3"
                                                                 Data="{Binding Source={StaticResource app_source},Path=Data}" />
                                                         </TabItem.Header>
@@ -694,7 +694,7 @@
                                                         <TabItem.Header>
                                                             <Path
                                                                 Stretch="Uniform"
-                                                                Fill="#FF555555"
+                                                                Fill="{StaticResource IconBrush}"
                                                                 Margin="4"
                                                                 Data="{Binding Source={StaticResource app_image},Path=Data}" />
                                                         </TabItem.Header>
@@ -704,7 +704,7 @@
                                                         <TabItem.Header>
                                                             <Path
                                                                 Stretch="Uniform"
-                                                                Fill="#FF555555"
+                                                                Fill="{StaticResource IconBrush}"
                                                                 Margin="4,3"
                                                                 Data="{Binding Source={StaticResource app_audio},Path=Data}" />
                                                         </TabItem.Header>
@@ -714,7 +714,7 @@
                                                         <TabItem.Header>
                                                             <Path
                                                                 Stretch="Uniform"
-                                                                Fill="#FF555555"
+                                                                Fill="{StaticResource IconBrush}"
                                                                 Margin="2,4"
                                                                 Data="{Binding Source={StaticResource app_video},Path=Data}" />
                                                         </TabItem.Header>
@@ -724,7 +724,7 @@
                                                         <TabItem.Header>
                                                             <Path
                                                                 Stretch="Uniform"
-                                                                Fill="#FF555555"
+                                                                Fill="{StaticResource IconBrush}"
                                                                 Margin="2,4"
                                                                 Data="{Binding Source={StaticResource app_html},Path=Data}" />
                                                         </TabItem.Header>
@@ -734,7 +734,7 @@
                                                         <TabItem.Header>
                                                             <Path
                                                                 Stretch="Uniform"
-                                                                Fill="#FF555555"
+                                                                Fill="{StaticResource IconBrush}"
                                                                 Margin="3"
                                                                 Data="{Binding Source={StaticResource app_stat},Path=Data}" />
                                                         </TabItem.Header>
@@ -833,7 +833,7 @@
                             Text="{x:Static lp:Resources.RoundTypesHeader}"
                             FontSize="14"
                             FontWeight="SemiBold"
-                            Foreground="#FF2060A0"
+                            Foreground="{StaticResource HeaderTextBrush}"
                             Margin="0,5,0,5" />
                         
                         <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
@@ -842,7 +842,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.RoundTypeStandardHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -853,7 +853,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.RoundTypeFinalHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -863,7 +863,7 @@
                             Text="{x:Static lp:Resources.QuestionTypesHeader}"
                             FontSize="14"
                             FontWeight="SemiBold"
-                            Foreground="#FF2060A0"
+                            Foreground="{StaticResource HeaderTextBrush}"
                             Margin="0,5,0,5" />
                         
                         <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
@@ -872,7 +872,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeSimpleHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -883,7 +883,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeStakeHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -894,7 +894,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeSecretHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -905,7 +905,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeSecretPublicPriceHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -916,7 +916,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeSecretNoQuestionHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -927,7 +927,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeNoRiskHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -938,7 +938,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeForAllHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -949,7 +949,7 @@
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeStakeAllHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="#FF555555"
+                                    Foreground="{StaticResource IconBrush}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>

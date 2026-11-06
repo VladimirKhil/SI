@@ -149,7 +149,7 @@
                 Command="{Binding AddItem}"
                 ToolTip="Добавить"
                 Width="25">
-                <Path Stretch="Uniform" Fill="#FF555555" Margin="1" Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="1" Data="{Binding Source={StaticResource app_add},Path=Data}" />
             </Button>
             
             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">

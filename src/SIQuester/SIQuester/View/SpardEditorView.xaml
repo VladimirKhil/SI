@@ -45,7 +45,7 @@
             <MenuItem Command="{Binding Cut}" ToolTip="{x:Static lp:Resources.CutTemplate}" Height="25">
                 <MenuItem.HeaderTemplate>
                     <DataTemplate>
-                        <Path Stretch="Uniform" Fill="#FF555555" Width="18" Margin="2" Data="{Binding Source={StaticResource app_cut},Path=Data}" />
+                        <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Width="18" Margin="2" Data="{Binding Source={StaticResource app_cut},Path=Data}" />
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
             </MenuItem>
@@ -55,7 +55,7 @@
                     <DataTemplate>
                         <Path
                             Stretch="Uniform"
-                            Fill="#FF555555"
+                            Fill="{StaticResource IconBrush}"
                             Width="18"
                             Margin="2"
                             Data="{Binding Source={StaticResource app_copy},Path=Data}" />
@@ -68,7 +68,7 @@
                     <DataTemplate>
                         <Path
                             Stretch="Uniform"
-                            Fill="#FF555555"
+                            Fill="{StaticResource IconBrush}"
                             Width="18"
                             Margin="2"
                             Data="{Binding Source={StaticResource app_paste},Path=Data}" />
