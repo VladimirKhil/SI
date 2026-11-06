@@ -2779,15 +2779,49 @@
                 </Style.Triggers>
             </Style>
 
+            <!-- Small round "+" / "×" button next to an answer field (AnswerListEditor) -->
+            <Style x:Key="AnswerRowButton" TargetType="Button">
+                <Setter Property="Width" Value="22" />
+                <Setter Property="Height" Value="22" />
+                <Setter Property="Margin" Value="2,0,0,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bg" CornerRadius="11" Background="Transparent">
+                                <TextBlock
+                                    x:Name="Glyph"
+                                    Text="{TemplateBinding Content}"
+                                    FontFamily="Segoe MDL2 Assets"
+                                    FontSize="10"
+                                    FontStyle="Normal"
+                                    Foreground="{DynamicResource MahApps.Brushes.Gray3}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{DynamicResource MahApps.Brushes.Gray8}" />
+                                    <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource MahApps.Brushes.Accent}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.35" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <DataTemplate x:Key="WrongAnswersTemplateKey">
-                <siq:TextList
-                    Style="{StaticResource LightTextBox}"
-                    CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
-                    ItemsSource="{Binding}"
-                    Background="{StaticResource WrongAnswerBackgroundBrush}"
+                <!-- One field per wrong answer -->
+                <siq:AnswerListEditor
+                    Answers="{Binding}"
                     siq:SmartMenuManager.SecondMenu="True"
-                    siq:ActivateManager.IsWatching="True"
-                    Padding="4" />
+                    FieldStyle="{StaticResource LightTextBox}"
+                    FieldBackground="{StaticResource WrongAnswerBackgroundBrush}" />
             </DataTemplate>
 
             <Style x:Key="WrongAnswersStyle" TargetType="{x:Type ContentControl}">
@@ -3442,17 +3476,14 @@
                     VerticalAlignment="Center"
                     TextBlock.FontStyle="Italic"
                     Background="{StaticResource SimpleAnswerBackgroundBrush}">
-                    <siq:TextList
+                    <!-- One field per right answer (pasting a picture goes to the media answer, see AnswerListEditor) -->
+                    <siq:AnswerListEditor
                         x:Name="right"
-                        Style="{StaticResource LightTextBox}"
                         siq:SmartMenuManager.SecondMenu="True"
-                        lb:PasteBehavior.IsAttached="True"
-                        CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
                         DataContext="{Binding Right}"
-                        ItemsSource="{Binding}"
-                        MinWidth="75"
-                        TabIndex="3"
-                        Padding="3" />
+                        Answers="{Binding}"
+                        FieldStyle="{StaticResource LightTextBox}"
+                        MinWidth="75" />
 
                     <ContentControl
                         Style="{StaticResource WrongAnswersStyle}"
