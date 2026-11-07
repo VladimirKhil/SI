@@ -1043,7 +1043,38 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         var player = (PlayerInfo)sender;
+
+        if (e.PropertyName == nameof(PlayerInfo.Name) && !ManagedMode)
+        {
+            var uniqueName = GetUniqueName(string.IsNullOrWhiteSpace(player.Name) ? (Players.IndexOf(player) + 1).ToString() : player.Name, player);
+
+            if (uniqueName != player.Name)
+            {
+                player.Name = uniqueName;
+                return;
+            }
+        }
+
         PresentationController.UpdatePlayerInfo(Players.IndexOf(player), player, e.PropertyName);
+    }
+
+    private string GetUniqueName(string name, PlayerInfo player)
+    {
+        bool IsTaken(string value) => Players.Any(p => p != player && p.Name == value);
+
+        if (!IsTaken(name))
+        {
+            return name;
+        }
+
+        var index = 2;
+
+        while (IsTaken(name + index))
+        {
+            index++;
+        }
+
+        return name + index;
     }
 
     private void QuestionTimer_Elapsed(object? state) =>
@@ -1295,6 +1326,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal void AddPlayerCore(PlayerInfo player)
     {
+        if (!ManagedMode)
+        {
+            player.Name = string.IsNullOrWhiteSpace(player.Name)
+                ? GetUniqueName((Players.Count + 1).ToString(), player)
+                : GetUniqueName(player.Name, player);
+        }
+
         player.PropertyChanged += PlayerInfo_PropertyChanged;
         Players.Add(player);
         PresentationController.AddPlayer(player.Name);
@@ -2112,6 +2150,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         player.Answer = answer;
         player.IsPreliminaryAnswer = isPreliminary;
+
+        if (string.IsNullOrEmpty(answer) && !isPreliminary && player.IsSelected && ReferenceEquals(player, _selectedPlayer))
+        {
+            SubtractStake_Executed(player);
+        }
     }
 
     public void OnPlayerPassed(string playerName)
