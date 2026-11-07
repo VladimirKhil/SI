@@ -342,7 +342,7 @@ public sealed class GameState : Data
     /// <summary>
     /// Known external identities of persons by person name.
     /// </summary>
-    public Dictionary<string, (string Provider, string UserId)> Identities { get; } = [];
+    public Dictionary<string, (string Provider, string UserId, string[] Badges)> Identities { get; } = [];
 
     /// <summary>
     /// Defines players statistics.

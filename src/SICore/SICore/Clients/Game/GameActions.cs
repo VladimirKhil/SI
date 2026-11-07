@@ -116,8 +116,13 @@ public sealed class GameActions
         isMale ? 'm' : 'f',
         "");
 
-    public void InformUserIdentity(string name, string authProvider, string externalUserId, string receiver) =>
-        SendMessageToWithArgs(receiver, Messages.UserIdentity, name, authProvider, externalUserId);
+    public void InformUserIdentity(
+        string name,
+        string authProvider,
+        string externalUserId,
+        string[] badges,
+        string receiver) =>
+        SendMessageToWithArgs(receiver, Messages.UserIdentity, name, authProvider, externalUserId, string.Join(",", badges));
 
     public void InformDisconnected(string name) => SendMessageToWithArgs(
         _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody, 
