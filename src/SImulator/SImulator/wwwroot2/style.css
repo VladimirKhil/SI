@@ -30,7 +30,3 @@ button.join:nth-child(1), button.join:nth-child(3) {
 .gameInfoBlock .gameInfoBlock__header {
 	flex: initial !important;
 }
-
-.dialog_closeButton {
-	display: none !important;
-}
