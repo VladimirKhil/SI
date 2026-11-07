@@ -27,7 +27,6 @@ public static class GameRunner
 
     public static Game CreateGame(
         Node node,
-        /* TODO: remove */ IGameSettingsCore<AppSettingsCore> settings,
         SI.Contracts.RoomSettings roomSettings,
         SI.Contracts.TimeSettings timeSettings,
         SI.Contracts.RulesSettings rules,
@@ -47,7 +46,7 @@ public static class GameRunner
     {
         var gameState = new GameState(
             gameHost,
-            new GamePersonAccount(settings.Showman),
+            new GamePersonAccount(ToAccount(roomSettings.Showman)),
             packageSource,
             language,
             roomSettings,
@@ -99,7 +98,7 @@ public static class GameRunner
                 for (int i = 0; i < roomSettings.Players.Length; i++)
                 {
                     var playerSettings = roomSettings.Players[i];
-                    gameState.Players.Add(new GamePlayerAccount(settings.Players[i]));
+                    gameState.Players.Add(new GamePlayerAccount(ToAccount(playerSettings)));
 
                     if (playerSettings.Type == SI.Contracts.Models.AccountType.Bot)
                     {
@@ -165,6 +164,14 @@ public static class GameRunner
             fileShare,
             avatarHelper);
     }
+
+    private static Account ToAccount(SI.Contracts.Models.Account account) => new()
+    {
+        Name = account.Name,
+        IsMale = account.Gender == SI.Contracts.Models.Gender.Male,
+        Picture = account.AvatarUri ?? "",
+        IsHuman = account.Type == SI.Contracts.Models.AccountType.Human,
+    };
 
     private static ComputerAccount GetComputerAccount(
         SI.Contracts.Models.Account account,

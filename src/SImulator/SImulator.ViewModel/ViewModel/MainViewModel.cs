@@ -583,7 +583,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         var game = GameRunner.CreateGame(
            node,
-           gameSettings,
            roomSettings,
            new SI.Contracts.TimeSettings(),
            rules,

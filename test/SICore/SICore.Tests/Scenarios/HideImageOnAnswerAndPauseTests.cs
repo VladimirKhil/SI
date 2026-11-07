@@ -1,4 +1,4 @@
-using NSubstitute;
+﻿using NSubstitute;
 using NUnit.Framework;
 using SI.Contracts;
 using SICore.Contracts;
@@ -106,7 +106,6 @@ public sealed class HideImageOnAnswerAndPauseTests
 
         var game = GameRunner.CreateGame(
             node,
-            gameSettings,
             new RoomSettings
             {
                 HostName = HostName,

@@ -66,7 +66,6 @@ public sealed class ScenariosTests
 
         var game = GameRunner.CreateGame(
             node,
-            gameSettings,
             new SI.Contracts.RoomSettings {
                 HostName = "Showman",
                 Showman = new SI.Contracts.Models.Account
@@ -415,7 +414,6 @@ public sealed class ScenariosTests
 
         var game = GameRunner.CreateGame(
             node,
-            gameSettings,
             new SI.Contracts.RoomSettings
             {
                 HostName = "Showman",
@@ -513,7 +511,6 @@ public sealed class ScenariosTests
 
         var game = GameRunner.CreateGame(
             node,
-            gameSettings,
             new SI.Contracts.RoomSettings
             {
                 Showman = new SI.Contracts.Models.Account { Type = SI.Contracts.Models.AccountType.Human, Name = Constants.FreePlace },
@@ -622,7 +619,6 @@ public sealed class ScenariosTests
 
         var game = GameRunner.CreateGame(
             node,
-            gameSettings,
             new SI.Contracts.RoomSettings
             {
                 HostName = "Showman",
@@ -733,7 +729,6 @@ public sealed class ScenariosTests
 
         var game = GameRunner.CreateGame(
             node,
-            gameSettings,
             new SI.Contracts.RoomSettings
             {
                 HostName = "Showman",
