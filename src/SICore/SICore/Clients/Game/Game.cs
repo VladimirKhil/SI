@@ -446,30 +446,35 @@ public sealed class Game : MessageHandler
     {
         var result = new List<ConnectionPersonData>
         {
-            new() { Name = _state.ShowMan.Name, Role = GameRole.Showman, IsOnline = _state.ShowMan.IsConnected }
+            CreatePersonData(_state.ShowMan, GameRole.Showman)
         };
 
         for (int i = 0; i < _state.Players.Count; i++)
         {
-            result.Add(new ConnectionPersonData
-            {
-                Name = _state.Players[i].Name,
-                Role = GameRole.Player,
-                IsOnline = _state.Players[i].IsConnected
-            });
+            result.Add(CreatePersonData(_state.Players[i], GameRole.Player));
         }
 
         for (int i = 0; i < _state.Viewers.Count; i++)
         {
-            result.Add(new ConnectionPersonData
-            {
-                Name = _state.Viewers[i].Name,
-                Role = GameRole.Viewer,
-                IsOnline = _state.Viewers[i].IsConnected
-            });
+            result.Add(CreatePersonData(_state.Viewers[i], GameRole.Viewer));
         }
 
         return result.ToArray();
+    }
+
+    private ConnectionPersonData CreatePersonData(ViewerAccount account, GameRole role)
+    {
+        var data = new ConnectionPersonData { Name = account.Name, Role = role, IsOnline = account.IsConnected };
+
+        if (account.IsConnected
+            && _state.Identities.TryGetValue(account.Name, out var identity)
+            && Enum.TryParse<AuthSource>(identity.Provider, out var authSource))
+        {
+            data.AuthSource = authSource;
+            data.UserId = identity.UserId;
+        }
+
+        return data;
     }
 
     private AuthenticationResult AuthenticateCore(
