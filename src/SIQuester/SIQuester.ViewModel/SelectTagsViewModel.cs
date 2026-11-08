@@ -48,6 +48,34 @@ public sealed class SelectTagsViewModel : INotifyPropertyChanged
         RemoveItem = new SimpleCommand(RemoveItem_Executed);
     }
 
+    /// <summary>
+    /// Gets the text that filters the tags catalog: the tag being typed (the part after the last comma).
+    /// </summary>
+    public static string GetFilter(string? newItem)
+    {
+        if (string.IsNullOrEmpty(newItem))
+        {
+            return "";
+        }
+
+        var lastSeparator = newItem.LastIndexOf(',');
+        return newItem[(lastSeparator + 1)..].Trim();
+    }
+
+    /// <summary>
+    /// Is the catalog tag shown for the filter: the tag or its whole group matches.
+    /// </summary>
+    public static bool IsTagVisible(TagsRepository.TagGroup group, TagsRepository.Tag tag, string filter) =>
+        filter.Length == 0 || Matches(tag.Name, filter) || Matches(group.Name, filter);
+
+    /// <summary>
+    /// Is the catalog group shown for the filter: the group or any of its tags matches.
+    /// </summary>
+    public static bool IsGroupVisible(TagsRepository.TagGroup group, string filter) =>
+        filter.Length == 0 || Matches(group.Name, filter) || group.Tags.Any(tag => Matches(tag.Name, filter));
+
+    private static bool Matches(string name, string filter) => name.Contains(filter, StringComparison.CurrentCultureIgnoreCase);
+
     private void AddItem_Executed(object? arg)
     {
         var items = NewItem.Split(',');
