@@ -1428,4 +1428,10 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="RemoveAuthors" xml:space="preserve">
+    <value>Remove authors</value>
+  </data>
+  <data name="RemoveSources" xml:space="preserve">
+    <value>Remove sources</value>
+  </data>
 </root>
