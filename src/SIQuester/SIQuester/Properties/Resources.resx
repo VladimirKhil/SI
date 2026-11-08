@@ -1428,4 +1428,7 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="ContactUriHint" xml:space="preserve">
+    <value>author&apos;s website, e-mail or Telegram</value>
+  </data>
 </root>
