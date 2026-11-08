@@ -1424,4 +1424,7 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="ContactUriHint" xml:space="preserve">
+    <value>сайт, почта или Telegram автора</value>
+  </data>
 </root>

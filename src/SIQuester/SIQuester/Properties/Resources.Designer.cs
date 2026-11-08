@@ -862,6 +862,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to author&apos;s website, e-mail or Telegram.
+        /// </summary>
+        public static string ContactUriHint {
+            get {
+                return ResourceManager.GetString("ContactUriHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to To ensure a positive and responsible experience, please follow these guidelines while working in the question editor:
         ///
         ///Responsible Use of Content:
