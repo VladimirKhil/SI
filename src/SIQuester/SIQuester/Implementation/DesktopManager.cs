@@ -56,7 +56,12 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService, IDispo
     };
 
     public override Tuple<int, int, int>? GetCurrentItemSelectionArea() =>
-        ActionMenuViewModel.Instance.PlacementTarget is TextList box ? box.GetSelectionInfo() : null;
+        ActionMenuViewModel.Instance.PlacementTarget switch
+        {
+            TextList box => box.GetSelectionInfo(),
+            AnswerListEditor answers => answers.GetSelectionInfo(),
+            _ => null
+        };
 
     public override void CreatePreview(SIDocument document)
     {
