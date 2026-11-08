@@ -15,5 +15,8 @@ public sealed class AuthorsViewModel : LinksViewModel
     protected override void LinkTo(int index, object arg) =>
         OwnerDocument.Document.SetAuthorLink(this, index, OwnerDocument.Document.Authors.IndexOf((AuthorInfo)arg));
 
+    // The package must keep at least one author
+    protected override bool CanClear() => Owner.Owner is not PackageViewModel;
+
     protected override bool CanRemove() => !(this == OwnerDocument?.Package?.Info?.Authors && Count == 1);
 }
