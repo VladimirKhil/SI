@@ -60,12 +60,14 @@
                 <my:MappedConverter.Map>
                     <my:StringDictionary>
                         <x:Static x:Key="{x:Static pc:QuestionTypes.Simple}" Member="lp:Resources.QuestionTypeSimple" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.WithButton}" Member="lp:Resources.QuestionTypeSimple" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.Stake}" Member="vmp:Resources.QuestionTypeStake" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.StakeAll}" Member="vmp:Resources.QuestionTypeStakeForAll" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.Secret}" Member="vmp:Resources.QuestionTypeSecret" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.SecretPublicPrice}" Member="lp:Resources.QuestionTypeSecretPublicPrice" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.SecretNoQuestion}" Member="lp:Resources.QuestionTypeSecretNoQuestion" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.NoRisk}" Member="vmp:Resources.NoRiskQuestion" />
+                        <x:Static x:Key="{x:Static pc:QuestionTypes.ForYourself}" Member="vmp:Resources.NoRiskQuestion" />
                         <x:Static x:Key="{x:Static pc:QuestionTypes.ForAll}" Member="vmp:Resources.QuestionTypeForAll" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>

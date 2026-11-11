@@ -367,7 +367,7 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
             throw new Exception(string.Format(Resources.LogsFolderNotFound, folder));
         }
 
-        return GameLogger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
+        return GameLogger.Create(Path.Combine(folder, $"{DateTime.Now:yyyy-MM-dd HH.mm.ss}.log"));
     }
 
     public void ClearMedia()

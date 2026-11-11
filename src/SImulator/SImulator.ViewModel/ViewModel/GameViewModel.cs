@@ -1950,6 +1950,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 _buttonManager = null;
             }
 
+            LogFinalStats();
+
             _gameActions.Dispose();
             _gameLogger.Dispose();
 
@@ -1999,6 +2001,25 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             first = false;
             sb.AppendFormat("{0}:{1}", player.Name, player.Sum);
+        }
+
+        _gameLogger.Write(sb.ToString());
+    }
+
+    private void LogFinalStats()
+    {
+        if (!Settings.Model.SaveLogs || Players.Count <= 0)
+        {
+            return;
+        }
+
+        LogScore();
+
+        var sb = new StringBuilder();
+
+        foreach (var player in Players)
+        {
+            sb.AppendFormat("\r\n{0}: {1} (+{2}/-{3})", player.Name, player.Sum, player.Right, player.Wrong);
         }
 
         _gameLogger.Write(sb.ToString());
