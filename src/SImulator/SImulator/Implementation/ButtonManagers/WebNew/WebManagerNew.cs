@@ -101,7 +101,7 @@ public sealed class WebManagerNew(WebApplication webApplication, IGameRepository
 
     public void AskStake(string connectionId, int maximum) => SendMessageTo(connectionId, "ASK_STAKE", "Stake", "1", maximum.ToString(), "1", "", "");
 
-    public void AskTextAnswer() => SendMessage("ANSWER");
+    public void AskTextAnswer() => SendMessage("ANSWER", "text");
 
     public void AskOralAnswer(string connectionId) => SendMessageTo(connectionId, "ORAL_ANSWER");
 

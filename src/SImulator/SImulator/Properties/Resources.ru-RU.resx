@@ -304,6 +304,12 @@
   <data name="GameModes_Sport" xml:space="preserve">
     <value>Упрощённая</value>
   </data>
+  <data name="GameModes_Quiz" xml:space="preserve">
+    <value>Викторина</value>
+  </data>
+  <data name="GameModes_TurnTaking" xml:space="preserve">
+    <value>По очереди</value>
+  </data>
   <data name="GameModes_Tv" xml:space="preserve">
     <value>Классическая</value>
   </data>

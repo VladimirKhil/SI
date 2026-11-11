@@ -1421,6 +1421,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             ManagedMode = true;
         }
 
+        if (!_managed)
+        {
+            for (var i = 0; i < Settings.Model.PlayerCount; i++)
+            {
+                AddPlayer.Execute(null);
+            }
+        }
+
         _language = Thread.CurrentThread.CurrentUICulture.Name;
 
         await PresentationController.StartAsync(InitPresentation);
@@ -1736,11 +1744,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         if (QuestionForAll)
         {
-            if (!IsCommonPrice)
-            {
-                PresentationController.OnFinalThink();
-            }    
-
+            PresentationController.OnFinalThink();
             _buttonManager?.TryGetCommandExecutor()?.AskTextAnswer();
 
             var time = Settings.Model.FinalQuestionThinkingTime;

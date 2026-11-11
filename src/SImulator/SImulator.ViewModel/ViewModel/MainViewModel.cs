@@ -666,7 +666,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         try
         {
             engine = EngineFactory.CreateEngine(
-                SettingsViewModel.Model.GameMode == Model.GameModes.Tv ? WellKnownGameRules.Classic : WellKnownGameRules.Simple,
+                SettingsViewModel.Model.GameMode switch
+                {
+                    Model.GameModes.Tv => WellKnownGameRules.Classic,
+                    Model.GameModes.Quiz => WellKnownGameRules.Quiz,
+                    Model.GameModes.TurnTaking => WellKnownGameRules.TurnTaking,
+                    _ => WellKnownGameRules.Simple
+                },
                 document,
                 GetEngineOptions,
                 gameEngineController,
@@ -705,11 +711,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         gameEngineController.GameViewModel = game;
         gameActions.GameViewModel = game;
-
-        for (var i = 0; i < SettingsViewModel.Model.PlayerCount; i++)
-        {
-            game.AddPlayer.Execute(null);
-        }
 
         return game;
     }
