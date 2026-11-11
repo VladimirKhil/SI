@@ -1683,22 +1683,13 @@ public sealed class Game : MessageHandler
         _actions.InformDisconnected(account.Name);
         _state.Identities.Remove(account.Name);
 
-        if (_state.HiddenPersons && _state.Players.Contains(account))
-        {
-            _actions.InformPlayerCount();
-        }
-
         _state.BeginUpdatePersons($"Disconnected {account.Name}");
 
         try
         {
             account.IsConnected = false;
 
-            if (_state.Viewers.Contains(account))
-            {
-                _state.Viewers.Remove(account);
-            }
-            else
+            if (!_state.Viewers.Remove(account))
             {
                 var isBefore = _state.Stage == GameStage.Before;
 
@@ -1717,6 +1708,11 @@ public sealed class Game : MessageHandler
         finally
         {
             _state.EndUpdatePersons();
+        }
+
+        if (_state.HiddenPersons && _state.Players.Contains(account))
+        {
+            _actions.InformPlayerCount();
         }
 
         if (args[1] == _state.HostName && !_state.HiddenPersons)

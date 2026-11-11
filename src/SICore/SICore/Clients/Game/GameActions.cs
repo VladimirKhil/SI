@@ -191,9 +191,16 @@ public sealed class GameActions
 
     public void ShowLeaderboard()
     {
+        var validPlayers = _state.Players.Where(player => player.IsConnected).ToList();
+
+        if (validPlayers.Count == 0)
+        {
+            return;
+        }
+
         var message = new MessageBuilder(Messages.Leaderboard);
 
-        foreach (var player in _state.Players.OrderByDescending(player => player.Sum).Take(10))
+        foreach (var player in validPlayers.OrderByDescending(player => player.Sum).Take(12))
         {
             message.Add(player.Name).Add(player.Sum);
         }
