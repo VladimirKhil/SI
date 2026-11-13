@@ -2459,7 +2459,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            if (_state.QuestionPlay.ActiveValidationCount > 0)
+            if (_state.QuestionPlay.ActiveValidationCount > 0 && _state.Rules.GameMode != SI.Contracts.GameMode.Quiz) // TODO: think about more elegant solution
             {
                 _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name); // Cancel validation
             }

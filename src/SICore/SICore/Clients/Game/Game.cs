@@ -980,7 +980,8 @@ public sealed class Game : MessageHandler
 
         if (_state.Decision == DecisionType.AnswerValidating && _state.QuestionPlay.Validations.All(v => v.Verdict.HasValue))
         {
-            _controller.Stop(StopReason.Decision);
+            Controller.StopWaiting();
+            Controller.ScheduleExecution(Tasks.MoveNext, 1, 1, true); // _controller.Stop(StopReason.Decision); not needed here
         }
     }
 
