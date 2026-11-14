@@ -137,6 +137,9 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Office-like caret in all text boxes: glides to the new position and blinks softly
+        Behaviors.SmoothCaret.Register();
+
         base.OnStartup(e);
 
         // Toolbar buttons are icons without captions, so their tooltips are the main hint: show them sooner
@@ -219,12 +222,132 @@ public partial class App : Application
 
         if (Dispatcher.CheckAccess())
         {
-            UpdateTheme();
+            UpdateThemeSmoothly();
         }
         else
         {
-            Dispatcher.Invoke(UpdateTheme);
+            Dispatcher.Invoke(UpdateThemeSmoothly);
         }
+    }
+
+    /// <summary>
+    /// The window title bar is outside the snapshot: blend its color from the old theme to the new one.
+    /// </summary>
+    private void AnimateTitleBar(System.Windows.Media.Color? from)
+    {
+        if (from == null
+            || MainWindow is not MahApps.Metro.Controls.MetroWindow window
+            || TryFindResource("Ui.TitleBar") is not System.Windows.Media.SolidColorBrush target)
+        {
+            return;
+        }
+
+        var brush = new System.Windows.Media.SolidColorBrush(from.Value);
+        window.WindowTitleBrush = brush;
+
+        var animation = new System.Windows.Media.Animation.ColorAnimation(target.Color, TimeSpan.FromMilliseconds(500))
+        {
+            EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut },
+        };
+
+        // Afterwards follow the palette again (so later theme changes keep working)
+        animation.Completed += (_, _) => window.SetResourceReference(MahApps.Metro.Controls.MetroWindow.WindowTitleBrushProperty, "Ui.TitleBar");
+        brush.BeginAnimation(System.Windows.Media.SolidColorBrush.ColorProperty, animation);
+    }
+
+    /// <summary>
+    /// Changes the theme with a cross-fade: a snapshot of the old look is laid over the window and faded out.
+    /// </summary>
+    private void UpdateThemeSmoothly()
+    {
+        if (MainWindow?.Content is not System.Windows.Controls.Panel root || !root.IsLoaded || root.ActualWidth < 1 || root.ActualHeight < 1)
+        {
+            UpdateTheme();
+            return;
+        }
+
+        System.Windows.Controls.Border? snapshot = null;
+
+        try
+        {
+            var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(root);
+
+            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(
+                (int)Math.Ceiling(root.ActualWidth * dpi.DpiScaleX),
+                (int)Math.Ceiling(root.ActualHeight * dpi.DpiScaleY),
+                dpi.PixelsPerInchX,
+                dpi.PixelsPerInchY,
+                System.Windows.Media.PixelFormats.Pbgra32);
+
+            bitmap.Render(root);
+            bitmap.Freeze();
+
+            // The root panel has no background of its own (the window paints it), so the old window
+            // background goes under the picture; otherwise the new theme shows through at once
+            snapshot = new System.Windows.Controls.Border
+            {
+                Background = MainWindow.Background?.CloneCurrentValue(),
+                IsHitTestVisible = false,
+                Child = new System.Windows.Controls.Image
+                {
+                    Source = bitmap,
+                    Stretch = System.Windows.Media.Stretch.Fill,
+                },
+            };
+
+            System.Windows.Controls.Panel.SetZIndex(snapshot, int.MaxValue);
+            System.Windows.Controls.Grid.SetRowSpan(snapshot, 100);
+            System.Windows.Controls.Grid.SetColumnSpan(snapshot, 100);
+            root.Children.Add(snapshot);
+        }
+        catch (Exception exc)
+        {
+            _logger?.LogWarning(exc, "Theme snapshot failed");
+            snapshot = null;
+        }
+
+        var oldTitleColor = (MainWindow as MahApps.Metro.Controls.MetroWindow)?.WindowTitleBrush is System.Windows.Media.SolidColorBrush titleBrush
+            ? titleBrush.Color
+            : (System.Windows.Media.Color?)null;
+
+        if (snapshot == null)
+        {
+            UpdateTheme();
+            AnimateTitleBar(oldTitleColor);
+            return;
+        }
+
+        // Hold the title bar at its old color until the fade starts (it is outside the snapshot)
+        if (oldTitleColor != null && MainWindow is MahApps.Metro.Controls.MetroWindow metroWindow)
+        {
+            metroWindow.WindowTitleBrush = new System.Windows.Media.SolidColorBrush(oldTitleColor.Value);
+        }
+
+        // 1) Let the still snapshot be painted first (Background runs after rendering).
+        // 2) Apply the new theme underneath it: restyling every control is the heavy part, and nothing moves meanwhile.
+        // 3) Once the new look is laid out and rendered (ContextIdle), fade the snapshot out: the animation
+        //    then runs on an idle UI thread and stays smooth.
+        Dispatcher.BeginInvoke(
+            () =>
+            {
+                UpdateTheme();
+
+                Dispatcher.BeginInvoke(
+                    () =>
+                    {
+                        AnimateTitleBar(oldTitleColor);
+
+                        var fade = new System.Windows.Media.Animation.DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(450))
+                        {
+                            EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut },
+                        };
+
+                        fade.Completed += (_, _) => root.Children.Remove(snapshot);
+                        snapshot.BeginAnimation(UIElement.OpacityProperty, fade);
+                    },
+                    DispatcherPriority.ContextIdle);
+            },
+            DispatcherPriority.Background);
     }
 
     private void UpdateTheme()
