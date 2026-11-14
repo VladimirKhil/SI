@@ -229,6 +229,21 @@ public partial class MainWindow : MetroWindow
         var activeNode = doc.ActiveNode;
         var activeItem = doc.ActiveItem;
 
+        // A picture or files pasted while editing the right answer go to the answer, not to the question
+        if (activeItem is AnswersViewModel answers && answers.IsRight && (Clipboard.ContainsFileDropList() || Clipboard.ContainsImage()))
+        {
+            try
+            {
+                answers.TryPasteMedia(GetClipboardMediaFiles());
+            }
+            catch (Exception ex)
+            {
+                MainViewModel.ShowError(ex);
+            }
+
+            return;
+        }
+
         var contentItemViewModel = activeItem as ContentItemsViewModel;
 
         if (contentItemViewModel == null && activeNode is QuestionViewModel question)
@@ -251,37 +266,15 @@ public partial class MainWindow : MetroWindow
 
         try
         {
+            var mediaFiles = GetClipboardMediaFiles();
 
-            var files = Clipboard.GetFileDropList();
-
-            if (files.Count > 0)
+            if (mediaFiles.Count > 0)
             {
-                foreach (var file in files)
+                foreach (var file in mediaFiles)
                 {
-                    if (file != null)
-                    {
-                        contentItemViewModel.TryImportMedia(file);
-                    }
+                    contentItemViewModel.TryImportMedia(file);
                 }
 
-                return;
-            }
-
-            if (Clipboard.ContainsImage())
-            {
-                var bitmap = Clipboard.GetImage();
-                var stream = new MemoryStream();
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(bitmap));
-                encoder.Save(stream);
-
-                var tempMediaDirectory = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName);
-                Directory.CreateDirectory(tempMediaDirectory);
-
-                var fileName = Path.Combine(tempMediaDirectory, $"{Guid.NewGuid()}.png");
-                File.WriteAllBytes(fileName, stream.ToArray());
-
-                contentItemViewModel.TryImportMedia(fileName);
                 return;
             }
 
@@ -291,5 +284,39 @@ public partial class MainWindow : MetroWindow
         {
             MainViewModel.ShowError(ex);
         }
+    }
+
+    /// <summary>
+    /// Media files from the clipboard: copied files, or a copied picture (e.g. a screenshot) saved as a temporary PNG.
+    /// </summary>
+    private static List<string> GetClipboardMediaFiles()
+    {
+        var result = new List<string>();
+
+        foreach (var file in Clipboard.GetFileDropList())
+        {
+            if (file != null)
+            {
+                result.Add(file);
+            }
+        }
+
+        if (result.Count == 0 && Clipboard.ContainsImage())
+        {
+            var bitmap = Clipboard.GetImage();
+            using var stream = new MemoryStream();
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bitmap));
+            encoder.Save(stream);
+
+            var tempMediaDirectory = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName);
+            Directory.CreateDirectory(tempMediaDirectory);
+
+            var fileName = Path.Combine(tempMediaDirectory, $"{Guid.NewGuid()}.png");
+            File.WriteAllBytes(fileName, stream.ToArray());
+            result.Add(fileName);
+        }
+
+        return result;
     }
 }

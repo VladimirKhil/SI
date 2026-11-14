@@ -73,7 +73,7 @@ body {
         color: darkblue !important;
     }
 
-.stakeHost {
+.stakeHost, .censorButton {
     display: none !important;
 }
 
@@ -81,8 +81,10 @@ body {
     top: 0 !important;
 }
 
-button.censorButton {
-    display: none !important;
+.clickableAnswer {
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
 }
 
 @media screen and (min-width: 1100px) and (min-height: 700px) {

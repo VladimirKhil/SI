@@ -116,8 +116,13 @@ public sealed class GameActions
         isMale ? 'm' : 'f',
         "");
 
-    public void InformUserIdentity(string name, string authProvider, string externalUserId, string receiver) =>
-        SendMessageToWithArgs(receiver, Messages.UserIdentity, name, authProvider, externalUserId);
+    public void InformUserIdentity(
+        string name,
+        string authProvider,
+        string externalUserId,
+        string[] badges,
+        string receiver) =>
+        SendMessageToWithArgs(receiver, Messages.UserIdentity, name, authProvider, externalUserId, string.Join(",", badges));
 
     public void InformDisconnected(string name) => SendMessageToWithArgs(
         _state.HiddenPersons ? _state.HostName ?? "" : NetworkConstants.Everybody, 
@@ -158,14 +163,44 @@ public sealed class GameActions
 
     public void Cancel(string person = NetworkConstants.Everybody) => SendMessage(Messages.Cancel, person);
 
+    public void InformOptions(string person = NetworkConstants.Everybody)
+    {
+        var rules = _state.Rules;
+
+        SendMessageToWithArgs(
+            person,
+            Messages.Options2,
+            "",
+            nameof(rules.Oral), rules.Oral,
+            nameof(rules.Managed), rules.Managed,
+            nameof(rules.DisplayAnswerOptionsLabels), rules.DisplayAnswerOptionsLabels,
+            nameof(rules.FalseStart), rules.FalseStart,
+            nameof(rules.ReadingSpeed), rules.Managed ? 0 : rules.ReadingSpeed,
+            "ReadingSpeed2", rules.ReadingSpeed,
+            nameof(rules.PartialText), rules.PartialText,
+            nameof(rules.PartialImages), rules.PartialImages,
+            nameof(rules.HideImageOnAnswerAndPause), rules.HideImageOnAnswerAndPause,
+            nameof(rules.UseAppellations), rules.UseAppellations,
+            nameof(rules.ValidateEqualAnswersSeparately), rules.ValidateEqualAnswersSeparately,
+            nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
+            nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
+    }
+
     public void ConfigSet(string personType, string index, string name, bool isMale) =>
         SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, personType, index, name, isMale ? '+' : '-');
 
     public void ShowLeaderboard()
     {
+        var validPlayers = _state.Players.Where(player => player.IsConnected).ToList();
+
+        if (validPlayers.Count == 0)
+        {
+            return;
+        }
+
         var message = new MessageBuilder(Messages.Leaderboard);
 
-        foreach (var player in _state.Players.OrderByDescending(player => player.Sum).Take(10))
+        foreach (var player in validPlayers.OrderByDescending(player => player.Sum).Take(12))
         {
             message.Add(player.Name).Add(player.Sum);
         }

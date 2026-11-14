@@ -303,6 +303,12 @@ when using buttons to start the question timer, an additional press of the Next 
   <data name="GameModes_Sport" xml:space="preserve">
     <value>Simplified</value>
   </data>
+  <data name="GameModes_Quiz" xml:space="preserve">
+    <value>Quiz</value>
+  </data>
+  <data name="GameModes_TurnTaking" xml:space="preserve">
+    <value>Turn taking</value>
+  </data>
   <data name="GameModes_Tv" xml:space="preserve">
     <value>Classic</value>
   </data>

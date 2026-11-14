@@ -316,6 +316,7 @@
 
                                     <TextBox
                                         x:Name="name"
+                                        lb:SelectAllOnFocusBehavior.IsAttached="True"
                                         Grid.Column="1"
                                         FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                                         Margin="1"

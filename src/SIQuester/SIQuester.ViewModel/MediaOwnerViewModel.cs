@@ -121,6 +121,31 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
         return await _mediaLoading;
     }
 
+    /// <summary>
+    /// Forgets the loaded media and loads it again (e.g. after the file became available).
+    /// </summary>
+    public void ReloadMedia()
+    {
+        Task? pending;
+
+        lock (_mediaLoadingLock)
+        {
+            pending = _mediaLoading;
+        }
+
+        // Let a load that is already running finish first, otherwise it would overwrite the new result
+        (pending ?? Task.CompletedTask).ContinueWith(_ =>
+        {
+            lock (_mediaLoadingLock)
+            {
+                _mediaLoaded = false;
+                _mediaLoading = null;
+            }
+
+            LoadMediaNoWait();
+        }, TaskScheduler.Default);
+    }
+
     private async void LoadMediaNoWait()
     {
         try

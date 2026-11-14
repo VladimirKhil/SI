@@ -60,6 +60,17 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     /// Пути для файлов, ещё не загруженных в коллекцию (не закоммиченных)
     /// </summary>
     private readonly Dictionary<MediaItemViewModel, Tuple<string, FileStream>> _streams = new();
+
+    // _streams is accessed from both UI and thread-pool threads (media loading), so all access must be guarded
+    private readonly Lock _streamsLock = new();
+
+    private KeyValuePair<MediaItemViewModel, Tuple<string, FileStream>> FindPendingStream(string name)
+    {
+        lock (_streamsLock)
+        {
+            return _streams.FirstOrDefault(n => n.Key.Model.Name == name);
+        }
+    }
     private readonly Dictionary<MediaItemViewModel, Tuple<string, FileStream>> _removedStreams = new();
 
     private bool _blockFlag = false;
@@ -383,7 +394,11 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                     else if (_removedStreams.ContainsKey(item))
                     {
                         _added.Add(item);
-                        _streams.Add(item, _removedStreams[item]);
+                        lock (_streamsLock)
+                        {
+                            _streams.Add(item, _removedStreams[item]);
+                        }
+
                         _removedStreams.Remove(item);
                     }
                     else
@@ -438,6 +453,9 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
                 PreviewRemove(item);
                 PreviewAdd(newItem, newUri, currentIndex);
+
+                // CreateItem started loading before the file was registered: load again so size and preview are known
+                newItem.ReloadMedia();
                 HasPendingChanges = IsChanged();
 
                 if (returnToCurrent)
@@ -529,8 +547,11 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         if (_added.Contains(item))
         {
             _added.Remove(item);
-            _removedStreams.Add(item, _streams[item]);
-            _streams.Remove(item);
+            lock (_streamsLock)
+            {
+                _removedStreams.Add(item, _streams[item]);
+                _streams.Remove(item);
+            }
         }
         else
         {
@@ -561,7 +582,14 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         {
             try
             {
-                using var fs = _streams[item].Item2;
+                FileStream stream;
+
+                lock (_streamsLock)
+                {
+                    stream = _streams[item].Item2;
+                }
+
+                using var fs = stream;
                 await collection.AddFileAsync(item.Model.Name, fs, cancellationToken);
             }
             catch (Exception exc)
@@ -570,7 +598,11 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             }
             
             _added.Remove(item);
-            _streams.Remove(item);
+
+            lock (_streamsLock)
+            {
+                _streams.Remove(item);
+            }
         }
 
         foreach (var item in _renamed.ToArray())
@@ -591,7 +623,12 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
         foreach (var item in _added.ToArray())
         {
-            var fs = _streams[item].Item2;
+            FileStream fs;
+
+            lock (_streamsLock)
+            {
+                fs = _streams[item].Item2;
+            }
 
             if (final)
             {
@@ -658,6 +695,9 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         var item = CreateItem(uniqueName);
         PreviewAdd(item, file);
 
+        // CreateItem started loading before the file was registered: load again so size and preview are known
+        item.ReloadMedia();
+
         OnChanged(new CustomChange(
             () =>
             {
@@ -722,7 +762,10 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             }
 
             _added.Add(item);
-            _streams[item] = Tuple.Create(path, fileStream);
+            lock (_streamsLock)
+            {
+                _streams[item] = Tuple.Create(path, fileStream);
+            }
 
             if (_removedStreams.ContainsKey(item))
             {
@@ -765,7 +808,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             }    
         }
 
-        var pendingStream = _streams.FirstOrDefault(n => n.Key.Model.Name == link);
+        var pendingStream = FindPendingStream(link);
 
         if (pendingStream.Key != null)
         {
@@ -776,9 +819,12 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             () =>
             {
                 var collection = _document.GetInternalCollection(_name); // This value cannot be cached as internal collection link can eventually change 
-                
+
                 return PlatformManager.Instance.PrepareMedia(
-                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), _internalId + link),
+                    new Media(
+                        () => collection.GetFile(link) ?? throw new FileNotFoundException(string.Format(Resources.ObjectNotFound, link), link),
+                        () => collection.GetFileLength(link),
+                        _internalId + link),
                     collection.Name);
             });
     }
@@ -794,7 +840,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             }
         }
 
-        var pendingStream = _streams.FirstOrDefault(n => n.Key.Model.Name == link);
+        var pendingStream = FindPendingStream(link);
 
         if (pendingStream.Key != null)
         {
@@ -817,7 +863,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     /// <returns>Global file path for media file or null.</returns>
     internal string? TryGetFilePath(MediaItemViewModel mediaItem)
     {
-        var pendingStream = _streams.FirstOrDefault(n => n.Key.Model.Name == mediaItem.Model.Name);
+        var pendingStream = FindPendingStream(mediaItem.Model.Name);
 
         if (pendingStream.Key != null)
         {
@@ -840,10 +886,18 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     internal StorageChanges GetChanges() => new()
     {
-        Added = _added.Select(item => _streams[item].Item1).ToArray(),
+        Added = GetAddedPaths(),
         Removed = _removed.Select(item => item.Model.Name).ToArray(),
         Renamed = _renamed.ToDictionary(item => item.Item1, item => item.Item2)
     };
+
+    private string[] GetAddedPaths()
+    {
+        lock (_streamsLock)
+        {
+            return _added.Select(item => _streams[item].Item1).ToArray();
+        }
+    }
 
     internal void RestoreChanges(StorageChanges storageChanges)
     {
@@ -919,10 +973,16 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         }
 
         // Try to get size from pending stream
-        var pendingStream = _streams.FirstOrDefault(s => s.Key == mediaItem);
-        if (pendingStream.Key != null)
+        Tuple<string, FileStream>? pendingStream;
+
+        lock (_streamsLock)
         {
-            return pendingStream.Value.Item2.Length;
+            _streams.TryGetValue(mediaItem, out pendingStream);
+        }
+
+        if (pendingStream != null)
+        {
+            return pendingStream.Item2.Length;
         }
 
         // Fallback: try to get size using the document's GetLength method

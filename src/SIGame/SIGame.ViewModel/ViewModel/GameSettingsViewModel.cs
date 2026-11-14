@@ -821,7 +821,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         var game = GameRunner.CreateGame(
             node,
-            _model,
             roomSettings,
             timeSettings,
             rulesSettings,

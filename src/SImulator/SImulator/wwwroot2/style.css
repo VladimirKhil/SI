@@ -26,3 +26,7 @@ button.join:nth-child(1), button.join:nth-child(3) {
 	.tableContextView .reactionButton, .tableContextView .ready_button {
 		display: none;
 	}
+
+.gameInfoBlock .gameInfoBlock__header {
+	flex: initial !important;
+}

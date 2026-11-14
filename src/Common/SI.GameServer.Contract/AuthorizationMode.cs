@@ -13,6 +13,7 @@ public enum AuthorizationMode
     /// <summary>
     /// Steam authorization is used.
     /// </summary>
+    [Obsolete("Steam authorization is deprecated and will be removed in future versions.")]
     Steam,
 
     /// <summary>

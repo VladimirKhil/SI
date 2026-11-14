@@ -55,6 +55,49 @@ internal sealed class MediaOperationsTests
     }
 
     [Test]
+    public async Task AddFile_NewItem_ShouldReportFileSize()
+    {
+        // Arrange
+        var document = SIDocument.Create("Test Package", "Test Author");
+        var qDocument = _documentFactory.CreateViewModelFor(document, "Test Package");
+
+        var tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDirectory);
+
+        try
+        {
+            var imageData = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x01, 0x02, 0x03, 0x04 };
+            var imagePath = Path.Combine(tempDirectory, "new_image.png");
+            await File.WriteAllBytesAsync(imagePath, imageData);
+
+            // Act
+            var item = qDocument.Images.AddFile(imagePath);
+
+            // The size is loaded in the background: wait for it
+            var deadline = DateTime.UtcNow.AddSeconds(5);
+
+            while ((item.MediaSource?.StreamLength ?? -1) != imageData.Length && DateTime.UtcNow < deadline)
+            {
+                await Task.Delay(20);
+            }
+
+            // Assert - the side panel shows the real size of a file that is not saved into the package yet
+            Assert.That(item.MediaSource?.StreamLength, Is.EqualTo(imageData.Length));
+        }
+        finally
+        {
+            try
+            {
+                Directory.Delete(tempDirectory, true);
+            }
+            catch (IOException)
+            {
+                // The document may still hold the pending file open
+            }
+        }
+    }
+
+    [Test]
     public async Task AddAudioToDocument_ShouldIncreaseAudioCount()
     {
         // Arrange
