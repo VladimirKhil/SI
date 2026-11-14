@@ -1470,5 +1470,13 @@
   </data>
   <data name="ToolbarLogo" xml:space="preserve">
     <value>Логотип</value>
+  <data name="StatisticsRounds" xml:space="preserve">
+    <value>раундов</value>
+  </data>
+  <data name="StatisticsThemes" xml:space="preserve">
+    <value>тем</value>
+  </data>
+  <data name="StatisticsNoWarnings" xml:space="preserve">
+    <value>Замечаний нет</value>
   </data>
 </root>

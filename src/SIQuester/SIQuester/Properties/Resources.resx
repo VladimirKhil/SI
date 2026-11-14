@@ -1474,5 +1474,13 @@ Theme list: players remove themes in turn; on the last one everyone bets and wri
   </data>
   <data name="ToolbarLogo" xml:space="preserve">
     <value>Logo</value>
+  <data name="StatisticsRounds" xml:space="preserve">
+    <value>rounds</value>
+  </data>
+  <data name="StatisticsThemes" xml:space="preserve">
+    <value>themes</value>
+  </data>
+  <data name="StatisticsNoWarnings" xml:space="preserve">
+    <value>No issues found</value>
   </data>
 </root>
