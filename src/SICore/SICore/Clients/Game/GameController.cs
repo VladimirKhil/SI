@@ -4550,6 +4550,19 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.MoveNext, 5);
     }
 
+    /// <summary>
+    /// Finishes the race: the first right answer has been given so the other players stop playing.
+    /// </summary>
+    internal void FinishRace()
+    {
+        foreach (var player in _state.Players)
+        {
+            player.Flag = false; // No more answers are accepted
+        }
+
+        ScheduleExecution(Tasks.WaitAnswer, 1, force: true);
+    }
+
     internal void OnButtonPressStart()
     {
         _state.Decision = DecisionType.Pressing;
@@ -4762,6 +4775,19 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 AddRightSum(answerer, _state.CurPriceRight);
                 outcome = _state.CurPriceRight;
+
+                if (_state.QuestionPlay.IsRace
+                    && GetTurnSwitchingStrategy() == TurnSwitchingStrategy.ByRightAnswerOnButton
+                    && _state.ChooserIndex != answererIndex)
+                {
+                    _state.ChooserIndex = answererIndex;
+                    _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+                }
+            }
+            else if (_state.QuestionPlay.AnswerType == AnswerType.Client)
+            {
+                _actions.SendMessageWithArgs(Messages.Pass, answererIndex); // Failed mini-game is not penalized
+                continue;
             }
             else
             {
