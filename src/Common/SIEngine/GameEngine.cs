@@ -1,4 +1,4 @@
-﻿using SIEngine.Core;
+using SIEngine.Core;
 using SIEngine.Models;
 using SIEngine.QuestionSelectionStrategies;
 using SIEngine.Rules;
@@ -73,19 +73,32 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
         }
     }
 
-    public bool CanMoveBack
+    public bool CanMoveBack => _canMoveBack || CanMoveBackContent;
+
+    private bool CanMoveBackStep
     {
         get => _canMoveBack;
-        private set
+        set
         {
             if (_canMoveBack != value)
             {
+                var oldValue = CanMoveBack;
                 _canMoveBack = value;
-                OnPropertyChanged();
+
+                if (oldValue != CanMoveBack)
+                {
+                    OnPropertyChanged(nameof(CanMoveBack));
+                }
+
                 UpdateCanMoveBackRound();
             }
         }
     }
+
+    /// <summary>
+    /// Can the previous content item of the current question step be replayed.
+    /// </summary>
+    public bool CanMoveBackContent => _stage == GameStage.Question && (_questionEngine?.CanMoveBack ?? false);
 
     public bool CanMoveNextRound
     {
@@ -247,7 +260,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
 
     private void OnRound()
     {
-        CanMoveBack = false;
+        CanMoveBackStep = false;
 
         var strategyType = _gameRules.GetRulesForRoundType(ActiveRound.Type).QuestionSelectionStrategyType;
 
@@ -321,14 +334,20 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
 
     private void UpdateCanMoveNextRound() => CanMoveNextRound = _roundIndex < _document.Package.Rounds.Count;
 
-    private void UpdateCanMoveBackRound() => CanMoveBackRound = _roundIndex > 0 || CanMoveBack;
+    private void UpdateCanMoveBackRound() => CanMoveBackRound = _roundIndex > 0 || CanMoveBackStep;
 
     /// <summary>
     /// Moves engine to the previous game state.
     /// </summary>
     public void MoveBack()
     {
-        if (!CanMoveBack)
+        if (CanMoveBackContent)
+        {
+            QuestionEngine.MoveBack();
+            return;
+        }
+
+        if (!CanMoveBackStep)
         {
             return;
         }
@@ -342,7 +361,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
         Stage = GameStage.SelectingQuestion;
 
         UpdateCanNext();
-        CanMoveBack = SelectionStrategy.CanMoveBack();
+        CanMoveBackStep = SelectionStrategy.CanMoveBack();
     }
 
     private void SetActiveThemeQuestion()
@@ -359,7 +378,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
         SetActiveThemeQuestion();
         OnMoveToQuestion();
         UpdateCanNext();
-        CanMoveBack = SelectionStrategy.CanMoveBack();
+        CanMoveBackStep = SelectionStrategy.CanMoveBack();
     }
 
     public bool CanNext() => _stage != GameStage.None && (_stage != GameStage.SelectingQuestion || SelectionStrategy.CanMoveNext());
@@ -396,7 +415,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
         _roundIndex++;
         SetActiveRound();
 
-        CanMoveBack = false;
+        CanMoveBackStep = false;
         UpdateCanMoveNextRound();
         UpdateCanMoveBackRound();
 
@@ -416,7 +435,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
     {
         if (_roundIndex == roundIndex)
         {
-            if (CanMoveBack)
+            if (CanMoveBackStep)
             {
                 return MoveBackRound();
             }
@@ -435,7 +454,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
         SetActiveRound();
         Stage = GameStage.Round;
 
-        CanMoveBack = false;
+        CanMoveBackStep = false;
         UpdateCanMoveNextRound();
         UpdateCanMoveBackRound();
         UpdateCanNext();
@@ -449,7 +468,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
             return false;
         }
 
-        if (CanMoveBack)
+        if (CanMoveBackStep)
         {
             Stage = GameStage.Round;
         }
@@ -466,7 +485,7 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
 
         _playHandler.OnRoundEnd(RoundEndReason.Manual);
 
-        CanMoveBack = false;
+        CanMoveBackStep = false;
         UpdateCanNext();
         UpdateCanMoveNextRound();
         UpdateCanMoveBackRound();

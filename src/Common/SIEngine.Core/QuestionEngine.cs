@@ -14,6 +14,8 @@ public sealed class QuestionEngine : IQuestionEngine
     private readonly IQuestionEnginePlayHandler _playHandler;
     private int _stepIndex = 0;
     private int _contentIndex = 0;
+    private int _lastContentStepIndex = -1;
+    private int _lastContentStartIndex = 0;
 
     private bool _started = false;
 
@@ -34,6 +36,8 @@ public sealed class QuestionEngine : IQuestionEngine
     private readonly Script? _script;
 
     public bool CanNext => _script != null && _stepIndex < _script.Steps.Count;
+
+    public bool CanMoveBack => _lastContentStepIndex > -1 && _lastContentStartIndex > 0;
 
     public string QuestionTypeName { get; } = "";
 
@@ -80,6 +84,11 @@ public sealed class QuestionEngine : IQuestionEngine
         while (CanNext)
         {
             var step = _script.Steps[_stepIndex];
+
+            if (step.Type != StepTypes.ShowContent)
+            {
+                _lastContentStepIndex = -1;
+            }
 
             switch (step.Type)
             {
@@ -468,7 +477,9 @@ public sealed class QuestionEngine : IQuestionEngine
                         {
                             if (contentItems.Any())
                             {
-                                _playHandler.OnQuestionContent(contentItems, _contentIndex == content.ContentValue.Count, contentStartIndex);
+                                _lastContentStepIndex = _stepIndex;
+                                _lastContentStartIndex = contentStartIndex;
+                                _playHandler.OnQuestionContent(contentItems, _contentIndex == content.ContentValue.Count);
                             }
 
                             if (_contentIndex == content.ContentValue.Count)
@@ -483,7 +494,9 @@ public sealed class QuestionEngine : IQuestionEngine
 
                     if (contentItems.Any())
                     {
-                        _playHandler.OnQuestionContent(contentItems, true, contentStartIndex);
+                        _lastContentStepIndex = _stepIndex;
+                        _lastContentStartIndex = contentStartIndex;
+                        _playHandler.OnQuestionContent(contentItems, true);
                     }
 
                     _stepIndex++;
@@ -549,6 +562,18 @@ public sealed class QuestionEngine : IQuestionEngine
     }
 
     private void SkipQuestion() => _stepIndex = _script?.Steps.Count ?? 0;
+
+    public void MoveBack()
+    {
+        if (!CanMoveBack)
+        {
+            return;
+        }
+
+        _stepIndex = _lastContentStepIndex;
+        _contentIndex = _lastContentStartIndex - 1;
+        PlayNext();
+    }
 
     private void MoveToContent(int stepIndex, int maxContentIndex, int contentIndex)
     {

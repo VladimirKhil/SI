@@ -212,10 +212,6 @@ internal sealed class QuestionPlayState
         FlexiblePrice = false;
         QuestionKey = "";
         CollectMediaCompletions = false;
-        ContentItems = null;
-        MoveToContent = null;
-        LastContentIndex = null;
-        PendingReplayIndex = null;
         UsedWrongVersions.Clear();
     }
 

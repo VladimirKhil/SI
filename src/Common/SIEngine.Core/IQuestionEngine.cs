@@ -30,6 +30,11 @@ public interface IQuestionEngine
     string QuestionTypeName { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the engine can replay the previous content item of the current content step.
+    /// </summary>
+    bool CanMoveBack { get; }
+
+    /// <summary>
     /// Advances the state machine to the next step and invokes the appropriate handler method.
     /// </summary>
     /// <returns>
@@ -49,6 +54,12 @@ public interface IQuestionEngine
     /// </para>
     /// </remarks>
     bool PlayNext();
+
+    /// <summary>
+    /// Replays the previous content item of the current content step.
+    /// Does nothing if <see cref="CanMoveBack"/> is <c>false</c>.
+    /// </summary>
+    void MoveBack();
 
     /// <summary>
     /// Moves the execution directly to the answer display stage, skipping intermediate steps.

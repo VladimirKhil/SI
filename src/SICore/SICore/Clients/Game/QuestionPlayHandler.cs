@@ -56,7 +56,6 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnAskAnswer(string mode, int duration)
     {
-        _state.QuestionPlay.ClearContentStep();
         _controller.OnLayout();
 
         if (_state.QuestionPlay.AnswerOptions != null && !_state.QuestionPlay.AnswerOptionsShown)
@@ -129,11 +128,10 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnContentStart(IReadOnlyList<ContentItem> contentItems, Action<int> moveToContentCallback)
     {
-        _state.QuestionPlay.StartContentStep(contentItems, moveToContentCallback);
         _controller.OnLayout();
     }
 
-    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast, int contentIndex)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content, bool isLast)
     {
         if (content.Count == 0)
         {
@@ -149,8 +147,6 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         {
             OnQuestionComplexContent(content, isLast);
         }
-
-        _controller.OnContentUnitPlayed(contentIndex);
     }
 
     private void OnQuestionComplexContent(IReadOnlyCollection<ContentItem> content, bool isLast)

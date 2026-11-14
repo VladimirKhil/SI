@@ -567,8 +567,6 @@ public sealed class GameActions
     /// <summary>
     /// Informs the showman about the index of the content unit that has just been sent.
     /// </summary>
-    internal void SendContentIndex(int contentIndex, string? person = null) =>
-        SendMessageToWithArgs(person ?? _state.ShowMan.Name, Messages.ContentIndex, contentIndex);
 
     internal void OnPlayerAnswer(int answererIndex, string answer)
     {

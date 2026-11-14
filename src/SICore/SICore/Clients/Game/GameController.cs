@@ -699,27 +699,8 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void ClearMediaContent() => _state.QuestionPlay.MediaContentCompletions.Clear();
 
-    /// <summary>
-    /// Registers the played content unit and informs the showman about its index.
-    /// </summary>
-    internal void OnContentUnitPlayed(int contentIndex)
+    private void MoveBackContent()
     {
-        _state.QuestionPlay.LastContentIndex = contentIndex;
-        _actions.SendContentIndex(contentIndex);
-    }
-
-    private void ReplayContent()
-    {
-        var questionPlay = _state.QuestionPlay;
-        var contentIndex = questionPlay.PendingReplayIndex;
-        var moveToContent = questionPlay.MoveToContent;
-        questionPlay.PendingReplayIndex = null;
-
-        if (contentIndex == null || moveToContent == null)
-        {
-            return;
-        }
-
         if (_completion != null)
         {
             _completion();
@@ -732,9 +713,9 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.IsPlayingMediaPaused = false;
         _state.MoveNextBlocked = false;
 
-        moveToContent(contentIndex.Value);
+        Engine.MoveBack();
 
-        _tasksHistory.AddLogEntry($"Replayed content: {contentIndex}");
+        _tasksHistory.AddLogEntry("Moved back to previous content");
     }
 
     internal void OnContentBackgroundAudio(ContentItem contentItem)
@@ -2092,6 +2073,13 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                         break;
 
                     case MoveDirections.Back:
+                        if (Engine.CanMoveBackContent)
+                        {
+                            MoveBackContent();
+                            _stopReason = StopReason.None;
+                            return (stop, newTask);
+                        }
+
                         if (Engine.CanMoveBack)
                         {
                             Engine.MoveBack();
@@ -2172,10 +2160,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                     ScheduleExecution(Tasks.MoveNext, _state.MoveDirection == MoveDirections.Next ? 10 : 30);
                 }
 
-                break;
-
-            case StopReason.Replay:
-                ReplayContent();
                 break;
 
             case StopReason.Wait:
@@ -4680,7 +4664,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal bool OnQuestionEnd()
     {
-        _state.QuestionPlay.ClearContentStep();
         var timeout = DetectRoundTimeout();
         var nextTaskTime = 1;
 
