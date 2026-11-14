@@ -1511,4 +1511,25 @@ Theme list: players remove themes in turn; on the last one everyone bets and wri
   <data name="RestrictionHint" xml:space="preserve">
     <value>e.g. 12+ or 18+</value>
   </data>
+  <data name="TagsSelected" xml:space="preserve">
+    <value>Selected tags</value>
+  </data>
+  <data name="TagsNone" xml:space="preserve">
+    <value>Nothing selected yet — click a tag below or type your own</value>
+  </data>
+  <data name="TagsPlaceholder" xml:space="preserve">
+    <value>Find or add a tag… (Enter — add)</value>
+  </data>
+  <data name="StatsChecks" xml:space="preserve">
+    <value>What to check</value>
+  </data>
+  <data name="StatsWarnings" xml:space="preserve">
+    <value>Issues</value>
+  </data>
+  <data name="StatsDetails" xml:space="preserve">
+    <value>By round</value>
+  </data>
+  <data name="StatsRemoveUnusedHint" xml:space="preserve">
+    <value>Remove files that no question uses. The list is shown for confirmation first.</value>
+  </data>
 </root>

@@ -155,16 +155,16 @@
             </ComboBox>
         </DockPanel>
 
-        <StackPanel Orientation="Horizontal" Background="#22000000" DockPanel.Dock="Top">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,4">
             <Button
                 Height="25"
                 HorizontalAlignment="Left"
-                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                Style="{StaticResource SideIconButton}"
                 Name="bAdd"
                 Command="{Binding AddItem}"
                 ToolTip="{x:Static lp:Resources.Add}">
 
-                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_add}, Path=Data}" />
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE710;" />
             </Button>
         </StackPanel>
         
@@ -181,9 +181,10 @@
             VirtualizingPanel.ScrollUnit="Pixel"
             VirtualizingPanel.CacheLength="2,2"
             VirtualizingPanel.CacheLengthUnit="Item"
+            Background="Transparent"
+            BorderThickness="0"
             lb:ScrollIntoSelectedItemBehavior.IsAttached="True">
-            <!-- Only the items on screen (and a couple around them) are created: the tab opens quickly in big packages.
-                 Standard mode (not Recycling): the item style selects an item through an animation that would stay on a reused container -->
+            <!-- Only the items on screen (and a couple around them) are created: big packs open the tab quickly -->
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel />
@@ -195,17 +196,25 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
-                                <Border Name="bd" BorderThickness="1" Padding="8" Margin="5,5,0,0" Background="#22000000">
+                                <Border
+                                    Name="bd"
+                                    CornerRadius="8"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource Ui.CardStroke}"
+                                    Padding="8"
+                                    Margin="0,0,4,6"
+                                    Background="{DynamicResource Ui.Card}">
                                     <ContentPresenter />
                                 </Border>
 
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="bd" Property="Background" Value="#FFADBCFF" />
+                                        <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource Ui.CardHoverStroke}" />
                                     </Trigger>
 
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="bd" Property="Background" Value="#FF8AA0FF" />
+                                        <Setter TargetName="bd" Property="Background" Value="{DynamicResource Ui.AccentSoft}" />
+                                        <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource Ui.Accent}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -245,18 +254,13 @@
                         <StackPanel Grid.Column="1" VerticalAlignment="Top">
                             <Button
                                 Name="bDel"
-                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                Style="{StaticResource SideIconButton}"
                                 Margin="5,0,0,0" Command="{Binding ElementName=root,Path=DataContext.DeleteItem}"
                                 CommandParameter="{Binding}"
                                 Width="25"
                                 Height="25"
                                 ToolTip="{x:Static lp:Resources.Delete}">
-                                <Path
-                                    Stretch="Uniform"
-                                    Stroke="{StaticResource IconBrush}"
-                                    StrokeThickness="2"
-                                    Margin="3"
-                                    Data="{Binding Source={StaticResource app_delete},Path=Data}" />
+                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE711;" />
                             </Button>
                             
                             <Button
@@ -267,15 +271,10 @@
                                 Width="25"
                                 Height="25"
                                 ToolTip="{x:Static lp:Resources.Compress}">
-                                <Path
-                                    Stretch="Uniform"
-                                    Stroke="{StaticResource IconBrush}"
-                                    StrokeThickness="2"
-                                    Margin="3"
-                                    Data="{Binding Source={StaticResource app_lightning},Path=Data}" />
+                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE945;" />
 
                                 <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                    <Style TargetType="Button" BasedOn="{StaticResource SideIconButton}">
                                         <Style.Triggers>
                                             <Trigger Property="IsEnabled" Value="False">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -286,18 +285,13 @@
                             </Button>
                             
                             <Button
-                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                Style="{StaticResource SideIconButton}"
                                 Margin="5,0,0,0" Command="{Binding ElementName=root,Path=DataContext.NavigateToUsage}"
                                 CommandParameter="{Binding}"
                                 Width="25"
                                 Height="25"
                                 ToolTip="{x:Static lp:Resources.NavigateToUsage}">
-                                <Path
-                                    Stretch="Uniform"
-                                    Stroke="{StaticResource IconBrush}"
-                                    StrokeThickness="2"
-                                    Margin="3"
-                                    Data="{Binding Source={StaticResource app_right},Path=Data}" />
+                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE72A;" />
                             </Button>
                         </StackPanel>
 
@@ -310,7 +304,7 @@
                             Margin="5,0,0,0"
                             Width="25"
                             ToolTip="{x:Static lp:Resources.Edit}">                            
-                            <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_edit}, Path=Data}" />                        
+                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE70F;" />                        
                         </ToggleButton>
 
                         <DockPanel Grid.Row="1">

@@ -1507,4 +1507,25 @@
   <data name="RestrictionHint" xml:space="preserve">
     <value>например, 12+ или 18+</value>
   </data>
+  <data name="TagsSelected" xml:space="preserve">
+    <value>Выбранные теги</value>
+  </data>
+  <data name="TagsNone" xml:space="preserve">
+    <value>Пока ничего не выбрано — щёлкните тег ниже или введите свой</value>
+  </data>
+  <data name="TagsPlaceholder" xml:space="preserve">
+    <value>Найти или добавить тег… (Enter — добавить)</value>
+  </data>
+  <data name="StatsChecks" xml:space="preserve">
+    <value>Что проверять</value>
+  </data>
+  <data name="StatsWarnings" xml:space="preserve">
+    <value>Замечания</value>
+  </data>
+  <data name="StatsDetails" xml:space="preserve">
+    <value>Подробно по раундам</value>
+  </data>
+  <data name="StatsRemoveUnusedHint" xml:space="preserve">
+    <value>Убрать из пакета файлы, которые не используются ни в одном вопросе. Перед удалением программа покажет их список и спросит подтверждение.</value>
+  </data>
 </root>

@@ -10,7 +10,7 @@
     d:DataContext="{d:DesignInstance vm:PointAnswerViewModel}">
     <UserControl.Resources>
         <Style x:Key="SelectPointButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-            <Setter Property="Foreground" Value="{StaticResource IconBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Ui.Muted}" />
 
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
@@ -43,7 +43,7 @@
             HorizontalContentAlignment="Center"
             VerticalAlignment="Center"
             IsReadOnly="True"
-            Background="{StaticResource WhiteBrush}" />
+            Background="{DynamicResource MahApps.Brushes.ThemeBackground}" />
 
         <Button
             Command="{Binding SelectPoint}"

@@ -3588,6 +3588,42 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to What to check.
+        /// </summary>
+        public static string StatsChecks {
+            get {
+                return ResourceManager.GetString("StatsChecks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to By round.
+        /// </summary>
+        public static string StatsDetails {
+            get {
+                return ResourceManager.GetString("StatsDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove files that no question uses. The list is shown for confirmation first..
+        /// </summary>
+        public static string StatsRemoveUnusedHint {
+            get {
+                return ResourceManager.GetString("StatsRemoveUnusedHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Issues.
+        /// </summary>
+        public static string StatsWarnings {
+            get {
+                return ResourceManager.GetString("StatsWarnings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Steam.
         /// </summary>
         public static string Steam {
@@ -3647,6 +3683,33 @@ namespace SIQuester.Properties {
         public static string Tags {
             get {
                 return ResourceManager.GetString("Tags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing selected yet — click a tag below or type your own.
+        /// </summary>
+        public static string TagsNone {
+            get {
+                return ResourceManager.GetString("TagsNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find or add a tag… (Enter — add).
+        /// </summary>
+        public static string TagsPlaceholder {
+            get {
+                return ResourceManager.GetString("TagsPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected tags.
+        /// </summary>
+        public static string TagsSelected {
+            get {
+                return ResourceManager.GetString("TagsSelected", resourceCulture);
             }
         }
         

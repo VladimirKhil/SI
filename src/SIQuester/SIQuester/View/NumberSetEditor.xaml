@@ -52,11 +52,11 @@
                 <DataTemplate x:Key="{x:Static lvmm:NumberSetMode.RangeWithStep}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{x:Static lp:Resources.From}" VerticalAlignment="Center" />
-                        <c:NumericTextBox Text="{Binding Minimum}" Margin="5,0,0,0" BorderBrush="{StaticResource MahApps.Brushes.TextBox.Border}" />
+                        <c:NumericTextBox Text="{Binding Minimum}" Margin="5,0,0,0" BorderBrush="{DynamicResource MahApps.Brushes.TextBox.Border}" />
                         <TextBlock Text="{x:Static lp:Resources.To}" Margin="5,0,0,0" VerticalAlignment="Center" />
-                        <c:NumericTextBox Text="{Binding Maximum}" Margin="5,0,0,0" BorderBrush="{StaticResource MahApps.Brushes.TextBox.Border}" />
+                        <c:NumericTextBox Text="{Binding Maximum}" Margin="5,0,0,0" BorderBrush="{DynamicResource MahApps.Brushes.TextBox.Border}" />
                         <TextBlock Text="{x:Static lp:Resources.WithStep}" Margin="5,0,0,0" VerticalAlignment="Center" />
-                        <c:NumericTextBox Text="{Binding Step}" Margin="5,0,0,0" BorderBrush="{StaticResource MahApps.Brushes.TextBox.Border}" />
+                        <c:NumericTextBox Text="{Binding Step}" Margin="5,0,0,0" BorderBrush="{DynamicResource MahApps.Brushes.TextBox.Border}" />
                     </StackPanel>
                 </DataTemplate>
             </lc:TemplateConverter.Templates>
