@@ -2340,6 +2340,10 @@ public sealed class Game : MessageHandler
         {
             _controller.Stop(StopReason.Decision);
         }
+        else if (_state.QuestionPlay.IsRace && !_state.Answerer.AnswerIsWrong)
+        {
+            _controller.FinishRace();
+        }
     }
 
     private void OnIsRight(Message message, string[] args)

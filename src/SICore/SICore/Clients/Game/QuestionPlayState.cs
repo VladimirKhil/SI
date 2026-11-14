@@ -100,6 +100,12 @@ internal sealed class QuestionPlayState
     internal bool UseButtons { get; set; }
 
     /// <summary>
+    /// Is the question played as a race: a mini-game of a question with buttons
+    /// is played by all players simultaneously and the first right answer wins.
+    /// </summary>
+    internal bool IsRace => UseButtons && AreMultipleAnswerers && AnswerType == AnswerType.Client;
+
+    /// <summary>
     /// Could appellation messages be collected.
     /// </summary>
     public AppellationState AppellationState { get; set; }

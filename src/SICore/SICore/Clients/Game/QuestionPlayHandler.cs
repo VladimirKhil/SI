@@ -75,6 +75,14 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         switch (mode)
         {
             case StepParameterValues.AskAnswerMode_Button:
+                if (_state.QuestionPlay.AnswerType == AnswerType.Client)
+                {
+                    // Mini-game is played by all players simultaneously without pressing the button
+                    _controller.SetAnswerersAll();
+                    _controller.AskDirectAnswer();
+                    break;
+                }
+
                 _controller.AskToPress();
                 break;
 
@@ -99,6 +107,11 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public bool OnButtonPressStart()
     {
+        if (_state.QuestionPlay.AnswerType == AnswerType.Client)
+        {
+            return false; // Mini-game is played without buttons
+        }
+
         // TODO: merge somehow with GameLogic.AskToPress() and OnAskAnswer() for buttons
         _controller.OnLayout();
 
