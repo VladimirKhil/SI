@@ -576,7 +576,7 @@
                 Style="{StaticResource TitleBarButton}"
                 ToolTip="{x:Static lp:Resources.ToggleTheme}"
                 Command="{Binding ToggleTheme}">
-                    <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE706;" />
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE706;" />
             </Button>
 
             <Button
