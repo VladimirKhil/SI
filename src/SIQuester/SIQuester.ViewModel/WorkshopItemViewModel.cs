@@ -78,6 +78,11 @@ public sealed class WorkshopItemViewModel : ModelViewBase
     }
 
     /// <summary>
+    /// ID of the package uploaded in this item (from the item metadata; empty for items uploaded before it was stored).
+    /// </summary>
+    public string PackageId { get; set; } = "";
+
+    /// <summary>
     /// Workshop item URL.
     /// </summary>
     public string Url => _model.Url;
