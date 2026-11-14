@@ -29,9 +29,9 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
-                <!-- Fluent (Windows 11) look for standard controls. Must stay after MahApps dictionaries so its implicit styles win -->
+                <!-- Fluent (Windows 11 / Office) look for standard controls. Must stay after MahApps dictionaries so its implicit styles win. -->
                 <ResourceDictionary Source="pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.Light.xaml" />
-                <!-- Colors of the new UI elements and the app accent for Fluent controls (light / dark is switched in App.UpdateTheme) -->
+                <!-- Colors of the modern UI elements (light/dark is switched in App.UpdateTheme) -->
                 <ResourceDictionary Source="View/Dictionaries/Palette.Light.xaml" />
                 <ResourceDictionary Source="/Icons.xaml" />
                 <ResourceDictionary Source="View/Dictionaries/Controls.xaml" />
@@ -42,10 +42,37 @@
             
             <BooleanToVisibilityConverter x:Key="VisibilityConverter" />
 
-            <!-- Menus and tooltips are popups and do not inherit the window font: use the same font with a readable size -->
+            <!-- Menus are popups and don't inherit the window font: use the same font with a readable size -->
             <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
                 <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
                 <Setter Property="FontSize" Value="14" />
+                <Setter Property="HasDropShadow" Value="False" />
+
+                <!-- Modern flyout: rounded, soft shadow, no classic icon gutter line -->
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ContextMenu">
+                            <Grid Margin="6,2,12,14">
+                                <Border CornerRadius="8" Background="{DynamicResource FlyoutBackground}">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="16" ShadowDepth="3" Direction="270" Opacity="0.2" />
+                                    </Border.Effect>
+                                </Border>
+
+                                <Border
+                                    CornerRadius="8"
+                                    Padding="4"
+                                    Background="{DynamicResource FlyoutBackground}"
+                                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                    BorderThickness="1">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" Grid.IsSharedSizeScope="True" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <Style TargetType="ToolTip" BasedOn="{StaticResource {x:Type ToolTip}}">
@@ -88,11 +115,6 @@
                 x:Key="ItemSelectedColorConverter"
                 LightColor="#FFDEECF9"
                 DarkColor="#FF263B52" />
-            <!-- Theme fill badge: amber while questions are missing, green when the theme is complete -->
-            <siqcv:ThemeToColorConverter x:Key="ThemeFillTodoColorConverter" LightColor="#FFFFF4CE" DarkColor="#FF4A3B12" />
-            <siqcv:ThemeToColorConverter x:Key="ThemeFillTodoTextColorConverter" LightColor="#FF8A5A00" DarkColor="#FFF7C55A" />
-            <siqcv:ThemeToColorConverter x:Key="ThemeFillDoneColorConverter" LightColor="#FFDFF6DD" DarkColor="#FF1E3B1E" />
-            <siqcv:ThemeToColorConverter x:Key="ThemeFillDoneTextColorConverter" LightColor="#FF107C10" DarkColor="#FF8FD88F" />
             <siqcv:ThemeToColorConverter
                 x:Key="TreeItemOverColorConverter"
                 LightColor="#FFF3F3F3"
@@ -308,12 +330,12 @@
                 Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource TextBoxBackgroundColorConverter}, FallbackValue=#00FFFFFF, TargetNullValue=#00FFFFFF}" />
 
             <Style x:Key="CommonTextBox" TargetType="{x:Type TextBox}">
-                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="BorderThickness" Value="1" /> <!-- transparent until hover/focus: shows where the text is being edited -->
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="TextWrapping" Value="Wrap" />
                 <Setter Property="Height" Value="Auto" />
                 <Setter Property="SpellCheck.IsEnabled" Value="{Binding SpellChecking, Source={x:Static m:AppSettings.Default}}" />
-                <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                 <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -329,6 +351,7 @@
                         <ControlTemplate TargetType="{x:Type TextBox}">
                             <Border
                                 x:Name="border"
+                                CornerRadius="4"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 Background="{TemplateBinding Background}"
@@ -348,11 +371,11 @@
                                 </Trigger>
                                 
                                 <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}" />
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Ui.Divider}" />
                                 </Trigger>
                                 
                                 <Trigger Property="IsKeyboardFocused" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focus.Border}" />
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Ui.Accent}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -378,6 +401,57 @@
                 <GradientStop Color="#34C5EBFF" Offset="0"/>
                 <GradientStop Color="#3481D8FF" Offset="1"/>
             </LinearGradientBrush>
+
+                <!-- Small icon button of the side panel (+, ×, arrows): rounded highlight, no gray square -->
+                <Style x:Key="SideIconButton" TargetType="ButtonBase">
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    <Setter Property="MinWidth" Value="28" />
+                    <Setter Property="MinHeight" Value="28" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ButtonBase">
+                                <Border x:Name="Bd" CornerRadius="6" Background="Transparent" Padding="4">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Ui.Hover}" />
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Ui.Pressed}" />
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <!-- Compact drop-down item (media, logo, prices, links, tags): Office-like height and rounded highlight -->
+                <Style x:Key="CompactSubItem" TargetType="MenuItem">
+                    <Setter Property="Foreground" Value="{DynamicResource Ui.Text}" />
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="MenuItem">
+                                <Border x:Name="Bd" CornerRadius="5" Padding="10,5" MinWidth="160" Background="Transparent">
+                                    <ContentPresenter ContentSource="Header" RecognizesAccessKey="False" VerticalAlignment="Center" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsHighlighted" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Ui.Hover}" />
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.45" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
 
             <Style x:Key="ChildMenuItem" TargetType="MenuItem">
                 <Setter Property="Template">
@@ -454,7 +528,7 @@
                                     PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}"
                                     VerticalOffset="-1"
                                     Focusable="false">
-                                    <Border Background="#F5F5F5" BorderBrush="#FF959595" BorderThickness="1">
+                                    <Border Background="{DynamicResource FlyoutBackground}" BorderBrush="{DynamicResource Ui.CardStroke}" BorderThickness="1" CornerRadius="8">
                                         <ScrollViewer
                                             Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}"
                                             CanContentScroll="true">
@@ -562,25 +636,13 @@
 
             <SolidColorBrush
                 x:Key="ItemOverBrush"
-                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ItemOverColorConverter}, FallbackValue=#FFE9E9FF, TargetNullValue=#FFE9E9FF}" />
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ItemOverColorConverter}, FallbackValue=#FFF2F6FB, TargetNullValue=#FFF2F6FB}" />
             <SolidColorBrush
                 x:Key="ItemSelectedBrush"
-                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ItemSelectedColorConverter}, FallbackValue=#FFD5D5FF, TargetNullValue=#FFD5D5FF}" />
+                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ItemSelectedColorConverter}, FallbackValue=#FFDEECF9, TargetNullValue=#FFDEECF9}" />
             <SolidColorBrush
                 x:Key="TreeItemOverBrush"
                 Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource TreeItemOverColorConverter}, FallbackValue=#FFF3F3F3, TargetNullValue=#FFF3F3F3}" />
-            <SolidColorBrush
-                x:Key="ThemeFillTodoBrush"
-                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeFillTodoColorConverter}, FallbackValue=#FFFFF4CE, TargetNullValue=#FFFFF4CE}" />
-            <SolidColorBrush
-                x:Key="ThemeFillTodoTextBrush"
-                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeFillTodoTextColorConverter}, FallbackValue=#FF8A5A00, TargetNullValue=#FF8A5A00}" />
-            <SolidColorBrush
-                x:Key="ThemeFillDoneBrush"
-                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeFillDoneColorConverter}, FallbackValue=#FFDFF6DD, TargetNullValue=#FFDFF6DD}" />
-            <SolidColorBrush
-                x:Key="ThemeFillDoneTextBrush"
-                Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeFillDoneTextColorConverter}, FallbackValue=#FF107C10, TargetNullValue=#FF107C10}" />
 
             <Style x:Key="QTreeViewItem" TargetType="{x:Type TreeViewItem}" >
                 <Setter Property="AllowDrop" Value="True" />
@@ -620,33 +682,45 @@
                                             
                                             <Setter Property="Control.Template">
                                                 <Setter.Value>
+                                                    <!-- Chevron "›" that rotates down smoothly when the node opens -->
                                                     <ControlTemplate TargetType="ToggleButton">
-                                                        <Border Padding="5,5,5,5" Background="#00FFFFFF" Width="16" Height="16">
-                                                            <Path Fill="#00FFFFFF" Stroke="#FF989898" Name="ExpandPath">
-                                                                <Path.Data>
-                                                                    <PathGeometry Figures="M0,0L0,6L6,0z" />
-                                                                </Path.Data>
-                                                                <Path.RenderTransform>
-                                                                    <RotateTransform Angle="135" CenterX="3" CenterY="3" />
-                                                                </Path.RenderTransform>
-                                                            </Path>
+                                                        <Border x:Name="Bg" CornerRadius="4" Background="Transparent" Width="16" Height="16">
+                                                            <TextBlock
+                                                                x:Name="Chevron"
+                                                                Text="&#xE76C;"
+                                                                FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                                FontSize="9"
+                                                                Foreground="{DynamicResource Ui.Muted}"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center"
+                                                                RenderTransformOrigin="0.5,0.5">
+                                                                <TextBlock.RenderTransform>
+                                                                    <RotateTransform Angle="0" />
+                                                                </TextBlock.RenderTransform>
+                                                            </TextBlock>
                                                         </Border>
-                                                        
+
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="UIElement.IsMouseOver" Value="True">
-                                                                <Setter TargetName="ExpandPath" Property="Shape.Stroke" Value="#FF1BBBFA" />
-                                                                <Setter TargetName="ExpandPath" Property="Shape.Fill" Value="#00FFFFFF" />
+                                                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Ui.Hover}" />
+                                                                <Setter TargetName="Chevron" Property="Foreground" Value="{DynamicResource Ui.Accent}" />
                                                             </Trigger>
-                                                            
+
                                                             <Trigger Property="ToggleButton.IsChecked" Value="True">
-                                                                <Setter TargetName="ExpandPath" Property="UIElement.RenderTransform">
-                                                                    <Setter.Value>
-                                                                        <RotateTransform Angle="180" CenterX="3" CenterY="3" />
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                                
-                                                                <Setter TargetName="ExpandPath" Property="Shape.Fill" Value="#FF595959" />
-                                                                <Setter TargetName="ExpandPath" Property="Shape.Stroke" Value="#FF262626" />
+                                                                <Trigger.EnterActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetName="Chevron" Storyboard.TargetProperty="RenderTransform.Angle" To="90" Duration="0:0:0.18" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                                <Trigger.ExitActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetName="Chevron" Storyboard.TargetProperty="RenderTransform.Angle" To="0" Duration="0:0:0.18" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </Trigger.ExitActions>
                                                             </Trigger>
                                                         </ControlTemplate.Triggers>
                                                     </ControlTemplate>
@@ -675,6 +749,7 @@
                                 <Border
                                     x:Name="Bd"
                                     HorizontalAlignment="Stretch"
+                                    CornerRadius="6"
                                     BorderThickness="{TemplateBinding Border.BorderThickness}"
                                     BorderBrush="{TemplateBinding Border.BorderBrush}"
                                     Padding="{TemplateBinding Control.Padding}"
@@ -691,12 +766,52 @@
                                         SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                                 </Border>
 
-                                <ItemsPresenter x:Name="ItemsHost" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" />
+                                <ItemsPresenter x:Name="ItemsHost" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1">
+                                    <ItemsPresenter.RenderTransform>
+                                        <TranslateTransform />
+                                    </ItemsPresenter.RenderTransform>
+                                </ItemsPresenter>
                             </Grid>
                             
                             <ControlTemplate.Triggers>
                                 <Trigger Property="TreeViewItem.IsExpanded" Value="False">
                                     <Setter TargetName="ItemsHost" Property="UIElement.Visibility" Value="Collapsed" />
+                                </Trigger>
+
+                                <!-- Children fade out and slide up before hiding when the user collapses the node -->
+                                <EventTrigger RoutedEvent="ToggleButton.Unchecked" SourceName="Expander">
+                                    <BeginStoryboard x:Name="CollapseStoryboard">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0.18" Value="{x:Static Visibility.Collapsed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.18" />
+                                            <DoubleAnimation Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="RenderTransform.Y" To="-8" Duration="0:0:0.18">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseIn" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+
+                                <!-- Children fade in and slide down a little when the node is expanded -->
+                                <Trigger Property="TreeViewItem.IsExpanded" Value="True">
+                                    <Trigger.EnterActions>
+                                        <!-- Drop a running/held collapse animation first (fast collapse + expand) -->
+                                        <RemoveStoryboard BeginStoryboardName="CollapseStoryboard" />
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.25" />
+                                                <DoubleAnimation Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="RenderTransform.Y" From="-10" To="0" Duration="0:0:0.25">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <CubicEase EasingMode="EaseOut" />
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
                                 </Trigger>
                                 
                                 <Trigger Property="ItemsControl.HasItems" Value="False">
@@ -723,7 +838,12 @@
                                 <Trigger Property="TreeViewItem.IsSelected" Value="True">
                                     <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource ItemSelectedBrush}" />
                                 </Trigger>
-                                
+
+                                <!-- Items drawn as their own card (the package header) get no row hover/selection fill -->
+                                <Trigger Property="Tag" Value="Card">
+                                    <Setter TargetName="Bd" Property="Panel.Background" Value="Transparent" />
+                                </Trigger>
+
                                 <Trigger Property="UIElement.IsEnabled" Value="False">
                                     <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                                 </Trigger>
@@ -896,7 +1016,6 @@
             </Style>
 
             <Style x:Key="CommandRoutedItem" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-                <Setter Property="Padding" Value="0,5" />
 
                 <Style.Triggers>
                     <Trigger Property="Command" Value="{x:Null}">
@@ -1090,7 +1209,7 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Path Data="M0,0L11.6,6.7L0,13.4z" Fill="{StaticResource IconBrush}" />
+                            <Path Data="M0,0L11.6,6.7L0,13.4z" Fill="{DynamicResource Ui.Glyph}" />
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -1101,7 +1220,7 @@
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <Path Data="M0,0L3,0L3,12L0,12zM6,0L9,0L9,12L6,12z" Fill="{StaticResource IconBrush}" />
+                                    <Path Data="M0,0L3,0L3,12L0,12zM6,0L9,0L9,12L6,12z" Fill="{DynamicResource Ui.Glyph}" />
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
@@ -1128,6 +1247,8 @@
                 <Setter Property="FontFamily" Value="{Binding FontFamily, Source={x:Static m:AppSettings.Default}}" />
                 <Setter Property="FontSize" Value="{Binding FontSize, Source={x:Static m:AppSettings.Default}}" />
                 <Setter Property="KeyboardNavigation.TabNavigation" Value="Continue" />
+                <Setter Property="Tag" Value="Card" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             </Style>
 
             <Style x:Key="ContextMenu2" TargetType="FrameworkElement">
@@ -1163,10 +1284,16 @@
                     <Trigger Property="DataContext" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </Trigger>
+
+                    <!-- Not placed yet (e.g. right after opening a pack): stay hidden instead of covering the header -->
+                    <Trigger Property="lb:PlacementManager.PlacementTarget" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Trigger>
                 </Style.Triggers>
             </Style>
 
             <siqcv:Multiplier x:Key="Multiplier" />
+            <siqcv:ScaleOffsetConverter x:Key="ScaleOffsetConverter" />
 
             <ControlTemplate x:Key="QTreeViewScrollViewerTemplate" TargetType="{x:Type ScrollViewer}">
                 <DockPanel Background="{TemplateBinding Background}">
@@ -1202,54 +1329,159 @@
                     Padding="{TemplateBinding Padding}"
                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                     VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-                    <Grid>
+                    <!--
+                        Document column is centered like a page in Office and has a stable width (85% of the window),
+                        so it does not jump when themes are expanded. Question rows wrap their text inside it (see QuestionStyle).
+                    -->
+                    <Grid
+                        HorizontalAlignment="Center"
+                        Width="{Binding ViewportWidth, RelativeSource={RelativeSource AncestorType=ScrollViewer}, Converter={StaticResource ScaleOffsetConverter}, ConverterParameter='0.85 0 auto'}">
                         <ItemsPresenter />
                         
                         <Grid Style="{StaticResource ContextMenu2}" HorizontalAlignment="Left" VerticalAlignment="Top">
-                            <Border BorderThickness="1" BorderBrush="Gray">
+                            <!-- Shadow is drawn by a separate border so the effect does not blur the toolbar content -->
+                            <Border CornerRadius="8" Background="{DynamicResource Ui.Panel}">
                                 <Border.Effect>
-                                    <DropShadowEffect ShadowDepth="1" />
+                                    <DropShadowEffect BlurRadius="16" ShadowDepth="3" Direction="270" Opacity="0.22" />
                                 </Border.Effect>
                             </Border>
-                            
+
                             <Border
                                 Name="Bd1"
                                 BorderThickness="1"
-                                BorderBrush="Gray"
-                                Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+                                BorderBrush="{DynamicResource Ui.CardStroke}"
+                                CornerRadius="8"
+                                Padding="4,3"
+                                Background="{DynamicResource Ui.Panel}">
                                 <StackPanel Orientation="Vertical">
                                     <StackPanel.Resources>
-                                        <Style x:Key="MenuButton" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                        <!-- The toolbar panel is always light, so hover colors are fixed semi-transparent black -->
+                                        <siqcv:ToolbarCaptionConverter x:Key="ToolbarCaptionConverter" />
+
+                                        <!-- Plain buttons and drop-down menu buttons share the same 32x32 cell so the spacing is even -->
+                                        <Style x:Key="MenuButton" TargetType="Button">
+                                            <Setter Property="Width" Value="32" />
+                                            <Setter Property="Height" Value="32" />
+                                            <Setter Property="Margin" Value="1" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+
                                             <Setter Property="ContentTemplate">
                                                 <Setter.Value>
                                                     <DataTemplate>
-                                                        <Image Source="{Binding}" Width="20" Height="20" Margin="3" />
+                                                        <Image Source="{Binding}" Width="20" Height="20" />
                                                     </DataTemplate>
                                                 </Setter.Value>
                                             </Setter>
 
-                                            <Setter Property="Margin" Value="2" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid Background="Transparent">
+                                                            <Border x:Name="HoverBg" CornerRadius="5" Background="{DynamicResource Ui.Hover}" Opacity="0" />
+                                                            <Border x:Name="PressedBg" CornerRadius="5" Background="{DynamicResource Ui.Pressed}" Opacity="0" />
 
-                                            <Style.Triggers>
-                                                <Trigger Property="IsEnabled" Value="False">
-                                                    <Setter Property="Opacity" Value="0.5" />
-                                                </Trigger>
-                                            </Style.Triggers>
+                                                            <ContentPresenter
+                                                                x:Name="Content"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center"
+                                                                RenderTransformOrigin="0.5,0.5">
+                                                                <ContentPresenter.RenderTransform>
+                                                                    <ScaleTransform />
+                                                                </ContentPresenter.RenderTransform>
+                                                            </ContentPresenter>
+                                                        </Grid>
+
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Trigger.EnterActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetName="HoverBg" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                                <Trigger.ExitActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetName="HoverBg" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.25" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </Trigger.ExitActions>
+                                                            </Trigger>
+
+                                                            <Trigger Property="IsPressed" Value="True">
+                                                                <Trigger.EnterActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetName="PressedBg" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.06" />
+                                                                            <DoubleAnimation Storyboard.TargetName="Content" Storyboard.TargetProperty="RenderTransform.ScaleX" To="0.88" Duration="0:0:0.08" />
+                                                                            <DoubleAnimation Storyboard.TargetName="Content" Storyboard.TargetProperty="RenderTransform.ScaleY" To="0.88" Duration="0:0:0.08" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                                <Trigger.ExitActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetName="PressedBg" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.2" />
+                                                                            <DoubleAnimation Storyboard.TargetName="Content" Storyboard.TargetProperty="RenderTransform.ScaleX" To="1" Duration="0:0:0.2">
+                                                                                <DoubleAnimation.EasingFunction>
+                                                                                    <BackEase EasingMode="EaseOut" Amplitude="0.4" />
+                                                                                </DoubleAnimation.EasingFunction>
+                                                                            </DoubleAnimation>
+                                                                            <DoubleAnimation Storyboard.TargetName="Content" Storyboard.TargetProperty="RenderTransform.ScaleY" To="1" Duration="0:0:0.2">
+                                                                                <DoubleAnimation.EasingFunction>
+                                                                                    <BackEase EasingMode="EaseOut" Amplitude="0.4" />
+                                                                                </DoubleAnimation.EasingFunction>
+                                                                            </DoubleAnimation>
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </Trigger.ExitActions>
+                                                            </Trigger>
+
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter TargetName="Content" Property="Opacity" Value="0.35" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
                                         </Style>
 
-                                        <Style
-                                            x:Key="MenuSeparator"
-                                            TargetType="Separator"
-                                            BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                                        <Style x:Key="MenuSeparator" TargetType="Separator">
+                                            <Setter Property="Width" Value="1" />
+                                            <Setter Property="Margin" Value="5,7" />
+                                            <Setter Property="Background" Value="{DynamicResource Ui.Divider}" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Separator">
+                                                        <Border Background="{TemplateBinding Background}" />
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
 
                                         <Style x:Key="MenuMenu" TargetType="Menu">
                                             <Setter Property="VerticalAlignment" Value="Center" />
                                             <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="Margin" Value="0" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Menu">
+                                                        <ItemsPresenter />
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
                                         </Style>
 
                                         <Style x:Key="MenuMenuHeader" TargetType="MenuItem">
-                                            <Setter Property="VerticalAlignment" Value="Stretch" />
-                                            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                            <Setter Property="Width" Value="32" />
+                                            <Setter Property="Height" Value="32" />
+                                            <Setter Property="Margin" Value="1" />
+                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                            <!-- Items of the drop-down inherit this: readable text in light and dark theme -->
+                                            <Setter Property="Foreground" Value="{DynamicResource Ui.Text}" />
 
                                             <Setter Property="ItemContainerStyle">
                                                 <Setter.Value>
@@ -1258,40 +1490,95 @@
                                                     </Style>
                                                 </Setter.Value>
                                             </Setter>
-                                            
+
                                             <Setter Property="HeaderTemplate">
                                                 <Setter.Value>
                                                     <DataTemplate>
-                                                        <ContentControl Name="root" Height="25" Width="25">
-                                                            <Image Source="{Binding}" Margin="2" />
-                                                        </ContentControl>
+                                                        <Image Source="{Binding}" Width="20" Height="20" />
                                                     </DataTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="MenuItem">
+                                                        <Grid Background="Transparent">
+                                                            <Border x:Name="HoverBg" CornerRadius="5" Background="{DynamicResource Ui.Hover}" Opacity="0" />
+                                                            <Border x:Name="OpenBg" CornerRadius="5" Background="{DynamicResource Ui.Pressed}" Opacity="0" />
+
+                                                            <ContentPresenter
+                                                                x:Name="Content"
+                                                                ContentSource="Header"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center"
+                                                                RecognizesAccessKey="True" />
+
+                                                            <Popup
+                                                                x:Name="PART_Popup"
+                                                                Placement="Bottom"
+                                                                VerticalOffset="2"
+                                                                AllowsTransparency="True"
+                                                                Focusable="False"
+                                                                PopupAnimation="Slide"
+                                                                IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                                                                <Border
+                                                                    Margin="0,0,10,10"
+                                                                    Padding="4"
+                                                                    CornerRadius="8"
+                                                                    BorderThickness="1"
+                                                                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                                                    Background="{DynamicResource FlyoutBackground}">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Opacity="0.2" />
+                                                                    </Border.Effect>
+
+                                                                    <ScrollViewer MaxHeight="480" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                                                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" Grid.IsSharedSizeScope="True" />
+                                                                    </ScrollViewer>
+                                                                </Border>
+                                                            </Popup>
+                                                        </Grid>
+
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsHighlighted" Value="True">
+                                                                <Trigger.EnterActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetName="HoverBg" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </Trigger.EnterActions>
+                                                                <Trigger.ExitActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetName="HoverBg" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.25" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </Trigger.ExitActions>
+                                                            </Trigger>
+
+                                                            <Trigger Property="IsSubmenuOpen" Value="True">
+                                                                <Setter TargetName="OpenBg" Property="Opacity" Value="1" />
+                                                            </Trigger>
+
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter TargetName="Content" Property="Opacity" Value="0.35" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
                                                 </Setter.Value>
                                             </Setter>
                                         </Style>
 
-                                        <siqcv:ToolbarCaptionConverter x:Key="ToolbarCaptionConverter" />
-
-                                        <!-- Caption at the left of a row: what the row buttons act on -->
-                                        <Style x:Key="ToolbarCaption" TargetType="TextBlock">
-                                            <Setter Property="DockPanel.Dock" Value="Left" />
-                                            <Setter Property="Width" Value="90" />
-                                            <Setter Property="Margin" Value="6,0,2,0" />
-                                            <Setter Property="VerticalAlignment" Value="Center" />
-                                            <Setter Property="FontSize" Value="11" />
-                                            <Setter Property="Foreground" Value="Gray" />
-                                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                                        </Style>
                                     </StackPanel.Resources>
                                     
                                     <DockPanel>
-                                        <TextBlock Style="{StaticResource ToolbarCaption}" Text="{Binding ActiveNode, Converter={StaticResource ToolbarCaptionConverter}}" />
-
+                                    <TextBlock DockPanel.Dock="Left" Width="88" Margin="6,0,4,0" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Ui.Muted}" TextTrimming="CharacterEllipsis" Text="{Binding ActiveNode, Converter={StaticResource ToolbarCaptionConverter}}" />
                                     <ContentControl DataContext="{Binding ActiveNode}" Content="{Binding}">
                                         <ContentControl.Resources>
                                             <siqcv:MultiCostSetterConverter x:Key="MultiCostSetterConverter" />
 
-                                            <Style x:Key="SubMenuItem" TargetType="MenuItem">
+                                            <Style x:Key="SubMenuItem" TargetType="MenuItem" BasedOn="{StaticResource CompactSubItem}">
                                                 <Setter
                                                     Property="Command"
                                                     Value="{Binding DataContext.SetCosts, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
@@ -1423,7 +1710,7 @@
                                                         Content="{StaticResource GenerateQuestionsImage}"
                                                         Command="{Binding GenerateThemes}"
                                                         Style="{StaticResource MenuButton}"
-                                                        IsEnabled="{Binding DataContext.Settings.UseGPT, RelativeSource={RelativeSource AncestorType=TreeView}}" />
+                                                        IsEnabled="{Binding DataContext.Settings.CanUseAI, RelativeSource={RelativeSource AncestorType=TreeView}}" />
                                                     
                                                     <Separator Style="{StaticResource MenuSeparator}" />
 
@@ -1446,7 +1733,7 @@
                                                                     Width="20"
                                                                     Height="20"
                                                                     Stretch="Uniform"
-                                                                    Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                                                    Fill="{DynamicResource Ui.Glyph}"
                                                                     Data="{Binding Source={StaticResource app_language},Path=Data}" />
                                                             </DataTemplate>
                                                         </Button.ContentTemplate>
@@ -1465,7 +1752,7 @@
                                                             </MenuItem.ItemsSource>
                                                             
                                                             <MenuItem.ItemContainerStyle>
-                                                                <Style TargetType="MenuItem">
+                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource CompactSubItem}">
                                                                     <Setter
                                                                         Property="Command"
                                                                         Value="{Binding DataContext.SelectLogo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
@@ -1540,7 +1827,7 @@
                                                         Content="{StaticResource GenerateQuestionsImage}"
                                                         Command="{Binding GenerateQuestions}"
                                                         Style="{StaticResource MenuButton}"
-                                                        IsEnabled="{Binding DataContext.Settings.UseGPT, RelativeSource={RelativeSource AncestorType=TreeView}}" />
+                                                        IsEnabled="{Binding DataContext.Settings.CanUseAI, RelativeSource={RelativeSource AncestorType=TreeView}}" />
 
                                                     <Button
                                                         ToolTip="{x:Static lp:Resources.CloneTheme}"
@@ -1733,22 +2020,21 @@
                                         </ContentControl.Resources>
                                     </ContentControl>
                                     </DockPanel>
-
+                                    
                                     <DockPanel>
-                                        <TextBlock Style="{StaticResource ToolbarCaption}" Text="{Binding ActiveItem, Converter={StaticResource ToolbarCaptionConverter}, ConverterParameter=item}" />
-
+                                    <TextBlock DockPanel.Dock="Left" Width="88" Margin="6,0,4,0" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Ui.Muted}" TextTrimming="CharacterEllipsis" Text="{Binding ActiveItem, Converter={StaticResource ToolbarCaptionConverter}, ConverterParameter=item}" />
                                     <ContentControl DataContext="{Binding ActiveItem}" Content="{Binding}">
                                         <ContentControl.Resources>
                                             <siqcv:MediaArgsConverter x:Key="MediaArgsConverter" />
 
-                                            <Style x:Key="ContentCommands" TargetType="MenuItem">
+                                            <Style x:Key="ContentCommands" TargetType="MenuItem" BasedOn="{StaticResource CompactSubItem}">
                                                 <Setter Property="Command" Value="{Binding Command}" />
                                                 <Setter Property="Header" Value="{Binding Name}" />
                                                 <Setter Property="CommandParameter" Value="{Binding Parameter}" />
-                                                <Setter Property="Padding" Value="5" />
+
                                             </Style>
 
-                                            <Style x:Key="SubMenuItemLink" TargetType="MenuItem">
+                                            <Style x:Key="SubMenuItemLink" TargetType="MenuItem" BasedOn="{StaticResource CompactSubItem}">
                                                 <Setter
                                                     Property="Command"
                                                     Value="{Binding DataContext.LinkItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
@@ -1757,7 +2043,7 @@
                                                 <Setter Property="Header" Value="{Binding}" />
                                             </Style>
 
-                                            <Style x:Key="SubMenuItemTag" TargetType="MenuItem">
+                                            <Style x:Key="SubMenuItemTag" TargetType="MenuItem" BasedOn="{StaticResource CompactSubItem}">
                                                 <Setter
                                                     Property="Command"
                                                     Value="{Binding DataContext.AddTag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
@@ -2187,6 +2473,9 @@
             </Style>
 
             <Style x:Key="RoundStyle" BasedOn="{StaticResource QTreeViewItem}" TargetType="{x:Type TreeViewItem}">
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <!-- Rounds read as sections: breathing space above each -->
+                <Setter Property="Margin" Value="0,14,0,0" />
                 <Setter Property="KeyboardNavigation.TabNavigation" Value="Continue" />
             </Style>
 
@@ -2204,7 +2493,8 @@
                         siq:ActivateManager.IsWatching="True"
                         Style="{StaticResource LightTextBox}"
                         MinWidth="90"
-                        Text="{Binding Model.Restriction}" />
+                        Text="{Binding Model.Restriction}"
+                        lb:Placeholder.Text="{x:Static lp:Resources.RestrictionHint}" />
                 </DockPanel>
             </DataTemplate>
 
@@ -2234,7 +2524,7 @@
                                     Cursor="Hand"
                                     HorizontalAlignment="Left"
                                     Padding="2">
-                                    <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                                    <Path Stretch="Uniform" Fill="{DynamicResource Ui.Glyph}" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
                                 </Button>
 
                                 <TextBox
@@ -2318,6 +2608,7 @@
                         MinWidth="90"
                         ItemsSource="{Binding DataContext.StorageContext.Publishers, RelativeSource={RelativeSource AncestorType=TreeView}}"
                         Text="{Binding Model.Publisher}"
+                        lb:Placeholder.Text="{x:Static lp:Resources.PublisherHint}"
                         VerticalContentAlignment="Center"
                         IsEditable="True" />
                 </DockPanel>
@@ -2448,7 +2739,7 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Image lb:MediaExport.IsEnabled="True" Source="{Binding Logo.Uri, Converter={StaticResource ImageConverter}}" HorizontalAlignment="Center" />
+                            <Image lb:MediaExport.IsEnabled="True" Source="{Binding Logo.Uri, Converter={StaticResource ImageConverter}}" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -2480,17 +2771,28 @@
                     x:Name="border"
                     Style="{StaticResource mediaBorder}"
                     ToolTip="{x:Static lp:Resources.PackageLogo}"
-                    Width="Auto"
-                    MaxHeight="100"
+                    Width="112"
+                    Height="112"
                     Margin="0,5,10,5"
                     Padding="3"
+                    CornerRadius="12"
+                    BorderBrush="{DynamicResource Ui.CardStroke}"
                     siq:SmartMenuManager.SecondMenu="True">
-                    <ContentControl Style="{StaticResource LogoViewStyle}" Content="{Binding}" />
+                    <!-- The picture itself is clipped to rounded corners -->
+                    <ContentControl Style="{StaticResource LogoViewStyle}" Content="{Binding}">
+                        <ContentControl.OpacityMask>
+                            <VisualBrush Stretch="Fill">
+                                <VisualBrush.Visual>
+                                    <Border Width="100" Height="100" CornerRadius="9" Background="Black" />
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </ContentControl.OpacityMask>
+                    </ContentControl>
                 </Border>
 
                 <DataTemplate.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter TargetName="border" Property="BorderBrush" Value="LightBlue" />
+                        <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource Ui.Accent}" />
                     </Trigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
@@ -2503,23 +2805,30 @@
                 DataType="{x:Type vm:PackageViewModel}"
                 ItemsSource="{Binding Rounds}"
                 ItemContainerStyle="{StaticResource RoundStyle}">
+                <!-- Package header card; the top margin leaves room for the package action bar above it -->
+                <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="1160" />
+                    <ColumnDefinition Width="0" />
+                </Grid.ColumnDefinitions>
+                <Border Margin="0,10,0,14" Padding="20,16" CornerRadius="12" Background="{DynamicResource Ui.Card}" BorderBrush="{DynamicResource Ui.CardStroke}" BorderThickness="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition MaxWidth="110" />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" MaxWidth="150" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="Auto" MinHeight="40" />
+                        <RowDefinition Height="Auto" MinHeight="40" />
+                        <RowDefinition Height="Auto" MinHeight="40" />
+                        <RowDefinition Height="Auto" MinHeight="40" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     
-                    <ContentControl Grid.RowSpan="5" Style="{StaticResource LogoStyle}" Content="{Binding}" />
+                    <ContentControl Grid.RowSpan="5" Margin="0,0,24,0" Width="130" Height="130" VerticalAlignment="Top" Style="{StaticResource LogoStyle}" Content="{Binding}" />
                     
                     <DockPanel Grid.Column="1" Grid.ColumnSpan="2">
                         <StackPanel
@@ -2561,14 +2870,40 @@
                             Height="25"
                             Padding="0,2,0,0" />
 
+                        <!-- "Today" puts the current date into the field -->
                         <Button
                             DockPanel.Dock="Right"
-                            Margin="5,0,0,0"
-                            Padding="8,0"
+                            Margin="8,0,0,0"
                             VerticalAlignment="Center"
-                            Content="{x:Static lp:Resources.Today}"
+                            Command="{Binding SetDateToday}"
                             ToolTip="{x:Static lp:Resources.TodayTip}"
-                            Command="{Binding SetDateToday}" />
+                            Cursor="Hand"
+                            FocusVisualStyle="{x:Null}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="Bg" CornerRadius="12" Padding="10,3" Background="{DynamicResource Ui.Hover}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                Text="&#xE787;"
+                                                FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                FontSize="12"
+                                                Foreground="{DynamicResource Ui.Accent}"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,6,0" />
+                                            <TextBlock Text="{x:Static lp:Resources.Today}" FontSize="12" Foreground="{DynamicResource Ui.Text}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Ui.AccentSoft}" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Ui.Pressed}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
 
                         <TextBox
                             siq:ActivateManager.IsWatching="True"
@@ -2578,14 +2913,17 @@
                     </DockPanel>
 
                     <ContentControl Grid.Column="1" Grid.Row="2" ContentTemplate="{StaticResource Publisher}" Content="{Binding}" />
-                    <ContentControl Grid.Column="1" Grid.Row="3" Style="{StaticResource TagsStyle}" Content="{Binding}" />
-                    <ContentControl Grid.Column="1" Grid.Row="4" Style="{StaticResource QualityStyle}" Content="{Binding}" />
-                    <ContentControl Grid.Column="2" Grid.Row="4" Margin="15,0,0,0" Style="{StaticResource LanguageStyle}" Content="{Binding}" />
-                    <ContentControl Grid.Column="2" Grid.Row="1" Margin="15,0,0,0" ContentTemplate="{StaticResource Restrictions}" Content="{Binding}" />
-                    <ContentControl Grid.Column="2" Grid.Row="2" Margin="15,0,0,0" ContentTemplate="{StaticResource Difficulty}" Content="{Binding}" />
-                    <ContentControl Grid.Column="2" Grid.Row="3" Margin="15,0,0,0" Style="{StaticResource ContactUrlStyle}" Content="{Binding}" />
+                    <!-- Left: about the package; right: game parameters -->
+                    <ContentControl Grid.Column="2" Grid.Row="3" Margin="15,0,0,0" Style="{StaticResource TagsStyle}" Content="{Binding}" />
+                    <ContentControl Grid.Column="2" Grid.Row="4" Margin="15,0,0,0" Style="{StaticResource QualityStyle}" Content="{Binding}" />
+                    <ContentControl Grid.Column="1" Grid.Row="4" Style="{StaticResource LanguageStyle}" Content="{Binding}" />
+                    <ContentControl Grid.Column="2" Grid.Row="2" Margin="15,0,0,0" ContentTemplate="{StaticResource Restrictions}" Content="{Binding}" />
+                    <ContentControl Grid.Column="2" Grid.Row="1" Margin="15,0,0,0" ContentTemplate="{StaticResource Difficulty}" Content="{Binding}" />
+                    <ContentControl Grid.Column="1" Grid.Row="3" Style="{StaticResource ContactUrlStyle}" Content="{Binding}" />
 
                     <ContentControl Grid.Row="5" Grid.ColumnSpan="3" Content="{Binding Info}" />
+                </Grid>
+                </Border>
                 </Grid>
 
                 <HierarchicalDataTemplate.Triggers>
@@ -2632,17 +2970,43 @@
                         Style="{StaticResource LightTextBox}"
                         Grid.ColumnSpan="2"
                         Text="{Binding Model.Name}"
-                        Padding="0,2" />
+                        Padding="0,2"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource Ui.RoundTitle}" />
 
-                    <!-- Only the known round types can be chosen: typed text would be written to the package as the round type -->
+                    <!-- Round type: plain drop-down (not editable) with an icon and an explanation in the tooltip -->
                     <ComboBox
                         Grid.Row="0"
                         Grid.Column="3"
-                        Margin="5,0,0,0"
+                        Margin="10,0,0,0"
+                        MinWidth="160"
+                        FontSize="13"
                         ToolTip="{x:Static lp:Resources.RoundTypeHint}"
                         ItemsSource="{Binding Source={StaticResource RTypes}, Path=Values, Mode=OneTime}"
                         SelectedItem="{Binding Path=Model.Type, Converter={StaticResource RoundTypeConverter}}"
-                        VerticalAlignment="Center" />
+                        VerticalAlignment="Center">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock
+                                        x:Name="icon"
+                                        Text="&#xE80A;"
+                                        FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                        FontSize="13"
+                                        Foreground="{DynamicResource Ui.Accent}"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,8,0" />
+                                    <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding}" Value="{x:Static lp:Resources.ThemeList}">
+                                        <Setter TargetName="icon" Property="Text" Value="&#xE8FD;" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
                     <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
                 </Grid>
@@ -2655,44 +3019,66 @@
             </HierarchicalDataTemplate>
 
             <Style x:Key="QuestionStyle" BasedOn="{StaticResource QTreeViewItem}" TargetType="{x:Type TreeViewItem}">
-                <Setter Property="Margin" Value="0,1" />
+                <!-- Each question is a light card -->
+                <Setter Property="Margin" Value="0,3" />
+                <Setter Property="Padding" Value="8,6" />
+                <Setter Property="Background" Value="{DynamicResource Ui.Card}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource Ui.CardStroke}" />
+                <Setter Property="BorderThickness" Value="1" />
                 
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TreeViewItem">
-                            <Border
-                                x:Name="Bd"
-                                HorizontalAlignment="Stretch"
-                                BorderThickness="{TemplateBinding Border.BorderThickness}"
-                                BorderBrush="{TemplateBinding Border.BorderBrush}"
-                                Padding="{TemplateBinding Control.Padding}"
-                                Background="{TemplateBinding Panel.Background}"
-                                SnapsToDevicePixels="True">
-                                <ContentPresenter
-                                    x:Name="PART_Header"
-                                    Content="{TemplateBinding HeaderedContentControl.Header}"
-                                    ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}"
-                                    ContentTemplateSelector="{TemplateBinding HeaderedItemsControl.HeaderTemplateSelector}"
-                                    ContentSource="Header"
-                                    HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
-                                    SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
-                            </Border>
-                            
+                            <Grid>
+                                <!-- Hover highlight fades in and out instead of switching instantly -->
+                                <Border x:Name="HoverBg" CornerRadius="6" Background="{StaticResource ItemOverBrush}" Opacity="0" />
+
+                                <!-- MaxWidth = document column minus tree indentation: makes long question text wrap -->
+                                <Border
+                                    x:Name="Bd"
+                                    HorizontalAlignment="Stretch"
+                                    MaxWidth="{Binding ViewportWidth, RelativeSource={RelativeSource AncestorType=ScrollViewer}, Converter={StaticResource ScaleOffsetConverter}, ConverterParameter='0.85 -64'}"
+                                    CornerRadius="6"
+                                    BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                    BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                    Padding="{TemplateBinding Control.Padding}"
+                                    Background="{TemplateBinding Panel.Background}"
+                                    SnapsToDevicePixels="True">
+                                    <ContentPresenter
+                                        x:Name="PART_Header"
+                                        Content="{TemplateBinding HeaderedContentControl.Header}"
+                                        ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding HeaderedItemsControl.HeaderTemplateSelector}"
+                                        ContentSource="Header"
+                                        HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
+                                        SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                </Border>
+                            </Grid>
+
                             <ControlTemplate.Triggers>
                                 <Trigger SourceName="Bd" Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource ItemOverBrush}" />
-                                    
-                                    <Setter
-                                        Property="TextElement.Foreground"
-                                        Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="HoverBg" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                    <Trigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="HoverBg" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.ExitActions>
+
+                                    <!-- Card outline lights up under the mouse -->
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Ui.CardHoverStroke}" />
                                 </Trigger>
-                                
+
                                 <Trigger Property="TreeViewItem.IsSelected" Value="True">
                                     <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource ItemSelectedBrush}" />
-                                    
-                                    <Setter
-                                        Property="TextElement.Foreground"
-                                        Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Ui.Accent}" />
                                 </Trigger>
                                 
                                 <Trigger Property="UIElement.IsEnabled" Value="False">
@@ -2727,34 +3113,34 @@
                             Padding="0,2"
                             Text="{Binding Model.Name, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <!-- Theme fill: questions with text and with a right answer out of all questions -->
+                        <!-- Theme fill progress: questions with text / answers out of total -->
                         <Border
-                            x:Name="fill"
+                            x:Name="stats"
                             VerticalAlignment="Center"
                             Margin="10,0,0,0"
                             Padding="8,2"
                             CornerRadius="10"
-                            Background="{StaticResource ThemeFillTodoBrush}"
+                            Background="{DynamicResource Ui.BadgeTodo}"
                             ToolTip="{x:Static lp:Resources.ThemeFillToolTip}">
                             <Grid>
-                                <TextBlock x:Name="fillText" FontSize="11" Foreground="{StaticResource ThemeFillTodoTextBrush}">
-                                    <Run Text="{x:Static lp:Resources.ThemeFillQuestions}" /> <Run Text="{Binding QuestionsWithTextCount, Mode=OneWay}" FontWeight="SemiBold" /><Run Text="/" /><Run Text="{Binding Questions.Count, Mode=OneWay}" />
-                                    <Run Text="  ·  " /><Run Text="{x:Static lp:Resources.ThemeFillAnswers}" /> <Run Text="{Binding QuestionsWithAnswerCount, Mode=OneWay}" FontWeight="SemiBold" /><Run Text="/" /><Run Text="{Binding Questions.Count, Mode=OneWay}" />
-                                </TextBlock>
+                            <TextBlock x:Name="statsText" FontSize="11" Foreground="{DynamicResource Ui.BadgeTodoText}">
+                                <Run Text="{x:Static lp:Resources.ThemeFillQuestions}" /> <Run Text="{Binding QuestionsWithTextCount, Mode=OneWay}" FontWeight="SemiBold" /><Run Text="/" /><Run Text="{Binding Questions.Count, Mode=OneWay}" />
+                                <Run Text="  ·  " /><Run Text="{x:Static lp:Resources.ThemeFillAnswers}" /> <Run Text="{Binding QuestionsWithAnswerCount, Mode=OneWay}" FontWeight="SemiBold" /><Run Text="/" /><Run Text="{Binding Questions.Count, Mode=OneWay}" />
+                            </TextBlock>
 
-                                <!-- Compact form when the theme is complete -->
-                                <TextBlock x:Name="fillDone" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ThemeFillDoneTextBrush}" Visibility="Collapsed">
-                                    <Run Text="✓" /> <Run Text="{Binding Questions.Count, Mode=OneWay}" />
-                                </TextBlock>
+                            <!-- Compact form when the theme is complete -->
+                            <TextBlock x:Name="statsDone" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Ui.BadgeDoneText}" Visibility="Collapsed">
+                                <Run Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="9" /> <Run Text="{Binding Questions.Count, Mode=OneWay}" />
+                            </TextBlock>
                             </Grid>
                         </Border>
                     </StackPanel>
-
-                    <ContentControl Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
+                    
+                    <ContentControl Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />                    
                 </StackPanel>
 
                 <HierarchicalDataTemplate.Triggers>
-                    <!-- Every question has text and a right answer: compact green badge -->
+                    <!-- Theme is complete: every question has text and an answer -> green badge -->
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Value="True">
@@ -2774,15 +3160,10 @@
                                 </Condition.Binding>
                             </Condition>
                         </MultiDataTrigger.Conditions>
-                        <Setter TargetName="fill" Property="Background" Value="{StaticResource ThemeFillDoneBrush}" />
-                        <Setter TargetName="fillText" Property="Visibility" Value="Collapsed" />
-                        <Setter TargetName="fillDone" Property="Visibility" Value="Visible" />
+                        <Setter TargetName="stats" Property="Background" Value="{DynamicResource Ui.BadgeDone}" />
+                        <Setter TargetName="statsText" Property="Visibility" Value="Collapsed" />
+                        <Setter TargetName="statsDone" Property="Visibility" Value="Visible" />
                     </MultiDataTrigger>
-
-                    <!-- Empty theme: nothing to count -->
-                    <DataTrigger Binding="{Binding Questions.Count}" Value="0">
-                        <Setter TargetName="fill" Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
 
                     <DataTrigger Binding="{Binding IsDragged}" Value="True">
                         <Setter Property="Opacity" Value="0.2" />
@@ -2846,49 +3227,14 @@
                 </Style.Triggers>
             </Style>
 
-            <!-- Small round "+" / "×" button next to an answer field (AnswerListEditor) -->
-            <Style x:Key="AnswerRowButton" TargetType="Button">
-                <Setter Property="Width" Value="22" />
-                <Setter Property="Height" Value="22" />
-                <Setter Property="Margin" Value="2,0,0,0" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bg" CornerRadius="11" Background="Transparent">
-                                <TextBlock
-                                    x:Name="Glyph"
-                                    Text="{TemplateBinding Content}"
-                                    FontFamily="Segoe MDL2 Assets"
-                                    FontSize="10"
-                                    FontStyle="Normal"
-                                    Foreground="{DynamicResource MahApps.Brushes.Gray3}"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center" />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="{DynamicResource MahApps.Brushes.Gray8}" />
-                                    <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource MahApps.Brushes.Accent}" />
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Opacity" Value="0.35" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
             <DataTemplate x:Key="WrongAnswersTemplateKey">
-                <!-- One field per wrong answer -->
+                <!-- Each wrong answer in its own field; + / × next to the fields -->
                 <siq:AnswerListEditor
                     Answers="{Binding}"
                     siq:SmartMenuManager.SecondMenu="True"
                     FieldStyle="{StaticResource LightTextBox}"
-                    FieldBackground="{StaticResource WrongAnswerBackgroundBrush}" />
+                    FieldBackground="{StaticResource WrongAnswerBackgroundBrush}"
+                    MinWidth="140" />
             </DataTemplate>
 
             <Style x:Key="WrongAnswersStyle" TargetType="{x:Type ContentControl}">
@@ -3147,39 +3493,20 @@
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <!-- pc:ContentTypes.Text -->
                     <DataTemplate DataType="vm:ContentItemViewModel">
-                        <Grid>
-                            <!-- Fills the whole row height (e.g. next to a picture): a click anywhere in the item puts the caret -->
-                            <TextBox
-                                x:Name="text"
-                                lb:PasteBehavior.IsAttached="True"
-                                siq:ActivateManager.IsWatching="True"
-                                TextWrapping="Wrap"
-                                AcceptsReturn="True"
-                                Height="Auto"
-                                MinWidth="250"
-                                Text="{Binding Model.Value, UpdateSourceTrigger=PropertyChanged}"
-                                Style="{StaticResource CommonTextBox}"
-                                TabIndex="2"
-                                Padding="0,2"
-                                VerticalAlignment="Stretch"
-                                VerticalContentAlignment="Center" />
-
-                            <!-- An empty text field has no border and can't be seen: show a hint in it -->
-                            <TextBlock
-                                x:Name="hint"
-                                Text="{x:Static lp:Resources.TextItemHint}"
-                                Margin="2,0,0,0"
-                                VerticalAlignment="Center"
-                                Opacity="0.5"
-                                IsHitTestVisible="False"
-                                Visibility="Collapsed" />
-                        </Grid>
-
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding Text, ElementName=text}" Value="">
-                                <Setter TargetName="hint" Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
+                        <TextBox
+                            lb:PasteBehavior.IsAttached="True"
+                            siq:ActivateManager.IsWatching="True"
+                            TextWrapping="Wrap"
+                            AcceptsReturn="True"
+                            Height="Auto"
+                            MinWidth="250"
+                            Text="{Binding Model.Value, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource CommonTextBox}"
+                            TabIndex="2"
+                            Padding="0,2"
+                            VerticalAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            lb:Placeholder.Text="{x:Static lp:Resources.TextItemHint}" />
                     </DataTemplate>
                 </siqcv:TemplateConverter.DefaultTemplate>
 
@@ -3565,15 +3892,17 @@
                     Orientation="Vertical"
                     VerticalAlignment="Center"
                     TextBlock.FontStyle="Italic"
-                    Background="{StaticResource SimpleAnswerBackgroundBrush}">
-                    <!-- One field per right answer (pasting a picture goes to the media answer, see AnswerListEditor) -->
+                    Background="Transparent">
+                    <!-- Each right answer in its own field; + / × next to the fields -->
                     <siq:AnswerListEditor
                         x:Name="right"
-                        siq:SmartMenuManager.SecondMenu="True"
                         DataContext="{Binding Right}"
                         Answers="{Binding}"
+                        siq:SmartMenuManager.SecondMenu="True"
                         FieldStyle="{StaticResource LightTextBox}"
-                        MinWidth="75" />
+                        FieldBackground="{StaticResource SimpleAnswerBackgroundBrush}"
+                        MinWidth="140"
+                        Margin="0,0,0,4" />
 
                     <ContentControl
                         Style="{StaticResource WrongAnswersStyle}"
@@ -3809,20 +4138,104 @@
             
             <util:LinkManager x:Key="LinkManager" />
 
-            <DataTemplate x:Key="Authors" DataType="{x:Type vm:AuthorsViewModel}">
-                <DockPanel Background="Transparent">
-                    <TextBlock Text="{x:Static lp:Resources.AuthorsHeader}" Style="{StaticResource BlockStyleKey}" />
+            <!-- Small round "+" / "×" buttons next to answer fields (content is an icon glyph) -->
+            <Style x:Key="AnswerRowButton" TargetType="Button">
+                <Setter Property="Width" Value="24" />
+                <Setter Property="Height" Value="24" />
+                <Setter Property="Margin" Value="3,0,0,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bg" CornerRadius="12" Background="Transparent">
+                                <TextBlock
+                                    x:Name="Glyph"
+                                    Text="{TemplateBinding Content}"
+                                    FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                    FontSize="11"
+                                    FontStyle="Normal"
+                                    Foreground="{DynamicResource Ui.Muted}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Ui.Hover}" />
+                                    <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource Ui.Accent}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.35" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-                    <Button
-                        x:Name="remove"
-                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                        Command="{Binding ClearAll}"
-                        Width="20"
-                        Height="20"
-                        Visibility="Hidden"
-                        ToolTip="{x:Static lp:Resources.RemoveAuthors}">
-                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
-                    </Button>
+            <!-- Small round "×" button that clears an info field (authors, sources, comments) -->
+            <Style x:Key="InfoClearButton" TargetType="Button">
+                <Setter Property="Width" Value="20" />
+                <Setter Property="Height" Value="20" />
+                <Setter Property="Margin" Value="0,0,4,0" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="Visibility" Value="Hidden" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bg" CornerRadius="10" Background="Transparent">
+                                <TextBlock
+                                    x:Name="Glyph"
+                                    Text="&#xE711;"
+                                    FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                    FontSize="9"
+                                    Foreground="{DynamicResource Ui.Muted}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="#1FC42B1C" />
+                                    <Setter TargetName="Glyph" Property="Foreground" Value="#FFC42B1C" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="InfoHeaderGlyph" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0,0,6,0" />
+            </Style>
+
+            <Style x:Key="InfoHeaderPanel" TargetType="StackPanel">
+                <Setter Property="DockPanel.Dock" Value="Left" />
+                <Setter Property="Orientation" Value="Horizontal" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="MinWidth" Value="175" />
+                <Setter Property="Margin" Value="0,1,4,1" />
+            </Style>
+
+            <Style x:Key="InfoAccentBar" TargetType="Border">
+                <Setter Property="DockPanel.Dock" Value="Left" />
+                <Setter Property="Width" Value="3" />
+                <Setter Property="CornerRadius" Value="1.5" />
+                <Setter Property="Margin" Value="0,2,8,2" />
+            </Style>
+
+            <DataTemplate x:Key="Authors" DataType="{x:Type vm:AuthorsViewModel}">
+                <DockPanel x:Name="panel" Background="Transparent" Margin="0,1">
+                    <Border Style="{StaticResource InfoAccentBar}" Background="#FF8764B8" />
+                    <StackPanel Style="{StaticResource InfoHeaderPanel}">
+                        <TextBlock Style="{StaticResource InfoHeaderGlyph}" Text="&#xE77B;" Foreground="#FF8764B8" />
+                        <TextBlock Text="{x:Static lp:Resources.AuthorsHeader}" Foreground="#FF8764B8" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <Button x:Name="remove" Style="{StaticResource InfoClearButton}" Command="{Binding ClearAll}" ToolTip="{x:Static lp:Resources.RemoveAuthors}" />
 
                     <siq:TextList
                         Style="{StaticResource LightTextBox}"
@@ -3850,19 +4263,14 @@
             </DataTemplate>
 
             <DataTemplate x:Key="Sources" DataType="{x:Type vm:SourcesViewModel}">
-                <DockPanel Background="Transparent">
-                    <TextBlock Text="{x:Static lp:Resources.SourcesHeader}" Style="{StaticResource BlockStyleKey}" />
+                <DockPanel Background="Transparent" Margin="0,1">
+                    <Border Style="{StaticResource InfoAccentBar}" Background="#FF038387" />
+                    <StackPanel Style="{StaticResource InfoHeaderPanel}">
+                        <TextBlock Style="{StaticResource InfoHeaderGlyph}" Text="&#xE736;" Foreground="#FF038387" />
+                        <TextBlock Text="{x:Static lp:Resources.SourcesHeader}" Foreground="#FF038387" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
 
-                    <Button
-                        x:Name="remove"
-                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                        Command="{Binding ClearAll}"
-                        Width="20"
-                        Height="20"
-                        Visibility="Hidden"
-                        ToolTip="{x:Static lp:Resources.RemoveSources}">
-                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
-                    </Button>
+                    <Button x:Name="remove" Style="{StaticResource InfoClearButton}" Command="{Binding ClearAll}" ToolTip="{x:Static lp:Resources.RemoveSources}" />
 
                     <Button
                         x:Name="openUrl"
@@ -3904,17 +4312,17 @@
 
             <DataTemplate x:Key="Comments" DataType="{x:Type vm:CommentsViewModel}">
                 <DockPanel x:Name="panel" Background="Transparent">
-                    <TextBlock Text="{x:Static lp:Resources.CommentsHeader}" Style="{StaticResource BlockStyleKey}" />
+                    <Border Style="{StaticResource InfoAccentBar}" Background="#FFCA5010" />
+                    <StackPanel Style="{StaticResource InfoHeaderPanel}">
+                        <TextBlock Style="{StaticResource InfoHeaderGlyph}" Text="&#xE90A;" Foreground="#FFCA5010" />
+                        <TextBlock Text="{x:Static lp:Resources.CommentsHeader}" Foreground="#FFCA5010" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
 
                     <Button
                         x:Name="remove"
-                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Style="{StaticResource InfoClearButton}"
                         lb:ClearTextBehaviour.Target="{Binding ElementName=text}"
-                        Width="20"
-                        Height="20"
-                        Visibility="Hidden"
                         ToolTip="{x:Static lp:Resources.RemoveComment}">
-                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
                     </Button>
                     
                     <TextBox
@@ -3938,17 +4346,17 @@
 
             <DataTemplate x:Key="ShowmanComments" DataType="{x:Type vm:ShowmanCommentsViewModel}">
                 <DockPanel x:Name="panel" Background="Transparent">
-                    <TextBlock Text="{x:Static lp:Resources.ShowmanCommentsHeader}" Style="{StaticResource BlockStyleKey}" />
+                    <Border Style="{StaticResource InfoAccentBar}" Background="#FF0F6CBD" />
+                    <StackPanel Style="{StaticResource InfoHeaderPanel}">
+                        <TextBlock Style="{StaticResource InfoHeaderGlyph}" Text="&#xE8BD;" Foreground="#FF0F6CBD" />
+                        <TextBlock Text="{x:Static lp:Resources.ShowmanCommentsHeader}" Foreground="#FF0F6CBD" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
 
                     <Button
                         x:Name="remove"
-                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Style="{StaticResource InfoClearButton}"
                         lb:ClearTextBehaviour.Target="{Binding ElementName=text}"
-                        Width="20"
-                        Height="20"
-                        Visibility="Hidden"
                         ToolTip="{x:Static lp:Resources.RemoveComment}">
-                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
                     </Button>
 
                     <TextBox

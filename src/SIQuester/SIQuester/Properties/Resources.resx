@@ -1505,4 +1505,10 @@ Theme list: players remove themes in turn; on the last one everyone bets and wri
   <data name="FontReset" xml:space="preserve">
     <value>Text size. Click to restore the default (Ctrl+0)</value>
   </data>
+  <data name="PublisherHint" xml:space="preserve">
+    <value>who published the pack</value>
+  </data>
+  <data name="RestrictionHint" xml:space="preserve">
+    <value>e.g. 12+ or 18+</value>
+  </data>
 </root>

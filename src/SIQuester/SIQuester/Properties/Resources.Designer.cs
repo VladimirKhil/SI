@@ -2405,6 +2405,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to who published the pack.
+        /// </summary>
+        public static string PublisherHint {
+            get {
+                return ResourceManager.GetString("PublisherHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (all).
         /// </summary>
         public static string PublishersAll {
@@ -2781,6 +2790,15 @@ namespace SIQuester.Properties {
         public static string Restriction {
             get {
                 return ResourceManager.GetString("Restriction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to e.g. 12+ or 18+.
+        /// </summary>
+        public static string RestrictionHint {
+            get {
+                return ResourceManager.GetString("RestrictionHint", resourceCulture);
             }
         }
         

@@ -1501,4 +1501,10 @@
   <data name="FontReset" xml:space="preserve">
     <value>Размер текста. Щелчок — вернуть размер по умолчанию (Ctrl+0)</value>
   </data>
+  <data name="PublisherHint" xml:space="preserve">
+    <value>кто выпустил пакет</value>
+  </data>
+  <data name="RestrictionHint" xml:space="preserve">
+    <value>например, 12+ или 18+</value>
+  </data>
 </root>
