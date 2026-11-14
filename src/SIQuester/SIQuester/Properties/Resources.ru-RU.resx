@@ -1424,4 +1424,13 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="StatisticsRounds" xml:space="preserve">
+    <value>раундов</value>
+  </data>
+  <data name="StatisticsThemes" xml:space="preserve">
+    <value>тем</value>
+  </data>
+  <data name="StatisticsNoWarnings" xml:space="preserve">
+    <value>Замечаний нет</value>
+  </data>
 </root>
