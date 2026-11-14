@@ -3543,6 +3543,33 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No issues found.
+        /// </summary>
+        public static string StatisticsNoWarnings {
+            get {
+                return ResourceManager.GetString("StatisticsNoWarnings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to rounds.
+        /// </summary>
+        public static string StatisticsRounds {
+            get {
+                return ResourceManager.GetString("StatisticsRounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to themes.
+        /// </summary>
+        public static string StatisticsThemes {
+            get {
+                return ResourceManager.GetString("StatisticsThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Steam.
         /// </summary>
         public static string Steam {
@@ -3773,6 +3800,15 @@ namespace SIQuester.Properties {
         public static string TodayTip {
             get {
                 return ResourceManager.GetString("TodayTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light / dark theme.
+        /// </summary>
+        public static string ToggleTheme {
+            get {
+                return ResourceManager.GetString("ToggleTheme", resourceCulture);
             }
         }
         

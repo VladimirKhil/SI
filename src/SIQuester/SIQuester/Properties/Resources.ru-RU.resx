@@ -1441,24 +1441,30 @@
   </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Поиск по пакету</value>
+  </data>
   <data name="Today" xml:space="preserve">
     <value>Сегодня</value>
   </data>
   <data name="TodayTip" xml:space="preserve">
     <value>Поставить сегодняшнюю дату</value>
+  </data>
   <data name="TextItemHint" xml:space="preserve">
     <value>Введите текст…</value>
+  </data>
   <data name="RoundTypeHint" xml:space="preserve">
     <value>Тип раунда — как он пройдёт в игре.
 Таблица: табло «темы × стоимости», игроки выбирают вопросы и жмут кнопку (обычно 5 вопросов в теме).
 Список тем: игроки по очереди убирают темы, по последней оставшейся все делают ставки и пишут ответ (1 вопрос в теме).</value>
+  </data>
   <data name="RemoveAuthors" xml:space="preserve">
     <value>Удалить авторов</value>
   </data>
   <data name="RemoveSources" xml:space="preserve">
     <value>Удалить источники</value>
+  </data>
   <data name="ContactUriHint" xml:space="preserve">
     <value>сайт, почта или Telegram автора</value>
+  </data>
   <data name="ToolbarRightAnswers" xml:space="preserve">
     <value>Ответы</value>
   </data>
@@ -1470,6 +1476,7 @@
   </data>
   <data name="ToolbarLogo" xml:space="preserve">
     <value>Логотип</value>
+  </data>
   <data name="StatisticsRounds" xml:space="preserve">
     <value>раундов</value>
   </data>
@@ -1478,10 +1485,13 @@
   </data>
   <data name="StatisticsNoWarnings" xml:space="preserve">
     <value>Замечаний нет</value>
+  </data>
   <data name="AutoCompressMedia" xml:space="preserve">
     <value>Автоматически сжимать картинки больше лимита SIGame (1 МБ) при добавлении</value>
+  </data>
   <data name="ToggleTheme" xml:space="preserve">
     <value>Светлая / тёмная тема</value>
+  </data>
   <data name="FontSmaller" xml:space="preserve">
     <value>Уменьшить текст (Ctrl+−, Ctrl+колесо мыши)</value>
   </data>
