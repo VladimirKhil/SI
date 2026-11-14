@@ -1424,4 +1424,7 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>Светлая / тёмная тема</value>
+  </data>
 </root>
