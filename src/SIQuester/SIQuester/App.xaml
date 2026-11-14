@@ -3788,9 +3788,20 @@
             <util:LinkManager x:Key="LinkManager" />
 
             <DataTemplate x:Key="Authors" DataType="{x:Type vm:AuthorsViewModel}">
-                <DockPanel>
+                <DockPanel Background="Transparent">
                     <TextBlock Text="{x:Static lp:Resources.AuthorsHeader}" Style="{StaticResource BlockStyleKey}" />
-                    
+
+                    <Button
+                        x:Name="remove"
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Command="{Binding ClearAll}"
+                        Width="20"
+                        Height="20"
+                        Visibility="Hidden"
+                        ToolTip="{x:Static lp:Resources.RemoveAuthors}">
+                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
+                    </Button>
+
                     <siq:TextList
                         Style="{StaticResource LightTextBox}"
                         ItemsSource="{Binding}"
@@ -3799,11 +3810,37 @@
                         CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
                         siq:ActivateManager.IsWatching="True" />
                 </DockPanel>
+
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter TargetName="remove" Property="Visibility" Value="Visible" />
+                    </Trigger>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="remove" Property="Visibility" Value="Visible" />
+                    </Trigger>
+
+                    <!-- Package authors: the package must keep at least one author -->
+                    <DataTrigger Binding="{Binding ClearAll.CanBeExecuted}" Value="False">
+                        <Setter TargetName="remove" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
             </DataTemplate>
 
             <DataTemplate x:Key="Sources" DataType="{x:Type vm:SourcesViewModel}">
                 <DockPanel Background="Transparent">
                     <TextBlock Text="{x:Static lp:Resources.SourcesHeader}" Style="{StaticResource BlockStyleKey}" />
+
+                    <Button
+                        x:Name="remove"
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Command="{Binding ClearAll}"
+                        Width="20"
+                        Height="20"
+                        Visibility="Hidden"
+                        ToolTip="{x:Static lp:Resources.RemoveSources}">
+                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
+                    </Button>
 
                     <Button
                         x:Name="openUrl"
@@ -3829,10 +3866,12 @@
                 <DataTemplate.Triggers>
                     <Trigger Property="IsKeyboardFocusWithin" Value="True">
                         <Setter TargetName="openUrl" Property="Visibility" Value="Visible" />
+                        <Setter TargetName="remove" Property="Visibility" Value="Visible" />
                     </Trigger>
 
                     <Trigger Property="IsMouseOver" Value="True">
                         <Setter TargetName="openUrl" Property="Visibility" Value="Visible" />
+                        <Setter TargetName="remove" Property="Visibility" Value="Visible" />
                     </Trigger>
                     
                     <DataTrigger Binding="{Binding Url}" Value="{x:Null}">
