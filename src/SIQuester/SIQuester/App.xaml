@@ -1136,6 +1136,9 @@
                     Property="lb:PlacementManager.PlacementTarget"
                     Value="{Binding PlacementTarget,Source={x:Static vm1:ActionMenuViewModel.Instance}}" />
                 
+                <!-- Until a tree item is selected the panel has no placement target: keep it off the package title, where it is placed for the package row -->
+                <Setter Property="Margin" Value="400,0,0,0" />
+
                 <Setter Property="Opacity" Value="0.3" />
                 
                 <Style.Triggers>
