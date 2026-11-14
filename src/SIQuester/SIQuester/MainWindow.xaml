@@ -611,9 +611,12 @@
         </metro:WindowCommands>
     </metro:MetroWindow.RightWindowCommands>
     
-    <TabControl
-        Name="tabControl1" 
-        SelectionChanged="TabControl1_SelectionChanged"
-        Style="{StaticResource TabControlStyle1}"
-        ItemContainerStyle="{StaticResource TabItemStyle1}" />
+    <!-- A panel as the window content: the theme change lays a snapshot of the old look over it (App.UpdateThemeSmoothly) -->
+    <Grid>
+        <TabControl
+            Name="tabControl1" 
+            SelectionChanged="TabControl1_SelectionChanged"
+            Style="{StaticResource TabControlStyle1}"
+            ItemContainerStyle="{StaticResource TabItemStyle1}" />
+    </Grid>
 </metro:MetroWindow>
