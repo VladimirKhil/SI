@@ -1428,4 +1428,22 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="StartSubtitle" xml:space="preserve">
+    <value>Question pack editor for SIGame</value>
+  </data>
+  <data name="StartNew" xml:space="preserve">
+    <value>New pack</value>
+  </data>
+  <data name="StartNewHint" xml:space="preserve">
+    <value>Pick a template and start</value>
+  </data>
+  <data name="StartOpen" xml:space="preserve">
+    <value>Open a pack</value>
+  </data>
+  <data name="StartOpenHint" xml:space="preserve">
+    <value>A .siq file from your computer</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search the pack</value>
+  </data>
 </root>

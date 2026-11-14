@@ -29,6 +29,10 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+                <!-- Fluent (Windows 11) look for standard controls. Must stay after MahApps dictionaries so its implicit styles win -->
+                <ResourceDictionary Source="pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.Light.xaml" />
+                <!-- Colors of the new UI elements and the app accent for Fluent controls (light / dark is switched in App.UpdateTheme) -->
+                <ResourceDictionary Source="View/Dictionaries/Palette.Light.xaml" />
                 <ResourceDictionary Source="/Icons.xaml" />
                 <ResourceDictionary Source="View/Dictionaries/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -37,12 +41,23 @@
             <ControlTemplate TargetType="ContentControl" x:Key="EmptyTemplate" />
             
             <BooleanToVisibilityConverter x:Key="VisibilityConverter" />
+
+            <!-- Menus and tooltips are popups and do not inherit the window font: use the same font with a readable size -->
+            <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
+                <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+                <Setter Property="FontSize" Value="14" />
+            </Style>
+
+            <Style TargetType="ToolTip" BasedOn="{StaticResource {x:Type ToolTip}}">
+                <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+                <Setter Property="FontSize" Value="13" />
+            </Style>
             <siqcv:GreaterThanValueConverter BaseValue="0" x:Key="GreaterZero" />
 
             <siqcv:ThemeToBrushConverter
                 x:Key="ThemeBackgroundConverter"
                 LightBrush="#FFFBFBFF"
-                DarkBrush="Black"
+                DarkBrush="#FF1F1F1F"
                 DarkGrayBrush="#FF1E1E1E" />
             <siqcv:ThemeToBrushConverter
                 x:Key="ThemeForegroundConverter"
@@ -67,12 +82,12 @@
                 DarkGrayColor="#FF2E4550" />
             <siqcv:ThemeToColorConverter
                 x:Key="ItemOverColorConverter"
-                LightColor="#FFE9E9FF"
+                LightColor="#FFF2F6FB"
                 DarkColor="#FF2B2B2B" />
             <siqcv:ThemeToColorConverter
                 x:Key="ItemSelectedColorConverter"
-                LightColor="#FFD5D5FF"
-                DarkColor="#FF3A3A3A" />
+                LightColor="#FFDEECF9"
+                DarkColor="#FF263B52" />
             <!-- Theme fill badge: amber while questions are missing, green when the theme is complete -->
             <siqcv:ThemeToColorConverter x:Key="ThemeFillTodoColorConverter" LightColor="#FFFFF4CE" DarkColor="#FF4A3B12" />
             <siqcv:ThemeToColorConverter x:Key="ThemeFillTodoTextColorConverter" LightColor="#FF8A5A00" DarkColor="#FFF7C55A" />
@@ -94,7 +109,7 @@
             <siqcv:ThemeToColorConverter
                 x:Key="MainBackColorConverter"
                 LightColor="#FFFBFBFF"
-                DarkColor="Black"
+                DarkColor="#FF1F1F1F"
                 DarkGrayColor="#FF1E1E1E" />
             <siqcv:ThemeToColorConverter
                 x:Key="LavenderColorConverter"
@@ -104,7 +119,7 @@
             <siqcv:ThemeToColorConverter
                 x:Key="SidePanelColorConverter"
                 LightColor="Lavender"
-                DarkColor="Black"
+                DarkColor="#FF1F1F1F"
                 DarkGrayColor="#FF1E1E1E" />
             <siqcv:ThemeToColorConverter
                 x:Key="LightBlueColorConverter"
@@ -1012,27 +1027,27 @@
             <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
             <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF"/>
             
+            <!-- Document tab, Office-like: rounded top, the selected tab merges with the command bar below -->
             <Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
-                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-                <Setter Property="Foreground" Value="Black"/>
-                <Setter Property="Background" Value="{StaticResource TabItem.Static.Background}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource TabItem.Static.Border}"/>
-                <Setter Property="Margin" Value="-1,0,0,0"/>
-                <Setter Property="Padding" Value="6,2,6,2"/>
-                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-                
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Foreground" Value="{DynamicResource Ui.Text}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Margin" Value="4,4,0,0" />
+                <Setter Property="Padding" Value="12,4,6,4" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type TabItem}">
                             <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
                                 <Border
                                     x:Name="mainBorder"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="1,0,1,0"
-                                    Background="{TemplateBinding Background}"
-                                    Margin="0" />
-                                
+                                    CornerRadius="8,8,0,0"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1,1,1,0"
+                                    Background="{TemplateBinding Background}" />
+
                                 <ContentPresenter
                                     x:Name="contentPresenter"
                                     ContentSource="Header"
@@ -1045,13 +1060,13 @@
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Background}"/>
-                                    <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Border}"/>
+                                    <Setter Property="Background" TargetName="mainBorder" Value="{DynamicResource Ui.Hover}" />
                                 </Trigger>
-                                
+
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.Selected.Background}"/>
-                                    <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.Selected.Border}"/>
+                                    <Setter Property="Background" TargetName="mainBorder" Value="{DynamicResource Ui.TopBar}" />
+                                    <Setter Property="BorderBrush" TargetName="mainBorder" Value="{DynamicResource Ui.CardStroke}" />
+                                    <Setter TargetName="contentPresenter" Property="TextElement.FontWeight" Value="SemiBold" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

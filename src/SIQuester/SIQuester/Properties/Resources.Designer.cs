@@ -2884,6 +2884,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Search the pack.
+        /// </summary>
+        public static string SearchPlaceholder {
+            get {
+                return ResourceManager.GetString("SearchPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search results.
         /// </summary>
         public static string SearchResults {
@@ -3411,6 +3420,51 @@ namespace SIQuester.Properties {
         public static string StartImport {
             get {
                 return ResourceManager.GetString("StartImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New pack.
+        /// </summary>
+        public static string StartNew {
+            get {
+                return ResourceManager.GetString("StartNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick a template and start.
+        /// </summary>
+        public static string StartNewHint {
+            get {
+                return ResourceManager.GetString("StartNewHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open a pack.
+        /// </summary>
+        public static string StartOpen {
+            get {
+                return ResourceManager.GetString("StartOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A .siq file from your computer.
+        /// </summary>
+        public static string StartOpenHint {
+            get {
+                return ResourceManager.GetString("StartOpenHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Question pack editor for SIGame.
+        /// </summary>
+        public static string StartSubtitle {
+            get {
+                return ResourceManager.GetString("StartSubtitle", resourceCulture);
             }
         }
         

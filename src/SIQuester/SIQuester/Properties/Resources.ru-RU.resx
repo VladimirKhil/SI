@@ -1424,4 +1424,22 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="StartSubtitle" xml:space="preserve">
+    <value>Редактор пакетов вопросов для SIGame</value>
+  </data>
+  <data name="StartNew" xml:space="preserve">
+    <value>Новый пакет</value>
+  </data>
+  <data name="StartNewHint" xml:space="preserve">
+    <value>Выбрать шаблон и начать</value>
+  </data>
+  <data name="StartOpen" xml:space="preserve">
+    <value>Открыть пакет</value>
+  </data>
+  <data name="StartOpenHint" xml:space="preserve">
+    <value>Файл .siq с компьютера</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Поиск по пакету</value>
+  </data>
 </root>
