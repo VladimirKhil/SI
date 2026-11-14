@@ -21,6 +21,7 @@ using SIQuester.ViewModel.Helpers;
 using SIStatisticsService.Client;
 using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -72,11 +73,36 @@ public partial class App : Application
     private static readonly Uri LightBlueThemeUri = new($"{MahAppsThemePathPrefix}Light.Blue.xaml", UriKind.Absolute);
     private static readonly Uri DarkBlueThemeUri = new($"{MahAppsThemePathPrefix}Dark.Blue.xaml", UriKind.Absolute);
 
+    private const string FluentThemePathPrefix = "pack://application:,,,/PresentationFramework.Fluent;component/Themes/";
+    private static readonly Uri FluentLightThemeUri = new($"{FluentThemePathPrefix}Fluent.Light.xaml", UriKind.Absolute);
+    private static readonly Uri FluentDarkThemeUri = new($"{FluentThemePathPrefix}Fluent.Dark.xaml", UriKind.Absolute);
+
+    private const string PalettePathPart = "/Palette.";
+    private static readonly Uri LightPaletteUri = new("pack://application:,,,/View/Dictionaries/Palette.Light.xaml", UriKind.Absolute);
+    private static readonly Uri DarkPaletteUri = new("pack://application:,,,/View/Dictionaries/Palette.Dark.xaml", UriKind.Absolute);
+
     private DispatcherTimer? _autoSaveTimer;
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
         AppSettings.Default = _settings;
+
+        // One-time move from the old default font to the new one (a font chosen later in the settings is kept)
+        if (!AppSettings.Default.ModernFontApplied)
+        {
+            if (AppSettings.Default.FontFamily == "Calibri")
+            {
+                AppSettings.Default.FontFamily = "Segoe UI Variable Text";
+
+                if (AppSettings.Default.FontSize == 15)
+                {
+                    AppSettings.Default.FontSize = 16;
+                }
+            }
+
+            AppSettings.Default.ModernFontApplied = true;
+        }
+
         AppSettings.Default.PropertyChanged += Default_PropertyChanged;
 
         if (!IsWindows8_1OrLater)
@@ -195,7 +221,8 @@ public partial class App : Application
 
     private void UpdateTheme()
     {
-        var themeUri = _settings.Theme == ThemeOption.Light ? LightBlueThemeUri : DarkBlueThemeUri;
+        var isLight = _settings.Theme == ThemeOption.Light;
+        var themeUri = isLight ? LightBlueThemeUri : DarkBlueThemeUri;
         var dictionaries = Resources.MergedDictionaries;
 
         var themeDictionary = dictionaries.FirstOrDefault(
@@ -206,12 +233,48 @@ public partial class App : Application
         if (themeDictionary is null)
         {
             dictionaries.Insert(0, new ResourceDictionary { Source = themeUri });
-            return;
         }
-
-        if (themeDictionary.Source != themeUri)
+        else if (themeDictionary.Source != themeUri)
         {
             themeDictionary.Source = themeUri;
+        }
+
+        ReplaceDictionary(dictionaries, FluentThemePathPrefix, isLight ? FluentLightThemeUri : FluentDarkThemeUri);
+        ReplaceDictionary(dictionaries, PalettePathPart, isLight ? LightPaletteUri : DarkPaletteUri);
+
+        // Monochrome toolbar icons: their colors follow the theme
+        FluentIcons.Apply(Resources, !isLight);
+    }
+
+    /// <summary>
+    /// Replaces a merged dictionary in place: Fluent must stay after the MahApps dictionaries and the palette after Fluent.
+    /// </summary>
+    private void ReplaceDictionary(Collection<ResourceDictionary> dictionaries, string sourcePart, Uri newSource)
+    {
+        for (var i = 0; i < dictionaries.Count; i++)
+        {
+            var source = dictionaries[i].Source;
+
+            if (source is null || !source.OriginalString.Contains(sourcePart, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (source.OriginalString.EndsWith(Path.GetFileName(newSource.OriginalString), StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            try
+            {
+                dictionaries[i] = new ResourceDictionary { Source = newSource };
+            }
+            catch (Exception exc)
+            {
+                _logger?.LogWarning(exc, "Failed to switch dictionary {source}", newSource);
+            }
+
+            return;
         }
     }
 
