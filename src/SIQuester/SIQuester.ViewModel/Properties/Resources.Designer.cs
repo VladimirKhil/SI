@@ -106,6 +106,42 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Claude (Anthropic) — Opus 5.5 model.
+        /// </summary>
+        public static string AiProviderClaude {
+            get {
+                return ResourceManager.GetString("AiProviderClaude", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ChatGPT (OpenAI) — model and key from the GPT section below.
+        /// </summary>
+        public static string AiProviderGpt {
+            get {
+                return ResourceManager.GetString("AiProviderGpt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AI assistant.
+        /// </summary>
+        public static string AiProviderHeader {
+            get {
+                return ResourceManager.GetString("AiProviderHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Who answers in the chat and generates questions:.
+        /// </summary>
+        public static string AiProviderLabel {
+            get {
+                return ResourceManager.GetString("AiProviderLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to and.
         /// </summary>
         public static string And {
@@ -246,6 +282,204 @@ namespace SIQuester.ViewModel.Properties {
         public static string ChangeGroupIsActivated {
             get {
                 return ResourceManager.GetString("ChangeGroupIsActivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Claude — assistant.
+        /// </summary>
+        public static string ChatButton {
+            get {
+                return ResourceManager.GetString("ChatButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimize.
+        /// </summary>
+        public static string ChatCollapse {
+            get {
+                return ResourceManager.GetString("ChatCollapse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For example: “check this question”, “suggest 5 wrong answers”, “write a 500-point question for this theme”, “make the wording shorter”..
+        /// </summary>
+        public static string ChatEmptyHint {
+            get {
+                return ResourceManager.GetString("ChatEmptyHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How can I help?.
+        /// </summary>
+        public static string ChatEmptyTitle {
+            get {
+                return ResourceManager.GetString("ChatEmptyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: .
+        /// </summary>
+        public static string ChatErrorPrefix {
+            get {
+                return ResourceManager.GetString("ChatErrorPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide the assistant (bring back: Settings → AI assistant).
+        /// </summary>
+        public static string ChatHide {
+            get {
+                return ResourceManager.GetString("ChatHide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New conversation.
+        /// </summary>
+        public static string ChatNew {
+            get {
+                return ResourceManager.GetString("ChatNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To let me answer, set the Claude API key: Settings → AI assistant → Claude API key..
+        /// </summary>
+        public static string ChatNoKey {
+            get {
+                return ResourceManager.GetString("ChatNoKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To let ChatGPT answer, set the OpenAI key: Settings → GPT → API key..
+        /// </summary>
+        public static string ChatNoKeyGpt {
+            get {
+                return ResourceManager.GetString("ChatNoKeyGpt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ask Claude… (Shift+Enter — new line).
+        /// </summary>
+        public static string ChatPlaceholder {
+            get {
+                return ResourceManager.GetString("ChatPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Claude declined this request. Try rephrasing it..
+        /// </summary>
+        public static string ChatRefused {
+            get {
+                return ResourceManager.GetString("ChatRefused", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send (Enter).
+        /// </summary>
+        public static string ChatSend {
+            get {
+                return ResourceManager.GetString("ChatSend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop the answer.
+        /// </summary>
+        public static string ChatStop {
+            get {
+                return ResourceManager.GetString("ChatStop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (stopped).
+        /// </summary>
+        public static string ChatStopped {
+            get {
+                return ResourceManager.GetString("ChatStopped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  · sees the open theme and question.
+        /// </summary>
+        public static string ChatSubtitleTail {
+            get {
+                return ResourceManager.GetString("ChatSubtitleTail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Claude is thinking….
+        /// </summary>
+        public static string ChatThinking {
+            get {
+                return ResourceManager.GetString("ChatThinking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  — assistant.
+        /// </summary>
+        public static string ChatTitleTail {
+            get {
+                return ResourceManager.GetString("ChatTitleTail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (answer cut: too long).
+        /// </summary>
+        public static string ChatTruncated {
+            get {
+                return ResourceManager.GetString("ChatTruncated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get a key at platform.claude.com (API keys). It is stored encrypted for your Windows account only. When the key is set, question and theme generation uses Claude (claude-opus-5-5) and the assistant chat in the bottom-right corner works..
+        /// </summary>
+        public static string ClaudeHint {
+            get {
+                return ResourceManager.GetString("ClaudeHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Claude API key is not set (Settings → AI assistant → Claude API key or the ANTHROPIC_API_KEY variable)..
+        /// </summary>
+        public static string ClaudeNoKey {
+            get {
+                return ResourceManager.GetString("ClaudeNoKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Claude declined the request. Try rephrasing the theme or the question..
+        /// </summary>
+        public static string ClaudeRefused {
+            get {
+                return ResourceManager.GetString("ClaudeRefused", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Claude&apos;s answer was too long and got cut. Please try again..
+        /// </summary>
+        public static string ClaudeTooLong {
+            get {
+                return ResourceManager.GetString("ClaudeTooLong", resourceCulture);
             }
         }
         
@@ -1711,6 +1945,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Separator {
             get {
                 return ResourceManager.GetString("Separator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show the assistant button in the bottom-right corner.
+        /// </summary>
+        public static string ShowAssistant {
+            get {
+                return ResourceManager.GetString("ShowAssistant", resourceCulture);
             }
         }
         

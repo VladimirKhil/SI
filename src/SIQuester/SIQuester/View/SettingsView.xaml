@@ -9,6 +9,7 @@
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:vmp="clr-namespace:SIQuester.ViewModel.Properties;assembly=SIQuester.ViewModel"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
@@ -29,6 +30,7 @@
         </Style>
 
         <siqcv:EnumConverter x:Key="ThemeOptionConverter" EnumType="{x:Type m:ThemeOption}" />
+        <siqcv:EnumEqualsConverter x:Key="EnumEquals" />
     </UserControl.Resources>
     
     <ScrollViewer
@@ -197,6 +199,31 @@
                     </Style>
                 </ToggleButton.Style>
             </ToggleButton>
+
+            <TextBlock Style="{StaticResource Header}" Text="{x:Static vmp:Resources.AiProviderHeader}" />
+
+            <!-- Assistant chat button and who works in the chat and in question generation -->
+            <CheckBox Content="{x:Static vmp:Resources.ShowAssistant}" IsChecked="{Binding Model.ShowAssistant}" />
+
+            <TextBlock Text="{x:Static vmp:Resources.AiProviderLabel}" Margin="0,10,0,0" />
+
+            <RadioButton
+                GroupName="AiProvider"
+                Margin="0,5,0,0"
+                Content="{x:Static vmp:Resources.AiProviderGpt}"
+                IsChecked="{Binding Model.AiProvider, Converter={StaticResource EnumEquals}, ConverterParameter={x:Static m:AiProvider.ChatGPT}}" />
+
+            <RadioButton
+                GroupName="AiProvider"
+                Margin="0,5,0,0"
+                Content="{x:Static vmp:Resources.AiProviderClaude}"
+                IsChecked="{Binding Model.AiProvider, Converter={StaticResource EnumEquals}, ConverterParameter={x:Static m:AiProvider.Claude}}" />
+
+            <StackPanel Width="700" HorizontalAlignment="Left" Margin="0,10,0,0">
+                <TextBlock Text="Claude API key" />
+                <TextBox Text="{Binding Model.ClaudeApiKey, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" />
+                <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Text="{x:Static vmp:Resources.ClaudeHint}" />
+            </StackPanel>
 
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GPTModel}" />
 

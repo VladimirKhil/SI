@@ -134,6 +134,13 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     public AppSettings Settings => AppSettings.Default;
 
+    private AssistantChatViewModel? _assistant;
+
+    /// <summary>
+    /// Claude assistant chat (bottom-right panel). Uses the active document as context.
+    /// </summary>
+    public AssistantChatViewModel Assistant => _assistant ??= new AssistantChatViewModel(() => ActiveDocument);
+
     private readonly string[] _args;
     private readonly AppOptions _appOptions;
     private readonly IClipboardService _clipboardService;

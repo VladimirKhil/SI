@@ -25,6 +25,8 @@ internal static class SettingsHelper
 
     internal const string GPTKeyFileName = "gpt.key";
 
+    internal const string ClaudeKeyFileName = "claude.key";
+
     /// <summary>
     /// Loads user settings.
     /// </summary>
@@ -55,6 +57,18 @@ internal static class SettingsHelper
                                 
                                 settings.GPTApiKey = Encoding.UTF8.GetString(
                                     ProtectedData.Unprotect(encryptedData, null, DataProtectionScope.CurrentUser));
+                            }
+                            catch { }
+                        }
+
+                        var claudeKeyFile = Path.Combine(SettingsFolder, ClaudeKeyFileName);
+
+                        if (File.Exists(claudeKeyFile))
+                        {
+                            try
+                            {
+                                settings.ClaudeApiKey = Encoding.UTF8.GetString(
+                                    ProtectedData.Unprotect(File.ReadAllBytes(claudeKeyFile), null, DataProtectionScope.CurrentUser));
                             }
                             catch { }
                         }
@@ -97,6 +111,11 @@ internal static class SettingsHelper
 
             var encryptedFile = Path.Combine(SettingsFolder, GPTKeyFileName);
             File.WriteAllBytes(encryptedFile, encryptedData);
+
+            // Claude API key: encrypted for the current Windows user, like the GPT key
+            File.WriteAllBytes(
+                Path.Combine(SettingsFolder, ClaudeKeyFileName),
+                ProtectedData.Protect(Encoding.UTF8.GetBytes(settings.ClaudeApiKey), null, DataProtectionScope.CurrentUser));
         }
         catch (Exception exc)
         {

@@ -92,3 +92,12 @@ public enum ThemeOption
     [Description("ThemeOptionDarkGray")]
     DarkGray
 }
+
+/// <summary>
+/// Which AI answers in the assistant chat (and generates questions/themes).
+/// </summary>
+public enum AiProvider
+{
+    Claude,
+    ChatGPT
+}

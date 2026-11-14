@@ -601,6 +601,8 @@ public sealed class AppSettings : INotifyPropertyChanged
             if (_useGPT != value)
             {
                 _useGPT = value;
+                OnPropertyChanged(nameof(CanUseAI));
+                OnPropertyChanged(nameof(CanGenerate));
                 OnPropertyChanged();
             }
         }
@@ -618,10 +620,90 @@ public sealed class AppSettings : INotifyPropertyChanged
             if (_gptApiKey != value)
             {
                 _gptApiKey = value;
+                OnPropertyChanged(nameof(CanUseAI));
+                OnPropertyChanged(nameof(CanGenerate));
                 OnPropertyChanged();
             }
         }
     }
+
+    private bool _showAssistant = false;
+
+    /// <summary>
+    /// Show the AI assistant button in the bottom-right corner of the main window (off by default: needs an API key).
+    /// </summary>
+    [DefaultValue(false)]
+    public bool ShowAssistant
+    {
+        get => _showAssistant;
+        set
+        {
+            if (_showAssistant != value)
+            {
+                _showAssistant = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private AiProvider _aiProvider = AiProvider.ChatGPT;
+
+    /// <summary>
+    /// Which AI works in the assistant chat and in question/theme generation.
+    /// </summary>
+    [DefaultValue(AiProvider.ChatGPT)]
+    public AiProvider AiProvider
+    {
+        get => _aiProvider;
+        set
+        {
+            if (_aiProvider != value)
+            {
+                _aiProvider = value;
+                OnPropertyChanged(nameof(CanUseAI));
+                OnPropertyChanged(nameof(CanGenerate));
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string _claudeApiKey = "";
+
+    /// <summary>
+    /// Anthropic (Claude) API key. Not stored in the settings file: saved encrypted (DPAPI) next to it.
+    /// </summary>
+    [DefaultValue("")]
+    [JsonIgnore]
+    public string ClaudeApiKey
+    {
+        get => _claudeApiKey;
+        set
+        {
+            if (_claudeApiKey != value)
+            {
+                _claudeApiKey = value;
+                OnPropertyChanged(nameof(CanUseAI));
+                OnPropertyChanged(nameof(CanGenerate));
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// AI generation is available for the selected assistant: Claude needs its key (in settings or ANTHROPIC_API_KEY),
+    /// ChatGPT needs the OpenAI key.
+    /// </summary>
+    [JsonIgnore]
+    public bool CanUseAI => AiProvider == AiProvider.Claude
+        ? !string.IsNullOrWhiteSpace(ClaudeApiKey) || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY"))
+        : !string.IsNullOrWhiteSpace(GPTApiKey);
+
+    /// <summary>
+    /// The question and theme generation buttons are enabled: ChatGPT is switched on with the "Use GPT" check box,
+    /// Claude works as soon as its key is set.
+    /// </summary>
+    [JsonIgnore]
+    public bool CanGenerate => AiProvider == AiProvider.Claude ? CanUseAI : UseGPT;
 
     private string _gptModel = DefaultGPTModel;
     
@@ -728,6 +810,8 @@ public sealed class AppSettings : INotifyPropertyChanged
         CreateQuestionsWithTheme = defaultSettings.CreateQuestionsWithTheme;
         FontFamily = defaultSettings.FontFamily;
         FontSize = defaultSettings.FontSize;
+        AiProvider = defaultSettings.AiProvider;
+        ShowAssistant = defaultSettings.ShowAssistant;
         QuestionBase = defaultSettings.QuestionBase;
         SearchForUpdates = defaultSettings.SearchForUpdates;
         RemoveLinks = defaultSettings.RemoveLinks;
