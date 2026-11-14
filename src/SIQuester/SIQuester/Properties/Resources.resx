@@ -1428,4 +1428,16 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="ToolbarRightAnswers" xml:space="preserve">
+    <value>Answers</value>
+  </data>
+  <data name="ToolbarWrongAnswers" xml:space="preserve">
+    <value>Wrong answers</value>
+  </data>
+  <data name="ToolbarQuestionBody" xml:space="preserve">
+    <value>Question body</value>
+  </data>
+  <data name="ToolbarLogo" xml:space="preserve">
+    <value>Logo</value>
+  </data>
 </root>
