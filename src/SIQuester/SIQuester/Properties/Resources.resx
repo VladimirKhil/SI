@@ -1463,5 +1463,16 @@ Theme list: players remove themes in turn; on the last one everyone bets and wri
     <value>Remove sources</value>
   <data name="ContactUriHint" xml:space="preserve">
     <value>author&apos;s website, e-mail or Telegram</value>
+  <data name="ToolbarRightAnswers" xml:space="preserve">
+    <value>Answers</value>
+  </data>
+  <data name="ToolbarWrongAnswers" xml:space="preserve">
+    <value>Wrong answers</value>
+  </data>
+  <data name="ToolbarQuestionBody" xml:space="preserve">
+    <value>Question body</value>
+  </data>
+  <data name="ToolbarLogo" xml:space="preserve">
+    <value>Logo</value>
   </data>
 </root>

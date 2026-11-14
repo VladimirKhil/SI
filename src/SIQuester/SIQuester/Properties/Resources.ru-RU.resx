@@ -1459,5 +1459,16 @@
     <value>Удалить источники</value>
   <data name="ContactUriHint" xml:space="preserve">
     <value>сайт, почта или Telegram автора</value>
+  <data name="ToolbarRightAnswers" xml:space="preserve">
+    <value>Ответы</value>
+  </data>
+  <data name="ToolbarWrongAnswers" xml:space="preserve">
+    <value>Неверные</value>
+  </data>
+  <data name="ToolbarQuestionBody" xml:space="preserve">
+    <value>Текст вопроса</value>
+  </data>
+  <data name="ToolbarLogo" xml:space="preserve">
+    <value>Логотип</value>
   </data>
 </root>
