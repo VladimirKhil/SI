@@ -1446,5 +1446,7 @@
   </data>
   <data name="TodayTip" xml:space="preserve">
     <value>Поставить сегодняшнюю дату</value>
+  <data name="TextItemHint" xml:space="preserve">
+    <value>Введите текст…</value>
   </data>
 </root>

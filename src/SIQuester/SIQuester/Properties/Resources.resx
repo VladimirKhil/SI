@@ -1450,5 +1450,7 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="TodayTip" xml:space="preserve">
     <value>Set today&apos;s date</value>
+  <data name="TextItemHint" xml:space="preserve">
+    <value>Type the text…</value>
   </data>
 </root>

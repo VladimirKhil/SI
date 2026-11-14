@@ -3559,6 +3559,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type the text….
+        /// </summary>
+        public static string TextItemHint {
+            get {
+                return ResourceManager.GetString("TextItemHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Text for import (copy into the field below or open a file).
         /// </summary>
         public static string TextToImport {
