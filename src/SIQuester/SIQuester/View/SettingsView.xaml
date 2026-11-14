@@ -15,17 +15,31 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
+    FontFamily="Segoe UI Variable Text, Segoe UI"
+    FontSize="14"
     Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <UserControl.Resources>
-        <Style x:Key="Header" TargetType="TextBlock">
-            <Setter Property="Margin" Value="0,15,0,0" />
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="FontWeight" Value="Bold" />
+        <!-- Section card -->
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Ui.Card}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Ui.CardStroke}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="20,14,20,18" />
+            <Setter Property="Margin" Value="0,0,0,12" />
         </Style>
 
-        <Style x:Key="{x:Type CheckBox}" TargetType="CheckBox">
-            <Setter Property="Margin" Value="0,7,0,0" />
-            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        <!-- Section title inside a card -->
+        <Style x:Key="Header" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource Ui.Accent}" />
+        </Style>
+
+        <Style x:Key="{x:Type CheckBox}" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+            <Setter Property="Margin" Value="0,6,0,0" />
+            <Setter Property="Foreground" Value="{DynamicResource Ui.Text}" />
         </Style>
 
         <siqcv:EnumConverter x:Key="ThemeOptionConverter" EnumType="{x:Type m:ThemeOption}" />
@@ -34,7 +48,10 @@
     <ScrollViewer
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Auto">
-        <StackPanel Orientation="Vertical" Margin="10,0,0,10">
+        <!-- Settings page: centered column of rounded section cards (Windows 11 style) -->
+        <StackPanel Orientation="Vertical" Margin="24,16,24,24" MaxWidth="860" HorizontalAlignment="Center" MinWidth="560">
+            <Border Style="{StaticResource Card}">
+            <StackPanel>
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
 
             <ComboBox
@@ -50,6 +67,11 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
+            </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+            <StackPanel>
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.BasicSettings}" />
             
             <StackPanel Orientation="Vertical" Margin="0,7,0,0">
@@ -88,6 +110,9 @@
             <CheckBox Content="{x:Static lp:Resources.SpellChecking}" IsChecked="{Binding Model.SpellChecking}" IsEnabled="{Binding SpellCheckingEnabled}" />
             <CheckBox Content="{x:Static lp:Resources.RemoveUnusedMedia}" IsChecked="{Binding Model.RemoveLinks}" />
             <CheckBox Content="{x:Static lp:Resources.CheckFileSize}" IsChecked="{Binding Model.CheckFileSize}" />
+            <CheckBox IsChecked="{Binding Model.AutoCompressMedia}">
+                <TextBlock Text="{x:Static lp:Resources.AutoCompressMedia}" TextWrapping="Wrap" />
+            </CheckBox>
             <CheckBox Content="{x:Static lp:Resources.SetRightAnswerFromFileName}" IsChecked="{Binding Model.SetRightAnswerFromFileName}" />
             <CheckBox Content="{x:Static lp:Resources.AskToSetTagsOnSave}" IsChecked="{Binding Model.AskToSetTagsOnSave}" />
 
@@ -111,6 +136,11 @@
                 <l:NumericTextBox Margin="15,0" Padding="0,1" Width="50" Text="{Binding Model.SelectOptionCount, Mode=TwoWay}" Minimum="2" />
             </StackPanel>
 
+            </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+            <StackPanel>
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AutoSetQuestionPrices}" />
 
             <ItemsControl Margin="0,4,0,0" DataContext="{Binding Model.CostSetters}" ItemsSource="{Binding}">
@@ -123,19 +153,13 @@
                             <l:NumericTextBox Margin="4,0,0,0" Text="{Binding Increment}" Width="40" VerticalContentAlignment="Center" />
 
                             <Button
-                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                Style="{StaticResource AnswerRowButton}" Content="&#xE711;"
                                 Margin="4,0,0,0"
                                 Command="{Binding CostSetters.DeleteItem, Source={x:Static m:AppSettings.Default}}"
                                 CommandParameter="{Binding}"
                                 ToolTip="{x:Static lp:Resources.Delete}"
-                                Width="20"
-                                Height="20">
-                                <Path
-                                    Data="M0,0L1,1M0,1L1,0"
-                                    Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    Stretch="Fill"
-                                    Margin="3" />
-                            </Button>
+                                Width="24"
+                                Height="24" />
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -143,20 +167,23 @@
             
             <Button
                 DataContext="{Binding Model.CostSetters}"
-                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                Margin="0,4,0,0"
+                Style="{StaticResource AnswerRowButton}"
+                Content="&#xE710;"
+                Margin="0,6,0,0"
                 HorizontalAlignment="Left"
                 Command="{Binding AddItem}"
-                ToolTip="Добавить"
-                Width="25">
-                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="1" Data="{Binding Source={StaticResource app_add},Path=Data}" />
-            </Button>
+                ToolTip="{x:Static lp:Resources.Add}" />
             
             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                 <TextBlock VerticalAlignment="Center"><Run Text="{x:Static lp:Resources.BaseQuestionPrice}" /></TextBlock>
                 <l:NumericTextBox Margin="15,0" Padding="0,1" Width="50" Text="{Binding Model.QuestionBase, Mode=TwoWay}" />
             </StackPanel>
             
+            </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+            <StackPanel>
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.DocumentFont}" />
             
             <ComboBox
@@ -177,6 +204,11 @@
                 Maximum="50"
                 Text="{Binding Model.FontSize}" />
             
+            </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+            <StackPanel>
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FlatLayoutModeHeader}" />
             
             <ToggleButton
@@ -198,11 +230,16 @@
                 </ToggleButton.Style>
             </ToggleButton>
 
+            </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+            <StackPanel>
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GPTModel}" />
 
             <CheckBox Content="{x:Static lp:Resources.UseGPT}" IsChecked="{Binding Model.UseGPT}" Margin="0,20,0,0" />
 
-            <StackPanel IsEnabled="{Binding Model.UseGPT}" Width="700" HorizontalAlignment="Left" Margin="0,10,0,0">
+            <StackPanel Width="700" HorizontalAlignment="Left" Margin="0,10,0,0">
                 <TextBlock Text="{x:Static lp:Resources.GPTModel}" />
                 <ComboBox ItemsSource="{Binding GPTModels}" SelectedItem="{Binding Model.GPTModel}" Margin="0,5,0,0" />
 
@@ -216,12 +253,15 @@
                     Margin="0,5,0,0"
                     Height="200"
                     IsReadOnly="True"
-                    Background="{StaticResource LightGrayBrush}"
+                    Background="{DynamicResource Ui.Hover}"
                     TextWrapping="Wrap"
                     VerticalScrollBarVisibility="Auto" />
 
                 <TextBlock Text="{x:Static lp:Resources.GPTHint}" Margin="0,10,0,0" TextWrapping="Wrap" />
             </StackPanel>
+
+            </StackPanel>
+            </Border>
 
             <Button
                 Margin="0,30,0,0"

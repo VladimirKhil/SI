@@ -12,7 +12,7 @@
     d:DesignHeight="450"
     d:DesignWidth="1200"
     d:DataContext="{d:DesignInstance vm:PreviewViewModel}"
-    Background="{StaticResource WhiteBrush}"
+    Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
     Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
     <UserControl.Resources>
         <lc:ContentTypeConverter x:Key="ContentTypeConverter" />

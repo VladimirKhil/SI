@@ -60,7 +60,7 @@
             Margin="0,5,0,0"
             ItemsSource="{Binding SearchResults}"
             BorderThickness="1"
-            BorderBrush="{StaticResource MahApps.Brushes.TextBox.Border}"
+            BorderBrush="{DynamicResource MahApps.Brushes.TextBox.Border}"
             MouseDoubleClick="ListBox_MouseDoubleClick">
             <ListBox.ItemTemplate>
                 <DataTemplate>

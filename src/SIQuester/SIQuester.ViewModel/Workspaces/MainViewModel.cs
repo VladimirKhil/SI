@@ -95,6 +95,11 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     public ICommand SetSettings { get; private set; }
 
+    /// <summary>
+    /// Switches between the light and the dark theme.
+    /// </summary>
+    public ICommand ToggleTheme { get; private set; }
+
     public ICommand SearchFolder { get; private set; }
 
     /// <summary>
@@ -178,6 +183,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         Donate = new SimpleCommand(Donate_Executed);
 
         SetSettings = new SimpleCommand(SetSettings_Executed);
+        ToggleTheme = new SimpleCommand(arg => AppSettings.Default.ToggleTheme());
         SearchFolder = new SimpleCommand(SearchFolder_Executed);
 
         _serviceProvider = serviceProvider;

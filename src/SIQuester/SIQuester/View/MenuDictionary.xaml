@@ -44,11 +44,11 @@
                     Width="22"
                     Height="22"
                     Visibility="Hidden"
-                    Background="#E6EFF4"
-                    BorderBrush="#CDD3E6"
+                    Background="{DynamicResource Ui.AccentSoft}"
+                    BorderBrush="{DynamicResource Ui.Accent}"
                     BorderThickness="1"
                     CornerRadius="3">
-                    <Path x:Name="Glyph" Fill="#0C12A1" FlowDirection="LeftToRight" Width="9" Height="11" Data="{StaticResource Checkmark}" />
+                    <Path x:Name="Glyph" Fill="{DynamicResource Ui.Accent}" FlowDirection="LeftToRight" Width="9" Height="11" Data="{StaticResource Checkmark}" />
                 </Border>
                 
                 <ContentPresenter
@@ -205,11 +205,11 @@
     </Style>
     
     <ControlTemplate x:Key="{ComponentResourceKey ResourceId=SubmenuContent, TypeInTargetAssembly={x:Type FrameworkElement}}" TargetType="{x:Type ContentControl}">
-        <Border Background="#F5F5F5" BorderBrush="#FF959595" BorderThickness="1">
+        <Border Background="{DynamicResource FlyoutBackground}" BorderBrush="{DynamicResource Ui.CardStroke}" BorderThickness="1" CornerRadius="8">
             <Grid>
-                <Rectangle Fill="#F1F1F1" RadiusX="2" RadiusY="2" HorizontalAlignment="Left" Margin="2" Width="28"/>
-                <Rectangle Fill="#E2E3E3" HorizontalAlignment="Left" Margin="30,2,0,2" Width="1"/>
-                <Rectangle Fill="White" HorizontalAlignment="Left" Margin="31,2,0,2" Width="1"/>
+                <Rectangle Fill="Transparent" RadiusX="2" RadiusY="2" HorizontalAlignment="Left" Margin="2" Width="28"/>
+                <Rectangle Fill="Transparent" HorizontalAlignment="Left" Margin="30,2,0,2" Width="1"/>
+                <Rectangle Fill="Transparent" HorizontalAlignment="Left" Margin="31,2,0,2" Width="1"/>
                 <ContentPresenter Margin="1,0" Grid.ColumnSpan="2"/>
             </Grid>
         </Border>
@@ -218,7 +218,7 @@
     <ControlTemplate x:Key="TopLevelHeaderTemplateKey1" TargetType="{x:Type MenuItem}">
         <Grid SnapsToDevicePixels="true">
             <Rectangle x:Name="OuterBorder" />
-            <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" Margin="1"/>
+            <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0" RadiusX="5" RadiusY="5" Margin="1"/>
             <Rectangle x:Name="InnerBorder" Margin="2" />
             
             <DockPanel>
@@ -327,21 +327,21 @@
             </Trigger>
             
             <Trigger Property="IsHighlighted" Value="true">
-                <Setter Property="Stroke" TargetName="Bg" Value="#90717070"/>
-                <Setter Property="Stroke" TargetName="OuterBorder" Value="#50FFFFFF"/>
-                <Setter Property="Stroke" TargetName="InnerBorder" Value="#50FFFFFF"/>
+                <Setter Property="Fill" TargetName="Bg" Value="{DynamicResource Ui.Hover}"/>
+                <Setter Property="Stroke" TargetName="OuterBorder" Value="Transparent"/>
+                <Setter Property="Stroke" TargetName="InnerBorder" Value="Transparent"/>
             </Trigger>
             
             <Trigger Property="IsKeyboardFocused" Value="true">
-                <Setter Property="Stroke" TargetName="Bg" Value="#E0717070"/>
-                <Setter Property="Fill" TargetName="Bg" Value="{StaticResource MenuItemPressedFill}"/>
-                <Setter Property="Stroke" TargetName="InnerBorder" Value="#50747272"/>
+                <Setter Property="Stroke" TargetName="Bg" Value="Transparent"/>
+                <Setter Property="Fill" TargetName="Bg" Value="{DynamicResource Ui.Pressed}"/>
+                <Setter Property="Stroke" TargetName="InnerBorder" Value="Transparent"/>
             </Trigger>
             
             <Trigger Property="IsSubmenuOpen" Value="true">
-                <Setter Property="Stroke" TargetName="Bg" Value="#E0717070"/>
-                <Setter Property="Fill" TargetName="Bg" Value="{StaticResource MenuItemPressedFill}"/>
-                <Setter Property="Stroke" TargetName="InnerBorder" Value="#50747272"/>
+                <Setter Property="Stroke" TargetName="Bg" Value="Transparent"/>
+                <Setter Property="Fill" TargetName="Bg" Value="{DynamicResource Ui.Pressed}"/>
+                <Setter Property="Stroke" TargetName="InnerBorder" Value="Transparent"/>
                 <Setter Property="Data" TargetName="Arrow" Value="{StaticResource UpArrow}"/>
             </Trigger>
             
@@ -355,7 +355,7 @@
     <ControlTemplate x:Key="TopLevelItemTemplateKey1" TargetType="{x:Type MenuItem}">
         <Grid SnapsToDevicePixels="true">
             <Rectangle x:Name="OuterBorder" RadiusX="2" RadiusY="2"/>
-            <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" RadiusX="1" RadiusY="1" Margin="1"/>
+            <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0" RadiusX="5" RadiusY="5" Margin="1"/>
             <Rectangle x:Name="InnerBorder" Margin="2"/>
             
             <DockPanel>
@@ -395,15 +395,15 @@
             </Trigger>
             
             <Trigger Property="IsHighlighted" Value="true">
-                <Setter Property="Stroke" TargetName="Bg" Value="#90717070"/>
-                <Setter Property="Stroke" TargetName="OuterBorder" Value="#50FFFFFF"/>
-                <Setter Property="Stroke" TargetName="InnerBorder" Value="#50FFFFFF"/>
+                <Setter Property="Fill" TargetName="Bg" Value="{DynamicResource Ui.Hover}"/>
+                <Setter Property="Stroke" TargetName="OuterBorder" Value="Transparent"/>
+                <Setter Property="Stroke" TargetName="InnerBorder" Value="Transparent"/>
             </Trigger>
             
             <Trigger Property="IsKeyboardFocused" Value="true">
-                <Setter Property="Stroke" TargetName="Bg" Value="#E0717070"/>
-                <Setter Property="Fill" TargetName="Bg" Value="{StaticResource MenuItemPressedFill}"/>
-                <Setter Property="Stroke" TargetName="InnerBorder" Value="#50747272"/>
+                <Setter Property="Stroke" TargetName="Bg" Value="Transparent"/>
+                <Setter Property="Fill" TargetName="Bg" Value="{DynamicResource Ui.Pressed}"/>
+                <Setter Property="Stroke" TargetName="InnerBorder" Value="Transparent"/>
             </Trigger>
             
             <Trigger Property="IsEnabled" Value="false">
@@ -448,12 +448,12 @@
                     Width="22"
                     Height="22"
                     Visibility="Hidden"
-                    Background="#E6EFF4"
-                    BorderBrush="#CDD3E6"
+                    Background="{DynamicResource Ui.AccentSoft}"
+                    BorderBrush="{DynamicResource Ui.Accent}"
                     BorderThickness="1"
                     CornerRadius="3">
                     
-                    <Path x:Name="Glyph" Fill="#0C12A1" FlowDirection="LeftToRight" Width="9" Height="11" Data="{StaticResource Checkmark}" />
+                    <Path x:Name="Glyph" Fill="{DynamicResource Ui.Accent}" FlowDirection="LeftToRight" Width="9" Height="11" Data="{StaticResource Checkmark}" />
                     
                 </Border>
                 
