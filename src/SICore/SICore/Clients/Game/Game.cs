@@ -302,8 +302,6 @@ public sealed class Game : MessageHandler
             Messages.ComputerAccounts,
             string.Join(Message.ArgsSeparator, _defaultPlayers.Select(p => p.Name)));
 
-        var rules = _state.Rules;
-
         var maxPressingTime = _state.TimeSettings.ButtonPressing * 10;
         _actions.SendMessageToWithArgs(person, Messages.Timer, 1, MessageParams.Timer_MaxTime, maxPressingTime);
 
@@ -314,22 +312,7 @@ public sealed class Game : MessageHandler
             _actions.OnArenaMode();
         }
 
-        _actions.SendMessageToWithArgs(
-            person,
-            Messages.Options2,
-            "",
-            nameof(rules.Oral), rules.Oral,
-            nameof(rules.Managed), rules.Managed,
-            nameof(rules.DisplayAnswerOptionsLabels), rules.DisplayAnswerOptionsLabels,
-            nameof(rules.FalseStart), rules.FalseStart,
-            nameof(rules.ReadingSpeed), rules.Managed ? 0 : rules.ReadingSpeed,
-            nameof(rules.PartialText), rules.PartialText,
-            nameof(rules.PartialImages), rules.PartialImages,
-            nameof(rules.HideImageOnAnswerAndPause), rules.HideImageOnAnswerAndPause,
-            nameof(rules.UseAppellations), rules.UseAppellations,
-            nameof(rules.ValidateEqualAnswersSeparately), rules.ValidateEqualAnswersSeparately,
-            nameof(_state.TimeSettings.ButtonBlocking), _state.TimeSettings.ButtonBlocking,
-            nameof(_state.TimeSettings.PartialImage), _state.TimeSettings.PartialImage);
+        _actions.InformOptions();
     }
 
     private void InformBanned(string person)
@@ -463,30 +446,35 @@ public sealed class Game : MessageHandler
     {
         var result = new List<ConnectionPersonData>
         {
-            new() { Name = _state.ShowMan.Name, Role = GameRole.Showman, IsOnline = _state.ShowMan.IsConnected }
+            CreatePersonData(_state.ShowMan, GameRole.Showman)
         };
 
         for (int i = 0; i < _state.Players.Count; i++)
         {
-            result.Add(new ConnectionPersonData
-            {
-                Name = _state.Players[i].Name,
-                Role = GameRole.Player,
-                IsOnline = _state.Players[i].IsConnected
-            });
+            result.Add(CreatePersonData(_state.Players[i], GameRole.Player));
         }
 
         for (int i = 0; i < _state.Viewers.Count; i++)
         {
-            result.Add(new ConnectionPersonData
-            {
-                Name = _state.Viewers[i].Name,
-                Role = GameRole.Viewer,
-                IsOnline = _state.Viewers[i].IsConnected
-            });
+            result.Add(CreatePersonData(_state.Viewers[i], GameRole.Viewer));
         }
 
         return result.ToArray();
+    }
+
+    private ConnectionPersonData CreatePersonData(ViewerAccount account, GameRole role)
+    {
+        var data = new ConnectionPersonData { Name = account.Name, Role = role, IsOnline = account.IsConnected };
+
+        if (account.IsConnected
+            && _state.Identities.TryGetValue(account.Name, out var identity)
+            && Enum.TryParse<AuthSource>(identity.Provider, out var authSource))
+        {
+            data.AuthSource = authSource;
+            data.UserId = identity.UserId;
+        }
+
+        return data;
     }
 
     private AuthenticationResult AuthenticateCore(
@@ -495,7 +483,8 @@ public sealed class Game : MessageHandler
         GameRole role,
         string? password,
         string? authProvider = null,
-        string? externalUserId = null)
+        string? externalUserId = null,
+        string[]? badges = null)
     {
         if (_state.JoinMode == JoinMode.Forbidden)
         {
@@ -565,7 +554,7 @@ public sealed class Game : MessageHandler
         {
             var accounts = accountsToSearch.ToArray();
 
-            var result = TryAuthenticateAccount(role, name, isMale, index, accounts[index], authProvider, externalUserId);
+            var result = TryAuthenticateAccount(role, name, isMale, index, accounts[index], authProvider, externalUserId, badges);
 
             if (result.HasValue)
             {
@@ -585,7 +574,7 @@ public sealed class Game : MessageHandler
             {
                 index++;
 
-                var result = TryAuthenticateAccount(role, name, isMale, index, account, authProvider, externalUserId);
+                var result = TryAuthenticateAccount(role, name, isMale, index, account, authProvider, externalUserId, badges);
 
                 if (result.HasValue)
                 {
@@ -630,9 +619,10 @@ public sealed class Game : MessageHandler
         string? password,
         CancellationToken cancellationToken = default,
         string? authProvider = null,
-        string? externalUserId = null) =>
+        string? externalUserId = null,
+        string[]? badges = null) =>
         _state.TaskLock.WithLockAsync(
-            () => AuthenticateCore(name, isMale, role, password, authProvider, externalUserId),
+            () => AuthenticateCore(name, isMale, role, password, authProvider, externalUserId, badges),
             cancellationToken);
 
     [Obsolete]
@@ -990,7 +980,8 @@ public sealed class Game : MessageHandler
 
         if (_state.Decision == DecisionType.AnswerValidating && _state.QuestionPlay.Validations.All(v => v.Verdict.HasValue))
         {
-            _controller.Stop(StopReason.Decision);
+            Controller.StopWaiting();
+            Controller.ScheduleExecution(Tasks.MoveNext, 1, 1, true); // _controller.Stop(StopReason.Decision); not needed here
         }
     }
 
@@ -1693,22 +1684,13 @@ public sealed class Game : MessageHandler
         _actions.InformDisconnected(account.Name);
         _state.Identities.Remove(account.Name);
 
-        if (_state.HiddenPersons && _state.Players.Contains(account))
-        {
-            _actions.InformPlayerCount();
-        }
-
         _state.BeginUpdatePersons($"Disconnected {account.Name}");
 
         try
         {
             account.IsConnected = false;
 
-            if (_state.Viewers.Contains(account))
-            {
-                _state.Viewers.Remove(account);
-            }
-            else
+            if (!_state.Viewers.Remove(account))
             {
                 var isBefore = _state.Stage == GameStage.Before;
 
@@ -1727,6 +1709,11 @@ public sealed class Game : MessageHandler
         finally
         {
             _state.EndUpdatePersons();
+        }
+
+        if (_state.HiddenPersons && _state.Players.Contains(account))
+        {
+            _actions.InformPlayerCount();
         }
 
         if (args[1] == _state.HostName && !_state.HiddenPersons)
@@ -3721,7 +3708,7 @@ public sealed class Game : MessageHandler
         _controller.ScheduleExecution(Tasks.StartGame, 1, 1);
     }
 
-    private void ShareIdentities(string name, string? authProvider, string? externalUserId)
+    private void ShareIdentities(string name, string? authProvider, string? externalUserId, string[]? badges)
     {
         if (_state.HiddenPersons)
         {
@@ -3730,7 +3717,7 @@ public sealed class Game : MessageHandler
 
         foreach (var (personName, identity) in _state.Identities.Where(i => _state.AllPersons.ContainsKey(i.Key)))
         {
-            _actions.InformUserIdentity(personName, identity.Provider, identity.UserId, name);
+            _actions.InformUserIdentity(personName, identity.Provider, identity.UserId, identity.Badges, name);
         }
 
         if (string.IsNullOrEmpty(authProvider) || string.IsNullOrEmpty(externalUserId))
@@ -3739,8 +3726,9 @@ public sealed class Game : MessageHandler
             return;
         }
 
-        _state.Identities[name] = (authProvider, externalUserId);
-        _actions.InformUserIdentity(name, authProvider, externalUserId, NetworkConstants.Everybody);
+        var personBadges = badges ?? [];
+        _state.Identities[name] = (authProvider, externalUserId, personBadges);
+        _actions.InformUserIdentity(name, authProvider, externalUserId, personBadges, NetworkConstants.Everybody);
     }
 
     private bool? TryAuthenticateAccount(
@@ -3750,7 +3738,8 @@ public sealed class Game : MessageHandler
         int index,
         ViewerAccount account,
         string? authProvider = null,
-        string? externalUserId = null)
+        string? externalUserId = null,
+        string[]? badges = null)
     {
         if (account.IsConnected)
         {
@@ -3779,7 +3768,7 @@ public sealed class Game : MessageHandler
         }
 
         _actions.InformConnected(name, role, index, isMale);
-        ShareIdentities(name, authProvider, externalUserId);
+        ShareIdentities(name, authProvider, externalUserId, badges);
 
         if (_state.HiddenPersons && role == GameRole.Player)
         {

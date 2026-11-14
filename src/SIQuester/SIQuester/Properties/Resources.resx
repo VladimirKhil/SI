@@ -1422,4 +1422,13 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="AutoCompressMedia" xml:space="preserve">
     <value>Automatically compress pictures larger than the SIGame limit (1 MB) when adding them</value>
   </data>
+  <data name="ThemeFillQuestions" xml:space="preserve">
+    <value>questions</value>
+  </data>
+  <data name="ThemeFillAnswers" xml:space="preserve">
+    <value>answers</value>
+  </data>
+  <data name="ThemeFillToolTip" xml:space="preserve">
+    <value>Questions with text / questions with a right answer</value>
+  </data>
 </root>

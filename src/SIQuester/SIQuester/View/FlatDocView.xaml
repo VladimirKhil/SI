@@ -725,7 +725,7 @@
                                                         Width="25"
                                                         Height="25"
                                                         Padding="2">
-                                                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="#555555" Stretch="Fill" Margin="5" />
+                                                        <Path Data="M0,0L1,1M0,1L1,0" Stroke="{StaticResource IconBrush}" Stretch="Fill" Margin="5" />
                                                     </Button>
 
                                                     <TextBox
@@ -839,7 +839,7 @@
                                 Cursor="Hand"
                                 HorizontalAlignment="Left"
                                 Padding="2">
-                                <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
                             </Button>
 
                             <TextBox

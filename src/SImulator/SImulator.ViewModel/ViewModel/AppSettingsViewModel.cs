@@ -18,7 +18,7 @@ public sealed class AppSettingsViewModel
 
     public SoundSettingsViewModel Sounds { get; }
 
-    public GameModes[] Modes { get; } = new GameModes[] { GameModes.Tv, GameModes.Sport };
+    public GameModes[] Modes { get; } = [GameModes.Tv, GameModes.Sport, GameModes.Quiz, GameModes.TurnTaking];
 
     [XmlIgnore]
     public ICommand Reset { get; private set; }

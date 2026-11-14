@@ -100,15 +100,15 @@
             </StackPanel.Resources>
             
             <Button Name="bAdd" Command="{Binding Add}" ToolTip="Добавить" Width="25" Height="25">
-                <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_add},Path=Data}" />
             </Button>
             
             <Button Command="{Binding MoveUp}" Margin="5,0,0,0" Name="bUp" ToolTip="Вверх" Width="25" Height="25">
-                <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_up},Path=Data}" />
+                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_up},Path=Data}" />
             </Button>
             
             <Button Command="{Binding MoveDown}" Margin="5,0,0,0" Name="bDown" ToolTip="Вниз" Width="25" Height="25">
-                <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_down},Path=Data}" />
+                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_down},Path=Data}" />
             </Button>
         </StackPanel>
         
@@ -149,8 +149,8 @@
                                             
                                             <Path
                                                 Stretch="Uniform"
-                                                Stroke="#FF555555"
-                                                Fill="Black"
+                                                Stroke="{StaticResource IconBrush}"
+                                                Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                                                 Margin="3"
                                                 Data="{Binding Source={StaticResource app_delete},Path=Data}" />
                                         </Button>

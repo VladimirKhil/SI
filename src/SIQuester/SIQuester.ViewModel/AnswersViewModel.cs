@@ -252,6 +252,58 @@ public sealed class AnswersViewModel : ItemsViewModel<string>, IContentCollectio
 
     private void AddFile_Executed(object? arg) => AddAnswerFile(arg, content => content.AddFile);
 
+    /// <summary>
+    /// Pastes media files (Ctrl+V) into the answer: they go to the media answer of the question,
+    /// which is created when needed. Only right answers can hold media.
+    /// </summary>
+    /// <param name="files">Media files to paste.</param>
+    /// <returns>false when media cannot go here (wrong answers).</returns>
+    public bool TryPasteMedia(IEnumerable<string> files)
+    {
+        if (!IsRight || Owner.Parameters == null)
+        {
+            return false;
+        }
+
+        var document = OwnerDocument;
+        using var change = document?.OperationsManager.BeginComplexChange();
+
+        var created = false;
+
+        if (!Owner.Parameters.TryGetValue(QuestionParameterNames.Answer, out var answer))
+        {
+            answer = new StepParameterViewModel(Owner, new StepParameter
+            {
+                Type = StepParameterTypes.Content,
+                ContentValue = new List<ContentItem>(new[] { new ContentItem() })
+            });
+
+            Owner.Parameters.AddAnswer(answer);
+            created = true;
+        }
+
+        var content = answer.ContentValue;
+
+        if (content == null)
+        {
+            return true;
+        }
+
+        foreach (var file in files)
+        {
+            content.TryImportMedia(file);
+        }
+
+        // Nothing usable was pasted (unsupported files): don't leave an empty media answer behind
+        if (created && content.All(item => string.IsNullOrWhiteSpace(item.Model.Value)))
+        {
+            Owner.Parameters.RemoveAnswer();
+        }
+
+        change?.Commit();
+        return true;
+    }
+
     private void AddAnswerFile(object? arg, Func<ContentItemsViewModel, ICommand> commandSelector)
     {
         if (Owner.Parameters == null)

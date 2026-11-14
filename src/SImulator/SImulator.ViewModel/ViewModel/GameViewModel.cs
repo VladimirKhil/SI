@@ -1043,7 +1043,38 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         var player = (PlayerInfo)sender;
+
+        if (e.PropertyName == nameof(PlayerInfo.Name) && !ManagedMode)
+        {
+            var uniqueName = GetUniqueName(string.IsNullOrWhiteSpace(player.Name) ? (Players.IndexOf(player) + 1).ToString() : player.Name, player);
+
+            if (uniqueName != player.Name)
+            {
+                player.Name = uniqueName;
+                return;
+            }
+        }
+
         PresentationController.UpdatePlayerInfo(Players.IndexOf(player), player, e.PropertyName);
+    }
+
+    private string GetUniqueName(string name, PlayerInfo player)
+    {
+        bool IsTaken(string value) => Players.Any(p => p != player && p.Name == value);
+
+        if (!IsTaken(name))
+        {
+            return name;
+        }
+
+        var index = 2;
+
+        while (IsTaken(name + index))
+        {
+            index++;
+        }
+
+        return name + index;
     }
 
     private void QuestionTimer_Elapsed(object? state) =>
@@ -1295,6 +1326,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal void AddPlayerCore(PlayerInfo player)
     {
+        if (!ManagedMode)
+        {
+            player.Name = string.IsNullOrWhiteSpace(player.Name)
+                ? GetUniqueName((Players.Count + 1).ToString(), player)
+                : GetUniqueName(player.Name, player);
+        }
+
         player.PropertyChanged += PlayerInfo_PropertyChanged;
         Players.Add(player);
         PresentationController.AddPlayer(player.Name);
@@ -1381,6 +1419,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (_buttonManager != null && _buttonManager.ArePlayersManaged())
         {
             ManagedMode = true;
+        }
+
+        if (!_managed)
+        {
+            for (var i = 0; i < Settings.Model.PlayerCount; i++)
+            {
+                AddPlayer.Execute(null);
+            }
         }
 
         _language = Thread.CurrentThread.CurrentUICulture.Name;
@@ -1639,6 +1685,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private bool AfterRoundThemes()
     {
         Continuation = null;
+        _gameActions.InformSkippedThemes();
         PresentationController.SetTable(LocalInfo.RoundInfo.ToArray());
         PresentationController.SetRoundTable();
         _gameActions.MoveNext();
@@ -1697,11 +1744,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         if (QuestionForAll)
         {
-            if (!IsCommonPrice)
-            {
-                PresentationController.OnFinalThink();
-            }    
-
+            PresentationController.OnFinalThink();
             _buttonManager?.TryGetCommandExecutor()?.AskTextAnswer();
 
             var time = Settings.Model.FinalQuestionThinkingTime;
@@ -1907,6 +1950,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 _buttonManager = null;
             }
 
+            LogFinalStats();
+
             _gameActions.Dispose();
             _gameLogger.Dispose();
 
@@ -1956,6 +2001,25 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             first = false;
             sb.AppendFormat("{0}:{1}", player.Name, player.Sum);
+        }
+
+        _gameLogger.Write(sb.ToString());
+    }
+
+    private void LogFinalStats()
+    {
+        if (!Settings.Model.SaveLogs || Players.Count <= 0)
+        {
+            return;
+        }
+
+        LogScore();
+
+        var sb = new StringBuilder();
+
+        foreach (var player in Players)
+        {
+            sb.AppendFormat("\r\n{0}: {1} (+{2}/-{3})", player.Name, player.Sum, player.Right, player.Wrong);
         }
 
         _gameLogger.Write(sb.ToString());
@@ -2111,6 +2175,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         player.Answer = answer;
         player.IsPreliminaryAnswer = isPreliminary;
+
+        if (string.IsNullOrEmpty(answer) && !isPreliminary && player.IsSelected && ReferenceEquals(player, _selectedPlayer))
+        {
+            SubtractStake_Executed(player);
+        }
     }
 
     public void OnPlayerPassed(string playerName)
@@ -2245,6 +2314,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 if (Settings.Model.ShowQuestionBorder)
                 {
                     PresentationController.BeginPressButton();
+                    _buttonManager?.TryGetCommandExecutor()?.AskPressButton();
                 }
                 break;
 

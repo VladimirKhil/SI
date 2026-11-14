@@ -266,7 +266,7 @@ internal sealed class AvaloniaPlatformManager : PlatformManager, IPlatformServic
             throw new Exception(string.Format(Resources.LogsFolderNotFound, folder));
         }
 
-        return GameLogger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.').Replace('/', '.')));
+        return GameLogger.Create(Path.Combine(folder, $"{DateTime.Now:yyyy-MM-dd HH.mm.ss}.log"));
     }
 
     public override void ClearMedia() => StopSound();

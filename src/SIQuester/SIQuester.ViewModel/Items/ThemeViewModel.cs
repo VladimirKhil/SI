@@ -59,6 +59,51 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     /// </summary>
     public ICommand ShuffleQuestions { get; private set; }
 
+    private int _questionsWithTextCount;
+
+    /// <summary>
+    /// Number of questions having question content (text or media).
+    /// </summary>
+    public int QuestionsWithTextCount
+    {
+        get => _questionsWithTextCount;
+        private set
+        {
+            if (_questionsWithTextCount != value)
+            {
+                _questionsWithTextCount = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private int _questionsWithAnswerCount;
+
+    /// <summary>
+    /// Number of questions having a filled right answer.
+    /// </summary>
+    public int QuestionsWithAnswerCount
+    {
+        get => _questionsWithAnswerCount;
+        private set
+        {
+            if (_questionsWithAnswerCount != value)
+            {
+                _questionsWithAnswerCount = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Recalculates theme fill statistics.
+    /// </summary>
+    internal void UpdateStats()
+    {
+        QuestionsWithTextCount = Questions.Count(q => QuestionExtensions.HasContent(q.Model));
+        QuestionsWithAnswerCount = Questions.Count(q => q.Model.HasAnswer());
+    }
+
     public ThemeViewModel(Theme theme)
         : base(theme)
     {
@@ -68,6 +113,8 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         }
 
         Questions.CollectionChanged += Questions_CollectionChanged;
+        Questions.CollectionChanged += (_, _) => UpdateStats();
+        UpdateStats();
 
         Clone = new SimpleCommand(CloneTheme_Executed);
         Remove = new SimpleCommand(RemoveTheme_Executed);

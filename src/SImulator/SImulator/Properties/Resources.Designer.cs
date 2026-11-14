@@ -685,6 +685,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Quiz.
+        /// </summary>
+        public static string GameModes_Quiz {
+            get {
+                return ResourceManager.GetString("GameModes_Quiz", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Turn taking.
+        /// </summary>
+        public static string GameModes_TurnTaking {
+            get {
+                return ResourceManager.GetString("GameModes_TurnTaking", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Classic.
         /// </summary>
         public static string GameModes_Tv {

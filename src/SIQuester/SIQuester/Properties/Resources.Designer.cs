@@ -3532,6 +3532,33 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to answers.
+        /// </summary>
+        public static string ThemeFillAnswers {
+            get {
+                return ResourceManager.GetString("ThemeFillAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to questions.
+        /// </summary>
+        public static string ThemeFillQuestions {
+            get {
+                return ResourceManager.GetString("ThemeFillQuestions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Questions with text / questions with a right answer.
+        /// </summary>
+        public static string ThemeFillToolTip {
+            get {
+                return ResourceManager.GetString("ThemeFillToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Theme list.
         /// </summary>
         public static string ThemeList {

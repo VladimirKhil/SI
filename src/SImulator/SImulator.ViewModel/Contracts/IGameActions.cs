@@ -38,4 +38,6 @@ public interface IGameActions : IDisposable
     void SetPause(bool isPaused) { }
 
     void PressButton() { }
+
+    void InformSkippedThemes() { }
 }

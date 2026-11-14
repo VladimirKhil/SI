@@ -19,4 +19,25 @@ public sealed class ConnectionPersonData
     /// Is the person connected.
     /// </summary>
     public bool IsOnline { get; set; }
+
+    /// <summary>
+    /// Authorization source. Null if the person is not authorized.
+    /// </summary>
+    public AuthSource? AuthSource { get; set; }
+
+    /// <summary>
+    /// User identifier in the authorization source. Null if the person is not authorized.
+    /// </summary>
+    public string? UserId { get; set; }
+}
+
+/// <summary>
+/// Defines a user authorization source.
+/// </summary>
+public enum AuthSource
+{
+    /// <summary>
+    /// Steam.
+    /// </summary>
+    Steam,
 }

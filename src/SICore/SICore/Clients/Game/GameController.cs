@@ -829,7 +829,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _taskRunner.ClearOldTasks();
 
-        PlanExecution(Tasks.MoveNext, 40);
+        PlanExecution(Tasks.MoveNext, _state.Rules.Managed ? 1 : 40, force: true);
     }
 
     internal void OnPauseCore(bool isPauseEnabled)
@@ -959,7 +959,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _actions.SendMessage(Messages.Stop);
 
         FillReport();
-        ScheduleExecution(Tasks.Winner, 15 + Random.Shared.Next(10), force: true);
+        ScheduleExecution(Tasks.Winner, _state.Rules.Managed ? 1 : 15 + Random.Shared.Next(10), force: true);
     }
 
     public void Dispose() =>
@@ -1695,7 +1695,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     // TODO: currently PlanExecution() is used for interruptions and ScheduleExecution() for normal tasks flow
     // Think about using a universal scheduler which will be able to handle both cases
 
-    internal void PlanExecution(Tasks task, double taskTime, int arg = 0)
+    internal void PlanExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
     {
         _tasksHistory.AddLogEntry($"PlanExecution {task} {taskTime} {arg} ({_state.TInfo.Pause})");
 
@@ -1705,7 +1705,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            _taskRunner.ScheduleExecution(task, taskTime, arg, ShouldRunTimer());
+            _taskRunner.ScheduleExecution(task, taskTime, arg, force || ShouldRunTimer());
         }
     }
 
@@ -2459,7 +2459,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
         else
         {
-            if (_state.QuestionPlay.ActiveValidationCount > 0)
+            if (_state.QuestionPlay.ActiveValidationCount > 0 && _state.Rules.GameMode != SI.Contracts.GameMode.Quiz) // TODO: think about more elegant solution
             {
                 _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name); // Cancel validation
             }
@@ -2685,7 +2685,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             }
         }
 
-        ScheduleExecution(Tasks.GoodLuck, 20 + Random.Shared.Next(10));
+        ScheduleExecution(Tasks.GoodLuck, _state.Rules.Managed ? 1 : 20 + Random.Shared.Next(10), force: true);
     }
 
     private void AskToTry(int arg)
@@ -4695,7 +4695,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                     return timeout;
                 }
 
-                nextTaskTime = 30;
+                nextTaskTime = _state.HiddenPersons ? 1 : 30;
             }
         }
 
