@@ -1484,5 +1484,7 @@ Theme list: players remove themes in turn; on the last one everyone bets and wri
     <value>No issues found</value>
   <data name="AutoCompressMedia" xml:space="preserve">
     <value>Automatically compress pictures larger than the SIGame limit (1 MB) when adding them</value>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>Light / dark theme</value>
   </data>
 </root>

@@ -1480,5 +1480,7 @@
     <value>Замечаний нет</value>
   <data name="AutoCompressMedia" xml:space="preserve">
     <value>Автоматически сжимать картинки больше лимита SIGame (1 МБ) при добавлении</value>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>Светлая / тёмная тема</value>
   </data>
 </root>

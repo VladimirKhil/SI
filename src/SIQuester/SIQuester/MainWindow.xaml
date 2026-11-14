@@ -574,6 +574,13 @@
         <metro:WindowCommands ShowSeparators="False" ShowLastSeparator="False">
             <Button
                 Style="{StaticResource TitleBarButton}"
+                ToolTip="{x:Static lp:Resources.ToggleTheme}"
+                Command="{Binding ToggleTheme}">
+                    <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE706;" />
+            </Button>
+
+            <Button
+                Style="{StaticResource TitleBarButton}"
                 ToolTip="{x:Static lp:Resources.Settings}"
                 Command="{Binding SetSettings}">
                 <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE713;" />
