@@ -195,6 +195,9 @@ public partial class App : Application
         }
         catch (Exception exc)
         {
+            // The message box shows only the message: keep the full exception (type, stack trace) in the log
+            _logger?.LogError(exc, "Application run error: {message}", exc.Message);
+
             MessageBox.Show(
                 $"{SIQuester.Properties.Resources.AppRunError}: {exc.Message}.\r\n{SIQuester.Properties.Resources.AppWillBeClosed}",
                 ProductName,
