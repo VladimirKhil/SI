@@ -9,6 +9,7 @@ using SIQuester.ViewModel.Services;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Input;
 using Utils.Commands;
 
@@ -83,6 +84,11 @@ public sealed class PackageViewModel : ItemViewModel<Package>
     public ICommand PasteInfo { get; private set; }
 
     /// <summary>
+    /// Sets the package creation date to today (in the same format as for a new package).
+    /// </summary>
+    public ICommand SetDateToday { get; private set; }
+
+    /// <summary>
     /// Has quality control.
     /// </summary>
     public bool HasQualityControl
@@ -139,7 +145,8 @@ public sealed class PackageViewModel : ItemViewModel<Package>
         
         CopyInfo = new SimpleCommand(CopyInfo_Executed);
         PasteInfo = new SimpleCommand(PasteInfo_Executed);
-        
+        SetDateToday = new SimpleCommand(_ => Model.Date = DateTime.Now.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture));
+
         GenerateThemes = new SimpleCommand(GenerateThemes_Executed);
     }
 
