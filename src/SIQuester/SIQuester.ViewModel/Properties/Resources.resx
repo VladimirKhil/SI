@@ -1037,4 +1037,10 @@ Humor</value>
   <data name="EmptyPreviewWarning" xml:space="preserve">
     <value>You package lacks preview image</value>
   </data>
+  <data name="WorkshopItemsStillLoading" xml:space="preserve">
+    <value>Your Workshop items are still loading. Please wait a moment and try again.</value>
+  </data>
+  <data name="WorkshopItemAlreadyPublished" xml:space="preserve">
+    <value>This pack is already in the Workshop: «{0}». It is selected in the list — press the button again to update it instead of publishing a duplicate.</value>
+  </data>
 </root>

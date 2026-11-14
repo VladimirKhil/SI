@@ -127,6 +127,15 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
     private UGCQueryHandle_t _userItemsQuery;
 
+    private const string PackageIdMetadataKey = "packageId";
+
+    private readonly string _packageId = "";
+
+    // The user items are queried page by page (Steam returns up to 50 items per page)
+    private uint _userItemsPage = 1;
+    private readonly List<WorkshopItemViewModel> _loadedUserItems = [];
+    private volatile bool _isLoadingUserItems;
+
     private readonly System.Timers.Timer _callbackTimer;
     private System.Timers.Timer? _timer;
 
@@ -171,6 +180,14 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
 
         _metadata["questionCount"] = preview.QuestionCount;
         _metadata["content"] = preview.Content;
+
+        // Lets the next upload of the same package find this item and update it instead of creating a duplicate
+        _packageId = _document.Document.Package.ID;
+
+        if (!string.IsNullOrEmpty(_packageId))
+        {
+            _metadata[PackageIdMetadataKey] = _packageId;
+        }
 
         Title = TrimToUtf8ByteLimit(_document.Document.Package.Name, MaxSteamTitleLength);
         Upload = new SimpleCommand(Upload_Executed);
@@ -232,7 +249,7 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
             EUserUGCListSortOrder.k_EUserUGCListSortOrder_CreationOrderDesc,
             SteamUtils.GetAppID(),
             SteamUtils.GetAppID(),
-            1 // page number
+            _userItemsPage
         );
 
         if (_userItemsQuery == UGCQueryHandle_t.Invalid)
@@ -240,6 +257,8 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
             Status = Resources.WorkshopItemsLoadError;
             return;
         }
+
+        _isLoadingUserItems = true;
 
         // Request additional details for each item
         SteamUGC.SetReturnMetadata(_userItemsQuery, true);
@@ -254,43 +273,94 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
     {
         if (bIOFailure || param.m_eResult != EResult.k_EResultOK)
         {
+            _isLoadingUserItems = false;
             Status = $"{Resources.WorkshopItemsLoadError}: {param.m_eResult}";
             return;
         }
-
-        var userItems = new List<WorkshopItemViewModel>();
 
         for (uint i = 0; i < param.m_unNumResultsReturned; i++)
         {
             if (SteamUGC.GetQueryUGCResult(param.m_handle, i, out SteamUGCDetails_t details))
             {
+                SteamUGC.GetQueryUGCMetadata(param.m_handle, i, out var metadata, Constants.k_cchDeveloperMetadataMax);
+
                 var item = new WorkshopItemViewModel(details.m_nPublishedFileId)
                 {
                     Title = details.m_rgchTitle,
                     Description = details.m_rgchDescription,
-                    Tags = details.m_rgchTags
+                    Tags = details.m_rgchTags,
+                    PackageId = ReadPackageId(metadata)
                 };
 
-                userItems.Add(item);
+                _loadedUserItems.Add(item);
             }
         }
-        
+
         // Release the query handle
         SteamUGC.ReleaseQueryUGCRequest(param.m_handle);
+
+        // Load all pages: the duplicate check needs every item of the user
+        if (param.m_unNumResultsReturned > 0 && _loadedUserItems.Count < param.m_unTotalMatchingResults)
+        {
+            _userItemsPage++;
+            LoadUserItems();
+            return;
+        }
+
+        var userItems = _loadedUserItems.ToArray();
+        _isLoadingUserItems = false;
 
         UI.Execute(
             () =>
             {
                 UserItems.Clear();
-            
+
                 foreach (var item in userItems)
                 {
                     UserItems.Add(item);
                 }
             },
             exc => OnError(exc));
+    }
 
-        // TODO: use param.m_unTotalMatchingResults to query next pages if needed
+    private static string ReadPackageId(string? metadata)
+    {
+        if (string.IsNullOrEmpty(metadata))
+        {
+            return "";
+        }
+
+        try
+        {
+            using var json = JsonDocument.Parse(metadata);
+
+            return json.RootElement.ValueKind == JsonValueKind.Object
+                && json.RootElement.TryGetProperty(PackageIdMetadataKey, out var packageId)
+                && packageId.ValueKind == JsonValueKind.String
+                ? packageId.GetString() ?? ""
+                : "";
+        }
+        catch (JsonException)
+        {
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// Finds the user's Workshop item that already holds this package.
+    /// </summary>
+    /// <remarks>
+    /// Items uploaded with a package ID are matched by the ID only (another package may have the same name);
+    /// older items without it are matched by the title.
+    /// </remarks>
+    public static WorkshopItemViewModel? FindPublishedItem(IEnumerable<WorkshopItemViewModel> userItems, string title, string packageId)
+    {
+        var normalizedTitle = title.Trim();
+
+        return userItems.FirstOrDefault(
+            item => item.PackageId.Length > 0 && packageId.Length > 0
+                ? item.PackageId == packageId
+                : string.Equals(item.Title.Trim(), normalizedTitle, StringComparison.CurrentCultureIgnoreCase));
     }
 
     private static string LocalizeContentType(string key) => key switch
@@ -308,6 +378,25 @@ public sealed class ExportToSteamViewModel : WorkspaceViewModel
         {
             Status = Resources.SteamNotRunning;
             return;
+        }
+
+        if (SelectedItem == null)
+        {
+            if (_isLoadingUserItems)
+            {
+                Status = Resources.WorkshopItemsStillLoading;
+                return;
+            }
+
+            // The package is already in the Workshop: offer to update that item instead of publishing a duplicate
+            var publishedItem = FindPublishedItem(UserItems, Title, _packageId);
+
+            if (publishedItem != null)
+            {
+                SelectedItem = publishedItem;
+                Status = string.Format(Resources.WorkshopItemAlreadyPublished, publishedItem.Title);
+                return;
+            }
         }
 
         Status = Resources.StartingUpload;
