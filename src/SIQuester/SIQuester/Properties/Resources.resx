@@ -1461,5 +1461,7 @@ Theme list: players remove themes in turn; on the last one everyone bets and wri
   </data>
   <data name="RemoveSources" xml:space="preserve">
     <value>Remove sources</value>
+  <data name="ContactUriHint" xml:space="preserve">
+    <value>author&apos;s website, e-mail or Telegram</value>
   </data>
 </root>

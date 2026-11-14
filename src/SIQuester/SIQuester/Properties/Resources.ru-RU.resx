@@ -1457,5 +1457,7 @@
   </data>
   <data name="RemoveSources" xml:space="preserve">
     <value>Удалить источники</value>
+  <data name="ContactUriHint" xml:space="preserve">
+    <value>сайт, почта или Telegram автора</value>
   </data>
 </root>
