@@ -1387,7 +1387,7 @@
                                                         Content="{StaticResource GenerateQuestionsImage}"
                                                         Command="{Binding GenerateThemes}"
                                                         Style="{StaticResource MenuButton}"
-                                                        IsEnabled="{Binding DataContext.Settings.UseGPT, RelativeSource={RelativeSource AncestorType=TreeView}}" />
+                                                        IsEnabled="{Binding DataContext.Settings.CanGenerate, RelativeSource={RelativeSource AncestorType=TreeView}}" />
                                                     
                                                     <Separator Style="{StaticResource MenuSeparator}" />
 
@@ -1504,7 +1504,7 @@
                                                         Content="{StaticResource GenerateQuestionsImage}"
                                                         Command="{Binding GenerateQuestions}"
                                                         Style="{StaticResource MenuButton}"
-                                                        IsEnabled="{Binding DataContext.Settings.UseGPT, RelativeSource={RelativeSource AncestorType=TreeView}}" />
+                                                        IsEnabled="{Binding DataContext.Settings.CanGenerate, RelativeSource={RelativeSource AncestorType=TreeView}}" />
 
                                                     <Button
                                                         ToolTip="{x:Static lp:Resources.CloneTheme}"

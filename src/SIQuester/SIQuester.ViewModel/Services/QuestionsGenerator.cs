@@ -26,10 +26,7 @@ internal static class QuestionsGenerator
 
         var theme = themeViewModel.Model;
 
-        if (string.IsNullOrEmpty(AppSettings.Default.GPTApiKey))
-        {
-            throw new Exception(Resources.ApiKeyNotSet);
-        }
+        EnsureConfigured();
 
         var themeNameSet = !string.IsNullOrEmpty(theme.Name);
         string topicName;
@@ -100,34 +97,7 @@ internal static class QuestionsGenerator
             }
         }
 
-        List<ChatMessage> messages = new()
-        {
-            new SystemChatMessage(prompt),
-            new UserChatMessage(userPrompt)
-        };
-
-        ChatCompletionOptions options = new()
-        {
-            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
-                jsonSchemaFormatName: "theme_questions",
-                jsonSchema: JsonSchema,
-                jsonSchemaIsStrict: true)
-        };
-
-        var client = new ChatClient(AppSettings.Default.GPTModel, new ApiKeyCredential(AppSettings.Default.GPTApiKey), new OpenAIClientOptions
-        {
-            NetworkTimeout = TimeSpan.FromMinutes(4),
-            RetryPolicy = new ClientRetryPolicy(0)
-        });
-
-        ClientResult<ChatCompletion> completion;
-
-        using (var dialog = PlatformManager.Instance.ShowProgressDialog())
-        {
-            completion = await client.CompleteChatAsync(messages, options);
-        }
-
-        var data = completion.Value.Content[0].Text;
+        var data = await CompleteJsonAsync(prompt, userPrompt, JsonSchema, "theme_questions");
         var themeInfo = JsonSerializer.Deserialize<ThemeInfo>(data) ?? throw new Exception(Resources.FailedToParseGPTResponse);
 
         var document = (themeViewModel.OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("Document not found");
@@ -211,12 +181,76 @@ internal static class QuestionsGenerator
         themeViewModel.IsExpanded = true;
     }
 
+    /// <summary>
+    /// Gets a JSON answer matching the schema: from the AI chosen in the settings.
+    /// </summary>
+    private static async Task<string> CompleteJsonAsync(string system, string user, BinaryData schema, string schemaName)
+    {
+        // The AI chosen in Settings (Claude, Gemini or ChatGPT)
+        if (AppSettings.Default.AiProvider == AiProvider.Claude)
+        {
+            using (PlatformManager.Instance.ShowProgressDialog())
+            {
+                return await ClaudeAssistant.CompleteJsonAsync(system, user, ClaudeAssistant.ParseSchema(schema.ToString()));
+            }
+        }
+
+        if (AppSettings.Default.AiProvider == AiProvider.Gemini)
+        {
+            using (PlatformManager.Instance.ShowProgressDialog())
+            {
+                return await GeminiAssistant.CompleteJsonAsync(system, user, schema.ToString());
+            }
+        }
+
+        List<ChatMessage> messages = new()
+        {
+            new SystemChatMessage(system),
+            new UserChatMessage(user)
+        };
+
+        ChatCompletionOptions options = new()
+        {
+            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                jsonSchemaFormatName: schemaName,
+                jsonSchema: schema,
+                jsonSchemaIsStrict: true)
+        };
+
+        var client = new ChatClient(AppSettings.Default.GPTModel, new ApiKeyCredential(AppSettings.Default.GPTApiKey), new OpenAIClientOptions
+        {
+            NetworkTimeout = TimeSpan.FromMinutes(4),
+            RetryPolicy = new ClientRetryPolicy(0)
+        });
+
+        ClientResult<ChatCompletion> completion;
+
+        using (var dialog = PlatformManager.Instance.ShowProgressDialog())
+        {
+            completion = await client.CompleteChatAsync(messages, options);
+        }
+
+        return completion.Value.Content[0].Text;
+    }
+
+    private static void EnsureConfigured()
+    {
+        var (isConfigured, noKeyMessage) = AppSettings.Default.AiProvider switch
+        {
+            AiProvider.Claude => (ClaudeAssistant.IsConfigured, Resources.ClaudeNoKey),
+            AiProvider.Gemini => (GeminiAssistant.IsConfigured, Resources.GeminiNoKey),
+            _ => (!string.IsNullOrEmpty(AppSettings.Default.GPTApiKey), Resources.ApiKeyNotSet)
+        };
+
+        if (!isConfigured)
+        {
+            throw new Exception(noKeyMessage);
+        }
+    }
+
     internal static async Task GenerateThemesAsync(PackageViewModel packageViewModel)
     {
-        if (string.IsNullOrEmpty(AppSettings.Default.GPTApiKey))
-        {
-            throw new Exception(Resources.ApiKeyNotSet);
-        }
+        EnsureConfigured();
 
         var topicCount = packageViewModel.Rounds.SelectMany(r => r.Themes).Count(t => t.Model.Name.Length == 0);
 
@@ -236,34 +270,7 @@ internal static class QuestionsGenerator
         var prompt = Resources.DefaultGTPTopicGeneration + "\nReturn array of theme names and comments (empty if not needed)";
         var userPrompt = $"{string.Format(Resources.GPTTopisHint, topicCount)}: {string.Join(", ", selectedCategories)}";
 
-        List<ChatMessage> messages = new()
-        {
-            new SystemChatMessage(prompt),
-            new UserChatMessage(userPrompt)
-        };
-
-        ChatCompletionOptions options = new()
-        {
-            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
-                jsonSchemaFormatName: "themes",
-                jsonSchema: ThemesJsonSchema,
-                jsonSchemaIsStrict: true)
-        };
-
-        var client = new ChatClient(AppSettings.Default.GPTModel, new ApiKeyCredential(AppSettings.Default.GPTApiKey), new OpenAIClientOptions
-        {
-            NetworkTimeout = TimeSpan.FromMinutes(4),
-            RetryPolicy = new ClientRetryPolicy(0)
-        });
-
-        ClientResult<ChatCompletion> completion;
-
-        using (var dialog = PlatformManager.Instance.ShowProgressDialog())
-        {
-            completion = await client.CompleteChatAsync(messages, options);
-        }
-
-        var data = completion.Value.Content[0].Text;
+        var data = await CompleteJsonAsync(prompt, userPrompt, ThemesJsonSchema, "themes");
         var themesResponse = JsonSerializer.Deserialize<ThemesResponse>(data) ?? throw new Exception(Resources.FailedToParseGPTResponse);
         var themes = themesResponse.Themes;
         var themeIndex = 0;

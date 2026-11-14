@@ -1037,4 +1037,106 @@ Humor</value>
   <data name="EmptyPreviewWarning" xml:space="preserve">
     <value>You package lacks preview image</value>
   </data>
+  <data name="ChatTitleTail" xml:space="preserve">
+    <value> — assistant</value>
+  </data>
+  <data name="ChatSubtitleTail" xml:space="preserve">
+    <value> · sees the open theme and question</value>
+  </data>
+  <data name="ChatCollapse" xml:space="preserve">
+    <value>Minimize</value>
+  </data>
+  <data name="ChatNew" xml:space="preserve">
+    <value>New conversation</value>
+  </data>
+  <data name="ChatSend" xml:space="preserve">
+    <value>Send (Enter)</value>
+  </data>
+  <data name="ChatStop" xml:space="preserve">
+    <value>Stop the answer</value>
+  </data>
+  <data name="ChatPlaceholder" xml:space="preserve">
+    <value>Ask the assistant… (Shift+Enter — new line)</value>
+  </data>
+  <data name="ChatThinking" xml:space="preserve">
+    <value>Thinking…</value>
+  </data>
+  <data name="ChatEmptyTitle" xml:space="preserve">
+    <value>How can I help?</value>
+  </data>
+  <data name="ChatEmptyHint" xml:space="preserve">
+    <value>For example: “check this question”, “suggest 5 wrong answers”, “write a 500-point question for this theme”, “make the wording shorter”.</value>
+  </data>
+  <data name="ChatButton" xml:space="preserve">
+    <value>AI assistant</value>
+  </data>
+  <data name="ChatNoKey" xml:space="preserve">
+    <value>To let me answer, set the Claude API key: Settings → AI assistant → Claude API key.</value>
+  </data>
+  <data name="ChatNoKeyGpt" xml:space="preserve">
+    <value>To let ChatGPT answer, set the OpenAI key: Settings → GPT → API key.</value>
+  </data>
+  <data name="ChatHide" xml:space="preserve">
+    <value>Hide the assistant (bring back: Settings → AI assistant)</value>
+  </data>
+  <data name="ChatRefused" xml:space="preserve">
+    <value>Claude declined this request. Try rephrasing it.</value>
+  </data>
+  <data name="ChatTruncated" xml:space="preserve">
+    <value>(answer cut: too long)</value>
+  </data>
+  <data name="ChatStopped" xml:space="preserve">
+    <value>(stopped)</value>
+  </data>
+  <data name="ChatErrorPrefix" xml:space="preserve">
+    <value>Error: </value>
+  </data>
+  <data name="ClaudeNoKey" xml:space="preserve">
+    <value>Claude API key is not set (Settings → AI assistant → Claude API key or the ANTHROPIC_API_KEY variable).</value>
+  </data>
+  <data name="ClaudeRefused" xml:space="preserve">
+    <value>Claude declined the request. Try rephrasing the theme or the question.</value>
+  </data>
+  <data name="ClaudeTooLong" xml:space="preserve">
+    <value>Claude&apos;s answer was too long and got cut. Please try again.</value>
+  </data>
+  <data name="ShowAssistant" xml:space="preserve">
+    <value>Show the assistant button in the bottom-right corner</value>
+  </data>
+  <data name="AiProviderHeader" xml:space="preserve">
+    <value>AI assistant</value>
+  </data>
+  <data name="AiProviderLabel" xml:space="preserve">
+    <value>Who answers in the chat and generates questions:</value>
+  </data>
+  <data name="AiProviderClaude" xml:space="preserve">
+    <value>Claude (Anthropic) — Opus 5.5 model</value>
+  </data>
+  <data name="AiProviderGpt" xml:space="preserve">
+    <value>ChatGPT (OpenAI) — model and key from the GPT section below</value>
+  </data>
+  <data name="ClaudeHint" xml:space="preserve">
+    <value>Get a key at platform.claude.com (API keys). It is stored encrypted for your Windows account only. When the key is set, question and theme generation uses Claude (claude-opus-5-5) and the assistant chat in the bottom-right corner works.</value>
+  </data>
+  <data name="ChatNoKeyGemini" xml:space="preserve">
+    <value>To let Gemini answer, set the Gemini API key: Settings → AI assistant → Gemini API key.</value>
+  </data>
+  <data name="GeminiNoKey" xml:space="preserve">
+    <value>Gemini API key is not set (Settings → AI assistant → Gemini API key or the GEMINI_API_KEY variable).</value>
+  </data>
+  <data name="GeminiRefused" xml:space="preserve">
+    <value>Gemini declined the request. Try rephrasing the theme or the question.</value>
+  </data>
+  <data name="GeminiTooLong" xml:space="preserve">
+    <value>Gemini&apos;s answer was too long and got cut. Please try again.</value>
+  </data>
+  <data name="AiProviderGemini" xml:space="preserve">
+    <value>Gemini (Google) — model below</value>
+  </data>
+  <data name="GeminiModelLabel" xml:space="preserve">
+    <value>Gemini model</value>
+  </data>
+  <data name="GeminiHint" xml:space="preserve">
+    <value>Get a key at aistudio.google.com (Get API key). It is stored encrypted for your Windows account only. The model list offers the current stable models; you can also type another model name.</value>
+  </data>
 </root>
