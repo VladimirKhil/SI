@@ -1441,5 +1441,10 @@
   </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Поиск по пакету</value>
+  <data name="Today" xml:space="preserve">
+    <value>Сегодня</value>
+  </data>
+  <data name="TodayTip" xml:space="preserve">
+    <value>Поставить сегодняшнюю дату</value>
   </data>
 </root>

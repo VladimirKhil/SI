@@ -1445,5 +1445,10 @@ When there are some questions in theme, they will be used as examples</value>
   </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Search the pack</value>
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="TodayTip" xml:space="preserve">
+    <value>Set today&apos;s date</value>
   </data>
 </root>

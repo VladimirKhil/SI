@@ -3676,6 +3676,24 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Today.
+        /// </summary>
+        public static string Today {
+            get {
+                return ResourceManager.GetString("Today", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set today&apos;s date.
+        /// </summary>
+        public static string TodayTip {
+            get {
+                return ResourceManager.GetString("TodayTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change type (to oral or back).
         /// </summary>
         public static string ToggleToOralAndBack {
