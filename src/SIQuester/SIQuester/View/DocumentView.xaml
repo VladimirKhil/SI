@@ -427,6 +427,21 @@
                     <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE9D2;" />
                 </ToggleButton>
 
+                <Separator />
+
+                <!-- Document text size: smaller / current size (click restores the default) / larger. Also Ctrl+mouse wheel and Ctrl+Plus / Ctrl+Minus -->
+                <Button ToolTip="{x:Static lp:Resources.FontSmaller}" Click="FontSmaller_Click">
+                    <TextBlock Text="A−" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Ui.Glyph}" />
+                </Button>
+
+                <Button ToolTip="{x:Static lp:Resources.FontReset}" Click="FontReset_Click" Width="Auto" MinWidth="34" Padding="6,4">
+                    <TextBlock Text="{Binding FontSize, Source={x:Static m:AppSettings.Default}, Mode=OneWay}" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" VerticalAlignment="Center" />
+                </Button>
+
+                <Button ToolTip="{x:Static lp:Resources.FontBigger}" Click="FontBigger_Click">
+                    <TextBlock Text="A+" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Ui.Glyph}" />
+                </Button>
+
                 <Separator Style="{StaticResource TreeOnly}" />
                 
                 <Slider

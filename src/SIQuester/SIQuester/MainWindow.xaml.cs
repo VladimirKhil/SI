@@ -175,8 +175,47 @@ public partial class MainWindow : MetroWindow
         }
     }
 
+    /// <summary>
+    /// Ctrl + mouse wheel changes the document text size.
+    /// </summary>
+    private void Main_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if ((Keyboard.Modifiers & ModifierKeys.Control) == 0 || e.Delta == 0)
+        {
+            return;
+        }
+
+        AppSettings.Default.ChangeFontSize(e.Delta > 0 ? 1 : -1);
+        e.Handled = true;
+    }
+
     private void Main_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // Ctrl+Plus / Ctrl+Minus change the document text size, Ctrl+0 restores the default
+        if (e.KeyboardDevice.Modifiers == ModifierKeys.Control)
+        {
+            switch (e.Key)
+            {
+                case Key.OemPlus:
+                case Key.Add:
+                    AppSettings.Default.ChangeFontSize(+1);
+                    e.Handled = true;
+                    return;
+
+                case Key.OemMinus:
+                case Key.Subtract:
+                    AppSettings.Default.ChangeFontSize(-1);
+                    e.Handled = true;
+                    return;
+
+                case Key.D0:
+                case Key.NumPad0:
+                    AppSettings.Default.ResetFontSize();
+                    e.Handled = true;
+                    return;
+            }
+        }
+
         if (TryUndoRedoDocument(e))
         {
             e.Handled = true;

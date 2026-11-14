@@ -1486,5 +1486,13 @@ Theme list: players remove themes in turn; on the last one everyone bets and wri
     <value>Automatically compress pictures larger than the SIGame limit (1 MB) when adding them</value>
   <data name="ToggleTheme" xml:space="preserve">
     <value>Light / dark theme</value>
+  <data name="FontSmaller" xml:space="preserve">
+    <value>Smaller text (Ctrl+−, Ctrl+mouse wheel)</value>
+  </data>
+  <data name="FontBigger" xml:space="preserve">
+    <value>Larger text (Ctrl++, Ctrl+mouse wheel)</value>
+  </data>
+  <data name="FontReset" xml:space="preserve">
+    <value>Text size. Click to restore the default (Ctrl+0)</value>
   </data>
 </root>
