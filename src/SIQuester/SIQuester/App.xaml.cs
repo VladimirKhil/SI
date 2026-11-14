@@ -224,6 +224,9 @@ public partial class App : Application
 
         ReplaceDictionary(dictionaries, FluentThemePathPrefix, isLight ? FluentLightThemeUri : FluentDarkThemeUri);
         ReplaceDictionary(dictionaries, PalettePathPart, isLight ? LightPaletteUri : DarkPaletteUri);
+
+        // Monochrome toolbar icons: their colors follow the theme
+        FluentIcons.Apply(Resources, !isLight);
     }
 
     /// <summary>
