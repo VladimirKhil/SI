@@ -107,6 +107,27 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Dark theme to return to when switching from the light one (not saved: dark after start).
+    /// </summary>
+    private ThemeOption _lastDarkTheme = ThemeOption.Dark;
+
+    /// <summary>
+    /// Switches between the light theme and the dark theme that was used last (dark or dark gray).
+    /// </summary>
+    public void ToggleTheme()
+    {
+        if (Theme == ThemeOption.Light)
+        {
+            Theme = _lastDarkTheme;
+        }
+        else
+        {
+            _lastDarkTheme = Theme;
+            Theme = ThemeOption.Light;
+        }
+    }
+
     private bool _automaticTextImport = false;
 
     /// <summary>
