@@ -1428,4 +1428,87 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="StartSubtitle" xml:space="preserve">
+    <value>Question pack editor for SIGame</value>
+  </data>
+  <data name="StartNew" xml:space="preserve">
+    <value>New pack</value>
+  </data>
+  <data name="StartNewHint" xml:space="preserve">
+    <value>Pick a template and start</value>
+  </data>
+  <data name="StartOpen" xml:space="preserve">
+    <value>Open a pack</value>
+  </data>
+  <data name="StartOpenHint" xml:space="preserve">
+    <value>A .siq file from your computer</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search the pack</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="TodayTip" xml:space="preserve">
+    <value>Set today&apos;s date</value>
+  </data>
+  <data name="TextItemHint" xml:space="preserve">
+    <value>Type the text…</value>
+  </data>
+  <data name="RoundTypeHint" xml:space="preserve">
+    <value>Round type: how the round is played.
+Table: a board of themes and prices; players pick questions and press the button (usually 5 questions per theme).
+Theme list: players remove themes in turn; on the last one everyone bets and writes an answer (1 question per theme).</value>
+  </data>
+  <data name="RemoveAuthors" xml:space="preserve">
+    <value>Remove authors</value>
+  </data>
+  <data name="RemoveSources" xml:space="preserve">
+    <value>Remove sources</value>
+  </data>
+  <data name="ContactUriHint" xml:space="preserve">
+    <value>author&apos;s website, e-mail or Telegram</value>
+  </data>
+  <data name="ToolbarRightAnswers" xml:space="preserve">
+    <value>Answers</value>
+  </data>
+  <data name="ToolbarWrongAnswers" xml:space="preserve">
+    <value>Wrong answers</value>
+  </data>
+  <data name="ToolbarQuestionBody" xml:space="preserve">
+    <value>Question body</value>
+  </data>
+  <data name="ToolbarLogo" xml:space="preserve">
+    <value>Logo</value>
+  </data>
+  <data name="StatisticsRounds" xml:space="preserve">
+    <value>rounds</value>
+  </data>
+  <data name="StatisticsThemes" xml:space="preserve">
+    <value>themes</value>
+  </data>
+  <data name="StatisticsNoWarnings" xml:space="preserve">
+    <value>No issues found</value>
+  </data>
+  <data name="AutoCompressMedia" xml:space="preserve">
+    <value>Automatically compress pictures larger than the SIGame limit (1 MB) when adding them</value>
+  </data>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>Light / dark theme</value>
+  </data>
+  <data name="FontSmaller" xml:space="preserve">
+    <value>Smaller text (Ctrl+−, Ctrl+mouse wheel)</value>
+  </data>
+  <data name="FontBigger" xml:space="preserve">
+    <value>Larger text (Ctrl++, Ctrl+mouse wheel)</value>
+  </data>
+  <data name="FontReset" xml:space="preserve">
+    <value>Text size. Click to restore the default (Ctrl+0)</value>
+  </data>
+  <data name="PublisherHint" xml:space="preserve">
+    <value>who published the pack</value>
+  </data>
+  <data name="RestrictionHint" xml:space="preserve">
+    <value>e.g. 12+ or 18+</value>
+  </data>
 </root>

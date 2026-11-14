@@ -74,6 +74,57 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         set { _result = value; OnPropertyChanged(); }
     }
 
+    private int _roundCount, _themeCount, _questionCount;
+
+    /// <summary>
+    /// Number of rounds (summary tile).
+    /// </summary>
+    public int RoundCount
+    {
+        get => _roundCount;
+        private set { _roundCount = value; OnPropertyChanged(); }
+    }
+
+    /// <summary>
+    /// Number of themes (summary tile).
+    /// </summary>
+    public int ThemeCount
+    {
+        get => _themeCount;
+        private set { _themeCount = value; OnPropertyChanged(); }
+    }
+
+    /// <summary>
+    /// Number of questions (summary tile).
+    /// </summary>
+    public int QuestionCount
+    {
+        get => _questionCount;
+        private set { _questionCount = value; OnPropertyChanged(); }
+    }
+
+    private string _details = "";
+
+    /// <summary>
+    /// Statistics result without the total counts (they are shown as tiles).
+    /// </summary>
+    public string Details
+    {
+        get => _details;
+        private set { _details = value; OnPropertyChanged(); }
+    }
+
+    private bool _hasNoWarnings;
+
+    /// <summary>
+    /// The check is finished and found nothing to fix (no issues in the text and no broken links).
+    /// </summary>
+    public bool HasNoWarnings
+    {
+        get => _hasNoWarnings;
+        private set { _hasNoWarnings = value; OnPropertyChanged(); }
+    }
+
     private WarningViewModel[] _warnings = Array.Empty<WarningViewModel>();
 
     /// <summary>
@@ -128,15 +179,24 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
             stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfQuests, questionCount));
             stats.AppendLine();
 
-            CheckText(stats, warnings);
+            RoundCount = _document.Document.Package.Rounds.Count;
+            ThemeCount = themeCount;
+            QuestionCount = questionCount;
+            HasNoWarnings = false;
+
+            var details = new StringBuilder();
+            var hasTextIssues = CheckText(details, warnings);
 
             var checkResult = await _document.CheckLinksAsync();
 
             warnings.AddRange(checkResult.Item1);
-            stats.Append(checkResult.Item2);
+            details.Append(checkResult.Item2);
 
+            stats.Append(details);
             Result = stats.ToString();
+            Details = details.ToString().Trim();
             Warnings = warnings.ToArray();
+            HasNoWarnings = !hasTextIssues && string.IsNullOrWhiteSpace(checkResult.Item2) && Warnings.Length == 0;
         }
         catch (Exception exc)
         {
@@ -144,8 +204,11 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         }
     }
 
-    private void CheckText(StringBuilder stats, List<WarningViewModel> warnings)
+    /// <returns>Whether any issue was found.</returns>
+    private bool CheckText(StringBuilder stats, List<WarningViewModel> warnings)
     {
+        var hasIssues = false;
+
         foreach (var round in _document.Package.Rounds)
         {
             stats.AppendLine(string.Format("{0}: {1}", Resources.Round, round.Model.Name));
@@ -285,12 +348,15 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
                 if (themeData.Length > 0)
                 {
+                    hasIssues = true;
                     stats.AppendLine(themeData.ToString());
                 }
             }
 
             stats.AppendLine();
         }
+
+        return hasIssues;
     }
 
     private async void RemoveUnusedFiles_Executed(object? arg)
