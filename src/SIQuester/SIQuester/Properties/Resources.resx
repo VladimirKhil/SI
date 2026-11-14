@@ -1419,6 +1419,9 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="Format" xml:space="preserve">
     <value>Format</value>
   </data>
+  <data name="AutoCompressMedia" xml:space="preserve">
+    <value>Automatically compress pictures larger than the SIGame limit (1 MB) when adding them</value>
+  </data>
   <data name="ThemeFillQuestions" xml:space="preserve">
     <value>questions</value>
   </data>
