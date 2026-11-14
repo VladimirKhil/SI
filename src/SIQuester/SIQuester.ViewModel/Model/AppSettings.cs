@@ -487,6 +487,25 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _autoCompressMedia = true;
+
+    /// <summary>
+    /// Compress pictures that exceed the SIGame size limit when they are added.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool AutoCompressMedia
+    {
+        get => _autoCompressMedia;
+        set
+        {
+            if (_autoCompressMedia != value)
+            {
+                _autoCompressMedia = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private bool _setRightAnswerFromFileName = false;
 
     /// <summary>
@@ -756,6 +775,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         SelectOptionCount = DefaultSelectOptionCount;
         CheckFileSize = defaultSettings.CheckFileSize;
         SetRightAnswerFromFileName = defaultSettings.SetRightAnswerFromFileName;
+        AutoCompressMedia = defaultSettings.AutoCompressMedia;
         AskToSetTagsOnSave = defaultSettings.AskToSetTagsOnSave;
         UseImageDuration = defaultSettings.UseImageDuration;
         ImageDurationSeconds = defaultSettings.ImageDurationSeconds;
