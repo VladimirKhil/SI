@@ -2612,13 +2612,14 @@
                         Text="{Binding Model.Name}"
                         Padding="0,2" />
 
+                    <!-- Only the known round types can be chosen: typed text would be written to the package as the round type -->
                     <ComboBox
                         Grid.Row="0"
                         Grid.Column="3"
-                        IsEditable="True"
                         Margin="5,0,0,0"
+                        ToolTip="{x:Static lp:Resources.RoundTypeHint}"
                         ItemsSource="{Binding Source={StaticResource RTypes}, Path=Values, Mode=OneTime}"
-                        Text="{Binding Path=Model.Type, Converter={StaticResource RoundTypeConverter}}"
+                        SelectedItem="{Binding Path=Model.Type, Converter={StaticResource RoundTypeConverter}}"
                         VerticalAlignment="Center" />
 
                     <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
