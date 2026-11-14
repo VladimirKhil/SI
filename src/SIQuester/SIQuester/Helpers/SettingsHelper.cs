@@ -27,6 +27,8 @@ internal static class SettingsHelper
 
     internal const string ClaudeKeyFileName = "claude.key";
 
+    internal const string GeminiKeyFileName = "gemini.key";
+
     /// <summary>
     /// Loads user settings.
     /// </summary>
@@ -69,6 +71,18 @@ internal static class SettingsHelper
                             {
                                 settings.ClaudeApiKey = Encoding.UTF8.GetString(
                                     ProtectedData.Unprotect(File.ReadAllBytes(claudeKeyFile), null, DataProtectionScope.CurrentUser));
+                            }
+                            catch { }
+                        }
+
+                        var geminiKeyFile = Path.Combine(SettingsFolder, GeminiKeyFileName);
+
+                        if (File.Exists(geminiKeyFile))
+                        {
+                            try
+                            {
+                                settings.GeminiApiKey = Encoding.UTF8.GetString(
+                                    ProtectedData.Unprotect(File.ReadAllBytes(geminiKeyFile), null, DataProtectionScope.CurrentUser));
                             }
                             catch { }
                         }
@@ -116,6 +130,11 @@ internal static class SettingsHelper
             File.WriteAllBytes(
                 Path.Combine(SettingsFolder, ClaudeKeyFileName),
                 ProtectedData.Protect(Encoding.UTF8.GetBytes(settings.ClaudeApiKey), null, DataProtectionScope.CurrentUser));
+
+            // Gemini API key: encrypted the same way
+            File.WriteAllBytes(
+                Path.Combine(SettingsFolder, GeminiKeyFileName),
+                ProtectedData.Protect(Encoding.UTF8.GetBytes(settings.GeminiApiKey), null, DataProtectionScope.CurrentUser));
         }
         catch (Exception exc)
         {

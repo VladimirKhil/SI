@@ -159,7 +159,7 @@ public sealed class AssistantChatViewModel : ModelViewBase
 
         AppSettings.Default.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(AppSettings.AiProvider) or nameof(AppSettings.GPTModel) or null or "")
+            if (e.PropertyName is nameof(AppSettings.AiProvider) or nameof(AppSettings.GPTModel) or nameof(AppSettings.GeminiModel) or null or "")
             {
                 OnPropertyChanged(nameof(AssistantName));
                 OnPropertyChanged(nameof(AssistantSubtitle));
@@ -170,13 +170,23 @@ public sealed class AssistantChatViewModel : ModelViewBase
     /// <summary>
     /// Name in the chat header and on the floating button.
     /// </summary>
-    public string AssistantName => AppSettings.Default.AiProvider == AiProvider.ChatGPT ? "ChatGPT" : "Claude";
+    public string AssistantName => AppSettings.Default.AiProvider switch
+    {
+        AiProvider.ChatGPT => "ChatGPT",
+        AiProvider.Gemini => "Gemini",
+        _ => "Claude"
+    };
 
     /// <summary>
     /// Model and context hint under the chat title.
     /// </summary>
     public string AssistantSubtitle =>
-        (AppSettings.Default.AiProvider == AiProvider.ChatGPT ? GptAssistant.ModelName : "Opus 5.5") + Resources.ChatSubtitleTail;
+        AppSettings.Default.AiProvider switch
+        {
+            AiProvider.ChatGPT => GptAssistant.ModelName,
+            AiProvider.Gemini => GeminiAssistant.ModelName,
+            _ => "Opus 5.5"
+        } + Resources.ChatSubtitleTail;
 
     private async Task SendAsync()
     {
@@ -191,12 +201,19 @@ public sealed class AssistantChatViewModel : ModelViewBase
         var question = new ChatMessageViewModel(true, text);
         Messages.Add(question);
 
-        var useGpt = AppSettings.Default.AiProvider == AiProvider.ChatGPT;
+        var provider = AppSettings.Default.AiProvider;
 
-        if (useGpt ? !GptAssistant.IsConfigured : !ClaudeAssistant.IsConfigured)
+        var (isConfigured, noKeyMessage) = provider switch
+        {
+            AiProvider.ChatGPT => (GptAssistant.IsConfigured, Resources.ChatNoKeyGpt),
+            AiProvider.Gemini => (GeminiAssistant.IsConfigured, Resources.ChatNoKeyGemini),
+            _ => (ClaudeAssistant.IsConfigured, Resources.ChatNoKey)
+        };
+
+        if (!isConfigured)
         {
             question.SkipInHistory = true; // unanswered: must not be sent again with the next question
-            Messages.Add(new ChatMessageViewModel(false, useGpt ? Resources.ChatNoKeyGpt : Resources.ChatNoKey) { IsError = true });
+            Messages.Add(new ChatMessageViewModel(false, noKeyMessage) { IsError = true });
             return;
         }
 
@@ -215,11 +232,16 @@ public sealed class AssistantChatViewModel : ModelViewBase
 
         try
         {
-            var stopReason = useGpt
-                ? await GptAssistant.StreamChatAsync(BuildSystemPrompt(), history, piece => answer.Text += piece, _cancellation.Token)
-                : await ClaudeAssistant.StreamChatAsync(BuildSystemPrompt(), history, piece => answer.Text += piece, _cancellation.Token);
+            void OnText(string piece) => answer.Text += piece;
 
-            // Claude: refusal / max_tokens; ChatGPT: content_filter / length
+            var stopReason = provider switch
+            {
+                AiProvider.ChatGPT => await GptAssistant.StreamChatAsync(BuildSystemPrompt(), history, OnText, _cancellation.Token),
+                AiProvider.Gemini => await GeminiAssistant.StreamChatAsync(BuildSystemPrompt(), history, OnText, _cancellation.Token),
+                _ => await ClaudeAssistant.StreamChatAsync(BuildSystemPrompt(), history, OnText, _cancellation.Token)
+            };
+
+            // Claude and Gemini: refusal / max_tokens; ChatGPT: content_filter / length
             var reason = stopReason?.Replace("_", "").ToLowerInvariant();
 
             if (reason is "refusal" or "contentfilter")

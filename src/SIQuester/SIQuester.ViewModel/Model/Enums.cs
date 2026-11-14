@@ -99,5 +99,6 @@ public enum ThemeOption
 public enum AiProvider
 {
     Claude,
-    ChatGPT
+    ChatGPT,
+    Gemini
 }

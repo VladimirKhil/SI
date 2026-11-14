@@ -10,6 +10,7 @@
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
     xmlns:vmp="clr-namespace:SIQuester.ViewModel.Properties;assembly=SIQuester.ViewModel"
+    xmlns:vms="clr-namespace:SIQuester.ViewModel.Services;assembly=SIQuester.ViewModel"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
@@ -219,10 +220,28 @@
                 Content="{x:Static vmp:Resources.AiProviderClaude}"
                 IsChecked="{Binding Model.AiProvider, Converter={StaticResource EnumEquals}, ConverterParameter={x:Static m:AiProvider.Claude}}" />
 
+            <RadioButton
+                GroupName="AiProvider"
+                Margin="0,5,0,0"
+                Content="{x:Static vmp:Resources.AiProviderGemini}"
+                IsChecked="{Binding Model.AiProvider, Converter={StaticResource EnumEquals}, ConverterParameter={x:Static m:AiProvider.Gemini}}" />
+
             <StackPanel Width="700" HorizontalAlignment="Left" Margin="0,10,0,0">
                 <TextBlock Text="Claude API key" />
                 <TextBox Text="{Binding Model.ClaudeApiKey, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" />
                 <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Text="{x:Static vmp:Resources.ClaudeHint}" />
+
+                <TextBlock Text="Gemini API key" Margin="0,15,0,0" />
+                <TextBox Text="{Binding Model.GeminiApiKey, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" />
+
+                <TextBlock Text="{x:Static vmp:Resources.GeminiModelLabel}" Margin="0,10,0,0" />
+                <ComboBox
+                    IsEditable="True"
+                    ItemsSource="{x:Static vms:GeminiAssistant.Models}"
+                    Text="{Binding Model.GeminiModel, UpdateSourceTrigger=LostFocus}"
+                    Margin="0,5,0,0" />
+
+                <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Text="{x:Static vmp:Resources.GeminiHint}" />
             </StackPanel>
 
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GPTModel}" />

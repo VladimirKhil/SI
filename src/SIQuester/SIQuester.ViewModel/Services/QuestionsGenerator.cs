@@ -26,10 +26,7 @@ internal static class QuestionsGenerator
 
         var theme = themeViewModel.Model;
 
-        if (AppSettings.Default.AiProvider == AiProvider.Claude ? !ClaudeAssistant.IsConfigured : string.IsNullOrEmpty(AppSettings.Default.GPTApiKey))
-        {
-            throw new Exception(AppSettings.Default.AiProvider == AiProvider.Claude ? Resources.ClaudeNoKey : Resources.ApiKeyNotSet);
-        }
+        EnsureConfigured();
 
         var themeNameSet = !string.IsNullOrEmpty(theme.Name);
         string topicName;
@@ -185,16 +182,24 @@ internal static class QuestionsGenerator
     }
 
     /// <summary>
-    /// Gets a JSON answer matching the schema: from Claude when its API key is set, otherwise from GPT.
+    /// Gets a JSON answer matching the schema: from the AI chosen in the settings.
     /// </summary>
     private static async Task<string> CompleteJsonAsync(string system, string user, BinaryData schema, string schemaName)
     {
-        // The AI chosen in Settings (Claude or ChatGPT)
+        // The AI chosen in Settings (Claude, Gemini or ChatGPT)
         if (AppSettings.Default.AiProvider == AiProvider.Claude)
         {
             using (PlatformManager.Instance.ShowProgressDialog())
             {
                 return await ClaudeAssistant.CompleteJsonAsync(system, user, ClaudeAssistant.ParseSchema(schema.ToString()));
+            }
+        }
+
+        if (AppSettings.Default.AiProvider == AiProvider.Gemini)
+        {
+            using (PlatformManager.Instance.ShowProgressDialog())
+            {
+                return await GeminiAssistant.CompleteJsonAsync(system, user, schema.ToString());
             }
         }
 
@@ -228,12 +233,24 @@ internal static class QuestionsGenerator
         return completion.Value.Content[0].Text;
     }
 
+    private static void EnsureConfigured()
+    {
+        var (isConfigured, noKeyMessage) = AppSettings.Default.AiProvider switch
+        {
+            AiProvider.Claude => (ClaudeAssistant.IsConfigured, Resources.ClaudeNoKey),
+            AiProvider.Gemini => (GeminiAssistant.IsConfigured, Resources.GeminiNoKey),
+            _ => (!string.IsNullOrEmpty(AppSettings.Default.GPTApiKey), Resources.ApiKeyNotSet)
+        };
+
+        if (!isConfigured)
+        {
+            throw new Exception(noKeyMessage);
+        }
+    }
+
     internal static async Task GenerateThemesAsync(PackageViewModel packageViewModel)
     {
-        if (AppSettings.Default.AiProvider == AiProvider.Claude ? !ClaudeAssistant.IsConfigured : string.IsNullOrEmpty(AppSettings.Default.GPTApiKey))
-        {
-            throw new Exception(AppSettings.Default.AiProvider == AiProvider.Claude ? Resources.ClaudeNoKey : Resources.ApiKeyNotSet);
-        }
+        EnsureConfigured();
 
         var topicCount = packageViewModel.Rounds.SelectMany(r => r.Themes).Count(t => t.Model.Name.Length == 0);
 

@@ -115,6 +115,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Gemini (Google) — model below.
+        /// </summary>
+        public static string AiProviderGemini {
+            get {
+                return ResourceManager.GetString("AiProviderGemini", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ChatGPT (OpenAI) — model and key from the GPT section below.
         /// </summary>
         public static string AiProviderGpt {
@@ -286,7 +295,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Claude — assistant.
+        ///   Looks up a localized string similar to AI assistant.
         /// </summary>
         public static string ChatButton {
             get {
@@ -358,6 +367,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To let Gemini answer, set the Gemini API key: Settings → AI assistant → Gemini API key..
+        /// </summary>
+        public static string ChatNoKeyGemini {
+            get {
+                return ResourceManager.GetString("ChatNoKeyGemini", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to To let ChatGPT answer, set the OpenAI key: Settings → GPT → API key..
         /// </summary>
         public static string ChatNoKeyGpt {
@@ -367,7 +385,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ask Claude… (Shift+Enter — new line).
+        ///   Looks up a localized string similar to Ask the assistant… (Shift+Enter — new line).
         /// </summary>
         public static string ChatPlaceholder {
             get {
@@ -421,7 +439,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Claude is thinking….
+        ///   Looks up a localized string similar to Thinking….
         /// </summary>
         public static string ChatThinking {
             get {
@@ -1036,6 +1054,51 @@ namespace SIQuester.ViewModel.Properties {
         public static string GamePackageTooLarge {
             get {
                 return ResourceManager.GetString("GamePackageTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get a key at aistudio.google.com (Get API key). It is stored encrypted for your Windows account only. The model list offers the current stable models; you can also type another model name..
+        /// </summary>
+        public static string GeminiHint {
+            get {
+                return ResourceManager.GetString("GeminiHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gemini model.
+        /// </summary>
+        public static string GeminiModelLabel {
+            get {
+                return ResourceManager.GetString("GeminiModelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gemini API key is not set (Settings → AI assistant → Gemini API key or the GEMINI_API_KEY variable)..
+        /// </summary>
+        public static string GeminiNoKey {
+            get {
+                return ResourceManager.GetString("GeminiNoKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gemini declined the request. Try rephrasing the theme or the question..
+        /// </summary>
+        public static string GeminiRefused {
+            get {
+                return ResourceManager.GetString("GeminiRefused", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gemini&apos;s answer was too long and got cut. Please try again..
+        /// </summary>
+        public static string GeminiTooLong {
+            get {
+                return ResourceManager.GetString("GeminiTooLong", resourceCulture);
             }
         }
         

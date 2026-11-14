@@ -689,21 +689,70 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private string _geminiApiKey = "";
+
     /// <summary>
-    /// AI generation is available for the selected assistant: Claude needs its key (in settings or ANTHROPIC_API_KEY),
-    /// ChatGPT needs the OpenAI key.
+    /// Google Gemini API key. Not stored in the settings file: saved encrypted (DPAPI) next to it.
+    /// </summary>
+    [DefaultValue("")]
+    [JsonIgnore]
+    public string GeminiApiKey
+    {
+        get => _geminiApiKey;
+        set
+        {
+            if (_geminiApiKey != value)
+            {
+                _geminiApiKey = value;
+                OnPropertyChanged(nameof(CanUseAI));
+                OnPropertyChanged(nameof(CanGenerate));
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string _geminiModel = DefaultGeminiModel;
+
+    /// <summary>
+    /// Default Gemini model: the current stable Flash model.
+    /// </summary>
+    public const string DefaultGeminiModel = "gemini-3.8-flash";
+
+    /// <summary>
+    /// Gemini model for the assistant chat and generation.
+    /// </summary>
+    [DefaultValue(DefaultGeminiModel)]
+    public string GeminiModel
+    {
+        get => _geminiModel;
+        set
+        {
+            if (_geminiModel != value)
+            {
+                _geminiModel = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// AI generation is available for the selected assistant: Claude and Gemini need their keys (in settings or
+    /// ANTHROPIC_API_KEY / GEMINI_API_KEY), ChatGPT needs the OpenAI key.
     /// </summary>
     [JsonIgnore]
-    public bool CanUseAI => AiProvider == AiProvider.Claude
-        ? !string.IsNullOrWhiteSpace(ClaudeApiKey) || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY"))
-        : !string.IsNullOrWhiteSpace(GPTApiKey);
+    public bool CanUseAI => AiProvider switch
+    {
+        AiProvider.Claude => !string.IsNullOrWhiteSpace(ClaudeApiKey) || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")),
+        AiProvider.Gemini => !string.IsNullOrWhiteSpace(GeminiApiKey) || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("GEMINI_API_KEY")),
+        _ => !string.IsNullOrWhiteSpace(GPTApiKey)
+    };
 
     /// <summary>
     /// The question and theme generation buttons are enabled: ChatGPT is switched on with the "Use GPT" check box,
-    /// Claude works as soon as its key is set.
+    /// Claude and Gemini work as soon as their key is set.
     /// </summary>
     [JsonIgnore]
-    public bool CanGenerate => AiProvider == AiProvider.Claude ? CanUseAI : UseGPT;
+    public bool CanGenerate => AiProvider == AiProvider.ChatGPT ? UseGPT : CanUseAI;
 
     private string _gptModel = DefaultGPTModel;
     
@@ -812,6 +861,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         FontSize = defaultSettings.FontSize;
         AiProvider = defaultSettings.AiProvider;
         ShowAssistant = defaultSettings.ShowAssistant;
+        GeminiModel = defaultSettings.GeminiModel;
         QuestionBase = defaultSettings.QuestionBase;
         SearchForUpdates = defaultSettings.SearchForUpdates;
         RemoveLinks = defaultSettings.RemoveLinks;

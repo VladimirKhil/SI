@@ -1054,10 +1054,10 @@
     <value>Остановить ответ</value>
   </data>
   <data name="ChatPlaceholder" xml:space="preserve">
-    <value>Спросите Claude… (Shift+Enter — новая строка)</value>
+    <value>Спросите помощника… (Shift+Enter — новая строка)</value>
   </data>
   <data name="ChatThinking" xml:space="preserve">
-    <value>Claude думает…</value>
+    <value>Думаю…</value>
   </data>
   <data name="ChatEmptyTitle" xml:space="preserve">
     <value>Чем помочь?</value>
@@ -1066,7 +1066,7 @@
     <value>Например: «проверь этот вопрос», «придумай 5 неверных ответов», «предложи вопрос на 500 по этой теме», «сделай формулировку короче».</value>
   </data>
   <data name="ChatButton" xml:space="preserve">
-    <value>Claude — помощник</value>
+    <value>ИИ-помощник</value>
   </data>
   <data name="ChatNoKey" xml:space="preserve">
     <value>Чтобы я мог отвечать, укажите ключ Claude API: Параметры → ИИ-помощник → Claude API key.</value>
@@ -1115,5 +1115,26 @@
   </data>
   <data name="ClaudeHint" xml:space="preserve">
     <value>Ключ можно получить на platform.claude.com (раздел API keys). Он хранится в зашифрованном виде только для вашей учётной записи Windows. Если ключ задан, генерация вопросов и тем идёт через Claude (модель claude-opus-5-5), а в правом нижнем углу работает чат-помощник.</value>
+  </data>
+  <data name="ChatNoKeyGemini" xml:space="preserve">
+    <value>Чтобы Gemini мог отвечать, укажите ключ Gemini API: Параметры → ИИ-помощник → Gemini API key.</value>
+  </data>
+  <data name="GeminiNoKey" xml:space="preserve">
+    <value>Не задан ключ Gemini API (Параметры → ИИ-помощник → Gemini API key или переменная GEMINI_API_KEY).</value>
+  </data>
+  <data name="GeminiRefused" xml:space="preserve">
+    <value>Gemini отказался выполнить запрос. Попробуйте переформулировать тему или вопрос.</value>
+  </data>
+  <data name="GeminiTooLong" xml:space="preserve">
+    <value>Ответ Gemini оказался слишком длинным и был обрезан. Попробуйте ещё раз.</value>
+  </data>
+  <data name="AiProviderGemini" xml:space="preserve">
+    <value>Gemini (Google) — модель ниже</value>
+  </data>
+  <data name="GeminiModelLabel" xml:space="preserve">
+    <value>Модель Gemini</value>
+  </data>
+  <data name="GeminiHint" xml:space="preserve">
+    <value>Ключ можно получить на aistudio.google.com (Get API key). Он хранится в зашифрованном виде только для вашей учётной записи Windows. В списке — текущие стабильные модели, можно вписать и другое название.</value>
   </data>
 </root>
