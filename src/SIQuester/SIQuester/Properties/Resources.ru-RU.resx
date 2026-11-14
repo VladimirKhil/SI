@@ -1424,4 +1424,108 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="StartSubtitle" xml:space="preserve">
+    <value>Редактор пакетов вопросов для SIGame</value>
+  </data>
+  <data name="StartNew" xml:space="preserve">
+    <value>Новый пакет</value>
+  </data>
+  <data name="StartNewHint" xml:space="preserve">
+    <value>Выбрать шаблон и начать</value>
+  </data>
+  <data name="StartOpen" xml:space="preserve">
+    <value>Открыть пакет</value>
+  </data>
+  <data name="StartOpenHint" xml:space="preserve">
+    <value>Файл .siq с компьютера</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Поиск по пакету</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Сегодня</value>
+  </data>
+  <data name="TodayTip" xml:space="preserve">
+    <value>Поставить сегодняшнюю дату</value>
+  </data>
+  <data name="TextItemHint" xml:space="preserve">
+    <value>Введите текст…</value>
+  </data>
+  <data name="RoundTypeHint" xml:space="preserve">
+    <value>Тип раунда — как он пройдёт в игре.
+Таблица: табло «темы × стоимости», игроки выбирают вопросы и жмут кнопку (обычно 5 вопросов в теме).
+Список тем: игроки по очереди убирают темы, по последней оставшейся все делают ставки и пишут ответ (1 вопрос в теме).</value>
+  </data>
+  <data name="RemoveAuthors" xml:space="preserve">
+    <value>Удалить авторов</value>
+  </data>
+  <data name="RemoveSources" xml:space="preserve">
+    <value>Удалить источники</value>
+  </data>
+  <data name="ContactUriHint" xml:space="preserve">
+    <value>сайт, почта или Telegram автора</value>
+  </data>
+  <data name="ToolbarRightAnswers" xml:space="preserve">
+    <value>Ответы</value>
+  </data>
+  <data name="ToolbarWrongAnswers" xml:space="preserve">
+    <value>Неверные</value>
+  </data>
+  <data name="ToolbarQuestionBody" xml:space="preserve">
+    <value>Текст вопроса</value>
+  </data>
+  <data name="ToolbarLogo" xml:space="preserve">
+    <value>Логотип</value>
+  </data>
+  <data name="StatisticsRounds" xml:space="preserve">
+    <value>раундов</value>
+  </data>
+  <data name="StatisticsThemes" xml:space="preserve">
+    <value>тем</value>
+  </data>
+  <data name="StatisticsNoWarnings" xml:space="preserve">
+    <value>Замечаний нет</value>
+  </data>
+  <data name="AutoCompressMedia" xml:space="preserve">
+    <value>Автоматически сжимать картинки больше лимита SIGame (1 МБ) при добавлении</value>
+  </data>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>Светлая / тёмная тема</value>
+  </data>
+  <data name="FontSmaller" xml:space="preserve">
+    <value>Уменьшить текст (Ctrl+−, Ctrl+колесо мыши)</value>
+  </data>
+  <data name="FontBigger" xml:space="preserve">
+    <value>Увеличить текст (Ctrl++, Ctrl+колесо мыши)</value>
+  </data>
+  <data name="FontReset" xml:space="preserve">
+    <value>Размер текста. Щелчок — вернуть размер по умолчанию (Ctrl+0)</value>
+  </data>
+  <data name="PublisherHint" xml:space="preserve">
+    <value>кто выпустил пакет</value>
+  </data>
+  <data name="RestrictionHint" xml:space="preserve">
+    <value>например, 12+ или 18+</value>
+  </data>
+  <data name="TagsSelected" xml:space="preserve">
+    <value>Выбранные теги</value>
+  </data>
+  <data name="TagsNone" xml:space="preserve">
+    <value>Пока ничего не выбрано — щёлкните тег ниже или введите свой</value>
+  </data>
+  <data name="TagsPlaceholder" xml:space="preserve">
+    <value>Найти или добавить тег… (Enter — добавить)</value>
+  </data>
+  <data name="StatsChecks" xml:space="preserve">
+    <value>Что проверять</value>
+  </data>
+  <data name="StatsWarnings" xml:space="preserve">
+    <value>Замечания</value>
+  </data>
+  <data name="StatsDetails" xml:space="preserve">
+    <value>Подробно по раундам</value>
+  </data>
+  <data name="StatsRemoveUnusedHint" xml:space="preserve">
+    <value>Убрать из пакета файлы, которые не используются ни в одном вопросе. Перед удалением программа покажет их список и спросит подтверждение.</value>
+  </data>
 </root>

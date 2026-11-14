@@ -21,6 +21,7 @@ using SIQuester.ViewModel.Helpers;
 using SIStatisticsService.Client;
 using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -72,11 +73,36 @@ public partial class App : Application
     private static readonly Uri LightBlueThemeUri = new($"{MahAppsThemePathPrefix}Light.Blue.xaml", UriKind.Absolute);
     private static readonly Uri DarkBlueThemeUri = new($"{MahAppsThemePathPrefix}Dark.Blue.xaml", UriKind.Absolute);
 
+    private const string FluentThemePathPrefix = "pack://application:,,,/PresentationFramework.Fluent;component/Themes/";
+    private static readonly Uri FluentLightThemeUri = new($"{FluentThemePathPrefix}Fluent.Light.xaml", UriKind.Absolute);
+    private static readonly Uri FluentDarkThemeUri = new($"{FluentThemePathPrefix}Fluent.Dark.xaml", UriKind.Absolute);
+
+    private const string PalettePathPart = "/Palette.";
+    private static readonly Uri LightPaletteUri = new("pack://application:,,,/View/Dictionaries/Palette.Light.xaml", UriKind.Absolute);
+    private static readonly Uri DarkPaletteUri = new("pack://application:,,,/View/Dictionaries/Palette.Dark.xaml", UriKind.Absolute);
+
     private DispatcherTimer? _autoSaveTimer;
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
         AppSettings.Default = _settings;
+
+        // One-time move from the old default font to the new one (a font chosen later in the settings is kept)
+        if (!AppSettings.Default.ModernFontApplied)
+        {
+            if (AppSettings.Default.FontFamily == "Calibri")
+            {
+                AppSettings.Default.FontFamily = "Segoe UI Variable Text";
+
+                if (AppSettings.Default.FontSize == 15)
+                {
+                    AppSettings.Default.FontSize = 16;
+                }
+            }
+
+            AppSettings.Default.ModernFontApplied = true;
+        }
+
         AppSettings.Default.PropertyChanged += Default_PropertyChanged;
 
         if (!IsWindows8_1OrLater)
@@ -111,7 +137,15 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Office-like caret in all text boxes: glides to the new position and blinks softly
+        Behaviors.SmoothCaret.Register();
+
         base.OnStartup(e);
+
+        // Toolbar buttons are icons without captions, so their tooltips are the main hint: show them sooner
+        // (the WPF default is 1 s) and switch between neighbouring buttons quickly
+        System.Windows.Controls.ToolTipService.InitialShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(250));
+        System.Windows.Controls.ToolTipService.BetweenShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(50));
 
         try
         {
@@ -164,6 +198,9 @@ public partial class App : Application
         }
         catch (Exception exc)
         {
+            // The message box shows only the message: keep the full exception (type, stack trace) in the log
+            _logger?.LogError(exc, "Application run error: {message}", exc.Message);
+
             MessageBox.Show(
                 $"{SIQuester.Properties.Resources.AppRunError}: {exc.Message}.\r\n{SIQuester.Properties.Resources.AppWillBeClosed}",
                 ProductName,
@@ -185,17 +222,138 @@ public partial class App : Application
 
         if (Dispatcher.CheckAccess())
         {
-            UpdateTheme();
+            UpdateThemeSmoothly();
         }
         else
         {
-            Dispatcher.Invoke(UpdateTheme);
+            Dispatcher.Invoke(UpdateThemeSmoothly);
         }
+    }
+
+    /// <summary>
+    /// The window title bar is outside the snapshot: blend its color from the old theme to the new one.
+    /// </summary>
+    private void AnimateTitleBar(System.Windows.Media.Color? from)
+    {
+        if (from == null
+            || MainWindow is not MahApps.Metro.Controls.MetroWindow window
+            || TryFindResource("Ui.TitleBar") is not System.Windows.Media.SolidColorBrush target)
+        {
+            return;
+        }
+
+        var brush = new System.Windows.Media.SolidColorBrush(from.Value);
+        window.WindowTitleBrush = brush;
+
+        var animation = new System.Windows.Media.Animation.ColorAnimation(target.Color, TimeSpan.FromMilliseconds(500))
+        {
+            EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut },
+        };
+
+        // Afterwards follow the palette again (so later theme changes keep working)
+        animation.Completed += (_, _) => window.SetResourceReference(MahApps.Metro.Controls.MetroWindow.WindowTitleBrushProperty, "Ui.TitleBar");
+        brush.BeginAnimation(System.Windows.Media.SolidColorBrush.ColorProperty, animation);
+    }
+
+    /// <summary>
+    /// Changes the theme with a cross-fade: a snapshot of the old look is laid over the window and faded out.
+    /// </summary>
+    private void UpdateThemeSmoothly()
+    {
+        if (MainWindow?.Content is not System.Windows.Controls.Panel root || !root.IsLoaded || root.ActualWidth < 1 || root.ActualHeight < 1)
+        {
+            UpdateTheme();
+            return;
+        }
+
+        System.Windows.Controls.Border? snapshot = null;
+
+        try
+        {
+            var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(root);
+
+            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(
+                (int)Math.Ceiling(root.ActualWidth * dpi.DpiScaleX),
+                (int)Math.Ceiling(root.ActualHeight * dpi.DpiScaleY),
+                dpi.PixelsPerInchX,
+                dpi.PixelsPerInchY,
+                System.Windows.Media.PixelFormats.Pbgra32);
+
+            bitmap.Render(root);
+            bitmap.Freeze();
+
+            // The root panel has no background of its own (the window paints it), so the old window
+            // background goes under the picture; otherwise the new theme shows through at once
+            snapshot = new System.Windows.Controls.Border
+            {
+                Background = MainWindow.Background?.CloneCurrentValue(),
+                IsHitTestVisible = false,
+                Child = new System.Windows.Controls.Image
+                {
+                    Source = bitmap,
+                    Stretch = System.Windows.Media.Stretch.Fill,
+                },
+            };
+
+            System.Windows.Controls.Panel.SetZIndex(snapshot, int.MaxValue);
+            System.Windows.Controls.Grid.SetRowSpan(snapshot, 100);
+            System.Windows.Controls.Grid.SetColumnSpan(snapshot, 100);
+            root.Children.Add(snapshot);
+        }
+        catch (Exception exc)
+        {
+            _logger?.LogWarning(exc, "Theme snapshot failed");
+            snapshot = null;
+        }
+
+        var oldTitleColor = (MainWindow as MahApps.Metro.Controls.MetroWindow)?.WindowTitleBrush is System.Windows.Media.SolidColorBrush titleBrush
+            ? titleBrush.Color
+            : (System.Windows.Media.Color?)null;
+
+        if (snapshot == null)
+        {
+            UpdateTheme();
+            AnimateTitleBar(oldTitleColor);
+            return;
+        }
+
+        // Hold the title bar at its old color until the fade starts (it is outside the snapshot)
+        if (oldTitleColor != null && MainWindow is MahApps.Metro.Controls.MetroWindow metroWindow)
+        {
+            metroWindow.WindowTitleBrush = new System.Windows.Media.SolidColorBrush(oldTitleColor.Value);
+        }
+
+        // 1) Let the still snapshot be painted first (Background runs after rendering).
+        // 2) Apply the new theme underneath it: restyling every control is the heavy part, and nothing moves meanwhile.
+        // 3) Once the new look is laid out and rendered (ContextIdle), fade the snapshot out: the animation
+        //    then runs on an idle UI thread and stays smooth.
+        Dispatcher.BeginInvoke(
+            () =>
+            {
+                UpdateTheme();
+
+                Dispatcher.BeginInvoke(
+                    () =>
+                    {
+                        AnimateTitleBar(oldTitleColor);
+
+                        var fade = new System.Windows.Media.Animation.DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(450))
+                        {
+                            EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut },
+                        };
+
+                        fade.Completed += (_, _) => root.Children.Remove(snapshot);
+                        snapshot.BeginAnimation(UIElement.OpacityProperty, fade);
+                    },
+                    DispatcherPriority.ContextIdle);
+            },
+            DispatcherPriority.Background);
     }
 
     private void UpdateTheme()
     {
-        var themeUri = _settings.Theme == ThemeOption.Light ? LightBlueThemeUri : DarkBlueThemeUri;
+        var isLight = _settings.Theme == ThemeOption.Light;
+        var themeUri = isLight ? LightBlueThemeUri : DarkBlueThemeUri;
         var dictionaries = Resources.MergedDictionaries;
 
         var themeDictionary = dictionaries.FirstOrDefault(
@@ -206,12 +364,48 @@ public partial class App : Application
         if (themeDictionary is null)
         {
             dictionaries.Insert(0, new ResourceDictionary { Source = themeUri });
-            return;
         }
-
-        if (themeDictionary.Source != themeUri)
+        else if (themeDictionary.Source != themeUri)
         {
             themeDictionary.Source = themeUri;
+        }
+
+        ReplaceDictionary(dictionaries, FluentThemePathPrefix, isLight ? FluentLightThemeUri : FluentDarkThemeUri);
+        ReplaceDictionary(dictionaries, PalettePathPart, isLight ? LightPaletteUri : DarkPaletteUri);
+
+        // Monochrome toolbar icons: their colors follow the theme
+        FluentIcons.Apply(Resources, !isLight);
+    }
+
+    /// <summary>
+    /// Replaces a merged dictionary in place: Fluent must stay after the MahApps dictionaries and the palette after Fluent.
+    /// </summary>
+    private void ReplaceDictionary(Collection<ResourceDictionary> dictionaries, string sourcePart, Uri newSource)
+    {
+        for (var i = 0; i < dictionaries.Count; i++)
+        {
+            var source = dictionaries[i].Source;
+
+            if (source is null || !source.OriginalString.Contains(sourcePart, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (source.OriginalString.EndsWith(Path.GetFileName(newSource.OriginalString), StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            try
+            {
+                dictionaries[i] = new ResourceDictionary { Source = newSource };
+            }
+            catch (Exception exc)
+            {
+                _logger?.LogWarning(exc, "Failed to switch dictionary {source}", newSource);
+            }
+
+            return;
         }
     }
 

@@ -466,6 +466,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatically compress pictures larger than the SIGame limit (1 MB) when adding them.
+        /// </summary>
+        public static string AutoCompressMedia {
+            get {
+                return ResourceManager.GetString("AutoCompressMedia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto-detect.
         /// </summary>
         public static string AutoDetect {
@@ -858,6 +867,15 @@ namespace SIQuester.Properties {
         public static string ContactUri {
             get {
                 return ResourceManager.GetString("ContactUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to author&apos;s website, e-mail or Telegram.
+        /// </summary>
+        public static string ContactUriHint {
+            get {
+                return ResourceManager.GetString("ContactUriHint", resourceCulture);
             }
         }
         
@@ -1498,6 +1516,33 @@ namespace SIQuester.Properties {
         public static string FlatLayoutModeTable {
             get {
                 return ResourceManager.GetString("FlatLayoutModeTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Larger text (Ctrl++, Ctrl+mouse wheel).
+        /// </summary>
+        public static string FontBigger {
+            get {
+                return ResourceManager.GetString("FontBigger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text size. Click to restore the default (Ctrl+0).
+        /// </summary>
+        public static string FontReset {
+            get {
+                return ResourceManager.GetString("FontReset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Smaller text (Ctrl+−, Ctrl+mouse wheel).
+        /// </summary>
+        public static string FontSmaller {
+            get {
+                return ResourceManager.GetString("FontSmaller", resourceCulture);
             }
         }
         
@@ -2360,6 +2405,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to who published the pack.
+        /// </summary>
+        public static string PublisherHint {
+            get {
+                return ResourceManager.GetString("PublisherHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (all).
         /// </summary>
         public static string PublishersAll {
@@ -2587,6 +2641,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove authors.
+        /// </summary>
+        public static string RemoveAuthors {
+            get {
+                return ResourceManager.GetString("RemoveAuthors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove comment.
         /// </summary>
         public static string RemoveComment {
@@ -2646,6 +2709,15 @@ namespace SIQuester.Properties {
         public static string RemoveRound {
             get {
                 return ResourceManager.GetString("RemoveRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove sources.
+        /// </summary>
+        public static string RemoveSources {
+            get {
+                return ResourceManager.GetString("RemoveSources", resourceCulture);
             }
         }
         
@@ -2722,6 +2794,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to e.g. 12+ or 18+.
+        /// </summary>
+        public static string RestrictionHint {
+            get {
+                return ResourceManager.GetString("RestrictionHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Percentage of correct answers.
         /// </summary>
         public static string RightPercentTooltip {
@@ -2781,6 +2862,17 @@ namespace SIQuester.Properties {
         public static string RoundTypeFinalHint {
             get {
                 return ResourceManager.GetString("RoundTypeFinalHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Round type: how the round is played.
+        ///Table: a board of themes and prices; players pick questions and press the button (usually 5 questions per theme).
+        ///Theme list: players remove themes in turn; on the last one everyone bets and writes an answer (1 question per theme)..
+        /// </summary>
+        public static string RoundTypeHint {
+            get {
+                return ResourceManager.GetString("RoundTypeHint", resourceCulture);
             }
         }
         
@@ -2880,6 +2972,15 @@ namespace SIQuester.Properties {
         public static string SearchFolder {
             get {
                 return ResourceManager.GetString("SearchFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search the pack.
+        /// </summary>
+        public static string SearchPlaceholder {
+            get {
+                return ResourceManager.GetString("SearchPlaceholder", resourceCulture);
             }
         }
         
@@ -3415,6 +3516,114 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New pack.
+        /// </summary>
+        public static string StartNew {
+            get {
+                return ResourceManager.GetString("StartNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick a template and start.
+        /// </summary>
+        public static string StartNewHint {
+            get {
+                return ResourceManager.GetString("StartNewHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open a pack.
+        /// </summary>
+        public static string StartOpen {
+            get {
+                return ResourceManager.GetString("StartOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A .siq file from your computer.
+        /// </summary>
+        public static string StartOpenHint {
+            get {
+                return ResourceManager.GetString("StartOpenHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Question pack editor for SIGame.
+        /// </summary>
+        public static string StartSubtitle {
+            get {
+                return ResourceManager.GetString("StartSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No issues found.
+        /// </summary>
+        public static string StatisticsNoWarnings {
+            get {
+                return ResourceManager.GetString("StatisticsNoWarnings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to rounds.
+        /// </summary>
+        public static string StatisticsRounds {
+            get {
+                return ResourceManager.GetString("StatisticsRounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to themes.
+        /// </summary>
+        public static string StatisticsThemes {
+            get {
+                return ResourceManager.GetString("StatisticsThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What to check.
+        /// </summary>
+        public static string StatsChecks {
+            get {
+                return ResourceManager.GetString("StatsChecks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to By round.
+        /// </summary>
+        public static string StatsDetails {
+            get {
+                return ResourceManager.GetString("StatsDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove files that no question uses. The list is shown for confirmation first..
+        /// </summary>
+        public static string StatsRemoveUnusedHint {
+            get {
+                return ResourceManager.GetString("StatsRemoveUnusedHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Issues.
+        /// </summary>
+        public static string StatsWarnings {
+            get {
+                return ResourceManager.GetString("StatsWarnings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Steam.
         /// </summary>
         public static string Steam {
@@ -3478,6 +3687,33 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nothing selected yet — click a tag below or type your own.
+        /// </summary>
+        public static string TagsNone {
+            get {
+                return ResourceManager.GetString("TagsNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find or add a tag… (Enter — add).
+        /// </summary>
+        public static string TagsPlaceholder {
+            get {
+                return ResourceManager.GetString("TagsPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected tags.
+        /// </summary>
+        public static string TagsSelected {
+            get {
+                return ResourceManager.GetString("TagsSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Template.
         /// </summary>
         public static string Template {
@@ -3501,6 +3737,15 @@ namespace SIQuester.Properties {
         public static string TextBeforeThemeName {
             get {
                 return ResourceManager.GetString("TextBeforeThemeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type the text….
+        /// </summary>
+        public static string TextItemHint {
+            get {
+                return ResourceManager.GetString("TextItemHint", resourceCulture);
             }
         }
         
@@ -3622,11 +3867,74 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Today.
+        /// </summary>
+        public static string Today {
+            get {
+                return ResourceManager.GetString("Today", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set today&apos;s date.
+        /// </summary>
+        public static string TodayTip {
+            get {
+                return ResourceManager.GetString("TodayTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light / dark theme.
+        /// </summary>
+        public static string ToggleTheme {
+            get {
+                return ResourceManager.GetString("ToggleTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change type (to oral or back).
         /// </summary>
         public static string ToggleToOralAndBack {
             get {
                 return ResourceManager.GetString("ToggleToOralAndBack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logo.
+        /// </summary>
+        public static string ToolbarLogo {
+            get {
+                return ResourceManager.GetString("ToolbarLogo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Question body.
+        /// </summary>
+        public static string ToolbarQuestionBody {
+            get {
+                return ResourceManager.GetString("ToolbarQuestionBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Answers.
+        /// </summary>
+        public static string ToolbarRightAnswers {
+            get {
+                return ResourceManager.GetString("ToolbarRightAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong answers.
+        /// </summary>
+        public static string ToolbarWrongAnswers {
+            get {
+                return ResourceManager.GetString("ToolbarWrongAnswers", resourceCulture);
             }
         }
         
