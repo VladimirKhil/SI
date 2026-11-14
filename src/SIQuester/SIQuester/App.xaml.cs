@@ -86,6 +86,23 @@ public partial class App : Application
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
         AppSettings.Default = _settings;
+
+        // One-time move from the old default font to the new one (a font chosen later in the settings is kept)
+        if (!AppSettings.Default.ModernFontApplied)
+        {
+            if (AppSettings.Default.FontFamily == "Calibri")
+            {
+                AppSettings.Default.FontFamily = "Segoe UI Variable Text";
+
+                if (AppSettings.Default.FontSize == 15)
+                {
+                    AppSettings.Default.FontSize = 16;
+                }
+            }
+
+            AppSettings.Default.ModernFontApplied = true;
+        }
+
         AppSettings.Default.PropertyChanged += Default_PropertyChanged;
 
         if (!IsWindows8_1OrLater)

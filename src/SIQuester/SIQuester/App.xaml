@@ -41,6 +41,17 @@
             <ControlTemplate TargetType="ContentControl" x:Key="EmptyTemplate" />
             
             <BooleanToVisibilityConverter x:Key="VisibilityConverter" />
+
+            <!-- Menus and tooltips are popups and do not inherit the window font: use the same font with a readable size -->
+            <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
+                <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+                <Setter Property="FontSize" Value="14" />
+            </Style>
+
+            <Style TargetType="ToolTip" BasedOn="{StaticResource {x:Type ToolTip}}">
+                <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+                <Setter Property="FontSize" Value="13" />
+            </Style>
             <siqcv:GreaterThanValueConverter BaseValue="0" x:Key="GreaterZero" />
 
             <siqcv:ThemeToBrushConverter
