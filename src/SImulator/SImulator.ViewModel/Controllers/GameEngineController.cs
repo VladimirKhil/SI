@@ -441,7 +441,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => GameViewModel.OnQuestionSelected(themeIndex, questionIndex);
 
-    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
+    public void OnThemeList(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
         GameViewModel.OnFinalThemes(themes.Select(t => t.Name).ToList());
         GameViewModel.ClearThemesComments();

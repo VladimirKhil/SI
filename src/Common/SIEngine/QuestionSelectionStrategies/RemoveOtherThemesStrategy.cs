@@ -74,7 +74,7 @@ internal sealed class RemoveOtherThemesStrategy : ISelectionStrategy
             _leftFinalThemesIndicies.Add(i);
         }
 
-        _playHandler.OnFinalThemes(_finalThemes, _options.PlayAllQuestionsInFinalRound, _isFirstPlay);
+        _playHandler.OnThemeList(_finalThemes, _options.PlayAllQuestionsInFinalRound, _isFirstPlay);
         return _finalThemes.Count == 1 ? Stage.ThemeSelected : Stage.AskDelete;
     }
 

@@ -81,8 +81,8 @@ public static class WellKnownGameRules
 
         TurnTaking.RoundRules[RoundTypes.Final] = TurnTaking.RoundRules[RoundTypes.ThemeList] = new()
         {
-            DefaultQuestionType = QuestionTypes.StakeAll,
-            QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes
+            DefaultQuestionType = QuestionTypes.StakeAll, // QuestionTypes.ForYourself,
+            QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes // QuestionSelectionStrategyType.SelectThemeByPlayer
         };
     }
 }

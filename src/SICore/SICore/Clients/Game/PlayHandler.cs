@@ -132,12 +132,16 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback)
     {
+        SetupChooser();
+
         Controller.SetContinuation(() => selectCallback(_state.ThemeIndex, _state.QuestionIndex));
         Controller.ScheduleExecution(Tasks.AskToSelectQuestion, 1, force: true); // TODO: why not calling AskToSelectQuestion directly?
     }
 
     public void AskForThemeSelection(IReadOnlyCollection<int> options, Action<int> selectCallback)
     {
+        SetupChooser();
+
         _state.ThemeSelectionOptions = [.. options];
         _state.ThemeIndex = -1;
         Controller.SetContinuation(() => selectCallback(_state.ThemeIndex));
@@ -146,13 +150,23 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public void OnQuestionSelected(int themeIndex, int questionIndex) => Controller.OnQuestionSelected(themeIndex, questionIndex);
 
-    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
+    public void OnThemeList(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
-        InformActivePlayers();
+        var isThemeRemoval = _state.RoundStrategy == QuestionSelectionStrategyType.RemoveOtherThemes;
+
+        if (isThemeRemoval)
+        {
+            InformActivePlayers();
+        }
 
         Controller.InitThemes(themes, willPlayAllThemes, isFirstPlay, ThemesPlayMode.AllTogether);
-        _state.ThemeDeleters = new ThemeDeletersEnumerator(_state.Players, _state.TInfo.RoundInfo.Count(t => t.Name != null));
-        _state.ThemeDeleters.Reset(true);
+
+        if (isThemeRemoval)
+        {
+            _state.ThemeDeleters = new ThemeDeletersEnumerator(_state.Players, _state.TInfo.RoundInfo.Count(t => t.Name != null));
+            _state.ThemeDeleters.Reset(true);
+        }
+
         Controller.ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));
     }
 
@@ -205,6 +219,7 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     public void OnTheme(Theme theme)
     {
         _state.Theme = theme;
+        _state.ThemesPlayMode = ThemesPlayMode.None;
         GameActions.SendThemeInfo();
         _state.InformStages |= InformStages.Theme;
         Controller.ScheduleExecution(Tasks.MoveNext, 20);
@@ -234,4 +249,12 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
     public void OnGameThemes(IEnumerable<string> themes) => Controller.OnGameThemes(themes);
 
     public void OnPackageEnd() => Controller.OnEndGame();
+
+    private void SetupChooser()
+    {
+        if (Controller.GetTurnSwitchingStrategy() == TurnSwitchingStrategy.Sequentially && _state.QuestionCounter > 0)
+        {
+            Controller.SwitchChooser();
+        }
+    }
 }

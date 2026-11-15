@@ -696,9 +696,9 @@ internal class TrackingGameHandler : ISIEnginePlayHandler
         CallOrder.Add("OnRoundThemes");
     }
 
-    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
+    public void OnThemeList(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
-        CallOrder.Add("OnFinalThemes");
+        CallOrder.Add("OnThemeList");
     }
 
     public void AskForQuestionSelection(IReadOnlyCollection<(int, int)> options, Action<int, int> selectCallback)

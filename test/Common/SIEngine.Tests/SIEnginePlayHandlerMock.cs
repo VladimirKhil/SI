@@ -22,7 +22,7 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
         
     }
 
-    public void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
+    public void OnThemeList(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay)
     {
         
     }

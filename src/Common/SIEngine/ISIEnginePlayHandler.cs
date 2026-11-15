@@ -58,13 +58,13 @@ public interface ISIEnginePlayHandler
     void OnRoundThemes(IReadOnlyList<Theme> themes, IRoundTableController tableController);
 
     /// <summary>
-    /// Handles final round themes list. 
+    /// Handles themes list displayed at once.
     /// </summary>
     /// <param name="themes">Round themes.</param>
     /// <param name="willPlayAllThemes">Will all the themes be played.</param>
     /// <param name="isFirstPlay">Is this the first theme in this round.</param>
     /// <remarks>Could be called multiple times per round.</remarks>
-    void OnFinalThemes(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay);
+    void OnThemeList(IReadOnlyList<Theme> themes, bool willPlayAllThemes, bool isFirstPlay);
 
     /// <summary>
     /// Handles question selection request.

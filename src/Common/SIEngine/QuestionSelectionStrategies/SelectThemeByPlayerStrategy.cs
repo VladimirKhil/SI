@@ -5,15 +5,17 @@ namespace SIEngine.QuestionSelectionStrategies;
 /// <summary>
 /// Allows player having a turn to select only the theme. All theme questions are played sequentially.
 /// </summary>
-internal sealed class SelectThemeByPlayerStrategy : ISelectionStrategy, IRoundTableController
+internal sealed class SelectThemeByPlayerStrategy : ISelectionStrategy
 {
     private readonly Round _round;
     private readonly ISIEnginePlayHandler _playHandler;
     private readonly Action<int, int> _selectionCallback;
 
     private readonly SortedSet<int> _availableThemes = [];
+    private readonly List<int> _listedThemes = [];
 
-    private Stage _stage = Stage.RoundThemes;
+    private Stage _stage = Stage.ThemeList;
+    private bool _isFirstPlay = true;
 
     private int _themeIndex = -1, _questionIndex = -1;
 
@@ -35,17 +37,16 @@ internal sealed class SelectThemeByPlayerStrategy : ISelectionStrategy, IRoundTa
     public bool ShouldPlayRound() => _availableThemes.Count != 0;
 
     public bool CanMoveNext() =>
-        _stage == Stage.RoundThemes
-        || _stage == Stage.AskTheme && _availableThemes.Count != 0
+        _stage == Stage.ThemeList && _availableThemes.Count != 0
+        || _stage == Stage.AskTheme
         || _stage == Stage.Question;
 
     public void MoveNext()
     {
         switch (_stage)
         {
-            case Stage.RoundThemes:
-                _playHandler.OnRoundThemes(_round.Themes, this);
-                _stage = Stage.AskTheme;
+            case Stage.ThemeList:
+                OnThemeList();
                 break;
 
             case Stage.AskTheme:
@@ -58,27 +59,37 @@ internal sealed class SelectThemeByPlayerStrategy : ISelectionStrategy, IRoundTa
         }
     }
 
-    public bool CanMoveBack() => false;
-
-    public void MoveBack()
+    private void OnThemeList()
     {
+        _listedThemes.Clear();
+        _listedThemes.AddRange(_availableThemes);
+
+        _playHandler.OnThemeList(_listedThemes.Select(index => _round.Themes[index]).ToList(), true, _isFirstPlay);
+        _isFirstPlay = false;
+        _stage = Stage.AskTheme;
     }
-
-    public bool RemoveQuestion(int themeIndex, int questionIndex) => false;
-
-    public bool RestoreQuestion(int themeIndex, int questionIndex) => false;
 
     private void OnAskTheme()
     {
         _stage = Stage.WaitTheme;
 
-        if (_availableThemes.Count == 1)
+        if (_listedThemes.Count == 1)
         {
-            SelectTheme(_availableThemes.First());
+            SelectListedTheme(0);
             return;
         }
 
-        _playHandler.AskForThemeSelection(_availableThemes, SelectTheme);
+        _playHandler.AskForThemeSelection(Enumerable.Range(0, _listedThemes.Count).ToArray(), SelectListedTheme);
+    }
+
+    private void SelectListedTheme(int listedIndex)
+    {
+        if (listedIndex < 0 || listedIndex >= _listedThemes.Count)
+        {
+            return;
+        }
+
+        SelectTheme(_listedThemes[listedIndex]);
     }
 
     private void SelectTheme(int themeIndex)
@@ -103,7 +114,7 @@ internal sealed class SelectThemeByPlayerStrategy : ISelectionStrategy, IRoundTa
         var questionIndex = _questionIndex;
         MoveNextQuestion();
 
-        _stage = _questionIndex < _round.Themes[_themeIndex].Questions.Count ? Stage.Question : Stage.AskTheme;
+        _stage = _questionIndex < _round.Themes[_themeIndex].Questions.Count ? Stage.Question : Stage.ThemeList;
         _selectionCallback(_themeIndex, questionIndex);
     }
 
@@ -118,7 +129,7 @@ internal sealed class SelectThemeByPlayerStrategy : ISelectionStrategy, IRoundTa
 
     private enum Stage
     {
-        RoundThemes,
+        ThemeList,
         AskTheme,
         WaitTheme,
         Question

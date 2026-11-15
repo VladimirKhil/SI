@@ -275,12 +275,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         ScheduleExecution(Tasks.QuestionPostInfo, taskTime, force: true);
 
-        if (GetTurnSwitchingStrategy() == TurnSwitchingStrategy.Sequentially)
-        {
-            _state.ChooserIndex = (_state.ChooserIndex + 1) % _state.Players.Count;
-            _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
-        }
-
         if (_state.QuestionPlay.AppellationState != AppellationState.None && _state.QuestionPlay.Appellations.Any())
         {
             ProcessNextAppellationRequest(true);
@@ -319,6 +313,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.QuestionPlay.Clear();
         _state.ThemeDeleters = null;
         _state.RoundStrategy = strategyType;
+        _state.QuestionCounter = 0;
 
         OnRound(round, 1);
         SetRoundPrices(round);
@@ -420,6 +415,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
     private void InitQuestionState(Question question)
     {
         // TODO: move all to question play state
+        _state.QuestionCounter++;
         _state.QuestionHistory.Clear();
         _state.PendingAnswererIndex = -1;
         _state.AnswererPressDuration = -1;
@@ -1444,7 +1440,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         return true;
     }
 
-    private TurnSwitchingStrategy GetTurnSwitchingStrategy() => _state.Rules.GameMode switch
+    internal TurnSwitchingStrategy GetTurnSwitchingStrategy() => _state.Rules.GameMode switch
     {
         SI.Contracts.GameMode.Classic => TurnSwitchingStrategy.ByRightAnswerOnButton,
         SI.Contracts.GameMode.Sequential => TurnSwitchingStrategy.Never,
@@ -1452,8 +1448,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         SI.Contracts.GameMode.TurnTaking => TurnSwitchingStrategy.Sequentially,
         _ => TurnSwitchingStrategy.Never,
     };
-
-    private static string PrintRightFactor(double factor) => Math.Abs(factor - 1.0) < double.Epsilon ? "" : " * " + factor;
 
     /// <summary>
     /// Skips left question part and moves directly to answer.
@@ -3002,6 +2996,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void OnAskToSelectTheme()
     {
+        if (_state.ChooserIndex == -1)
+        {
+            _state.ChooserIndex = DetectPlayerIndexWithLowestSum();
+        }
+
         if (_state.Chooser == null)
         {
             throw new Exception("_data.Chooser == null");
@@ -3012,7 +3011,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         _state.ThemeIndex = -1;
 
         var time = _state.TimeSettings.ThemeSelection * 10;
-        var message = new MessageBuilder(Messages.AskSelectTheme).AddRange(_state.ThemeSelectionOptions.Cast<object>()).ToString();
+        var message = new MessageBuilder(Messages.AskSelectTheme).Add('+').AddRange(_state.ThemeSelectionOptions.Cast<object>()).ToString();
         _state.IsOralNow = _state.IsOral && _state.Chooser.IsHuman;
 
         if (_state.IsOralNow)
@@ -3047,6 +3046,12 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
         _state.ThemeIndex = _state.ThemeSelectionOptions.ElementAt(Random.Shared.Next(_state.ThemeSelectionOptions.Count));
         OnDecision();
+    }
+
+    internal void SwitchChooser()
+    {
+        _state.ChooserIndex = (_state.ChooserIndex + 1) % _state.Players.Count;
+        _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
     }
 
     private void OnAskToSelectQuestion()

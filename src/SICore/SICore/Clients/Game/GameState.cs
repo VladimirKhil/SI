@@ -429,6 +429,11 @@ public sealed class GameState : Data
     /// </summary>
     public bool IsQuestionFinished { get; set; }
 
+    /// <summary>
+    /// Number of questions started in the current round.
+    /// </summary>
+    public int QuestionCounter { get; set; }
+
     public int AtomTime { get; set; }
 
     public DateTime AtomStart { get; set; }

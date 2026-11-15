@@ -1499,6 +1499,7 @@ public sealed class Game : MessageHandler
     {
         var roundIndex = _controller.Engine.RoundIndex;
         _actions.InformStageInfo(person, roundIndex);
+        _actions.InformQuestionCounter(_state.QuestionCounter, person);
 
         if ((_state.InformStages & InformStages.RoundNames) > 0)
         {
