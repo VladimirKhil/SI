@@ -3631,6 +3631,42 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Logo.
+        /// </summary>
+        public static string ToolbarLogo {
+            get {
+                return ResourceManager.GetString("ToolbarLogo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Question body.
+        /// </summary>
+        public static string ToolbarQuestionBody {
+            get {
+                return ResourceManager.GetString("ToolbarQuestionBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Answers.
+        /// </summary>
+        public static string ToolbarRightAnswers {
+            get {
+                return ResourceManager.GetString("ToolbarRightAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong answers.
+        /// </summary>
+        public static string ToolbarWrongAnswers {
+            get {
+                return ResourceManager.GetString("ToolbarWrongAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File search.
         /// </summary>
         public static string ToolTipFileSearch {
