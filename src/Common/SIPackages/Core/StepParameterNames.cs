@@ -44,4 +44,9 @@ public static class StepParameterNames
     /// Target duration.
     /// </summary>
     public const string Duration = "duration";
+
+    /// <summary>
+    /// Answering stage completion mode.
+    /// </summary>
+    public const string CompletionMode = "completionMode";
 }

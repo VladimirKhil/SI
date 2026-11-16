@@ -25,6 +25,11 @@ public static class StepParameterValues
     public const string AskAnswerMode_Direct = "direct";
 
     /// <summary>
+    /// First correct AskAnswer completion mode: the first right answer finishes the answering stage and is the only one scored.
+    /// </summary>
+    public const string AskAnswerCompletionMode_FirstCorrect = "firstCorrect";
+
+    /// <summary>
     /// Stake SetAnswerer mode.
     /// </summary>
     public const string SetAnswererMode_Stake = "stake";

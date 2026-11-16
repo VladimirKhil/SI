@@ -49,4 +49,13 @@ public static class QuestionParameterNames
     /// Answer duration in seconds.
     /// </summary>
     public const string AnswerDuration = "answerDuration";
+
+    /// <summary>
+    /// Answering stage completion mode of a question for all.
+    /// </summary>
+    /// <remarks>
+    /// Supported values: <see cref="StepParameterValues.AskAnswerCompletionMode_FirstCorrect" />.
+    /// When the parameter is missing or has an unknown value, every answer is judged.
+    /// </remarks>
+    public const string CompletionMode = "completionMode";
 }

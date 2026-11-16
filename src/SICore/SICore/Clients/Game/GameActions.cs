@@ -493,11 +493,20 @@ public sealed class GameActions
     internal void InformAnswerDeviation(double deviation, string person = NetworkConstants.Everybody) =>
         SendMessageToWithArgs(person, Messages.AnswerDeviation, deviation);
 
-    internal void AskAnswer(string person, AnswerType answerType) =>
-        SendMessageToWithArgs(
-            person,
-            Messages.Answer,
-            answerType.ToString().ToLowerInvariant());
+    internal void AskAnswer(string person, AnswerType answerType, bool canPass = false)
+    {
+        var answerTypeName = answerType.ToString().ToLowerInvariant();
+
+        if (canPass)
+        {
+            // The player can refuse to answer by sending the PASS message
+            SendMessageToWithArgs(person, Messages.Answer, answerTypeName, '+');
+        }
+        else
+        {
+            SendMessageToWithArgs(person, Messages.Answer, answerTypeName);
+        }
+    }
 
     internal void SendAppellationCancellationsToActivePlayers()
     {
