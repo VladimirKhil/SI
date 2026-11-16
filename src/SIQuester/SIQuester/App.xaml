@@ -29,6 +29,10 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+                <!-- Fluent (Windows 11) look for standard controls. Must stay after MahApps dictionaries so its implicit styles win -->
+                <ResourceDictionary Source="pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.Light.xaml" />
+                <!-- Colors of the new UI elements and the app accent for Fluent controls (light / dark is switched in App.UpdateTheme) -->
+                <ResourceDictionary Source="View/Dictionaries/Palette.Light.xaml" />
                 <ResourceDictionary Source="/Icons.xaml" />
                 <ResourceDictionary Source="View/Dictionaries/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
