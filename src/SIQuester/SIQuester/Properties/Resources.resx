@@ -1428,4 +1428,13 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="StatisticsRounds" xml:space="preserve">
+    <value>rounds</value>
+  </data>
+  <data name="StatisticsThemes" xml:space="preserve">
+    <value>themes</value>
+  </data>
+  <data name="StatisticsNoWarnings" xml:space="preserve">
+    <value>No issues found</value>
+  </data>
 </root>
