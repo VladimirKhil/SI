@@ -2,6 +2,7 @@
 using SIPackages;
 using SIPackages.Core;
 using SIPackages.Models;
+using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Model;
@@ -684,6 +685,27 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     public MediaItemViewModel AddFile(string file, string? name = null)
     {
+        // Larger than the SIGame limit (picture > 1 MB): add a compressed copy instead
+        if (AppSettings.Default.AutoCompressMedia
+            && Quality.FileSizeMb.TryGetValue(_name, out var limitMb)
+            && File.Exists(file)
+            && new FileInfo(file).Length > limitMb * 1024L * 1024L)
+        {
+            var shrunk = PlatformManager.Instance.ShrinkMediaIfNeeded(file, _name, limitMb * 1024L * 1024L);
+
+            if (shrunk != file)
+            {
+                // The format may change (e.g. PNG → JPEG): keep the given name but with the new extension
+                if (name != null && !string.Equals(Path.GetExtension(name), Path.GetExtension(shrunk), StringComparison.OrdinalIgnoreCase))
+                {
+                    name = Path.ChangeExtension(name, Path.GetExtension(shrunk));
+                }
+
+                name ??= Path.ChangeExtension(Path.GetFileName(file), Path.GetExtension(shrunk));
+                file = shrunk;
+            }
+        }
+
         if (_document.Package.HasQualityControl)
         {
             ValidateFileExtensionAndSize(file);

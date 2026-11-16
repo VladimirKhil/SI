@@ -13,7 +13,7 @@
     <UserControl.Resources>
         <Style x:Key="LightTextBox" TargetType="{x:Type TextBox}">
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Background" Value="{StaticResource WhiteBrush}" />
+            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ThemeBackground}" />
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Height" Value="Auto" />
@@ -88,9 +88,9 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
-        <StackPanel Orientation="Horizontal" Background="{StaticResource LavenderBrush}">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
             <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SideIconButton}">
                     <Style.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Visibility" Value="Hidden" />
@@ -99,16 +99,16 @@
                 </Style>
             </StackPanel.Resources>
             
-            <Button Name="bAdd" Command="{Binding Add}" ToolTip="Добавить" Width="25" Height="25">
-                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_add},Path=Data}" />
+            <Button Name="bAdd" Command="{Binding Add}" ToolTip="Добавить" Width="30" Height="30">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE710;" />
             </Button>
             
-            <Button Command="{Binding MoveUp}" Margin="5,0,0,0" Name="bUp" ToolTip="Вверх" Width="25" Height="25">
-                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_up},Path=Data}" />
+            <Button Command="{Binding MoveUp}" Margin="5,0,0,0" Name="bUp" ToolTip="Вверх" Width="30" Height="30">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE74A;" />
             </Button>
             
-            <Button Command="{Binding MoveDown}" Margin="5,0,0,0" Name="bDown" ToolTip="Вниз" Width="25" Height="25">
-                <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_down},Path=Data}" />
+            <Button Command="{Binding MoveDown}" Margin="5,0,0,0" Name="bDown" ToolTip="Вниз" Width="30" Height="30">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE74B;" />
             </Button>
         </StackPanel>
         
@@ -139,7 +139,7 @@
                                         <Button
                                             Name="bDelete"
                                             Visibility="Hidden"
-                                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                            Style="{StaticResource SideIconButton}"
                                             ToolTip="Удалить"
                                             DockPanel.Dock="Right"
                                             VerticalAlignment="Top"
@@ -147,12 +147,7 @@
                                             Command="{Binding DataContext.Remove, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                             CommandParameter="{Binding}">
                                             
-                                            <Path
-                                                Stretch="Uniform"
-                                                Stroke="{StaticResource IconBrush}"
-                                                Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                                                Margin="3"
-                                                Data="{Binding Source={StaticResource app_delete},Path=Data}" />
+                                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Glyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Text="&#xE711;" />
                                         </Button>
                                         
                                         <ContentPresenter Content="{Binding}" />
