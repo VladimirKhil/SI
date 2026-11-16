@@ -467,6 +467,15 @@
                 VerticalAlignment="Stretch"
                 Width="25"
                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                ToolTip="{x:Static lp:Resources.ToggleTheme}"
+                Command="{Binding ToggleTheme}">
+                <TextBlock Text="&#xE706;" FontFamily="Segoe MDL2 Assets" FontSize="15" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" />
+            </Button>
+
+            <Button
+                VerticalAlignment="Stretch"
+                Width="25"
+                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 ToolTip="{x:Static lp:Resources.Settings}"
                 Command="{Binding SetSettings}">                
                 <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_cog},Path=Data}" />                

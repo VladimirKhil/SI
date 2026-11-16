@@ -3622,6 +3622,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Light / dark theme.
+        /// </summary>
+        public static string ToggleTheme {
+            get {
+                return ResourceManager.GetString("ToggleTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change type (to oral or back).
         /// </summary>
         public static string ToggleToOralAndBack {
