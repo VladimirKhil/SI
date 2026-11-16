@@ -29,6 +29,20 @@
                 <ResourceDictionary Source="MenuDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- Side panel tab icon: Fluent glyph, accent color on the selected tab -->
+            <Style x:Key="SideTabGlyph" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{DynamicResource Ui.Glyph}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource Ui.Accent}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <siqcv:TemplateConverter x:Key="ViewSelector">
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <DataTemplate>
@@ -79,25 +93,109 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         
-        <DockPanel Grid.ColumnSpan="3" Height="30" Name="statusBar1" HorizontalAlignment="Stretch">
+        <!-- Top command bar styled like the Office ribbon: soft background, thin bottom line, rounded animated buttons -->
+        <Border
+            Grid.ColumnSpan="3"
+            Background="{DynamicResource Ui.TopBar}"
+            BorderBrush="{DynamicResource Ui.CardStroke}"
+            BorderThickness="0,0,0,1" />
+
+        <DockPanel Grid.ColumnSpan="3" Height="40" Name="statusBar1" HorizontalAlignment="Stretch" Margin="6,0">
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
                 <StackPanel.Resources>
                     <Style x:Key="{x:Type Image}" TargetType="{x:Type Image}">
                         <Setter Property="Width" Value="20" />
                         <Setter Property="Height" Value="20" />
                     </Style>
-                    
-                    <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                    
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                        <Setter Property="Width" Value="35" />
+
+                    <!-- Monochrome Windows 11 / Office icon glyphs -->
+                    <Style x:Key="TopBarGlyph" TargetType="TextBlock">
+                        <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                        <Setter Property="FontSize" Value="17" />
+                        <Setter Property="Foreground" Value="{DynamicResource Ui.Glyph}" />
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+
+
+                    <ControlTemplate x:Key="TopBarButtonTemplate" TargetType="ButtonBase">
+                        <Grid Background="Transparent">
+                            <Border x:Name="CheckedBg" CornerRadius="5" Background="{DynamicResource AccentFillColorDefaultBrush}" Opacity="0" />
+                            <Border x:Name="HoverBg" CornerRadius="5" Background="{DynamicResource Ui.Hover}" Opacity="0" />
+                            <Border x:Name="PressedBg" CornerRadius="5" Background="{DynamicResource Ui.Pressed}" Opacity="0" />
+                            <ContentPresenter x:Name="Content" Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="HoverBg" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="HoverBg" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.25" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="PressedBg" Property="Opacity" Value="1" />
+                            </Trigger>
+
+                            <Trigger Property="ToggleButton.IsChecked" Value="True">
+                                <Setter TargetName="CheckedBg" Property="Opacity" Value="0.18" />
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Content" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+
+                    <Style TargetType="{x:Type Separator}">
+                        <Setter Property="Width" Value="1" />
+                        <Setter Property="Margin" Value="6,9" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Separator">
+                                    <Border Background="{DynamicResource Ui.Divider}" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Width" Value="34" />
+                        <Setter Property="Height" Value="32" />
+                        <Setter Property="Margin" Value="1,0" />
+                        <Setter Property="Padding" Value="4" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                        <Setter Property="Template" Value="{StaticResource TopBarButtonTemplate}" />
+                    </Style>
+
+                    <Style TargetType="{x:Type ToggleButton}">
+                        <Setter Property="Width" Value="34" />
+                        <Setter Property="Height" Value="32" />
+                        <Setter Property="Margin" Value="1,0" />
+                        <Setter Property="Padding" Value="4" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                        <Setter Property="Template" Value="{StaticResource TopBarButtonTemplate}" />
                     </Style>
                     
-                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}">
-                        <Setter Property="Width" Value="35" />
+                    <Style TargetType="{x:Type siq:DropDownButton}">
+                        <Setter Property="Height" Value="32" />
+                        <Setter Property="MinWidth" Value="18" />
+                        <Setter Property="Margin" Value="1,0" />
+                        <Setter Property="Padding" Value="4" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                        <Setter Property="Template" Value="{StaticResource TopBarButtonTemplate}" />
                     </Style>
-                    
-                    <Style TargetType="{x:Type siq:DropDownButton}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" />
 
                     <Style x:Key="blured" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                         <Style.Triggers>
@@ -123,17 +221,17 @@
                 </StackPanel.Resources>
 
                 <ToggleButton Name="bSidebar" ToolTip="{x:Static lp:Resources.SidePanel}" IsChecked="{Binding IsSideOpened}">
-                    <Path Stretch="Uniform" Margin="3" Fill="#FF806830" Data="{Binding Source={StaticResource app_sidebar},Path=Data}" />
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE8A0;" />
                 </ToggleButton>
                 
                 <Separator />
                 
                 <Button ToolTip="{x:Static lp:Resources.Save}" Command="{Binding Save}">
-                    <Path Stretch="Uniform" Fill="#FF5000C3" Margin="3" Data="{Binding Source={StaticResource app_save},Path=Data}" />
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE74E;" Foreground="#FF0F6CBD" />
                 </Button>
 
                 <Button ToolTip="{x:Static lp:Resources.ExportAndPrint}" Command="{Binding ExportDinabank}" Padding="4,3">
-                    <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_export},Path=Data}" />
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE749;" />
                 </Button>
 
                 <Button ToolTip="{x:Static lp:Resources.Preview}" Command="{Binding ExportPreview}" VerticalAlignment="Stretch">
@@ -149,7 +247,7 @@
                     IsEnabled="{Binding ElementName=bExpand,Path=IsEnabled}"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch">
-                    <Path Data="M0,0L8,0L4,4z" Fill="{StaticResource IconBrush}" />
+                    <Path Data="M0,0L8,0L4,4z" Fill="{DynamicResource Ui.Glyph}" />
                     
                     <siq:DropDownButton.DropDown>
                         <ContextMenu>
@@ -182,22 +280,19 @@
                 <Separator />
 
                 <Button Style="{StaticResource blured}" ToolTip="{x:Static lp:Resources.Undo}" Command="{Binding OperationsManager.Undo}">
-                    <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="4" Data="{Binding Source={StaticResource app_undo},Path=Data}" />
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE7A7;" />
                 </Button>
 
                 <Button Style="{StaticResource blured}" ToolTip="{x:Static lp:Resources.Redo}" Command="{Binding OperationsManager.Redo}">
-                    <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="4" Data="{Binding Source={StaticResource app_redo},Path=Data}" />
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE7A6;" />
                 </Button>
                 
                 <Separator />
                 
                 <siq:DropDownButton
                     ToolTip="{x:Static lp:Resources.Actions}"
-                    VerticalAlignment="Stretch"
-                    HorizontalAlignment="Stretch">
-                    <Border Padding="5">
-                        <Path Data="M0,0L10,0M0,3L10,3M0,6L10,6" Stroke="{StaticResource IconBrush}" StrokeThickness="2" Stretch="UniformToFill" />
-                    </Border>
+                    Width="34">
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE700;" />
                     
                     <siq:DropDownButton.Resources>
                         <Style TargetType="{x:Type Image}">
@@ -303,7 +398,7 @@
                     Command="{Binding ExpandAll}"
                     CommandParameter="False"
                     Style="{StaticResource TreeOnlyButton}">
-                    <Path Stretch="Uniform" Fill="#FF177E00" Margin="2" Data="{Binding Source={StaticResource app_collapsed},Path=Data}" />
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE70D;" />
                 </Button>
 
                 <Button
@@ -311,7 +406,7 @@
                     Command="{Binding ExpandAll}"
                     CommandParameter="True"
                     Style="{StaticResource TreeOnlyButton}">
-                    <Path Stretch="Uniform" Fill="#FF177E00" Margin="3" Data="{Binding Source={StaticResource app_expanded},Path=Data}" />
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE70E;" />
                 </Button>
                 
                 <Separator Style="{StaticResource TreeOnly}" />
@@ -320,8 +415,7 @@
                     ToolTip="{x:Static lp:Resources.ShowQuestionStatistics}"
                     IsChecked="{Binding ShowQuestionStatistics}">
                     <ToggleButton.Style>
-                        <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}">
-                            <Setter Property="Width" Value="35" />
+                        <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
                             <Setter Property="Visibility" Value="Visible" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Source={x:Static m:AppSettings.Default},Path=View}" Value="{x:Static m:ViewMode.Flat}">
@@ -330,9 +424,9 @@
                             </Style.Triggers>
                         </Style>
                     </ToggleButton.Style>
-                    <Path Stretch="Uniform" Fill="#FF5555AA" Margin="4" Data="M3,3 L3,14 L5,14 L5,8 L7,8 L7,14 L9,14 L9,5 L11,5 L11,14 L13,14 L13,3 Z" />
+                    <TextBlock Style="{StaticResource TopBarGlyph}" Text="&#xE9D2;" />
                 </ToggleButton>
-                
+
                 <Separator Style="{StaticResource TreeOnly}" />
                 
                 <Slider
@@ -370,7 +464,7 @@
                 <MenuItem ToolTip="{x:Static lp:Resources.EditMode}">
                     <MenuItem.HeaderTemplate>
                         <DataTemplate>
-                            <Path Stretch="Uniform" Fill="{StaticResource IconBrush}" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                            <Path Stretch="Uniform" Fill="{DynamicResource Ui.Glyph}" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
                         </DataTemplate>
                     </MenuItem.HeaderTemplate>
 
@@ -418,7 +512,7 @@
                 <TextBlock
                     FontSize="14"
                     FontWeight="SemiBold"
-                    Foreground="{StaticResource IconBrush}"
+                    Foreground="{DynamicResource Ui.Muted}"
                     VerticalAlignment="Center"
                     Margin="0,0,10,0"
                     ToolTip="{x:Static lp:Resources.DocumentFilledQuestionCount}">
@@ -456,29 +550,48 @@
                         Text="?"
                         FontWeight="Bold"
                         FontSize="14"
-                        Foreground="{StaticResource IconBrush}"
+                        Foreground="{DynamicResource Ui.Muted}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center" />
                 </ToggleButton>
                 
+                <Grid VerticalAlignment="Center">
                 <TextBox
                     Name="searchText"
                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     VerticalAlignment="Center"
-                    Padding="0,2"
-                    Width="200"
+                    Padding="32,4,8,4"
+                    Width="220"
                     ToolTip="{x:Static lp:Resources.Search}"
                     Margin="0">
+                    <!-- Standard Fluent text box: rounded, accent underline on focus -->
                     <TextBox.Style>
-                        <Style TargetType="TextBox">
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SearchFailed}" Value="True">
-                                    <Setter Property="Background" Value="Red" />
+                                    <Setter Property="Background" Value="#33E81123" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBox.Style>
                 </TextBox>
+
+                <!-- Search icon and placeholder inside the box -->
+                <TextBlock Text="&#xE721;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource Ui.Muted}" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False" />
+
+                <TextBlock Text="{x:Static lp:Resources.SearchPlaceholder}" Foreground="{DynamicResource Ui.Muted}" FontSize="13" Margin="32,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=searchText}" Value="">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                </Grid>
 
                 <Button
                     ToolTip="{x:Static lp:Resources.CancelSearch}"
@@ -487,7 +600,7 @@
                     Width="22"
                     Margin="0,-1,0,0"
                     VerticalAlignment="Center">
-                    <Path Data="M0,0L10,10M0,10L10,0" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    <Path Data="M0,0L10,10M0,10L10,0" Stroke="{DynamicResource Ui.Glyph}" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" />
                 </Button>
 
                 <Button
@@ -496,7 +609,7 @@
                     Padding="5"
                     Margin="0,-1,0,0"
                     VerticalAlignment="Center">
-                    <Path Data="M0,5L10,0L10,10" Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                    <Path Data="M0,5L10,0L10,10" Fill="{DynamicResource Ui.Glyph}" />
                 </Button>
 
                 <Button
@@ -505,7 +618,7 @@
                     Padding="5"
                     Margin="0,-1,0,0"
                     VerticalAlignment="Center">
-                    <Path Data="M10,5L0,0L0,10" Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                    <Path Data="M10,5L0,0L0,10" Fill="{DynamicResource Ui.Glyph}" />
                 </Button>
             </StackPanel>
             
@@ -528,11 +641,11 @@
                     
                     <Menu.Resources>
                         <DataTemplate x:Key="CommonTemplate">
-                            <TextBlock Text="{Binding Model.Name}" Foreground="Black" />
+                            <TextBlock Text="{Binding Model.Name}" Foreground="{DynamicResource Ui.Text}" />
                         </DataTemplate>
 
                         <DataTemplate x:Key="QuestionTemplate">
-                            <TextBlock Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}" Foreground="Black" />
+                            <TextBlock Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}" Foreground="{DynamicResource Ui.Text}" />
                         </DataTemplate>
 
                         <siqsel:DictionaryTemplateSelector x:Key="NavigateSelector">
@@ -600,20 +713,37 @@
                                     <DataTemplate>
                                         <Border Background="{StaticResource SidePanelBrush}">
                                             <Grid>
-                                                <TabControl BorderThickness="0,0,1,0" BorderBrush="{StaticResource LightGrayBrush}" Margin="1,0,0,1" SelectedIndex="{Binding SideIndex}">
+                                                <TabControl BorderThickness="0,0,1,0" BorderBrush="{DynamicResource Ui.Divider}" Margin="1,0,0,1" SelectedIndex="{Binding SideIndex}">
+                                                    <TabControl.Template>
+                                                        <!-- Tab icons spread over the whole panel width -->
+                                                        <ControlTemplate TargetType="TabControl">
+                                                            <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                                                                <DockPanel>
+                                                                    <UniformGrid Rows="1" IsItemsHost="True" DockPanel.Dock="Top" Margin="2,0" />
+                                                                    <ContentPresenter ContentSource="SelectedContent" />
+                                                                </DockPanel>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </TabControl.Template>
+
                                                     <TabControl.Resources>
                                                         <Style TargetType="TabItem">
                                                             <Setter Property="Template">
                                                                 <Setter.Value>
                                                                     <ControlTemplate TargetType="TabItem">
-                                                                        <Border
-                                                                            x:Name="borderMain"
-                                                                            BorderThickness="0,0,1,0"
-                                                                            BorderBrush="#FFAEAEAE"
-                                                                            Margin="0,1">
+                                                                        <Grid Margin="0,1">
+                                                                            <!-- Short divider on the right of each tab icon -->
+                                                                            <Rectangle
+                                                                                x:Name="divider"
+                                                                                Width="1"
+                                                                                Height="18"
+                                                                                HorizontalAlignment="Right"
+                                                                                VerticalAlignment="Center"
+                                                                                Fill="{DynamicResource Ui.Divider}" />
                                                                             <Border
                                                                                 x:Name="border"
                                                                                 Background="Transparent"
+                                                                                CornerRadius="5"
                                                                                 Height="30"
                                                                                 Width="30"
                                                                                 Padding="3"
@@ -624,28 +754,28 @@
                                                                                     VerticalAlignment="Center"
                                                                                     HorizontalAlignment="Center" />
                                                                             </Border>
-                                                                        </Border>
+                                                                        </Grid>
                                                                         
                                                                         <ControlTemplate.Triggers>
                                                                             <Trigger Property="IsMouseOver" Value="True">
                                                                                 <Setter
                                                                                     TargetName="border"
                                                                                     Property="Background"
-                                                                                    Value="{StaticResource ToolBarButtonHover}" />
+                                                                                    Value="{DynamicResource Ui.Hover}" />
                                                                             </Trigger>
                                                                             
                                                                             <Trigger Property="IsSelected" Value="True">
                                                                                 <Setter
                                                                                     TargetName="border"
                                                                                     Property="Background"
-                                                                                    Value="{StaticResource ToolBarButtonPressed}" />
+                                                                                    Value="{DynamicResource Ui.AccentSoft}" />
                                                                             </Trigger>
                                                                             
                                                                             <Trigger Property="Tag" Value="last">
                                                                                 <Setter
-                                                                                    TargetName="borderMain"
-                                                                                    Property="BorderThickness"
-                                                                                    Value="0" />
+                                                                                    TargetName="divider"
+                                                                                    Property="Visibility"
+                                                                                    Value="Collapsed" />
                                                                             </Trigger>
                                                                         </ControlTemplate.Triggers>
                                                                     </ControlTemplate>
@@ -672,84 +802,46 @@
 
                                                     <TabItem ToolTip="{x:Static lp:Resources.Authors}" Content="{Binding Authors}">
                                                         <TabItem.Header>
-                                                            <Path
-                                                                Stretch="Uniform"
-                                                                Fill="{StaticResource IconBrush}"
-                                                                Margin="5,3"
-                                                                Data="{Binding Source={StaticResource app_author},Path=Data}" />
+                                                            <TextBlock Style="{StaticResource SideTabGlyph}" Text="&#xE77B;" />
                                                         </TabItem.Header>
                                                     </TabItem>
 
                                                     <TabItem ToolTip="{x:Static lp:Resources.Sources}" Content="{Binding Sources}">
                                                         <TabItem.Header>
-                                                            <Path
-                                                                Stretch="Uniform"
-                                                                Fill="{StaticResource IconBrush}"
-                                                                Margin="3"
-                                                                Data="{Binding Source={StaticResource app_source},Path=Data}" />
+                                                            <TextBlock Style="{StaticResource SideTabGlyph}" Text="&#xE736;" />
                                                         </TabItem.Header>
                                                     </TabItem>
 
                                                     <TabItem ToolTip="{x:Static lp:Resources.Images}" Content="{Binding Images}">
                                                         <TabItem.Header>
-                                                            <Path
-                                                                Stretch="Uniform"
-                                                                Fill="{StaticResource IconBrush}"
-                                                                Margin="4"
-                                                                Data="{Binding Source={StaticResource app_image},Path=Data}" />
+                                                            <TextBlock Style="{StaticResource SideTabGlyph}" Text="&#xEB9F;" />
                                                         </TabItem.Header>
                                                     </TabItem>
 
                                                     <TabItem ToolTip="{x:Static lp:Resources.Audio}" Content="{Binding Audio}">
                                                         <TabItem.Header>
-                                                            <Path
-                                                                Stretch="Uniform"
-                                                                Fill="{StaticResource IconBrush}"
-                                                                Margin="4,3"
-                                                                Data="{Binding Source={StaticResource app_audio},Path=Data}" />
+                                                            <TextBlock Style="{StaticResource SideTabGlyph}" Text="&#xE8D6;" />
                                                         </TabItem.Header>
                                                     </TabItem>
 
                                                     <TabItem ToolTip="{x:Static lp:Resources.Video}" Content="{Binding Video}">
                                                         <TabItem.Header>
-                                                            <Path
-                                                                Stretch="Uniform"
-                                                                Fill="{StaticResource IconBrush}"
-                                                                Margin="2,4"
-                                                                Data="{Binding Source={StaticResource app_video},Path=Data}" />
+                                                            <TextBlock Style="{StaticResource SideTabGlyph}" Text="&#xE714;" />
                                                         </TabItem.Header>
                                                     </TabItem>
 
                                                     <TabItem ToolTip="HTML" Content="{Binding Html}">
                                                         <TabItem.Header>
-                                                            <Path
-                                                                Stretch="Uniform"
-                                                                Fill="{StaticResource IconBrush}"
-                                                                Margin="2,4"
-                                                                Data="{Binding Source={StaticResource app_html},Path=Data}" />
+                                                            <TextBlock Style="{StaticResource SideTabGlyph}" Text="&#xE774;" />
                                                         </TabItem.Header>
                                                     </TabItem>
 
                                                     <TabItem ToolTip="{x:Static vmp:Resources.Statistic}" Content="{Binding Statistics}" Tag="last">
                                                         <TabItem.Header>
-                                                            <Path
-                                                                Stretch="Uniform"
-                                                                Fill="{StaticResource IconBrush}"
-                                                                Margin="3"
-                                                                Data="{Binding Source={StaticResource app_stat},Path=Data}" />
+                                                            <TextBlock Style="{StaticResource SideTabGlyph}" Text="&#xE9D2;" />
                                                         </TabItem.Header>
                                                     </TabItem>
                                                 </TabControl>
-                                                
-                                                <Button
-                                                    ToolTip="{x:Static lp:Resources.Close}"
-                                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Top"
-                                                    Margin="0,10,5,5"
-                                                    lb:ToggleBehavior.Target="{Binding ElementName=bSidebar}">
-                                                    <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="2" Data="M0,0L10,10M0,10L10,0" />
-                                                </Button>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
@@ -797,7 +889,7 @@
             VerticalAlignment="Top"
             HorizontalAlignment="Stretch"
             Stretch="Fill"
-            Stroke="#FFAEAEAE"
+            Stroke="{DynamicResource Ui.Divider}"
             StrokeThickness="1" />
 
         <!-- Help Panel Popup -->
@@ -810,8 +902,8 @@
             AllowsTransparency="True"
             PopupAnimation="Slide">
             <Border
-                Background="{StaticResource WhiteBrush}"
-                BorderBrush="#FFAEAEAE"
+                Background="{DynamicResource Ui.Card}"
+                BorderBrush="{DynamicResource Ui.CardStroke}"
                 BorderThickness="1"
                 CornerRadius="3"
                 Padding="10"
@@ -833,27 +925,27 @@
                             Text="{x:Static lp:Resources.RoundTypesHeader}"
                             FontSize="14"
                             FontWeight="SemiBold"
-                            Foreground="{StaticResource HeaderTextBrush}"
+                            Foreground="{DynamicResource Ui.Accent}"
                             Margin="0,5,0,5" />
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static lp:Resources.RoundTypeStandard}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.RoundTypeStandardHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,10">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,10">
                             <StackPanel>
                                 <TextBlock Text="{x:Static lp:Resources.RoundTypeFinal}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.RoundTypeFinalHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
@@ -863,93 +955,93 @@
                             Text="{x:Static lp:Resources.QuestionTypesHeader}"
                             FontSize="14"
                             FontWeight="SemiBold"
-                            Foreground="{StaticResource HeaderTextBrush}"
+                            Foreground="{DynamicResource Ui.Accent}"
                             Margin="0,5,0,5" />
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static vmp:Resources.SimpleQuestion}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeSimpleHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static vmp:Resources.StakeQuestion}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeStakeHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static vmp:Resources.SecretQuestion}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeSecretHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static vmp:Resources.SecretPublicPrice}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeSecretPublicPriceHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static vmp:Resources.SecretNoQuestion}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeSecretNoQuestionHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static vmp:Resources.NoRiskQuestion}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeNoRiskHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static vmp:Resources.QuestionForAll}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeForAllHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
                         
-                        <Border Background="{StaticResource WhiteBrush}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
+                        <Border Background="{DynamicResource Ui.Panel}" CornerRadius="3" Padding="8" Margin="0,0,0,5">
                             <StackPanel>
                                 <TextBlock Text="{x:Static vmp:Resources.StakeAllQuestion}" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="{x:Static lp:Resources.QuestionTypeStakeAllHint}"
                                     TextWrapping="Wrap"
-                                    Foreground="{StaticResource IconBrush}"
+                                    Foreground="{DynamicResource Ui.Muted}"
                                     Margin="0,3,0,0" />
                             </StackPanel>
                         </Border>
