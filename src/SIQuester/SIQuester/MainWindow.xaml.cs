@@ -175,8 +175,53 @@ public partial class MainWindow : MetroWindow
         }
     }
 
+    /// <summary>
+    /// Ctrl + mouse wheel changes the document text size.
+    /// </summary>
+    private void Main_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if ((Keyboard.Modifiers & ModifierKeys.Control) == 0 || e.Delta == 0)
+        {
+            return;
+        }
+
+        AppSettings.Default.ChangeFontSize(e.Delta > 0 ? 1 : -1);
+        e.Handled = true;
+    }
+
     private void Main_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // Ctrl+Plus / Ctrl+Minus change the document text size, Ctrl+0 restores the default
+        if (e.KeyboardDevice.Modifiers == ModifierKeys.Control)
+        {
+            switch (e.Key)
+            {
+                case Key.OemPlus:
+                case Key.Add:
+                    AppSettings.Default.ChangeFontSize(+1);
+                    e.Handled = true;
+                    return;
+
+                case Key.OemMinus:
+                case Key.Subtract:
+                    AppSettings.Default.ChangeFontSize(-1);
+                    e.Handled = true;
+                    return;
+
+                case Key.D0:
+                case Key.NumPad0:
+                    AppSettings.Default.ResetFontSize();
+                    e.Handled = true;
+                    return;
+            }
+        }
+
+        if (TryUndoRedoDocument(e))
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (DataContext is MainViewModel mainViewModel && e.Key == Key.Insert)
         {
             var cmd = (e.KeyboardDevice.Modifiers & ModifierKeys.Shift) > 0 ?
@@ -189,6 +234,63 @@ public partial class MainWindow : MetroWindow
                 e.Handled = true;
             }
         }
+    }
+
+    /// <summary>
+    /// Ctrl+Z / Ctrl+Y (Ctrl+Shift+Z) undo and redo document changes, as the toolbar buttons do,
+    /// even when a text box has focus. Otherwise the text box would run its own text undo, which
+    /// writes the text back to the package as one more change and gets out of step with the document history.
+    /// </summary>
+    /// <returns><c>true</c> if the key was handled.</returns>
+    private bool TryUndoRedoDocument(KeyEventArgs e)
+    {
+        if ((e.KeyboardDevice.Modifiers & ModifierKeys.Control) == 0 || e.Key is not (Key.Z or Key.Y))
+        {
+            return false;
+        }
+
+        // Without an open package (or on another tab: import, search) ActiveDocument is null
+        if (DataContext is not MainViewModel mainViewModel || mainViewModel.ActiveDocument is not QDocument document)
+        {
+            return false;
+        }
+
+        var focusedBox = Keyboard.FocusedElement as TextBox;
+
+        // Fields that are not part of the package (document search, side panel filter) are bound
+        // to the workspace itself: they keep their own text undo
+        if (focusedBox?.DataContext is WorkspaceViewModel)
+        {
+            return false;
+        }
+
+        // A field that is saved on focus loss may still hold typed text that is not in the package:
+        // save it first, so that Ctrl+Z undoes exactly this typing
+        if (focusedBox != null && !focusedBox.IsReadOnly)
+        {
+            var binding = focusedBox.TemplatedParent is ComboBox comboBox
+                ? comboBox.GetBindingExpression(ComboBox.TextProperty)
+                : focusedBox.GetBindingExpression(TextBox.TextProperty);
+
+            try
+            {
+                binding?.UpdateSource();
+            }
+            catch (InvalidOperationException)
+            {
+                // One-way binding: nothing to save
+            }
+        }
+
+        var isRedo = e.Key == Key.Y || (e.KeyboardDevice.Modifiers & ModifierKeys.Shift) != 0;
+        var command = isRedo ? document.OperationsManager.Redo : document.OperationsManager.Undo;
+
+        if (command.CanExecute(null))
+        {
+            command.Execute(null);
+        }
+
+        return true;
     }
 
     // Prevents some weird WPF automation issues (totally disables automation)

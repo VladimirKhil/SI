@@ -17,15 +17,20 @@
     Height="450"
     Width="746"
     TitleCharacterCasing="Normal"
-    TitleBarHeight="25"
+    TitleBarHeight="32"
+    WindowTitleBrush="{DynamicResource Ui.TitleBar}"
+    NonActiveWindowTitleBrush="{DynamicResource Ui.TitleBarInactive}"
+    FontFamily="Segoe UI Variable Text, Segoe UI"
     Name="main"
     WindowState="Maximized"
     Icon="Resources/logo.jpg"
     Closing="Main_Closing"
     Loaded="Main_Loaded"
     SnapsToDevicePixels="True"
-    TextOptions.TextFormattingMode="Display"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="ClearType"
     PreviewKeyDown="Main_PreviewKeyDown"
+    PreviewMouseWheel="Main_PreviewMouseWheel"
     Background="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeBackgroundConverter}, FallbackValue=#FFFBFBFF, TargetNullValue=#FFFBFBFF}"
     Foreground="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ThemeForegroundConverter}, FallbackValue=Black, TargetNullValue=Black}">
     <Window.Resources>
@@ -33,6 +38,40 @@
         <siqcv:DirectoryConverter x:Key="DirectoryConverter" />
         <siqcv:FileNameConverter x:Key="FileNameConverter" />
 
+        <!-- Title bar buttons: white Fluent glyphs with a soft rounded hover (like Office) -->
+        <Style x:Key="TitleBarButton" TargetType="ButtonBase">
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Margin" Value="1,0" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ButtonBase">
+                        <Border x:Name="Bg" CornerRadius="5" Background="Transparent">
+                            <ContentPresenter x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#26FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#40FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Content" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TitleBarGlyph" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
         <DataTemplate x:Key="TabItemHeaderTemplate">
             <DockPanel AllowDrop="True" Height="25" Background="Transparent">
                 <Button
@@ -46,8 +85,28 @@
                     Height="20"
                     Command="{Binding Close}"
                     ToolTip="{x:Static lp:Resources.Close}"
-                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                    <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="2" Data="M0,0L12,12M0,12L12,0" />
+                    FocusVisualStyle="{x:Null}">
+                    <!-- Round close button, readable in light and dark themes -->
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bg" CornerRadius="10" Background="Transparent">
+                                <TextBlock
+                                    x:Name="Glyph"
+                                    Text="&#xE711;"
+                                    FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                    FontSize="10"
+                                    Foreground="{DynamicResource Ui.Muted}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Ui.Hover}" />
+                                    <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource Ui.Text}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
                 </Button>
 
                 <ContentControl Style="{StaticResource WarningBox}" />
@@ -78,7 +137,7 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="AllowDrop" Value="True" />
             <Setter Property="Background" Value="{StaticResource MainBack}" />
-            <Setter Property="BorderBrush" Value="#FFACACAC" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Ui.CardStroke}" />
             <Setter Property="BorderThickness" Value="0,1,0,0" />
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
 
@@ -180,89 +239,176 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="TabControl">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <Grid
-                                        x:Name="grid"
-                                        DataContext="{Binding Settings.History.Files}"
+                                <!-- Start page: centered column, quick actions, recent files and guidelines on cards -->
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <StackPanel
+                                        Width="720"
+                                        Margin="24,48,24,32"
                                         HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        TextBlock.Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=Black, TargetNullValue=Black}">
+                                        TextElement.Foreground="{DynamicResource Ui.Text}">
+                                        <StackPanel.Resources>
+                                            <Style x:Key="StartCard" TargetType="Border">
+                                                <Setter Property="Background" Value="{DynamicResource Ui.Card}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Ui.CardStroke}" />
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Setter Property="CornerRadius" Value="10" />
+                                                <Setter Property="Padding" Value="20,14,20,16" />
+                                                <Setter Property="Margin" Value="0,0,0,12" />
+                                            </Style>
 
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
+                                            <!-- Big quick-action tile -->
+                                            <Style x:Key="StartAction" TargetType="Button">
+                                                <Setter Property="Cursor" Value="Hand" />
+                                                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border
+                                                                x:Name="Bd"
+                                                                Background="{DynamicResource Ui.Card}"
+                                                                BorderBrush="{DynamicResource Ui.CardStroke}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="10"
+                                                                Padding="18,16">
+                                                                <ContentPresenter />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Ui.Accent}" />
+                                                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Ui.AccentSoft}" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
 
-                                        <TextBlock FontSize="24" HorizontalAlignment="Center" Text="{x:Static lp:Resources.RecentFiles}" />
+                                            <!-- Recent file row -->
+                                            <Style x:Key="RecentRow" TargetType="Button">
+                                                <Setter Property="Cursor" Value="Hand" />
+                                                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="Bd" Background="Transparent" CornerRadius="6" Padding="10,7">
+                                                                <ContentPresenter />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Ui.Hover}" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
 
-                                        <ItemsControl Grid.Row="1" ItemsSource="{Binding}" Margin="0,20,0,0">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Button
-                                                        x:Name="open"
-                                                        Command="{Binding ElementName=main, Path=DataContext.OpenRecent}"
-                                                        CommandParameter="{Binding}"
-                                                        ToolTip="{Binding}"
-                                                        Padding="30,7,10,7"
-                                                        HorizontalAlignment="Stretch"
-                                                        HorizontalContentAlignment="Left"
-                                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=Black, TargetNullValue=Black}"
-                                                        Cursor="Hand">
-                                                        <DockPanel Width="600">
+                                            <Style x:Key="StartGlyph" TargetType="TextBlock">
+                                                <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
+                                        </StackPanel.Resources>
+
+                                        <TextBlock Text="SIQuester" FontSize="30" FontWeight="SemiBold" />
+                                        <TextBlock Text="{x:Static lp:Resources.StartSubtitle}" FontSize="15" Margin="0,2,0,22" Foreground="{DynamicResource Ui.Muted}" />
+
+                                        <!-- Quick actions -->
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="12" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Button Style="{StaticResource StartAction}" Command="ApplicationCommands.New">
+                                                <DockPanel>
+                                                    <Border DockPanel.Dock="Left" Width="40" Height="40" CornerRadius="8" Background="{DynamicResource Ui.Accent}" Margin="0,0,14,0">
+                                                        <TextBlock Style="{StaticResource StartGlyph}" Text="&#xE8A5;" FontSize="18" Foreground="White" HorizontalAlignment="Center" />
+                                                    </Border>
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock Text="{x:Static lp:Resources.StartNew}" FontSize="16" FontWeight="SemiBold" />
+                                                        <TextBlock Text="{x:Static lp:Resources.StartNewHint}" FontSize="13" Foreground="{DynamicResource Ui.Muted}" TextWrapping="Wrap" />
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Button>
+
+                                            <Button Grid.Column="2" Style="{StaticResource StartAction}" Command="ApplicationCommands.Open">
+                                                <DockPanel>
+                                                    <Border DockPanel.Dock="Left" Width="40" Height="40" CornerRadius="8" Background="{DynamicResource Ui.AccentSoft}" Margin="0,0,14,0">
+                                                        <TextBlock Style="{StaticResource StartGlyph}" Text="&#xE838;" FontSize="18" Foreground="{DynamicResource Ui.Accent}" HorizontalAlignment="Center" />
+                                                    </Border>
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock Text="{x:Static lp:Resources.StartOpen}" FontSize="16" FontWeight="SemiBold" />
+                                                        <TextBlock Text="{x:Static lp:Resources.StartOpenHint}" FontSize="13" Foreground="{DynamicResource Ui.Muted}" TextWrapping="Wrap" />
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Button>
+                                        </Grid>
+
+                                        <!-- Recent files (hidden while the list is empty) -->
+                                        <Border x:Name="recentCard" Style="{StaticResource StartCard}">
+                                            <StackPanel>
+                                                <TextBlock Text="{x:Static lp:Resources.RecentFiles}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Ui.Accent}" Margin="0,0,0,6" />
+
+                                                <ItemsControl ItemsSource="{Binding Settings.History.Files}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
                                                             <Button
-                                                                x:Name="remove"
-                                                                Visibility="Hidden"
-                                                                DockPanel.Dock="Right"
-                                                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                                                Margin="4,0,0,0" 
-                                                                Command="{Binding ElementName=main, Path=DataContext.RemoveRecent}"
+                                                                x:Name="open"
+                                                                Style="{StaticResource RecentRow}"
+                                                                Command="{Binding ElementName=main, Path=DataContext.OpenRecent}"
                                                                 CommandParameter="{Binding}"
-                                                                ToolTip="{x:Static lp:Resources.RemoveLink}"
-                                                                Width="20"
-                                                                Height="20">
-                                                                <Path
-                                                                    Data="M0,0L1,1M0,1L1,0"
-                                                                    Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=Black, TargetNullValue=Black}"
-                                                                    Stretch="Fill"
-                                                                    Margin="3" />
+                                                                ToolTip="{Binding}">
+                                                                <DockPanel>
+                                                                    <TextBlock DockPanel.Dock="Left" Style="{StaticResource StartGlyph}" Text="&#xE8A5;" FontSize="18" Foreground="{DynamicResource Ui.Glyph}" Margin="0,0,12,0" />
+
+                                                                    <Button
+                                                                        x:Name="remove"
+                                                                        Visibility="Hidden"
+                                                                        DockPanel.Dock="Right"
+                                                                        Style="{StaticResource RecentRow}"
+                                                                        Command="{Binding ElementName=main, Path=DataContext.RemoveRecent}"
+                                                                        CommandParameter="{Binding}"
+                                                                        ToolTip="{x:Static lp:Resources.RemoveLink}"
+                                                                        VerticalAlignment="Center">
+                                                                        <TextBlock Style="{StaticResource StartGlyph}" Text="&#xE711;" FontSize="11" Foreground="{DynamicResource Ui.Glyph}" />
+                                                                    </Button>
+
+                                                                    <StackPanel VerticalAlignment="Center">
+                                                                        <TextBlock Text="{Binding Mode=OneWay, Converter={StaticResource FileNameConverter}}" FontSize="15" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Ui.Text}" />
+                                                                        <TextBlock Text="{Binding Mode=OneWay, Converter={StaticResource DirectoryConverter}}" FontSize="12" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Ui.Muted}" />
+                                                                    </StackPanel>
+                                                                </DockPanel>
                                                             </Button>
 
-                                                            <TextBlock TextTrimming="CharacterEllipsis" TextAlignment="Left">
-                                                                <Run Text="{Binding Mode=OneWay, Converter={StaticResource FileNameConverter}}" FontSize="18" />
-                                                                <LineBreak />
-                                                                <Run Text="{Binding Mode=OneWay, Converter={StaticResource DirectoryConverter}}" FontSize="11" />
-                                                            </TextBlock>
-                                                        </DockPanel>
-                                                    </Button>
+                                                            <DataTemplate.Triggers>
+                                                                <Trigger SourceName="open" Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="remove" Property="Visibility" Value="Visible" />
+                                                                </Trigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
 
-                                                    <DataTemplate.Triggers>
-                                                        <Trigger SourceName="open" Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="remove" Property="Visibility" Value="Visible" />
-                                                        </Trigger>
-                                                    </DataTemplate.Triggers>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
+                                        <!-- Guidelines -->
+                                        <Border Style="{StaticResource StartCard}" Padding="16,8,16,10">
+                                            <Expander Foreground="{DynamicResource Ui.Text}" Background="Transparent" BorderThickness="0">
+                                                <Expander.Header>
+                                                    <TextBlock Text="{x:Static lp:Resources.ContentGuidelineHeader}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Ui.Accent}" />
+                                                </Expander.Header>
 
-                                        <Expander
-                                            Grid.Row="2"
-                                            Margin="0,10,0,10"
-                                            FontSize="16"
-                                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=Black, TargetNullValue=Black}">
-                                            <Expander.Header>
-                                                <TextBlock Text="{x:Static lp:Resources.ContentGuidelineHeader}" Margin="3,0,0,0" FontSize="20" />
-                                            </Expander.Header>
-                                            
-                                            <TextBlock Text="{x:Static lp:Resources.ContentGuideline}" MaxWidth="600" TextWrapping="Wrap" />
-                                        </Expander>
-                                    </Grid>
+                                                <TextBlock Text="{x:Static lp:Resources.ContentGuideline}" TextWrapping="Wrap" FontSize="14" Margin="4,8,4,4" Foreground="{DynamicResource Ui.Text}" />
+                                            </Expander>
+                                        </Border>
+                                    </StackPanel>
                                 </ScrollViewer>
 
                                 <ControlTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Settings.History.Files.Count}" Value="0">
-                                        <Setter TargetName="grid" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="recentCard" Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -302,7 +448,16 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="{x:Static lp:Resources.AppTitle}" />
     </Window.TaskbarItemInfo>
-    
+
+    <!--
+        With the Fluent theme enabled WPF assigns its own Window style to every window whose Style is null.
+        That style replaces the MahApps template and MetroWindow.OnApplyTemplate crashes (no PART_FlyoutModal).
+        An explicit (empty) style prevents this; the MahApps template still comes from its default theme style.
+    -->
+    <metro:MetroWindow.Style>
+        <Style TargetType="metro:MetroWindow" />
+    </metro:MetroWindow.Style>
+
     <metro:MetroWindow.IconTemplate>
         <DataTemplate>
             <Grid
@@ -326,32 +481,22 @@
     
     <metro:MetroWindow.LeftWindowCommands>
         <metro:WindowCommands ShowSeparators="False" ShowLastSeparator="False">
-            <Button
-                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                ToolTip="{x:Static lp:Resources.ToolTipNew}"
-                Command="ApplicationCommands.New">
-                <Path Stretch="Uniform" Fill="White" Margin="4,2" Data="{Binding Source={StaticResource app_new},Path=Data}" />
+
+            <Button Style="{StaticResource TitleBarButton}" ToolTip="{x:Static lp:Resources.ToolTipNew}" Command="ApplicationCommands.New">
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE8A5;" />
             </Button>
 
-            <Button
-                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                ToolTip="{x:Static lp:Resources.Open}"
-                Command="ApplicationCommands.Open">
-                <Path Stretch="Uniform" Fill="#FFCD58" Margin="2" Data="{Binding Source={StaticResource app_open},Path=Data}" />
-               
-                <Button.LayoutTransform>
-                    <ScaleTransform ScaleX="0.75" />
-                </Button.LayoutTransform>
+            <Button Style="{StaticResource TitleBarButton}" ToolTip="{x:Static lp:Resources.Open}" Command="ApplicationCommands.Open">
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE838;" />
             </Button>
 
             <siq:DropDownButton
-                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                Style="{StaticResource TitleBarButton}"
+                Width="20"
                 ToolTip="{x:Static lp:Resources.OpenRecent}"
                 DataContext="{Binding}"
-                IsEnabled="{Binding Settings.History.Files.Count,Converter={StaticResource GreaterZero}}"
-                VerticalAlignment="Stretch"
-                HorizontalAlignment="Stretch">
-                <Path Data="M0,0L8,0L4,4z" Fill="White" />
+                IsEnabled="{Binding Settings.History.Files.Count,Converter={StaticResource GreaterZero}}">
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE70D;" FontSize="10" />
 
                 <siq:DropDownButton.DropDown>
                     <ContextMenu ItemsSource="{Binding Settings.History.Files}">
@@ -360,21 +505,19 @@
                                 <Setter Property="HeaderedItemsControl.Header" Value="{Binding}" />
                                 <Setter Property="MenuItem.Command" Value="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=DataContext.OpenRecent}" />
                                 <Setter Property="MenuItem.CommandParameter" Value="{Binding}" />
-                                <Setter Property="Padding" Value="0,5" />
                             </Style>
                         </ContextMenu.ItemContainerStyle>
                     </ContextMenu>
                 </siq:DropDownButton.DropDown>
             </siq:DropDownButton>
 
-            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="{x:Static lp:Resources.Import}">
-                <Path Stretch="Uniform" Fill="White" Margin="3,2,4,2" Data="{Binding Source={StaticResource app_import},Path=Data}" />
+            <siq:DropDownButton Style="{StaticResource TitleBarButton}" ToolTip="{x:Static lp:Resources.Import}">
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE8B5;" />
                 
                 <siq:DropDownButton.DropDown>
                     <ContextMenu>
                         <ContextMenu.ItemContainerStyle>
                             <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-                                <Setter Property="Padding" Value="0,5" />
                             </Style>
                         </ContextMenu.ItemContainerStyle>
 
@@ -415,48 +558,15 @@
                 </siq:DropDownButton.DropDown>
             </siq:DropDownButton>
 
-            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="{x:Static lp:Resources.SaveAll}" Command="{Binding SaveAll}">
-                <Button.ContentTemplate>
-                    <DataTemplate>
-                        <Grid Width="20" Height="20">                            
-                            <Path
-                                Name="p1"
-                                Stretch="Uniform"
-                                Fill="#FF5000C3"
-                                Margin="5"
-                                Data="{Binding Source={StaticResource app_save},Path=Data}">                                
-                                <Path.RenderTransform>
-                                    <TranslateTransform X="-4" Y="4" />
-                                </Path.RenderTransform>
-                            </Path>
-                            
-                            <Path
-                                Name="p2"
-                                Stretch="Uniform"
-                                Fill="#FF5000C3"
-                                Margin="5"
-                                Data="{Binding Source={StaticResource app_save},Path=Data}">                                
-                                <Path.RenderTransform>
-                                    <TranslateTransform X="4" Y="-4" />
-                                </Path.RenderTransform>
-                            </Path>                            
-                        </Grid>
-                        
-                        <DataTemplate.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="p1" Property="Fill" Value="LightGray" />
-                                <Setter TargetName="p2" Property="Fill" Value="LightGray" />
-                            </Trigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </Button.ContentTemplate>
+            <Button Style="{StaticResource TitleBarButton}" ToolTip="{x:Static lp:Resources.SaveAll}" Command="{Binding SaveAll}">
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE78C;" />
             </Button>
 
             <Button
-                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                Style="{StaticResource TitleBarButton}"
                 ToolTip="{x:Static lp:Resources.ToolTipFileSearch}"
                 Command="{Binding SearchFolder}">                
-                <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_search},Path=Data}" />            
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE721;" />
             </Button>
         </metro:WindowCommands>
     </metro:MetroWindow.LeftWindowCommands>
@@ -464,22 +574,26 @@
     <metro:MetroWindow.RightWindowCommands>
         <metro:WindowCommands ShowSeparators="False" ShowLastSeparator="False">
             <Button
-                VerticalAlignment="Stretch"
-                Width="25"
-                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                ToolTip="{x:Static lp:Resources.Settings}"
-                Command="{Binding SetSettings}">                
-                <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_cog},Path=Data}" />                
+                Style="{StaticResource TitleBarButton}"
+                ToolTip="{x:Static lp:Resources.ToggleTheme}"
+                Command="{Binding ToggleTheme}">
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE706;" />
             </Button>
-            
-            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="{x:Static lp:Resources.Help}">
-                <TextBlock Text="?" FontSize="14" FontWeight="Bold" Foreground="White" Width="20" TextAlignment="Center" Margin="0,-2,0,0" />
+
+            <Button
+                Style="{StaticResource TitleBarButton}"
+                ToolTip="{x:Static lp:Resources.Settings}"
+                Command="{Binding SetSettings}">
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE713;" />
+            </Button>
+
+            <siq:DropDownButton Style="{StaticResource TitleBarButton}" ToolTip="{x:Static lp:Resources.Help}">
+                <TextBlock Style="{StaticResource TitleBarGlyph}" Text="&#xE897;" />
                 
                 <siq:DropDownButton.DropDown>
                     <ContextMenu>
                         <ContextMenu.ItemContainerStyle>
                             <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-                                <Setter Property="Padding" Value="0,5" />
                             </Style>
                         </ContextMenu.ItemContainerStyle>
 
@@ -501,5 +615,5 @@
         Name="tabControl1" 
         SelectionChanged="TabControl1_SelectionChanged"
         Style="{StaticResource TabControlStyle1}"
-        ItemContainerStyle="{StaticResource TabItemStyle1}" />    
+        ItemContainerStyle="{StaticResource TabItemStyle1}" />
 </metro:MetroWindow>

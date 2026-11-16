@@ -20,6 +20,7 @@
     d:DataContext="{d:DesignInstance lvm:SelectTagsViewModel}">
     <Window.Resources>
         <lc:ContainsConverter x:Key="ContainsConverter" />
+        <lc:TagFilterVisibilityConverter x:Key="TagFilter" />
     </Window.Resources>
     
     <DockPanel>
@@ -103,6 +104,14 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
+                            <!-- Typing a new tag filters the catalog -->
+                            <StackPanel.Visibility>
+                                <MultiBinding Converter="{StaticResource TagFilter}">
+                                    <Binding />
+                                    <Binding Path="DataContext.NewItem" RelativeSource="{RelativeSource AncestorType=Window}" />
+                                </MultiBinding>
+                            </StackPanel.Visibility>
+
                             <TextBlock
                                 Text="{Binding Name}"
                                 FontSize="17"
@@ -132,6 +141,14 @@
                                             Width="150"
                                             BorderThickness="0"
                                             Cursor="Hand">
+                                            <Button.Visibility>
+                                                <MultiBinding Converter="{StaticResource TagFilter}">
+                                                    <Binding />
+                                                    <Binding Path="DataContext.NewItem" RelativeSource="{RelativeSource AncestorType=Window}" />
+                                                    <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                </MultiBinding>
+                                            </Button.Visibility>
+
                                             <Button.Style>
                                                 <Style TargetType="Button">
                                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />

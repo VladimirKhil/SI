@@ -1,0 +1,100 @@
+﻿<!-- Colors of the modern UI elements, dark theme (swapped with Palette.Light.xaml in App.UpdateTheme) -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="Ui.Accent" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="Ui.AccentHover" Color="#FF62ABE6" />
+    <SolidColorBrush x:Key="Ui.AccentSoft" Color="#2A4CA0E0" />
+
+    <!-- Window title bar (Office dark: same gray as the ribbon) -->
+    <SolidColorBrush x:Key="Ui.TitleBar" Color="#FF292929" />
+    <SolidColorBrush x:Key="Ui.TitleBarInactive" Color="#FF333333" />
+
+    <!-- Surfaces -->
+    <SolidColorBrush x:Key="Ui.Card" Color="#FF2B2B2B" />
+    <SolidColorBrush x:Key="Ui.CardStroke" Color="#1FFFFFFF" />
+    <SolidColorBrush x:Key="Ui.Panel" Color="#FF2D2D2D" />
+    <SolidColorBrush x:Key="Ui.TopBar" Color="#FF292929" />
+    <SolidColorBrush x:Key="Ui.Divider" Color="#26FFFFFF" />
+    <SolidColorBrush x:Key="Ui.CardHoverStroke" Color="#884CA0E0" />
+
+    <!-- Text and icons -->
+    <SolidColorBrush x:Key="Ui.Text" Color="#FFF0F0F0" />
+    <SolidColorBrush x:Key="Ui.Muted" Color="#FFA8A8A8" />
+    <SolidColorBrush x:Key="Ui.Glyph" Color="#FFDADADA" />
+    <Color x:Key="Ui.GlyphColor">#FFDADADA</Color>
+
+    <!-- Interaction -->
+    <SolidColorBrush x:Key="Ui.Hover" Color="#1AFFFFFF" />
+    <SolidColorBrush x:Key="Ui.Pressed" Color="#2EFFFFFF" />
+
+    <!-- Theme progress badges -->
+    <SolidColorBrush x:Key="Ui.BadgeDone" Color="#FF1F3A1F" />
+    <SolidColorBrush x:Key="Ui.BadgeDoneText" Color="#FF8FD18B" />
+    <SolidColorBrush x:Key="Ui.BadgeTodo" Color="#FF3D3420" />
+    <SolidColorBrush x:Key="Ui.BadgeTodoText" Color="#FFE8B860" />
+
+    <!-- Round title -->
+    <SolidColorBrush x:Key="Ui.RoundTitle" Color="#FF6CB4EE" />
+
+    <!-- Chat -->
+    <SolidColorBrush x:Key="Ui.ChatBubble" Color="#FF383838" />
+    <SolidColorBrush x:Key="Ui.ChatInput" Color="#FF1F1F1F" />
+
+    <!-- Fluent accent: the app blue instead of the Windows accent color (check boxes, radio buttons, selection...) -->
+    <Color x:Key="SystemAccentColor">#FF0F6CBD</Color>
+    <Color x:Key="SystemAccentColorLight1">#FF2886DE</Color>
+    <Color x:Key="SystemAccentColorLight2">#FF4CA0E0</Color>
+    <Color x:Key="SystemAccentColorLight3">#FF62ABF5</Color>
+    <Color x:Key="SystemAccentColorDark1">#FF115EA3</Color>
+    <Color x:Key="SystemAccentColorDark2">#FF0F548C</Color>
+    <Color x:Key="SystemAccentColorDark3">#FF0C3B5E</Color>
+    <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#E64CA0E0" />
+    <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#CC4CA0E0" />
+    <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF62ABF5" />
+    <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF62ABF5" />
+    <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#FF4CA0E0" />
+
+    <!-- Fluent control colors that use the accent (the theme takes them from Windows otherwise) -->
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillChecked" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" Color="#E64CA0E0" />
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPressed" Color="#CC4CA0E0" />
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeChecked" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" Color="#E64CA0E0" />
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedPressed" Color="#CC4CA0E0" />
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillIndeterminate" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillIndeterminatePointerOver" Color="#E64CA0E0" />
+    <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillIndeterminatePressed" Color="#CC4CA0E0" />
+    <SolidColorBrush x:Key="RadioButtonOuterEllipseCheckedFill" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="RadioButtonOuterEllipseCheckedStroke" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="RadioButtonOuterEllipseCheckedStrokePointerOver" Color="#E64CA0E0" />
+    <SolidColorBrush x:Key="RadioButtonCheckOuterEllipseCheckedFillPointerOver" Color="#E64CA0E0" />
+    <SolidColorBrush x:Key="RadioButtonCheckOuterEllipseCheckedFillPressed" Color="#CC4CA0E0" />
+    <SolidColorBrush x:Key="RadioButtonCheckOuterEllipseCheckedStrokePressed" Color="#CC4CA0E0" />
+    <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#E64CA0E0" />
+    <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#CC4CA0E0" />
+    <SolidColorBrush x:Key="ComboBoxItemPillFillBrush" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="ListViewItemPillFillBrush" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="SliderTrackFill" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#E64CA0E0" />
+    <SolidColorBrush x:Key="ProgressBarForeground" Color="#FF4CA0E0" />
+    <SolidColorBrush x:Key="TextControlFocusedBorderBrush" Color="#FF4CA0E0" />
+    <!-- Focused text box: accent line at the bottom (Fluent draws it with this brush) -->
+    <LinearGradientBrush x:Key="TextControlElevationBorderFocusedBrush" MappingMode="Absolute" StartPoint="0,0" EndPoint="0,2">
+        <LinearGradientBrush.RelativeTransform>
+            <ScaleTransform CenterY="0.5" ScaleY="-1" />
+        </LinearGradientBrush.RelativeTransform>
+        <GradientStop Offset="1.0" Color="#FF4CA0E0" />
+        <GradientStop Offset="1.0" Color="#12FFFFFF" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="TextControlBorderBrushFocused" MappingMode="Absolute" StartPoint="0,0" EndPoint="0,2">
+        <LinearGradientBrush.RelativeTransform>
+            <ScaleTransform CenterY="0.5" ScaleY="-1" />
+        </LinearGradientBrush.RelativeTransform>
+        <GradientStop Offset="1.0" Color="#FF4CA0E0" />
+        <GradientStop Offset="1.0" Color="#12FFFFFF" />
+    </LinearGradientBrush>
+</ResourceDictionary>
