@@ -91,7 +91,7 @@
                                 <StackPanel Orientation="Horizontal">
                                     <Path
                                         Stretch="Uniform"
-                                        Fill="{StaticResource IconBrush}"
+                                        Fill="{DynamicResource Ui.Glyph}"
                                         Margin="2"
                                         Width="14"
                                         Data="{Binding Source={StaticResource app_next},Path=Data}" />
@@ -169,7 +169,7 @@
                                 <StackPanel Orientation="Horizontal">
                                     <Path
                                         Stretch="Uniform"
-                                        Fill="{StaticResource IconBrush}"
+                                        Fill="{DynamicResource Ui.Glyph}"
                                         Margin="2"
                                         Width="14"
                                         Data="{Binding Source={StaticResource app_next},Path=Data}" />
@@ -265,7 +265,7 @@
                                 <StackPanel Orientation="Horizontal">
                                     <Path
                                         Stretch="Uniform"
-                                        Fill="{StaticResource IconBrush}"
+                                        Fill="{DynamicResource Ui.Glyph}"
                                         Margin="2"
                                         Width="14"
                                         Data="{Binding Source={StaticResource app_next},Path=Data}" />
@@ -278,7 +278,7 @@
                                 <StackPanel Orientation="Horizontal">
                                     <Path
                                         Stretch="Uniform"
-                                        Fill="{StaticResource IconBrush}"
+                                        Fill="{DynamicResource Ui.Glyph}"
                                         Margin="2"
                                         Width="14"
                                         Data="{Binding Source={StaticResource app_warning},Path=Data}" />
@@ -342,7 +342,7 @@
                                                     <TextBlock
                                                         Text="{Binding}"
                                                         TextWrapping="Wrap"
-                                                        Background="{StaticResource WhiteBrush}"
+                                                        Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                                                         Padding="7"
                                                         HorizontalAlignment="Stretch" />
                                                 </DataTemplate>
@@ -433,7 +433,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Path
                                             Stretch="Uniform"
-                                            Fill="{StaticResource IconBrush}"
+                                            Fill="{DynamicResource Ui.Glyph}"
                                             Margin="2"
                                             Width="17"
                                             Data="{Binding Source={StaticResource app_cog},Path=Data}" />
@@ -451,7 +451,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Path
                                             Stretch="Uniform"
-                                            Fill="{StaticResource IconBrush}"
+                                            Fill="{DynamicResource Ui.Glyph}"
                                             Margin="2"
                                             Width="17"
                                             Data="{Binding Source={StaticResource app_cog},Path=Data}" />
@@ -518,7 +518,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Path
                                             Stretch="Uniform"
-                                            Fill="{StaticResource IconBrush}"
+                                            Fill="{DynamicResource Ui.Glyph}"
                                             Margin="2"
                                             Width="14"
                                             Data="{Binding Source={StaticResource app_next},Path=Data}" />
@@ -531,7 +531,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Path
                                             Stretch="Uniform"
-                                            Fill="{StaticResource IconBrush}"
+                                            Fill="{DynamicResource Ui.Glyph}"
                                             Margin="2"
                                             Width="14"
                                             Data="{Binding Source={StaticResource app_warning},Path=Data}" />

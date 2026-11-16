@@ -46,7 +46,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     /// </summary>
     public const string SiqExtension = "siq";
 
-    private const string DefaultFontFamily = "Calibri";
+    private const string DefaultFontFamily = "Segoe UI Variable Text";
 
     private const int DefaultSelectOptionCount = 4;
     private const bool DefaultUseImageDuration = false;
@@ -104,6 +104,27 @@ public sealed class AppSettings : INotifyPropertyChanged
                 _theme = value;
                 OnPropertyChanged();
             }
+        }
+    }
+
+    /// <summary>
+    /// Dark theme to return to when switching from the light one (not saved: dark after start).
+    /// </summary>
+    private ThemeOption _lastDarkTheme = ThemeOption.Dark;
+
+    /// <summary>
+    /// Switches between the light theme and the dark theme that was used last (dark or dark gray).
+    /// </summary>
+    public void ToggleTheme()
+    {
+        if (Theme == ThemeOption.Light)
+        {
+            Theme = _lastDarkTheme;
+        }
+        else
+        {
+            _lastDarkTheme = Theme;
+            Theme = ThemeOption.Light;
         }
     }
 
@@ -398,9 +419,24 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
-    private int _fontSize = 15;
+    /// <summary>
+    /// Default document font size.
+    /// </summary>
+    public const int DefaultFontSize = 16;
 
-    [DefaultValue(15)]
+    /// <summary>
+    /// Smallest document font size reachable with the text size buttons and shortcuts.
+    /// </summary>
+    public const int MinFontSize = 8;
+
+    /// <summary>
+    /// Largest document font size reachable with the text size buttons and shortcuts.
+    /// </summary>
+    public const int MaxFontSize = 40;
+
+    private int _fontSize = DefaultFontSize;
+
+    [DefaultValue(DefaultFontSize)]
     public int FontSize
     {
         get => _fontSize;
@@ -414,6 +450,17 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Makes the document text larger or smaller (A+ / A− buttons, Ctrl+mouse wheel, Ctrl+Plus / Ctrl+Minus).
+    /// </summary>
+    /// <param name="delta">Size change in points.</param>
+    public void ChangeFontSize(int delta) => FontSize = Math.Clamp(FontSize + delta, MinFontSize, MaxFontSize);
+
+    /// <summary>
+    /// Restores the default document text size (Ctrl+0).
+    /// </summary>
+    public void ResetFontSize() => FontSize = DefaultFontSize;
+
     private string _fontFamily = DefaultFontFamily;
 
     [DefaultValue(DefaultFontFamily)]
@@ -425,6 +472,25 @@ public sealed class AppSettings : INotifyPropertyChanged
             if (_fontFamily != value && value != null) // null could be provided by the WPF binding
             {
                 _fontFamily = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _modernFontApplied;
+
+    /// <summary>
+    /// The one-time move from the old default font (Calibri 15) to Segoe UI Variable Text 16 is done.
+    /// </summary>
+    [DefaultValue(false)]
+    public bool ModernFontApplied
+    {
+        get => _modernFontApplied;
+        set
+        {
+            if (_modernFontApplied != value)
+            {
+                _modernFontApplied = value;
                 OnPropertyChanged();
             }
         }
@@ -463,6 +529,25 @@ public sealed class AppSettings : INotifyPropertyChanged
             if (_checkFileSize != value)
             {
                 _checkFileSize = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _autoCompressMedia = true;
+
+    /// <summary>
+    /// Compress pictures that exceed the SIGame size limit when they are added.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool AutoCompressMedia
+    {
+        get => _autoCompressMedia;
+        set
+        {
+            if (_autoCompressMedia != value)
+            {
+                _autoCompressMedia = value;
                 OnPropertyChanged();
             }
         }
@@ -737,6 +822,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         SelectOptionCount = DefaultSelectOptionCount;
         CheckFileSize = defaultSettings.CheckFileSize;
         SetRightAnswerFromFileName = defaultSettings.SetRightAnswerFromFileName;
+        AutoCompressMedia = defaultSettings.AutoCompressMedia;
         AskToSetTagsOnSave = defaultSettings.AskToSetTagsOnSave;
         UseImageDuration = defaultSettings.UseImageDuration;
         ImageDurationSeconds = defaultSettings.ImageDurationSeconds;

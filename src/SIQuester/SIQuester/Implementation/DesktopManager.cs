@@ -56,7 +56,12 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService, IDispo
     };
 
     public override Tuple<int, int, int>? GetCurrentItemSelectionArea() =>
-        ActionMenuViewModel.Instance.PlacementTarget is TextList box ? box.GetSelectionInfo() : null;
+        ActionMenuViewModel.Instance.PlacementTarget switch
+        {
+            TextList box => box.GetSelectionInfo(),
+            AnswerListEditor answers => answers.GetSelectionInfo(),
+            _ => null
+        };
 
     public override void CreatePreview(SIDocument document)
     {
@@ -1032,6 +1037,18 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService, IDispo
     public override void CopyInfo(object info) => Clipboard.SetText(JsonSerializer.Serialize(info));
 
     public override Dictionary<string, JsonElement>? PasteInfo() => JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Clipboard.GetText());
+
+    public override string ShrinkMediaIfNeeded(string filePath, string collectionName, long maxBytes)
+    {
+        try
+        {
+            return Helpers.MediaShrinker.Shrink(filePath, collectionName, maxBytes) ?? filePath;
+        }
+        catch
+        {
+            return filePath; // keep the original file if compression fails for any reason
+        }
+    }
 
     public override string CompressImage(string imageUri)
     {
