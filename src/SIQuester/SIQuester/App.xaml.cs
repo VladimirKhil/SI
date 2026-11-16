@@ -113,6 +113,11 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // Toolbar buttons are icons without captions, so their tooltips are the main hint: show them sooner
+        // (the WPF default is 1 s) and switch between neighbouring buttons quickly
+        System.Windows.Controls.ToolTipService.InitialShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(250));
+        System.Windows.Controls.ToolTipService.BetweenShowDelayProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(50));
+
         try
         {
             if (_settings.Language != null)
