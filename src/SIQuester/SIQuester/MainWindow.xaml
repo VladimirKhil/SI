@@ -302,6 +302,15 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="{x:Static lp:Resources.AppTitle}" />
     </Window.TaskbarItemInfo>
+
+    <!--
+        With the Fluent theme enabled WPF assigns its own Window style to every window whose Style is null.
+        That style replaces the MahApps template and MetroWindow.OnApplyTemplate crashes (no PART_FlyoutModal).
+        An explicit (empty) style prevents this; the MahApps template still comes from its default theme style.
+    -->
+    <metro:MetroWindow.Style>
+        <Style TargetType="metro:MetroWindow" />
+    </metro:MetroWindow.Style>
     
     <metro:MetroWindow.IconTemplate>
         <DataTemplate>
