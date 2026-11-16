@@ -1033,6 +1033,18 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService, IDispo
 
     public override Dictionary<string, JsonElement>? PasteInfo() => JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Clipboard.GetText());
 
+    public override string ShrinkMediaIfNeeded(string filePath, string collectionName, long maxBytes)
+    {
+        try
+        {
+            return Helpers.MediaShrinker.Shrink(filePath, collectionName, maxBytes) ?? filePath;
+        }
+        catch
+        {
+            return filePath; // keep the original file if compression fails for any reason
+        }
+    }
+
     public override string CompressImage(string imageUri)
     {
         var extension = Path.GetExtension(imageUri);

@@ -466,6 +466,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatically compress pictures larger than the SIGame limit (1 MB) when adding them.
+        /// </summary>
+        public static string AutoCompressMedia {
+            get {
+                return ResourceManager.GetString("AutoCompressMedia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto-detect.
         /// </summary>
         public static string AutoDetect {
