@@ -1415,6 +1415,12 @@
   <data name="Format" xml:space="preserve">
     <value>Формат</value>
   </data>
+  <data name="Today" xml:space="preserve">
+    <value>Сегодня</value>
+  </data>
+  <data name="TodayTip" xml:space="preserve">
+    <value>Поставить сегодняшнюю дату</value>
+  </data>
   <data name="ThemeFillQuestions" xml:space="preserve">
     <value>вопросы</value>
   </data>
