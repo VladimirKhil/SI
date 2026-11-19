@@ -520,7 +520,9 @@ public sealed class QuestionEngine : IQuestionEngine
                             duration = 0;
                         }
 
-                        _playHandler.OnAskAnswer(mode, duration);
+                        var completionMode = TryGetParameter(step, StepParameterNames.CompletionMode)?.SimpleValue;
+
+                        _playHandler.OnAskAnswer(mode, duration, completionMode);
                         _answerPhase = AnswerPhase.Asking;
                         _stepIndex++;
                     }

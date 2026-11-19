@@ -1,6 +1,7 @@
 ﻿using SICore.Models;
 using SIEngine.Core;
 using SIPackages;
+using SIPackages.Core;
 
 namespace SICore.Clients.Game;
 
@@ -98,6 +99,26 @@ internal sealed class QuestionPlayState
     /// Should the question be answered by pressing button.
     /// </summary>
     internal bool UseButtons { get; set; }
+
+    /// <summary>
+    /// Answering stage completion mode (null if not specified).
+    /// </summary>
+    internal string? CompletionMode { get; set; }
+
+    /// <summary>
+    /// Is the question played as a race: all players answer simultaneously and only the first right answer is accepted.
+    /// </summary>
+    internal bool IsRace => CompletionMode == StepParameterValues.AskAnswerCompletionMode_FirstCorrect && AreMultipleAnswerers;
+
+    /// <summary>
+    /// Indicies of players in the order their answers have been received.
+    /// </summary>
+    internal List<int> AnswerOrder { get; } = new();
+
+    /// <summary>
+    /// Index of the player who has given the first right answer in the race (-1 if unknown yet).
+    /// </summary>
+    internal int RaceWinnerIndex { get; set; } = -1;
 
     /// <summary>
     /// Could appellation messages be collected.
@@ -203,6 +224,9 @@ internal sealed class QuestionPlayState
         IsAnswerAnnounced = false;
         IsAnswerSimple = false;
         UseButtons = false;
+        CompletionMode = null;
+        AnswerOrder.Clear();
+        RaceWinnerIndex = -1;
         AppellationState = AppellationState.None;
         Appellations.Clear();
         AppellationIndex = 0;
@@ -225,6 +249,25 @@ internal sealed class QuestionPlayState
             {
                 validation.PlayerIndex--;
             }
+        }
+
+        AnswerOrder.Remove(playerIndex);
+
+        for (var i = 0; i < AnswerOrder.Count; i++)
+        {
+            if (AnswerOrder[i] > playerIndex)
+            {
+                AnswerOrder[i]--;
+            }
+        }
+
+        if (RaceWinnerIndex == playerIndex)
+        {
+            RaceWinnerIndex = -1;
+        }
+        else if (RaceWinnerIndex > playerIndex)
+        {
+            RaceWinnerIndex--;
         }
 
         if (!AnswererIndicies.Any(index => index >= playerIndex))

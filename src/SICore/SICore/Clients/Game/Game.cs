@@ -974,6 +974,11 @@ public sealed class Game : MessageHandler
 
         validation.Verdict = (validationStatus, validationFactor);
 
+        if (Controller.TryFinishRace())
+        {
+            return;
+        }
+
         if (_state.Decision == DecisionType.AnswerValidating && _state.QuestionPlay.Validations.All(v => v.Verdict.HasValue))
         {
             Controller.StopWaiting();
@@ -2156,6 +2161,7 @@ public sealed class Game : MessageHandler
                 {
                     _state.AnswererIndex = i;
                     _state.Players[i].Flag = false;
+                    _state.QuestionPlay.AnswerOrder.Add(i);
 
                     _actions.InformPlayerState(PlayerState.HasAnswered, i);
 
@@ -2301,6 +2307,11 @@ public sealed class Game : MessageHandler
 
         _state.AnswerCount--;
 
+        if (_controller.TryFinishRace())
+        {
+            return;
+        }
+
         if (_state.AnswerCount == 0)
         {
             _controller.Stop(StopReason.Decision);
@@ -2377,6 +2388,12 @@ public sealed class Game : MessageHandler
     {
         if (!_state.IsQuestionAskPlaying) // TODO: this condition looks ugly and unnecessary
         {
+            return;
+        }
+
+        if (_state.Decision == DecisionType.Answering && _state.QuestionPlay.IsRace)
+        {
+            OnRacePass(message.Sender);
             return;
         }
 
@@ -2481,6 +2498,40 @@ public sealed class Game : MessageHandler
         {
             _controller.MoveToAnswer();
             _controller.ScheduleExecution(Tasks.WaitTry, 1, force: true);
+        }
+    }
+
+    /// <summary>
+    /// Handles player refusal to answer in the "firstCorrect" completion mode.
+    /// The player gets the same outcome as a player who has not answered, but the answering stage does not wait for them anymore.
+    /// </summary>
+    /// <param name="playerName">Passing player name.</param>
+    private void OnRacePass(string playerName)
+    {
+        for (var i = 0; i < _state.Players.Count; i++)
+        {
+            var player = _state.Players[i];
+
+            if (player.Name != playerName)
+            {
+                continue;
+            }
+
+            if (!player.Flag || !_state.QuestionPlay.AnswererIndicies.Contains(i))
+            {
+                return; // The player has already answered or passed, or the race is already finished
+            }
+
+            player.Flag = false;
+            _actions.SendMessageWithArgs(Messages.Pass, i);
+            _state.AnswerCount--;
+
+            if (_state.AnswerCount == 0)
+            {
+                _controller.Stop(StopReason.Decision);
+            }
+
+            return;
         }
     }
 

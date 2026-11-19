@@ -138,7 +138,19 @@ public static class ScriptsLibrary
         forAllScript.Steps.Add(CreateSetAnswerTypeStep());
         forAllScript.Steps.Add(CreateSetAnswererAllStep());
         forAllScript.Steps.Add(CreateQuestionStep());
-        forAllScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
+
+        var askAnswerStep = CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct);
+
+        askAnswerStep.Parameters.Add(
+            StepParameterNames.CompletionMode,
+            new StepParameter
+            {
+                IsRef = true,
+                Type = StepParameterTypes.Simple,
+                SimpleValue = QuestionParameterNames.CompletionMode
+            });
+
+        forAllScript.Steps.Add(askAnswerStep);
         forAllScript.Steps.Add(CreateAnswerStep());
 
         return forAllScript;

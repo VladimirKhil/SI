@@ -381,6 +381,16 @@ ANSWER\n<answer_type>
 - `select` - Multiple choice (sent with options earlier)
 - `number` - Numeric answer
 
+When a question for all has the `firstCorrect` completion mode (question parameter `completionMode`), only the first
+right answer is scored, and the optional `+` argument means that the player can refuse to answer:
+```
+ANSWER\n<answer_type>\n+
+```
+
+The player refuses by sending `PASS`. The server informs all clients with `PASS\n<player_index>`. The player gets
+the same outcome as a player who has not answered, and the answering stage finishes when all players have answered
+or passed.
+
 Optional for oral answers:
 ```
 ORAL_ANSWER

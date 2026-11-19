@@ -55,6 +55,15 @@ public interface IQuestionEnginePlayHandler
     void OnAskAnswer(string mode, int duration);
 
     /// <summary>
+    /// Asks for the answer.
+    /// </summary>
+    /// <param name="mode">Ask answer mode.</param>
+    /// <param name="duration">Answering duration in seconds.</param>
+    /// <param name="completionMode">Answering stage completion mode (null if not specified).</param>
+    /// <remarks>Handlers which do not support completion modes ask for the answer as usual.</remarks>
+    void OnAskAnswer(string mode, int duration, string? completionMode) => OnAskAnswer(mode, duration);
+
+    /// <summary>
     /// Allows to press the button.
     /// </summary>
     bool OnButtonPressStart();

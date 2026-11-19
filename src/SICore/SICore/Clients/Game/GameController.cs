@@ -1312,6 +1312,17 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
                 if (multipleAnswerers)
                 {
+                    if (_state.QuestionPlay.IsRace)
+                    {
+                        // Answers are judged in the order they have been given, so the first right one is the winner
+                        if (_state.QuestionPlay.RaceWinnerIndex == -1)
+                        {
+                            _state.QuestionPlay.RaceWinnerIndex = _state.AnswererIndex;
+                        }
+
+                        GiveTurnToRaceWinner(_state.AnswererIndex);
+                    }
+
                     ScheduleExecution(Tasks.Announce, _state.HiddenPersons ? 1 : 15);
                 }
                 else
@@ -1627,7 +1638,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             _actions.ShowmanReplicNew(MessageCode.PlayerAnswers);
         }
 
-        var answererIndicies = _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
+        IEnumerable<int> answererIndicies = _state.QuestionPlay.IsRace
+            // Race answers are judged in the order they have been given
+            ? _state.QuestionPlay.AnswerOrder.Concat(_state.QuestionPlay.AnswererIndicies.Except(_state.QuestionPlay.AnswerOrder))
+            : _state.QuestionPlay.AnswererIndicies.OrderBy(index => _state.Players[index].Sum);
+
         _state.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answererIndicies);
 
         if (ValidateAfterRightAnswer)
@@ -2904,6 +2919,14 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         }
 
         var answererIndex = _state.AnnouncedAnswerersEnumerator.Current;
+
+        if (_state.QuestionPlay.IsRace && !IsRaceAnswerAccepted(answererIndex))
+        {
+            _actions.SendMessageWithArgs(Messages.Pass, answererIndex);
+            ScheduleExecution(Tasks.Announce, 1, force: true);
+            return;
+        }
+
         _state.AnswererIndex = answererIndex;
         var playerAnswer = _state.Answerer?.Answer;
 
@@ -3377,19 +3400,31 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
             _actions.SendMessageWithArgs(Messages.FinalThink, answerTime);
 
+            // Bots cannot play mini-games, and their instant answer would finish the race before people start playing
+            var skipBots = _state.QuestionPlay.IsRace && _state.QuestionPlay.AnswerType == AnswerType.Client;
+            var answerCount = 0;
+
             for (var i = 0; i < _state.Players.Count; i++)
             {
                 if (_state.QuestionPlay.AnswererIndicies.Contains(i))
                 {
                     _state.Players[i].Answer = "";
+
+                    if (skipBots && !_state.Players[i].IsHuman)
+                    {
+                        _state.Players[i].Flag = false;
+                        continue;
+                    }
+
                     _state.Players[i].Flag = true;
-                    _actions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.AnswerType);
+                    _actions.AskAnswer(_state.Players[i].Name, _state.QuestionPlay.AnswerType, _state.QuestionPlay.IsRace);
+                    answerCount++;
                 }
             }
 
             var waitTime = answerTime * 10;
 
-            _state.AnswerCount = _state.QuestionPlay.AnswererIndicies.Count;
+            _state.AnswerCount = answerCount;
             ScheduleExecution(Tasks.WaitAnswer, waitTime, force: true);
             WaitFor(DecisionType.Answering, waitTime, -2, false);
             return;
@@ -4539,6 +4574,108 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.MoveNext, 5);
     }
 
+    /// <summary>
+    /// Finishes the race if its winner is already known: all answers given before the winner's one have been judged wrong.
+    /// </summary>
+    /// <returns>True if the answering stage has been finished.</returns>
+    internal bool TryFinishRace()
+    {
+        if (!_state.QuestionPlay.IsRace || _state.QuestionPlay.RaceWinnerIndex != -1)
+        {
+            return false;
+        }
+
+        var winnerIndex = FindRaceWinner(false);
+
+        if (winnerIndex == -1)
+        {
+            return false;
+        }
+
+        _state.QuestionPlay.RaceWinnerIndex = winnerIndex;
+
+        // Answers given after the winner's one are not judged so they do not need validation
+        if (_state.QuestionPlay.ActiveValidationCount > 0)
+        {
+            if (_state.Rules.GameMode != SI.Contracts.GameMode.Quiz)
+            {
+                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            }
+
+            _state.QuestionPlay.Validations.RemoveAll(validation => !validation.Verdict.HasValue);
+        }
+
+        if (_state.Decision != DecisionType.Answering)
+        {
+            return false;
+        }
+
+        foreach (var player in _state.Players)
+        {
+            player.Flag = false; // No more answers are accepted
+        }
+
+        ScheduleExecution(Tasks.WaitAnswer, 1, force: true);
+        return true;
+    }
+
+    /// <summary>
+    /// Finds the player who has given the first right answer in the race.
+    /// </summary>
+    /// <param name="isFinal">Should pending text answers be checked automatically instead of waiting for the showman verdict.</param>
+    /// <returns>Winner index or -1 if the winner is unknown yet.</returns>
+    private int FindRaceWinner(bool isFinal)
+    {
+        foreach (var playerIndex in _state.QuestionPlay.AnswerOrder)
+        {
+            var player = _state.Players[playerIndex];
+            var answer = player.Answer ?? "";
+
+            var isRight = !isFinal && player.IsHuman && !player.AnswerIsWrong && _state.QuestionPlay.AnswerType == AnswerType.Text
+                ? FindAnswerVerdict(playerIndex, answer)?.IsRight // Text answers wait for the showman verdict
+                : ValidateAnswerAutomatically(playerIndex, answer, player.AnswerIsWrong);
+
+            if (!isRight.HasValue)
+            {
+                return -1; // An earlier answer has not been validated yet
+            }
+
+            if (isRight.Value)
+            {
+                return playerIndex;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Checks whether the player answer is judged in the race: the player has answered not later than the winner.
+    /// </summary>
+    /// <param name="playerIndex">Player index.</param>
+    private bool IsRaceAnswerAccepted(int playerIndex)
+    {
+        var answerPosition = _state.QuestionPlay.AnswerOrder.IndexOf(playerIndex);
+
+        if (answerPosition == -1)
+        {
+            return false; // The player has not answered
+        }
+
+        var winnerPosition = _state.QuestionPlay.AnswerOrder.IndexOf(_state.QuestionPlay.RaceWinnerIndex);
+
+        return winnerPosition == -1 || answerPosition <= winnerPosition;
+    }
+
+    private void GiveTurnToRaceWinner(int playerIndex)
+    {
+        if (GetTurnSwitchingStrategy() == TurnSwitchingStrategy.ByRightAnswerOnButton && _state.ChooserIndex != playerIndex)
+        {
+            _state.ChooserIndex = playerIndex;
+            _actions.SendMessageWithArgs(Messages.SetChooser, _state.ChooserIndex);
+        }
+    }
+
     internal void OnButtonPressStart()
     {
         _state.Decision = DecisionType.Pressing;
@@ -4729,12 +4866,23 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             return;
         }
 
+        if (_state.QuestionPlay.IsRace && _state.QuestionPlay.RaceWinnerIndex == -1)
+        {
+            _state.QuestionPlay.RaceWinnerIndex = FindRaceWinner(true);
+        }
+
         while (_state.AnnouncedAnswerersEnumerator.MoveNext())
         {
             var answererIndex = _state.AnnouncedAnswerersEnumerator.Current;
 
             if (answererIndex < 0 || answererIndex >= _state.Players.Count)
             {
+                continue;
+            }
+
+            if (_state.QuestionPlay.IsRace && !IsRaceAnswerAccepted(answererIndex))
+            {
+                _actions.SendMessageWithArgs(Messages.Pass, answererIndex);
                 continue;
             }
 
@@ -4750,6 +4898,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             {
                 AddRightSum(answerer, _state.CurPriceRight);
                 outcome = _state.CurPriceRight;
+
+                if (_state.QuestionPlay.IsRace)
+                {
+                    GiveTurnToRaceWinner(answererIndex);
+                }
             }
             else
             {
