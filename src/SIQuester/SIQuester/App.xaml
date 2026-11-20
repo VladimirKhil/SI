@@ -521,9 +521,18 @@
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.AnswerType}" Member="lp:Resources.AnswerType" />
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.AnswerOptions}" Member="lp:Resources.AnswerOptions" />
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.AnswerDuration}" Member="lp:Resources.AnswerDuration" />
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.CompletionMode}" Member="lp:Resources.CompletionMode" />
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="QuestionParameterNamesConverter" Map="{StaticResource QuestionParameterNames}" />
+
+            <siqcv:StringDictionary x:Key="CompletionModes">
+                <x:Static
+                    x:Key="{x:Static pc:StepParameterValues.AskAnswerCompletionMode_FirstCorrect}"
+                    Member="lp:Resources.CompletionMode_FirstCorrect" />
+            </siqcv:StringDictionary>
+
+            <siqcv:MappedConverter x:Key="CompletionModesConverter" Map="{StaticResource CompletionModes}" />
 
             <siqcv:StringDictionary x:Key="SelectionModes">
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswererSelect_Any}" Member="lp:Resources.SetAnswererSelect_Any" />
@@ -2787,7 +2796,28 @@
                         ToolTip="{x:Static lp:Resources.ClearType}">
                         <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="1" Data="M0,0L6,6M0,6L6,0" />
                     </Button>
+
+                    <ComboBox
+                        x:Name="completionMode"
+                        Margin="10,0,0,0"
+                        MinWidth="120"
+                        Visibility="Collapsed"
+                        SelectedValuePath="Tag"
+                        SelectedValue="{Binding Parameters.CompletionMode, Mode=TwoWay}"
+                        ToolTip="{x:Static lp:Resources.CompletionModeHint}">
+                        <ComboBoxItem Tag="" Content="{x:Static lp:Resources.CompletionMode_Default}" />
+
+                        <ComboBoxItem
+                            Tag="{x:Static pc:StepParameterValues.AskAnswerCompletionMode_FirstCorrect}"
+                            Content="{x:Static lp:Resources.CompletionMode_FirstCorrect}" />
+                    </ComboBox>
                 </StackPanel>
+
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding TypeName}" Value="{x:Static pc:QuestionTypes.ForAll}">
+                        <Setter TargetName="completionMode" Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
             </DataTemplate>
 
             <siqcv:NotDefaultTypeConverter x:Key="NotDefaultTypeConverter" />
@@ -3442,6 +3472,12 @@
                                 </DataTrigger>
 
                                 <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerDuration}">
+                                    <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+
+                                <!-- Completion mode is edited next to the question type -->
+                                <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.CompletionMode}">
                                     <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
                                     <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>

@@ -1434,4 +1434,16 @@ When there are some questions in theme, they will be used as examples</value>
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Questions with text / questions with a right answer</value>
   </data>
+  <data name="CompletionMode" xml:space="preserve">
+    <value>Answer mode</value>
+  </data>
+  <data name="CompletionMode_Default" xml:space="preserve">
+    <value>Each for themselves</value>
+  </data>
+  <data name="CompletionMode_FirstCorrect" xml:space="preserve">
+    <value>Fastest wins</value>
+  </data>
+  <data name="CompletionModeHint" xml:space="preserve">
+    <value>Each for themselves: every player who answers right scores. Fastest wins: only the first right answer counts and finishes the answering stage.</value>
+  </data>
 </root>

@@ -849,7 +849,8 @@ public sealed class QDocument : WorkspaceViewModel
                 || parameter.Key == QuestionParameterNames.Answer
                 || parameter.Key == QuestionParameterNames.AnswerType
                 || parameter.Key == QuestionParameterNames.AnswerOptions
-                || parameter.Key == QuestionParameterNames.AnswerDeviation)
+                || parameter.Key == QuestionParameterNames.AnswerDeviation
+                || parameter.Key == QuestionParameterNames.AnswerDuration) // Answer duration does not depend on question type
             {
                 continue;
             }
