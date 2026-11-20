@@ -826,6 +826,42 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Answer mode.
+        /// </summary>
+        public static string CompletionMode {
+            get {
+                return ResourceManager.GetString("CompletionMode", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Each for themselves.
+        /// </summary>
+        public static string CompletionMode_Default {
+            get {
+                return ResourceManager.GetString("CompletionMode_Default", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fastest wins.
+        /// </summary>
+        public static string CompletionMode_FirstCorrect {
+            get {
+                return ResourceManager.GetString("CompletionMode_FirstCorrect", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Each for themselves: every player who answers right scores. Fastest wins: only the first right answer counts and finishes the answering stage..
+        /// </summary>
+        public static string CompletionModeHint {
+            get {
+                return ResourceManager.GetString("CompletionModeHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Compress.
         /// </summary>
         public static string Compress {

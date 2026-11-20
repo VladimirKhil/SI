@@ -36,6 +36,42 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
         }
     }
 
+    /// <summary>
+    /// Answering stage completion mode of a question for all (empty string if not set).
+    /// </summary>
+    /// <remarks>
+    /// Setting null is ignored: a selector writes it when its value is unknown or it is being unloaded.
+    /// </remarks>
+    public string? CompletionMode
+    {
+        get => TryGetValue(QuestionParameterNames.CompletionMode, out var completionModeParameter)
+            ? completionModeParameter.Model.SimpleValue
+            : "";
+        set
+        {
+            if (value == null || value == CompletionMode)
+            {
+                return;
+            }
+
+            var document = _question.OwnerTheme?.OwnerRound?.OwnerPackage?.Document;
+            using var change = document?.OperationsManager.BeginComplexChange();
+
+            RemoveParameter(QuestionParameterNames.CompletionMode);
+
+            if (value.Length > 0)
+            {
+                AddParameter(QuestionParameterNames.CompletionMode, new StepParameterViewModel(_question, new StepParameter
+                {
+                    Type = StepParameterTypes.Simple,
+                    SimpleValue = value
+                }));
+            }
+
+            change?.Commit();
+        }
+    }
+
     public SimpleCommand AddItem { get; }
 
     public SimpleCommand DeleteItem { get; }
@@ -244,6 +280,7 @@ public sealed class StepParametersViewModel : ObservableCollection<StepParameter
 
         OnPropertyChanged(new PropertyChangedEventArgs(nameof(HasComplexAnswer)));
         OnPropertyChanged(new PropertyChangedEventArgs(nameof(AnswerType)));
+        OnPropertyChanged(new PropertyChangedEventArgs(nameof(CompletionMode)));
         UpdateCommands();
     }
 

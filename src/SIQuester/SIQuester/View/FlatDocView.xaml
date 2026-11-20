@@ -337,6 +337,16 @@
                                         </Setter>
                                     </DataTrigger>
 
+                                    <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.CompletionMode}">
+                                        <Setter TargetName="value" Property="ContentTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Model.SimpleValue, Converter={StaticResource CompletionModesConverter}}" />
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+
                                     <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerType}">
                                         <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
                                         <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
@@ -1029,6 +1039,22 @@
                                 ItemsSource="{Binding Source={StaticResource QuestionTypesNamesNew}}"
                                 SelectedItem="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
 
+                            <StackPanel x:Name="completionModeSection" Visibility="Collapsed">
+                                <TextBlock Text="{x:Static lp:Resources.CompletionMode}" Margin="0,5,0,0" />
+
+                                <ComboBox
+                                    Margin="0,1,0,0"
+                                    SelectedValuePath="Tag"
+                                    SelectedValue="{Binding Parameters.CompletionMode, Mode=TwoWay}"
+                                    ToolTip="{x:Static lp:Resources.CompletionModeHint}">
+                                    <ComboBoxItem Tag="" Content="{x:Static lp:Resources.CompletionMode_Default}" />
+
+                                    <ComboBoxItem
+                                        Tag="{x:Static pc:StepParameterValues.AskAnswerCompletionMode_FirstCorrect}"
+                                        Content="{x:Static lp:Resources.CompletionMode_FirstCorrect}" />
+                                </ComboBox>
+                            </StackPanel>
+
                             <ItemsControl x:Name="params" ItemsSource="{Binding Parameters}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -1074,6 +1100,12 @@
 
                                             <!-- Hide answer duration - it is displayed separately -->
                                             <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerDuration}">
+                                                <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                                <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+
+                                            <!-- Hide completion mode - it is displayed separately -->
+                                            <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.CompletionMode}">
                                                 <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
                                                 <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
@@ -1168,7 +1200,11 @@
                             <Setter TargetName="typeHeader" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
-                        
+
+                        <DataTrigger Binding="{Binding TypeName}" Value="{x:Static pc:QuestionTypes.ForAll}">
+                            <Setter TargetName="completionModeSection" Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+
                         <!-- Show numeric answer template when IsNumericAnswer is true -->
                         <DataTrigger Binding="{Binding IsNumericAnswer}" Value="True">
                             <Setter TargetName="numericAnswerSection" Property="Visibility" Value="Visible" />

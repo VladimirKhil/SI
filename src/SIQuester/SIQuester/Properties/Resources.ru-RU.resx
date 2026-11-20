@@ -1430,4 +1430,16 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="CompletionMode" xml:space="preserve">
+    <value>Режим ответа</value>
+  </data>
+  <data name="CompletionMode_Default" xml:space="preserve">
+    <value>Каждый за себя</value>
+  </data>
+  <data name="CompletionMode_FirstCorrect" xml:space="preserve">
+    <value>Кто быстрее</value>
+  </data>
+  <data name="CompletionModeHint" xml:space="preserve">
+    <value>Каждый за себя: очки получает каждый, кто ответил верно. Кто быстрее: засчитывается только первый верный ответ, он завершает этап ответа.</value>
+  </data>
 </root>
