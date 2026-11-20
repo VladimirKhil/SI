@@ -1035,4 +1035,10 @@
   <data name="EmptyPreviewWarning" xml:space="preserve">
     <value>У вашего пакета отсутствует превью</value>
   </data>
+  <data name="WorkshopItemsStillLoading" xml:space="preserve">
+    <value>Ваши пакеты в мастерской ещё загружаются. Подождите немного и нажмите ещё раз.</value>
+  </data>
+  <data name="WorkshopItemAlreadyPublished" xml:space="preserve">
+    <value>Этот пакет уже есть в мастерской: «{0}». Он выбран в списке — нажмите кнопку ещё раз, чтобы обновить его, а не выкладывать дубликат.</value>
+  </data>
 </root>

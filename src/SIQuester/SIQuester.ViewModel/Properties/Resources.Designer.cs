@@ -2147,6 +2147,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This pack is already in the Workshop: «{0}». It is selected in the list — press the button again to update it instead of publishing a duplicate..
+        /// </summary>
+        public static string WorkshopItemAlreadyPublished {
+            get {
+                return ResourceManager.GetString("WorkshopItemAlreadyPublished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to create Workshop item.
         /// </summary>
         public static string WorkshopItemCreationError {
@@ -2161,6 +2170,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string WorkshopItemsLoadError {
             get {
                 return ResourceManager.GetString("WorkshopItemsLoadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your Workshop items are still loading. Please wait a moment and try again..
+        /// </summary>
+        public static string WorkshopItemsStillLoading {
+            get {
+                return ResourceManager.GetString("WorkshopItemsStillLoading", resourceCulture);
             }
         }
         
