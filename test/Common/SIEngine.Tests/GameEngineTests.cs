@@ -766,4 +766,9 @@ internal class TrackingGameHandler : ISIEnginePlayHandler
     {
         CallOrder.Add("OnQuestionAborted");
     }
+
+    public void OnUnsupportedQuestion()
+    {
+        CallOrder.Add("OnUnsupportedQuestion");
+    }
 }

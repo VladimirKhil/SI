@@ -556,6 +556,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             FalseStart = Settings.FalseStart,
             PartialText = Settings.PartialText,
             ReadingSpeed = Settings.QuestionReadingSpeed,
+            GameMode = SettingsViewModel.Model.GameMode switch
+            {
+                Model.GameModes.Tv => SI.Contracts.GameMode.Classic,
+                Model.GameModes.Quiz => SI.Contracts.GameMode.Quiz,
+                Model.GameModes.TurnTaking => SI.Contracts.GameMode.TurnTaking,
+                _ => SI.Contracts.GameMode.Sequential
+            },
         };
 
         var roomSettings = new SI.Contracts.RoomSettings

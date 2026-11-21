@@ -524,4 +524,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     public bool OnPointAnswerType(double deviation) => false;
 
     public bool OnClientAnswerType() => false;
+
+    public void OnUnsupportedQuestion() { }
 }
