@@ -52,6 +52,10 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
 
     }
 
+    public void OnUnsupportedQuestion()
+    {
+    }
+
     public bool OnQuestionEnd(string comments) => false;
 
     public void OnQuestionRestored(int themeIndex, int questionIndex, int price)
