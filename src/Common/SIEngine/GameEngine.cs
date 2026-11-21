@@ -292,6 +292,12 @@ public sealed class GameEngine : EngineBase, INotifyPropertyChanged
 
     private void OnQuestionType()
     {
+        if (QuestionEngine.UnsupportedQuestion)
+        {
+            _playHandler.OnUnsupportedQuestion();
+            return;
+        }
+
         var questionTypeName = QuestionEngine.QuestionTypeName;
         var isDefault = questionTypeName == _gameRules.GetRulesForRoundType(ActiveRound.Type).DefaultQuestionType;
         _playHandler.OnQuestionType(questionTypeName, isDefault);

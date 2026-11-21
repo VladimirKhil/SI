@@ -41,6 +41,9 @@ public sealed class QuestionEngine : IQuestionEngine
 
     public string QuestionTypeName { get; } = "";
 
+    /// <inheritdoc />
+    public bool UnsupportedQuestion => _script == null;
+
     /// <summary>
     /// Initializes a new instance of <see cref="QuestionEngine" /> class.
     /// </summary>

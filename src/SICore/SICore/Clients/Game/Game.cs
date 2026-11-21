@@ -1479,9 +1479,23 @@ public sealed class Game : MessageHandler
     private void OnInfo(string person)
     {
         Inform(person);
+        InformIdentities(person);
         InformReady(person);
         _actions.InformSums(person);
         InformGameStage(person);
+    }
+
+    private void InformIdentities(string person)
+    {
+        if (_state.HiddenPersons)
+        {
+            return;
+        }
+
+        foreach (var (personName, identity) in _state.Identities.Where(i => _state.AllPersons.ContainsKey(i.Key)))
+        {
+            _actions.InformUserIdentity(personName, identity.Provider, identity.UserId, identity.Badges, person);
+        }
     }
 
     private void InformReady(string person)
@@ -3729,11 +3743,6 @@ public sealed class Game : MessageHandler
         if (_state.HiddenPersons)
         {
             return;
-        }
-
-        foreach (var (personName, identity) in _state.Identities.Where(i => _state.AllPersons.ContainsKey(i.Key)))
-        {
-            _actions.InformUserIdentity(personName, identity.Provider, identity.UserId, identity.Badges, name);
         }
 
         if (string.IsNullOrEmpty(authProvider) || string.IsNullOrEmpty(externalUserId))

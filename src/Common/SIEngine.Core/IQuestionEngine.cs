@@ -35,6 +35,11 @@ public interface IQuestionEngine
     bool CanMoveBack { get; }
 
     /// <summary>
+    /// Marks question that cannot be played by the current engine.
+    /// </summary>
+    bool UnsupportedQuestion { get; }
+
+    /// <summary>
     /// Advances the state machine to the next step and invokes the appropriate handler method.
     /// </summary>
     /// <returns>

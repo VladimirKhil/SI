@@ -227,6 +227,8 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
 
     public void OnQuestion(Question question) => Controller.OnQuestion(question);
 
+    public void OnUnsupportedQuestion() => Controller.OnUnsupportedQuestion();
+
     public void OnQuestionType(string typeName, bool isDefault)
     {
         _state.QuestionTypeName = typeName;

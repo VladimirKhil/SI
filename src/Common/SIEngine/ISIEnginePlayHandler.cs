@@ -147,4 +147,9 @@ public interface ISIEnginePlayHandler
     /// Handles question abort.
     /// </summary>
     void OnQuestionAborted();
+
+    /// <summary>
+    /// Handles unsupported question.
+    /// </summary>
+    void OnUnsupportedQuestion();
 }

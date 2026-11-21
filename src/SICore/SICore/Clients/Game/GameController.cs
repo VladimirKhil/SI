@@ -2788,26 +2788,6 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     internal void OnQuestionType(string typeName, bool isDefault)
     {
-        if (!isDefault) // TODO: This announcement should be handled by the client in the future
-        {
-            switch (typeName)
-            {
-                case QuestionTypes.Stake:
-                case QuestionTypes.Secret:
-                case QuestionTypes.SecretPublicPrice:
-                case QuestionTypes.SecretNoQuestion:
-                case QuestionTypes.NoRisk:
-                case QuestionTypes.Simple:
-                case QuestionTypes.StakeAll:
-                case QuestionTypes.ForAll:
-                    break;
-
-                default:
-                    OnUnsupportedQuestionType(typeName); // TODO: emit this by Game Engine
-                    return;
-            }
-        }
-
         _state.QuestionTypeSettings.TryGetValue(typeName, out var questionTypeRules);
         
         var isNoRisk = questionTypeRules?.PenaltyType == PenaltyType.None;
@@ -2821,7 +2801,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         ScheduleExecution(Tasks.MoveNext, isDefault ? 1 : 22, force: true);
     }
 
-    private void OnUnsupportedQuestionType(string typeName)
+    internal void OnUnsupportedQuestion()
     {
         _actions.ShowmanReplicNew(MessageCode.UnsupportedQuestion);
         _state.SkipQuestion?.Invoke();
