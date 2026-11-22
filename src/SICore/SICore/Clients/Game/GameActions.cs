@@ -515,7 +515,7 @@ public sealed class GameActions
             if (player.AppellationFlag)
             {
                 player.AppellationFlag = false;
-                SendMessage(Messages.Cancel, player.Name);
+                Cancel(player.Name);
             }
         }
     }

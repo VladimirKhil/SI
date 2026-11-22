@@ -2224,7 +2224,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitRight()
     {
-        _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+        _actions.Cancel(_state.ShowMan.Name);
 
         if (_state.Answerer == null)
         {
@@ -2261,11 +2261,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new ArgumentException($"{nameof(_state.StakeRange)} == null", nameof(_state.StakeRange));
         }
 
-        _actions.SendMessage(Messages.Cancel, _state.Answerer.Name);
+        _actions.Cancel(_state.Answerer.Name);
 
         if (_state.IsOralNow)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
         }
 
         _state.CurPriceRight = _state.StakeRange.Minimum;
@@ -2322,7 +2322,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitNext(bool isSelectingStaker)
     {
-        _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+        _actions.Cancel(_state.ShowMan.Name);
         _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
         if (!isSelectingStaker && _state.ThemeDeleters != null && _state.ThemeDeleters.IsEmpty())
@@ -2381,11 +2381,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
             throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0; {_state.Players.Count - 1}]: {_state.OrderHistory}");
         }
 
-        _actions.SendMessage(Messages.Cancel, _state.Players[playerIndex].Name);
+        _actions.Cancel(_state.Players[playerIndex].Name);
 
         if (_state.IsOralNow)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
         }
 
         _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
@@ -2417,7 +2417,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitFirst()
     {
-        _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+        _actions.Cancel(_state.ShowMan.Name);
 
         if (_state.ChooserIndex == -1)
         {
@@ -2442,7 +2442,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                 return;
             }
 
-            _actions.SendMessage(Messages.Cancel, _state.Answerer.Name);
+            _actions.Cancel(_state.Answerer.Name);
 
             if (string.IsNullOrEmpty(_state.Answerer.Answer))
             {
@@ -2454,7 +2454,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (_state.QuestionPlay.ActiveValidationCount > 0 && _state.Rules.GameMode != SI.Contracts.GameMode.Quiz) // TODO: think about more elegant solution
             {
-                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name); // Cancel validation
+                _actions.Cancel(_state.ShowMan.Name); // Cancel validation
             }
 
             for (var i = 0; i < _state.Players.Count; i++)
@@ -2465,7 +2465,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
                     _state.Players[i].AnswerIsWrong = true;
                 }
 
-                _actions.SendMessage(Messages.Cancel, _state.Players[i].Name);
+                _actions.Cancel(_state.Players[i].Name);
             }
 
             _state.IsWaiting = true;
@@ -2476,11 +2476,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitQuestionAnswererSelection()
     {
-        _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+        _actions.Cancel(_state.Chooser.Name);
 
         if (_state.IsOralNow)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
         }
 
         var index = _state.Players.SelectRandomOnIndex(index => index != _state.ChooserIndex);
@@ -2514,7 +2514,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (_state.QuestionPlay.AnswererIndicies.Contains(i) && _state.Players[i].PersonalStake == -1)
             {
-                _actions.SendMessage(Messages.Cancel, _state.Players[i].Name);
+                _actions.Cancel(_state.Players[i].Name);
                 _state.Players[i].PersonalStake = 1;
 
                 _actions.SendMessageWithArgs(Messages.PersonFinalStake, i);
@@ -2640,11 +2640,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitDelete()
     {
-        _actions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
+        _actions.Cancel(_state.ActivePlayer.Name);
 
         if (_state.IsOralNow)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
         }
 
         _actions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
@@ -2730,11 +2730,11 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
 
     private void WaitChoose()
     {
-        _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+        _actions.Cancel(_state.Chooser.Name);
 
         if (_state.IsOralNow)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
         }
 
         var canChooseTheme = _state.TInfo.RoundInfo.Select(t => t.Questions.Any(QuestionHelper.IsActive)).ToArray();
@@ -4579,7 +4579,7 @@ public sealed class GameController : ITaskRunHandler<Tasks>, IDisposable
         {
             if (_state.Rules.GameMode != SI.Contracts.GameMode.Quiz)
             {
-                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _actions.Cancel(_state.ShowMan.Name);
             }
 
             _state.QuestionPlay.Validations.RemoveAll(validation => !validation.Verdict.HasValue);

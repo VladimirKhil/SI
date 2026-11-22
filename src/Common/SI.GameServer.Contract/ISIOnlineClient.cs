@@ -1,6 +1,4 @@
-﻿using SIData;
-
-namespace SI.GameServer.Contract;
+﻿namespace SI.GameServer.Contract;
 
 /// <summary>
 /// Defines SIGame client callback methods.

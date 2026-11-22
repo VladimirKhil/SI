@@ -1018,9 +1018,7 @@ public sealed class Game : MessageHandler
 
                 if (_state.IsOralNow)
                 {
-                    _actions.SendMessage(
-                        Messages.Cancel,
-                        messageSender == _state.ShowMan.Name ? _state.Chooser.Name : _state.ShowMan.Name);
+                    _actions.Cancel(messageSender == _state.ShowMan.Name ? _state.Chooser.Name : _state.ShowMan.Name);
                 }
 
                 _controller.Stop(StopReason.Decision);
@@ -1068,12 +1066,12 @@ public sealed class Game : MessageHandler
 
         if (_state.IsOralNow)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
         }
 
         if (Controller.CanPlayerAct())
         {
-            _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+            _actions.Cancel(_state.Chooser.Name);
         }
 
         _controller.Stop(StopReason.Decision);
@@ -1136,12 +1134,12 @@ public sealed class Game : MessageHandler
 
             if (_state.IsOralNow)
             {
-                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _actions.Cancel(_state.ShowMan.Name);
             }
 
             if (_state.Chooser != null && Controller.CanPlayerAct())
             {
-                _actions.SendMessage(Messages.Cancel, _state.Chooser.Name);
+                _actions.Cancel(_state.Chooser.Name);
             }
         }
 
@@ -1458,12 +1456,12 @@ public sealed class Game : MessageHandler
             {
                 if (Controller.CanPlayerAct())
                 {
-                    _actions.SendMessage(Messages.Cancel, stakerName);
+                    _actions.Cancel(stakerName);
                 }
             }
             else
             {
-                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _actions.Cancel(_state.ShowMan.Name);
             }
         }
     }
@@ -1672,12 +1670,12 @@ public sealed class Game : MessageHandler
 
         if (_state.IsOralNow)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
         }
 
         if (Controller.CanPlayerAct())
         {
-            _actions.SendMessage(Messages.Cancel, _state.ActivePlayer.Name);
+            _actions.Cancel(_state.ActivePlayer.Name);
         }
 
         _controller.Stop(StopReason.Decision);
@@ -2309,12 +2307,12 @@ public sealed class Game : MessageHandler
                 {
                     if (_state.Answerer != null)
                     {
-                        _actions.SendMessage(Messages.Cancel, _state.Answerer.Name);
+                        _actions.Cancel(_state.Answerer.Name);
                     }
                 }
                 else if (!Controller.HaveMultipleAnswerers())
                 {
-                    _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                    _actions.Cancel(_state.ShowMan.Name);
                 }
             }
         }
@@ -2354,7 +2352,7 @@ public sealed class Game : MessageHandler
                 && (_state.QuestionPlay.AnswerOptions == null || !_state.Rules.OralPlayersActions))
             {
                 // Cancelling Oral Answer player mode
-                _actions.SendMessage(Messages.Cancel, _state.Answerer.Name);
+                _actions.Cancel(_state.Answerer.Name);
             }
 
             _controller.Stop(StopReason.Decision);
@@ -2461,7 +2459,7 @@ public sealed class Game : MessageHandler
                                 var stakerIndex = _state.Players.IndexOf(possibleStakers[0]);
                                 _state.Order[_state.OrderIndex] = stakerIndex;
                                 Controller.CheckOrder(_state.OrderIndex);
-                                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                                _actions.Cancel(_state.ShowMan.Name);
                                 _controller.Stop(StopReason.Decision);
                             }
                         }
@@ -2908,7 +2906,7 @@ public sealed class Game : MessageHandler
         {
             case DecisionType.StarterChoosing:
                 // Asking again
-                _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                _actions.Cancel(_state.ShowMan.Name);
                 _controller.StopWaiting();
                 _controller.PlanExecution(Tasks.AskFirst, 20);
                 break;
@@ -3069,7 +3067,7 @@ public sealed class Game : MessageHandler
                 // Staker has been deleted. We need to move game further
                 if (_state.IsOralNow || _state.Decision == DecisionType.NextPersonStakeMaking)
                 {
-                    _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+                    _actions.Cancel(_state.ShowMan.Name);
                 }
 
                 ContinueMakingStakes();
@@ -3077,7 +3075,7 @@ public sealed class Game : MessageHandler
         }
         else if (_state.Decision == DecisionType.NextPersonStakeMaking)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
             ContinueMakingStakes();
         }
     }
@@ -3125,13 +3123,13 @@ public sealed class Game : MessageHandler
             // Answerer has been dropped. The game should be moved forward
             Controller.StopWaiting();
 
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
 
             Controller.PlanExecution(Tasks.ContinueQuestion, 1);
         }
         else if (nextTask == Tasks.AskRight || nextTask == Tasks.WaitRight)
         {
-            _actions.SendMessage(Messages.Cancel, _state.ShowMan.Name);
+            _actions.Cancel(_state.ShowMan.Name);
 
             // Player has been removed after giving answer. But the answer has not been validated by showman yet
             if (_state.QuestionPlay.AnswererIndicies.Count == 0)
