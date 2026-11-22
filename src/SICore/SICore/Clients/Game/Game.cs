@@ -1525,11 +1525,10 @@ public sealed class Game : MessageHandler
             _actions.InformRoundsNames(person);
         }
 
-        // To save traffic, do not send round content info on reconnection
-        //if ((ClientData.InformStages & InformStages.RoundContent) > 0)
-        //{
-        //    _gameActions.InformRoundContent(person);
-        //}
+        if ((_state.InformStages & InformStages.RoundContent) > 0)
+        {
+            _actions.InformRoundContent(person, onlyRemaining: true);
+        }
 
         if ((_state.InformStages & InformStages.RoundThemesNames) > 0)
         {
