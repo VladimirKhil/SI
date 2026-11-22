@@ -14,7 +14,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddSIGame(this IServiceCollection services)
     {
-        services.AddHttpClient<ILocalFileManager, LocalFileManager>(
+        services.AddHttpClient(
+            LocalFileManager.HttpClientName,
             client =>
             {
                 client.DefaultRequestVersion = HttpVersion.Version20;
@@ -24,6 +25,8 @@ public static class ServiceCollectionExtensions
                 .WaitAndRetryAsync(
                     RetryCount,
                     retryAttempt => TimeSpan.FromSeconds(Math.Pow(1.5, retryAttempt))));
+
+        services.AddSingleton<ILocalFileManager, LocalFileManager>();
 
         services.AddSingleton<IGameHost, GameHost>();
         services.AddSingleton<IGameSettingsViewModelFactory, GameSettingsViewModelFactory>();

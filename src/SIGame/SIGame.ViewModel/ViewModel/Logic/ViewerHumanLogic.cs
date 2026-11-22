@@ -1474,11 +1474,11 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
 
     public void TimeOut() => PlatformManager.Instance.PlaySound(Sounds.RoundTimeout);
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         if (_disposed)
         {
-            return;
+            return ValueTask.CompletedTask;
         }
 
         _disposed = true;
@@ -1486,11 +1486,12 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
         _timer.Dispose();
 
         _gameLogger?.Dispose();
-        
+
+        _localFileManager.Error -= LocalFileManager_Error;
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
 
-        await _localFileManager.DisposeAsync();
+        return ValueTask.CompletedTask;
     }
 
     public void FinalThink() => PlatformManager.Instance.PlaySound(Sounds.FinalThink);
@@ -1781,7 +1782,7 @@ public sealed class ViewerHumanLogic : IPersonController, IAsyncDisposable
                     lastReportedProgress = currentProgressRounded;
                     _actions.ReportMediaPreloadProgress(currentProgressRounded);
                 }
-            });
+            }, _cancellationTokenSource.Token);
         }
     }
 

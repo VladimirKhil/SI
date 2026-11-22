@@ -1,6 +1,7 @@
 ﻿using Notions;
 using SICore.Clients;
 using SICore.Contracts;
+using SICore.Helpers;
 using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -333,12 +334,13 @@ public sealed class GameActions
     }
 
     /// <summary>
-    /// Sends links to all round media content to the person. This allows the person to preload content in advance.
+    /// Sends links to round media content to the person. This allows the person to preload content in advance.
     /// </summary>
     /// <param name="person">Person name (everybody by default).</param>
-    internal void InformRoundContent(string person = NetworkConstants.Everybody)
+    /// <param name="onlyRemaining">When true, skips questions already played on the round table (keeping the current question).</param>
+    internal void InformRoundContent(string person = NetworkConstants.Everybody, bool onlyRemaining = false)
     {
-        if (!_state.Rules.PreloadRoundContent)
+        if (!_state.Rules.PreloadRoundContent || _state.Round == null)
         {
             return;
         }
@@ -369,10 +371,28 @@ public sealed class GameActions
 
         var contentUris = new HashSet<string>();
 
-        foreach (var theme in _state.Round.Themes)
+        var filterByTable = onlyRemaining
+            && (_state.InformStages & InformStages.Table) > 0
+            && _state.TInfo.RoundInfo.Count == _state.Round.Themes.Count;
+
+        var currentQuestion = (_state.InformStages & InformStages.Question) > 0 ? _state.Question : null;
+
+        for (var i = 0; i < _state.Round.Themes.Count; i++)
         {
-            foreach (var question in theme.Questions)
+            var theme = _state.Round.Themes[i];
+            var tableQuestions = filterByTable ? _state.TInfo.RoundInfo[i].Questions : null;
+
+            for (var j = 0; j < theme.Questions.Count; j++)
             {
+                var question = theme.Questions[j];
+
+                if (tableQuestions != null
+                    && question != currentQuestion
+                    && (j >= tableQuestions.Count || !tableQuestions[j].IsActive()))
+                {
+                    continue;
+                }
+
                 foreach (var contentItem in question.GetContent())
                 {
                     var contentType = contentItem.Type;

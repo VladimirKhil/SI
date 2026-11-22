@@ -8,7 +8,9 @@ namespace SIGame.ViewModel.Services;
 /// <inheritdoc cref="ILocalFileManager" />
 internal sealed class LocalFileManager : ILocalFileManager
 {
-    private readonly HttpClient _client;
+    internal const string HttpClientName = "LocalFileManager";
+
+    private readonly IHttpClientFactory _clientFactory;
 
     private readonly Task _localFileManagerTask;
     private readonly CancellationTokenSource _cancellation = new();
@@ -19,6 +21,8 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     private readonly HashSet<string> _lockedFiles = new();
 
+    private int _disposed;
+
     private readonly Channel<FileTask> _processingQueue = Channel.CreateUnbounded<FileTask>(
         new UnboundedChannelOptions
         {
@@ -28,9 +32,9 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     public event Action<Uri, Exception>? Error;
 
-    public LocalFileManager(HttpClient client)
+    public LocalFileManager(IHttpClientFactory clientFactory)
     {
-        _client = client;
+        _clientFactory = clientFactory;
         _rootFolder = Path.Combine(Path.GetTempPath(), "SIGame", Guid.NewGuid().ToString());
         _localFileManagerTask = StartAsync(_cancellation.Token);
     }
@@ -39,38 +43,47 @@ internal sealed class LocalFileManager : ILocalFileManager
     {
         try
         {
-            while (await _processingQueue.Reader.WaitToReadAsync(cancellationToken))
+            while (await _processingQueue.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
             {
                 while (_processingQueue.Reader.TryRead(out var fileTask))
                 {
-                    await ProcesFileAsync(fileTask, cancellationToken);
-                    await Task.Delay(1000, cancellationToken);
+                    if (await ProcesFileAsync(fileTask, cancellationToken).ConfigureAwait(false))
+                    {
+                        await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 
-    public bool AddFile(Uri uri, Action? onCompleted = null) =>
-        _processingQueue.Writer.TryWrite(new FileTask { Uri = uri, OnCompleted = onCompleted });
+    public bool AddFile(Uri uri, Action? onCompleted = null, CancellationToken cancellationToken = default) =>
+        !cancellationToken.IsCancellationRequested &&
+        _processingQueue.Writer.TryWrite(new FileTask { Uri = uri, OnCompleted = onCompleted, CancellationToken = cancellationToken });
 
-    private async Task ProcesFileAsync(FileTask fileTask, CancellationToken cancellationToken)
+    private async Task<bool> ProcesFileAsync(FileTask fileTask, CancellationToken cancellationToken)
     {
+        if (fileTask.CancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+
         var fileName = FilePathHelper.GetSafeFileName(fileTask.Uri);
         var localFile = Path.Combine(_rootFolder, fileName);
+        var canceled = false;
 
         try
         {
             if (File.Exists(localFile))
             {
-                return;
+                return false;
             }
 
             lock (_globalLock)
             {
                 if (_lockedFiles.Contains(localFile))
                 {
-                    return;
+                    return false;
                 }
 
                 _lockedFiles.Add(localFile);
@@ -80,22 +93,40 @@ internal sealed class LocalFileManager : ILocalFileManager
             {
                 Directory.CreateDirectory(_rootFolder);
 
-                using var response = await _client.GetAsync(fileTask.Uri, cancellationToken);
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, fileTask.CancellationToken);
+                var client = _clientFactory.CreateClient(HttpClientName);
+
+                using var response = await client.GetAsync(fileTask.Uri, linkedCts.Token).ConfigureAwait(false);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     Error?.Invoke(
                         fileTask.Uri,
-                        new Exception($"{SIGame.ViewModel.Properties.Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(cancellationToken)}"));
+                        new Exception($"{SIGame.ViewModel.Properties.Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(linkedCts.Token).ConfigureAwait(false)}"));
 
-                    return;
+                    return true;
                 }
 
-                using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                using var responseStream = await response.Content.ReadAsStreamAsync(linkedCts.Token).ConfigureAwait(false);
                 using var fileStream = File.Create(localFile);
-                await responseStream.CopyToAsync(fileStream, cancellationToken);
+                await responseStream.CopyToAsync(fileStream, linkedCts.Token).ConfigureAwait(false);
+                return true;
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested || fileTask.CancellationToken.IsCancellationRequested)
+            {
+                canceled = true;
+
+                try
+                {
+                    if (File.Exists(localFile))
+                    {
+                        File.Delete(localFile);
+                    }
+                }
+                catch { }
+
+                return false;
+            }
             catch (Exception exc)
             {
                 Error?.Invoke(fileTask.Uri, exc);
@@ -108,6 +139,8 @@ internal sealed class LocalFileManager : ILocalFileManager
                     }
                 }
                 catch { }
+
+                return true;
             }
             finally
             {
@@ -119,7 +152,10 @@ internal sealed class LocalFileManager : ILocalFileManager
         }
         finally
         {
-            try { fileTask.OnCompleted?.Invoke(); } catch { /* Ignore */ }
+            if (!canceled && !fileTask.CancellationToken.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+            {
+                try { fileTask.OnCompleted?.Invoke(); } catch { /* Ignore */ }
+            }
         }
     }
 
@@ -144,12 +180,19 @@ internal sealed class LocalFileManager : ILocalFileManager
         return localFile;
     }
 
+    public void Dispose() => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
     public async ValueTask DisposeAsync()
     {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
         try
         {
             _cancellation.Cancel();
-            await _localFileManagerTask;
+            await _localFileManagerTask.ConfigureAwait(false);
             _cancellation.Dispose();
 
             try
@@ -177,5 +220,7 @@ internal sealed class LocalFileManager : ILocalFileManager
         public Uri Uri { get; init; }
 
         public Action? OnCompleted { get; init; }
+
+        public CancellationToken CancellationToken { get; init; }
     }
 }
