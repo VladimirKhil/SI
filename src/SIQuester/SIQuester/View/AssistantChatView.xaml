@@ -1,0 +1,361 @@
+<UserControl
+    x:Class="SIQuester.AssistantChatView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:vmp="clr-namespace:SIQuester.ViewModel.Properties;assembly=SIQuester.ViewModel"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
+    xmlns:siqcv="clr-namespace:SIQuester.Converters"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=vm:AssistantChatViewModel}"
+    HorizontalAlignment="Right"
+    VerticalAlignment="Bottom"
+    Margin="0,0,28,24"
+    FontFamily="Segoe UI Variable Text, Segoe UI">
+
+    <UserControl.Resources>
+
+        <!-- Chat colors for the light and dark themes -->
+        <siqcv:ThemeToColorConverter x:Key="ChatAccentColor" LightColor="#FF0F6CBD" DarkColor="#FF4CA0E0" />
+        <siqcv:ThemeToColorConverter x:Key="ChatAccentHoverColor" LightColor="#FF115EA3" DarkColor="#FF62ABE6" />
+        <siqcv:ThemeToColorConverter x:Key="ChatCardColor" LightColor="#FFFFFFFF" DarkColor="#FF2B2B2B" />
+        <siqcv:ThemeToColorConverter x:Key="ChatCardStrokeColor" LightColor="#14000000" DarkColor="#1FFFFFFF" />
+        <siqcv:ThemeToColorConverter x:Key="ChatBubbleColor" LightColor="#FFF2F3F5" DarkColor="#FF383838" />
+        <siqcv:ThemeToColorConverter x:Key="ChatInputColor" LightColor="#FFFFFFFF" DarkColor="#FF1F1F1F" />
+        <siqcv:ThemeToColorConverter x:Key="ChatDividerColor" LightColor="#22000000" DarkColor="#26FFFFFF" />
+        <siqcv:ThemeToColorConverter x:Key="ChatHoverColor" LightColor="#14000000" DarkColor="#1AFFFFFF" />
+        <siqcv:ThemeToColorConverter x:Key="ChatMutedColor" LightColor="#FF6B6B6B" DarkColor="#FFA8A8A8" />
+        <siqcv:ThemeToColorConverter x:Key="ChatPanelColor" LightColor="#FFFFFFFF" DarkColor="#FF2D2D2D" />
+        <siqcv:ThemeToColorConverter x:Key="ChatTextColor" LightColor="#FF1E1E1E" DarkColor="#FFF0F0F0" />
+
+        <SolidColorBrush x:Key="Ui.Accent" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatAccentColor}}" />
+        <SolidColorBrush x:Key="Ui.AccentHover" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatAccentHoverColor}}" />
+        <SolidColorBrush x:Key="Ui.Card" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatCardColor}}" />
+        <SolidColorBrush x:Key="Ui.CardStroke" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatCardStrokeColor}}" />
+        <SolidColorBrush x:Key="Ui.ChatBubble" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatBubbleColor}}" />
+        <SolidColorBrush x:Key="Ui.ChatInput" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatInputColor}}" />
+        <SolidColorBrush x:Key="Ui.Divider" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatDividerColor}}" />
+        <SolidColorBrush x:Key="Ui.Hover" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatHoverColor}}" />
+        <SolidColorBrush x:Key="Ui.Muted" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatMutedColor}}" />
+        <SolidColorBrush x:Key="Ui.Panel" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatPanelColor}}" />
+        <SolidColorBrush x:Key="Ui.Text" Color="{Binding Theme, Source={x:Static m:AppSettings.Default}, Converter={StaticResource ChatTextColor}}" />
+
+        <Style x:Key="Glyph" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!-- Flat round icon button with soft hover -->
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Foreground" Value="{DynamicResource Ui.Muted}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" CornerRadius="6" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Ui.Hover}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Read-only selectable text inside a chat bubble -->
+        <Style x:Key="BubbleText" TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="False" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="MessageTemplate" DataType="{x:Type vm:ChatMessageViewModel}">
+            <Border
+                x:Name="Bubble"
+                Margin="0,4"
+                Padding="12,8"
+                MaxWidth="320"
+                HorizontalAlignment="Left"
+                CornerRadius="12,12,12,4"
+                Background="{DynamicResource Ui.ChatBubble}">
+                <Grid>
+                    <TextBox x:Name="Text" Style="{StaticResource BubbleText}" Text="{Binding Text, Mode=OneWay}" Foreground="{DynamicResource Ui.Text}" />
+
+                    <!-- "Typing" dots while the answer has not started yet -->
+                    <TextBlock
+                        x:Name="Typing"
+                        Text="{x:Static vmp:Resources.ChatThinking}"
+                        FontStyle="Italic"
+                        Foreground="{DynamicResource Ui.Muted}"
+                        Visibility="Collapsed" />
+                </Grid>
+            </Border>
+
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsUser}" Value="True">
+                    <Setter TargetName="Bubble" Property="HorizontalAlignment" Value="Right" />
+                    <Setter TargetName="Bubble" Property="CornerRadius" Value="12,12,4,12" />
+                    <Setter TargetName="Bubble" Property="Background" Value="{DynamicResource Ui.Accent}" />
+                    <Setter TargetName="Text" Property="Foreground" Value="White" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding IsError}" Value="True">
+                    <Setter TargetName="Bubble" Property="Background" Value="#FFFDE7E9" />
+                    <Setter TargetName="Text" Property="Foreground" Value="#FFA4262C" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding Text}" Value="">
+                    <Setter TargetName="Typing" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="Text" Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+
+                <!-- New messages slide in -->
+                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="Bubble" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <!-- Chat panel -->
+        <Grid x:Name="Panel" Width="420" Height="580" Margin="0,0,0,12" RenderTransformOrigin="1,1">
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="PanelOffset" />
+            </Grid.RenderTransform>
+
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2" />
+                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.Y" From="16" To="0" Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <!-- Shadow layer (kept separate so text is not blurred) -->
+            <Border CornerRadius="12" Background="{DynamicResource Ui.Panel}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="24" ShadowDepth="4" Direction="270" Opacity="0.22" />
+                </Border.Effect>
+            </Border>
+
+            <Border CornerRadius="12" Background="{DynamicResource Ui.Panel}" BorderBrush="{DynamicResource Ui.CardStroke}" BorderThickness="1">
+                <DockPanel>
+                    <!-- Header -->
+                    <Border DockPanel.Dock="Top" Padding="14,10,8,10" BorderBrush="{DynamicResource Ui.CardStroke}" BorderThickness="0,0,0,1">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Command="{Binding Toggle}" ToolTip="{x:Static vmp:Resources.ChatCollapse}">
+                                <TextBlock Style="{StaticResource Glyph}" Text="&#xE921;" FontSize="12" />
+                            </Button>
+
+                            <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Command="{Binding Clear}" ToolTip="{x:Static vmp:Resources.ChatNew}">
+                                <TextBlock Style="{StaticResource Glyph}" Text="&#xE74D;" FontSize="14" />
+                            </Button>
+
+                            <Border Width="30" Height="30" CornerRadius="15" Background="{DynamicResource Ui.Accent}" Margin="0,0,10,0">
+                                <TextBlock Style="{StaticResource Glyph}" Text="&#xE8BD;" Foreground="White" FontSize="14" />
+                            </Border>
+
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock FontWeight="SemiBold" FontSize="15" Foreground="{DynamicResource Ui.Text}"><Run Text="{Binding AssistantName, Mode=OneWay}" /><Run Text="{x:Static vmp:Resources.ChatTitleTail}" /></TextBlock>
+                                <TextBlock Text="{Binding AssistantSubtitle}" TextTrimming="CharacterEllipsis" FontSize="11.5" Foreground="{DynamicResource Ui.Muted}" />
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Input -->
+                    <Border DockPanel.Dock="Bottom" Padding="10" BorderBrush="{DynamicResource Ui.CardStroke}" BorderThickness="0,1,0,0">
+                        <Border CornerRadius="10" BorderBrush="{DynamicResource Ui.Divider}" BorderThickness="1" Background="{DynamicResource Ui.ChatInput}" Padding="10,6,6,6">
+                            <DockPanel>
+                                <Button
+                                    x:Name="SendButton"
+                                    DockPanel.Dock="Right"
+                                    VerticalAlignment="Bottom"
+                                    Style="{StaticResource IconButton}"
+                                    Command="{Binding Send}"
+                                    ToolTip="{x:Static vmp:Resources.ChatSend}">
+                                    <TextBlock Style="{StaticResource Glyph}" Text="&#xE724;" FontSize="15" Foreground="{DynamicResource Ui.Accent}" />
+                                </Button>
+
+                                <Button
+                                    DockPanel.Dock="Right"
+                                    VerticalAlignment="Bottom"
+                                    Style="{StaticResource IconButton}"
+                                    Command="{Binding Stop}"
+                                    ToolTip="{x:Static vmp:Resources.ChatStop}"
+                                    Visibility="{Binding IsBusy, Converter={StaticResource VisibilityConverter}}">
+                                    <TextBlock Style="{StaticResource Glyph}" Text="&#xE71A;" FontSize="13" Foreground="#FFC42B1C" />
+                                </Button>
+
+                                <Grid>
+                                    <TextBox
+                                        x:Name="InputBox"
+                                        Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}"
+                                        AcceptsReturn="True"
+                                        TextWrapping="Wrap"
+                                        MaxHeight="120"
+                                        VerticalScrollBarVisibility="Auto"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        FontSize="14"
+                                        VerticalContentAlignment="Center"
+                                        Padding="0"
+                                        PreviewKeyDown="InputBox_PreviewKeyDown">
+                                        <TextBox.Template>
+                                            <ControlTemplate TargetType="TextBox">
+                                                <ScrollViewer x:Name="PART_ContentHost" Focusable="False" />
+                                            </ControlTemplate>
+                                        </TextBox.Template>
+                                    </TextBox>
+
+                                    <TextBlock
+                                        Text="{x:Static vmp:Resources.ChatPlaceholder}"
+                                        Foreground="#FF9A9A9A"
+                                        FontSize="14"
+                                        IsHitTestVisible="False"
+                                        Margin="2,0,0,0"
+                                        VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=InputBox}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </DockPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Messages -->
+                    <Grid>
+                        <ScrollViewer x:Name="MessagesScroll" VerticalScrollBarVisibility="Auto" Padding="12,8">
+                            <ItemsControl ItemsSource="{Binding Messages}" ItemTemplate="{StaticResource MessageTemplate}" />
+                        </ScrollViewer>
+
+                        <!-- Empty state with example requests -->
+                        <StackPanel VerticalAlignment="Center" Margin="28,0" IsHitTestVisible="False">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Messages.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{x:Static vmp:Resources.ChatEmptyTitle}" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="{DynamicResource Ui.Text}" />
+                            <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource Ui.Muted}" FontSize="13"
+                                       Text="{x:Static vmp:Resources.ChatEmptyHint}" />
+                        </StackPanel>
+                    </Grid>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <!-- Floating button with a small "hide" cross in its corner -->
+        <Grid HorizontalAlignment="Right">
+        <Button Margin="0,8,8,0" Command="{Binding Toggle}" ToolTip="{x:Static vmp:Resources.ChatButton}" Cursor="Hand" FocusVisualStyle="{x:Null}">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Bg" Height="48" CornerRadius="24" Background="{DynamicResource Ui.Accent}" Padding="16,0,20,0">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="14" ShadowDepth="3" Direction="270" Opacity="0.3" />
+                            </Border.Effect>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" Margin="16,0,20,0" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource Glyph}" Text="&#xE8BD;" Foreground="White" FontSize="17" Margin="0,0,10,0" />
+                            <TextBlock Text="{Binding AssistantName}" Foreground="White" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Ui.AccentHover}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+
+        <Button
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Click="Hide_Click"
+            ToolTip="{x:Static vmp:Resources.ChatHide}"
+            Cursor="Hand"
+            Focusable="False">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="Bg"
+                        Width="20"
+                        Height="20"
+                        CornerRadius="10"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource Ui.CardStroke}"
+                        Background="{DynamicResource Ui.Card}">
+                        <TextBlock
+                            Style="{StaticResource Glyph}"
+                            Text="&#xE711;"
+                            FontSize="9"
+                            Foreground="{DynamicResource Ui.Text}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Ui.Hover}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        </Grid>
+    </StackPanel>
+</UserControl>

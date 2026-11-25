@@ -497,9 +497,16 @@
         </metro:WindowCommands>
     </metro:MetroWindow.RightWindowCommands>
     
-    <TabControl
-        Name="tabControl1" 
-        SelectionChanged="TabControl1_SelectionChanged"
-        Style="{StaticResource TabControlStyle1}"
-        ItemContainerStyle="{StaticResource TabItemStyle1}" />    
+    <Grid>
+        <TabControl
+            Name="tabControl1"
+            SelectionChanged="TabControl1_SelectionChanged"
+            Style="{StaticResource TabControlStyle1}"
+            ItemContainerStyle="{StaticResource TabItemStyle1}" />
+
+        <!-- AI assistant: floating chat in the bottom-right corner (off by default) -->
+        <siq:AssistantChatView
+            DataContext="{Binding Assistant}"
+            Visibility="{Binding ShowAssistant, Source={x:Static m:AppSettings.Default}, Converter={StaticResource VisibilityConverter}}" />
+    </Grid>
 </metro:MetroWindow>
