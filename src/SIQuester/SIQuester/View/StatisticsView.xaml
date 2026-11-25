@@ -53,6 +53,58 @@
 
         <ScrollViewer Margin="0,5" Padding="0,0,3,0">
             <StackPanel>
+                <!-- Package totals: big numbers instead of the first text lines -->
+                <UniformGrid Columns="3" Margin="0,0,0,5">
+                    <UniformGrid.Resources>
+                        <Style x:Key="Tile" TargetType="Border">
+                            <Setter Property="BorderBrush" Value="Gray" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="CornerRadius" Value="4" />
+                            <Setter Property="Margin" Value="0,0,5,0" />
+                            <Setter Property="Padding" Value="5,3" />
+                        </Style>
+
+                        <Style x:Key="TileNumber" TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="22" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                        </Style>
+
+                        <Style x:Key="TileLabel" TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="Foreground" Value="Gray" />
+                        </Style>
+                    </UniformGrid.Resources>
+
+                    <Border Style="{StaticResource Tile}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource TileNumber}" Text="{Binding RoundCount}" />
+                            <TextBlock Style="{StaticResource TileLabel}" Text="{x:Static lp:Resources.StatisticsRounds}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Tile}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource TileNumber}" Text="{Binding ThemeCount}" />
+                            <TextBlock Style="{StaticResource TileLabel}" Text="{x:Static lp:Resources.StatisticsThemes}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Tile}" Margin="0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource TileNumber}" Text="{Binding QuestionCount}" />
+                            <TextBlock Style="{StaticResource TileLabel}" Text="{x:Static lp:Resources.Questions}" />
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <TextBlock
+                    Text="{x:Static lp:Resources.StatisticsNoWarnings}"
+                    Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                    Margin="5"
+                    Visibility="{Binding HasNoWarnings, Converter={StaticResource VisibilityConverter}}" />
+
                 <ItemsControl ItemsSource="{Binding Warnings}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -83,7 +135,7 @@
                     Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                     Padding="3,3,0,0"
                     Margin="0,5,0,0"
-                    Text="{Binding Result}"
+                    Text="{Binding Details, Mode=OneWay}"
                     IsReadOnly="True"
                     TextWrapping="Wrap" />
             </StackPanel>
