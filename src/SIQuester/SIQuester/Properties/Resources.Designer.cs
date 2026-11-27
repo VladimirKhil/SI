@@ -2785,6 +2785,17 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Round type: how the round is played.
+        ///Table: a board of themes and prices; players pick questions and press the button (usually 5 questions per theme).
+        ///Theme list: players remove themes in turn; on the last one everyone bets and writes an answer (1 question per theme)..
+        /// </summary>
+        public static string RoundTypeHint {
+            get {
+                return ResourceManager.GetString("RoundTypeHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Round Types.
         /// </summary>
         public static string RoundTypesHeader {
