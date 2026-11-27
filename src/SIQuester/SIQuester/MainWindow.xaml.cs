@@ -177,6 +177,12 @@ public partial class MainWindow : MetroWindow
 
     private void Main_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (TryUndoRedoDocument(e))
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (DataContext is MainViewModel mainViewModel && e.Key == Key.Insert)
         {
             var cmd = (e.KeyboardDevice.Modifiers & ModifierKeys.Shift) > 0 ?
@@ -189,6 +195,63 @@ public partial class MainWindow : MetroWindow
                 e.Handled = true;
             }
         }
+    }
+
+    /// <summary>
+    /// Ctrl+Z / Ctrl+Y (Ctrl+Shift+Z) undo and redo document changes, as the toolbar buttons do,
+    /// even when a text box has focus. Otherwise the text box would run its own text undo, which
+    /// writes the text back to the package as one more change and gets out of step with the document history.
+    /// </summary>
+    /// <returns><c>true</c> if the key was handled.</returns>
+    private bool TryUndoRedoDocument(KeyEventArgs e)
+    {
+        if ((e.KeyboardDevice.Modifiers & ModifierKeys.Control) == 0 || e.Key is not (Key.Z or Key.Y))
+        {
+            return false;
+        }
+
+        // Without an open package (or on another tab: import, search) ActiveDocument is null
+        if (DataContext is not MainViewModel mainViewModel || mainViewModel.ActiveDocument is not QDocument document)
+        {
+            return false;
+        }
+
+        var focusedBox = Keyboard.FocusedElement as TextBox;
+
+        // Fields that are not part of the package (document search, side panel filter) are bound
+        // to the workspace itself: they keep their own text undo
+        if (focusedBox?.DataContext is WorkspaceViewModel)
+        {
+            return false;
+        }
+
+        // A field that is saved on focus loss may still hold typed text that is not in the package:
+        // save it first, so that Ctrl+Z undoes exactly this typing
+        if (focusedBox != null && !focusedBox.IsReadOnly)
+        {
+            var binding = focusedBox.TemplatedParent is ComboBox comboBox
+                ? comboBox.GetBindingExpression(ComboBox.TextProperty)
+                : focusedBox.GetBindingExpression(TextBox.TextProperty);
+
+            try
+            {
+                binding?.UpdateSource();
+            }
+            catch (InvalidOperationException)
+            {
+                // One-way binding: nothing to save
+            }
+        }
+
+        var isRedo = e.Key == Key.Y || (e.KeyboardDevice.Modifiers & ModifierKeys.Shift) != 0;
+        var command = isRedo ? document.OperationsManager.Redo : document.OperationsManager.Undo;
+
+        if (command.CanExecute(null))
+        {
+            command.Execute(null);
+        }
+
+        return true;
     }
 
     // Prevents some weird WPF automation issues (totally disables automation)
