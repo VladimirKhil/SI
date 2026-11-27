@@ -1502,6 +1502,33 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Larger text (Ctrl++, Ctrl+mouse wheel).
+        /// </summary>
+        public static string FontBigger {
+            get {
+                return ResourceManager.GetString("FontBigger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text size. Click to restore the default (Ctrl+0).
+        /// </summary>
+        public static string FontReset {
+            get {
+                return ResourceManager.GetString("FontReset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Smaller text (Ctrl+−, Ctrl+mouse wheel).
+        /// </summary>
+        public static string FontSmaller {
+            get {
+                return ResourceManager.GetString("FontSmaller", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Format.
         /// </summary>
         public static string Format {
