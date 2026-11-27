@@ -46,7 +46,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     /// </summary>
     public const string SiqExtension = "siq";
 
-    private const string DefaultFontFamily = "Calibri";
+    private const string DefaultFontFamily = "Segoe UI Variable Text";
 
     private const int DefaultSelectOptionCount = 4;
     private const bool DefaultUseImageDuration = false;
@@ -398,9 +398,9 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
-    private int _fontSize = 15;
+    private int _fontSize = 16;
 
-    [DefaultValue(15)]
+    [DefaultValue(16)]
     public int FontSize
     {
         get => _fontSize;
@@ -425,6 +425,25 @@ public sealed class AppSettings : INotifyPropertyChanged
             if (_fontFamily != value && value != null) // null could be provided by the WPF binding
             {
                 _fontFamily = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _modernFontApplied;
+
+    /// <summary>
+    /// The one-time move from the old default font (Calibri 15) to Segoe UI Variable Text 16 is done.
+    /// </summary>
+    [DefaultValue(false)]
+    public bool ModernFontApplied
+    {
+        get => _modernFontApplied;
+        set
+        {
+            if (_modernFontApplied != value)
+            {
+                _modernFontApplied = value;
                 OnPropertyChanged();
             }
         }
