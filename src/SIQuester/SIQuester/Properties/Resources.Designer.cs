@@ -2587,6 +2587,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove authors.
+        /// </summary>
+        public static string RemoveAuthors {
+            get {
+                return ResourceManager.GetString("RemoveAuthors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove comment.
         /// </summary>
         public static string RemoveComment {
@@ -2646,6 +2655,15 @@ namespace SIQuester.Properties {
         public static string RemoveRound {
             get {
                 return ResourceManager.GetString("RemoveRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove sources.
+        /// </summary>
+        public static string RemoveSources {
+            get {
+                return ResourceManager.GetString("RemoveSources", resourceCulture);
             }
         }
         

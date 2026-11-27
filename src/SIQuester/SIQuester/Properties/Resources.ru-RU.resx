@@ -1430,4 +1430,10 @@
   <data name="ThemeFillToolTip" xml:space="preserve">
     <value>Заполнено вопросов / вопросов с правильным ответом</value>
   </data>
+  <data name="RemoveAuthors" xml:space="preserve">
+    <value>Удалить авторов</value>
+  </data>
+  <data name="RemoveSources" xml:space="preserve">
+    <value>Удалить источники</value>
+  </data>
 </root>
