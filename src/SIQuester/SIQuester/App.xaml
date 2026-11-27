@@ -2324,7 +2324,8 @@
                                 <TextBox
                                     Style="{StaticResource LightTextBox}"
                                     MinWidth="90"
-                                    Text="{Binding Model.ContactUri}" />
+                                    Text="{Binding Model.ContactUri}"
+                                    lb:Placeholder.Text="{x:Static lp:Resources.ContactUriHint}" />
                             </DockPanel>
                         </DataTemplate>
                     </Setter.Value>
